@@ -1,0 +1,52 @@
+server:
+    port: 8082
+
+# 配置mybatis 之前手动配置：1.配置数据源  2.配置SqlSessionFactoryBean:引入Mybatis核心配置文件 3.扫描mapper包
+# springboot整合mybatis 1.配置数据源 2.配置mybatis的核心信息  3.扫描mapper
+
+spring:
+    # 配置数据源
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/myproject?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
+        username: root
+        password: 123456?
+        druid:
+            min-idle: 3
+            max-active: 15
+    mvc:
+        pathmatch:
+            matching-strategy: ANT_PATH_MATCHER
+# 配置mybatis
+mybatis:
+    mapper-locations: classpath:mapper/*.xml #配置读取映射配置文件的路径
+    type-handlers-package: com.bjpowernode.springboot28mybatis.domain # 读取指定包中的所有类并取别名
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
+
+swagger3:
+    base-package: com.web.app.controller # 设置swagger扫描的controller所在的包
+    name: PH # 设置作者的名称
+    url: https://xxx.xxx.com #设置作者的主页地址
+    email: 1234567890@qq.com # 设置联系作者的邮箱
+    version: 1.0 # 设置项目的版本
+    group-name: PH使用 # 设置组织名称
+    title: '生产服务环境' # 设置文档的标题
+    description: 'swagger文档' # 设置文档的介绍
+    terms-of-service-url: https://xxx.xxx.com # 设置组织的主页地址
+    license: XXX # 设置许可证
+    license-url: https://xxx.xxx.com # 设置许可证的访问地址
+
+logging:
+    config: classpath:log4j2-prod.xml
+
+file:
+    # 静态资源对外暴露的访问路径
+    # file.staticAccessPath=/api/file/**
+    staticAccessPath: /file/**
+    # 文件上传目录（注意Linux和Windows上的目录结构不同）
+    # file.uploadFolder=/home/uploads/
+    # file.uploadFolder=d://uploads/
+    uploadFolder: /home/uploads/
+    downloadFolder: /home/downloads/

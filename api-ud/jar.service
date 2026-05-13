@@ -1,0 +1,21 @@
+[Unit]
+Description=java project Service
+After=network.target
+ 
+[Service]
+# Type=forking #是后台运行的形式
+# simple（默认值）：ExecStart启动的进程为主进程
+
+ExecStart=/usr/java/jdk1.8/bin/java -jar /home/creater/sbApi/target/pay.jar  --spring.profiles.active=prod
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+# ------------------------------
+# 启动服务: systemctl start jar
+# 重启服务: systemctl restart jar
+# 关闭服务: systemctl stop jar
+# 查看状态: systemctl status jar

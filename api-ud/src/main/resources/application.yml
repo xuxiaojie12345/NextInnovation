@@ -1,0 +1,6 @@
+# linux生产环境中, jar.service里已经指定了--spring.profiles.active=prod
+# 所以无需修改此处, 直接打包即可
+# 这样就实现了,开发时是dev, 发布时是prod
+spring:
+    profiles:
+        active: dev
