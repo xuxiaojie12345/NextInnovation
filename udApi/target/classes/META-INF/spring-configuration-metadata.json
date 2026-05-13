@@ -1,0 +1,67 @@
+{
+  "groups": [
+    {
+      "name": "swagger3",
+      "type": "com.web.app.config.SwaggerProperties",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "swagger3.base-package",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.description",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.email",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.group-name",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.license",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.license-url",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.name",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.termsof-service-url",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.title",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.url",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    },
+    {
+      "name": "swagger3.version",
+      "type": "java.lang.String",
+      "sourceType": "com.web.app.config.SwaggerProperties"
+    }
+  ],
+  "hints": []
+}
