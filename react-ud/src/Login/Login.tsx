@@ -74,7 +74,7 @@ const Login: React.FC = () => {
       if (result.success) {
         // 认证成功：跳转或保存 Token
         // alert("Login Successful!");
-        navigate("/TestMain");
+        navigate("/Menu");
       } else {
         // 认证失败：显示指定错误信息
         setMessage(
