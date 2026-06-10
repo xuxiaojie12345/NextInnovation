@@ -26,7 +26,7 @@
                 1.不设置默认为: %m%n
                 2.disableAnsi="false" noConsoleNoAnsi="false" 配置开启支持%highlight彩色日志
             -->
-            <PatternLayout charset="GBK" pattern="${PATTERN_CONSOLE}" disableAnsi="false" noConsoleNoAnsi="false"/>
+            <PatternLayout charset="UTF-8" pattern="${PATTERN_CONSOLE}" disableAnsi="false" noConsoleNoAnsi="false"/>
             <!--只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
             <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
         </Console>

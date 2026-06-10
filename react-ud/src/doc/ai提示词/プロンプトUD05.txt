@@ -1,0 +1,243 @@
+请根据以下要求生成[Modify Document]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Modify Document]-001
+   模块名称:[Modify Document]
+   作成日:2026-05-21
+
+## 2. 背景 (Background)
+本模块用于展示和修改VIN Plate模板中的变量值，支持用户查看当前值并输入修改后的值。
+
+**核心功能和目标**：
+- 展示从前画面传递的Chassis no和Market信息
+- 展示Template文件链接，用户可点击下载模板文件
+- 以表格形式展示所有可修改变量（Variable、Description、Current value、Modified value）
+- Current value根据HDOC_ADCA_MODIFICATION表或HDOC_REC_DATA_KOLA_VARIANT表动态获取
+- Modified value允许用户输入修改值（最大长度500）
+- Save按钮保存所有修改内容到HDOC_ADCA_MODIFICATION表
+- Chassis no链接可查看该Chassis的详细信息
+
+**面向的用户群体**：系统管理员、生产准备人员及质量审核人员
+
+**用户体验方面的考虑**：界面清晰易读、变量列表完整、修改操作便捷、错误提示明确
+
+**安全性或特殊要求**：仅允许授权用户执行修改操作，所有变更需记录日志；必须至少有一个Modified value字段有值才能保存
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | chassis no | label | - | - | Output | - | 左 | - | - | 数据来源：前画面传递的chassis no；显示当前处理的Chassis编号，可点击链接查看详情 |
+| 2   | Market | label | - | - | Output | - | 左 | - | - | 数据来源：前画面传递的Market；显示当前市场代码 |
+| 3   | Templateファイル | link | - | - | Output | - | 左 | - | 活性 | 数据来源：Template文件的Template名；点击可下载对应的VIN Plate模板文件 |
+| 4   | Variable | DataTable列 | - | - | Output | - | 左 | - | - | 数据来源：Template文件的Template項目；显示变量名（如VIN、VIN_TEXT2等） |
+| 5   | Description | DataTable列 | - | - | Output | - | 左 | - | - | 数据来源：HDOC_VARIABLES.DESCRIPTION；显示变量的描述信息 |
+| 6   | Current value | DataTable列 | - | - | Output | - | 左 | - | - | 数据来源：若HDOC_ADCA_MODIFICATION中存在则取NEWVAL，否则从HDOC_REC_DATA_KOLA_VARIANT.SYMBOL获取；显示当前值 |
+| 7   | Modified value | DataTable列 | - | 500 | Input | - | 左 | 空 | 活性 | 数据来源：HDOC_ADCA_MODIFICATION.NEWVAL；若不存在则为空；用户可输入修改值，最大长度500 |
+| 8   | Save | button | - | - | Action | - | 中 | - | 活性 | 点击后保存所有Modified value字段的修改内容到HDOC_ADCA_MODIFICATION表 |
+
+**控件类型说明**：
+- Output控件：Label（chassis no、Market）、Link（Templateファイル）、DataTable列（Variable、Description、Current value）
+- Input控件：DataTable列（Modified value）
+- Action控件：Button（Save）
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 初始显示
+**功能说明**：加载Modify Document画面，展示Chassis no、Market、Template链接及变量列表。
+
+**操作步骤**：
+1. 页面加载时自动调用UD05ModifyDocumentApi获取数据
+2. 展示从前画面传递的Chassis no和Market信息
+3. 展示Template文件链接（如aus/UD_TEST.odt）
+4. 从Template文件解析所有变量列表
+5. 对每个变量：
+   - 从HDOC_VARIABLES表获取Description
+   - 检查HDOC_ADCA_MODIFICATION表中是否存在该变量的修改记录
+   - 若存在：Current value显示NEWVAL
+   - 若不存在：显示为空白
+6. 以表格形式展示所有变量及其信息
+
+### 4.2 修改变量值功能
+**功能说明**：用户在Modified value列中输入需要修改的值。
+
+**操作步骤**：
+1. 用户在任意一个或多个Modified value输入框中输入新值
+2. 输入值最大长度为500字符
+3. 系统实时验证输入长度，超过500字符时截断或提示错误
+4. 用户可以随时修改已输入的值
+
+### 4.3 保存功能（Save）
+**功能说明**：保存所有Modified value字段的修改内容到HDOC_ADCA_MODIFICATION表。
+
+**操作步骤**：
+1. 用户点击「Save」按钮
+2. 系统校验是否至少有一个Modified value字段有输入值：
+   - 若所有Modified value字段均为空：
+     - 设置Message = "NO UNRELEASED VERSION EXISTS!"
+     - 终止流程
+   - 若至少有一个Modified value字段有值：
+     - 调用API将所有有值的Modified field保存到HDOC_ADCA_MODIFICATION表
+     - 记录UPDATE_DATETIME、UPDATE_USER、UPDATE_PROCESS
+3. 成功后显示提示："修改保存成功"
+4. 失败则显示错误消息："保存失败，请联系管理员"
+
+### 4.4 Template文件下载功能
+**功能说明**：点击Template文件链接下载对应的VIN Plate模板文件。
+
+**操作步骤**：
+1. 用户点击Template文件链接（如aus/UD_TEST.odt）
+2. 系统从文件系统读取对应的模板文件
+3. 将文件作为附件发送给浏览器进行下载
+
+### 4.5 Chassis no详情查看功能
+**功能说明**：点击Chassis no链接查看该Chassis的详细信息。
+
+**操作步骤**：
+1. 用户点击Chassis no链接（如JPCT 028321）
+2. 系统跳转到VDA - Vehicle Specification画面，展示该Chassis的详细信息
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+**开始**：页面加载触发
+
+**前置处理**：
+- 获取前画面传递的Chassis no和Market参数
+- 调用UD05ModifyDocumentApi加载所有相关数据
+
+**数据加载逻辑**：
+- 从Template文件解析所有变量列表
+- 对每个变量：
+  - 查询HDOC_VARIABLES表获取Description
+  - 查询HDOC_ADCA_MODIFICATION表检查是否存在修改记录
+  - 若存在：Current value = NEWVAL
+  - 若不存在：Current value 显示为空白
+**保存处理（Save）**：
+- 用户点击Save按钮
+- 校验是否至少有一个Modified value字段有值
+- 若全部为空，报错"NO UNRELEASED VERSION EXISTS!"
+- 若有值，调用API保存到HDOC_ADCA_MODIFICATION表
+
+**空值校验等 (Frontend Check)**：
+- 若执行Save时所有Modified value字段均为空：
+  - 设置Message = "NO UNRELEASED VERSION EXISTS!"
+  - 终止流程
+
+**API调用 (Backend Check)**：
+- 调用 `UD05ModifyDocumentApi` 接口执行数据查询和保存操作
+
+### 5.2 结果处理
+- **成功**：正常渲染变量列表或显示保存成功消息
+- **失败**：显示对应错误消息
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | Save操作 | Modified value | 所有字段均为空 | "NO UNRELEASED VERSION EXISTS!" | 显示错误消息 |
+| 2 | Save操作 | Modified value | 输入长度超过500 | "输入值长度不能超过500字符" | 截断或提示错误 |
+
+## 6. 接口定义 (API Specification)
+
+### UD05ModifyDocumentApi
+
+#### 6.1 查询接口
+- **功能**：提供Modify Document页面的数据查询和保存接口
+- **Method**：GET/POST
+- **Endpoint**：/api/UD05/modifyDocumentUnit
+
+**Request [请求格式]**：
+```json
+{
+  "chassisNo": "JPCT 028321",
+  "market": "AUS"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": [
+    {
+    "DESCRIPTION": "xxx",
+    "NEWVAL": "xxx"
+  },
+  {
+    "DESCRIPTION": "xxx",
+    "NEWVAL": "xxx"
+  }
+ ]
+}```
+
+#### 6.2 保存接口
+功能：提供Modify Document页面的数据查询和保存接口。
+Method: POST
+Endpoint: /api/UD05/modifyDocumentSave
+
+**Request [请求格式]**：
+```json
+{
+  "action": "save",
+  "chassisNo": "JPCT 028321",
+  "market": "AUS",
+  "modifications": [
+    {
+      "variable": "VIN_TEXT3",
+      "newValue": "MODIFIED_VALUE_1"
+    },
+    {
+      "variable": "UD_GCM",
+      "newValue": "35000"
+    }
+  ]
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "修改保存成功"
+}
+```
+
+**Response Error (400)**：
+```json
+{
+  "error": "Validation failed",
+  "message": "NO UNRELEASED VERSION EXISTS!"
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "error": "Internal Server Error",
+  "message": "Failed to save modifications"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 所有Modified value为空 | 显示错误消息 | "NO UNRELEASED VERSION EXISTS!" |
+| Modified value长度超过500 | 截断或提示错误 | "输入值长度不能超过500字符" |
+| Template文件不存在 | 显示通用错误 | "模板文件不存在，请联系管理员" |
+| API调用失败 | 显示通用错误 | "保存失败，请联系管理员" |
+| 数据库操作异常 | 显示通用错误 | "系统内部错误，请联系管理员" |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Modify Document]_詳細設計.md
+  保存到：当前文件夹下的work目录

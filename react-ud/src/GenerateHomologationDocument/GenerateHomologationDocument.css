@@ -1,0 +1,235 @@
+/* GenerateHomologationDocument.css */
+
+.ghd-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+/* 标题区域 */
+.ghd-header {
+  margin-bottom: 20px;
+}
+
+.ghd-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 10px 0;
+  font-family: Arial, sans-serif;
+}
+
+.ghd-error-label {
+  font-size: 16px;
+  color: #ff0000; /* 红色 */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 主内容区域 - 带边框的容器 */
+.ghd-main-content {
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  background-color: #ffffff;
+  padding: 30px;
+  margin-bottom: 20px;
+  min-height: 350px;
+}
+
+.ghd-form {
+  width: 100%;
+}
+
+/* 输入框组 */
+.ghd-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.ghd-label {
+  width: 180px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  flex-shrink: 0;
+}
+
+.ghd-input-field {
+  width: 280px;
+  height: 36px;
+  padding: 6px 10px;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+.ghd-input-field:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+.ghd-select-field {
+  width: 280px;
+  height: 36px;
+  padding: 6px 10px;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.ghd-select-field:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+/* 错误信息显示区域 */
+.ghd-error-message {
+  margin-top: 20px;
+  padding: 12px 18px;
+  background-color: #fff5f5;
+  border-left: 4px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+}
+
+/* 底部按钮区域 */
+.ghd-footer {
+  display: flex;
+  gap: 15px;
+  padding: 15px 0;
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  border-top: 1px solid #b4c7dc;
+  border-bottom: 1px solid #b4c7dc;
+}
+
+.ghd-button {
+  height: 38px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #8fa4d9;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ghd-submit-btn {
+  background-color: #d0d8f0;
+  color: #000000;
+}
+
+.ghd-submit-btn:hover:not(:disabled) {
+  background-color: #b8c4e8;
+  border-color: #6b8bc7;
+}
+
+.ghd-reset-btn {
+  background-color: #d0d8f0;
+  color: #000000;
+}
+
+.ghd-reset-btn:hover:not(:disabled) {
+  background-color: #b8c4e8;
+  border-color: #6b8bc7;
+}
+
+.ghd-help-btn {
+  background-color: #d0d8f0;
+  color: #000000;
+  margin-left: 120px;
+}
+
+.ghd-help-btn:hover:not(:disabled) {
+  background-color: #b8c4e8;
+  border-color: #6b8bc7;
+}
+
+.ghd-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 支持邮箱信息 */
+.ghd-support-info {
+  margin-top: 25px;
+  padding: 15px 0;
+}
+
+.ghd-support-info p {
+  font-size: 18px;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ghd-container {
+    padding: 20px;
+  }
+
+  .ghd-title {
+    font-size: 20px;
+  }
+
+  .ghd-error-label {
+    font-size: 14px;
+  }
+
+  .ghd-main-content {
+    padding: 20px;
+  }
+
+  .ghd-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ghd-label {
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .ghd-input-field,
+  .ghd-select-field {
+    width: 100%;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .ghd-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ghd-button {
+    height: 36px;
+    font-size: 14px;
+    padding: 0 15px;
+  }
+
+  .ghd-help-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .ghd-error-message {
+    font-size: 16px;
+  }
+
+  .ghd-support-info p {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,417 @@
+请根据以下要求生成[AD Change]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[AD Change]-001
+   模块名称:[AD Change]
+   作成日:2026-05-25
+
+---
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于管理ADCA（Advanced Data Change Authorization）变更信息的维护。用户可以添加、删除和检查AD Change记录，包括Serie-Chnr（系列编号）和Desc（描述信息）。该功能主要用于系统配置和数据变更管理，确保AD Change信息的准确性和完整性。
+
+### 面向的用户群体
+- 具有系统配置权限的管理员
+- 负责数据变更管理的业务人员
+- 需要维护AD Change记录的授权用户
+
+### 用户体验方面的考虑
+- 界面简洁直观，提供清晰的输入框和操作按钮
+- 支持快速添加、删除和检查操作
+- 提供明确的错误提示和警告消息
+- 所有操作均有即时反馈
+
+### 安全性或特殊要求
+- 需要对HDOC_ADCA_CHANGE表进行CRUD操作
+- ADD操作前需检查是否存在未激活的记录
+- DELETE操作需谨慎处理，避免误删重要数据
+- CHECK操作用于验证记录状态
+
+---
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Serie-Chnr | TextField | - | 15 | Input | 字母、数字、连字符 | 左 | 空 | 活性 | AD Change系列编号 |
+| 2   | Desc | TextField | - | 4000 | Input | 任意字符（包括中文、英文、数字、符号） | 左 | 空 | 活性 | 描述信息，最大长度4000字符 |
+| 3   | ADD | Button | - | - | Action | - | 中 | - | 活性 | 添加新的AD Change记录 |
+| 4   | DELETE | Button | - | - | Action | - | 中 | - | 活性 | 删除指定的AD Change记录 |
+| 5   | CHECK | Button | - | - | Action | - | 中 | - | 活性 | 检查AD Change记录状态 |
+
+---
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 添加AD Change记录（ADD操作）
+
+**功能说明**: 用户输入Serie-Chnr和Desc后，点击ADD按钮将新的AD Change记录保存到数据库
+
+**操作步骤**:
+1. 用户在Serie-Chnr输入框中输入系列编号（最大15字符）
+2. 用户在Desc输入框中输入描述信息（最大4000字符）
+3. 用户点击ADD按钮
+4. 系统执行前端校验：
+   - 检查Serie-Chnr是否为空
+   - 检查Serie-Chnr长度是否超过15字符
+   - 检查Desc长度是否超过4000字符
+5. 调用后端API `UD07AddAdChangeApi`，传入Serie-Chnr和Desc参数
+6. API内部逻辑：
+   - 检查该Serie-Chnr是否已存在于HDOC_ADCA_CHANGE表中
+   - 若存在且状态为未激活，返回警告"AFTER DEF CHANGE IS NOT ACTIVATED"
+   - 若不存在或已激活，则插入新记录到HDOC_ADCA_CHANGE表
+7. 根据API返回结果显示成功或错误消息
+
+**结果反馈**: 
+- 成功：显示"AD Change记录添加成功"
+- 失败：
+  - Serie-Chnr为空：显示"Serie-Chnr不能为空"
+  - 记录已存在且未激活：显示"AFTER DEF CHANGE IS NOT ACTIVATED"（Warning）
+  - 其他错误：显示具体错误消息
+
+### 4.2 删除AD Change记录（DELETE操作）
+
+**功能说明**: 用户输入Serie-Chnr后，点击DELETE按钮从数据库中删除对应的AD Change记录
+
+**操作步骤**:
+1. 用户在Serie-Chnr输入框中输入要删除的系列编号
+2. 用户点击DELETE按钮
+3. 系统执行前端校验：
+   - 检查Serie-Chnr是否为空
+4. 弹出确认对话框："Do you really want to delete this AD Change record?"
+5. 用户确认后，调用后端API `UD07DeleteAdChangeApi`，传入Serie-Chnr参数
+6. API内部逻辑：
+   - 查询HDOC_ADCA_CHANGE表中是否存在该Serie-Chnr的记录
+   - 若不存在，返回错误"记录不存在"
+   - 若存在，则删除该记录
+7. 根据API返回结果显示成功或错误消息
+
+**结果反馈**: 
+- 成功：显示"AD Change记录删除成功"
+- 失败：
+  - Serie-Chnr为空：显示"Serie-Chnr不能为空"
+  - 记录不存在：显示"记录不存在，无法删除"
+  - 用户取消：不执行任何操作
+
+### 4.3 检查AD Change记录（CHECK操作）
+
+**功能说明**: 用户输入Serie-Chnr后，点击CHECK按钮检查该记录是否存在及其状态
+
+**操作步骤**:
+1. 用户在Serie-Chnr输入框中输入要检查的系列编号
+2. 用户点击CHECK按钮
+3. 系统执行前端校验：
+   - 检查Serie-Chnr是否为空
+4. 调用后端API `UD07CheckAdChangeApi`，传入Serie-Chnr参数
+5. API内部逻辑：
+   - 查询HDOC_ADCA_CHANGE表中是否存在该Serie-Chnr的记录
+   - 若存在，检查其激活状态
+   - 若状态为未激活，返回警告"AFTER DEF CHANGE IS NOT ACTIVATED"
+   - 若已激活或不存在，返回相应状态信息
+6. 根据API返回结果显示检查结果
+
+**结果反馈**: 
+- 记录存在且已激活：显示"记录存在且已激活"
+- 记录存在但未激活：显示"AFTER DEF CHANGE IS NOT ACTIVATED"（Warning）
+- 记录不存在：显示"记录不存在"
+- Serie-Chnr为空：显示"Serie-Chnr不能为空"
+
+---
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 ADD操作流程
+
+**开始**: 用户点击ADD按钮
+
+**前置处理**: 
+- 获取Serie-Chnr和Desc字段的输入值
+- 去除首尾空格
+
+**空值校验 (Frontend Check)**:
+- 若Serie-Chnr为空或仅包含空格：
+  - 设置Message = "Serie-Chnr不能为空"
+  - 终止流程
+- 若Serie-Chnr长度超过15字符：
+  - 设置Message = "Serie-Chnr长度不能超过15字符"
+  - 终止流程
+- 若Desc长度超过4000字符：
+  - 设置Message = "Desc长度不能超过4000字符"
+  - 终止流程
+
+**API调用 (Backend Check)**:
+- 调用`UD16ADChangeApi`
+- 请求参数：
+  ```json
+  {
+    "serieChnr": "JPCT-G28321",
+    "desc": "这是AD Change的描述信息"
+  }
+  ```
+- API内部逻辑：
+  1. 查询HDOC_ADCA_CHANGE表，检查是否存在相同Serie-Chnr的记录
+  2. 若存在且ACTIVATED字段为'N'（未激活）：
+     - 返回警告码和消息"AFTER DEF CHANGE IS NOT ACTIVATED"
+  3. 若不存在或已激活：
+     - 插入新记录到HDOC_ADCA_CHANGE表
+     - 设置ACTIVATED字段为'Y'（已激活）
+     - 返回成功消息
+
+**结果处理**:
+- 成功：
+  - 显示成功消息"AD Change记录添加成功"
+  - 清空输入框（可选）
+- 失败：
+  - 若记录已存在且未激活：显示警告"AFTER DEF CHANGE IS NOT ACTIVATED"
+  - 若其他错误：显示具体错误消息
+
+#### 5.1.2 DELETE操作流程
+
+**开始**: 用户点击DELETE按钮
+
+**前置处理**: 
+- 获取Serie-Chnr字段的输入值
+- 去除首尾空格
+
+**空值校验 (Frontend Check)**:
+- 若Serie-Chnr为空或仅包含空格：
+  - 设置Message = "Serie-Chnr不能为空"
+  - 终止流程
+
+**确认对话框**:
+- 弹出确认对话框："Do you really want to delete this AD Change record?"
+- 若用户点击"取消"：终止流程
+- 若用户点击"确定"：继续执行
+
+**API调用 (Backend Check)**:
+- 调用`UD16ADChangeApi`
+- 请求参数：
+  ```json
+  {
+    "serieChnr": "JPCT-G28321"
+  }
+  ```
+- API内部逻辑：
+  1. 查询HDOC_ADCA_CHANGE表，检查是否存在该Serie-Chnr的记录
+  2. 若不存在：
+     - 返回错误码和消息"记录不存在"
+  3. 若存在：
+     - 执行DELETE操作，删除该记录
+     - 返回成功消息
+
+**结果处理**:
+- 成功：
+  - 显示成功消息"AD Change记录删除成功"
+  - 清空Serie-Chnr输入框
+- 失败：
+  - 若记录不存在：显示错误"记录不存在，无法删除"
+  - 若其他错误：显示具体错误消息
+
+#### 5.1.3 CHECK操作流程
+
+**开始**: 用户点击CHECK按钮
+
+**前置处理**: 
+- 获取Serie-Chnr字段的输入值
+- 去除首尾空格
+
+**空值校验 (Frontend Check)**:
+- 若Serie-Chnr为空或仅包含空格：
+  - 设置Message = "Serie-Chnr不能为空"
+  - 终止流程
+
+**API调用 (Backend Check)**:
+- 调用`UD16ADChangeApi`
+- 请求参数：
+  ```json
+  {
+    "serieChnr": "JPCT-G28321"
+  }
+  ```
+- API内部逻辑：
+  1. 查询HDOC_ADCA_CHANGE表，检查是否存在该Serie-Chnr的记录
+  2. 若不存在：
+     - 返回状态码"NOT_FOUND"和消息"记录不存在"
+  3. 若存在：
+     - 检查ACTIVATED字段值
+     - 若为'N'（未激活）：返回警告码和消息"AFTER DEF CHANGE IS NOT ACTIVATED"
+     - 若为'Y'（已激活）：返回成功码和消息"记录存在且已激活"
+
+**结果处理**:
+- 记录存在且已激活：显示"记录存在且已激活"
+- 记录存在但未激活：显示警告"AFTER DEF CHANGE IS NOT ACTIVATED"
+- 记录不存在：显示"记录不存在"
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | ADD操作 | Serie-Chnr | 不能为空 | "Serie-Chnr不能为空" | 终止流程，显示错误消息 |
+| 2 | ADD操作 | Serie-Chnr | 长度≤15字符 | "Serie-Chnr长度不能超过15字符" | 终止流程，显示错误消息 |
+| 3 | ADD操作 | Desc | 长度≤4000字符 | "Desc长度不能超过4000字符" | 终止流程，显示错误消息 |
+| 4 | ADD操作 | HDOC_ADCA_CHANGE表 | 记录存在且未激活 | "AFTER DEF CHANGE IS NOT ACTIVATED" | 显示警告消息（Warning级别） |
+| 5 | DELETE操作 | Serie-Chnr | 不能为空 | "Serie-Chnr不能为空" | 终止流程，显示错误消息 |
+| 6 | DELETE操作 | HDOC_ADCA_CHANGE表 | 记录不存在 | "记录不存在，无法删除" | 显示错误消息 |
+| 7 | CHECK操作 | Serie-Chnr | 不能为空 | "Serie-Chnr不能为空" | 终止流程，显示错误消息 |
+| 8 | CHECK操作 | HDOC_ADCA_CHANGE表 | 记录存在且未激活 | "AFTER DEF CHANGE IS NOT ACTIVATED" | 显示警告消息（Warning级别） |
+| 9 | CHECK操作 | HDOC_ADCA_CHANGE表 | 记录不存在 | "记录不存在" | 显示提示信息 |
+
+---
+
+## 6. 接口定义 (API Specification)
+
+### 6.1 UD16ADChangeApi
+
+**功能**: 添加新的AD Change记录
+
+**Method**: POST
+
+**Endpoint**: `/api/ud16ADChange/add`
+
+**Request Body**:
+```json
+{
+  "serieChnr": "JPCT-G28321",
+  "desc": "这是AD Change的描述信息"
+}
+```
+
+**参数说明**:
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| serieChnr | String | Y | AD Change系列编号，最大15字符 |
+| desc | String | Y | 描述信息，最大4000字符 |
+
+**Response Success (200)**:
+```json
+{
+            "code": 200,
+            "msg": "添加AD Change成功",
+            "data": {
+                "serie": "xxx",
+                "chnr": "xxx"
+            }
+        }
+```
+
+**Response Error (400/500)**:
+```json
+{
+  "code": 400,
+  "message": "Serie-Chnr已存在且未激活",
+  "data": null
+}
+```
+
+### 6.2 UD16ADChangeApi
+
+**功能**: 删除指定的AD Change记录
+
+**Method**: DELETE
+
+**Endpoint**: `/api/ud16ADChange/delete`
+
+**Request Body**:
+```json
+{
+  "serieChnr": "JPCT-G28321"
+}
+```
+
+**参数说明**:
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| serieChnr | String | Y | 要删除的AD Change系列编号 |
+
+**Response Success (200)**:
+```json
+{
+            "code": 200,
+            "msg": "删除AD Change成功",
+            "data": {
+                "serie": "xxx",
+                "chnr": "xxx"
+            }
+        }
+```
+
+**Response Error (400/500)**:
+```json
+{
+  "code": 400,
+  "message": "记录不存在，无法删除",
+  "data": null
+}
+```
+
+### 6.3 UD16ADChangeApi
+
+**功能**: 检查AD Change记录是否存在及其状态
+
+**Method**: GET
+
+**Endpoint**: `/api/ud16ADChange/check`
+
+**Request Parameters**:
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| serieChnr | String | Y | 要检查的AD Change系列编号 |
+
+**Response Success:
+```json
+{
+            "code": 200,
+            "msg": "检查AD Change成功",
+            "data": {
+                "serie": "xxx",
+                "chnr": "xxx",
+                "act": "xxx",
+                "bu": "xxx",
+                "reason": "xxx"
+            }
+        }
+```
+
+**Response Error - 不存在 (404)**:
+```json
+{
+  "code": 404,
+  "message": "记录不存在",
+  "data": null
+}
+```
+
+---
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| Serie-Chnr为空（ADD/DELETE/CHECK） | 前端校验拦截，不发起API请求 | "Serie-Chnr不能为空" |
+| Serie-Chnr长度超过15字符（ADD） | 前端校验拦截，不发起API请求 | "Serie-Chnr长度不能超过15字符" |
+| Desc长度超过4000字符（ADD） | 前端校验拦截，不发起API请求 | "Desc长度不能超过4000字符" |
+| 记录已存在且未激活（ADD） | API返回警告，前端显示警告消息 | "AFTER DEF CHANGE IS NOT ACTIVATED" |
+| 记录不存在（DELETE） | API返回400错误，前端显示错误消息 | "记录不存在，无法删除" |
+| 记录不存在（CHECK） | API返回404错误，前端显示提示信息 | "记录不存在" |
+| 记录存在但未激活（CHECK） | API返回警告，前端显示警告消息 | "AFTER DEF CHANGE IS NOT ACTIVATED" |
+| 数据库连接异常 | API返回500错误，前端显示通用错误消息 | "系统错误，请稍后重试" |
+| API超时 | 前端捕获超时异常，显示超时提示 | "请求超时，请检查网络连接后重试" |
+| 网络异常 | 前端捕获网络异常，显示网络错误提示 | "网络连接失败，请检查网络设置" |
+| 用户取消删除操作 | 前端拦截，不发起API请求 | 无（不显示任何消息） |
+
+---
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档（内部設計模板.md）相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：AD Change_詳細設計.md
+- 保存到：当前文件夹下的work目录

@@ -1,0 +1,252 @@
+请根据以下要求生成[Homologation Variables]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Homologation Variables]-001
+   模块名称:[Homologation Variables]
+   作成日:2026-05-21 
+
+## 2. 背景 (Background)
+本模块用于管理车辆认证变量（Homologation Variables）的配置信息，支持对变量数据的查询、新增、修改和删除操作。  
+核心功能包括：
+- 根据产品类别、编号和市场条件进行搜索
+- 显示变量值、变体字符串、备注等详细信息
+- 支持新增、更新和删除记录
+- 提供下拉菜单选择Product class和Market
+
+面向用户群体为系统管理员、配置工程师及合规审核人员。  
+用户体验方面需保证输入字段清晰、操作按钮明确、错误提示及时。  
+安全性要求：仅允许授权用户执行增删改操作，所有变更需记录操作人与时间。
+
+---
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 | 種別 | 必須 | MaxLength | I/O | 許容文字 | 文字配置 | 初期値 | 表示制御 | 备注 |
+|-----|-------|------|------|-----------|-----|----------|----------|--------|----------|------|
+| 1   | Product class | pull-downList | Y | 2 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | Add/Update/Delete时必须填写；数据来源：PRODUCT_CLASS_MASTER.PC |
+| 2   | Number | textfield | Y | 10 | Input/Output | 半角数字 | 左 | 空 | 活性 | Add/Update/Delete时必须填写 |
+| 3   | Market | pull-downList | Y | 3 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | Add/Update/Delete时必须填写；数据来源：MARKET_MASTER.MARKET |
+| 4   | Variable | textfield | - | 20 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 输入内容以'TEMPLATE-'开头时，自动去除前缀，并验证剩余部分是否存在于HDOC_VARIABLES表中 |
+| 5   | Value | textfield | - | 200 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 变量值字段 |
+| 6   | Variant string.1 | textfield | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 第一个变体字符串 |
+| 7   | Variant string.2 | textfield | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 第二个变体字符串 |
+| 8   | Comments | textfield | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 备注信息 |
+| 9   | Add | textfield | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 添加日期，格式YYYYMM |
+| 10  | Delete | textfield | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 删除日期，格式YYYYMM |
+| 11  | Created by user | textfield | - | 16 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 创建用户，由系统自动填充 |
+| 12  | Date | textfield | - | - | Input/Output | 日付 | 左 | 空 | 活性 | 更新时间，由系统自动填充 |
+| 13  | Search | button | - | - | Action | - | 中 | - | 活性 | 点击后根据输入条件跳转至搜索结果页面 |
+| 14  | Clear | button | - | - | Action | - | 中 | - | 活性 | 点击后清空所有输入框内容 |
+| 15  | Add | button | - | - | Action | - | 中 | - | 活性 | 点击后将当前输入内容添加到数据库 |
+| 16  | Update | button | - | - | Action | - | 中 | - | 活性 | 点击后更新现有记录 |
+| 17  | Delete | button | - | - | Action | - | 中 | - | 活性 | 点击后删除指定记录 |
+
+---
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 初始显示
+**功能说明**：加载Homologation Variables画面的搜索条件界面，展示所有可输入字段和操作按钮。  
+**操作步骤**：
+1. 页面加载时初始化所有字段为空。
+2. 加载Product class下拉列表（从PRODUCT_CLASS_MASTER获取）。
+3. 加载Market下拉列表（从MARKET_MASTER获取）。
+4. 所有文本框默认为空，按钮处于可用状态。
+
+---
+
+### 4.2 搜索功能
+**功能说明**：根据用户输入的Product class、Number、Market条件执行搜索。  
+**操作步骤**：
+1. 用户在对应字段中输入或选择条件。
+2. 点击「Search」按钮。
+3. 若成功，跳转至“Homologation Variables”搜索结果页面。
+4. 若失败，显示错误消息：“系统内部错误，请联系管理员”。
+
+---
+
+### 4.3 清除功能
+**功能说明**：清除所有已输入的内容。  
+**操作步骤**：
+1. 用户点击「Clear」按钮。
+2. 所有输入框内容被清空。
+3. 下拉菜单恢复初始状态。
+
+---
+
+### 4.4 新增功能
+**功能说明**：将新记录添加到HDOC_USER_DEFINED_RULES表中。  
+**操作步骤**：
+1. 用户填写Product class、Number、Market等必填字段。
+2. 填写Variable、Value、Variant string等其他字段。
+3. 点击「Add」按钮。
+4. 系统校验输入内容：
+   - 检查Product class、Number、Market组合是否已存在（主键冲突）
+   - 检查Variable字段是否以TEMPLATE-开头，若为真则去除前缀并验证其是否存在于HDOC_VARIABLES表中
+5. 若校验通过，调用 `UD08HomologationVariablesApi` 接口执行插入操作。
+6. 成功后显示提示：“记录添加成功”。
+7. 失败则显示对应错误消息。
+
+---
+
+### 4.5 更新功能
+**功能说明**：修改已有记录的信息。  
+**操作步骤**：
+1. 用户选择要修改的记录（可通过搜索获取）。
+2. 修改相关字段内容。
+3. 点击「Update」按钮。
+4. 系统校验：
+   - 检查Product class、Number、Market组合是否存在
+   - 检查是否与其他记录重复（主键冲突）
+   - 检查Variable字段有效性（同新增逻辑）
+5. 若校验通过，调用 `UD08HomologationVariablesApi` 接口执行更新操作。
+6. 成功后显示提示：“记录更新成功”。
+7. 失败则显示对应错误消息。
+
+---
+
+### 4.6 删除功能
+**功能说明**：删除指定记录。  
+**操作步骤**：
+1. 用户选择要删除的记录。
+2. 点击「Delete」按钮。
+3. 系统校验该记录是否存在。
+4. 若存在，调用 `UD08HomologationVariablesApi` 接口执行删除操作。
+5. 成功后显示提示：“记录删除成功”。
+6. 失败则显示错误消息：“数据不存在，请检查输入内容”。
+
+---
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 开始：页面加载触发
+#### 前置处理：
+- 初始化所有字段为空
+- 加载Product class下拉列表（PRODUCT_CLASS_MASTER）
+- 加载Market下拉列表（MARKET_MASTER）
+
+#### 空值校验等 (Frontend Check)：
+- 若执行Add/Update/Delete操作时，Product class、Number、Market任一为空：
+  - 设置Message = “Product class、Number、Market为必填项”
+  - 终止流程
+- 若Variable字段以TEMPLATE-开头：
+  - 去除前缀后检查是否存在于HDOC_VARIABLES表中
+  - 若不存在：
+    - 设置Message = “Variant does not exist, Please enter the correct content”
+    - 终止流程
+
+#### 5.1.2 API调用 (Backend Check)：
+- 调用 `UD08HomologationVariablesApi` 接口执行以下操作：
+  - 搜索：GET /api/v1/ud08/homologation-variables/search
+  - 新增：POST /api/v1/ud08/homologation-variables/add
+  - 更新：PUT /api/v1/ud08/homologation-variables/update
+  - 删除：DELETE /api/v1/ud08/homologation-variables/delete
+
+#### 5.2 结果处理：
+- 成功：显示对应操作成功消息，刷新页面或跳转
+- 失败：显示错误消息，保持当前状态
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | Add操作 | Product class, Number, Market | 存在重复记录 | “Primary key conflict, Please enter the correct content” | 终止流程 |
+| 2 | Add操作 | Variable | 不在HDOC_VARIABLES中 | “Variant does not exist, Please enter the correct content” | 终止流程 |
+| 3 | Update操作 | Product class, Number, Market | 记录不存在 | “Data does not exist, Please enter the correct content” | 终止流程 |
+| 4 | Update操作 | Product class, Number, Market | 存在重复记录 | “Primary key conflict, Please enter the correct content” | 终止流程 |
+| 5 | Update操作 | Variable | 不在HDOC_VARIABLES中 | “Variant does not exist, Please enter the correct content” | 终止流程 |
+| 6 | Delete操作 | Product class, Number, Market | 记录不存在 | “Data does not exist, Please enter the correct content” | 终止流程 |
+
+---
+
+## 6. 接口定义 (API Specification)
+
+### UD08HomologationVariablesApi
+- **功能**：提供Homologation Variables的CRUD操作接口
+- **Method**：GET/POST/PUT/DELETE
+- **Endpoint**：/api/v1/ud08/homologation-variables
+
+#### Request [请求格式]
+
+##### GET /search
+```json
+{
+  "productClass": "UD",
+  "number": "123456",
+  "market": "IDN"
+}
+
+POST /add
+{
+  "productClass": "UD",
+  "number": "123456",
+  "market": "IDN",
+  "variable": "TEMPLATE-FTLI",
+  "value": "150",
+  "variantString1": "FTLI-150",
+  "variantString2": "",
+  "comments": "Front load index",
+  "addDate": "202309",
+  "deleteDate": "",
+  "updateUser": "admin",
+  "updateDatetime": "2023-09-01 10:00:00"
+}
+PUT /update
+{
+  "productClass": "UD",
+  "number": "123456",
+  "market": "IDN",
+  "variable": "TEMPLATE-FTLI",
+  "value": "150",
+  "variantString1": "FTLI-150",
+  "variantString2": "",
+  "comments": "Updated front load index",
+  "addDate": "202309",
+  "deleteDate": "",
+  "updateUser": "admin",
+  "updateDatetime": "2023-09-01 10:00:00"
+}
+DELETE /delete
+{
+  "productClass": "UD",
+  "number": "123456",
+  "market": "IDN"
+}
+
+Response Success (200)
+{
+  "success": true,
+  "message": "Record added successfully"
+}
+
+Response Error (400)
+{
+  "error": "Validation failed",
+  "message": "Primary key conflict, Please enter the correct content"
+}
+
+Response Error (500)
+{
+  "error": "Internal Server Error",
+  "message": "Failed to process request"
+}
+
+7. 异常处理 (Exception Handling)
+异常场景	处理方式	Message显示内容
+主键冲突（Add/Update）	终止流程	“Primary key conflict, Please enter the correct content”
+Variable不存在	终止流程	“Variant does not exist, Please enter the correct content”
+记录不存在（Update/Delete）	终止流程	“Data does not exist, Please enter the correct content”
+API调用失败	显示通用错误	“系统内部错误，请联系管理员”
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Homologation Variables]_詳細設計.md
+  保存到：当前文件夹下的work目录

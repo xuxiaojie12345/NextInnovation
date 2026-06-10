@@ -1,0 +1,199 @@
+/* VehicleSpecification.css - UD07模块 */
+
+.vs-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 边框容器 */
+.vs-border-box {
+  max-width: 900px;
+  margin: 0 auto;
+  border: 2px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+/* 标题 */
+.vs-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 基本信息区域 */
+.vs-info-section {
+  margin-bottom: 20px;
+  font-family: monospace; /* 等宽字体，保持对齐 */
+}
+
+.vs-info-row {
+  margin-bottom: 8px;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+}
+
+.vs-info-col {
+  display: flex;
+  align-items: center;
+}
+
+.vs-info-col:first-child {
+  margin-right: 50px; /* 左右两列之间的间距 */
+}
+
+.vs-info-col-full {
+  display: flex;
+  align-items: center;
+  width: 100%; /* 占满整行 */
+}
+
+.vs-label {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 180px; /* 统一标签宽度，与Country of Operation一致 */
+  text-align: left;
+  white-space: nowrap; /* 不换行 */
+}
+
+.vs-value {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  margin-left: 0; /* 标签和值之间无额外间距 */
+  min-width: 200px; /* 统一值的宽度，与Country of Operation的值一致 */
+}
+
+/* SYMBOL_STR表格区域 */
+.vs-variant-section {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.vs-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6列布局 */
+  gap: 8px;
+  font-family: monospace; /* 等宽字体 */
+}
+
+.vs-variant-item {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #000000;
+  cursor: help; /* 鼠标悬停时显示help光标 */
+}
+
+.vs-symbol {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* S-Note NO区域 */
+.vs-snote-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: monospace; /* 等宽字体 */
+}
+
+.vs-snote-content {
+  font-size: 14px;
+  color: #000000;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border: 1px solid #d0d0d0;
+  word-break: break-all;
+}
+
+/* 错误消息显示 */
+.vs-error-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+/* Close按钮区域 */
+.vs-button-bar {
+  margin-top: 20px;
+}
+
+.vs-close-btn {
+  background-color: #d0d8f0;
+  border: 1px solid #8fa4d0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.vs-close-btn:hover:not(:disabled) {
+  background-color: #c0c8e0;
+}
+
+.vs-close-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 加载状态 */
+.vs-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .vs-container {
+    padding: 15px;
+  }
+
+  .vs-border-box {
+    padding: 15px;
+  }
+
+  .vs-title {
+    font-size: 18px;
+  }
+
+  .vs-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vs-label-right {
+    margin-left: 0;
+    margin-top: 5px;
+  }
+
+  .vs-variant-grid {
+    grid-template-columns: repeat(3, 1fr); /* 移动端改为3列 */
+  }
+
+  .vs-label,
+  .vs-value,
+  .vs-snote-content {
+    font-size: 13px;
+  }
+
+  .vs-error-message {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}

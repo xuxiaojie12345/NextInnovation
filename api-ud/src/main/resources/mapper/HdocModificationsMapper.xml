@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocModificationsMapper">
+    
+    <!-- 根据Chassis series和Chassis no查询最新的Modify情报 -->
+    <select id="selectLatestModification" resultType="com.web.app.domain.UD06SaveModificationsResponse$ModificationItem">
+        SELECT 
+            DOCTYPE,
+            VERS,
+            VARIABLE,
+            NEWVAL,
+            UPDATE_DATETIME
+        FROM 
+            HDOC_ADCA_MODIFICATION
+        WHERE 
+            SERIE = #{chassisSerie}
+            AND CHNO = #{chassisNo}
+        ORDER BY 
+            UPDATE_DATETIME DESC
+        LIMIT 1
+    </select>
+    
+</mapper>

@@ -1,114 +1,255 @@
-import React from 'react';
-import './Menu.css';
-
-interface MenuItem {
-  label: string;
-  path?: string;
-}
-
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
+// src/components/NavigationMenu/NavigationMenu.tsx
+import React from "react";
+import "./Menu.css";
 
 const Menu: React.FC = () => {
-  const menuSections: MenuSection[] = [
+  // 定义菜单数据结构
+  interface MenuItem {
+    id: string;
+    label: string;
+    path?: string; // 如果 undefined，则不是 Link
+    type: "link" | "group";
+    children?: MenuItem[];
+  }
+
+  // 菜单配置数据
+  const menuData: MenuItem[] = [
     {
-      title: 'Generate Document',
-      items: [
-        { label: 'Generate Doc' },
-        { label: 'Generate in Batch' },
-        { label: 'Regdata Archive' },
-        { label: 'Regdata Batch' },
+      id: "generate",
+      label: "Generate",
+      type: "group",
+      children: [
+        {
+          // ✅ 带有 Link
+          id: "gen_doc",
+          label: "Generate Doc",
+          path: "/generate-homologation-document",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "gen_batch",
+          label: "Generate in Batch",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "reg_archive",
+          label: "Regdata Archive",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "reg_batch",
+          label: "Regdata Batch",
+          type: "link",
+        },
       ],
     },
     {
-      title: 'Admin',
-      items: [
-        { label: 'Update user defined variables (rules)' },
-        { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
-        { label: 'Unlock Document' },
-        { label: 'HDoc Number Series' },
-        { label: 'Upload/Delete template' },
-        { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
+      id: "admin",
+      label: "Admin",
+      type: "group",
+      children: [
+        {
+          // ✅ 带有 Link
+          id: "admin_rules",
+          label: "Update user defined variables (rules)",
+          path: "/admin/rules",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "admin_unicode",
+          label: "Update user defined variables (UNICODE rules)",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "admin_existing",
+          label: "Existing HDoc variables",
+          path: "/admin/existing",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "admin_unlock",
+          label: "Unlock Document",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "admin_series",
+          label: "HDoc Number Series",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "admin_templates",
+          label: "Upload/Delete template",
+          path: "/admin/templates",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "admin_list_templates",
+          label: "List available templates",
+          path: "/admin/list-templates",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "admin_pps_vin",
+          label: "PPS Vin plate",
+          path: "/admin/pps-vin",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "admin_ad_ca",
+          label: "AD/CA Change",
+          path: "/admin/ad-ca",
+          type: "link",
+        },
       ],
     },
     {
-      title: 'User Administration',
-      items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
-        { label: 'Change Password' },
-        { label: 'User Position' },
+      id: "user_admin",
+      label: "User Administration",
+      type: "group",
+      children: [
+        {
+          // ✅ 带有 Link
+          id: "user_hdoc_admin",
+          label: "HDoc User Administration",
+          path: "/user/hdoc-admin",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "user_doc_admin",
+          label: "HDoc User Doc Administration",
+          path: "/user/doc-admin",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "user_search",
+          label: "Search User",
+          path: "/user/search",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
+          id: "user_password",
+          label: "Change Password",
+          path: "/user/password",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "user_position",
+          label: "User Position",
+          type: "link",
+        },
       ],
     },
     {
-      title: 'Archive',
-      items: [
-        { label: 'Search' },
-        { label: 'Upload Document' },
+      id: "archive",
+      label: "Archive",
+      type: "group",
+      children: [
+        {
+          // 无 Link
+          id: "archive_search",
+          label: "Search",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "archive_upload",
+          label: "Upload Document",
+          type: "link",
+        },
       ],
     },
     {
-      title: 'Documentation',
-      items: [
-        { label: 'User Guide' },
-        { label: 'AD/CA Change Guide' },
-        { label: 'Vin plate Guide FM/FH' },
-        { label: 'Archive Guide' },
-        { label: 'Privacy' },
+      id: "documentation",
+      label: "Documentation",
+      type: "group",
+      children: [
+        {
+          // ✅ 带有 Link
+          id: "doc_user_guide",
+          label: "User Guide",
+          path: "/docs/user-guide",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "doc_ad_ca_guide",
+          label: "AD/CA Change Guide",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "doc_vin_plate",
+          label: "Vin plate Guide FM/FH",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "doc_archive_guide",
+          label: "Archive Guide",
+          type: "link",
+        },
+        {
+          // 无 Link
+          id: "doc_privacy",
+          label: "Privacy",
+          type: "link",
+        },
       ],
     },
   ];
 
-  const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+  // 处理点击事件
+  const handleItemClick = (path: string | undefined) => {
+    if (path) {
+      window.location.href = path;
+    }
   };
 
   return (
-    <div className="menu-container">
-      <div className="menu-header">
-        <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-            const parent = (e.target as HTMLImageElement).parentElement;
-            if (parent) {
-              const textLogo = document.createElement('div');
-              textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
-              parent.appendChild(textLogo);
-            }
-          }}
-        />
+    <div className='navigation-menu'>
+      {/* 标题区域 */}
+      <div className='menu-header'>
+        <h1>Generate Document</h1>
       </div>
 
-      <div className="menu-content">
-        {menuSections.map((section, index) => (
-          <div key={index} className="menu-section">
-            <h3 className="section-title">{section.title}</h3>
-            <ul className="menu-list">
-              {section.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex} 
-                  className="menu-item"
-                  onClick={() => handleMenuItemClick(item)}
-                >
-                  <span className="menu-arrow">»</span>
-                  <span className="menu-label">{item.label}</span>
-                </li>
-              ))}
+      {/* 菜单项列表 */}
+      <ul className='menu-list'>
+        {menuData.map((module) => (
+          <li key={module.id} className='menu-group'>
+            <div className='group-title'>{module.label}</div>
+            <ul className='submenu-list'>
+              {module.children?.map((item) => {
+                const isLink = !!item.path;
+                return (
+                  <li
+                    key={item.id}
+                    className={`menu-item ${isLink ? "clickable" : "disabled"}`}
+                    onClick={() => handleItemClick(item.path)}
+                  >
+                    <span className='arrow-icon'>{isLink ? "»" : "-"}</span>
+                    <span className='item-label'>{item.label}</span>
+                  </li>
+                );
+              })}
             </ul>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

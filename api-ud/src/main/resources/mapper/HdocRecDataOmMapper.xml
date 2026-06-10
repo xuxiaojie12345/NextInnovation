@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.app.mapper.HdocRecDataOmMapper">
+    
+    <!-- 查询车辆基础信息 -->
+    <select id="selectVehicleBaseInfo" resultType="java.util.HashMap">
+        SELECT
+            om.MODEL                AS model,
+            gen.BUILD_WEEK          AS builtWeek,
+            om.CUSTOMER_ADAP        AS customerAdap,
+            gen.PRODUCT_TYPE        AS productType,
+            om.VIN                  AS vin,
+            gen.COUNTRY_OF_OPERATION AS countryOfOperation,
+            var.FAMILY_ID           AS familyId,
+            var.VARIANT_ID          AS variantId
+        FROM
+            HDOC_REC_DATA_OM om
+        INNER JOIN
+            HDOC_REC_DATA_VDA_GENERAL gen
+            ON om.SERIE = gen.SERIE
+            AND om.CHNR = gen.CHNR
+        INNER JOIN
+            HDOC_REC_DATA_VDA_VARIANTS var
+            ON om.SERIE = var.SERIE
+            AND om.CHNR = var.CHNR
+        WHERE
+            om.SERIE = #{serie}
+            AND om.CHNR = #{chnr}
+    </select>
+    
+</mapper>

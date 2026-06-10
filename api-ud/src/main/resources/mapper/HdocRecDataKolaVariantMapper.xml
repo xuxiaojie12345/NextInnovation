@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.app.mapper.HdocRecDataKolaVariantMapper">
+    
+    <!-- 查询变体信息列表 -->
+    <select id="selectVariantList" resultType="java.util.HashMap">
+        SELECT
+            SUBSTR(SYMBOL, 1, 8) AS symbolPrefix,
+            DESCRIPTION          AS description,
+            FUNCTION_GROUP       AS functionGroup
+        FROM
+            HDOC_REC_DATA_KOLA_VARIANT
+        WHERE
+            FAMILY_ID = #{familyId}
+            AND VARIANT_ID = #{variantId}
+        ORDER BY
+            LPAD(FUNCTION_GROUP, 4, ' '),
+            FAMILY_ID
+    </select>
+    
+</mapper>

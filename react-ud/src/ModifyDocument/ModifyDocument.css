@@ -1,0 +1,239 @@
+/* ModifyDocument.css - UD05模块 */
+
+.md-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 标题区域 */
+.md-header {
+  margin-bottom: 20px;
+}
+
+.md-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 基本信息区域 */
+.md-info-section {
+  margin-bottom: 20px;
+  padding: 10px 0;
+}
+
+.md-info-group {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.md-label {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  display: inline-block;
+  min-width: 120px;
+}
+
+.md-value {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+}
+
+/* Chassis no加粗显示 */
+.md-chassis-no {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.md-link {
+  font-size: 14px;
+  color: #0000ff; /* 蓝色链接 */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.md-link:hover {
+  color: #0000cc;
+}
+
+/* 错误消息显示 */
+.md-error-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+/* 表格容器 */
+.md-table-container {
+  border: 2px solid #b4c7dc; /* 浅蓝色边框 */
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* Save按钮区域 */
+.md-button-bar {
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  padding: 8px 10px;
+  border-bottom: 1px solid #b4c7dc;
+}
+
+.md-save-btn {
+  background-color: #d0d8f0;
+  border: 1px solid #8fa4d0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.md-save-btn:hover:not(:disabled) {
+  background-color: #c0c8e0;
+}
+
+.md-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 表格样式 */
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.md-th {
+  background-color: #ffffff; /* 白色表头 */
+  color: #000000;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 8px 6px;
+  text-align: left;
+  border-right: 1px solid #b4c7dc;
+  border-bottom: 1px solid #b4c7dc;
+}
+
+.md-th:last-child {
+  border-right: none;
+}
+
+.md-td {
+  padding: 6px;
+  font-size: 13px;
+  color: #000000;
+  border-right: 1px solid #b4c7dc;
+  border-bottom: 1px solid #b4c7dc;
+  vertical-align: middle;
+}
+
+.md-td:last-child {
+  border-right: none;
+}
+
+/* 偶数行背景色 - 改为白色（第2、4、6...行） */
+.md-tr-even {
+  background-color: #ffffff; /* 白色 */
+}
+
+/* 奇数行背景色 - 改为浅蓝色（第1、3、5...行） */
+.md-tr-odd {
+  background-color: #e8eef8; /* 浅蓝色 */
+}
+
+/* 输入框样式 */
+.md-input {
+  width: 95%;
+  padding: 4px 6px;
+  font-size: 13px;
+  border: 1px solid #a0a0a0;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.md-input:focus {
+  outline: none;
+  border-color: #0000ff;
+  box-shadow: 0 0 3px rgba(0, 0, 255, 0.3);
+}
+
+/* 底部按钮区域 */
+.md-footer {
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.md-cancel-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #cccccc;
+  padding: 6px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #000000;
+  margin-left: 10px;
+}
+
+.md-cancel-btn:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.md-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 加载状态 */
+.md-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .md-container {
+    padding: 15px;
+  }
+
+  .md-title {
+    font-size: 20px;
+  }
+
+  .md-label {
+    font-size: 13px;
+    min-width: 100px;
+  }
+
+  .md-value,
+  .md-link {
+    font-size: 13px;
+  }
+
+  .md-th,
+  .md-td {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .md-input {
+    font-size: 12px;
+    padding: 3px 4px;
+  }
+
+  .md-error-message {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}

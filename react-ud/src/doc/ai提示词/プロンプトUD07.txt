@@ -1,0 +1,155 @@
+请根据以下要求生成[Vehicle Specification]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Vehicle Specification]-001
+   模块名称:[Vehicle Specification]
+   作成日:2026-05-21 
+
+## 2. 背景 (Background)
+本模块用于展示车辆的详细规格信息，基于Chassis编号从多个数据源获取并整合车辆配置数据。  
+核心功能包括：
+- 显示车辆基本信息（如型号、制造周、VIN等）
+- 展示发动机编号及符号信息
+- 显示国家运营区域与产品类型
+- 提供S-Note编号信息
+- 支持通过tooltip查看KOLA Variant的描述信息
+
+面向用户群体为车辆配置工程师、质量审核人员和生产准备人员。  
+用户体验方面需保证信息清晰、字段排列合理、关键信息突出显示。  
+安全性要求：仅读取已授权访问的数据，不涉及敏感操作或写入。
+
+---
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 | 種別 | 必須 | MaxLength | I/O | 許容文字 | 文字配置 | 初期値 | 表示制御 | 备注 |
+|-----|-------|------|------|-----------|-----|----------|----------|--------|----------|------|
+| 1   | Chassis no | label | - | - | Output | - | 左 | - | - | 数据来源：前画面传入的Chassis编号 |
+| 2   | Model | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.MODEL |
+| 3   | Built week | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.BUILD |
+| 4   | Product type | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.PRODUCT_TYPE |
+| 5   | VIN | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.VIN |
+| 6   | Engine no | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT 的 SYMBOL 字段；获取逻辑如下：<br>① 根据Chassis no在HDOC_REC_DATA_VDA_VARIANTS中查找FAMILY_ID和VARIANT_ID（条件：Family ID Like 'DPX%'）<br>② 使用上述结果在HDOC_REC_DATA_KOLA_VARIANT中查询SYMBOL字段 |
+| 7   | Country of Operation | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION |
+| 8   | SYMBOL_STR | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT；处理逻辑如下：<br>① 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID<br>② 查询HDOC_REC_DATA_KOLA_VARIANT获取Symbol<br>③ 取Symbol前8位，不足则左补半角空格<br>④ 按FUNCTION_GROUP（左补至4位）+ FAMILY_ID（3位）排序显示 |
+| 9   | DESCRIPTION | tooltip | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION；鼠标悬停时显示该字段内容 |
+| 10  | S-Note NO | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.CUSTOMER_ADAP |
+
+---
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 画面初期表示
+**功能说明**：根据前画面传入的Chassis编号，调用API获取车辆规格信息，并在页面上展示所有相关字段。  
+**操作步骤**：
+1. 接收前画面传递的Chassis编号。
+2. 调用 `UD07VehicleSpecificationApi` 获取车辆基础信息。
+3. 从HDOC_REC_DATA_OM表中提取Model、Built week等信息。
+4. 从HDOC_REC_DATA_VDA_GENERAL表中提取VIN、Product Type、Country of Operation等信息。
+5. 通过组合查询HDOC_REC_DATA_VDA_VARIANTS和HDOC_REC_DATA_KOLA_VARIANT获取Engine no和SYMBOL_STR。
+6. 显示S-Note NO信息。
+7. 在SYMBOL_STR字段上方设置tooltip，当用户将鼠标悬停于该字段时，显示对应的DESCRIPTION内容。
+8. 所有字段以标签形式静态展示，无交互操作。
+
+---
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 开始：页面加载触发
+#### 前置处理：
+- 获取当前Chassis编号
+- 查询HDOC_REC_DATA_OM获取Model、Build Week，S-Note NO信息
+- 查询HDOC_REC_DATA_VDA_GENERAL获取VIN、Product Type、Country of Operation
+- 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID（条件：Chassis no + Family ID Like 'DPX%'）
+- 查询HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL和DESCRIPTION
+
+#### 空值校验等 (Frontend Check)：
+- 若Chassis编号为空：
+  - 设置Message = “未指定Chassis编号”
+  - 终止流程
+- 若HDOC_REC_DATA_VDA_VARIANTS中未找到匹配记录：
+  - 设置Message = “未找到对应变体信息”
+  - Engine no和SYMBOL_STR字段留空
+- 若HDOC_REC_DATA_KOLA_VARIANT中未找到对应Symbol：
+  - Engine no字段显示“N/A”
+  - SYMBOL_STR字段显示“N/A”
+
+#### 5.1.2 API调用 (Backend Check)：
+- 调用 `UD07VehicleSpecificationApi` 接口获取初始数据
+- 若返回失败，记录错误日志并显示通用错误消息
+
+#### 5.2 结果处理：
+- 成功：正常渲染所有标签与tooltip
+- 失败：显示“系统内部错误，请联系管理员”
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 页面加载前 | Chassis编号 | 为空 | “未指定Chassis编号” | 终止流程 |
+| 2 | 查询变体信息时 | HDOC_REC_DATA_VDA_VARIANTS | 无匹配记录 | “未找到对应变体信息” | Engine no和SYMBOL_STR设为空 |
+| 3 | 查询Symbol信息时 | HDOC_REC_DATA_KOLA_VARIANT | 无匹配记录 | “无法获取发动机符号信息” | Engine no设为“N/A”，SYMBOL_STR设为“N/A” |
+
+---
+
+## 6. 接口定义 (API Specification)
+
+### UD07VehicleSpecificationApi
+- **功能**：获取车辆规格信息，包括型号、制造周、VIN、发动机编号、变体信息等
+- **Method**：GET
+- **Endpoint**：/api/UD07/vehicleSpecification
+
+#### Request [请求格式]
+```json
+{
+  "chassisNo": "JPCT 013945"
+}
+Response Success (200)
+{
+            "code": 200,
+            "msg": "查询成功",
+            "data": {
+                "vehicleInfo": {
+                    "model": "xxx",
+                    "builtWeek": "xxx",
+                    "customerAdap": "xxx",
+                    "productType": "xxx",
+                    "vin": "xxx",
+                    "countryOfOperation": "xxx",
+                    "familyId": "xxx",
+                    "variantId": "xxx"
+                },
+                "variantInfo": {
+                    // 对应HDOC_REC_DATA_KOLA_VARIANT查询结果
+                }
+            }
+        }
+Response Error (400)
+{
+  "error": "Invalid chassis number",
+  "message": "Chassis number is required"
+}
+Response Error (500)
+{
+  "error": "Internal Server Error",
+  "message": "Failed to retrieve data from database"
+}
+7. 异常处理 (Exception Handling)
+异常场景	处理方式	Message显示内容
+Chassis编号为空	终止流程	“未指定Chassis编号”
+变体信息未找到	显示提示，字段留空	“未找到对应变体信息”
+Symbol信息未找到	显示“N/A”	“无法获取发动机符号信息”
+API调用失败	显示通用错误	“系统内部错误，请联系管理员”
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Vehicle Specification]_詳細設計.md
+  保存到：当前文件夹下的work目录

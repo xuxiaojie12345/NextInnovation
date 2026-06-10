@@ -1,0 +1,284 @@
+请根据以下要求生成[Vin Plate]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Vin Plate]-001
+   模块名称:[Vin Plate]
+   作成日:2026-05-25
+
+## 2. 背景 (Background)
+本模块用于管理VIN Plate的发送数据状态，支持查询、状态更新及模式切换操作。
+
+**核心功能和目标**：
+- 用户输入Chassis number查询VIN Plate详细信息
+- 展示VIN Plate的状态、类型、错误消息等基本信息
+- 提供状态更新功能（Set Regenerate、Set OK）
+- 提供模式切换功能（Change to Basic Info、Change to Advanced Info）
+- 从XML_DOC字段中解析并展示Print Items和VP Data信息
+
+**面向的用户群体**：系统管理员、生产准备人员及质量审核人员
+
+**用户体验方面的考虑**：操作流程清晰、状态变化明确、错误提示及时
+
+**安全性或特殊要求**：仅允许授权用户执行状态更新操作，所有变更需记录日志
+
+## 3. 画面项目定义 (Screen Parameters)
+
+### 3.1 搜索区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis number | textfield | - | 15 | Input | - | 左 | - | 活性 | 用户输入要查询的Chassis编号 |
+| 2   | View Info | button | - | - | Action | - | 中 | - | 活性 | 点击后查询并展示VIN Plate详细信息 |
+| 3   | Set Regenerate | button | - | - | Action | - | 中 | - | 活性 | 点击后将Status更新为'0'（新規追加） |
+| 4   | Set OK | button | - | - | Action | - | 中 | - | 活性 | 点击后将Status更新为'1'（xml doc作成済み） |
+| 5   | Change to Basic Info | button | - | - | Action | - | 中 | - | 活性 | 点击后将Status更新为'0'，Type更新为'1'（basic） |
+| 6   | Change to Advanced Info | button | - | - | Action | - | 中 | - | 活性 | 点击后将Status更新为'0'，Type更新为'2'（ADVANCED (with weights)） |
+
+### 3.2 详细信息展示区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 7   | Chassis number | label | - | - | Output | - | 左 | - | - | 数据来源：画面设定内容；显示当前查询的Chassis编号 |
+| 8   | Plate type | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.TYPE；显示模板类型 |
+| 9   | Status | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.STATUS；显示当前状态 |
+| 10  | Error Message | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.MSG；显示错误消息（如有） |
+| 11  | Def. | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.REGISTER_DATETIME；显示定义时间 |
+| 12  | Data ready | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.DOC_READY；显示数据准备时间 |
+| 13  | Sent to CAB factory | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.DOC_SENT；显示发送到工厂时间 |
+| 14  | Print items | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.XML_DOC中的PrintItemName字段；显示打印项名称 |
+| 15  | VP Data | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_SEND_DATA_VIN_PLATE.XML_DOC中的各Variant名与Value；显示变体数据 |
+
+**控件类型说明**：
+- Input控件：TextField（Chassis number）
+- Action控件：Button（View Info、Set Regenerate、Set OK、Change to Basic Info、Change to Advanced Info）
+- Output控件：Label（Chassis number、Plate type、Status、Error Message、Def.、Data ready、Sent to CAB factory、Print items、VP Data）
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 初始显示
+**功能说明**：加载Vin Plate画面，展示搜索输入框和操作按钮。
+
+**操作步骤**：
+1. 页面加载时初始化"Chassis number"输入框为空
+2. 所有操作按钮处于可用状态
+3. 详细信息展示区域隐藏或显示为空
+
+### 4.2 查询功能（View Info）
+**功能说明**：根据用户输入的Chassis number查询VIN Plate详细信息并展示。
+
+**操作步骤**：
+1. 用户在"Chassis number"输入框中输入Chassis编号（如JPCT-013945）
+2. 点击「View Info」按钮
+3. 系统校验Chassis number是否为空：
+   - 若为空：提示"请输入Chassis number"
+   - 若不为空：迁移至VIN　Plate詳細画面
+### 4.3 状态更新功能（Set Regenerate）
+**功能说明**：将指定Chassis的Status更新为'0'（新規追加），表示需要重新生成VIN Plate。
+
+**操作步骤**：
+1. 用户先通过View Info查询到目标Chassis
+2. 点击「Set Regenerate」按钮
+3. 系统调用API将HDOC_SEND_DATA_VIN_PLATE表中该Chassis的Status字段更新为'0'
+4. 成功后刷新页面，显示更新后的Status值
+5. 失败则显示错误消息："更新失败，请联系管理员"
+
+### 4.4 状态更新功能（Set OK）
+**功能说明**：将指定Chassis的Status更新为'1'（xml doc作成済み），表示已完成。
+
+**操作步骤**：
+1. 用户先通过View Info查询到目标Chassis
+2. 点击「Set OK」按钮
+3. 系统调用API将HDOC_SEND_DATA_VIN_PLATE表中该Chassis的Status字段更新为'1'
+4. 成功后刷新页面，显示更新后的Status值
+5. 失败则显示错误消息："更新失败，请联系管理员"
+
+### 4.5 模式切换功能（Change to Basic Info）
+**功能说明**：将指定Chassis的Status更新为'0'，Type更新为'1'（basic），切换到基础信息模式。
+
+**操作步骤**：
+1. 用户先通过View Info查询到目标Chassis
+2. 点击「Change to Basic Info」按钮
+3. 系统调用API将HDOC_SEND_DATA_VIN_PLATE表中该Chassis的：
+   - Status字段更新为'0'
+   - Type字段更新为'1'
+4. 成功后刷新页面，显示更新后的Status和Type值
+5. 失败则显示错误消息："更新失败，请联系管理员"
+
+### 4.6 模式切换功能（Change to Advanced Info）
+**功能说明**：将指定Chassis的Status更新为'0'，Type更新为'2'（ADVANCED (with weights)），切换到高级信息模式。
+
+**操作步骤**：
+1. 用户先通过View Info查询到目标Chassis
+2. 点击「Change to Advanced Info」按钮
+3. 系统调用API将HDOC_SEND_DATA_VIN_PLATE表中该Chassis的：
+   - Status字段更新为'0'
+   - Type字段更新为'2'
+4. 成功后刷新页面，显示更新后的Status和Type值
+5. 失败则显示错误消息："更新失败，请联系管理员"
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+**开始**：页面加载触发
+
+**前置处理**：
+- 初始化所有输入框为空
+- 详细信息展示区域隐藏
+
+**查询处理（View Info）**：
+- 用户输入Chassis number并点击按钮
+- 校验Chassis number是否为空
+- 调用API查询HDOC_SEND_DATA_VIN_PLATE表
+- 若未找到记录，报错"Chassis number XXX not found."
+- 若找到记录，解析XML_DOC字段并展示所有信息
+
+**状态更新处理（Set Regenerate/Set OK/Change to Basic Info/Change to Advanced Info）**：
+- 用户必须先执行View Info查询到目标Chassis
+- 点击对应按钮后调用API更新数据库
+- 成功后刷新页面显示最新状态
+
+**空值校验等 (Frontend Check)**：
+- 若执行View Info时Chassis number为空：
+  - 设置Message = "请输入Chassis number"
+  - 终止流程
+- 若执行任何更新操作前未查询到Chassis：
+  - 设置Message = "请先查询Chassis信息"
+  - 终止流程
+
+**API调用 (Backend Check)**：
+- 调用 `UD15SelecthdocsenddatavinplateApi` 接口执行查询和更新操作
+
+### 5.2 结果处理
+- **成功**：正常渲染详细信息或显示更新成功消息
+- **失败**：显示对应错误消息
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | View Info操作 | Chassis number | 未找到匹配记录 | "Chassis number XXX not found." | 显示警告消息 |
+| 2 | View Info操作 | Chassis number | 输入为空 | "请输入Chassis number" | 终止流程 |
+| 3 | 更新操作 | Chassis信息 | 未先执行查询 | "请先查询Chassis信息" | 终止流程 |
+| 4 | API调用 | 数据库更新 | 更新失败 | "更新失败，请联系管理员" | 显示错误消息 |
+
+## 6. 接口定义 (API Specification)
+
+### UD15SelecthdocsenddatavinplateApi
+- **功能**：提供VIN Plate数据的查询和状态更新接口
+- **Method**：GET/PUT
+- **Endpoint**：/api/v1/ud15/vin-plate
+
+#### 6.1 查询接口
+
+**Request [请求格式]**：
+```json
+{
+  "action": "view",
+  "chassisNumber": "JPCT-013945"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "data": {
+    "chassisNumber": "JPCT-013945",
+    "plateType": "ADVANCED (with weights)",
+    "status": "SENT",
+    "errorMessage": "",
+    "defTime": "2016-03-31 09:14",
+    "dataReadyTime": "2022-11-16 05:00",
+    "sentToFactoryTime": "2022-11-16 05:30",
+    "printItems": "82644192",
+    "vpData": {
+      "ChassieCode": "JPCT",
+      "ChassieNumber": "013945",
+      "Drive": "6X4",
+      "LegalAxle1Load": "",
+      "LegalAxle2Load": "",
+      "LegalAxle3Load": "",
+      "LegalAxle4Load": "",
+      "LegalGrossCombinationWeight1": "",
+      "LegalGrossVehicleWeight1": "",
+      "ProductType": "",
+      "TechnicalAxle1Load": "",
+      "TechnicalAxle2Load": "",
+      "TechnicalAxle3Load": "",
+      "TechnicalAxle4Load": "",
+      "TechnicalGrossCombinationWeight2": "",
+      "TechnicalGrossVehicleWeight2": "",
+      "TypeApprovalNumber": "*JPCZZ30D8GT013945*",
+      "VINNumber": "CWE 280 6X4R",
+      "VehicleModelCode": "RIGID",
+      "VehicleType": "3700",
+      "WheelBase": ""
+    }
+  }
+}
+```
+
+#### 6.2 更新接口
+
+**Request [请求格式]**：
+```json
+{
+  "action": "update",
+  "chassisNumber": "JPCT-013945",
+  "updateType": "regenerate",
+  "status": "0",
+  "type": null
+}
+```
+
+**updateType取值说明**：
+- "regenerate"：Set Regenerate操作，仅更新Status为'0'
+- "ok"：Set OK操作，仅更新Status为'1'
+- "basic"：Change to Basic Info操作，更新Status为'0'，Type为'1'
+- "advanced"：Change to Advanced Info操作，更新Status为'0'，Type为'2'
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "更新成功"
+}
+```
+
+**Response Error (400)**：
+```json
+{
+  "error": "Validation failed",
+  "message": "Chassis number JPCT-013945 not found."
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "error": "Internal Server Error",
+  "message": "Failed to update record"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| Chassis number未找到 | 显示警告消息 | "Chassis number XXX not found." |
+| Chassis number为空 | 终止流程 | "请输入Chassis number" |
+| 未先查询直接更新 | 终止流程 | "请先查询Chassis信息" |
+| API调用失败 | 显示通用错误 | "更新失败，请联系管理员" |
+| 数据库更新异常 | 显示通用错误 | "系统内部错误，请联系管理员" |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档（内部設計模板.md）相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：Vin_Plate_詳細設計.md
+- 保存到：当前文件夹下的work目录

@@ -1,0 +1,138 @@
+/* SaveModifications.css - UD06模块 */
+
+.sm-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 边框容器 */
+.sm-border-box {
+  max-width: 500px;
+  margin: 0 auto;
+  border: 2px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+/* 标题 */
+.sm-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 基本信息区域 */
+.sm-info-section {
+  margin-bottom: 20px;
+}
+
+.sm-info-row {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+/* 空行间距 */
+.sm-spacer {
+  margin-bottom: 15px;
+}
+
+.sm-label {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  display: inline-block;
+  font-family: monospace; /* 等宽字体，保持对齐 */
+}
+
+.sm-value {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  margin-left: 5px;
+  font-family: monospace; /* 等宽字体，保持对齐 */
+}
+
+/* 绿色高亮消息 */
+.sm-message-highlight {
+  font-size: 14px;
+  color: #000000;
+  font-weight: bold;
+  background-color: #00ff00; /* 绿色背景 */
+  padding: 2px 6px;
+  display: inline-block;
+  font-family: monospace; /* 等宽字体 */
+}
+
+/* 错误消息显示 */
+.sm-error-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+/* Close按钮区域 */
+.sm-button-bar {
+  margin-top: 20px;
+}
+
+.sm-close-btn {
+  background-color: #d0d8f0;
+  border: 1px solid #8fa4d0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.sm-close-btn:hover:not(:disabled) {
+  background-color: #c0c8e0;
+}
+
+.sm-close-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 加载状态 */
+.sm-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .sm-container {
+    padding: 15px;
+  }
+
+  .sm-border-box {
+    padding: 15px;
+  }
+
+  .sm-title {
+    font-size: 20px;
+  }
+
+  .sm-label,
+  .sm-value,
+  .sm-message-highlight {
+    font-size: 13px;
+  }
+
+  .sm-error-message {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}

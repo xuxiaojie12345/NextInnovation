@@ -1,0 +1,383 @@
+请根据以下要求生成[HDoc User Administration]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[HDoc User Administration]-001
+   模块名称:[HDoc User Administration]
+   作成日:2026-05-25
+
+## 2. 背景 (Background)
+本模块用于管理HDoc系统的用户权限配置，支持查询用户信息、分配角色权限及Market访问权限。
+
+**核心功能和目标**：
+- 用户输入UserID查询用户基本信息（从Saviynt系统获取用户名）
+- 展示和配置用户的多种角色权限（Standard User、Rule Admin、Template Admin等）
+- 为每个角色分配对应的Market访问权限
+- 支持更新和删除用户权限配置
+- 提供特殊功能权限开关（Manage Variable List、Show change variants fields等）
+
+**面向的用户群体**：系统管理员、权限管理人员
+
+**用户体验方面的考虑**：界面布局清晰、权限分类明确、操作反馈及时
+
+**安全性或特殊要求**：仅允许授权管理员执行权限配置操作，所有变更需记录日志
+
+## 3. 画面项目定义 (Screen Parameters)
+
+### 3.1 搜索区域                                                                                                                                                                                                                                                                                                                 
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | UserID | textfield | Y | 10 | Input | - | 左 | - | 活性 | 用户输入要查询的UserID；必填字段 |
+| 2   | User Info | button | - | - | Action | - | 中 | - | 活性 | 点击后从Saviynt系统获取用户名并展示 |
+
+### 3.2 用户信息显示区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 3   | User | label | - | - | Output | - | 左 | - | 活性 | 数据来源：Saviynt系统的User名；显示查询到的用户名 |
+
+### 3.3 角色权限配置区域
+
+#### Standard User 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 4   | Standard User | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用Standard User角色 |
+| 5   | Market | pull-downList | - | - | Input | - | 左 | -EU | 活性 | 数据来源：MARKET_MASTER.MARKET；默认显示'-EU'；可多选 |
+
+#### Rule Admin 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 6   | Rule Admin | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用Rule Admin角色 |
+| 7   | Market | pull-downList | - | - | Input | - | 左 | - | 活性 | 数据来源：MARKET_MASTER.MARKET；可多选 |
+
+#### Template Admin 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 8   | Template Admin | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用Template Admin角色 |
+| 9   | Market | pull-downList | - | - | Input | - | 左 | - | 活性 | 数据来源：MARKET_MASTER.MARKET；可多选 |
+
+#### Document Auth Admin 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 10  | Document Auth Admin | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用Document Auth Admin角色 |
+| 11  | Market | pull-downList | - | - | Input | - | 左 | - | 活性 | 数据来源：MARKET_MASTER.MARKET；可多选 |
+
+#### User Admin 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 12  | User Admin | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用User Admin角色 |
+
+#### Adaptation user 角色
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 13  | Adaptation user | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后启用Adaptation user角色 |
+| 14  | Market | pull-downList | - | - | Input | - | 左 | -EU | 活性 | 默认显示'-EU'；可多选 |
+
+### 3.4 功能权限配置区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 15  | Manage Variable List | checkbox | - | - | Input | - | 左 | - | 活性 | 勾选后授予管理变量列表权限 |
+
+### 3.5 Market Super User 配置区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 17  | Market Super User | pull-downList | - | - | Input | - | 左 | - | 活性 | 可选择多个Market作为超级用户权限 |
+| 18  | Market | pull-downList | - | - | Input | - | 左 | - | 活性 | 数据来源：MARKET_MASTER.MARKET；可多选 |
+
+### 3.6 操作按钮区域
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 19  | Update Role | button | - | - | Action | - | 中 | - | 活性 | 点击后保存/更新用户权限配置 |
+| 20  | Delete Role | button | - | - | Action | - | 中 | - | 活性 | 点击后删除用户的所有权限配置 |
+
+**控件类型说明**：
+- Input控件：TextField（UserID）、Checkbox（各种角色和功能权限）、Pull-downList（Market选择）
+- Action控件：Button（User Info、Update Role、Delete Role）
+- Output控件：Label（User）
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 初始显示
+**功能说明**：加载HDoc User Administration画面，展示UserID输入框和操作按钮。
+
+**操作步骤**：
+1. 页面加载时初始化"UserID"输入框为空
+2. "User"标签显示为空
+3. 所有角色复选框初始未勾选
+4. 所有Market下拉列表默认显示'-EU'（如适用）或为空
+5. 功能权限复选框初始未勾选
+6. 所有操作按钮处于可用状态
+
+### 4.2 用户信息查询功能（User Info）
+**功能说明**：根据用户输入的UserID从Saviynt系统获取用户名并展示。
+
+**操作步骤**：
+1. 用户在"UserID"输入框中输入UserID（如v0c6900）
+2. 点击「User Info」按钮
+3. 系统校验UserID是否为空：
+   - 若为空：提示"请输入UserID"
+   - 若不为空：调用API从Saviynt系统查询用户信息
+4. 若Saviynt系统中未找到该UserID：
+   - 设置Message = "We didn't recognize the userid you entered. Please try again."
+   - 终止流程
+5. 若找到用户：
+   - 在"User"标签中显示从Saviynt获取的用户名
+   - 同时从DOC_MARKET_AUTH和HDOC_FUNCTION_AUTH表加载该用户已有的权限配置
+   - 自动勾选已配置的角色复选框
+   - 自动填充已配置的Market下拉列表
+   - 自动勾选已配置的功能权限复选框
+
+### 4.3 权限更新功能（Update Role）
+**功能说明**：保存或更新用户的角色权限和市场访问权限配置。
+
+**操作步骤**：
+1. 用户先通过User Info查询到目标用户
+2. 根据需要勾选/取消勾选各角色复选框
+3. 为每个启用的角色选择对应的Market
+4. 勾选/取消勾选功能权限复选框
+5. 选择Market Super User（如需要）
+6. 点击「Update Role」按钮
+7. 系统校验UserID是否存在：
+   - 若不存在：设置Message = "We didn't recognize the userid you entered. Please try again."
+   - 若存在：调用API保存权限配置到DOC_MARKET_AUTH和HDOC_FUNCTION_AUTH表
+8. 成功后显示提示："权限更新成功"
+9. 失败则显示错误消息："更新失败，请联系管理员"
+
+### 4.4 权限删除功能（Delete Role）
+**功能说明**：删除用户的所有权限配置。
+
+**操作步骤**：
+1. 用户先通过User Info查询到目标用户
+2. 点击「Delete Role」按钮
+3. 系统弹出确认对话框："确定要删除该用户的所有权限吗？"
+4. 用户确认后，系统校验UserID是否存在：
+   - 若不存在：设置Message = "We didn't recognize the userid you entered. Please try again."
+   - 若存在：调用API从DOC_MARKET_AUTH和HDOC_FUNCTION_AUTH表删除该用户的所有权限记录
+5. 成功后：
+   - 显示提示："权限删除成功"
+   - 清空所有角色复选框
+   - 清空所有Market下拉列表
+   - 清空所有功能权限复选框
+6. 失败则显示错误消息："删除失败，请联系管理员"
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+**开始**：页面加载触发
+
+**前置处理**：
+- 初始化所有输入框和复选框为空/未勾选状态
+- 加载MARKET_MASTER表数据到所有Market下拉列表
+
+**用户信息查询处理（User Info）**：
+- 用户输入UserID并点击按钮
+- 校验UserID是否为空
+- 调用API从Saviynt系统查询用户信息
+- 若未找到用户，报错"We didn't recognize the userid you entered. Please try again."
+- 若找到用户，加载并展示已有权限配置
+
+**权限更新处理（Update Role）**：
+- 用户必须先执行User Info查询到目标用户
+- 配置各角色、Market和功能权限
+- 点击Update Role按钮后调用API保存配置
+- 保存到DOC_MARKET_AUTH表（市场权限）和HDOC_FUNCTION_AUTH表（功能权限）
+- 根据角色自动应用对应的画面功能权限（参考权限矩阵表）
+
+**权限删除处理（Delete Role）**：
+- 用户必须先执行User Info查询到目标用户
+- 点击Delete Role按钮后弹出确认对话框
+- 用户确认后调用API删除所有权限记录
+
+**空值校验等 (Frontend Check)**：
+- 若执行User Info时UserID为空：
+  - 设置Message = "请输入UserID"
+  - 终止流程
+- 若执行Update/Delete操作前未查询到用户：
+  - 设置Message = "请先查询用户信息"
+  - 终止流程
+
+**API调用 (Backend Check)**：
+- 调用 `UD17HDocUserAdministrationApi` 接口执行查询、更新和删除操作
+
+### 5.2 结果处理
+- **成功**：正常渲染权限配置或显示操作成功消息
+- **失败**：显示对应错误消息
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | User Info操作 | UserID | Saviynt中不存在 | "We didn't recognize the userid you entered. Please try again." | 显示错误消息 |
+| 2 | User Info操作 | UserID | 输入为空 | "请输入UserID" | 终止流程 |
+| 3 | Update Role操作 | UserID | 未先执行查询 | "请先查询用户信息" | 终止流程 |
+| 4 | Update Role操作 | UserID | DOC_MARKET_AUTH/HDOC_FUNCTION_AUTH中不存在 | "We didn't recognize the userid you entered. Please try again." | 显示错误消息 |
+| 5 | Delete Role操作 | UserID | 未先执行查询 | "请先查询用户信息" | 终止流程 |
+| 6 | Delete Role操作 | UserID | DOC_MARKET_AUTH/HDOC_FUNCTION_AUTH中不存在 | "We didn't recognize the userid you entered. Please try again." | 显示错误消息 |
+
+## 6. 接口定义 (API Specification)
+
+### UD17HDocUserAdministrationApi
+- **功能**：提供HDoc用户权限管理的查询、更新和删除接口
+- **Method**：GET/POST/DELETE
+- **Endpoint**：/api/v1/ud17/hdoc-user-admin
+
+#### 6.1 查询用户信息接口
+
+**Request [请求格式]**：
+```json
+{
+  "action": "query",
+  "userId": "v0c6900"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "userName": "John Smith",
+  "roles": {
+    "standardUser": {
+      "enabled": true,
+      "markets": ["-EU", "-UD", "IAD"]
+    },
+    "ruleAdmin": {
+      "enabled": false,
+      "markets": []
+    },
+    "templateAdmin": {
+      "enabled": true,
+      "markets": ["-EU", "ALB", "ARG"]
+    },
+    "documentAuthAdmin": {
+      "enabled": false,
+      "markets": []
+    },
+    "userAdmin": {
+      "enabled": false
+    },
+    "adaptationUser": {
+      "enabled": true,
+      "markets": ["-EU"]
+    }
+  },
+  "functions": {
+    "manageVariableList": true,
+    "showChangeVariantsFields": false
+  },
+  "marketSuperUser": ["-EU", "-UD", "IAD"]
+}
+```
+
+#### 6.2 更新权限接口
+
+**Request [请求格式]**：
+```json
+{
+  "action": "update",
+  "userId": "v0c6900",
+  "roles": {
+    "standardUser": {
+      "enabled": true,
+      "markets": ["-EU", "-UD", "IAD", "ICZ"]
+    },
+    "ruleAdmin": {
+      "enabled": true,
+      "markets": ["IES", "IIT"]
+    },
+    "templateAdmin": {
+      "enabled": false,
+      "markets": []
+    },
+    "documentAuthAdmin": {
+      "enabled": true,
+      "markets": ["IPO", "IPT", "IRU"]
+    },
+    "userAdmin": {
+      "enabled": false
+    },
+    "adaptationUser": {
+      "enabled": true,
+      "markets": ["-EU", "ISE"]
+    }
+  },
+  "functions": {
+    "manageVariableList": true,
+    "showChangeVariantsFields": true
+  },
+  "marketSuperUser": ["-EU", "-UD"]
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "权限更新成功"
+}
+```
+
+#### 6.3 删除权限接口
+
+**Request [请求格式]**：
+```json
+{
+  "action": "delete",
+  "userId": "v0c6900"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "权限删除成功"
+}
+```
+
+**Response Error (400)**：
+```json
+{
+  "error": "Validation failed",
+  "message": "We didn't recognize the userid you entered. Please try again."
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "error": "Internal Server Error",
+  "message": "Failed to process request"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| UserID在Saviynt中不存在 | 显示错误消息 | "We didn't recognize the userid you entered. Please try again." |
+| UserID为空 | 终止流程 | "请输入UserID" |
+| 未先查询直接更新/删除 | 终止流程 | "请先查询用户信息" |
+| API调用失败 | 显示通用错误 | "更新失败，请联系管理员" 或 "删除失败，请联系管理员" |
+| 数据库操作异常 | 显示通用错误 | "系统内部错误，请联系管理员" |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档（内部設計模板.md）相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：HDoc User Administration_詳細設計.md
+- 保存到：当前文件夹下的work目录

@@ -1,48 +1,24 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
+/* src/components/NavigationMenu/Menu.css */
+
+.navigation-menu {
+  width: 420px; /* 增加宽度 */
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   font-family: Arial, sans-serif;
+  margin-left: 20px; /* 添加左外边距，与屏幕边缘保持距离 */
 }
 
 .menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
+  background-color: #0056b3;
+  color: white;
+  padding: 15px;
   text-align: center;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-.menu-content {
-  padding: 0;
-}
-
-.menu-section {
-  border-bottom: 1px solid #ccc;
-}
-
-.menu-section:last-child {
-  border-bottom: none;
-}
-
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
+.menu-header h1 {
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  font-size: 25px;
+  font-weight: bold;
 }
 
 .menu-list {
@@ -51,26 +27,74 @@
   margin: 0;
 }
 
+.menu-group {
+  margin-bottom: 10px;
+}
+
+.group-title {
+  padding: 8px 15px;
+  font-weight: bold;
+  color: #0056b3;
+  font-size: 19px;
+  background-color: #e9ecef;
+  border-bottom: 1px solid #ddd;
+}
+
+.submenu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .menu-item {
+  padding: 8px 15px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 18px;
   display: flex;
   align-items: center;
-  padding: 6px 15px;
-  cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  white-space: nowrap; /* 防止文字折行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 显示省略号 */
 }
 
 .menu-item:hover {
-  background-color: #d5e3f0;
+  background-color: #e2e6ea;
 }
 
-.menu-arrow {
+.arrow-icon {
   margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
+  font-size: 17px;
+  color: #888;
 }
 
-.menu-label {
+.item-label {
   flex: 1;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .navigation-menu {
+    width: 100%;
+    max-width: 300px;
+    margin-left: 10px; /* 移动端也添加左外边距 */
+  }
+
+  .menu-header {
+    padding: 10px;
+  }
+
+  .group-title {
+    padding: 6px 10px;
+    font-size: 18px;
+  }
+
+  .menu-item {
+    padding: 6px 10px;
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

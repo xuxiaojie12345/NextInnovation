@@ -1,156 +1,210 @@
+// Login.tsx
 import React, { useState } from "react";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
-// ... existing code ...
 
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
-const authenticationApi = async (
-  userID: string,
-  password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
+// 定义后端返回的数据结构接口
+interface BackendLoginResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    userId: string;
+  };
+}
+
+const Login = () => {
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    userId: "",
+    password: "",
+    authentication: "",
   });
-};
 
-const Login: React.FC = () => {
-  const navigate = useNavigate();
-  // 状态管理 (对应设计书 6. 实现注意事项)
-  const [userID, setUserID] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // 验证函数
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { userId: "", password: "", authentication: "" };
 
-  // 处理 UserID 输入 (限制：半角英数字, MaxLength 10)
-  const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    // 正则校验：只允许半角英数字
-    if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 10) {
-      setUserID(val);
-      // 用户体验优化：用户重新输入时清空错误提示
-      if (message) setMessage("");
+    if (!userId.trim()) {
+      newErrors.userId = "Username and password are required.";
+      valid = false;
     }
+
+    if (!password.trim()) {
+      newErrors.password = "Username and password are required.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
-  // 处理 Password 输入 (限制：半角英数字+记号, MaxLength 32)
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    // 正则校验：允许半角英数字及常见 ASCII 符号
-    if (
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(val) &&
-      val.length <= 32
-    ) {
-      setPassword(val);
-      if (message) setMessage("");
-    }
-  };
+  // 登录处理函数
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  // 点击 Login 按钮触发 (对应设计书 3. 业务逻辑与校验规则)
-  const handleLogin = async () => {
-    // 1. 前置处理：去除首尾空格
-    const trimmedUserID = userID.trim();
-    const trimmedPassword = password.trim();
-
-    // 2. 空值校验 (Frontend Check)
-    if (!trimmedUserID || !trimmedPassword) {
-      setMessage("Username and password are required.");
-      return; // 终止流程，不调用 API
+    // 验证表单
+    if (!validateForm()) {
+      return;
     }
 
-    // 3. API 调用 (Backend Check)
+    // 禁用按钮防止重复提交
     setIsLoading(true);
-    setMessage(""); // 清除旧消息
+    // 清除之前的认证错误
+    setErrors((prev) => ({ ...prev, authentication: "" }));
 
     try {
-      const result = await authenticationApi(trimmedUserID, trimmedPassword);
+      // 调用真实的后端 API
+      const response = await authenticateUser(userId, password);
 
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
-        navigate("/Menu");
+      if (response.success) {
+        // 登录成功，跳转到菜单页面
+        // 如果需要保存 token 或用户信息，可以在这里处理
+        window.location.href = "/menu";
       } else {
-        // 认证失败：显示指定错误信息
-        setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        // 登录失败，显示后端返回的错误信息或默认信息
+        setErrors((prev) => ({
+          ...prev,
+          authentication:
+            response.message ||
+            "We didn't recognize the username or password you entered. Please try again.",
+        }));
       }
     } catch (error) {
-      // 异常处理：网络错误或服务器错误
-      setMessage("System error. Please contact administrator.");
+      console.error("Login error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        authentication:
+          "Network error or server unavailable. Please try again later.",
+      }));
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 真实认证 API 调用
+  const authenticateUser = async (
+    userId: string,
+    password: string,
+  ): Promise<BackendLoginResponse> => {
+    const API_BASE_URL = "http://localhost:8081";
+
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId,
+        password: password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: BackendLoginResponse = await response.json();
+    return data;
+  };
+
+  // 输入框变化处理
+  const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUserId(value);
+
+    // 清除错误信息
+    if (value.trim()) {
+      setErrors((prev) => ({ ...prev, userId: "" }));
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    // 清除错误信息
+    if (value.trim()) {
+      setErrors((prev) => ({ ...prev, password: "" }));
+    }
+  };
+
   return (
     <div className='login-container'>
-      <div className='login-box'>
-        <div className='login-header'>
-          <h2>Login</h2>
-        </div>
+      {/* 左侧内容 */}
+      <div className='left-content'>
+        <h1 className='main-title'>EDB Engineering Database</h1>
+        <p className='sub-title'>Use Outlook id and password</p>
+        <p className='support-text'>
+          Support, authorization request or improvement suggestions, send mail
+          to Support.TPI
+        </p>
+      </div>
 
-        {/* Message Label: Output, Left Align, Red Color */}
-        {message && (
-          <div
-            className='error-message'
-            style={{
-              color: "#ff4d4f",
-              textAlign: "left",
-              marginBottom: "15px",
-              fontSize: "14px",
-              wordBreak: "break-word",
-            }}
-          >
-            {message}
-          </div>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          {/* UserID: TextField, Input, Left Align */}
-          <div className='form-group'>
-            <label htmlFor='userID'>UserID</label>
+      {/* 右侧表单 */}
+      <div className='right-form'>
+        <form onSubmit={handleLogin} className='login-form'>
+          {/* 用户ID输入框 */}
+          <div className='input-group'>
             <input
-              id='userID'
               type='text'
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder='Enter User ID'
+              id='userId'
+              name='userId'
+              value={userId}
+              onChange={handleUserIdChange}
+              placeholder='Enter your user ID'
+              maxLength={10}
               disabled={isLoading}
-              autoComplete='username'
+              className={`input-field ${errors.userId ? "error" : ""}`}
             />
+            {errors.userId && (
+              <span className='error-message'>{errors.userId}</span>
+            )}
           </div>
 
-          {/* Password: TextField, Input, Left Align, Masked */}
-          <div className='form-group'>
-            <label htmlFor='password'>Password</label>
+          {/* 密码输入框 */}
+          <div className='input-group'>
             <input
-              id='password'
               type='password'
+              id='password'
+              name='password'
               value={password}
               onChange={handlePasswordChange}
-              placeholder='Enter Password'
+              placeholder='Enter your password'
+              maxLength={32}
               disabled={isLoading}
-              autoComplete='current-password'
+              className={`input-field ${errors.password ? "error" : ""}`}
             />
+            {errors.password && (
+              <span className='error-message'>{errors.password}</span>
+            )}
           </div>
 
-          {/* Login Button: Center Align, Active/Disabled Control */}
-          <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
+          {/* 登录按钮 */}
+          <button type='submit' disabled={isLoading} className='login-button'>
+            {isLoading ? "Logging in..." : "Login"}
           </button>
+
+          {/* 错误提示 */}
+          {errors.authentication && (
+            <div className='error-message'>{errors.authentication}</div>
+          )}
         </form>
+
+        {/* 新增：登录按钮下方的红色提示信息 - 单独显示 */}
+        <div className='login-help-text'>
+          If you get error message: "Your account is locked. Please contact your
+          system administrator"
+          <br />
+          Please try this alternative login link before contacting support:{" "}
+          <a href='/alternative-login' style={{ color: "red" }}>
+            Login
+          </a>
+          <br />
+          We are working to find root cause of problem.
+        </div>
       </div>
     </div>
   );

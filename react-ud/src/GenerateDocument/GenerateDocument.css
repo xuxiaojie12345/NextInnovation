@@ -1,0 +1,222 @@
+/* GenerateDocument.css - UD04模块 */
+
+.gd-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 25px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  zoom: 1.1; /* 整体放大10% */
+}
+
+/* 主内容区域 - 带边框的容器（与4.png完全一致） */
+.gd-main-content {
+  border: 2px solid #000080; /* 深蓝色边框 */
+  background-color: #ffffff;
+  padding: 18px;
+  margin-bottom: 18px;
+  min-height: 600px;
+}
+
+/* 标题区域 - 在边框容器内 */
+.gd-header {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.gd-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 10px 0;
+  font-family: Arial, sans-serif;
+}
+
+.gd-error-label {
+  font-size: 15px;
+  color: #ff0000; /* 红色 */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 信息组 - 每行显示一个字段 */
+.gd-info-group {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.gd-label {
+  font-size: 15px;
+  color: #000000;
+  font-weight: normal;
+  display: inline-block;
+  min-width: 160px;
+}
+
+/* Chassis no标签加粗 */
+.gd-label.chassis-no-label {
+  font-weight: bold;
+}
+
+.gd-value {
+  font-size: 15px;
+  color: #000000;
+  font-weight: normal;
+}
+
+/* S-Note编号区域 */
+.gd-snote-section {
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+.gd-snote-no {
+  font-size: 15px;
+  color: #000000;
+  font-family: monospace;
+}
+
+/* S-Note消息 - 红色显示 */
+.gd-snote-message {
+  color: #ff0000; /* 红色 */
+  font-size: 15px;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+/* 链接样式 */
+.gd-link {
+  font-size: 15px;
+  color: #0000ff; /* 蓝色链接 */
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.gd-link:hover {
+  color: #0000cc;
+  text-decoration: underline;
+}
+
+/* ADCA警告消息 - 红色可点击链接 */
+.gd-adca-warning-link {
+  color: #ff0000; /* 红色 */
+  font-weight: bold;
+  font-size: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.gd-adca-warning-link:hover {
+  color: #cc0000;
+  text-decoration: underline;
+}
+
+/* Modify Doc链接 - 红色可点击 */
+.gd-modify-link {
+  color: #ff0000; /* 红色 */
+  font-weight: bold;
+}
+
+.gd-modify-link:hover {
+  color: #cc0000;
+}
+
+/* Replacing parameters区域 */
+.gd-replacing-params {
+  margin: 12px 0;
+}
+
+.gd-param-label {
+  font-size: 15px;
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.gd-param-value {
+  font-size: 15px;
+  color: #000000;
+  font-family: monospace;
+  padding-left: 10px;
+}
+
+/* Generated document下载链接 */
+.gd-download-link {
+  color: #0000ff; /* 蓝色 */
+  font-weight: bold;
+}
+
+.gd-download-link:hover {
+  color: #0000cc;
+}
+
+/* 底部信息区域 - 在边框容器内 */
+.gd-footer {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* 错误消息显示 */
+.gd-error-message {
+  margin-bottom: 18px;
+  padding: 12px 18px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+/* 加载状态 */
+.gd-loading {
+  text-align: center;
+  padding: 60px;
+  font-size: 18px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .gd-container {
+    padding: 18px;
+    zoom: 1.05; /* 移动端放大5% */
+  }
+
+  .gd-title {
+    font-size: 20px;
+  }
+
+  .gd-error-label {
+    font-size: 13px;
+  }
+
+  .gd-main-content {
+    padding: 12px;
+    min-height: 450px;
+  }
+
+  .gd-label {
+    font-size: 14px;
+    min-width: 130px;
+  }
+
+  .gd-value,
+  .gd-link,
+  .gd-snote-no,
+  .gd-snote-message,
+  .gd-adca-warning,
+  .gd-param-label,
+  .gd-param-value {
+    font-size: 14px;
+  }
+
+  .gd-error-message {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}
