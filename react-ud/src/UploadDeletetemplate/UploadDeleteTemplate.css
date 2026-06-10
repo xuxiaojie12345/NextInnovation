@@ -1,0 +1,308 @@
+/* UploadDeleteTemplateコンポーネントのスタイル */
+
+.upload-delete-template-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+/* セクション共通スタイル */
+.section {
+  margin-bottom: 30px;
+}
+
+.upload-section h2,
+.delete-section h2 {
+  color: #000080;
+  margin: 0 0 10px 0;
+  padding: 0;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+}
+
+/* フォームボックス - 青い枠線 */
+.form-box {
+  background-color: #ffffff;
+  border: 1px solid #a4b8d6;
+  padding: 10px 15px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+.form-label {
+  min-width: 100px;
+  font-weight: normal;
+  color: #000;
+  font-size: 14px;
+}
+
+/* ファイル入力ラッパー */
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-select-btn {
+  padding: 3px 10px;
+  background-color: #e8e8e8;
+  border: 2px outset #f0f0f0;
+  cursor: pointer;
+  font-size: 13px;
+  color: #000;
+  font-family: Arial, sans-serif;
+}
+
+.file-select-btn:hover {
+  background-color: #d8d8d8;
+}
+
+.file-select-btn:active {
+  border-style: inset;
+}
+
+.file-status {
+  font-size: 13px;
+  color: #000;
+  flex: 1;
+}
+
+/* セレクトボックス */
+.select-input {
+  padding: 2px 3px;
+  border: 1px solid #808080;
+  font-size: 13px;
+  background-color: white;
+  font-family: Arial, sans-serif;
+}
+
+.market-select {
+  width: 80px;
+}
+
+.templates-select {
+  width: 80px;
+}
+
+.select-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* ボタン行 - 淡い青色背景 */
+.button-row {
+  margin-top: 0;
+  padding: 6px 10px;
+  border-top: 1px solid #a4b8d6;
+  background-color: #eef0ff;
+}
+
+.btn {
+  padding: 3px 10px;
+  border: 2px outset #f0f0f0;
+  cursor: pointer;
+  font-size: 13px;
+  background-color: #e8e8e8;
+  color: #000;
+  font-family: Arial, sans-serif;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: #d8d8d8;
+}
+
+.btn:active:not(:disabled) {
+  border-style: inset;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-upload {
+  background-color: #e8e8e8;
+}
+
+.btn-delete {
+  background-color: #e8e8e8;
+}
+
+/* 情報テキスト */
+.info-text {
+  margin: 10px 0 0 0;
+  padding: 0;
+  background-color: transparent;
+  border-left: none;
+  font-size: 13px;
+  color: #000;
+  line-height: 1.5;
+}
+
+/* Check your rtf templateセクション */
+.check-section {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background-color: transparent;
+  margin-top: 20px;
+}
+
+.check-title {
+  color: #cc0000;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+
+.check-text {
+  font-size: 13px;
+  color: #000;
+  line-height: 1.5;
+  margin: 0 0 15px 0;
+}
+
+.check-link {
+  color: #0000ee;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.check-link:hover {
+  color: #0000aa;
+}
+
+/* メッセージ表示エリア */
+.message {
+  padding: 12px 15px;
+  margin: 15px 0;
+  border-radius: 4px;
+  text-align: left;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+.message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-color: #bee5eb;
+}
+
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.dialog p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.dialog-buttons .btn {
+  min-width: 80px;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: 2px outset #f0f0f0;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: 2px outset #f0f0f0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .upload-delete-template-container {
+    padding: 10px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-group label {
+    margin-bottom: 5px;
+  }
+  
+  .file-input-wrapper {
+    width: 100%;
+  }
+  
+  .select-input {
+    width: 100%;
+  }
+  
+  .dialog-buttons {
+    flex-direction: column;
+  }
+  
+  .dialog-buttons .btn {
+    width: 100%;
+  }
+}

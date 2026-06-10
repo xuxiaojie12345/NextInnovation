@@ -1,0 +1,171 @@
+请根据以下要求生成[Generate document]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Generate document]-001
+   模块名称:[Generate document]
+   作成日:YYYY-MM-DD
+
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  面向的用户群体
+  用户体验方面的考虑
+  安全性或特殊要求（如有）
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | [Chassis no] | [label] | [-] | [15] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 2   | [Ordernumber] | [label] | [-] | [16] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 3   | [Build week] | [label] | [-] | [10] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 4   | [Spec week] | [label] | [-] | [10] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 5   | [Market] | [label] | [-] | [10] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 6   | [Master Market] | [label] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 7   | [S-Note NO] | [label] | [-] | [4000] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 8   | [S-Note Message] | [label] | [-] | [256] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 9   | [Load Index] | [label] | [-] | [10] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 10  | [Analyze Rules] | [label] | [-] | [10] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 11  | [Modify Doc Link] | [label] | [-] | [1] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 12  | [Using template] | [label] | [-] | [20] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 13  | [Replacing parameters] | [label] | [-] | [40] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 14  | [Generated document] | [Link] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 15  | [Date] | [label] | [-] | [20] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 16  | [HDoc version] | [label] | [-] | [20] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 17  | [Error message area] | [label] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 [初期表示]
+    功能说明：[画面初期表示，API取得数据表示画面]
+    操作步骤：
+      1. [画面初期表示，接收前画面传递的参数（Chassis series，Chassis no），同时调用API（UD04SelectGeneratedocumentApi）取得数据返回画面表示。]
+      2. [成功：画面数据正常显示
+          失败：画面显示错误信息]
+  
+    4.2 [After def change detected. Document need to be modified.点击，Chassis no参数传递]
+      功能说明：[Modify Document画面迁移]
+      操作步骤：
+        1. [画面初期表示，After def change detected. Document need to be modified.Link点击]
+        2. [成功：Modify Document画面迁移
+            失败：画面状态保持，迁移失败] 
+
+    4.3 [Chassis no点击]
+          功能说明：[VDA - Vehicle Specification画面迁移]
+          操作步骤：
+            1. [画面初期表示，Chassis noLink点击]
+            4. [成功：VDA - Vehicle Specification画面迁移
+                失败：画面状态保持，迁移失败]
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      5.1.1 开始：[初期表示]
+            前置处理：[画面传递的参数（Chassis series，Chassis no）]
+            空值校验等 (Frontend Check)：
+            无
+            API调用 (Backend Check)：
+              调用[UD04SelectGeneratedocumentApi] API，两个参数：
+                Chassis series
+                Chassis no 传递到后台
+            结果处理：
+              成功：[code：200，数据正常取得返回前台，画面数据正常显示]
+              失败：[code：500，数据取得异常返回前台，画面显示错误信息]
+
+      5.1.2 开始：[After def change detected. Document need to be modified.点击]
+            前置处理：[将画面项目值进行传递（Chassis no，Market）]
+            空值校验等 (Frontend Check)：
+            无
+            API调用 (Backend Check)：
+              无
+            结果处理：
+              成功：[Modify Document画面迁移]
+              失败：[画面状态保持，迁移失败]
+
+      5.1.3 开始：[After def change detected. Document need to be modified.点击]
+            前置处理：[将画面项目值进行传递（Chassis no）]
+            空值校验等 (Frontend Check)：
+            无
+            API调用 (Backend Check)：
+              无
+            结果处理：
+              成功：[Modify Document画面迁移]
+              失败：[画面状态保持，迁移失败]
+
+      5.1.3 开始：[Chassis no点击]
+            前置处理：[将画面项目值进行传递（Chassis no）]
+            空值校验等 (Frontend Check)：
+            无
+            API调用 (Backend Check)：
+              无
+            结果处理：
+              成功：[VDA - Vehicle Specification画面迁移]
+              失败：[画面状态保持，迁移失败]
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   无
+
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [UD04SelectGeneratedocumentApi]
+     功能：[通过画面传递的参数进行数据查询]
+     Method：[POST]
+     Endpoint：[/api/UD04/generatedocument]
+
+     Request [
+      {
+        "Chassis series": "string",
+        "Chassis no": "string"
+      }
+     ]
+
+     Response Success (
+      [
+      {
+        "code": 200,
+         "data": {
+          "generatedocumentdate": { ... },
+          "message": "success"
+      }
+     ]
+     )
+
+     Response Error ([401])
+     [
+      json
+      {
+        "code": 401,
+        "data": {},
+        "message": "Invalid credentials"
+      }
+    ]
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络错误 | catch块捕获，输出错误日志 | Upload failed. Please try again. |
+| 服务器错误（500） | catch块捕获，显示服务器错误消息 | 服务器返回的错误消息 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Generate document]_詳細設計.md
+  保存到：当前文件夹下的work目录

@@ -1,76 +1,181 @@
+/* Menu 画面样式 - 左侧边栏布局，无滚动条，自适应浏览器 */
+
+/* 整体容器 */
 .menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #ffffff;
+  overflow: hidden;
 }
 
+/* VOLVO 品牌标识头部 */
 .menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
+  background-color: #003057;
+  padding: 10px 12px;
   text-align: center;
+  width: 100%;
 }
 
 .volvo-logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.text-logo {
-  color: white;
-  font-size: 24px;
+  color: #ffffff;
+  font-size: 22px;
   font-weight: bold;
+  margin: 0;
   letter-spacing: 2px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
+/* 左侧边栏 */
+.menu-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: #e8e8e8;
+  border-right: 1px solid #cccccc;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 菜单内容区 - 自动滚动，隐藏滚动条 */
 .menu-content {
+  background-color: #e8e8e8;
   padding: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
-.menu-section {
-  border-bottom: 1px solid #ccc;
+/* Webkit 浏览器隐藏滚动条 */
+.menu-content::-webkit-scrollbar {
+  display: none;
 }
 
-.menu-section:last-child {
+/* 分类容器 */
+.menu-category {
+  margin-bottom: 0;
+  border-bottom: 1px solid #cccccc;
+}
+
+.menu-category:last-child {
   border-bottom: none;
 }
 
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
+/* 分类标题头部 */
+.category-header {
+  background-color: #d8d8d8;
+  padding: 6px 10px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.category-title {
+  font-size: 13px;
   font-weight: bold;
+  color: #003057;
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
+/* 菜单列表 */
 .menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  background-color: #e8e8e8;
+  padding: 4px 0;
 }
 
+/* 子分类（如 Generate） */
+.sub-category {
+  margin-bottom: 8px;
+}
+
+.sub-category:last-child {
+  margin-bottom: 0;
+}
+
+.sub-category-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #003057;
+  margin: 0 0 3px 10px;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 菜单项 */
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  padding: 3px 10px 3px 20px;
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
+  text-align: left;
 }
 
 .menu-item:hover {
-  background-color: #d5e3f0;
+  background-color: #d0d0d0;
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
+.menu-item:focus {
+  outline: 2px solid #003057;
+  outline-offset: -2px;
+  background-color: #d0d0d0;
+}
+
+.menu-item:active {
+  background-color: #c0c0c0;
+}
+
+/* 菜单项箭头符号 */
+.menu-item-arrow {
+  color: #003057;
   font-size: 12px;
+  margin-right: 5px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.menu-label {
+/* 菜单项文字 */
+.menu-item-text {
+  color: #003057;
+  font-size: 11px;
+  line-height: 1.4;
+  font-family: Arial, Helvetica, sans-serif;
+  word-break: break-word;
+}
+
+/* 主内容区域（右侧） */
+.main-content {
   flex: 1;
+  padding: 24px;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .menu-sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .volvo-logo {
+    font-size: 18px;
+  }
+
+  .category-title {
+    font-size: 12px;
+  }
+
+  .menu-item-text {
+    font-size: 10px;
+  }
+
+  .sub-category-title {
+    font-size: 11px;
+  }
+
+  .menu-item {
+    padding: 3px 8px 3px 16px;
+  }
 }

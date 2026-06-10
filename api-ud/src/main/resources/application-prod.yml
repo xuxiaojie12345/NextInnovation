@@ -50,3 +50,11 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: /home/uploads/
     downloadFolder: /home/downloads/
+
+# 模板文件上传路径（生产环境）
+upload:
+  template:
+    # 生产环境根据实际情况配置
+    path: //172.17.0.63/F$/hdoc/template/upload
+    remote.server: 172.17.0.63
+    use.network.share: true

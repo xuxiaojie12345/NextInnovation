@@ -1,0 +1,118 @@
+请根据以下要求生成[Login]的详细设计文档：
+
+1.基本信息
+文档编号:DES-[Login]-001
+模块名称:[Login]
+作成日:YYYY-MM-DD
+  
+2. 背景 (Background)
+  登录页面，用户输入用户名和密码，点击登录按钮，进行登录验证，验证成功后跳转到首页，验证失败后提示错误信息。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | [UserID] | [TextField] | [Y] | [10] | [Input] | [半角英数字] | [左] | [空] | [活性] | [] |
+| 2   | [Password] | [TextField] | [Y] | [32] | [Input] | [半角英数字+記号] | [左] | [空] | [活性] | [] |
+| 3   | [Message] | [label] | [-] | [256] | [Output] | [-] | [左] | [空] | [-] | [] |
+| 4   | [Login] | [button] | [-] | [-] | [-] | [-] | [中] | [-] | [活性] | [] |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 [Login登陆]
+    功能说明：[用户点击Login登录按钮，跳转到menu画面。]
+    操作步骤：
+      1. [用户打开系统登录页面，输入userid和password]
+      2. [点击Login登陆按钮，调用AuthenticationApi进行用户信息验证]
+      3. [系统验证用户并返回认证结果]
+      4. [登录成功：跳转至系统主菜单界面，用户可以开始使用系统功能
+          登录失败：在登录界面显示相应的错误信息，如用户名或密码错误，提示用户重新输入] 
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      开始：[点击Login登陆按钮]
+      前置处理：[获取userid，password]
+      空值校验等 (Frontend Check)：
+       若[userid为空的场合]：
+        设置Message = [Username and password are required.]
+        终止流程，不调用API
+       若[password为空的场合]：
+        设置Message = [Username and password are required.]
+        终止流程，不调用API 
+       若[userid或password输入不正时]：
+        设置Message = [We didn't recognize the username or password you entered. Please try again.]
+        终止流程，不调用API
+      5.1.2 API调用 (Backend Check)：
+        若校验通过，调用 "AuthenticationApi",API参数(userid，password)。
+   5.2 结果处理：
+       成功：[用户验证成功后跳转到menu画面]
+       失败：[用户验证失败后跳转到login画面]
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | [1] | [点击Login按钮] | [userid] | [userid为空] | [Username and password are required.] | [-] |
+   | [2] | [点击Login按钮] | [password] | [password为空] | [Username and password are required.] | [-] |
+   | [3] | [点击Login按钮] | [userid，password] | [userid或password输入不正] | [We didn't recognize the username or password you entered. Please try again.] | [-] |
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [AuthenticationApi]
+     功能：[对接收到用户登录信息进行验证]
+     Method：[POST]
+     Endpoint：[/api/auth/login]
+
+     Request [
+      {
+        "userid": "string",
+        "password": "string"
+      }
+     ]
+
+     Response Success (
+      [
+      {
+        "code": 200,
+         "data": {
+          "userInfo": { ... },
+          "message": "success"
+      }
+     ]
+     )
+
+     Response Error ([401])
+     [
+      json
+      {
+        "code": 401,
+        "data": {},
+        "message": "Invalid credentials"
+      }
+    ]
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络错误 | catch块捕获，输出错误日志 | Upload failed. Please try again. |
+| 服务器错误（500） | catch块捕获，显示服务器错误消息 | 服务器返回的错误消息 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Login]_詳細設計.md
+  保存到：当前文件夹下的work目录

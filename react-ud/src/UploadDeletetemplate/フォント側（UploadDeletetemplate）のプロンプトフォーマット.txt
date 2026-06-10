@@ -1,0 +1,66 @@
+请严格按照以下要求，生成一个规范、可直接运行的React登录页面完整代码，要求代码结构清晰、注释完整、无冗余，适配React 18版本，贴合前端开发规范，具体要求如下：
+
+请参照该路径下的开发规约：react-ud\src\開発規約.txt 严格参照
+
+ 一、基础配置
+1.  技术栈：React 18 + React Hooks（useState、useEffect）
+2.  样式方案：【原生CSS】
+3.  路由支持：【需要】（例：需要，使用react-router-dom实现登录跳转）
+4.  请求工具：【axios】
+5.  适配要求：PC端居中显示，支持响应式
+
+ 二、页面UI要求（以Login画面为例，可根据自己的画面进行修改）
+1.  整体布局：
+    1.1.项目结构
+        react-ud\
+        ├── .gitignore (0.3KB)                        # Git版本控制系统忽略文件配置
+        ├── node_modules/ (953 items)                 # 项目依赖包目录
+        ├── package-lock.json (761.5KB)               # 锁定依赖版本确保一致性
+        ├── package.json (1.7KB)                      # 项目配置和依赖声明
+        ├── public/ (6 items)                         # 公共静态资源目录
+        │   ├── favicon.ico                           # 网站图标
+        │   ├── index.html                            # 应用程序主HTML页面
+        │   ├── manifest.json                         # Web应用清单文件
+        │   ├── robots.txt                            # 搜索引擎爬虫访问规则
+        │   ├── logo192.png                           # 应用图标(192x192)
+        │   └── logo512.png                           # 应用图标(512x512)
+        ├── src/ (12 items)                           # 源代码主目录
+        │   ├── App.css (0.6KB)                       # App组件的样式文件
+        │   ├── App.test.tsx (0.3KB)                  # App组件单元测试文件
+        │   ├── App.tsx (1.0KB)                       # 应用程序主组件
+        │   ├── Login/ (8 items)                      # 登录功能模块目录
+        │   │   ├── Login.css (6.9KB)                 # 登录页面样式文件
+        │   │   ├── Login.png (1556.4KB)              # 登录页面设计图
+        │   │   ├── Login.tsx (9.4KB)                 # 登录页面React组件实现
+        │   │   ├── Login_内部設計.md (4.9KB)         # 登录模块内部设计文档
+        │   │   └── README.md (3.6KB)                 # 登录模块说明文档
+        │   ├── fTRYDXFAD.jpeg (393.5KB)              # 项目背景图片
+        │   ├── index.css (0.4KB)                     # 应用程序全局样式
+        │   ├── index.tsx (0.5KB)                     # React应用入口文件
+        │   ├── logo.svg (2.6KB)                      # React应用Logo矢量图
+        │   ├── react-app-env.d.ts (0.0KB)            # React应用类型定义文件
+        │   ├── reportWebVitals.ts (0.4KB)            # 性能指标收集工具
+        │   └── setupTests.ts (0.2KB)                 # 测试环境初始化配置
+        └── tsconfig.json (0.5KB)                     # TypeScript编译配置文件
+        
+    1.2.画面样式
+      根据 react-ud\src\UploadDeletetemplate\Upload&Deletetemplate.png 图片生成一下画面样式代码，严格保持式样与图片一致，包括颜色，字体，位置一致 严格参照
+      要求整体样式与图片一致
+ 三、功能要求（核心，可修改接口参数）
+ 
+    1.  根据react-ud\src\UploadDeletetemplate\work\[Upload&Delete template]_詳細設計.md 内部设计描述，生成画面逻辑代码，严格参照
+
+ 四、代码规范要求
+    1.  代码结构：拆分组件，样式文件单独存放，不内嵌style，详细结构参照【1.1.项目结构】
+    2.  注释要求：
+            2.1.组件定义上方：添加JSDoc风格的注释，说明组件功能、Props参数类型和含义
+            2.2.对API请求相关代码进行注释，根据内部设计中的描述，说明请求目的、参数和处理逻辑
+            2.3.针对业务逻辑添加注释，解释内部设计中的业务规则如何实现
+            2.4.内部设计的内容需要对应到代码相关处理中，注释 需与代码逻辑对应
+    3.  错误处理：捕获请求异常、表单校验异常，无控制台报错
+    4.  可复用性：核心函数（表单校验、密码显示隐藏）可单独抽取，方便后续复用
+    5.  导出要求：默认导出组件，可直接在App.tsx中引入使用
+
+ 五、禁止事项
+    1.  禁止冗余代码、无效注释，禁止代码格式混乱
+    2.  不要参照其他，不要读取之前的记忆

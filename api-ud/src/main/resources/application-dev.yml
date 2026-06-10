@@ -1,68 +1,99 @@
 server:
-    port: 8081
+  port: 8081
 
 # 配置mybatis 之前手动配置：1.配置数据源  2.配置SqlSessionFactoryBean:引入Mybatis核心配置文件 3.扫描mapper包
 # springboot整合mybatis 1.配置数据源 2.配置mybatis的核心信息  3.扫描mapper
 spring:
-    # 配置数据源
-    datasource:
-        type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://172.17.0.63:3306/react_use?&characterEncoding=utf-8&serverTimezone=UTC
-        username: root
-        password: 1234
-        druid:
-            min-idle: 3
-            max-active: 15
-    mvc:
-        pathmatch:
-            matching-strategy: ANT_PATH_MATCHER
+  # 配置数据源
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: 1234
+    druid:
+      min-idle: 3
+      max-active: 15
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+    # 添加字符编码设置
+    content-negotiation:
+      media-types:
+        json: application/json
     servlet:
-        multipart:
-            # 文件最大限制
-            max-file-size: 50MB
-            # 请求最大限制
-            max-request-size: 50MB
-            enabled: true
-            # 设置文件缓存的临界点,超过则先保存到临时目录,默认为0,所有文件都会进行缓存
-            file-size-threshold: 0
-    mail:
-        username: react_jn@163.com
-        password: DMZQGCKBRNUNJPQZ
-        host: smtp.163.com
-        default-encoding: UTF-8
+      encoding:
+        charset: UTF-8
+        enabled: true
+        force: true
+  servlet:
+    multipart:
+      # 文件最大限制
+      max-file-size: 50MB
+      # 请求最大限制
+      max-request-size: 50MB
+      enabled: true
+      # 设置文件缓存的临界点,超过则先保存到临时目录,默认为0,所有文件都会进行缓存
+      file-size-threshold: 0
+  mail:
+    username: react_jn@163.com
+    password: DMZQGCKBRNUNJPQZ
+    host: smtp.163.com
+    default-encoding: UTF-8
 
 # 配置mybatis
 mybatis:
-    mapper-locations: classpath:mapper/*.xml #配置读取映射配置文件的路径
-    type-handlers-package: com.bjpowernode.springboot28mybatis.domain # 读取指定包中的所有类并取别名
-    configuration:
-        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
+  mapper-locations: classpath:mapper/*.xml #配置读取映射配置文件的路径
+  type-handlers-package: com.bjpowernode.springboot28mybatis.domain # 读取指定包中的所有类并取别名
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
+    # 设置mybatis的字符编码
+    default-charset: UTF-8
 
 swagger3:
-    base-package: com.web.app.controller # 设置swagger扫描的controller所在的包
-    name: PH # 设置作者的名称
-    url: https://xxx.xxx.com #设置作者的主页地址
-    email: 1234567890@qq.com # 设置联系作者的邮箱
-    version: 1.0 # 设置项目的版本
-    group-name: PH使用 # 设置组织名称
-    title: '开发服务环境' # 设置文档的标题
-    description: 'swagger文档' # 设置文档的介绍
-    terms-of-service-url: https://xxx.xxx.com # 设置组织的主页地址
-    license: XXX # 设置许可证
-    license-url: https://xxx.xxx.com # 设置许可证的访问地址
+  base-package: com.web.app.controller # 设置swagger扫描的controller所在的包
+  name: PH # 设置作者的名称
+  url: https://xxx.xxx.com #设置作者的主页地址
+  email: 1234567890@qq.com # 设置联系作者的邮箱
+  version: 1.0 # 设置项目的版本
+  group-name: PH使用 # 设置组织名称
+  title: "开发服务环境" # 设置文档的标题
+  description: "swagger文档" # 设置文档的介绍
+  terms-of-service-url: https://xxx.xxx.com # 设置组织的主页地址
+  license: XXX # 设置许可证
+  license-url: https://xxx.xxx.com # 设置许可证的访问地址
 
 swagger:
-    enabled: true
+  enabled: true
 logging:
-    config: classpath:log4j2-dev.xml
+  config: classpath:log4j2-dev.xml
+  charset: UTF-8
 
 file:
-    # 静态资源对外暴露的访问路径
-    # file.staticAccessPath=/api/file/**
-    staticAccessPath: /file/**
-    # 文件上传目录（注意Linux和Windows上的目录结构不同）
-    # file.uploadFolder=/root/uploads/
-    # file.uploadFolder=d://uploads/
-    uploadFolder: d://uploads/
-    downloadFolder: d://downloads/
+  # 静态资源对外暴露的访问路径
+  # file.staticAccessPath=/api/file/**
+  staticAccessPath: /file/**
+  # 文件上传目录（注意Linux和Windows上的目录结构不同）
+  # file.uploadFolder=/root/uploads/
+  # file.uploadFolder=d://uploads/
+  uploadFolder: d://uploads/
+  downloadFolder: d://downloads/
+
+# 模板文件上传路径（远程服务器172.17.0.63）
+# 方式1：如果已将远程目录映射为网络驱动器，使用本地路径格式
+# 例如：Z:/hdoc/template/upload 或 //172.17.0.63/hdoc/template/upload
+upload:
+  template:
+    # 上传路径 - 根据实际情况选择以下一种：
+    # 选项A：网络UNC路径（推荐）
+    path: //172.17.0.63/F$/hdoc/template/upload
+    # 选项B：如果已映射为网络驱动器（如Z盘）
+    # path: Z:/hdoc/template/upload
+    # 选项C：本地测试路径
+    # path: F:/hdoc/template/upload
+    
+    # 远程服务器IP
+    remote.server: 172.17.0.63
+    
+    # 是否使用网络共享（true=使用UNC路径，false=使用本地路径）
+    use.network.share: true

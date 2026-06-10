@@ -1,0 +1,189 @@
+请根据以下要求生成[Modify Document]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Modify Document]-001
+   模块名称:[Modify Document]
+   作成日:YYYY-MM-DD
+
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  面向的用户群体
+  用户体验方面的考虑
+  安全性或特殊要求（如有）
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | [chassis no] | [Label] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 2   | [Market] | [Label] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 3   | [Templateファイル] | [link] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 4   | [Variable] | [DataTable] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 5   | [Description] | [DataTable] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 6   | [Current value] | [DataTable] | [-] | [-] | [Output] | [-] | [左] | [空] | [-] | [-] |
+| 7   | [Modified value] | [DataTable] | [-] | [500] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 8   | [Save] | [Button] | [-] | [-] | [Output] | [-] | [中] | [空] | [活性] | [-] |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 [初期表示]
+    功能说明：[画面初始化，显示画面内容]
+    操作步骤：
+      1. [画面初期表示，接收前画面参数（Chassis no，Market），调用API（UD05ModifyDocumentApi.UD05SelectVariableModification）后台获取数据]
+      2. [画面接收后端数据，显示画面内容]
+      4. 结果反馈：
+              成功：[code：200，数据正常取得返回前台，画面数据正常显示]
+              失败：[code：500，数据取得异常返回前台，画面显示错误信息]
+  
+    4.2 [save按钮]
+    功能说明：[调用后台API（UD05ModifyDocumentApi.UD05UpdateHdocAdcaModification）,使用参数chassis no，Description，画面迁移，修正内容表示]
+    操作步骤：
+      1. [修正后的值入力完成]
+      2. [save按钮点击，将chassis no传到后画面]
+      4. 结果反馈：
+              成功：[Save Modifications画面迁移，修正内容表示]
+              失败：[迁移失败，画面状态保持] 
+
+    4.3 [Chassis no Link]
+    功能说明：[VDA-Vehicle Specification画面迁移]
+    操作步骤：
+      1. [Chassis no Link点击]
+      2. [将画面项目值进行传递（Chassis no）]
+      4. 结果反馈：
+              成功：[VDA-Vehicle Specification画面迁移]
+              失败：[迁移失败，画面状态保持] 
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      5.1.1 开始：[初期表示]
+            前置处理：[接收前画面参数（Chassis no，Market）]
+            空值校验等 (Frontend Check)：
+            无
+            API调用 (Backend Check)：
+              调用[UD05ModifyDocumentApi.UD05SelectVariableModification]，将参数Chassis no传给API作为检索条件。
+            结果处理：
+            成功：[code：200，API返回数据正常，画面数据正常显示]
+            失败：[code：500，数据取得异常返回前台，画面显示错误信息]
+
+      5.1.2 开始：[save按钮点击]
+            前置处理：[获取画面修正后的入力值]
+            空值校验等 (Frontend Check)：
+            若[Modified value入力值为空的场合]
+             设置Message = [NO UNRELEASED VERSION EXISTS!]
+             终止流程，不调用API
+            API调用 (Backend Check)：
+              若校验通过，调用后台API（UD05ModifyDocumentApi.UD05UpdateHdocAdcaModification）,将参数chassis no，Description，作为更新条件传递到API
+            结果处理：
+            成功：[code：200，API更新成功，画面迁移，修正内容表示]
+            失败：[code：500，API更新异常返回前台，画面显示错误信息]
+
+      5.1.2 开始：[Chassis no Link点击]
+            前置处理：[将画面项目值进行传递（Chassis no]
+            空值校验等 (Frontend Check)：
+              无
+            API调用 (Backend Check)：
+              无
+            结果处理：
+            成功：[VDA-Vehicle Specification画面迁移]
+            失败：[迁移失败，画面状态保持]          
+
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | [1] | [save按钮点击] | [Modified value入力值] | [是否为空] | [NO UNRELEASED VERSION EXISTS!] | [message显示] |
+
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [UD05ModifyDocumentApi]
+     6.1 功能：[date取得]
+          Method：[POST]
+          Endpoint：[/api/modifydocument/UD05SelectVariableModification]
+
+          Request [
+            {
+              "Chassisno": "string"
+            }
+          ]
+
+          Response Success (
+            [
+            {
+              "code": 200,
+              "data": {
+                "variablemodificationdete": { ... },
+                "message": "success"
+            }
+          ]
+          )
+
+          Response Error ([401])
+          [
+            json
+            {
+              "code": 401,
+              "data": {},
+              "message": "Invalid credentials"
+            }
+          ]
+    6.2 功能：[数据更新]
+        Method：[POST]
+        Endpoint：[/api/modifydocument/UD05UpdateHdocAdcaModification]
+
+        Request [
+          {
+            "chassisno": "string"，
+            "description": "string"
+          }
+        ]
+
+        Response Success (
+          [
+          {
+            "code": 200,
+            "data": {
+              "hdocAdcaModification": { ... },
+              "message": "success"
+          }
+        ]
+        )
+
+        Response Error ([401])
+        [
+          json
+          {
+            "code": 401,
+            "data": {},
+            "message": "Invalid credentials"
+          }
+        ]
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络错误 | catch块捕获，输出错误日志 | Upload failed. Please try again. |
+| 服务器错误（500） | catch块捕获，显示服务器错误消息 | 服务器返回的错误消息 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Modify Document]_詳細設計.md
+  保存到：当前文件夹下的work目录

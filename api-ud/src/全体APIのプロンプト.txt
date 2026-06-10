@@ -1,0 +1,180 @@
+请严格按照以下要求，生成所有【API】的逻辑代码
+
+2.整体架构
+    2.1 技术栈
+    核心框架: Spring Boot 2.7.6
+    持久层: MyBatis 2.2.2 + Druid 1.2.5 连接池
+    数据库: MySQL
+    API 文档: Swagger 3.0.0 (Springfox)
+    日志框架: Log4j2 (替代默认日志系统)
+    构建工具: Maven
+    编程语言: Java 1.8
+    辅助库: Lombok, PageHelper, commons-lang
+
+    2.2 项目结构
+api-ud/                                    # 后端Spring Boot项目根目录
+├── .classpath                            # Eclipse类路径配置文件
+├── .gitignore                           # Git忽略文件配置
+├── .metadata/                           # Eclipse元数据目录（开发环境相关）
+├── .project                            # Eclipse项目配置文件
+├── .settings/                          # Eclipse项目设置目录
+├── HELP.md                             # 项目帮助文档
+├── README.md                           # 项目说明文档（空文件）
+├── bin/                                # 编译后的二进制文件目录
+├── jar.service                         # JAR服务配置文件
+├── mvnw                                # Maven包装器脚本（Linux/Mac）
+├── mvnw.cmd                            # Maven包装器脚本（Windows）
+├── pom.xml                             # Maven项目依赖和构建配置文件
+├── src/                                # 源代码主目录
+│   ├── main/                           # 主代码目录
+│   │   ├── java/                       # Java源代码目录
+│   │   │   └── com/
+│   │   │       └── web/
+│   │   │           └── app/            # 应用程序主包
+│   │   │               ├── Application.java              # Spring Boot启动类
+│   │   │               ├── config/                     # 配置类目录
+│   │   │               │   ├── SimpleCORSFilter.java   # CORS过滤器配置
+│   │   │               │   ├── SwaggerAutoConfiguration.java # Swagger自动配置
+│   │   │               │   └── SwaggerProperties.java  # Swagger属性配置
+│   │   │               ├── controller/                 # 控制器层目录
+│   │   │               │   ├── AuthController.java     # 认证控制器
+│   │   │               ├── domain/                     # 领域模型目录
+│   │   │               ├── dto/                        # 数据传输对象目录
+│   │   │               │   ├── LoginRequest.java       # 登录请求DTO
+│   │   │               │   ├── LoginResponse.java      # 登录响应DTO
+│   │   │               ├── entity/                     # 实体类目录
+│   │   │               │   └── User.java               # 用户实体类
+│   │   │               ├── exception/                  # 异常处理目录
+│   │   │               │   └── GlobalExceptionHandler.java  # 全局异常处理器
+│   │   │               ├── mapper/                     # MyBatis映射器目录
+│   │   │               │   └── UserMapper.java         # 用户映射器接口
+│   │   │               ├── service/                    # 服务层目录
+│   │   │               │   ├── AuthService.java        # 认证服务接口
+│   │   │               │   └── impl/                   # 服务实现类目录
+│   │   │               │       ├── AuthServiceImpl.java         # 认证服务实现
+│   │   │               └── tool/                       # 工具类目录
+│   │   │                   └── JwtUtil.java            # JWT工具类
+│   │   └── resources/                  # 资源文件目录
+│   │       ├── application-dev.yml     # 开发环境配置文件
+│   │       ├── application-prod.yml    # 生产环境配置文件
+│   │       ├── application-test.yml    # 测试环境配置文件
+│   │       ├── application.yml         # 主配置文件
+│   │       ├── log4j2-dev.xml          # 开发环境日志配置
+│   │       ├── log4j2-prod.xml         # 生产环境日志配置
+│   │       ├── log4j2-test.xml         # 测试环境日志配置
+│   │       ├── mapper/                 # MyBatis映射文件目录
+│   │       │   └── UserMapper.xml      # 用户映射XML文件
+│   │       ├── sql/                    # SQL脚本目录
+│   │       │   ├── init.sql            # 初始化SQL脚本
+│   │       │   └── test_login.sql      # 登录测试SQL脚本
+│   │       ├── static/                 # 静态资源目录
+│   │       └── templates/              # 模板文件目录
+├── swagger.iml                         # IntelliJ IDEA模块配置文件
+└── target/                             # Maven编译输出目录
+
+2.3 模块组成
+    控制器: [XXXXXController] (src/main/java/com/web/app/controller/XXXXXController.java) - 处理认证请求
+    服务接口: [XXXXXService](src/main/java/com/web/app/service/XXXXXService.java) - 定义认证服务方法
+    服务实现: [XXXXXServiceImpl](src/main/java/com/web/app/service/impl/XXXXXServiceImpl.java) - 实现认证逻辑
+    数据访问: [UserMapper]+ [UserMapper.xml](src/main/java/com/web/app/mapper/UserMapper.xml) - 用户数据访问
+    数据传输对象: [LoginRequest]()/[LoginResponse]() - 认证请求/响应对象
+    实体类: [User](src/main/java/com/web/app/entity/User.java) - 用户实体
+
+3. API功能概述
+    例：3.1.[AuthenticationApi]:用户信息的验证与管理
+    3.2：[UD12UploadDeleteTemplateApi]:文件的上传，删除，模板管理
+    3.3：[XXXXXApi]:
+    ............
+        
+4. 处理流程
+   【AuthenticationApi】
+    4.1 客户端通过POST请求访问接口 /api/XXXXX/login，将用户名、密码等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的 login() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 对密码格式、账号状态进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserMapper】数据访问层，根据用户名查询数据库中的用户信息，获取用户实体对象。
+
+    4.6 登录核心验证逻辑：
+        • 判断用户是否存在，不存在则返回“账号不存在”
+        • 比对前端传递密码与数据库加密密码是否一致
+        • 密码错误则返回“密码不正确”
+    4.7 验证全部通过后：
+        • 生成Token（包含用户ID、用户名等）
+        • 可记录登录日志（登录时间、IP、设备信息）
+        • 构建登录成功响应体，包含Token、用户基础信息
+
+    4.8 封装【LoginResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "登录成功",
+            "data": {
+                "token": "xxxx",
+                "userId": 1,
+                "username": "xxx"
+            }
+        }
+        
+    根据模块组成部分结构生成【UD12UploadDeleteTemplateApi】相关代码
+    4.1 客户端通过POST请求访问接口 /api/ud12/upload，将Template File、Market等请求参数，以JSON格式发送至后端服务，API通过实体类接收请求参数。
+        客户端通过POST请求访问接口 /api/ud12/delete，将Market、TemplateName等请求参数，以JSON格式发送至后端服务，API通过实体类接收请求参数。
+        客户端通过POST请求访问接口 /api/ud12/getMarkets。
+
+    4.2 后端【UploadDeleteTemplateController】接收前端请求，通过【UploadDeleteTemplateRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【UploadDeleteTemplateService】接口中的方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【UploadDeleteTemplateServiceImpl】业务实现层执行核心登录逻辑：
+    upload的场合：
+        • 对Template File文件进行大小检证,
+        • 对Market进行前置校验
+        • 校验不通过则直接返回参数异常响应
+    delete的场合：
+        • 获取上传路径\\172.17.0.63\hdoc\template\upload下的Market文件夹名称，同时获取Market下的所有TemplateName模板名称，并将market和TemplateName名称返回前台，
+        • 通过前台的参数删除符合Market，TemplateName条件的所有模板文件
+    getMarkets的场合：
+        • 获取所有Market名称   
+
+    4.5 业务层通过【XXXXXXMapper】数据访问层，查询表中所有Market名称，返回给前端。
+
+    4.6 业务层通过后将文件上传到服务器端，并返回文件上传结果，上传文件名称保持不变，上传服务器地址为另外一台电脑，IP是\\172.17.0.63\hdoc\template\upload；
+        业务层
+        
+    4.8 封装【UploadDeleteTemplateResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "上传成功",
+            "data": {
+                "XXX"："XXXClass",
+                "YYYY"："YYYYList",
+                ...
+            }
+        }
+
+    ............（TODO：请根据API一览和概要设计描述所有API）
+
+5. 数据库设计（TODO：请根据API一览和概要设计描述各个API的SQL）
+    【AuthenticationApi】
+    5.1- 查询语句: 
+    SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor WHERE USERID = {userId} AND PASSWORD = {password}
+    【UD12UploadDeleteTemplateApi】、
+    5.1- 查询语句: 
+    SELECT market FROM market_master
+
+6. 开发指导原则
+
+6.1 代码编写规范
+    - 遵循MVC三层架构模式
+    - 使用Lombok减少样板代码
+    - 保持Controller、Service、Mapper层职责分离
+
+6.2 错误处理
+    - 对输入参数进行验证
+    - 合理捕获和处理异常
+    - 返回有意义的错误信息

@@ -1,0 +1,86 @@
+请根据以下要求生成[Menu]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Menu]-001
+   模块名称:[Menu]
+   作成日:YYYY-MM-DD
+
+2. 背景 (Background)
+ Menu画面是用户登录系统后的首页面，提供系统所有功能模块的统一访问入口。它将系统中分散的功能整合到一个界面中，使用户能够一目了然地看到所有可用功能
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | [Generate>>Generate Doc​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>Update user defined variables (rules)​​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>Existing HDoc variables​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>Upload/Delete template​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>List available templates​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>VPPS Vin plate​​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Admin>>AD/CA Change​ ] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [User Administration>>HDoc User Administration​​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [User Administration>>HDoc User Doc Administration​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [User Administration>>Search User​​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+| 1   | [Documentation>>User Guide​​] | [Link] | [-] | [-] | [Input] | [-] | [左] | [空] | [活性] | [-] |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 [Link跳转]
+    功能说明：[所有菜单项均为链接类型，点击后触发页面跳转]
+    操作步骤：
+      1. [Login用户认证成功，该用户对应的权限画面初期表示]
+      2. [各画面名称Link点击]
+      3. [跳转后的画面表示]
+      4. [跳转成功：跳转至画面
+          跳转失败：message表示，自画面表示] 
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      开始：[Link点击]
+      前置处理：[获取该用户的权限，验证是否存在可操作的权限]
+      空值校验等 (Frontend Check)：
+       若[权限不存在的场合]：
+        设置Message = [YOU (XXXXXXXX) ARE NOT AUTHORIZED TO ACCESS THIS PAGE]
+        终止流程
+      5.1.2 API调用 (Backend Check)：
+        无
+   5.2 结果处理：
+       成功：[画面成功跳转]
+       失败：[Message = [YOU (XXXXXXXX) ARE NOT AUTHORIZED TO ACCESS THIS PAGE]]
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | [1] | [画面名称Link点击] | [权限验证] | [用户权限不足] | [YOU (XXXXXXXX) ARE NOT AUTHORIZED TO ACCESS THIS PAGE] | [显示错误消息，阻止页面跳转] |
+
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+无
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 路由不存在 | 导航到错误页面 | THE REQUESTED PAGE DOES NOT EXIST |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[Menu]_詳細設計.md
+  保存到：当前文件夹下的work目录
