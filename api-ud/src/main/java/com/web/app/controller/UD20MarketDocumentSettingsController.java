@@ -43,20 +43,20 @@ public class UD20MarketDocumentSettingsController {
         return CommonResponse.success(data);
     }
     
-    @PostMapping("/update")
-    @ApiOperation("更新文档设置")
-    public CommonResponse update(@RequestBody Map<String, String> params) {
-        String documentType = params.get("documentType");
-        String user = params.get("user");
-        String date = params.get("date");
+    // @PostMapping("/update")
+    // @ApiOperation("更新文档设置")
+    // public CommonResponse update(@RequestBody Map<String, String> params) {
+    //     String documentType = params.get("documentType");
+    //     String user = params.get("user");
+    //     String date = params.get("date");
         
-        // 检查文档是否存在
-        List<Map<String, Object>> docs = hdocDocumentListMapper.selectByDocumentType(documentType);
-        if (docs == null || docs.isEmpty()) {
-            return CommonResponse.error("No data found");
-        }
+    //     // 检查文档是否存在
+    //     List<Map<String, Object>> docs = hdocDocumentListMapper.selectByDocumentType(documentType);
+    //     if (docs == null || docs.isEmpty()) {
+    //         return CommonResponse.error("No data found");
+    //     }
         
-        // 这里简化处理，实际需要更新具体字段
-        return CommonResponse.success("更新成功", null);
-    }
+    //     // 这里简化处理，实际需要更新具体字段
+    //     return CommonResponse.success("更新成功", null);
+    // }
 }
