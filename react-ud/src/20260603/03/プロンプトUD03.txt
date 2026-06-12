@@ -1,0 +1,126 @@
+1. 基本信息
+  模块名称：认证文档生成查询页面
+  文档编号：UD03
+  版本号：v1.0
+  作成日期：2026-05-27
+
+2. 背景 (Background)
+  本模块的核心功能是提供用户输入车辆底盘系列、底盘编号和文档类型，用于生成认证文档（如 Dimension Plate）。该页面作为文档生成流程的入口，支持自动回填上一次的检索条件，提升操作效率。
+
+  面向的用户群体：
+  - 生产工程师
+  - 质量控制人员
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 界面简洁，仅包含必要输入项
+  - 支持自动回填上次输入内容
+  - 提供帮助链接，便于用户查阅说明
+  - 所有操作均有明确反馈提示
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 输入字段需校验格式与长度
+  - 所有通信使用 HTTPS 加密
+  - 不暴露敏感信息
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis series | TextField | Y | 5 | Input | 半角英数字 | 左 | 空 | 活性 | 示例：JPCT |
+| 2   | Chassis no | TextField | Y | 10 | Input | 半角数字 | 左 | 空 | 活性 | 示例：028321 |
+| 3   | Document type | Pull-downList | Y | - | Input | 半角英数字+記号 | 左 | 空 | 活性 | 数据源：HDOC_DOCUMENT_LIST |
+| 4   | Submit | Button | - | - | Action | - | 中 | - | 活性 | 触发跳转至文档生成页面 |
+| 5   | Reset | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入框 |
+| 6   | Help | Button | - | - | Action | - | 中 | - | 活性 | 跳转至帮助页面 |
+| 7   | Support Mail | Label | - | - | Output | - | 左 | support.tpi@volvo.com | - | 固定显示 |
+| 8   | error message area | Label | - | - | Output | - | 左 | - | - | 显示错误信息 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 查询提交功能
+    功能说明：用户输入条件后点击“Submit”按钮，跳转至文档生成页面。
+    操作步骤：
+      1. 用户在 Chassis series、Chassis no、Document type 字段中输入查询条件
+      2. 点击“Submit”按钮
+      3. 系统校验输入合法性
+      4. 若通过，则调用接口验证数据存在性
+      5. 成功后跳转至Generate document页面，并携带参数
+      6. 若失败则显示错误消息：“Chassis no is not exists”
+
+    4.2 重置功能
+    功能说明：点击“Reset”按钮，清空所有输入内容并恢复初始状态。
+    操作步骤：
+      1. 用户点击“Reset”按钮
+      2. 所有输入框内容被清空
+      3. 页面恢复默认值
+
+    4.3 帮助功能
+    功能说明：点击“Help”按钮，跳转至帮助页面。
+    操作步骤：
+      1. 用户点击“Help”按钮
+      2. 系统跳转至“Help”画面
+      3. 展示文档生成流程说明与常见问题解答
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Submit / Reset / Help 按钮
+      前置处理：获取输入参数
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若点击 Submit 且 Chassis series 或 Chassis no 为空：
+        设置Message = “Chassis series and chassis no are required.”
+        终止流程
+
+       若点击 Submit 且 Document type 未选择：
+        设置Message = “Please select a document type.”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/UD03SelectHdocdocumentlistApi/types` 获取文档类型列表
+
+   5.2 结果处理：
+       成功：跳转至文档生成页面
+       失败：显示错误消息：“Chassis no is not exists”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Submit | Chassis series | 为空 | “Chassis series and chassis no are required.” | 阻止提交 |
+   | 2   | 点击 Submit | Chassis no | 为空 | “Chassis series and chassis no are required.” | 阻止提交 |
+   | 3   | 点击 Submit | Document type | 未选择 | “Please select a document type.” | 阻止提交 |
+   | 4   | 查询时 | Chassis no | 不存在 | “Chassis no is not exists” | 显示错误 |
+
+6. 接口定义 (API Specification)
+
+   UD03SelectHdocdocumentlistApi
+     功能：获取文档类型列表
+     Method：GET
+     Endpoint：/api/UD03SelectHdocdocumentlistApi/types
+
+     Request 
+     无参数
+
+     Response Success (200)
+     [
+       { "doctyp": "Dimension Plate" },
+       { "doctyp": "VIN Plate"}
+     ]
+
+     Response Error (500)
+     {
+       "error": "Internal Server Error",
+       "message": "Failed to load document types"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 底盘编号不存在 | 返回错误响应 | “Chassis no is not exists” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

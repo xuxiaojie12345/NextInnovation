@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserPermissionMapper">
+    
+    <!-- 检查用户是否存在 -->
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(1) FROM hdoc_user_infor WHERE USERID = #{userid}
+    </select>
+    
+    <!-- 查询用户功能权限和市场权限 -->
+    <select id="selectUserPermissions" resultType="map">
+        SELECT FUNCTIONAUTH.FUNCTION, MARKETAUTH.MARKET
+        FROM HDOC_FUNCTION_AUTH FUNCTIONAUTH
+        LEFT JOIN HDOC_MARKET_AUTH MARKETAUTH
+            ON FUNCTIONAUTH.USERID = MARKETAUTH.USERID
+            AND FUNCTIONAUTH.FUNCTION = MARKETAUTH.TYPE
+        WHERE FUNCTIONAUTH.USERID = #{userid}
+    </select>
+    
+    <!-- 更新用户功能权限 -->
+    <update id="updateFunctionAuth">
+        UPDATE HDOC_FUNCTION_AUTH SET FUNCTION = #{permissions}
+        WHERE USERID = #{userid}
+    </update>
+    
+    <!-- 更新用户市场权限 -->
+    <update id="updateMarketAuth">
+        UPDATE HDOC_MARKET_AUTH SET MARKET = #{market}
+        WHERE USERID = #{userid} AND TYPE = #{permissions}
+    </update>
+    
+    <!-- 清空用户功能权限 -->
+    <update id="clearFunctionAuth">
+        UPDATE HDOC_FUNCTION_AUTH SET FUNCTION = ''
+        WHERE USERID = #{userid}
+    </update>
+    
+    <!-- 清空用户市场权限 -->
+    <update id="clearMarketAuth">
+        UPDATE HDOC_MARKET_AUTH SET MARKET = ''
+        WHERE USERID = #{userid}
+    </update>
+    
+</mapper>

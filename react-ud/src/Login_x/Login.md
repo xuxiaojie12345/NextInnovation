@@ -1,153 +1,184 @@
-# EDB Engineering Database 登录功能详细设计书
+## 1. 基本信息
 
-## 1. 背景 (Background)
+- **模块名称**：EDB Engineering Database 登录模块 (Login Module)
+- **文档编号**：DES-LOGIN-001
+- **版本号**：v1.0
+- **作成日期**：2023-10-27
 
-### 1.1 画面概述
+## 2. 背景 (Background)
 
-本页面为 **EDB Engineering Database** 系统的统一登录入口。画面采用全屏背景图片（具体资源待定），布局上严格分为左右两栏，各占屏幕宽度的 50%。整体风格简洁、现代，左侧用于品牌展示与信息告知，右侧用于用户交互与登录操作。
+本模块是 **EDB Engineering Database** 系统的统一安全入口。其核心目标是验证用户身份，并在认证成功后根据用户权限加载相应的功能菜单。
 
-### 1.2 界面布局详解
+- **核心功能和目标**：
+  - 提供安全的用户身份认证机制。
+  - 根据认证结果获取用户权限列表，实现基于角色的访问控制（RBAC）。
+  - 引导用户进入系统主界面或显示相应的错误提示。
+- **面向的用户群体**：
+  - 公司内部拥有 Outlook 账号的工程数据库使用者。
+  - 系统管理员及支持人员。
+- **用户体验方面的考虑**：
+  - 界面采用左右分栏设计，左侧展示品牌与支持信息，右侧聚焦登录操作，视觉清晰。
+  - 输入框实时过滤非法字符，减少提交后的报错概率。
+  - 提供明确的错误反馈（警告 vs 错误），并在失败时自动聚焦或清空敏感字段。
+  - 静态提示账户锁定等常见问题的解决方案，降低支持成本。
+- **安全性或特殊要求**：
+  - 密码输入必须掩码显示。
+  - 所有通信必须通过 HTTPS 加密。
+  - 前端严格限制输入字符类型（半角英数/符号），防止注入攻击。
+  - 认证失败后清空密码框，防止残留。
 
-#### 1.2.1 左侧区域：信息展示区
+## 3. 画面项目定义 (Screen Parameters)
 
-- **布局位置**：屏幕左半部分 (`flex: 1`)。
-- **背景样式**：透明（无底色），直接透出底层背景图。
-- **文字样式**：所有文字均为**白色** (`#FFFFFF`)，以确保在深色或复杂背景图上的可读性。
-- **对齐方式**：内容在左侧区域内**垂直居中、水平居中**。
-- **显示内容**：
-  1.  **主标题**：`EDB Engineering Database`
-      - 格式要求：**EDB** 部分加粗 (`font-weight: bold`)，其余部分正常。
-  2.  **副标题**：`Use Outlook id and password`
-  3.  **支持信息**：`Support, authorization request or improvement suggestions, send mail to: Support TPI`
+| No. | 項目名 (Item)  | 種別 (Type) | 必須 (Req) | MaxLength | I/O    | 許容文字 (Allowed Chars)                     | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注                               |
+| --- | -------------- | ----------- | ---------- | --------- | ------ | -------------------------------------------- | ---------------- | ---------------- | ------------------ | ---------------------------------- |
+| 1   | UserID         | TextField   | Y          | 10        | Input  | 半角英文数字 (`a-z, A-Z, 0-9`)               | 左               | 空               | 活性               | 对应 Outlook ID，实时过滤非法字符  |
+| 2   | Password       | TextField   | Y          | 32        | Input  | 半角英文数字+符号 (`a-z, A-Z, 0-9, !@#$...`) | 左               | 空               | 活性               | 密码掩码显示，实时过滤非法字符     |
+| 3   | Message        | Label       | -          | 256       | Output | -                                            | 左               | 空               | 动态               | 显示校验警告或认证错误信息         |
+| 4   | Login          | Button      | -          | -         | Action | -                                            | 中               | -                | 活性/禁用          | 点击触发认证，加载时禁用           |
+| 5   | StaticHelpText | Label       | -          | -         | Output | -                                            | 左               | -                | 常显               | 红色固定提示文本（账户锁定说明等） |
 
-#### 1.2.2 右侧区域：登录交互区
+## 4. 功能描述 (Functional Description)
 
-- **布局位置**：屏幕右半部分 (`flex: 1`)。
-- **背景样式**：透明（无底色）。
-- **表单布局**：
-  - 表单容器在右侧区域内**垂直居中**。
-  - 表单内部元素（输入框）**左对齐**起始。
-  - [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L176-L181) 按钮在表单容器内**居中**显示。
-  - **无表单标题**：不显示“Login”或“Sign In”等大标题，仅保留输入控件，减少视觉干扰。
-- **静态提示信息**：
-  - 位于登录表单下方。
-  - 文字颜色：**红色** (`#DC3545` 或类似警示红)。
-  - 对齐方式：**左对齐**。
-  - 显示内容（固定文本）：
-    1.  `If you get error message: "Your account is locked. Please contact your system administrator"`
-    2.  `Please try this alternative login link before contacting support Login`
-    3.  `We are working to find root cause of problem`
+### 4.1 用户登录与权限获取
 
-## 2. 参数定义 (Parameter Definition)
+**功能说明**：用户输入 UserID 和 Password，点击登录按钮，系统验证身份并获取该用户的菜单权限列表。
 
-| 項目名                                                                                 | 種別      | 必須 | MaxLength |  I/O   | 合规文字          | 文字配置 | 初期値 | 表示制御 | 备注                             |
-| :------------------------------------------------------------------------------------- | :-------- | :--: | :-------: | :----: | :---------------- | :------: | :----: | :------: | :------------------------------- |
-| [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8)    | textfield |  Y   |    10     | Input  | 半角英文数字      |    左    |   空   |   活性   | 对应 Outlook ID                  |
-| [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9)  | textfield |  Y   |    32     | Input  | 半角英文数字+符号 |    左    |   空   |   活性   | 密码掩码显示 (`type="password"`) |
-| `Message`                                                                              | label     |  -   |    256    | Output | -                 |    左    |   空   |    -     | 动态显示校验或认证错误信息       |
-| [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L176-L181) | button    |  -   |     -     | Action | -                 |    中    |   -    |   活性   | 触发认证流程，加载时禁用         |
+**操作步骤**：
 
-## 3. 业务逻辑与校验规则 (Business Logic & Validation)
+1.  用户在右侧区域输入 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 和 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6)。
+2.  用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮。
+3.  系统执行前端校验（非空、字符合规性）。
+4.  若校验通过，调用后端认证 API。
+5.  **结果反馈**：
+    - **成功**：保存 Token 和用户权限信息，跳转至系统主页（Menu 页面），并根据权限渲染菜单。
+    - **失败**：在 `Message` 区域显示错误提示，清空 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 字段，保持 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 以便修改。
 
-### 3.1 前端校验 (Frontend Validation)
+### 4.2 输入字符实时过滤
 
-在用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L176-L181) 按钮时，立即执行以下非空校验。若校验失败，**不调用 API**，并在 `Message` 标签中显示警告信息。
+**功能说明**：在用户输入过程中，即时移除不符合规定的字符，确保提交数据的合规性。
 
-| 检查対象                                                                              | 检查内容                             | 错误信息 (Error Message)              | 错误类型 | UI 行为                                                                                                                    |
-| :------------------------------------------------------------------------------------ | :----------------------------------- | :------------------------------------ | :------: | :------------------------------------------------------------------------------------------------------------------------- |
-| [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8)   | 值为空字符串 (`""`) 或仅包含空白字符 | `Username and password are required.` | Warning  | 聚焦到 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8) 输入框，显示黄色/橙色警告背景   |
-| [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9) | 值为空字符串 (`""`) 或仅包含空白字符 | `Username and password are required.` | Warning  | 聚焦到 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9) 输入框，显示黄色/橙色警告背景 |
+**操作步骤**：
 
-_注：若两者均为空，优先校验 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8)。_
+1.  用户在 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 输入框输入内容。
+2.  系统监听 `onChange` 事件，使用正则 `/[^a-zA-Z0-9]/g` 替换非法字符为空。
+3.  用户在 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 输入框输入内容。
+4.  系统监听 `onChange` 事件，使用正则移除非允许符号的字符。
+5.  **结果反馈**：输入框中仅保留合规字符，无效字符无法上屏。
 
-### 3.2 后端认证校验 (Backend Authentication)
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
 
-当前端校验通过后，调用 `AuthenticationApi` 进行身份验证。
+### 5.1 处理流程
 
-| 检查対象              | 检查内容                                       | 错误信息 (Error Message)                                                      | 错误类型 | UI 行为                                                                                                                                                                                                                      |
-| :-------------------- | :--------------------------------------------- | :---------------------------------------------------------------------------- | :------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 用户存在性/密码正确性 | API 返回认证失败 (HTTP 401/403 或业务代码错误) | `We didn't recognize the username or password you entered. Please try again.` |  Error   | 显示红色错误背景，**清空 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9) 字段**，保留 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8) 以便用户修改 |
+**开始**：用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮。
 
-### 3.3 异常处理
+**前置处理**：
 
-- **网络异常/服务器错误 (HTTP 5xx)**：
-  - 消息：`System error. Please try again later.`
-  - 类型：Error
-- **账户锁定 (特定业务错误码)**：
-  - 若 API 返回特定锁定错误码，前端可额外高亮显示静态提示中的第一句，或弹出模态框引导联系管理员。
+- 获取 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 和 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 的当前值。
+- 清除之前的 `Message` 状态。
 
-## 4. 接口设计 (API Specification)
+**5.1.1 空值与格式校验 (Frontend Check)**：
 
-### 4.1 认证接口 (AuthenticationApi)
+- 若 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 为空或仅含空白：
+  - 设置 `Message` = "Username and password are required." (Warning)
+  - 聚焦 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 输入框
+  - 终止流程
+- 若 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 为空或仅含空白：
+  - 设置 `Message` = "Username and password are required." (Warning)
+  - 聚焦 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 输入框
+  - 终止流程
 
-- **接口名称**: `authenticate`
-- **请求方法**: `POST`
-- **Content-Type**: `application/json`
+**5.1.2 API调用 (Backend Check)**：
 
-#### 请求参数 (Request Body)
+- 设置 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮为禁用状态，显示 "Logging in..."。
+- 调用 `AuthenticationApi.authenticate`。
+
+**5.2 结果处理**：
+
+- **成功 (HTTP 200)**：
+  - 接收 Token 和 `userInfo.permissions`。
+  - 存储认证状态。
+  - 页面跳转至 Menu 首页。
+- **失败 (HTTP 401/403)**：
+  - 设置 `Message` = "We didn't recognize the username or password you entered. Please try again." (Error)
+  - 清空 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 字段。
+  - 恢复 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮可用状态。
+- **异常 (HTTP 5xx/Network Error)**：
+  - 设置 `Message` = "System error. Please try again later." (Error)
+  - 恢复 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮可用状态。
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机   | 检查对象 | 检查条件             | 错误消息 (Message Content)                                                  | 动作                        |
+| --- | ---------- | -------- | -------------------- | --------------------------------------------------------------------------- | --------------------------- |
+| 1   | 点击 Login | UserID   | 值为空或 Trim 后为空 | Username and password are required.                                         | 显示 Warning，聚焦 UserID   |
+| 2   | 点击 Login | Password | 值为空或 Trim 后为空 | Username and password are required.                                         | 显示 Warning，聚焦 Password |
+| 3   | 输入时     | UserID   | 包含非半角英数字符   | (无消息，直接过滤)                                                          | 实时移除非法字符            |
+| 4   | 输入时     | Password | 包含非允许符号       | (无消息，直接过滤)                                                          | 实时移除非法字符            |
+| 5   | API 返回   | 认证结果 | 用户名或密码错误     | We didn't recognize the username or password you entered. Please try again. | 显示 Error，清空 Password   |
+
+## 6. 接口定义 (API Specification)
+
+### AuthenticationApi.authenticate
+
+**功能**：验证用户身份并获取用户权限信息。
+**Method**：POST
+**Endpoint**：`/api/auth/login`
+
+**Request [请求格式]**
 
 ```json
 {
-  "userId": "string", // 映射自 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8)，Max 10
-  "password": "string" // 映射自 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9)，Max 32
+  "userId": "string", // 半角英数字，Max 10
+  "password": "string" // 半角英数字+符号，Max 32
 }
 ```
 
-#### 响应定义 (Response)
+**Response Success (200 OK)**
 
-**成功 (Success):**
-
-- **Status Code**: 200 OK
-- **Body**:
-  ```json
-  {
-    "token": "eyJhbGciOi...",
+```json
+{
+  "code": 200,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs...",
     "expiresIn": 3600,
-    "userInfo": { ... }
-  }
-  ```
-- **动作**: 保存 Token 至 LocalStorage/SessionStorage/Cookie，跳转至系统主页。
+    "userInfo": {
+      "userId": "A451340",
+      "name": "John Doe",
+      "permissions": ["Generate Document", "Admin", "User Administration"]
+    }
+  },
+  "message": "Success"
+}
+```
 
-**失败 (Failure):**
+**Response Error (401 Unauthorized)**
 
-- **Status Code**: 401 Unauthorized
-- **Body**:
-  ```json
-  {
-    "errorCode": "INVALID_CREDENTIALS",
-    "message": "Invalid username or password"
-  }
-  ```
-- **动作**: 显示动态 Error 消息。
+```json
+{
+  "code": 401,
+  "data": null,
+  "message": "Invalid credentials"
+}
+```
 
-## 5. 安全性与非功能性需求 (Security & NFR)
+## 7. 异常处理 (Exception Handling)
 
-1.  **数据传输安全**：必须使用 HTTPS 协议传输登录凭据。
-2.  **密码保护**：
-    - 前端输入框使用 `type="password"` 掩码显示。
-    - 认证成功后，前端内存中不应明文存储密码。
-    - 认证失败后，前端应清空密码输入框，防止残留。
-3.  **防暴力破解**：
-    - 后端应实施速率限制 (Rate Limiting)。
-    - 连续多次失败后，后端应返回账户锁定状态。
-4.  **用户体验 (UX)**：
-    - **加载状态**：点击登录后，按钮变为禁用状态并显示 "Logging in..."，防止重复提交。
-    - **即时反馈**：用户开始重新输入时，自动清除之前的错误/警告消息，减少视觉噪音。
-    - **焦点管理**：校验失败时，自动聚焦到第一个错误的输入框，方便用户修正。
-    - **无障碍访问**：确保输入框有适当的 `aria-label` 或关联的 [label](file://e:\git20260511\NextInnovation\react-ud\src\Menu\Menu.tsx#L4-L4)（即使视觉上隐藏），以便屏幕阅读器识别。
+| 异常场景              | 处理方式                                    | Message显示内容                                                   |
+| --------------------- | ------------------------------------------- | ----------------------------------------------------------------- |
+| 网络超时/断开         | 捕获网络异常，恢复按钮状态                  | System error. Please try again later.                             |
+| 服务器内部错误 (500)  | 捕获 HTTP 5xx 错误，恢复按钮状态            | System error. Please try again later.                             |
+| 账户锁定 (特定业务码) | 若 API 返回特定锁定码，可高亮静态提示或弹窗 | Your account is locked. Please contact your system administrator. |
+| 权限获取失败          | 认证成功但权限接口失败，视为系统错误        | System error. Unable to load user permissions.                    |
 
-## 6. 附录：UI 交互流程图 (Pseudo-Flow)
+## 8. 语言要求
 
-1.  **Start**: 用户访问登录页。
-2.  **Input**: 用户输入 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8) 和 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9)。
-3.  **Click**: 用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L176-L181)。
-4.  **Validate Frontend**:
-    - If [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L8-L8) is Empty -> Show Warning "Username and password are required." -> End.
-    - If [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L9-L9) is Empty -> Show Warning "Username and password are required." -> End.
-5.  **Call API**: Send POST to `AuthenticationApi`.
-6.  **Wait**: Show Loading State (Disable Button).
-7.  **Receive Response**:
-    - If Success -> Save Token -> Redirect to Dashboard.
-    - If Fail (Invalid Creds) -> Show Error "We didn't recognize..." -> Clear Password Field -> Enable Button.
-    - If Fail (Network/System) -> Show Error "System error..." -> Enable Button.
-8.  **End**.
+- 文档使用中文编写。
+- 所有错误消息和成功消息在代码实现中使用英文（依据设计书要求），但在本文档描述中使用中文或保留原文对照。
+- 技术术语可保留英文。
+- 保持与参考文档相同的格式结构。
+
+## 9. 输出要求
+
+- 生成完整的 Markdown 格式文档。
+- 文件名格式：`EDB登录模块_詳細設計.md`
+- 保存到：当前文件夹下的 `work` 目录

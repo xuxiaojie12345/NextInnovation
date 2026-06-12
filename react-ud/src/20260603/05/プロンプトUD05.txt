@@ -1,0 +1,204 @@
+ Modify Document_詳細設計.md
+
+ 1. 基本信息
+
+模块名称：Modify Document（文档修改）
+文档编号：UD05
+版本号：v1.0
+作成日期：2026-05-22
+
+ 2. 背景 (Background)
+
+ 核心功能与目标
+本模块用于支持用户对车辆铭牌模板中的变量值进行修改，并保存修改后的数据。主要功能包括：
+- 展示当前车辆的VIN及相关字段的当前值
+- 允许用户编辑部分字段并提交修改
+- 提供下载空白铭牌文件的功能
+- 支持跳转至底盘详细信息页面
+
+ 面向用户群体
+- 车辆配置工程师
+- 生产线管理人员
+- 质量控制人员
+
+ 用户体验考虑
+- 界面简洁，重点突出可编辑字段
+- 明确区分输入项与输出项
+- 提供清晰的操作反馈（如保存成功提示）
+- 支持快速访问相关联的数据（如底盘详情、模板文件）
+
+ 安全性要求
+- 修改操作需校验是否已发布版本存在（防止覆盖未发布版本）
+- 所有修改必须经过系统验证后才允许提交
+- 操作日志记录（由后端实现）
+
+---
+
+ 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis no | Label       | -         | -         | Output | -                       | 左              | JPCT 028321     | -                 | 显示底盘编号，可点击跳转 |
+| 2   | Market      | Label       | -         | -         | Output | -                       | 左              | AUS             | -                 | 固定显示市场信息 |
+| 3   | Template: aus/UD_TEST.odt | Link        | -         | -         | Output | -                       | 左              | -               | 活性              | 下载空白铭牌文件 |
+| 4   | Variable    | DataTable   | -         | -         | Output | -                       | 左              | -               | -                 | 变量名称列 |
+| 5   | Description | DataTable   | -         | -         | Output | -                       | 左              | -               | -                 | 字段说明列 |
+| 6   | Current value | DataTable | -         | -         | Output | -                       | 左              | -               | -                 | 当前值列，来自 `HDOC_REC_DATA_KOLA_VARIANT` |
+| 7   | Modified value | DataTable | -         | 500       | Input | -                       | 左              | 空白            | 活性              | 用户输入修改值 |
+| 8   | Save        | Button      | -         | -         | Action | -                       | 中              | -               | 活性              | 提交修改 |
+
+> 备注：
+> - `DataTable` 类型表示表格中的一列，实际渲染为多行数据。
+> - `Modified value` 字段仅在对应 `Current value` 存在时激活。
+> - 所有字段均从数据库表 `HDOC_VARIABLES`, `HDOC_ADCA_MODIFICATION`, `HDOC_REC_DATA_KOLA_VARIANT` 获取。
+
+
+ 4. 功能描述 (Functional Description)
+
+ 4.1 修改并保存文档内容
+
+功能说明：  
+用户可在“Modified value”栏输入新的字段值，点击“Save”按钮后，系统将对比新旧值并跳转至修改确认页面。
+
+操作步骤：
+1. 用户进入 Modify Document 页面，查看当前车辆信息及各变量值。
+2. 在“Modified value”列中填写需要更改的字段值。
+3. 点击“Save”按钮。
+4. 系统执行前端校验，若通过则调用后端 API 进行保存。
+5. 成功后跳转至“修改保存页面”，展示所有修改内容。
+
+
+ 4.2 下载空白车辆铭牌文件
+
+功能说明：  
+点击链接 `Template: aus/UD_TEST.odt`，下载一个空白的 `.odt` 文件，用于后续打印或编辑。
+
+操作步骤：
+1. 用户点击链接 `Template: aus/UD_TEST.odt`。
+2. 系统触发文件下载请求。
+3. 返回 `trf` 格式的空白铭牌文件（实际为 `.odt` 文件）。
+4. 浏览器自动开始下载。
+
+---
+
+ 4.3 查看底盘详细信息
+
+功能说明：  
+点击底盘编号（如 `JPCT 028321`），跳转至该底盘的详细信息页面。
+
+操作步骤：
+1. 用户点击“Chassis no”字段中的链接。
+2. 系统发起请求获取该底盘的完整配置信息。
+3. 跳转至底盘详情页，展示所有参数和历史记录。
+
+---
+
+ 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+ 5.1 处理流程
+
+ 开始：点击“Save”按钮
+
+ 前置处理：
+- 调用 `GET /api/UD05ModifyDocumentApi/UD05SelectVariableModification`
+- 获取当前页面所有 `Modified value` 字段的输入值
+- 检查是否有任意字段被修改
+- 从数据库加载 `HDOC_ADCA_MODIFICATION` 和 `HDOC_REC_DATA_KOLA_VARIANT` 数据
+
+ 空值校验等 (Frontend Check)：
+- 若所有 `Modified value` 字段为空且无任何修改：
+  - 设置 Message = “NO UNRELEASED VERSION EXISTS!”
+  - 终止流程
+
+ 5.1.2 API调用 (Backend Check)：
+- 调用 `POST /api/UD05ModifyDocumentApi/UD05UpdateHdocAdcaModification`
+
+
+ 5.2 结果处理：
+成功：跳转至 `/document/confirm-modify` 页面，显示修改内容列表
+失败：弹出错误消息：“保存失败，请检查输入内容”
+
+---
+
+ 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1   | 点击 Save 按钮 | 所有 Modified value 字段 | 无任何字段被修改 | NO UNRELEASED VERSION EXISTS! | 显示错误消息，阻止提交 |
+
+---
+
+ 6. 接口定义 (API Specification)
+
+ 6.1 UD05SelectVariableModificationAPI
+
+功能：检索全部信息
+
+Method：GET  
+Endpoint：`/api/UD05ModifyDocumentApi/UD05SelectVariableModificatio`
+
+ Request [json]
+｛
+"SERIE": "***"，
+"CHNO": "***"
+｝
+
+ Response Success (200)
+  {
+  "chassisNo": "JPCT028321",
+  "market": "AUS",
+  "templateFile": "aus/UD_TEST.odt",
+  "modifications": [
+    {
+      "variable": "VIN",
+      "DESCRIPTION": "****",
+      "currentValue": "JPCYZ50A2LT028321",
+      "modifiedValue": "JPCYZ50A2LT028322"
+    }
+  ]
+}
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "
+     }
+
+ 6.2 UD05UpdateHdocAdcaModificationAPI
+
+功能：提交文档修改请求，记录变更内容并生成待发布版本
+
+Method：POST  
+Endpoint：`/api/UD05ModifyDocumentApi/UD05UpdateHdocAdcaModification`
+
+ Request [json]
+  {
+  "chassisNo": "JPCT028321",
+  "market": "AUS",
+  "templateFile": "aus/UD_TEST.odt",
+  "modifications": [
+    {
+      "variable": "VIN",
+      "currentValue": "JPCYZ50A2LT028321",
+      "modifiedValue": "JPCYZ50A2LT028322"
+    }
+  ]
+}
+
+ Response Success (200)
+  {
+"message": "
+}
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

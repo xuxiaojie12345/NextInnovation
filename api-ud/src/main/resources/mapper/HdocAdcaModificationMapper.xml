@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaModificationMapper">
+    
+    <resultMap id="HdocAdcaModificationResultMap" type="com.web.app.entity.HdocAdcaModification">
+        <id property="serie" column="SERIE"/>
+        <result property="chno" column="CHNO"/>
+        <result property="variable" column="VARIABLE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="newval" column="NEWVAL"/>
+    </resultMap>
+    
+    <!-- 根据条件查询 -->
+    <select id="selectByCondition" resultMap="HdocAdcaModificationResultMap">
+        SELECT a.NEWVAL, b.DESCRIPTION 
+        FROM HDOC_ADCA_MODIFICATION a 
+        LEFT JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE 
+        WHERE SERIE = #{serie} AND CHNO = #{chno}
+    </select>
+    
+    <!-- 更新修改值 -->
+    <update id="updateNewVal">
+        UPDATE HDOC_ADCA_MODIFICATION 
+        SET NEWVAL = #{modifiedValue} 
+        WHERE SERIE = #{serie} AND CHNO = #{chno} AND DESCRIPTION = #{description}
+    </update>
+    
+</mapper>

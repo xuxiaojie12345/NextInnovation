@@ -1,0 +1,167 @@
+1. 基本信息
+  模块名称：HDoc市场文档设置查询结果页面
+  文档编号：UD20
+  版本号：v1.0
+  作成日期：2025-04-05
+
+2. 背景 (Background)
+  本模块的核心功能是展示从 `HDOC_DOCUMENT_LIST` 表中查询出的市场文档配置数据列表。该页面作为“市场文档设置”流程的输出界面，支持用户对检索结果进行选择、打印和跳转操作。
+
+  面向的用户群体：
+  - 系统管理员
+  - 生产工程师
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 支持多行勾选，提升批量操作效率
+  - 提供清晰的数据字段展示（如 Document type、Business unit）
+  - User 列可点击跳转，增强信息追溯能力
+  - 所有按钮具备明确语义，避免误操作
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 所有通信使用 HTTPS 加密
+  - 不暴露敏感信息
+  - 打印功能不包含系统按钮和操作栏
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Document type | DataTable | - | 20 | Output | - | 左 | - | - | [ソート順] Document type, Business unit |
+| 2   | Business unit | DataTable | - | - | Output | - | 左 | - | - | 固定表示：BU |
+| 3   | User | DataTable | - | 16 | Output | - | 左 | - | - | 可点击跳转至用户信息查看页面 |
+| 4   | Date | DataTable | - | - | Output | - | 左 | - | - | (Automatic) |
+| 5   | Select | Button | - | - | Action | - | 中 | - | 活性 | 勾选后触发返回并回填 |
+| 6   | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回上一级 |
+| 7   | Print | Button | - | - | Action | - | 中 | - | 活性 | 打印当前列表 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 数据展示功能
+    功能说明：根据上一页的查询条件，从数据库中加载并展示对应的市场文档配置数据。
+    操作步骤：
+      1. 用户在前一页面输入查询条件并提交
+      2. 系统调用 `GET /api/document/settings` 接口获取匹配数据
+      3. 将数据渲染为表格形式，每行包含 Document type、Business unit、User 等字段
+      4. 显示总记录数（Count）于页面底部
+
+    4.2 选择并返回功能
+    功能说明：用户勾选一条数据后点击“Select”按钮，将所选数据回传至上一级页面。
+    操作步骤：
+      1. 用户勾选一个数据条目
+      2. 点击“Select”按钮
+      3. 系统收集所有选中项的主键（如 ID 或组合字段）
+      4. 跳转至上一级市场文档设置页面，并自动填充选中数据的信息
+
+    4.3 返回功能
+    功能说明：点击“Back”按钮直接返回上一级页面。
+    操作步骤：
+      1. 用户点击“Back”按钮
+      2. 系统跳转至市场文档设置页面
+      3. 不保存当前筛选状态
+
+    4.4 打印功能
+    功能说明：将当前查询结果以打印格式输出。
+    操作步骤：
+      1. 用户点击“Print”按钮
+      2. 系统触发浏览器打印对话框
+      3. 打印内容包括表头、所有可见列及分页信息
+      4. 不包含系统按钮和操作栏
+
+    4.5 用户跳转功能
+    功能说明：点击“User”列中的用户名链接，跳转至用户信息查看页面。
+    操作步骤：
+      1. 用户点击某条记录的“User”字段（如 a304598）
+      2. 系统发起请求至 `/user/profile/{userId}`
+      3. 展示该用户的详细信息（姓名、部门、角色等）
+      4. 支持返回原页面
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Select / Back / Print / User 链接
+      前置处理：验证当前会话有效性，获取用户权限
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若未勾选任何数据且点击“Select”：
+        设置Message = “请至少选择一条记录”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/document/settings` 获取数据
+        调用 `GET /user/profile/{id}` 查看用户详情
+
+   5.2 结果处理：
+       成功：显示提示消息“操作成功”
+       失败：显示错误消息“操作失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Select | 选中项数量 | 无选中项 | “请至少选择一条记录” | 阻止提交 |
+   | 2   | 跳转用户详情 | 用户ID | 用户不存在 | “用户信息不存在” | 跳转失败页 |
+
+6. 接口定义 (API Specification)
+
+   GET /api/document/settings
+     功能：获取市场文档配置列表
+     Method：GET
+     Endpoint：/api/document/settings
+
+     Request [请求格式]
+     {
+       "doctype": "COC_EUB1",
+       "businessUnit": "VBC"
+     }
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           "documentType": "COC_EUB1",
+           "businessUnit": "VBC",
+           "user": "a304598",
+           "date": "2022-01-10"
+         }
+       ],
+       "totalCount": 1
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+   GET /user/profile/{id}
+     功能：获取用户详细信息
+     Method：GET
+     Endpoint：/api/user/profile/{id}
+
+     Request [请求格式]
+     无参数
+
+     Response Success (200)
+     {
+       "userId": "a304598",
+       "name": "张三",
+       "department": "研发部",
+       "role": "Engineer"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "用户不存在"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
+| 用户不存在 | 返回错误响应 | “用户信息不存在” |

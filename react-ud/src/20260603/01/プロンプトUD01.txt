@@ -1,0 +1,139 @@
+1. 基本信息
+  模块名称：EDB登录认证页面
+  文档编号：UD01
+  版本号：v1.0
+  作成日期：2026-05-26
+
+2. 背景 (Background)
+  本模块的核心功能是实现用户通过 Outlook ID 和密码完成 ISAM 身份认证，进入 Engineering Database（EDB）系统。该页面为系统的入口点，负责验证用户身份并控制访问权限。
+
+  面向的用户群体：
+  - 工程师
+  - 系统管理员
+  - 支持人员
+
+  用户体验方面的考虑：
+  - 界面简洁，突出登录区域
+  - 界面采用左右分栏设计，左侧展示品牌与支持信息（参照*1），右侧聚焦登录操作，视觉清晰（参照*2）
+  - 提供清晰的错误提示信息
+  - 支持键盘快捷键（如 Enter 键触发登录）
+  - 登录失败时提供备用登录链接建议
+*1：左右字体白色表示；第一行：EDB Engineering Database（标题，EDB加粗表示，文字靠左表示）；第二行：Use Outlook id and password（文字居中表示）；第三行：Support, authorization request or improvement suggestions, send mail to: Support.TPI（靠左表示）
+*2：Login按钮下面展示信息：If you get error message: "Your account is locked. Please contact your system administrator."
+Please try this alternative login link before contacting support: Login
+We are working to find root cause of problem.（红色字体表示）
+
+  安全性或特殊要求：
+  - 密码字段自动隐藏
+  - 登录失败超过阈值后账户锁定
+  - 所有通信使用 HTTPS 加密
+  - 后端调用 ISAM 接口进行身份验证
+  - 不允许空用户名/密码提交
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | UserID | TextField | Y | 10 | Input | 半角英数字 | 左 | 空 | 活性 | 示例：A451340 |
+| 2   | Password | TextField | Y | 32 | Input | 半角英数字+符号 | 左 | 空 | 活性 | 密码输入框，显示为星号 |
+| 3   | Message | Label | - | 256 | Output | - | 左 | 空 | 活性 | 显示错误消息，红色字体 |
+| 4   | Login | Button | - | - | Action | - | 中 | - | 活性 | 点击后触发登录流程 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 登录功能
+    功能说明：用户输入有效的 Outlook ID 和密码，点击“Login”按钮，系统调用 ISAM 接口完成身份认证。
+    操作步骤：
+      1. 用户在 UserID 字段输入账号（如 A451340）
+      2. 用户在 Password 字段输入密码
+      3. 用户点击“Login”按钮或按 Enter 键
+      4. 系统执行前端校验
+      5. 若通过，则调用后端认证接口
+      6. 成功后跳转至主页面
+      7. 失败则显示错误消息
+
+    4.2 错误提示功能
+    功能说明：当用户输入无效凭据时，系统显示相应的错误信息。
+    操作步骤：
+      1. 用户输入错误的 UserID 或 Password
+      2. 点击“Login”按钮
+      3. 系统调用认证接口失败
+      4. 返回错误响应
+      5. 页面显示红色提示：“We didn't recognize the username or password you entered. Please try again.”（该提示位于Lonin按钮上面，密码输入框下面）
+      6. 用户可重新输入或尝试备用登录方式
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击“Login”按钮
+      前置处理：获取 UserID 和 Password 输入值
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若 UserID 为空：
+        设置Message = “Username and password are required.”
+        终止流程
+
+       若 Password 为空：
+        设置Message = “Username and password are required.”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/AuthenticationApi/login` 接口进行身份验证
+
+   5.2 结果处理：
+       成功：跳转至 `/dashboard` 页面，清除登录表单
+       失败：设置Message = “We didn't recognize the username or password you entered. Please try again.”，保持当前页面
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Login 按钮 | UserID | 为空 | “Username and password are required.” | 阻止提交 |
+   | 2   | 点击 Login 按钮 | Password | 为空 | “Username and password are required.” | 阻止提交 |
+   | 3   | API 返回失败 | 认证结果 | 凭据不匹配 | “We didn't recognize the username or password you entered. Please try again.” | 显示错误 |
+
+6. 接口定义 (API Specification)
+
+   POST /AuthenticationApi
+     功能：验证用户身份信息
+     Method：POST
+     Endpoint：/api/AuthenticationApi/login
+
+     Request [json]
+     {
+       "userId": "A451340",
+       "password": "********"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+       "user": {
+         "id": "A451340",
+         "name": "张三",
+         "role": "Engineer"
+       }
+     }
+
+     Response Error (401)
+     {
+       "error": "Unauthorized",
+       "message": "Invalid credentials"
+     }
+
+     Response Error (403)
+     {
+       "error": "Forbidden",
+       "message": "We didn't recognize the username or password you entered. Please try again."
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 账户被锁定 | 显示提示并禁用登录按钮 | “您的账户已被锁定，请联系系统管理员” |
+| 密码错误次数过多 | 自动锁定账户，需管理员解锁 | “您已多次输入错误密码，账户暂时不可用” |
+| 服务器异常 | 返回通用错误 | “系统繁忙，请稍后再试” |

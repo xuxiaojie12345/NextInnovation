@@ -1,0 +1,186 @@
+ 1. 基本信息
+
+模块名称：VDA 车辆规格（Vehicle Specification）
+文档编号：UD07
+版本号：v1.0
+作成日期：2026-05-22
+
+ 2. 背景 (Background)
+
+ 核心功能与目标  
+本模块用于展示车辆的详细配置信息，基于 VDA（德国汽车工业协会）标准格式。主要功能包括：
+- 展示底盘编号、型号、生产周、VIN、发动机号等基本信息
+- 显示完整的车辆配置项（如品牌、类型、功能组等）
+- 支持鼠标悬停时显示字段描述（tooltip），提升可读性
+- 所有数据来源于多个数据库表，确保信息一致性
+
+ 面向用户群体  
+- 车辆工程师  
+- 生产线操作员  
+- 质量控制人员  
+- 技术支持团队  
+
+ 用户体验考虑  
+- 页面布局清晰，关键信息前置（如 Chassis no、Model、VIN）
+- 使用表格形式展示大量配置项，便于快速浏览
+- 提供 tooltip 功能，帮助用户理解缩写或专业术语
+- 支持响应式设计，适配不同屏幕尺寸
+
+ 安全性要求  
+- 数据仅读取，不可编辑（防止误改）
+- 所有字段均来自系统数据库，无外部输入风险
+- 不涉及敏感操作，无需权限校验
+
+
+
+ 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|--|--|-|--|--|--|-|--|--|-||
+| 1   | Chassis no | Label       | -         | -         | Output | -                       | 左              | JPCT 013945     | -                 | 来自 `HDOC_REC_DATA_OM` 的 `Chassis no` 字段 |
+| 2   | Model      | Label       | -         | -         | Output | -                       | 左              | UD-HDE          | -                 | 来自 `HDOC_REC_DATA_OM` 的 `MODEL` 字段 |
+| 3   | Built week | Label       | -         | -         | Output | -                       | 左              | 1617            | -                 | 来自 `HDOC_REC_DATA_OM` 的 `BUILD` 字段 |
+| 4   | Product type | Label       | -         | -         | Output | -                       | 左              | EM 64 R         | -                 | 来自 `HDOC_REC_DATA_VDA_GENERAL` 的 `PRODUCT_TYPE` 字段 |
+| 5   | VIN        | Label       | -         | -         | Output | -                       | 左              | JPCZZ30D8GT013945 | -                 | 来自 `HDOC_REC_DATA_VDA_GENERAL` 的 `VIN` 字段 |
+| 6   | Engine no  | Label       | -         | -         | Output | -                       | 左              | 428328          | -                 | 来自 `HDOC_REC_DATA_KOLA_VARIANT` 的 `SYMBOL` 字段 |
+| 7   | Country of Operation | Label | - | - | Output | - | 左 | IDN | - | 来自 `HDOC_REC_DATA_VDA_GENERAL` 的 `COUNTRY_OF_OPERATION` 字段 |
+| 8   | SYMBOL_STR | Label       | -         | -         | Output | -                       | 左              | [动态生成]      | -                 | 从 `HDOC_REC_DATA_VDA_VARIANTS` 和 `HDOC_REC_DATA_KOLA_VARIANT` 获取并拼接 |
+| 9   | DESCRIPTION | Tooltip     | -         | -         | Output | -                       | 左              | -               | -                 | 悬停时显示对应符号的描述 |
+| 10  | S-Note NO  | Label       | -         | -         | Output | -                       | 左              | -               | -                 | 来自 `HDOC_REC_DATA_OM` 的 `CUSTOMER_ADAP` 字段 |
+
+> 备注：
+> - 所有字段均为只读输出项。
+> - `SYMBOL_STR` 是由多个符号组成的字符串，按固定格式排列。
+> - `DESCRIPTION` 字段为 tooltip 类型，当用户将鼠标悬停在某个符号上时，弹出其含义说明。
+> - 数据来源如下：
+>   - `HDOC_REC_DATA_OM`：基础信息（Chassis, Model, Build, etc.）
+>   - `HDOC_REC_DATA_VDA_GENERAL`：通用信息（Product Type, VIN, Country）
+>   - `HDOC_REC_DATA_VDA_VARIANTS`：变体信息（FUNCTION_GROUP）
+>   - `HDOC_REC_DATA_KOLA_VARIANT`：KOLA 变体数据（SYMBOL, DESCRIPTION）
+
+
+
+ 4. 功能描述 (Functional Description)
+
+ 4.1 展示车辆基本信息
+
+功能说明：  
+加载并展示车辆的核心识别信息，包括底盘编号、型号、生产周、VIN、发动机号等。
+
+操作步骤：
+1. 用户进入 VDA 车辆规格页面。
+2. 系统根据传入的 `chassisNo` 参数，查询相关数据库表。
+3. 加载以下字段：
+   - Chassis no
+   - Model
+   - Built week
+   - Product type
+   - VIN
+   - Engine no
+   - Country of Operation
+4. 在页面顶部区域渲染这些信息。
+
+ 4.2 显示完整配置项列表
+
+功能说明：  
+以表格形式展示所有车辆配置项（如 BRAND-UP、FUEL、TRIM 等），每行一个配置项。
+
+操作步骤：
+1. 系统从 `HDOC_REC_DATA_VDA_VARIANTS` 和 `HDOC_REC_DATA_KOLA_VARIANT` 中获取所有符号（SYMBOL）。
+2. 将符号按预设顺序排列，形成 `SYMBOL_STR` 字符串。
+3. 渲染为多行文本，每行包含一组配置项。
+4. 支持滚动查看全部内容。
+
+
+ 4.3 悬停显示字段描述（Tooltip）
+
+功能说明：  
+当用户将鼠标悬停在任意配置项（如 `BRAND-UP`）上时，弹出该字段的中文描述。
+
+操作步骤：
+1. 用户将鼠标移至某一行中的符号（如 `BRAND-UP`）。
+2. 系统查找该符号对应的 `DESCRIPTION` 字段内容。
+3. 弹出 tooltip，显示描述信息（例如：“品牌升级”）。
+4. 移动鼠标离开后，tooltip 自动隐藏。
+
+
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户访问 `/UD07VehicleSpecification/{chassisNo}` 页面
+      前置处理：验证用户权限，获取 chassisNo 参数
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若 chassisNo 为空：
+        设置Message = “无法加载数据，请检查输入”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/UD07VehicleSpecification/Selest/{chassisNo}` 获取完整数据
+
+   5.2 结果处理：
+       成功：正常渲染所有字段
+       失败：显示错误消息：“数据加载失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 页面加载前 | Chassis no | 为空 | “无法加载数据，请检查输入” | 阻止加载 |
+   | 2   | 数据查询时 | HDOC_REC_DATA_OM | 不存在 | “未找到对应底盘数据” | 显示错误 |
+   | 3   | SYMBOL 解析时 | SYMBOL_STR | 无匹配描述 | “描述信息不可用” | 显示默认提示 |
+
+6. 接口定义 (API Specification)
+
+   GET /api/UD07VehicleSpecification/Selest/{chassisNo}
+     功能：获取指定底盘的 VDA 车辆规格信息
+     Method：GET
+     Endpoint：/api/UD07VehicleSpecification/Selest/{chassisNo}
+
+     Request [请求格式]
+     无参数
+
+     Response Success (200)
+     {
+       "chassisNo": "JPCT 013945",
+       "model": "UD-HDE",
+       "builtWeek": "1617",
+       "productType": "EM 64 R",
+       "vin": "JPCZZ30D8GT013945",
+       "engineNo": "428328",
+       "countryOfOperation": "IDN",
+       "symbols": [
+         { "symbol": "G3-MY", "description": "Engine Type: EM 64 R" },
+         { "symbol": "EM 64 R", "description": "Engine Model: EM 64 R" },
+         { "symbol": "T-RYPE-EM", "description": "Transmission Type: EM" }
+       ],
+       "sNotes": ["S161011", "S161014"]
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Chassis not found"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
+| 权限不足 | 禁用页面访问 | “您没有权限查看此信息” |
+| 数据缺失 | 显示默认值 | “数据不可用” |
+
+8. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：VDA车辆规格页面_詳細設計.md
+  保存到：当前文件夹下的work目录

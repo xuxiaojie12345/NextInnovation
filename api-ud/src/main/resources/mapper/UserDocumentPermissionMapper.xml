@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserDocumentPermissionMapper">
+    
+    <!-- 查询用户文档权限 -->
+    <select id="selectUserDocPermissions" resultType="map">
+        SELECT DOCUMENTLIST.DOCTYPE, DOCUMENTLIST.DESCRIPTION 
+        FROM HDOC_USER_DOC USERDOC
+        INNER JOIN HDOC_DOCUMENT_LIST DOCUMENTLIST
+            ON USERDOC.DOCTYPE = DOCUMENTLIST.DOCTYPE
+        WHERE USERDOC.USERID = #{userid}
+    </select>
+    
+    <!-- 删除用户文档权限 -->
+    <delete id="deleteUserDoc">
+        DELETE FROM HDOC_USER_DOC WHERE USERID = #{userid}
+    </delete>
+    
+    <!-- 插入用户文档权限 -->
+    <insert id="insertUserDoc">
+        INSERT INTO HDOC_USER_DOC (USERID, DOCTYPE, REGISTER_DATETIME, REGISTER_USER)
+        VALUES (#{userid}, #{doctype}, NOW(), #{registerUser})
+    </insert>
+    
+</mapper>

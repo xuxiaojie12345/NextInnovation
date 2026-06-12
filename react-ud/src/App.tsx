@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login/Login";
 import TestMain from "./Test/Test";
 import Menu from "./Menu/Menu";
-import LoginPage from "./Login_x/LoginPage";
+import UD01 from "./20260603/01/UD01";
+import UD02 from "./20260603/02/UD02";
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/TestMain" element={<TestMain />} />
             <Route path="/Menu" element={<Menu />} />
-            <Route path="/LoginPage" element={<LoginPage />} />
+            <Route path="/UD01" element={<UD01 />} />
+            <Route path="/UD02" element={<UD02 />} />
           </Routes>
         </div>
       </Router>

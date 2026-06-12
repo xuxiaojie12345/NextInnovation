@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>Login</title>
+      <title>04</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -26,43 +26,42 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
+<h1 id="hdoc---generate-homologation-document_詳細設計md">HDoc - Generate Homologation Document_詳細設計.md </h1>
 <h2 id="1-基本信息">1. 基本信息 </h2>
 <ul>
-<li><strong>模块名称</strong>：EDB Engineering Database 登录模块 (Login Module)</li>
-<li><strong>文档编号</strong>：DES-LOGIN-001</li>
+<li><strong>模块名称</strong>：HDoc - Generate Homologation Document 模块 (Generate Document Module)</li>
+<li><strong>文档编号</strong>：DES-HDOC-GEN-001</li>
 <li><strong>版本号</strong>：v1.0</li>
 <li><strong>作成日期</strong>：2023-10-27</li>
 </ul>
-<h2 id="2-背景-background">2. 背景 (Background) </h2>
-<p>本模块是 <strong>EDB Engineering Database</strong> 系统的统一安全入口。其核心目标是验证用户身份，并在认证成功后根据用户权限加载相应的功能菜单。</p>
+<h2 id="2-胐景-background">2. 胐景 (Background) </h2>
+<p>本模块是 VOLVO 公司内部工程数据库系统中用于生成车辆认证文件（Homologation Document）的核心功能。用户通过输入车辆系列、底盘号和文档类型，触发后台服务生成特定的认证文件。</p>
 <ul>
 <li><strong>核心功能和目标</strong>：
 <ul>
-<li>提供安全的用户身份认证机制。</li>
-<li>根据认证结果获取用户权限列表，实现基于角色的访问控制（RBAC）。</li>
-<li>引导用户进入系统主界面或显示相应的错误提示。</li>
+<li>提供一个简洁的表单界面，让用户输入生成认证文件所需的必要参数。</li>
+<li>根据用户输入的参数，调用后端服务生成对应的文档（如 VIN Plate, CEMT ）。</li>
+<li>显示生成过程中的分析规则、替换参数及最终结果，并提供下载链接。</li>
 </ul>
 </li>
 <li><strong>面向的用户群体</strong>：
 <ul>
-<li>公司内部拥有 Outlook 账号的工程数据库使用者。</li>
-<li>系统管理员及支持人员。</li>
+<li>已登录的 VOLVO 内部员工、工程师、质量控制人员等需要生成认证文件的用户。</li>
 </ul>
 </li>
 <li><strong>用户体验方面的考虑</strong>：
 <ul>
-<li>界面采用左右分栏设计，左侧展示品牌与支持信息，右侧聚焦登录操作，视觉清晰。</li>
-<li>输入框实时过滤非法字符，减少提交后的报错概率。</li>
-<li>提供明确的错误反馈（警告 vs 错误），并在失败时自动聚焦或清空敏感字段。</li>
-<li>静态提示账户锁定等常见问题的解决方案，降低支持成本。</li>
+<li>界面布局清晰，将输入区域与结果展示区域分离。</li>
+<li>使用 <code>Submit</code> 和 <code>Reset</code> 挂晰地引导用户操作流程。</li>
+<li>在 <code>Help</code> 挂钮旁提供帮助文档链接，便于用户查阅详细说明。</li>
+<li>在 <code>error message area</code> 区域明确显示错误信息，提升问题排查效率。</li>
 </ul>
 </li>
 <li><strong>安全性或特殊要求</strong>：
 <ul>
-<li>密码输入必须掩码显示。</li>
-<li>所有通信必须通过 HTTPS 加密。</li>
-<li>前端严格限制输入字符类型（半角英数/符号），防止注入攻击。</li>
-<li>认证失败后清空密码框，防止残留。</li>
+<li><strong>权限控制</strong>：若用户无权访问此功能，需拦截并显示“YOU (XXXXXXXX) ARE NOT AUTHORIZED TO ACCESS THIS PAGE”警告。</li>
+<li><strong>数据校验</strong>：对输入的 Chassis series 和 Chassis no 进行格式和存在性校验。</li>
+<li><strong>会话管理</strong>：确保所有请求都携带有效的 Session/Token。</li>
 </ul>
 </li>
 </ul>
@@ -76,7 +75,7 @@
 <th>必須 (Req)</th>
 <th>MaxLength</th>
 <th>I/O</th>
-<th>許容文字 (Allowed Chars)</th>
+<th>获容文字 (Allowed Chars)</th>
 <th>文字配置 (Align)</th>
 <th>初期値 (Default)</th>
 <th>表示制御 (Control)</th>
@@ -86,147 +85,130 @@
 <tbody>
 <tr>
 <td>1</td>
-<td>UserID</td>
-<td>TextField</td>
+<td>Chassis no</td>
+<td>textField</td>
 <td>Y</td>
-<td>10</td>
+<td>15</td>
 <td>Input</td>
-<td>半角英文数字 (<code>a-z, A-Z, 0-9</code>)</td>
+<td>半角数字</td>
 <td>左</td>
 <td>空</td>
 <td>活性</td>
-<td>对应 Outlook ID，实时过滤非法字符</td>
+<td>用户首次登录时默认为空</td>
 </tr>
 <tr>
 <td>2</td>
-<td>Password</td>
-<td>TextField</td>
-<td>Y</td>
-<td>32</td>
-<td>Input</td>
-<td>半角英文数字+符号 (<code>a-z, A-Z, 0-9, !@#$...</code>)</td>
-<td>左</td>
-<td>空</td>
-<td>活性</td>
-<td>密码掩码显示，实时过滤非法字符</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Message</td>
-<td>Label</td>
+<td>Ordernumber</td>
+<td>label</td>
 <td>-</td>
-<td>256</td>
-<td>Output</td>
-<td>-</td>
-<td>左</td>
-<td>空</td>
-<td>动态</td>
-<td>显示校验警告或认证错误信息</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Login</td>
-<td>Button</td>
-<td>-</td>
-<td>-</td>
-<td>Action</td>
-<td>-</td>
-<td>中</td>
-<td>-</td>
-<td>活性/禁用</td>
-<td>点击触发认证，加载时禁用</td>
-</tr>
-<tr>
-<td>5</td>
-<td>StaticHelpText</td>
-<td>Label</td>
-<td>-</td>
-<td>-</td>
+<td>16</td>
 <td>Output</td>
 <td>-</td>
 <td>左</td>
 <td>-</td>
 <td>常显</td>
-<td>红色固定提示文本（账户锁定说明等）</td>
+<td>来自 <code>HDOC_REC_DATA_OM</code> 表</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Build week</td>
+<td>label</td>
+<td>-</td>
+<td>10</td>
+<td>Output</td>
+<td>-</td>
+<td>左</td>
+<td>-</td>
+<td>常显</td>
+<td>来自 <code>HDOC_REC_DATA_OM</code> 表</td>
 </tr>
 </tbody>
 </table>
+<p>| 4 | Spec week | label | - | 10 | Output | - | 左 | - | 常常显 | 来自 <code>HDOC_REC_DATA_OM</code> 表 |<br>
+| 5 | Market | label | - | 10 | Output | - | 左 | - | 常常显 | 来自 <code>HDOC_REC_DATA_VD_A_GENERAL</code> 表 |<br>
+| 6 | Master Market | label | - | - | Output | - | 左 | - | 常常显 | 固定设定为 '-EU' |<br>
+| 7 | S-Note NO | label | - | 4000 | Output | - | 左 | - | 常常显 | 来自 <code>HDOC_REC_DATA_OM</code> 表 |<br>
+| 8 | S-Note Message | label | - | 256 | Output | - | 左 | - | 常常显 | 固定表示 "The S-Notes above can affect homologation documents." |<br>
+| 9 | Load Index | label | - | 10 | Output | - | 左 | - | 常常显 | 来自 <code>HDOC_REC_DATA_KO_LA_TIRE_MASTER</code> 表 |<br>
+| 10 | Analyze Rules | link | - | 10 | Output | - | 左 | - | 动态 | 若 AD-Change 息激活，则显示 "After def change detected. Document need to be modified." |<br>
+| 11 | Modify Doc Link | link | - | 1 | Output | - | 左 | - | 动态 | 若 AD-Change 息激活，则显示 "Modify" 并可点击跳转至修改页面 |<br>
+| 12 | Using template | label | - | 20 | Output | - | 左 | - | 常常显 | 显示模板名称，如 "_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHL.rtf" |<br>
+| 13 | Replacing parameters | label | - | 40 | Output | - | 左 | - | 常常显 | 显示变量替换信息，如 "AD Change. Modifying: AXLE_CONF" |<br>
+| 14 | Generated document | link | - | - | Output | - | 左 | - | 动态 | 显示 "Generated document" 并可点击下载生成的 VIN Plate 文件 |<br>
+| 15 | Date | label | - | 20 | Output | - | 左 | - | 常常显 | 显示当前时间，如 "2022-12-06 07:30:31" |<br>
+| 16 | HDoc version | label | - | 20 | Output | - | 左 | - | 常常显 | 显示程序版本，如 "4.2.1" |<br>
+| 17 | Error message area | label | - | - | Output | - | 左 | - | 动态 | 用于显示批处理失败等错误消息 |</p>
 <h2 id="4-功能描述-functional-description">4. 功能描述 (Functional Description) </h2>
-<h3 id="41-用户登录与权限获取">4.1 用户登录与权限获取 </h3>
-<p><strong>功能说明</strong>：用户输入 UserID 和 Password，点击登录按钮，系统验证身份并获取该用户的菜单权限列表。</p>
+<h3 id="41-清晰表示-initial-display">4.1 清晰表示 (Initial Display) </h3>
+<p><strong>功能说明</strong>：页面加载时，初始化表单控件，为用户提供一个空白的输入环境。</p>
 <p><strong>操作步骤</strong>：</p>
 <ol>
-<li>用户在右侧区域输入 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 和 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6)。</li>
-<li>用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮。</li>
-<li>系统执行前端校验（非空、字符合规性）。</li>
-<li>若校验通过，调用后端认证 API。</li>
+<li>用户从菜单进入 "Generate Homologation Document" 页面。</li>
+<li>系统读取当前用户权限。</li>
+<li>若用户有权限：
+<ul>
+<li>清除 <code>Chassis no</code> 字段。</li>
+<li>设置 <code>error message area</code> 为空。</li>
+<li>显示 <code>Support Mail</code> 标签。</li>
+</ul>
+</li>
+<li><strong>结果反馈</strong>：成功加载初始state的表单。</li>
+</ol>
+<h3 id="42-生成文档-generate-document">4.2 生成文档 (generate Document) </h3>
+<p><strong>功能说明</strong>：用户输入查询条件并点击 <code>Submit</code> 挂钮，系统执行文档生成逻辑。</p>
+<p><strong>操作步骤</strong>：</p>
+<ol>
+<li>用户在 <code>Chassis no</code> 输入框中填写内容。</li>
+<li>用户点击 <code>Submit</code> 挂钮。</li>
 <li><strong>结果反馈</strong>：
 <ul>
-<li><strong>成功</strong>：保存 Token 和用户权限信息，跳转至系统主页（Menu 页面），并根据权限渲染菜单。</li>
-<li><strong>失败</strong>：在 <code>Message</code> 区域显示错误提示，清空 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 字段，保持 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 以便修改。</li>
+<li><strong>成功</strong>：系统调用后端 API，生成文档。页面跳转至 "generate document" 结果页面，显示详细的生成信息、分析规则、替换参数和最终的文档内容。</li>
+<li><strong>失败</strong>：若校验失败（如 Chassis no 不存在），在 <code>error message area</code> 显示错误信息（如 "Batch processing failed: Failed to make the Inplate"），不跳转。</li>
 </ul>
 </li>
 </ol>
-<h3 id="42-输入字符实时过滤">4.2 输入字符实时过滤 </h3>
-<p><strong>功能说明</strong>：在用户输入过程中，即时移除不符合规定的字符，确保提交数据的合规性。</p>
+<h3 id="43-查看帮助-view-help">4.3 查看帮助 (View Help) </h3>
+<p><strong>功能说明</strong>：用户点击 <code>Help</code> 挂钮，查看该功能的使用指南。</p>
 <p><strong>操作步骤</strong>：</p>
 <ol>
-<li>用户在 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 输入框输入内容。</li>
-<li>系统监听 <code>onChange</code> 事件，使用正则 <code>/[^a-zA-Z0-9]/g</code> 替换非法字符为空。</li>
-<li>用户在 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 输入框输入内容。</li>
-<li>系统监听 <code>onChange</code> 事件，使用正则移除非允许符号的字符。</li>
-<li><strong>结果反馈</strong>：输入框中仅保留合规字符，无效字符无法上屏。</li>
+<li>用户点击 <code>Help</code> 挂钮。</li>
+<li><strong>结果反馈</strong>：页面跳转至 "HDoc Help" 页面，显示用户手册、快速指南等帮助信息。</li>
 </ol>
 <h2 id="5-业务逻辑与校验规则-business-logic--checks">5. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
 <h3 id="51-处理流程">5.1 处理流程 </h3>
-<p><strong>开始</strong>：用户点击 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮。</p>
+<p><strong>开始</strong>：用户点击 <code>Submit</code> 挂钮。</p>
 <p><strong>前置处理</strong>：</p>
 <ul>
-<li>获取 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 和 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 的当前值。</li>
-<li>清除之前的 <code>Message</code> 状态。</li>
+<li>获取 <code>Chassis no</code> 的当前值。</li>
 </ul>
-<p><strong>5.1.1 空值与格式校验 (Frontend Check)</strong>：</p>
+<p><strong>5.1.1 值校验等 (Frontend Check)</strong>：</p>
 <ul>
-<li>若 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 为空或仅含空白：
+<li>若 <code>Chassis no</code> 为空或仅含空白字符：
 <ul>
-<li>设置 <code>Message</code> = "Username and password are required." (Warning)</li>
-<li>聚焦 [UserID](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L5-L5) 输入框</li>
-<li>终止流程</li>
-</ul>
-</li>
-<li>若 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 为空或仅含空白：
-<ul>
-<li>设置 <code>Message</code> = "Username and password are required." (Warning)</li>
-<li>聚焦 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 输入框</li>
+<li>设置 <code>error message area</code> = "Chassis no is required."</li>
 <li>终止流程</li>
 </ul>
 </li>
 </ul>
 <p><strong>5.1.2 API调用 (Backend Check)</strong>：</p>
 <ul>
-<li>设置 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮为禁用状态，显示 "Logging in..."。</li>
-<li>调用 <code>AuthenticationApi.authenticate</code>。</li>
+<li>调用 <code>generateDocumentApi.generate</code> 接口。</li>
 </ul>
 <p><strong>5.2 结果处理</strong>：</p>
 <ul>
-<li><strong>成功 (HTTP 200)</strong>：
+<li><strong>成功</strong>：跳转至 "generate document" 结果页面。</li>
+<li><strong>失败</strong>：
 <ul>
-<li>接收 Token 和 <code>userInfo.permissions</code>。</li>
-<li>存储认证状态。</li>
-<li>页面跳转至 Menu 首页。</li>
+<li>若返回错误码 <code>404</code> 或 <code>400</code> 且消息为 "Batch processing failed: Failed to make the Inplate"：
+<ul>
+<li>设置 <code>error message area</code> = "Batch processing failed: Failed to make the Inplate"</li>
 </ul>
 </li>
-<li><strong>失败 (HTTP 401/403)</strong>：
+<li>若返回其他错误码（如 <code>401</code>）：
 <ul>
-<li>设置 <code>Message</code> = "We didn't recognize the username or password you entered. Please try again." (Error)</li>
-<li>清空 [Password](file://e:\git20260511\NextInnovation\react-ud\src\Login_x\Login.tsx#L6-L6) 字段。</li>
-<li>恢复 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮可用状态。</li>
+<li>设置 <code>error message area</code> = "System error. Please try again later."</li>
 </ul>
 </li>
-<li><strong>异常 (HTTP 5xx/Network Error)</strong>：
-<ul>
-<li>设置 <code>Message</code> = "System error. Please try again later." (Error)</li>
-<li>恢复 [Login](file://e:\git20260511\NextInnovation\react-ud\src\Login\Login.tsx#L22-L156) 按钮可用状态。</li>
 </ul>
 </li>
 </ul>
@@ -239,81 +221,87 @@
 <th>检查对象</th>
 <th>检查条件</th>
 <th>错误消息 (Message Content)</th>
-<th>动作</th>
+<th>劢作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>点击 Login</td>
-<td>UserID</td>
-<td>值为空或 Trim 后为空</td>
-<td>Username and password are required.</td>
-<td>显示 Warning，聚焦 UserID</td>
+<td>点击 Submit</td>
+<td>Chassis no</td>
+<td>值为空或仅含空白</td>
+<td>Chassis no is required.</td>
+<td>显示 Warning，聚焦字段</td>
 </tr>
 <tr>
 <td>2</td>
-<td>点击 Login</td>
-<td>Password</td>
-<td>值为空或 Trim 后为空</td>
-<td>Username and password are required.</td>
-<td>显示 Warning，聚焦 Password</td>
+<td>API 返回</td>
+<td>Batch Processing</td>
+<td>批工失败</td>
+<td>Batch processing failed: Failed to make the Inplate</td>
+<td>显示 Error，不跳转</td>
 </tr>
 <tr>
 <td>3</td>
-<td>输入时</td>
-<td>UserID</td>
-<td>包含非半角英数字符</td>
-<td>(无消息，直接过滤)</td>
-<td>实时移除非法字符</td>
+<td>API 返回</td>
+<td>Template 取得</td>
+<td>模板文件不存在</td>
+<td>Can not find template for doctype VIN-PLATE</td>
+<td>显示 Error，不跳转</td>
 </tr>
 <tr>
 <td>4</td>
-<td>输入时</td>
-<td>Password</td>
-<td>包含非允许符号</td>
-<td>(无消息，直接过滤)</td>
-<td>实时移除非法字符</td>
-</tr>
-<tr>
-<td>5</td>
 <td>API 返回</td>
-<td>认证结果</td>
-<td>用户名或密码错误</td>
-<td>We didn't recognize the username or password you entered. Please try again.</td>
-<td>显示 Error，清空 Password</td>
+<td>Template 取得</td>
+<td>模板规则未定义</td>
+<td>No template rule defined for this truck. XXX XXX</td>
+<td>显示 Error，不跳转</td>
 </tr>
 </tbody>
 </table>
 <h2 id="6-接口定义-api-specification">6. 接口定义 (API Specification) </h2>
-<h3 id="authenticationapiauthenticate">AuthenticationApi.authenticate </h3>
-<p><strong>功能</strong>：验证用户身份并获取用户权限信息。<br>
+<h3 id="generatedocumentapigenerate">generateDocumentApi.generate </h3>
+<p><strong>功能</strong>：根据提供的车辆信息和文档类型，生成相应的认证文件。<br>
 <strong>Method</strong>：POST<br>
-<strong>Endpoint</strong>：<code>/api/auth/login</code></p>
+<strong>Endpoint</strong>：<code>/api/hdoc/generate</code></p>
 <p><strong>Request [请求格式]</strong></p>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"userId"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token comment">// 半角英数字，Max 10</span>
-  <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token comment">// 半角英数字+符号，Max 32</span>
+  <span class="token property">"chassisNo"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token comment">// 半角数字，Max 15</span>
+  <span class="token property">"documentType"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token comment">// 来自 HD_DOC_DOCUMENT_LIST 的 DocType</span>
 <span class="token punctuation">}</span>
 </code></pre><p><strong>Response Success (200 OK)</strong></p>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
   <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"token"</span><span class="token operator">:</span> <span class="token string">"eyJhbGciOiJIUzI1NiIs..."</span><span class="token punctuation">,</span>
-    <span class="token property">"expiresIn"</span><span class="token operator">:</span> <span class="token number">3600</span><span class="token punctuation">,</span>
-    <span class="token property">"userInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-      <span class="token property">"userId"</span><span class="token operator">:</span> <span class="token string">"A451340"</span><span class="token punctuation">,</span>
-      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"John Doe"</span><span class="token punctuation">,</span>
-      <span class="token property">"permissions"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"Generate Document"</span><span class="token punctuation">,</span> <span class="token string">"Admin"</span><span class="token punctuation">,</span> <span class="token string">"User Administration"</span><span class="token punctuation">]</span>
-    <span class="token punctuation">}</span>
+    <span class="token property">"chassisNo"</span><span class="token operator">:</span> <span class="token string">"JPCT 028321"</span><span class="token punctuation">,</span>
+    <span class="token property">"ordernumber"</span><span class="token operator">:</span> <span class="token string">"19146492"</span><span class="token punctuation">,</span>
+    <span class="token property">"buildWeek"</span><span class="token operator">:</span> <span class="token string">"2020186"</span><span class="token punctuation">,</span>
+    <span class="token property">"specWeek"</span><span class="token operator">:</span> <span class="token string">"202018"</span><span class="token punctuation">,</span>
+    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"AUS"</span><span class="token punctuation">,</span>
+    <span class="token property">"masterMarket"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
+    <span class="token property">"frontLoadIndex"</span><span class="token operator">:</span> <span class="token string">"FTLI-152"</span><span class="token punctuation">,</span>
+    <span class="token property">"frontSpeedIndex"</span><span class="token operator">:</span> <span class="token string">"FTSI-"</span><span class="token punctuation">,</span>
+    <span class="token property">"driveLoadIndex"</span><span class="token operator">:</span> <span class="token string">"DTLI-143"</span><span class="token punctuation">,</span>
+    <span class="token property">"driveSpeedIndex"</span><span class="token operator">:</span> <span class="token string">"DTSI-L"</span><span class="token punctuation">,</span>
+    <span class="token property">"analyzeRules"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"After def change detected. Document need to be modified."</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"replacingParameters"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"Information parameter: YPGVW_2 Market: AUS overrides -EU"</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"errors"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"ERROR: RULE_EPC_4_8."</span><span class="token punctuation">,</span>
+      <span class="token string">"ERROR: for variable RULE_EPC_4_8ERROR: Can not find RULE_EPC_4_8. No match in user defined rules.."</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"generatedDocument"</span><span class="token operator">:</span> <span class="token string">"base64_encoded_document_content"</span><span class="token punctuation">,</span>
+    <span class="token property">"downloadUrl"</span><span class="token operator">:</span> <span class="token string">"/downloads/document_123.pdf"</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span>
 <span class="token punctuation">}</span>
-</code></pre><p><strong>Response Error (401 Unauthorized)</strong></p>
+</code></pre><p><strong>Response Error (404 Not Found)</strong></p>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">401</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Invalid credentials"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">404</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Batch processing failed: Failed to make the Inplate"</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="7-异常处理-exception-handling">7. 异常处理 (Exception Handling) </h2>
 <table>
@@ -326,38 +314,43 @@
 </thead>
 <tbody>
 <tr>
-<td>网络超时/断开</td>
-<td>捕获网络异常，恢复按钮状态</td>
-<td>System error. Please try again later.</td>
+<td>无权限访问功能</td>
+<td>前端拦截或后端返回 401，显示警告</td>
+<td>YOU (XXXXXXXX) ARE NOT AUTHORIZED TO ACCESS THIS PAGE</td>
+</tr>
+<tr>
+<td>Chassis no 不存在</td>
+<td>后端返回 404，显示错误</td>
+<td>Chassis no is not exists</td>
+</tr>
+<tr>
+<td>会话过期 (401)</td>
+<td>捕获全局 Auth 错误，重定向</td>
+<td>Session expired. Please login again.</td>
+</tr>
+<tr>
+<td>网络错误</td>
+<td>显示通用错误提示</td>
+<td>Network error. Please check your connection.</td>
 </tr>
 <tr>
 <td>服务器内部错误 (500)</td>
-<td>捕获 HTTP 5xx 错误，恢复按钮状态</td>
-<td>System error. Please try again later.</td>
-</tr>
-<tr>
-<td>账户锁定 (特定业务码)</td>
-<td>若 API 返回特定锁定码，可高亮静态提示或弹窗</td>
-<td>Your account is locked. Please contact your system administrator.</td>
-</tr>
-<tr>
-<td>权限获取失败</td>
-<td>认证成功但权限接口失败，视为系统错误</td>
-<td>System error. Unable to load user permissions.</td>
+<td>显示通用错误提示</td>
+<td>System error. Please contact support.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="8-语言要求">8. 语言要求 </h2>
 <ul>
 <li>文档使用中文编写。</li>
-<li>所有错误消息和成功消息在代码实现中使用英文（依据设计书要求），但在本文档描述中使用中文或保留原文对照。</li>
+<li>所有错误消息和成功消息在代码实现中使用英文（依据设计书要求，如 "Chassis no is not exists"），但在本文档描述中使用中文或保留原文对照。</li>
 <li>技术术语可保留英文。</li>
 <li>保持与参考文档相同的格式结构。</li>
 </ul>
 <h2 id="9-输出要求">9. 输出要求 </h2>
 <ul>
 <li>生成完整的 Markdown 格式文档。</li>
-<li>文件名格式：<code>EDB登录模块_詳細設計.md</code></li>
+<li>文件名格式：<code>HDoc - Generate Homologation Document_詳細設計.md</code></li>
 <li>保存到：当前文件夹下的 <code>work</code> 目录</li>
 </ul>
 

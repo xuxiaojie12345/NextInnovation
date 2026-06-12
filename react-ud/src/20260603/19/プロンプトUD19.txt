@@ -1,0 +1,185 @@
+1. 基本信息
+  模块名称：HDoc用户查询页面
+  文档编号：UD19
+  版本号：v1.0
+  作成日期：2025-04-05
+
+2. 背景 (Background)
+  本模块的核心功能是提供对 HDoc 系统用户的检索能力，支持通过用户 ID、用户名或权限类型进行查询。系统从 Saviynt 获取用户基本信息，并结合本地权限表查询其关联市场与角色权限。
+
+  面向的用户群体：
+  - 系统管理员
+  - IT 运维人员
+  - 安全管理人员
+
+  用户体验方面的考虑：
+  - 界面简洁，支持多种查询方式
+  - 支持反向查询（通过用户名获取用户 ID）
+  - 提供权限筛选选项，便于快速定位特定用户
+  - 所有操作均有明确反馈提示
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 所有通信使用 HTTPS 加密
+  - 用户信息从 Saviynt 获取，确保一致性
+  - 权限筛选基于数据库校验，防止越权访问
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Userid | TextField | - | 10 | Input | 半角英数字 | 左 | 空 | 活性 | 示例：a420064 |
+| 2   | User | TextField | - | 32 | Input | 半角英数字 | 左 | 空 | 活性 | 示例：Jenna Wang |
+| 3   | Market | Pull-downList | - | - | Input | 半角英数字+記号 | 左 | - | 活性 | 数据源：MARKET_MASTER |
+| 4   | Not set | Radiobox | - | - | Input | - | 左 | 选中 | 活性 | 默认选中 |
+| 5   | Rule | Radiobox | - | - | Input | - | 左 | - | 活性 | 规则管理员 |
+| 6   | Template | Radiobox | - | - | Input | - | 左 | - | 活性 | 模板管理员 |
+| 7   | Search | Button | - | - | Action | - | 中 | - | 活性 | 触发查询 |
+| 8   | Userid | DataTable | - | - | Output | - | 左 | - | - | 查询结果输出 |
+| 9   | User | DataTable | - | - | Output | - | 左 | - | - | 查询结果输出 |
+| 10  | Market | DataTable | - | - | Output | - | 左 | - | - | 查询结果输出 |
+| 11  | COUNT | DataTable | - | - | Output | - | 左 | - | - | 显示记录总数 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 用户 ID 查询功能
+    功能说明：输入用户 ID 并点击“Search”按钮，从 Saviynt 获取用户名，并查询其关联市场。
+    操作步骤：
+      1. 用户在 Userid 字段中输入用户 ID（如 a420064）
+      2. 点击“Search”按钮
+      3. 系统调用 Saviynt 接口获取用户名
+      4. 查询 HDOC_MARKET_AUTH 表获取该用户关联的市场列表
+      5. 成功后将结果渲染为表格显示
+
+    4.2 用户名查询功能
+    功能说明：输入用户名并点击“Search”按钮，先从 Saviynt 反向获取对应用户 ID，再查询其关联市场。
+    操作步骤：
+      1. 用户在 User 字段中输入用户名（如 Jenna Wang）
+      2. 点击“Search”按钮
+      3. 系统调用 Saviynt 接口反向查询用户 ID
+      4. 查询 HDOC_MARKET_AUTH 表获取该用户关联的市场列表
+      5. 成功后将结果渲染为表格显示
+
+    4.3 权限筛选功能
+    功能说明：通过勾选不同权限选项，筛选拥有特定权限的用户。
+    操作步骤：
+      1. 用户选择其中一个单选按钮（Not set / Rule / Template）
+      2. 点击“Search”按钮
+      3. 系统根据选择执行不同逻辑：
+         - 若选中 "Not set"：查询所有用户
+         - 若选中 "Rule"：查询拥有规则管理员权限的用户
+         - 若选中 "Template"：查询拥有模板管理员权限的用户
+      4. 成功后将结果渲染为表格显示
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Search 按钮
+      前置处理：获取查询条件（Userid、User、Market、Radio）
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若未选择任何 Radio 且 Userid 和 User 均为空：
+        设置Message = “请输入查询条件”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/user/search` 执行查询
+        调用 `GET /api/saviynt/user` 获取用户信息
+        调用 `GET /api/market/auth` 获取市场权限
+
+   5.2 结果处理：
+       成功：正常渲染查询结果表格
+       失败：显示错误消息：“查询失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Search | 查询条件 | 无有效输入 | “请输入查询条件” | 阻止提交 |
+   | 2   | 查询时 | Userid | 不存在于 Saviynt | “用户不存在” | 显示警告 |
+   | 3   | 查询时 | User | 不存在于 Saviynt | “用户不存在” | 显示警告 |
+
+6. 接口定义 (API Specification)
+
+   GET /api/user/search
+     功能：执行用户查询
+     Method：GET
+     Endpoint：/api/user/search
+
+     Request [请求格式]
+     {
+       "userid": "a420064",
+       "user": "Jenna Wang",
+       "market": "-EU",
+       "role": "Rule"
+     }
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           "userid": "a420064",
+           "user": "Jenna Wang",
+           "market": "-EU"
+         }
+       ],
+       "totalCount": 1
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "No matching user found"
+     }
+
+   GET /api/saviynt/user
+     功能：从 Saviynt 获取用户信息
+     Method：GET
+     Endpoint：/api/saviynt/user
+
+     Request [请求格式]
+     {
+       "userId": "a420064"
+     }
+
+     Response Success (200)
+     {
+       "name": "Jenna Wang",
+       "email": "jenna.wang@volvo.com"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "User not found in Saviynt"
+     }
+
+   GET /api/market/auth
+     功能：获取用户市场权限
+     Method：GET
+     Endpoint：/api/market/auth
+
+     Request [请求格式]
+     {
+       "userId": "a420064"
+     }
+
+     Response Success (200)
+     {
+       "markets": ["-EU", "DEU"]
+     }
+
+     Response Error (500)
+     {
+       "error": "Internal Server Error",
+       "message": "Failed to load market auth"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 用户不存在 | 返回错误响应 | “用户不存在” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

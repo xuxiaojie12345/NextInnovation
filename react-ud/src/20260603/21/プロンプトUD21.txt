@@ -1,0 +1,107 @@
+1. 基本信息
+  模块名称：HDoc系统市场列表页面
+  文档编号：UD21
+  版本号：v1.0
+  作成日期：2026-05-29
+
+2. 背景 (Background)
+  本模块的核心功能是展示 HDoc 系统中所有市场的基础信息列表，包括市场代码、描述以及是否支持重量数据（Weights from Hdoc）。该页面用于提供市场配置的概览，支持用户快速查阅各市场的属性。
+
+  面向的用户群体：
+  - 系统管理员
+  - 生产工程师
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 表格布局清晰，便于浏览
+  - 支持排序与筛选（如按市场代码）
+  - 所有字段均来自数据库，确保一致性
+  - 不提供编辑功能，仅为只读展示
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 所有通信使用 HTTPS 加密
+  - 不暴露敏感信息
+  - 数据来源为 `MARKET_MASTER` 表，确保准确性
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Market | DataTable | - | 3 | Output | - | 左 | - | - | 市场代码，如 AUT, BEL |
+| 2   | Description | DataTable | - | - | Output | - | 左 | - | - | 市场描述，如 Austria |
+| 3   | Weights from Hdoc | DataTable | - | - | Output | - | 左 | - | - | - |
+
+4. 功能描述 (Functional Description)
+
+    4.1 市场列表展示功能
+    功能说明：从 `MARKET_MASTER` 表中加载并展示所有市场的基础信息。
+    操作步骤：
+      1. 用户进入 HDoc 系统市场列表页面
+      2. 系统调用 `GET /api/market/list` 接口获取所有市场数据
+      3. 将 Market、Description、Weights from Hdoc 字段渲染为表格
+      4. 显示在页面中央区域
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户访问此页面
+
+      5.1.1 空值校验等 (Frontend Check)：
+       无前端校验，直接加载数据
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/market/list` 获取市场列表
+
+   5.2 结果处理：
+       成功：正常渲染表格
+       失败：显示错误消息：“无法加载市场列表，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 页面加载时 | MARKET_MASTER | 数据库连接失败 | “无法加载市场列表，请稍后重试” | 显示错误 |
+
+6. 接口定义 (API Specification)
+
+   GET /api/market/list
+     功能：获取所有市场列表
+     Method：GET
+     Endpoint：/api/market/list
+
+     Request [请求格式]
+     无参数
+
+     Response Success (200)
+     [
+       {
+         "market": "AUT",
+         "description": "Austria",
+         "weightsFromHdoc": true
+       },
+       {
+         "market": "BEL",
+         "description": "Belgium",
+         "weightsFromHdoc": true
+       },
+       {
+         "market": "CHE",
+         "description": "Switzerland",
+         "weightsFromHdoc": true
+       }
+     ]
+
+     Response Error (500)
+     {
+       "error": "Internal Server Error",
+       "message": "Failed to load market list"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

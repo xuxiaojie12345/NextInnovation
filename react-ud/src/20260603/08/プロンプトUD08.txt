@@ -1,0 +1,334 @@
+1. 基本信息
+
+模块名称：Homologation Variables（认证参数管理）
+文档编号：UD08
+版本号：v1.0
+作成日期：2026-05-22
+
+
+ 2. 背景 (Background)
+
+ 核心功能与目标  
+本模块用于管理系统中的认证参数（Homologation Variables），支持对用户定义规则的查询、新增、修改和删除操作。主要功能包括：
+- 提供灵活的查询条件输入界面
+- 支持数据的增删改查（CRUD）操作
+- 确保数据完整性，防止重复或无效记录
+- 所有操作均记录创建/更新时间及用户信息
+
+ 面向用户群体  
+- 系统管理员  
+- 车辆合规工程师  
+- 数据维护人员  
+
+ 用户体验考虑  
+- 查询条件清晰排列，关键字段带星号标识必填项
+- 操作按钮集中放置于顶部，便于快速访问
+- 输入框长度合理，避免内容截断
+- 支持实时校验，减少提交错误
+
+ 安全性要求  
+- `Product class`、`Number`、`Market` 组合为主键，禁止重复
+- `Variable` 必须存在于 `HDOC_VARIABLES` 表中
+- 所有写入操作需验证权限（由后端控制）
+- 自动记录 `Created by user` 和 `Date` 字段，不可手动编辑
+
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Product class | Pull-downList | Y | 2 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | Add/Update/Delete时变为必填 |
+| 2   | Number | TextField | Y | 10 | Input/Output | 半角英数字 | 左 | 空 | 活性 | Add/Update/Delete时变为必填 |
+| 3   | Market | Pull-downList | Y | 3 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | Add/Update/Delete时变为必填 |
+| 4   | Variable | TextField | - | 20 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 5   | Value | TextField | - | 200 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 6   | Variant string.1 | TextField | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 7   | Variant string.2 | TextField | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 8   | Comments | TextField | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 9   | Add | TextField | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 格式：YYYYWW |
+| 10  | Delete | TextField | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 格式：YYYYWW |
+| 11  | Created by user | TextField | - | 16 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 自动填充，不可编辑 |
+| 12  | Date | TextField | - | - | Input/Output | 日付 | 左 | 空 | 活性 | 自动填充，不可编辑 |
+| 13  | Search | Button | - | - | Action | - | 中 | - | 活性 | 触发查询跳转 |
+| 14  | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入框 |
+| 15  | Add | Button | - | - | Action | - | 中 | - | 活性 | 新增记录 |
+| 16  | Update | Button | - | - | Action | - | 中 | - | 活性 | 修改现有记录 |
+| 17  | Delete | Button | - | - | Action | - | 中 | - | 活性 | 删除当前记录 |
+
+> 备注：
+> - `Product class`、`Number`、`Market` 为组合主键，必须唯一。
+> - `Variable` 字段若以 `TEMPLATE-` 开头，系统将检查其后缀是否存在于 `HDOC_VARIABLES` 表中。
+> - `Add` 和 `Delete` 字段为时间戳，格式为 `YYYYWW`，由系统自动填充。
+> - `Created by user` 和 `Date` 字段由系统自动设置，用户不可修改。
+
+ 4. 功能描述 (Functional Description)
+
+ 4.1 查询认证参数
+
+功能说明：  
+根据输入的查询条件，检索符合条件的认证参数记录。
+
+操作步骤：
+1. 用户在“Product class”、“Number”、“Market”等字段中输入查询条件。
+2. 点击“Search”按钮。
+3. 系统执行前端校验，确保必填项不为空。
+4. 调用后端 API 进行查询。
+5. 成功后跳转至“认证参数查询结果页”，展示匹配记录列表。
+
+ 4.2 清空输入内容
+
+功能说明：  
+清除所有已输入的查询条件，恢复初始状态。
+
+操作步骤：
+1. 用户点击“Clear”按钮。
+2. 系统清空所有文本框和下拉选择项。
+3. 所有字段重置为默认值（空）。
+
+ 4.3 新增认证参数
+
+功能说明：  
+录入新的认证参数，并保存至数据库。
+
+操作步骤：
+1. 用户填写“Product class”、“Number”、“Market”等必填字段。
+2. 填写可选字段如 `Variable`、`Value`、`Comments` 等。
+3. 点击“Add”按钮。
+4. 系统执行校验：
+   - 检查主键是否重复
+   - 检查 `Variable` 是否有效
+5. 若通过，调用 `POST /api/UD08HomologationVariablesApi/UD08Add` 接口。
+6. 成功后提示“添加成功”，并刷新页面或跳转至列表页。
+
+ 4.4 编辑并更新认证参数
+
+功能说明：  
+修改现有认证参数记录。
+
+操作步骤：
+1. 用户在查询结果中选择一条记录，进入编辑模式。
+2. 修改任意字段（如 `Value`、`Comments`）。
+3. 点击“Update”按钮。
+4. 系统校验数据有效性。
+5. 调用 `POST /api/UD08HomologationVariablesApi/UD08Update` 接口。
+6. 成功后提示“更新成功”。
+
+ 4.5 删除认证参数
+
+功能说明：  
+删除指定的认证参数记录。
+
+操作步骤：
+1. 用户在查询结果中选择一条记录。
+2. 点击“Delete”按钮。
+3. 系统弹出确认对话框：“确定要删除该记录吗？”
+4. 用户确认后，调用 `DELETE /api/UD08HomologationVariablesApi/UD08Delete` 接口。
+5. 成功后提示“删除成功”。
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Search / Add / Update / Delete 按钮
+      前置处理：验证会话有效性，检查权限
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若点击 Add 或 Update 且 Product class、Number、Market 任一为空：
+        设置Message = “Product class, Number, Market 是必填项”
+        终止流程
+
+       若点击 Delete 但未选中任何记录：
+        设置Message = “请选择要删除的记录”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+                调用 `GET /UD08HomologationVariablesApi/UD08SelectProductclassmaster` 获取查询结果
+                调用 `GET /UD08HomologationVariablesApi/UD08SelectMarketmaster` 获取查询结果
+                调用 `GET /UD08HomologationVariablesApi/UD08SelectHdocvariables` 获取查询结果
+        调用 `POST /UD08HomologationVariablesApi/UD08Add` 添加新记录
+        调用 `POST /UD08HomologationVariablesApi/UD08Update` 更新记录
+        调用 `DELETE /UD08HomologationVariablesApi/UD08Delete` 删除记录
+
+   5.2 结果处理：
+       成功：显示提示消息“操作成功”
+       失败：显示错误消息“操作失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | Add 操作前 | Product class | 为空 | “Product class 是必填项” | 阻止提交 |
+   | 2   | Add 操作前 | Number | 为空 | “Number 是必填项” | 阻止提交 |
+   | 3   | Add 操作前 | Market | 为空 | “Market 是必填项” | 阻止提交 |
+   | 4   | Add 操作时 | Variant | 不存在于 HDOC_VARIABLES | “Variant does not exist, Please enter the correct content” | 返回错误 |
+   | 5   | Update 操作时 | Record | 不存在 | “Data does not exist, Please enter the correct content” | 返回错误 |
+   | 6   | Delete 操作时 | Record | 不存在 | “Data does not exist, Please enter the correct content” | 返回错误 |
+
+6. 接口定义 (API Specification)
+
+   UD08HomologationVariablesApi
+     6.1功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectProductclassmaster
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+     6.2功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectMarketmaster
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+     6.3功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectHdocvariables
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+     6.4功能：新增一条认证参数记录
+     Method：POST
+     Endpoint：/api/UD08HomologationVariablesApi/UD08Add
+
+     Request [请求格式]
+     {
+       "Product_class": "E2",
+       "Number": 1,
+       "Market": "-EU",
+       "Variable": "ENG_TORQUE",
+       "Value": "1000",
+       "Variant_string": "E2-OMEGA",
+       "Comments": "Engine Torque",
+       "Add": "20250405",
+       "Created_by_user": "a304598",
+       "Date": "2025-04-05"
+     }
+
+     Response Success (201)
+     {
+       "success": true,
+       "id": "12345",
+       "message": "添加成功"
+     }
+
+     Response Error (409)
+     {
+       "error": "Conflict",
+       "message": "Primary key conflict, Please enter the correct content"
+     }
+
+     6.5功能：更新现有记录
+     Method：PUT
+     Endpoint：/api/UD08HomologationVariablesApi/UD08Update
+
+     Request [请求格式]
+     {
+       "id": "12345",
+       "Product_class": "E2",
+       "Number": 1,
+       "Market": "-EU",
+       "Variable": "ENG_TORQUE",
+       "Value": "1200",
+       "Variant_string": "E2-OMEGA",
+       "Comments": "Updated Engine Torque"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "更新成功"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Data does not exist, Please enter the correct content"
+     }
+
+     6.6功能：删除指定记录
+     Method：DELETE
+     Endpoint：/api/UD08HomologationVariablesApi/UD08Delete
+
+     Request [请求格式]
+     {
+       "id": "12345"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "删除成功"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Data does not exist, Please enter the correct content"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
+| 主键冲突 | 返回错误响应 | “Primary key conflict, Please enter the correct content” |
+
+8. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：认证参数管理页面_詳細設計.md
+  保存到：当前文件夹下的work目录

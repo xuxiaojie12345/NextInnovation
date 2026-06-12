@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserMapper">
+    
+    <resultMap id="UserResultMap" type="com.web.app.entity.User">
+        <id property="userid" column="USERID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+    </resultMap>
+    
+    <!-- 根据用户ID查询用户 -->
+    <select id="selectByUserId" resultMap="UserResultMap">
+        SELECT USERID, PASSWORD, USERNAME 
+        FROM hdoc_user_infor 
+        WHERE USERID = #{userId}
+    </select>
+    
+</mapper>

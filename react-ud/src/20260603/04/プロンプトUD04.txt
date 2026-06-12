@@ -1,0 +1,183 @@
+1. 基本信息
+  模块名称：车辆铭牌生成结果页面
+  文档编号：UD04
+  版本号：v1.0
+  作成日期：2026-06-26
+
+2. 背景 (Background)
+  本模块的核心功能是展示通过 VPPS 批处理程序生成的车辆铭牌（VIN Plate）相关信息，包括底盘数据、S-Notes、轮胎主数据、变更状态及最终生成的文档链接。该页面作为批处理流程的输出界面，用于确认生成结果并支持后续操作。
+
+  面向的用户群体：
+  - 生产工程师
+  - 质量控制人员
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 关键信息（如 Chassis no、Error message）突出显示
+  - 支持点击链接跳转至详情页或下载文件
+  - 变更状态以颜色区分（红色表示需修改）
+  - 提供清晰的时间与版本信息
+
+  安全性或特殊要求：
+  - 错误信息不暴露系统内部结构
+  - 所有通信使用 HTTPS 加密
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis no | label | - | 15 | Output | - | 左 | - | - | 可点击跳转至底盘详情页 |
+| 2   | Ordernumber | label | - | 16 | Output | - | 左 | - | - | - |
+| 3   | Build week | label | - | 10 | Output | - | 左 | - | - | - |
+| 4   | Spec week | label | - | 10 | Output | - | 左 | - | - | - |
+| 5   | Market | label | - | 10 | Output | - | 左 | - | - | - |
+| 6   | Master Market | label | - | - | Output | - | 左 | - | - | 固定为 '-EU' |
+| 7   | S-Note NO | label | - | 4000 | Output | - | 左 | - | - | 显示 S-Notes 编号列表 |
+| 8   | S-Note Message | label | - | 256 | Output | - | 左 | - | - | 若存在则显示提示：“The S-Notes above can affect homologation documents.” |
+| 9   | Load Index | label | - | 10 | Output | - | 左 | - | - | Tire Master 数据来源 |
+| 10  | Analyze Rules | link | - | 10 | Output | - | 左 | - | - | 链接至规则分析页面 |
+| 11  | Modify Doc Link | link | - | 1 | Output | - | 左 | - | - | AD-Change 启用时显示红色，点击跳转至修改页面 |
+| 12  | Using template | label | - | 20 | Output | - | 左 | - | - | 显示模板名称，如 _eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf |
+| 13  | Replacing parameters | label | - | 40 | Output | - | 左 | - | - | 显示被替换参数，如 AXLE_CONF, WB_MM |
+| 14  | Generated document | link | - | - | Output | - | 左 | - | - | 点击下载填充后的 .rtf 文件 |
+| 15  | Date | label | - | 20 | Output | - | 左 | - | - | 当前系统时间 |
+| 16  | HDoc version | label | - | 20 | Output | - | 左 | - | - | 当前程序版本 |
+| 17  | Error message area | label | - | - | Output | - | 左 | - | - | 显示错误信息，若无则为空 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 展示底盘接收信息
+    功能说明：从 OM 和 VDA 数据源获取并展示对应底盘的基本信息。
+    操作步骤：
+      1. 系统根据上一页面设置的条件（如 Chassis no）查询数据库
+      2. 获取 HDOC_REC_DATA_OM 和 HDOC_REC_DATA_VDA_GENERAL 中的数据
+      3. 将 Chassis no、Ordernumber、Build week 等字段渲染为标签
+      4. 显示在页面顶部区域
+
+    4.2 展示备注信息
+    功能说明：展示与当前底盘相关的 S-Notes 及其影响说明。
+    操作步骤：
+      1. 查询 CUSTOMER_ADAP 表中的 S-Note NO
+      2. 若存在，则显示 S-Note NO 列表
+      3. 若 S-Note 存在且内容非空，则显示提示消息：“The S-Notes above can affect homologation documents.”
+      4. 消息以红色字体显示，增强可见性
+
+    4.3 展示轮胎主数据信息
+    功能说明：从 KOLA 数据源获取并展示轮胎负载和速度指数。
+    操作步骤：
+      1. 查询 HDOC_REC_DATA_KOLA_TIRE_MASTER 表
+      2. 获取 Front load index、Front speed index、Drive load index、Drive speed index
+      3. 渲染为标签并显示在页面中部
+
+    4.4 修改链接状态控制
+    功能说明：当 AD-Change 状态启用时，将“Modify Doc Link”链接标为红色，并可跳转至修改页面。
+    操作步骤：
+      1. 查询 HDOC_ADCA_CHANGE 表中是否存在对应记录
+      2. 若存在且 ACT 字段为 'Y'，则将“Modify Doc Link”文本设为红色
+      3. 点击后跳转至 Modify Document页面
+      4. 若未启用，则隐藏或禁用该链接
+
+    4.5 展示车辆铭牌模板与参数
+    功能说明：展示所使用的模板名称及替换参数。
+    操作步骤：
+      1. 读取 Template 文件路径（来自 VPPS VIN PLATE 生成批次）
+      2. 显示模板名称（如 _eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf）
+      3. 查询 HDOC_ADCA_MODIFICATION 表获取被替换参数
+      4. 显示参数列表（如 AXLE_CONF, WB_MM）
+
+    4.6 下载生成文档
+    功能说明：点击“Generated document”链接，下载已填充数据的 .rtf 文件。
+    操作步骤：
+      1. 用户点击“Generated document”链接
+      2. 系统调用接口获取生成的 VIN Plate 文件
+      3. 触发浏览器下载功能
+      4. 文件命名格式：`VIN_Plate_JPCT_013945.rtf`
+
+    4.7 查看底盘详细信息
+    功能说明：点击“Chassis no”链接，跳转至对应底盘的详细信息页面。
+    操作步骤：
+      1. 用户点击 Chassis no 链接（如 JPCT_013945）
+      2. 系统跳转至 `/chassis-detail/{chassisNo}` 页面
+      3. 展示该底盘的所有技术参数与历史记录
+
+    4.8 显示系统时间与版本
+    功能说明：展示当前系统时间和 HDoc 程序版本。
+    操作步骤：
+      1. 获取服务器当前时间（如 2022-12-06 07:30:31）
+      2. 获取程序版本号（如 4.2.1）
+      3. 渲染为标签并显示在页面底部
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户进入本页面（由批处理触发）
+      前置处理：获取 Chassis no 并初始化数据查询
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若 Chassis no 为空：
+        设置Message = “无法加载数据，请检查输入”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/UD04SelectGeneratedocumentApi/{chassisNo，ordernumber，market}` 获取完整数据
+
+   5.2 结果处理：
+       成功：正常渲染所有字段
+       失败：显示错误消息：“数据加载失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 页面加载前 | Chassis no | 为空 | “无法加载数据，请检查输入” | 阻止加载 |
+   | 2   | 模板获取时 | Template 文件 | 不存在 | “Can not find template for doctype VIN-PLATE” | 显示错误 |
+   | 3   | 参数替换时 | HDOC_USER_DEFINED_RULES | 无匹配规则 | “No template rule defined for this truck.” | 显示错误 |
+   | 4   | 批处理执行时 | Batch Process | 失败 | “Batch processing failed: Failed to make the Inplate Error reson:XXX” | 显示错误 |
+
+6. 接口定义 (API Specification)
+
+   UD04SelectGeneratedocumentApi
+
+     功能：获取指定底盘的车辆铭牌生成结果
+     Method：GET
+     Endpoint：/api/UD04SelectGeneratedocumentApi/{chassisNo，ordernumber，market}
+
+     Request [json]
+     {"1","2","3"}
+
+     Response Success (200)
+     {
+       "chassisNo": "JPCT_013945",
+       "ordernumber": "15101319",
+       "buildWeek": "2016173",
+       "specWeek": "201617",
+       "market": "IDO",
+       "masterMarket": "-EU",
+       "sNotes": ["S161011", "S1610174"],
+       "sNoteMessage": "The S-Notes above can affect homologation documents.",
+       "loadIndex": "FTLI-150",
+       "speedIndex": "FTSI-K",
+       "adChangeEnabled": true,
+       "templateName": "_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf",
+       "replacedParams": ["AXLE_CONF", "WB_MM"],
+       "generatedFileUrl": "/download/vinplate/JPCT_013945.rtf",
+       "date": "2022-12-06 07:30:31",
+       "hdocVersion": "4.2.1"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Chassis not found"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 模板文件缺失 | 显示错误并阻止生成 | “无法找到模板文件，请联系管理员” |
+| 批处理失败 | 显示具体错误码 | “Batch processing failed: Failed to make the Inplate Error reson:XXX” |
+| 权限不足 | 禁用下载链接 | “您没有权限访问此文件” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

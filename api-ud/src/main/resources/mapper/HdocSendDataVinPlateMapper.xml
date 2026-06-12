@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocSendDataVinPlateMapper">
+    
+    <resultMap id="HdocSendDataVinPlateResultMap" type="com.web.app.entity.HdocSendDataVinPlate">
+        <id property="serie" column="SERIE"/>
+        <result property="chnr" column="CHNR"/>
+        <result property="type" column="TYPE"/>
+        <result property="status" column="STATUS"/>
+        <result property="msg" column="MSG"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="docReady" column="DOC_READY"/>
+        <result property="docSent" column="DOC_SENT"/>
+        <result property="xmlDoc" column="XML_DOC"/>
+    </resultMap>
+    
+    <!-- 根据条件查询 -->
+    <select id="selectByCondition" resultMap="HdocSendDataVinPlateResultMap">
+        SELECT TYPE, STATUS, MSG, REGISTER_DATETIME, DOC_READY, DOC_SENT, XML_DOC
+        FROM HDOC_SEND_DATA_VIN_PLATE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+    
+    <!-- 更新状态为0（Regenerate） -->
+    <update id="updateStatusToRegenerate">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = 0
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+    
+    <!-- 更新状态为1（OK） -->
+    <update id="updateStatusToOk">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = 1
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+    
+    <!-- 更新为基本信息 -->
+    <update id="updateToBasicInfo">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = 0, TYPE = 1
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+    
+    <!-- 更新为高级信息 -->
+    <update id="updateToAdvancedInfo">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = 0, TYPE = 2
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+    
+</mapper>

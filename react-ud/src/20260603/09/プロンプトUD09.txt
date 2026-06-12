@@ -1,0 +1,241 @@
+1. 基本信息
+  模块名称：认证参数检索结果页面
+  文档编号：UD09
+  版本号：v1.0
+  作成日期：2026-05-25
+
+2. 背景 (Background)
+  本模块的核心功能是展示基于上一页查询条件所获取的“Homologation Variables”数据列表，支持用户对检索结果进行选择、打印、删除等操作，并提供跳转至用户详情页的功能。该页面作为认证参数管理流程中的中间环节，用于辅助用户完成数据确认与后续处理。
+
+  面向的用户群体：
+  - 产品工程师
+  - 认证管理人员
+  - 系统管理员
+
+  用户体验方面的考虑：
+  - 支持多行勾选，提升批量操作效率
+  - 提供清晰的数据字段展示（如Product class、Market、Variable等）
+  - 创建人列可点击跳转，增强信息追溯能力
+  - 所有按钮具备明确语义，避免误操作
+
+  安全性或特殊要求：
+  - 删除操作需确认，防止误删
+  - 创建人链接仅限于已登录用户访问，且权限控制由后端统一管理
+  - 打印功能不包含敏感信息（如内部ID）
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Product class | DataTable | - | - | Output | - | 左 | - | - | [ソート順] Product Class, Market, Number |
+| 2   | Number | DataTable | - | - | Output | - | 左 | - | - | - |
+| 3   | Market | DataTable | - | - | Output | - | 左 | - | - | - |
+| 4   | Variable | DataTable | - | - | Output | - | 左 | - | - | - |
+| 5   | Value | DataTable | - | - | Output | - | 左 | - | - | - |
+| 6   | Variant string. | DataTable | - | - | Output | - | 左 | - | - | - |
+| 7   | Comments | DataTable | - | - | Output | - | 左 | - | - | - |
+| 8   | Add | DataTable | - | - | Output | - | 左 | - | - | (YYYYWW)(YYYYWW) |
+| 9   | Delete | DataTable | - | - | Output | - | 左 | - | - | - |
+| 10  | Created by user | DataTable | - | - | Output | - | 左 | - | - | 可点击跳转至用户信息查看页面 |
+| 11  | Date | DataTable | - | - | Output | - | 左 | - | - | (Automatic) |
+| 12  | Count | label | - | - | Output | - | 左 | - | - | Number of lines found: XXX |
+| 13  | Select | button | - | - | Action | - | 中 | - | 活性 | 勾选后触发返回并回填 |
+| 14  | Back | button | - | - | Action | - | 中 | - | 活性 | 返回上一级，恢复查询条件 |
+| 15  | Print | button | - | - | Action | - | 中 | - | 活性 | 打印当前检索结果 |
+| 16  | Delete selected | button | - | - | Action | - | 中 | - | 活性 | 删除已选中条目 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 数据展示功能
+    功能说明：根据上一页的查询条件，从数据库中加载并展示对应的 Homologation Variables 数据。
+    操作步骤：
+      1. 用户在前一页面输入查询条件并提交
+      2. 系统调用 `GET /HDOC_USER_DEFINED_RULES` 接口获取匹配数据
+      3. 将数据渲染为表格形式，每行包含 Product class、Number、Market、Variable、Varriant string.、Comments、Add、Delete、Created by user、Date 字段
+      4. 显示总记录数（Count）于页面底部(靠左表示)。
+
+    4.2 选择并返回功能
+    功能说明：用户勾选一条或多条数据后，点击“Select”按钮，将所选数据回传至上一级页面。
+    操作步骤：
+      1. 用户勾选一个或多个数据条目
+      2. 点击“Select”按钮
+      3. 系统收集所有选中项的主键（如 ID 或组合字段）
+      4. 跳转至上一级认证参数页面，并自动填充选中数据的信息
+      5. 页面提示：“已成功选择 X 条记录”
+
+    4.3 返回功能
+    功能说明：点击“Back”按钮返回上一级页面，并恢复原始查询条件。
+    操作步骤：
+      1. 用户点击“Back”按钮
+      2. 系统不保存当前筛选状态
+      3. 跳转至认证参数查询页面
+      4. 查询条件自动还原为进入本页面前的状态
+
+    4.4 打印功能
+    功能说明：将当前检索结果以打印格式输出。
+    操作步骤：
+      1. 用户点击“Print”按钮
+      2. 系统触发浏览器打印对话框
+      3. 打印内容包括表头、所有可见列及分页信息
+      4. 不包含系统按钮和操作栏
+
+    4.5 批量删除功能
+    功能说明：删除用户勾选的数据条目。
+    操作步骤：
+      1. 用户勾选一个或多个数据条目
+      2. 点击“Delete selected”按钮
+      3. 弹出确认对话框：“确定要删除选中的 X 条记录吗？”
+      4. 用户确认后，系统调用删除接口
+      5. 成功后刷新列表，显示剩余数据
+      6. 提示：“删除成功，共删除 X 条记录”
+
+    4.6 创建人跳转功能
+    功能说明：点击“Created by user”列中的用户名链接，跳转至用户信息查看页面。
+    操作步骤：
+      1. 用户点击某条记录的“Created by user”字段（如 a304598）
+      2. 系统发起请求
+      3. 展示该用户的详细信息（姓名、部门、角色等）
+      4. 支持返回原页面
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击“Select”、“Back”、“Print”、“Delete selected”或“Created by user”链接
+      前置处理：验证当前会话有效性，获取用户权限
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若未勾选任何数据且点击“Select”或“Delete selected”：
+        设置Message = “请至少选择一条记录”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET api/UD08HomologationVariablesApi/UD08SelectProductclassmaster` 获取数据
+        调用 `GET api/UD08HomologationVariablesApi/UD08SelectMarketmaster` 获取数据
+        调用 `GET api/UD08HomologationVariablesApi/UD08SelectHdocvariables` 获取数据
+        调用 `POST api/UD08HomologationVariablesApi/UD08Delete` 执行删除
+
+   5.2 结果处理：
+       成功：显示提示消息“操作成功”
+       失败：显示错误消息“操作失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Select/Delete selected | 选中项数量 | 无选中项 | “请至少选择一条记录” | 阻止提交 |
+   | 2   | 删除前 | 用户权限 | 当前用户无删除权限 | “您没有权限执行此操作” | 禁用按钮 |
+   | 3   | 跳转用户详情 | 用户ID | 用户不存在 | “用户信息不存在” | 跳转失败页 |
+
+6. 接口定义 (API Specification)
+
+   UD08HomologationVariablesApi
+     6.1功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectProductclassmaster
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+     6.2功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectMarketmaster
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+     6.3功能：根据条件查询认证参数列表
+     Method：GET
+     Endpoint：/api/UD08HomologationVariablesApi/UD08SelectHdocvariables
+
+     Request [json]
+	无
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           全项目
+         }
+       ]
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid parameters",
+       "message": "查询参数格式错误"
+     }
+
+
+     6.4功能：删除指定记录
+     Method：DELETE
+     Endpoint：/api/UD08HomologationVariablesApi/UD08Delete
+
+     Request [json]
+     [
+            {
+       "id": "12345"
+        }
+          ]
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "删除成功"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Data does not exist, Please enter the correct content"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
+| 用户ID无效 | 跳转失败页 | “用户信息不存在” |
+
+8. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：认证参数检索结果页面_詳細設計.md
+  保存到：当前文件夹下的work目录

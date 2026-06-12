@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaChangeMapper">
+    
+    <resultMap id="HdocAdcaChangeResultMap" type="com.web.app.entity.HdocAdcaChange">
+        <id property="serie" column="SERIE"/>
+        <result property="chnr" column="CHNR"/>
+        <result property="act" column="ACT"/>
+        <result property="bu" column="BU"/>
+        <result property="reason" column="REASON"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerProcess" column="REGISTER_PROCESS"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateProcess" column="UPDATE_PROCESS"/>
+    </resultMap>
+    
+    <!-- 根据条件查询 -->
+    <select id="selectByCondition" resultMap="HdocAdcaChangeResultMap">
+        SELECT * FROM HDOC_ADCA_CHANGE 
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+    
+    <!-- 插入ADCA变更 -->
+    <insert id="insert">
+        INSERT INTO HDOC_ADCA_CHANGE (
+            SERIE, CHNR, ACT, BU, REASON, REGISTER_DATETIME, REGISTER_USER, 
+            REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        ) VALUES (
+            #{serie}, #{chnr}, 'Y', '', #{reason}, SYSDATE, #{registerUser},
+            #{registerUser}, SYSDATE, #{registerUser}, #{registerUser}
+        )
+    </insert>
+    
+    <!-- 更新ADCA变更（逻辑删除） -->
+    <update id="updateActToN">
+        UPDATE HDOC_ADCA_CHANGE SET ACT = 'N' 
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+    
+</mapper>

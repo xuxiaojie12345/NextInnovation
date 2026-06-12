@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+    
+    <resultMap id="HdocVariablesResultMap" type="com.web.app.entity.HdocVariables">
+        <id property="variable" column="VARIABLE"/>
+        <result property="type" column="TYPE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createdByUser" column="CREATED_BY_USER"/>
+        <result property="createDate" column="CREATE_DATE"/>
+    </resultMap>
+    
+    <!-- 根据变量名计数 -->
+    <select id="countByVariable" resultType="int">
+        SELECT COUNT(1) FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </select>
+    
+    <!-- 插入变量 -->
+    <insert id="insert">
+        INSERT INTO HDOC_VARIABLES (
+            VARIABLE, TYPE, DESCRIPTION, CREATED_BY_USER, CREATE_DATE
+        ) VALUES (
+            #{variable}, #{type}, #{description}, #{createdByUser}, SYSDATE
+        )
+    </insert>
+    
+    <!-- 更新变量 -->
+    <update id="update">
+        UPDATE HDOC_VARIABLES
+        SET TYPE = #{type},
+            DESCRIPTION = #{description},
+            CREATED_BY_USER = #{createdByUser},
+            CREATE_DATE = SYSDATE
+        WHERE VARIABLE = #{variable}
+    </update>
+    
+    <!-- 删除变量 -->
+    <delete id="deleteByVariable">
+        DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </delete>
+    
+    <!-- 搜索变量 -->
+    <select id="searchVariables" resultMap="HdocVariablesResultMap">
+        SELECT VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_VARIABLES
+        WHERE 1=1
+        <if test="variable != null and variable != ''">
+            AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+        </if>
+        <if test="type != null and type != ''">
+            AND TYPE LIKE CONCAT('%', #{type}, '%')
+        </if>
+        <if test="description != null and description != ''">
+            AND DESCRIPTION LIKE CONCAT('%', #{description}, '%')
+        </if>
+    </select>
+    
+</mapper>

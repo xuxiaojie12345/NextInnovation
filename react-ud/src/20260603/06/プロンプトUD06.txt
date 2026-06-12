@@ -1,0 +1,144 @@
+1. 基本信息
+
+模块名称：Save Modifications（保存修改）
+文档编号：UD06
+版本号：v1.0
+作成日期：2026-05-22
+
+ 2. 背景 (Background)
+
+ 核心功能与目标  
+本模块用于在用户提交文档修改后，展示系统处理结果及当前版本状态。主要功能包括：
+- 显示车辆基本信息（如底盘系列、编号、文档类型等）
+- 展示当前操作的版本信息
+- 提供“关闭”按钮以退出当前页面
+- 显示关键提示信息（如“VERSION IS RELEASED”）
+
+ 面向用户群体  
+- 车辆配置工程师  
+- 生产线管理人员  
+- 质量控制人员  
+
+ 用户体验考虑  
+- 界面简洁明了，突出关键信息  
+- 使用绿色高亮显示重要状态消息（如已发布）  
+- 操作路径清晰，仅需点击“Close”即可返回  
+
+ 安全性要求  
+- 不允许直接编辑或再次提交已发布的版本  
+- 所有信息均来自数据库读取，不可篡改  
+- 页面无输入字段，防止误操作  
+
+
+
+ 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+| 1   | Chassis serie | Label       | -         | -         | Output | -                       | 左              | JPCT            | -                 | 来自 `HDOC_ADCA_MODIFICATION` 的 `Chassis serie` 字段 |
+| 2   | Chassis number | Label       | -         | -         | Output | -                       | 左              | 028321          | -                 | 来自 `HDOC_ADCA_MODIFICATION` 的 `Chassis number` 字段 |
+| 3   | Doctype      | Label       | -         | -         | Output | -                       | 左              | DIM-PLATE       | -                 | 固定值 |
+| 4   | Version      | Label       | -         | -         | Output | -                       | 左              | 1               | -                 | 当前版本号 |
+| 5   | Storing      | Label       | -         | -         | Output | -                       | 左              | SEAT_NO 4       | -                 | 存储位置信息 |
+| 6   | FOUND UNRELEASED VERSION | Label | - | - | Output | - | 左 | 1 | - | 表示存在未发布版本 |
+| 7   | Message      | Label       | -         | -         | Output | -                       | 左              | VERSION IS RELEASED | - | 绿色高亮显示，表示版本已发布 |
+| 8   | Close        | Button      | -         | -         | Action | -                       | 中              | -               | 活性              | 关闭当前窗口 |
+
+> 备注：
+> - 所有字段均为只读输出项，来源于 `HDOC_ADCA_MODIFICATION` 数据表。
+> - “Message”字段使用绿色背景高亮显示，增强视觉提示。
+> - “Close”按钮点击后关闭弹窗并返回上一页面。
+
+ 4. 功能描述 (Functional Description)
+
+ 4.1 显示修改保存结果
+
+功能说明：  
+在用户成功提交修改后，系统跳转至本页面，展示本次操作的相关信息和状态。
+
+操作步骤：
+1. 用户在 Modify Document 页面完成修改并点击“Save”按钮。
+2. 后端处理完成后，返回成功响应，并跳转至本页面。
+3. 页面加载以下数据：
+   - Chassis serie
+   - Chassis number
+   - Doctype
+   - Version
+   - Storing
+   - FOUND UNRELEASED VERSION
+   - Message（显示“VERSION IS RELEASED”）
+4. 用户查看信息后，点击“Close”按钮关闭页面。
+
+ 4.2 关闭页面
+
+功能说明：  
+点击“Close”按钮可关闭当前弹窗，返回上一级页面。
+
+操作步骤：
+1. 用户点击“Close”按钮。
+2. 系统执行页面关闭逻辑（如关闭模态框或跳转回原页面）。
+3. 返回至 Modify Document 页面或其他主界面。
+
+ 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+ 5.1 处理流程
+
+ 开始：跳转至 Save Modifications 页面
+
+ 前置处理：
+- 接收从前端传来的参数（如 chassisNo、version 等）
+- 查询数据库表 `HDOC_ADCA_MODIFICATION` 获取相关记录
+- 构造页面所需字段内容
+
+ 空值校验等 (Frontend Check)：
+- 若 `FOUND UNRELEASED VERSION` 为 0：
+  - 设置 Message = “NO UNRELEASED VERSION EXISTS!”
+  - 但不阻止页面加载（仅提示）
+
+ 5.1.2 API调用 (Backend Check)：
+- 无需调用新 API，所有数据通过 `GET /api/UD06SaveModificationsApi/UD06SelectHdocAdcaModification` 获取
+
+ 5.2 结果处理：
+成功：正常渲染页面，显示所有字段
+失败：若数据获取失败，则显示通用错误：“无法加载修改状态，请重试”
+
+ 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+| 1   | 页面加载时 | HDOC_ADCA_MODIFICATION | 数据不存在 | 无法加载修改状态，请重试 | 显示错误页 |
+| 2   | 页面加载时 | FOUND UNRELEASED VERSION | 值为 0 | NO UNRELEASED VERSION EXISTS! | 显示警告信息 |
+
+ 6. 接口定义 (API Specification)
+
+ GET /api/UD06SaveModificationsApi/UD06SelectHdocAdcaModification
+
+功能：获取文档修改后的状态信息，用于渲染 Save Modifications 页面
+
+Method：GET  
+Endpoint：`/api/UD06SaveModificationsApi/UD06SelectHdocAdcaModification`
+
+ Request [json]
+{
+  "ChassisSerie": "JPCT028321",
+  "ChassisNumber": "1"
+}
+
+Response Success ([200])
+{
+Doctype:"xxx",
+Version:"xxx",
+Storing:"xxx",
+FOUND UNRELEASED VERSION:"xxx",
+Message:"xxx"
+}
+
+Response Error ([400])
+{
+msg:""
+}
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

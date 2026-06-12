@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocDocumentListMapper">
+    
+    <resultMap id="HdocDocumentListResultMap" type="com.web.app.entity.HdocDocumentList">
+        <id property="doctype" column="DOCTYPE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+    </resultMap>
+    
+    <!-- 查询所有文档类型 -->
+    <select id="selectAllDocumentTypes" resultMap="HdocDocumentListResultMap">
+        SELECT DOCTYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME 
+        FROM HDOC_DOCUMENT_LIST
+    </select>
+    
+    <!-- 根据文档类型查询 -->
+    <select id="selectByDocumentType" resultMap="HdocDocumentListResultMap">
+        SELECT DOCTYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME 
+        FROM HDOC_DOCUMENT_LIST
+        WHERE DOCTYPE LIKE CONCAT('%', #{documentType}, '%')
+    </select>
+    
+    <!-- 更新文档信息 -->
+    <update id="updateDocument">
+        UPDATE HDOC_DOCUMENT_LIST 
+        SET REGISTER_USER = #{registerUser}, 
+            REGISTER_DATETIME = #{registerDatetime}
+        WHERE DOCTYPE = #{doctype}
+    </update>
+    
+</mapper>

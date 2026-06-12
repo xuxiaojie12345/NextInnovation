@@ -1,0 +1,176 @@
+1. 基本信息
+  模块名称：HDoc模板管理页面
+  文档编号：UD12
+  版本号：v1.0
+  作成日期：2026-05-26
+
+2. 背景 (Background)
+  本模块的核心功能是提供对车辆铭牌（VIN Plate）模板文件的上传、删除和校验操作。用户可通过该页面将 `.rtf` 格式的模板文件上传至指定市场目录，或从目录中移除不再使用的模板，并在上传前进行格式校验。
+
+  面向的用户群体：
+  - 系统管理员
+  - 生产工程师
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 提供清晰的上传与删除区域划分
+  - 支持市场选择，确保模板按区域分类存储
+  - 提供模板校验链接，避免无效文件上传
+  - 所有操作均有明确反馈提示
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 上传文件需为 `.rtf` 格式，防止恶意文件注入
+  - 删除操作需确认，防止误删
+  - 所有通信使用 HTTPS 加密
+  - 文件路径由后端统一管理，避免直接暴露
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Template File | File Input | Y | - | Input | .rtf 文件 | 左 | 空 | 活性 | 仅支持 .rtf 文件 |
+| 2   | Market | Pull-downList | Y | 3 | Input | 半角英数字+記号 | 左 | JPN | 活性 | 可选：JPN, EU, US, etc. |
+| 3   | Upload file | Button | - | - | Action | - | 中 | - | 活性 | 触发上传流程 |
+| 4   | Market (Delete) | Pull-downList | Y | 3 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 可选：JPN, EU, US, etc. |
+| 5   | Templates | Pull-downList | Y | - | Input | 半角英数字+記号 | 左 | 空 | 活性 | 动态加载对应市场的模板列表 |
+| 6   | Delete | Button | - | - | Action | - | 中 | - | 活性 | 触发删除流程 |
+| 7   | Check Template (Only for rtf files) | Link | - | - | Action | - | 左 | - | 活性 | 跳转至模板校验页面 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 模板上传功能
+    功能说明：用户选择一个 `.rtf` 文件并指定市场，点击“Upload file”按钮将其上传至服务器。
+    操作步骤：
+      1. 用户点击“Template File”输入框，选择本地 `.rtf` 文件
+      2. 在“Market”下拉菜单中选择目标市场（如 JPN）
+      3. 点击“Upload file”按钮
+      4. 系统校验文件类型和大小
+      5. 若通过，则调用接口上传文件
+      6. 成功后显示提示：“TEMPLATE XXX WAS SUCCESSFULLY UPLOADED TO MARKET JPN”
+
+    4.2 模板删除功能
+    功能说明：用户选择市场和模板文件，点击“Delete”按钮将其从服务器移除。
+    操作步骤：
+      1. 用户在“Market (Delete)”下拉菜单中选择目标
+      2. 在“Templates”下拉菜单中选择要删除的模板文件
+      3. 点击“Delete”按钮
+      4. 弹出确认对话框：“Do you really want to delete template?”
+      5. 用户确认后，系统调用接口执行删除
+   6. 成功后显示提示：“TEMPLATE XXX WAS SUCCESSFULLY DELETE FROM MARKET JPN”
+
+    4.3 模板校验功能
+    功能说明：用户点击链接跳转至模板校验页面，用于检查 `.rtf` 文件是否符合规范。
+    操作步骤：
+      1. 用户点击“Check Template (Only for rtf files)”链接
+      2. 系统跳转至 `HDoc Template Check` 页面
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Upload file / Delete / Check Template 链接
+      前置处理：验证用户权限，获取当前会话
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若点击 Upload file 且未选择文件：
+        设置Message = “NO FILE UPLOADED”
+        终止流程
+
+       若点击 Delete 且 Market 或 Templates 为空：
+        设置Message = “请选择市场和模板”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `POST /api/template/upload` 上传文件
+        调用 `DELETE /api/template/delete` 删除文件
+        调用 `GET /api/template/check` 校验模板
+
+   5.2 结果处理：
+       成功：显示提示消息“操作成功”
+       失败：显示错误消息“操作失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 上传前 | 文件类型 | 不是 .rtf | “仅支持 .rtf 文件” | 阻止上传 |
+   | 2   | 上传前 | 文件大小 | 超过 10MB | “文件过大，请压缩后上传” | 阻止上传 |
+   | 3   | 删除前 | Market | 为空 | “请选择市场” | 阻止提交 |
+   | 4   | 删除前 | Template | 为空 | “请选择模板” | 阻止提交 |
+   | 5   | 删除时 | 用户确认 | 未确认 | “操作已取消” | 终止流程 |
+
+6. 接口定义 (API Specification)
+
+   POST /api/template/upload
+     功能：上传 VIN plate 模板文件
+     Method：POST
+     Endpoint：/api/template/upload
+
+     Request [json]
+     {
+       "file": "base64-encoded-rtf-file",
+       "market": "JPN"
+     }
+
+     Response Success (201)
+     {
+       "success": true,
+       "message": "TEMPLATE XXX WAS SUCCESSFULLY UPLOADED TO MARKET JPN"
+     }
+
+     Response Error (400)
+     {
+       "error": "Invalid file type",
+       "message": "Only .rtf files are allowed"
+     }
+
+   DELETE /api/template/delete
+     功能：删除指定模板文件
+     Method：DELETE
+     Endpoint：/api/template/delete
+
+     Request [json]
+     {
+       "market": "JPN",
+       "templateName": "VIN_PLATE_JPCT.rtf"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "TEMPLATE XXX WAS SUCCESSFULLY DELETE FROM MARKET JPN"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Template not found"
+     }
+
+   GET /api/template/check
+     功能：跳转至模板校验页面
+     Method：GET
+     Endpoint：/api/template/check
+
+     Request
+     无参数
+
+     Response Success (200)
+     [重定向至 `/template-check` 页面]
+
+     Response Error (403)
+     {
+       "error": "Forbidden",
+       "message": "You do not have permission to access this page"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
+| 文件格式错误 | 返回错误响应 | “仅支持 .rtf 文件” |
+| 文件过大 | 返回错误响应 | “文件过大，请压缩后上传” |
+| 模板不存在 | 返回错误响应 | “模板不存在” |

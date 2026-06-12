@@ -1,0 +1,150 @@
+1. 基本信息
+  模块名称：模板文件列表页面
+  文档编号：UD14
+  版本号：v1.0
+  作成日期：2026-05-27
+
+2. 背景 (Background)
+  本模块的核心功能是展示指定市场文件夹下的所有模板文件列表，支持用户查看文件名、大小、修改时间等信息，并可直接下载文件。该页面用于管理与检索存储在服务器上的模板文件，确保用户能够快速定位并获取所需资源。
+
+  面向的用户群体：
+  - 系统管理员
+  - 生产工程师
+  - 认证管理人员
+
+  用户体验方面的考虑：
+  - 提供清晰的表格布局，便于浏览
+  - 支持市场选择，实现数据分类展示
+  - 文件名可点击下载，提升操作效率
+  - 所有字段均来自数据库或文件系统，确保一致性
+
+  安全性或特殊要求：
+  - 仅允许授权用户访问此页面
+  - 下载链接需验证权限
+  - 不暴露文件路径，防止目录遍历攻击
+  - 所有通信使用 HTTPS 加密
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Select Market | Pull-downList | Y | 3 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 可选：AUT, JPN, EU, etc. |
+| 2   | Filename | DataTable | - | - | Output | - | 左 | 空 | - | 可点击下载 |
+| 3   | Used | DataTable | - | - | Output | - | 左 | 空 | - | 若 HDOC_USER_DEFINED_RULES 中存在对应 VARIABLE，则显示 |
+| 4   | Last Mod. | DataTable | - | - | Output | - | 左 | 空 | - | 文件最后修改时间 |
+| 5   | Size | DataTable | - | - | Output | - | 左 | 空 | - | 文件大小 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 展示文件列表
+    功能说明：根据用户选择的市场，展示对应文件夹内的所有文件信息。
+    操作步骤：
+      1. 用户进入模板文件列表页面
+      2. 页面初始化时显示“Select Market”下拉菜单
+      3. 用户从下拉菜单中选择一个市场（如 AUT）
+      4. 系统调用接口获取该市场文件夹下的所有文件信息
+      5. 将文件名、修改时间、大小等字段渲染为表格
+      6. 若某文件名在 HDOC_USER_DEFINED_RULES 表中有对应 VARIABLE，则在“Used”列显示标记
+
+    4.2 下载文件功能
+    功能说明：用户点击文件名链接，即可下载对应文件。
+    操作步骤：
+      1. 用户在文件列表中找到目标文件（如 `.m003432.txt`）
+      2. 点击文件名链接
+      3. 系统触发浏览器下载功能
+      4. 文件以原始名称保存至本地
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户选择市场并提交
+      前置处理：获取 market 参数
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若未选择市场且提交：
+        设置Message = “请选择市场”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `GET /api/templates/list` 获取文件列表
+        调用 `GET /api/rules/used` 获取已使用的变量信息
+
+   5.2 结果处理：
+       成功：正常渲染表格
+       失败：显示错误消息：“无法加载文件列表，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 页面加载前 | Market | 为空 | “请选择市场” | 阻止加载 |
+   | 2   | 数据查询时 | Market | 不存在 | “市场不存在” | 显示错误 |
+   | 3   | 文件读取时 | 文件路径 | 无法访问 | “无法访问文件” | 显示错误 |
+
+6. 接口定义 (API Specification)
+
+   GET /api/templates/list
+     功能：获取指定市场的模板文件列表
+     Method：GET
+     Endpoint：/api/templates/list
+
+     Request [请求格式]
+     {
+       "market": "AUT"
+     }
+
+     Response Success (200)
+     {
+       "data": [
+         {
+           "filename": ".m003432.txt",
+           "used": true,
+           "lastModified": "2022-01-10 18:29",
+           "size": "317 Kb"
+         },
+         {
+           "filename": ".m003432.txt.170629.backup",
+           "used": false,
+           "lastModified": "2017-06-29 16:50",
+           "size": "377 Kb"
+         }
+       ]
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Market not found"
+     }
+
+   GET /api/rules/used
+     功能：获取已使用的变量信息
+     Method：GET
+     Endpoint：/api/rules/used
+
+     Request [请求格式]
+     {
+       "market": "AUT"
+     }
+
+     Response Success (200)
+     {
+       "variables": ["AXLE_CONF", "WB_MM", "ENGINE_TYPE"]
+     }
+
+     Response Error (500)
+     {
+       "error": "Internal Server Error",
+       "message": "Failed to load rules"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 权限不足 | 禁用页面访问 | “您没有权限查看此信息” |
+| 市场不存在 | 返回错误响应 | “市场不存在” |
+| 文件无法访问 | 返回错误响应 | “无法访问文件” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

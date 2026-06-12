@@ -1,0 +1,239 @@
+1. 基本信息
+  模块名称：认证参数查询与维护页面
+  文档编号：UD10
+  版本号：v1.0
+  作成日期：2026-05-25
+
+2. 背景 (Background)
+  本模块的核心功能是提供对 `HDOC_VARIABLES` 表中认证参数（Homologation Variables）的查询、新增、更新、删除及导出操作。用户可通过输入条件进行筛选，并执行CRUD操作，支持数据批量管理。
+
+  面向的用户群体：
+  - 系统管理员
+  - 产品工程师
+  - 认证负责人
+
+  用户体验方面的考虑：
+  - 查询条件字段清晰布局，便于快速定位
+  - 支持“Add/Update/Delete”按钮联动控制必填项
+  - 提供Excel导出功能，满足报表需求
+  - 所有操作均有明确反馈提示
+
+  安全性或特殊要求：
+  - 删除操作需确认，防止误删
+  - “Variable”字段在增改时为必填项
+  - 导出文件不包含敏感信息
+  - 权限控制由后端统一管理（如仅允许特定角色执行删除）
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Variable | TextField | Y | 30 | Input | 半角英数字+記号 | 左 | 空 | 活性 | Add/Update/Delete时变为必填 |
+| 2   | Type | Pull-downList | - | 20 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 内容固定：VDA, User Defined |
+| 3   | Description | TextField | - | 100 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
+| 4   | Created by user | TextField | - | 16 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 自动填充，不可编辑 |
+| 5   | Date | TextField | - | - | Input | 日付 | 左 | 空 | 活性 | 自动填充，不可编辑 |
+| 6   | Search | Button | - | - | Action | - | 中 | - | 活性 | 触发查询跳转 |
+| 7   | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入框 |
+| 8   | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回上一页面 |
+| 9   | Add | Button | - | - | Action | - | 中 | - | 活性 | 新增记录 |
+| 10  | Update | Button | - | - | Action | - | 中 | - | 活性 | 修改现有记录 |
+| 11  | Delete | Button | - | - | Action | - | 中 | - | 活性 | 删除当前记录 |
+| 12  | Excel | Button | - | - | Action | - | 中 | - | 活性 | 导出CSV文件 |
+
+4. 功能描述 (Functional Description)
+
+    4.1 查询功能
+    功能说明：根据用户输入的查询条件，跳转至“现有文档参数查询结果页”。
+    操作步骤：
+      1. 用户在 Variable、Type、Description 等字段中输入查询条件
+      2. 点击“Search”按钮
+      3. 系统将查询参数封装并发送请求
+      4. 成功后跳转至检索结果页面，展示匹配数据
+
+    4.2 清空功能
+    功能说明：清除所有已填写的查询条件。
+    操作步骤：
+      1. 用户点击“Clear”按钮
+      2. 所有输入框内容被清空
+      3. 页面恢复初始状态
+
+    4.3 返回功能
+    功能说明：返回到调用本页面之前的原页面。
+    操作步骤：
+      1. 用户点击“Back”按钮
+      2. 系统跳转至上一级页面
+      3. 不保存当前输入内容
+
+    4.4 新增功能
+    功能说明：提交新记录至数据库。
+    操作步骤：
+      1. 用户填写 Variable、Type、Description 字段
+      2. 点击“Add”按钮
+      3. 系统校验输入合法性
+      4. 若通过，则调用接口创建记录
+      5. 成功后提示：“添加成功”，并刷新列表或跳转
+
+    4.5 更新功能
+    功能说明：修改已有记录的内容。
+    操作步骤：
+      1. 用户选择一条记录并编辑其字段
+      2. 点击“Update”按钮
+      3. 系统验证是否已存在相同 Variant
+      4. 若无冲突，则更新数据库
+      5. 成功后提示：“更新成功”
+
+    4.6 删除功能
+    功能说明：移除指定型号的数据记录。
+    操作步骤：
+      1. 用户确认要删除的记录
+      2. 点击“Delete”按钮
+      3. 弹出确认对话框：“确定要删除该记录吗？”
+      4. 用户确认后，系统调用删除接口
+      5. 成功后提示：“删除成功”，并刷新界面
+
+    4.7 导出功能
+    功能说明：将当前查询条件下的所有数据导出为 CSV 文件。
+    操作步骤：
+      1. 用户点击“Excel”按钮
+      2. 系统调用导出接口获取数据
+      3. 生成 CSV 文件并触发下载
+      4. 文件命名格式：`HDoc_Variables_YYYYMMDD.csv`
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+   5.1 处理流程
+
+      开始：用户点击 Search / Add / Update / Delete / Excel 按钮
+      前置处理：验证会话有效性，检查权限
+
+      5.1.1 空值校验等 (Frontend Check)：
+       若点击 Add 或 Update 且 Variable 为空：
+        设置Message = “Variable 是必填项”
+        终止流程
+
+       若点击 Delete 但未选中任何记录：
+        设置Message = “请选择要删除的记录”
+        终止流程
+
+      5.1.2 API调用 (Backend Check)：
+        调用 `POST /HDOC_VARIABLES/add` 添加新记录
+        调用 `PUT /HDOC_VARIABLES/update` 更新记录
+        调用 `DELETE /HDOC_VARIABLES/delete` 删除记录
+        调用 `GET /HDOC_VARIABLES/export` 导出CSV
+
+   5.2 结果处理：
+       成功：显示提示消息“操作成功”
+       失败：显示错误消息“操作失败，请稍后重试”
+
+   5.3 校验详细规格表
+
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | Add 操作前 | Variable | 为空 | “Variable 是必填项” | 阻止提交 |
+   | 2   | Add 操作时 | Variant | 已存在 | “Variant already exists. Please enter the correct content” | 返回错误 |
+   | 3   | Update 操作时 | Variant | 不存在 | “Variant does not exist. Please enter the correct content” | 返回错误 |
+   | 4   | Delete 操作时 | Variant | 不存在 | “Variant does not exist. Please enter the correct content” | 返回错误 |
+   | 5   | 导出前 | 查询条件 | 无效 | “无法生成导出文件” | 阻止导出 |
+
+6. 接口定义 (API Specification)
+
+   POST /HDOC_VARIABLES/add
+     功能：新增一条认证参数记录
+     Method：POST
+     Endpoint：/api/HDOC_VARIABLES/add
+
+     Request [请求格式]
+     {
+       "Variable": "ENG_TORQUE",
+       "Type": "VDA",
+       "Description": "Engine Torque",
+       "Created_by_user": "a304598",
+       "Date": "2025-04-05"
+     }
+
+     Response Success (201)
+     {
+       "success": true,
+       "id": "12345",
+       "message": "添加成功"
+     }
+
+     Response Error (409)
+     {
+       "error": "Conflict",
+       "message": "Variant already exists. Please enter the correct content"
+     }
+
+   PUT /HDOC_VARIABLES/update
+     功能：更新现有记录
+     Method：PUT
+     Endpoint：/api/HDOC_VARIABLES/update
+
+     Request [请求格式]
+     {
+       "id": "12345",
+       "Variable": "ENG_TORQUE",
+       "Type": "User Defined",
+       "Description": "Updated Engine Torque"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "更新成功"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Variant does not exist. Please enter the correct content"
+     }
+
+   DELETE /HDOC_VARIABLES/delete
+     功能：删除指定记录
+     Method：DELETE
+     Endpoint：/api/HDOC_VARIABLES/delete
+
+     Request [请求格式]
+     {
+       "id": "12345"
+     }
+
+     Response Success (200)
+     {
+       "success": true,
+       "message": "删除成功"
+     }
+
+     Response Error (404)
+     {
+       "error": "Not Found",
+       "message": "Variant does not exist. Please enter the correct content"
+     }
+
+   GET /HDOC_VARIABLES/export
+     功能：导出当前查询结果为CSV文件
+     Method：GET
+     Endpoint：/api/HDOC_VARIABLES/export
+
+     Request [请求格式]
+     无参数（或携带查询条件）
+
+     Response Success (200)
+     [CSV文件流]
+
+     Response Error (400)
+     {
+       "error": "Invalid export request",
+       "message": "无法生成导出文件"
+     }
+
+7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
+| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
+| 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
+| 文件导出失败 | 返回错误响应 | “导出失败，请联系管理员” |
