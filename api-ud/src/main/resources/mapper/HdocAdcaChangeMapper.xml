@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaChangeMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocAdcaChange">
+        <result property="serie" column="SERIE" jdbcType="VARCHAR"/>
+        <result property="chnr" column="CHNR" jdbcType="VARCHAR"/>
+        <result property="act" column="ACT" jdbcType="VARCHAR"/>
+        <result property="bu" column="BU" jdbcType="VARCHAR"/>
+        <result property="reason" column="REASON" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectBySerieAndChnr" resultMap="BaseResultMap">
+        SELECT * FROM HDOC_ADCA_CHANGE WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <select id="countBySerieAndChnr" resultType="int">
+        SELECT COUNT(1) FROM HDOC_ADCA_CHANGE WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <insert id="insert" parameterType="com.web.app.entity.HdocAdcaChange">
+        INSERT INTO HDOC_ADCA_CHANGE (SERIE, CHNR, ACT, BU, REASON, REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS, UPDATE_USER, UPDATE_DATETIME, UPDATE_PROCESS)
+        VALUES (#{serie}, #{chnr}, #{act}, #{bu}, #{reason}, #{registerUser}, #{registerDatetime}, #{registerProcess}, #{updateUser}, #{updateDatetime}, #{updateProcess})
+    </insert>
+
+    <delete id="deleteBySerieAndChnr">
+        DELETE FROM HDOC_ADCA_CHANGE WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </delete>
+
+</mapper>

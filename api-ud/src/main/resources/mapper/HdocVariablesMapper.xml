@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocVariables">
+        <result property="variable" column="VARIABLE" jdbcType="VARCHAR"/>
+        <result property="typeField" column="TYPE" jdbcType="VARCHAR"/>
+        <result property="description" column="DESCRIPTION" jdbcType="VARCHAR"/>
+        <result property="userid" column="USERID" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="countByVariable" resultType="int">
+        SELECT COUNT(1) FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </select>
+
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_VARIABLES
+        WHERE 1=1
+        AND (VARIABLE LIKE CONCAT('%',#{variable},'%') OR #{variable} IS NULL)
+        AND (TYPE LIKE CONCAT('%',#{type},'%') OR #{type} IS NULL)
+        AND (DESCRIPTION LIKE CONCAT('%',#{description},'%') OR #{description} IS NULL)
+    </select>
+
+    <insert id="insert" parameterType="com.web.app.entity.HdocVariables">
+        INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS, UPDATE_USER, UPDATE_DATETIME, UPDATE_PROCESS)
+        VALUES (#{variable}, #{typeField}, #{description}, #{registerUser}, #{registerDatetime}, #{registerProcess}, #{updateUser}, #{updateDatetime}, #{updateProcess})
+    </insert>
+
+    <update id="updateByVariable" parameterType="com.web.app.entity.HdocVariables">
+        UPDATE HDOC_VARIABLES
+        SET TYPE = #{typeField},
+            DESCRIPTION = #{description},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime}
+        WHERE VARIABLE = #{variable}
+    </update>
+
+    <delete id="deleteByVariable">
+        DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </delete>
+
+</mapper>

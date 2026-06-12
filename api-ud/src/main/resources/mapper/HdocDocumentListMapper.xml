@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocDocumentListMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocDocumentList">
+        <result property="doctype" column="DOCTYPE" jdbcType="VARCHAR"/>
+        <result property="description" column="DESCRIPTION" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectAllDoctype" resultMap="BaseResultMap">
+        SELECT DOCTYPE, DESCRIPTION FROM HDOC_DOCUMENT_LIST
+    </select>
+
+    <select id="selectByDoctype" resultMap="BaseResultMap">
+        SELECT * FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE = #{doctype}
+    </select>
+
+    <update id="updateByDoctype" parameterType="com.web.app.entity.HdocDocumentList">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET DESCRIPTION = #{description},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE DOCTYPE = #{doctype}
+    </update>
+
+</mapper>

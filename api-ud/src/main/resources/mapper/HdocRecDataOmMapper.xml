@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocRecDataOmMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocRecDataOm">
+        <result property="ordernumber" column="ORDERNUMBER" jdbcType="VARCHAR"/>
+        <result property="transTs" column="TRANS_TS" jdbcType="VARCHAR"/>
+        <result property="salesmarket" column="SALESMARKET" jdbcType="VARCHAR"/>
+        <result property="buyerpartyid" column="BUYERPARTYID" jdbcType="VARCHAR"/>
+        <result property="endcustomerpartyid" column="ENDCUSTOMERPATYID" jdbcType="VARCHAR"/>
+        <result property="dealagreementid" column="DEALAGREEMENTID" jdbcType="VARCHAR"/>
+        <result property="spec" column="SPEC" jdbcType="NUMERIC"/>
+        <result property="build" column="BUILD" jdbcType="NUMERIC"/>
+        <result property="serie" column="SERIE" jdbcType="VARCHAR"/>
+        <result property="chnr" column="CHNR" jdbcType="VARCHAR"/>
+        <result property="delivery" column="DELIVERY" jdbcType="NUMERIC"/>
+        <result property="model" column="MODEL" jdbcType="VARCHAR"/>
+        <result property="vin" column="VIN" jdbcType="VARCHAR"/>
+        <result property="customerAdapt" column="CUSTOMER_ADAPT" jdbcType="VARCHAR"/>
+        <result property="varstr" column="VARSTR" jdbcType="VARCHAR"/>
+        <result property="symbolStr" column="SYMBOL_STR" jdbcType="VARCHAR"/>
+        <result property="orderstatus" column="ORDERSTATUS" jdbcType="VARCHAR"/>
+        <result property="assemblyOrder" column="ASSEMBLY_ORDER" jdbcType="VARCHAR"/>
+        <result property="facLine" column="FAC_LINE" jdbcType="VARCHAR"/>
+        <result property="regdate" column="REGDATE" jdbcType="VARCHAR"/>
+        <result property="pc" column="PC" jdbcType="VARCHAR"/>
+        <result property="nsvDescr" column="NSV_DESCR" jdbcType="VARCHAR"/>
+        <result property="firmPlan" column="FIRM_PLAN" jdbcType="NUMERIC"/>
+        <result property="vstatus" column="VSTATUS" jdbcType="NUMERIC"/>
+        <result property="lastCd" column="LAST_CD" jdbcType="NUMERIC"/>
+        <result property="fo" column="FO" jdbcType="VARCHAR"/>
+        <result property="productionEnd" column="PRODUCTION_END" jdbcType="VARCHAR"/>
+        <result property="buyerpartyid2" column="BUYERPARTYID2" jdbcType="VARCHAR"/>
+        <result property="tdiDealerid" column="TDI_DEALERID" jdbcType="VARCHAR"/>
+        <result property="releasefactory" column="RELEASEFACTORY" jdbcType="VARCHAR"/>
+        <result property="retailsalesdate" column="RETAILSALESDATE" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectBySerieAndChnr" resultMap="BaseResultMap">
+        SELECT * FROM HDOC_REC_DATA_OM WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+</mapper>

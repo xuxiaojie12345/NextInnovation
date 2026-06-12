@@ -1,24 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
-// ... existing code ...
-
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
-const authenticationApi = async (
-  userID: string,
-  password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
-  });
-};
+import { loginApi } from "../api/login";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -69,16 +52,20 @@ const Login: React.FC = () => {
     setMessage(""); // 清除旧消息
 
     try {
-      const result = await authenticationApi(trimmedUserID, trimmedPassword);
+      const result = await loginApi({
+        userId: trimmedUserID,
+        password: trimmedPassword,
+      });
 
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
+      if (result.code === 200 && result.data) {
+        // 认证成功：保存 Token 并跳转
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("username", result.data.username);
         navigate("/Menu");
       } else {
-        // 认证失败：显示指定错误信息
+        // 认证失败：显示后端返回的错误信息
         setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
+          result.msg || "We didn't recognize the username or password you entered. Please try again.",
         );
       }
     } catch (error) {

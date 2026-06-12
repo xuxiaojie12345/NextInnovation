@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocMarketAuthMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocMarketAuth">
+        <result property="userid" column="USERID" jdbcType="VARCHAR"/>
+        <result property="market" column="MARKET" jdbcType="VARCHAR"/>
+        <result property="typeField" column="TYPE" jdbcType="VARCHAR"/>
+        <result property="bu" column="BU" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectByUserid" resultMap="BaseResultMap">
+        SELECT * FROM HDOC_MARKET_AUTH WHERE USERID = #{userid}
+    </select>
+
+    <update id="updateByUseridAndType" parameterType="com.web.app.entity.HdocMarketAuth">
+        UPDATE HDOC_MARKET_AUTH
+        SET MARKET = #{market},
+            TYPE = #{typeField},
+            BU = #{bu},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE USERID = #{userid}
+    </update>
+
+    <delete id="deleteByUserid">
+        DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userid}
+    </delete>
+
+</mapper>

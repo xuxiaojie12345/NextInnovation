@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocUserDefinedRulesMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.app.entity.HdocUserDefinedRules">
+        <result property="pc" column="PC" jdbcType="VARCHAR"/>
+        <result property="num" column="NUM" jdbcType="NUMERIC"/>
+        <result property="market" column="MARKET" jdbcType="VARCHAR"/>
+        <result property="vs" column="VS" jdbcType="VARCHAR"/>
+        <result property="vs2" column="VS2" jdbcType="VARCHAR"/>
+        <result property="variable" column="VARIABLE" jdbcType="VARCHAR"/>
+        <result property="val" column="VAL" jdbcType="VARCHAR"/>
+        <result property="userid" column="USERID" jdbcType="VARCHAR"/>
+        <result property="upDate" column="UP_DATE" jdbcType="VARCHAR"/>
+        <result property="comments" column="COMMENTS" jdbcType="VARCHAR"/>
+        <result property="addDate" column="ADD_DATE" jdbcType="VARCHAR"/>
+        <result property="deleteDate" column="DELETE_DATE" jdbcType="VARCHAR"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="registerUser" column="REGISTER_USER" jdbcType="VARCHAR"/>
+        <result property="registerProcess" column="REGISTER_PROCESS" jdbcType="VARCHAR"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME" jdbcType="TIMESTAMP"/>
+        <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+        <result property="updateProcess" column="UPDATE_PROCESS" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="countByPcNumMarket" resultType="int">
+        SELECT COUNT(1) FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+
+    <select id="searchByCondition" resultMap="BaseResultMap">
+        SELECT PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE 1=1
+        AND (PC = #{productClass} OR #{productClass} IS NULL)
+        AND (NUM = #{number} OR #{number} IS NULL)
+        AND (MARKET = #{market} OR #{market} IS NULL)
+        AND (VARIABLE LIKE CONCAT('%',#{variable},'%') OR #{variable} IS NULL)
+        AND (VAL LIKE CONCAT('%',#{value},'%') OR #{value} IS NULL)
+        AND (VS LIKE CONCAT('%',#{string1},'%') OR #{string1} IS NULL)
+        AND (VS2 LIKE CONCAT('%',#{string2},'%') OR #{string2} IS NULL)
+        AND (COMMENTS LIKE CONCAT('%',#{comments},'%') OR #{comments} IS NULL)
+        GROUP BY PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, REGISTER_USER, REGISTER_DATETIME
+    </select>
+
+    <insert id="insert" parameterType="com.web.app.entity.HdocUserDefinedRules">
+        INSERT INTO HDOC_USER_DEFINED_RULES (PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS, UPDATE_USER, UPDATE_DATETIME, UPDATE_PROCESS)
+        VALUES (#{pc}, #{num}, #{market}, #{variable}, #{val}, #{vs}, #{vs2}, #{comments}, #{addDate}, #{deleteDate}, #{registerUser}, #{registerDatetime}, #{registerProcess}, #{updateUser}, #{updateDatetime}, #{updateProcess})
+    </insert>
+
+    <update id="updateByPcNumMarket" parameterType="com.web.app.entity.HdocUserDefinedRules">
+        UPDATE HDOC_USER_DEFINED_RULES
+        SET VARIABLE = #{variable},
+            VAL = #{val},
+            VS = #{vs},
+            VS2 = #{vs2},
+            COMMENTS = #{comments},
+            ADD_DATE = #{addDate},
+            DELETE_DATE = #{deleteDate},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </update>
+
+    <delete id="deleteByPcNumMarket">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </delete>
+
+    <select id="selectByMarket" resultMap="BaseResultMap">
+        SELECT VARIABLE FROM HDOC_USER_DEFINED_RULES
+        WHERE MARKET = #{market}
+    </select>
+
+    <select id="searchResultList" resultMap="BaseResultMap">
+        SELECT PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE MARKET = #{market}
+    </select>
+
+</mapper>
