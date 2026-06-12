@@ -58,7 +58,7 @@ body {
 .brand-support {
   font-size: 16px;
   text-align: left;
-  margin-top: auto; /* 推到底部 */
+
   opacity: 0.9;
   line-height: 1.5;
 }

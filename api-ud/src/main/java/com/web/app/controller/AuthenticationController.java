@@ -23,6 +23,11 @@ public class AuthenticationController {
     @PostMapping("/login")
     @ApiOperation("用户登录")
     public LoginResponse login(@RequestBody LoginRequest request) {
-        return loginService.login(request);
+        LoginResponse loginResponse = new LoginResponse();
+        System.out.println("-----------------1-------------"+ request+"----------------");
+        loginResponse = loginService.login(request);
+        System.out.println("------------------2------------"+ loginResponse+"----------------");
+        System.out.println("------------------4------------"+ loginResponse.getData()+"----------------");
+        return loginResponse;
     }
 }

@@ -1,28 +1,12 @@
 import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
-// ... existing code ...
-
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
-const authenticationApi = async (
-  userID: string,
-  password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
-  });
-};
+import { authApi } from "../services/api";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  // 状态管理 (对应设计书 6. 实现注意事项)
+  
+  // 状态管理
   const [userID, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [message, setMessage] = useState<string>("");
@@ -52,7 +36,7 @@ const Login: React.FC = () => {
     }
   };
 
-  // 点击 Login 按钮触发 (对应设计书 3. 业务逻辑与校验规则)
+  // 点击 Login 按钮触发
   const handleLogin = async () => {
     // 1. 前置处理：去除首尾空格
     const trimmedUserID = userID.trim();
@@ -64,26 +48,26 @@ const Login: React.FC = () => {
       return; // 终止流程，不调用 API
     }
 
-    // 3. API 调用 (Backend Check)
+    // 3. 调用后端 API
     setIsLoading(true);
     setMessage(""); // 清除旧消息
 
     try {
-      const result = await authenticationApi(trimmedUserID, trimmedPassword);
+      const result = await authApi.login(trimmedUserID, trimmedPassword);
 
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
+      if (result.code === 200) {
+        // 认证成功：保存用户信息到 localStorage
+        localStorage.setItem('currentUser', JSON.stringify(result.data));
+        // 跳转到菜单页面
         navigate("/Menu");
       } else {
-        // 认证失败：显示指定错误信息
-        setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        // 认证失败：显示错误信息
+        setMessage(result.msg || "We didn't recognize the username or password you entered. Please try again.");
       }
     } catch (error) {
       // 异常处理：网络错误或服务器错误
-      setMessage("System error. Please contact administrator.");
+      console.error('Login error:', error);
+      setMessage("Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +132,7 @@ const Login: React.FC = () => {
 
           {/* Login Button: Center Align, Active/Disabled Control */}
           <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

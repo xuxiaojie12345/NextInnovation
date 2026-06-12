@@ -6,16 +6,16 @@
 
  2. 背景 (Background)
 
-本模块是 VOLVO 公司内部工程数据库系统的主导航界面。用户在成功登录并经过权限校验后进入此页面。
+本模块是 VOLVO 公司内部工程数据库系统的主导航界面。用户在成功登录后进入此页面。
 
    核心功能和目标：
        提供清晰的功能导航，将系统功能划分为“Generate Document”、“User Administration”、“Archive”和“Documentation”四大模块。
-       根据登录用户的权限动态渲染菜单项，隐藏无权访问的功能。
+       渲染菜单项。
        作为系统操作的入口，点击菜单项触发相应的业务功能或页面跳转。
    面向的用户群体：
        已登录的 VOLVO 内部员工、工程师、管理员及支持人员。
    用户体验方面的考虑：
-       界面布局简洁，靠左对齐，符合阅读习惯。
+       界面布局简洁，靠左对齐，顶部logo是蓝色背景，下面菜单树是浅灰色背景，纵向：整体大小大约占据屏幕的30%，靠左表示，符合阅读习惯。
        顶部蓝色底板配合白色 Logo，强化品牌识别度。
        使用 `»` 符号明确标识可点击的操作链接，视觉引导性强。
        模块化分组展示，便于用户快速定位所需功能。
@@ -25,43 +25,26 @@
 | No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
 |-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
 | 1   | HeaderLogo | Label/Image | - | - | Output | - | 左 | VOLVO| 常显 | 白色字体，蓝色背景底板 |
-| 2   | MenuGroup_Generate | Label | - | - | Output | - | 左 | Generate Document | 常显 | 模块标题 |
-| 3   | MenuGroup_Admin | Label | - | - | Output | - | 左 | Generate | 常显 | 子模块标题 |
-| 4   | Link_GenerateDoc | Link/Button | - | - | Action | - | 左 | Generate Doc | 活性/动态 | - |
-| 5   | Link_GenerateBatch | Link/Button | - | - | Action | - | 左 | Generate in Batch | 活性/动态 | - |
-| 6   | Link_RegdataArchive | Link/Button | - | - | Action | - | 左 | Regdata Archive | 活性/动态 | - |
-| 7   | Link_RegdataBatch | Link/Button | - | - | Action | - | 左 | Regdata Batch | 活性/动态 | - |
-| 8   | MenuGroup_Admin | Label | - | - | Output | - | 左 | Admin | 常显 | 子模块标题 |
-| 9   | Link_UpdateRules | Link/Button | - | - | Action | - | 左 | Update user defined variables (rules) | 活性/动态 | - |
-| 10  | Link_UpdateUnicode | Link/Button | - | - | Action | - | 左 | Update user defined variables (UNICODE rules) | 活性/动态 | - |
-| 11  | Link_ExistingVars | Link/Button | - | - | Action | - | 左 | Existing HDoc variables | 活性/动态 | - |
-| 12  | Link_UnlockDoc | Link/Button | - | - | Action | - | 左 | Unlock Document | 活性/动态 | - |
-| 13  | Link_HDocSeries | Link/Button | - | - | Action | - | 左 | HDoc Number Series | 活性/动态 | - |
-| 14  | Link_TemplateMgmt | Link/Button | - | - | Action | - | 左 | Upload/Delete template | 活性/动态 | - |
-| 15  | Link_ListTemplates | Link/Button | - | - | Action | - | 左 | List available templates | 活性/动态 | - |
-| 16  | Link_VPPSVinPlate | Link/Button | - | - | Action | - | 左 | VPPS Vin plate | 活性/动态 | - |
-| 17  | Link_ADCAChange | Link/Button | - | - | Action | - | 左 | AD/CA Change | 活性/动态 | - |
-| 18  | MenuGroup_UserAdmin | Label | - | - | Output | - | 左 | User Administration | 常显 | 模块标题 |
-| 19  | Link_HDocUserAdmin | Link/Button | - | - | Action | - | 左 | HDoc User Administration | 活性/动态 | - |
-| 20  | Link_HDocUserDoc | Link/Button | - | - | Action | - | 左 | HDoc User Doc Administration | 活性/动态 | - |
-| 21  | Link_SearchUser | Link/Button | - | - | Action | - | 左 | Search User | 活性/动态 | - |
-| 22  | Link_ChangePwd | Link/Button | - | - | Action | - | 左 | Change Password | 活性/动态 | - |
-| 23  | Link_UserPosition | Link/Button | - | - | Action | - | 左 | User Position | 活性/动态 | - |
-| 24  | MenuGroup_Archive | Label | - | - | Output | - | 左 | Archive | 常显 | 模块标题 |
-| 25  | Link_ArchiveSearch | Link/Button | - | - | Action | - | 左 | Search | 活性/动态 | - |
-| 26  | Link_UploadDoc | Link/Button | - | - | Action | - | 左 | Upload Document | 活性/动态 | - |
-| 27  | MenuGroup_Doc | Label | - | - | Output | - | 左 | Documentation | 常显 | 模块标题 |
-| 28  | Link_UserGuide | Link/Button | - | - | Action | - | 左 | User Guide | 活性/动态 | - |
-| 29  | Link_ADCAguide | Link/Button | - | - | Action | - | 左 | AD/CA Change Guide | 活性/动态 | - |
-| 30  | Link_VinPlateGuide | Link/Button | - | - | Action | - | 左 | Vin plate Guide FM/FH | 活性/动态 | - |
-| 31  | Link_ArchiveGuide | Link/Button | - | - | Action | - | 左 | Archive Guide | 活性/动态 | - |
-| 32  | Link_Privacy | Link/Button | - | - | Action | - | 左 | Privacy | 活性/动态 | - |
+| 2   | Generate | Label | - | - | Output | - | 左 | Generate | 常显 | 模块标题 |
+| 3   | Admin | Label | - | - | Output | - | 左 | Admin | 常显 | 模块标题 |
+| 4   | Update user defined variables (rules)​ | Link/Button | - | - | Action | - | 左 | Update user defined variables (rules) | 活性 | - |
+| 5    | Existing HDoc variables | Link/Button | - | - | Action | - | 左 | Existing HDoc variables | 活性 | - |
+| 6    | Upload/Delete template | Link/Button | - | - | Action | - | 左 | Upload/Delete template | 活性 | - |
+| 7    | List available templates | Link/Button | - | - | Action | - | 左 | List available templates | 活性 | - |
+| 8    | VPPS Vin plate​ | Link/Button | - | - | Action | - | 左 | VPPS Vin plate | 活性 | - |
+| 9    | AD/CA Change​  | Link/Button | - | - | Action | - | 左 | AD/CA Change​ | 活性 | - |
+| 10  | User Administration | Label | - | - | Output | - | 左 | User Administration | 常显 | 模块标题 |
+| 11  | HDoc User Administration​ | Link/Button | - | - | Action | - | 左 | HDoc User Administration​ | 活性 | - |
+| 12  | HDoc User Doc Administration | Link/Button | - | - | Action | - | 左 | HDoc User Doc Administration | 活性 | - |
+| 13  | Search User​ | Link/Button | - | - | Action | - | 左 | Search User | 活性 | - |
+| 14  | Documentation | Label | - | - | Output | - | 左 | Documentation | 常显 | 模块标题 |
+| 15  | User Guide | Link/Button | - | - | Action | - | 左 | User Guide | 活性/动态 | - |
 
 注：所有 Link/Button 控件前在 UI 上需显示 `»` 符号。
 
  4. 功能描述 (Functional Description)
 
- 4.1 菜单渲染与权限过滤
+ 4.1 菜单渲染
 功能说明：页面加载时，动态生成左侧菜单树。
 
 操作步骤：
@@ -87,10 +70,10 @@
 开始：页面加载（OnMount）或用户点击菜单项。
 
 前置处理：
-   获取当前用户对象 `CurrentUser` 。
+  -
 
 5.2 结果处理：
-   成功：执行具体业务逻辑（跳转、弹窗、下载等）。
+   成功：跳转至目标页面。
    失败：显示通用错误提示。
 
  5.3 校验详细规格表

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 
 interface MenuItem {
@@ -12,11 +13,13 @@ interface MenuSection {
 }
 
 const Menu: React.FC = () => {
+  const navigate = useNavigate();
+
   const menuSections: MenuSection[] = [
     {
       title: 'Generate Document',
       items: [
-        { label: 'Generate Doc' },
+        { label: 'Generate Doc', path: '/UD01' },
         { label: 'Generate in Batch' },
         { label: 'Regdata Archive' },
         { label: 'Regdata Batch' },
@@ -25,22 +28,22 @@ const Menu: React.FC = () => {
     {
       title: 'Admin',
       items: [
-        { label: 'Update user defined variables (rules)' },
+        { label: 'Update user defined variables (rules)', path: '/UD08' },
         { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
+        { label: 'Existing HDoc variables', path: '/UD11' },
         { label: 'Unlock Document' },
         { label: 'HDoc Number Series' },
         { label: 'Upload/Delete template' },
         { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
+        { label: 'VPPS Vin plate', path: '/UD15' },
+        { label: 'AD/CA Change', path: '/UD16' },
       ],
     },
     {
       title: 'User Administration',
       items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
+        { label: 'HDoc User Administration', path: '/UD17' },
+        { label: 'HDoc User Doc Administration', path: '/UD18' },
         { label: 'Search User' },
         { label: 'Change Password' },
         { label: 'User Position' },
@@ -66,8 +69,14 @@ const Menu: React.FC = () => {
   ];
 
   const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+    if (item.path) {
+      // 如果有路径，进行路由跳转
+      navigate(item.path);
+    } else {
+      // 否则显示提示信息
+      console.log('Clicked:', item.label);
+      alert(`${item.label} - Functionality under development`);
+    }
   };
 
   return (

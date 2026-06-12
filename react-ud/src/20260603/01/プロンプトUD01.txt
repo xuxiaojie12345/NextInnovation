@@ -95,9 +95,9 @@ We are working to find root cause of problem.（红色字体表示）
 
 6. 接口定义 (API Specification)
 
-   POST /AuthenticationApi
+   AuthenticationApi
      功能：验证用户身份信息
-     Method：POST
+     Method：GET
      Endpoint：/api/AuthenticationApi/login
 
      Request [json]

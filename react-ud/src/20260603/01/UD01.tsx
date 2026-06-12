@@ -6,16 +6,16 @@ import "./UD01.css";
 
 // 类型定义
 interface LoginResponse {
-  success: boolean;
-  token: string;
+  code: number;
+  msg: string;
   user: {
-    id: string;
+    userId: string;
     name: string;
-    role: string;
+    password: string;
   };
 }
 
-const Login: React.FC = () => {
+const UD01: React.FC = () => {
   const navigate = useNavigate();
 
   // 状态管理
@@ -78,10 +78,35 @@ const Login: React.FC = () => {
       );
 
       // 4. 结果处理 - 成功
-      if (response.data && response.data.success) {
-        localStorage.setItem("auth_token", response.data.token);
-        localStorage.setItem("user_info", JSON.stringify(response.data.user));
-        navigate("/dashboard");
+      if (response.data && response.data.code === 200) {
+        console.log("=== 登录成功，准备保存数据 ===");
+        console.log("response.data.user:", response.data);
+        console.log("response.data:", response.data);
+
+        // 检查 user 对象是否存在且有效
+        if (!response.data) {
+          console.error("错误：后端返回的 user 对象为空");
+          setErrorMessage("登录失败：用户信息不完整");
+          setIsLoading(false);
+          return;
+        }
+
+        // 保存用户信息到 localStorage（UD02 需要读取）
+        const userInfoStr = JSON.stringify(response.data);
+        console.log("保存到 localStorage 的 user_info:", userInfoStr);
+        localStorage.setItem("user_info", userInfoStr);
+
+        console.log("保存到 localStorage 的 auth_token:", trimmedUserId);
+        localStorage.setItem("auth_token", trimmedUserId); // 使用 userId 作为 token
+
+        // 验证保存是否成功
+        const savedUserInfo = localStorage.getItem("user_info");
+        const savedToken = localStorage.getItem("auth_token");
+        console.log("验证 - 读取到的 user_info:", savedUserInfo);
+        console.log("验证 - 读取到的 auth_token:", savedToken);
+
+        // 跳转到 UD02 主菜单页面
+        navigate("/UD02");
       } else {
         setErrorMessage(
           "We didn't recognize the username or password you entered. Please try again.",
@@ -203,4 +228,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default UD01;
