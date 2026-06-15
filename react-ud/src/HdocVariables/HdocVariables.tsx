@@ -1,6 +1,6 @@
 // HdocVariables.tsx - UD10模块
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./HdocVariables.css";
 
 interface FormData {
@@ -36,6 +36,7 @@ const HdocVariables = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Type下拉列表固定选项
   const typeOptions = ["VDA", "User Defined"];
@@ -44,6 +45,55 @@ const HdocVariables = () => {
   useEffect(() => {
     fetchCurrentUserInfo();
   }, []);
+
+  // 处理从 HdocVariablesResultList 返回的导航状态
+  useEffect(() => {
+    const state = location.state as any;
+    if (!state) return;
+
+    // Select → 填充选中记录的内容
+    if (state.isFromSelection && state.selectedRecord) {
+      const record = state.selectedRecord;
+      setFormData((prev) => ({
+        ...prev,
+        variable: record.variable || "",
+        type: record.type || "",
+        description: record.description || "",
+        createdByUser: record.createdByUser || prev.createdByUser,
+        date: record.date || prev.date,
+        // 重置运算符为默认值 "="
+        variableOperator: "=",
+        typeOperator: "=",
+        descriptionOperator: "=",
+        createdByUserOperator: "=",
+        dateOperator: "=",
+      }));
+      setErrorMessage("");
+      setSuccessMessage("");
+    }
+
+    // Back → 保留之前的搜索条件
+    if (state.isFromBack && state.searchCriteria) {
+      const criteria = state.searchCriteria;
+      setFormData((prev) => ({
+        ...prev,
+        variable: criteria.variable || "",
+        type: criteria.type || "",
+        description: criteria.description || "",
+        // 恢复各字段的操作符
+        variableOperator: criteria.variableOperator || "=",
+        typeOperator: criteria.typeOperator || "=",
+        descriptionOperator: criteria.descriptionOperator || "=",
+        createdByUserOperator: prev.createdByUserOperator,
+        dateOperator: prev.dateOperator,
+      }));
+      setErrorMessage("");
+      setSuccessMessage("");
+    }
+
+    // 清除 state，防止刷新页面时重复填充
+    window.history.replaceState({}, document.title);
+  }, [location.state]);
 
   // 获取当前用户信息和日期
   const fetchCurrentUserInfo = async () => {
@@ -138,75 +188,30 @@ const HdocVariables = () => {
     return true;
   };
 
-  // Search功能
-  const handleSearch = async () => {
+  // Search功能：导航到搜索结果列表页面
+  const handleSearch = () => {
     if (!validateRequiredFields()) return;
 
-    setIsLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+    // 构建搜索条件对象（包含各字段前的操作符）
+    const searchCriteria = {
+      variable: formData.variable,
+      type: formData.type,
+      description: formData.description,
+      createdByUser: formData.createdByUser,
+      date: formData.date,
+      variableOperator: formData.variableOperator,
+      typeOperator: formData.typeOperator,
+      descriptionOperator: formData.descriptionOperator,
+    };
 
-    try {
-      const API_BASE_URL = "http://localhost:8081";
+    console.log("Navigating to result list with criteria:", searchCriteria);
 
-      console.log(
-        "Sending search request to:",
-        `${API_BASE_URL}/api/ud10Hdocvariables/search`,
-      );
-      console.log("Request data:", formData);
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/ud10Hdocvariables/search`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            variable: formData.variable,
-            type: formData.type,
-            description: formData.description,
-            variableOperator: formData.variableOperator,
-            typeOperator: formData.typeOperator,
-            descriptionOperator: formData.descriptionOperator,
-          }),
-        },
-      );
-
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorText}`,
-        );
-      }
-
-      const data = await response.json();
-      console.log("Response data:", data);
-
-      if (data.code === 200) {
-        // TODO: 跳转到搜索结果页面（如果需要）
-        setSuccessMessage("搜索成功");
-      } else {
-        setErrorMessage(data.msg || "搜索失败");
-      }
-    } catch (error) {
-      console.error("Search error:", error);
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error ? error.message : "系统内部错误，请联系管理员",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // 导航到搜索结果列表页面
+    navigate("/hdoc-variables-result-list", {
+      state: {
+        searchCriteria: searchCriteria,
+      },
+    });
   };
 
   // Clear功能

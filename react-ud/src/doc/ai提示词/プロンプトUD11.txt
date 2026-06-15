@@ -217,42 +217,46 @@
 ## 6. 接口定义 (API Specification)
 
 ### 6.1 UD11HdocvariablesApi
-**功能**：根据搜索条件查询变量定义列表
 
-**Method**：POST
+- **功能**：根据搜索条件查询变量定义列表。
+- **Method**: `POST`
+- **Endpoint**: `/api/ud11Hdocvariables/search`
 
-**Endpoint**：/api/ud11Hdocvariables/search
+#### Request
 
-**Request**：
 ```json
 {
   "variable": "VAR001",
   "type": "VDA",
-  "description": ""
+  "description": "",
+  "Created by user": "xxx",
+  "Date": "2023-07-01T00:00:00.000Z"
 }
 ```
 
-**请求参数说明**：
+##### 请求参数说明
+
 - variable：变量名，字符串类型，可选，最大长度30字符
 - type：类型，字符串类型，可选，最大长度20字符
 - description：描述，字符串类型，可选，最大长度100字符
 - 所有字段均为可选，未提供的字段不参与筛选
 
-**Response Success (200)**：
+#### Response Success (200)
+
 ```json
 {
-            "code": 200,
-            "msg": "搜索变量成功",
-            "data": [
-                {
-                    "variable": "xxx",
-                    "type": "xxx",
-                    "descr": "xxx",
-                    "registerUser": "xxx",
-                    "registerDatetime": "xxx"
-                }
-            ]
-        }
+  "code": 200,
+  "msg": "搜索变量成功",
+  "data": [
+    {
+      "variable": "xxx",
+      "type": "xxx",
+      "descr": "xxx",
+      "registerUser": "xxx",
+      "registerDatetime": "xxx"
+    }
+  ]
+}
 ```
 
 **成功响应参数说明**：

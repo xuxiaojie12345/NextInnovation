@@ -53,7 +53,7 @@ public class UD10HdocVariablesController {
      * @param request 变量信息（variable, type, description, createdByUser）
      * @return API响应
      */
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse<?>> updateVariable(@RequestBody HdocVariables request) {
         log.info("========== UD10 Controller: Update Variable ==========");
         log.info("Update request - variable: {}", request.getVariable());
@@ -84,6 +84,31 @@ public class UD10HdocVariablesController {
 
         log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
         log.info("========== UD10 Controller: Delete completed ==========");
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * UD11: 搜索变量
+     * 客户端通过POST请求将搜索条件以JSON格式发送至后端服务
+     *
+     * @param request 搜索条件（variable, type, description, createdByUser, date）
+     * @return API响应，包含变量列表
+     */
+    @PostMapping("/search")
+    public ResponseEntity<ApiResponse<?>> searchVariables(@RequestBody HdocVariables request) {
+        log.info("========== UD10 Controller: Search Variables ==========");
+        log.info("Search params - variable: {}, type: {}, description: {}",
+                request.getVariable(), request.getType(), request.getDescription());
+
+        // 4.3 调用Service层处理搜索逻辑
+        ApiResponse<?> response = ud10HdocVariablesService.searchVariables(request);
+
+        log.info("Response code: {}, msg: {}, data size: {}",
+                response.getCode(), response.getMsg(),
+                response.getData() instanceof java.util.List ?
+                ((java.util.List<?>) response.getData()).size() : "N/A");
+        log.info("========== UD10 Controller: Search completed ==========");
 
         return ResponseEntity.ok(response);
     }

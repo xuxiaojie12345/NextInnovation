@@ -23,4 +23,9 @@ public class HdocVariables {
     @JsonProperty("createdByUser")
     private String createdByUser;   // 创建/更新用户（前端传入）
     private String date;            // 日期（前端传入，当前未使用）
+
+    // 搜索用运算符字段（非数据库字段）
+    private String variableOperator;    // Variable运算符 (= / !=)
+    private String typeOperator;        // Type运算符 (= / !=)
+    private String descriptionOperator; // Description运算符 (= / !=)
 }

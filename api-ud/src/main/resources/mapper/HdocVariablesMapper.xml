@@ -48,4 +48,59 @@
         DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
     </delete>
 
+    <!-- UD11: 搜索变量（支持 eq/ne 操作符） -->
+    <!-- 操作符说明：eq(=) / ne(!=) -->
+    <select id="searchVariables" resultType="com.web.app.domain.Entity.HdocVariables">
+        SELECT
+            VARIABLE,
+            TYPE,
+            DESCRIPTION,
+            REGISTER_USER,
+            REGISTER_DATETIME
+        FROM HDOC_VARIABLES
+        WHERE 1=1
+            <!-- VARIABLE: 精确匹配 eq 或 ne -->
+            <choose>
+                <when test="varOp == 'ne'">
+                    AND VARIABLE != #{variable}
+                </when>
+                <otherwise>
+                    AND VARIABLE = #{variable}
+                </otherwise>
+            </choose>
+            <!-- TYPE: 可选，eq 对应 LIKE, ne 对应 NOT LIKE -->
+            <if test="type != null and type != ''">
+                <choose>
+                    <when test="typeOp == 'ne'">
+                        AND (TYPE NOT LIKE CONCAT('%', #{type}, '%') OR TYPE IS NULL)
+                    </when>
+                    <otherwise>
+                        AND TYPE LIKE CONCAT('%', #{type}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <!-- DESCRIPTION: 可选，eq 对应 LIKE, ne 对应 NOT LIKE -->
+            <if test="description != null and description != ''">
+                <choose>
+                    <when test="descrOp == 'ne'">
+                        AND (DESCRIPTION NOT LIKE CONCAT('%', #{description}, '%') OR DESCRIPTION IS NULL)
+                    </when>
+                    <otherwise>
+                        AND DESCRIPTION LIKE CONCAT('%', #{description}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <!-- REGISTER_USER: 可选，eq 对应 LIKE, ne 对应 NOT LIKE -->
+            <if test="createdByUser != null and createdByUser != ''">
+                <choose>
+                    <when test="userOp == 'ne'">
+                        AND (REGISTER_USER NOT LIKE CONCAT('%', #{createdByUser}, '%') OR REGISTER_USER IS NULL)
+                    </when>
+                    <otherwise>
+                        AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
 </mapper>

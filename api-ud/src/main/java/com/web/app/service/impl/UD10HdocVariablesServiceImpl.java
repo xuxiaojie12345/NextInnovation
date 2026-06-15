@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -208,6 +209,109 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
         } catch (Exception e) {
             log.error("Error deleting variable", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
+        }
+    }
+
+    /**
+     * UD11: 搜索变量
+     * 对请求参数进行校验，调用Mapper执行查询
+     */
+    @Override
+    public ApiResponse<?> searchVariables(HdocVariables request) {
+        log.info("========== UD10 Service: Search Variables ==========");
+        log.info("Search params - variable: {}, type: {}, description: {}",
+                request.getVariable(), request.getType(), request.getDescription());
+
+        try {
+            // 4.4 参数合法性校验
+            String variable = request.getVariable();
+            if (variable == null || variable.trim().isEmpty()) {
+                return ApiResponse.error(400, "Variable不能为空");
+            }
+            variable = variable.trim();
+
+            // 4.6 验证Variable字段长度
+            if (variable.length() > 20) {
+                return ApiResponse.error(400, "Variable长度不能超过20");
+            }
+
+            // 4.6 映射操作符为XML安全的标识（eq / ne）
+            String varOp = mapOperatorForXml(request.getVariableOperator());
+            String typeOp = mapOperatorForXml(request.getTypeOperator());
+            String descrOp = mapOperatorForXml(request.getDescriptionOperator());
+            // Variable 用 eq（精确匹配），其他字段默认为 eq
+            String userOp = "eq";
+            String dateOp = "eq";
+
+            // 4.6 对模糊查询参数进行转义处理，防止SQL注入
+            String type = escapeLikeParam(request.getType());
+            String description = escapeLikeParam(request.getDescription());
+            String createdByUser = escapeLikeParam(request.getCreatedByUser());
+            String date = escapeLikeParam(request.getDate());
+
+            // 4.5 调用Mapper执行查询（传入各字段值及对应的操作符）
+            List<HdocVariables> variablesList = hdocVariablesMapper.searchVariables(
+                    variable, varOp,
+                    type, typeOp,
+                    description, descrOp,
+                    createdByUser, userOp,
+                    date, dateOp);
+
+            // 4.7 构建响应数据（映射字段名以匹配前端）
+            log.info("Found {} matching variables", variablesList.size());
+
+            List<Map<String, Object>> dataList = variablesList.stream().map(v -> {
+                Map<String, Object> item = new HashMap<>();
+                item.put("variable", v.getVariable());
+                item.put("type", v.getType());
+                item.put("description", v.getDescription());
+                item.put("createdByUser", v.getRegisterUser());
+                item.put("date", v.getRegisterDatetime());
+                return item;
+            }).collect(java.util.stream.Collectors.toList());
+
+            // 4.8 封装响应对象
+            return ApiResponse.success("搜索变量成功", dataList);
+
+        } catch (Exception e) {
+            log.error("Error searching variables", e);
+            return ApiResponse.error(500, "系统内部错误，请联系管理员");
+        }
+    }
+
+    /**
+     * 对模糊查询参数进行转义处理，防止SQL注入
+     * 转义 LIKE 查询中的特殊字符 % 和 _
+     *
+     * @param param 原始参数
+     * @return 转义后的参数，如果为空则返回null
+     */
+    private String escapeLikeParam(String param) {
+        if (param == null || param.trim().isEmpty()) {
+            return null;
+        }
+        // 转义 % 和 _ 字符
+        return param.trim()
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+    }
+
+    /**
+     * 将操作符映射为XML安全的字符串
+     * "=" → "eq", "!=" → "ne"
+     *
+     * @param operator 原始操作符（=, !=）
+     * @return XML安全的操作符标识（eq, ne），缺省返回 "eq"
+     */
+    private String mapOperatorForXml(String operator) {
+        if (operator == null) {
+            return "eq";
+        }
+        switch (operator.trim()) {
+            case "!=": return "ne";
+            case "=":
+            default:   return "eq";
         }
     }
 }

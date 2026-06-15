@@ -1,0 +1,239 @@
+/* HdocVariablesResultList.css - UD10搜索结果列表模块 */
+
+.hvrl-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 标题 */
+.hvrl-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 错误消息 */
+.hvrl-error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef5350;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* 成功消息 */
+.hvrl-success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #66bb6a;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* 边框容器 */
+.hvrl-border-box {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  background-color: #ffffff;
+}
+
+/* 按钮区域 */
+.hvrl-button-bar {
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  margin-bottom: 15px;
+  display: flex;
+  gap: 5px;
+  padding: 10px;
+  justify-content: flex-start;
+  border-bottom: 1px solid #b4c7dc;
+}
+
+.hvrl-btn {
+  background-color: #d0d8e8;
+  border: 1px solid #a0a0c0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 70px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hvrl-btn:hover:not(:disabled) {
+  background-color: #c0c8d8;
+  border-color: #8080a0;
+}
+
+.hvrl-btn:active:not(:disabled) {
+  background-color: #b0b8c8;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.hvrl-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 表格容器 */
+.hvrl-table-container {
+  overflow-x: auto;
+  padding: 10px;
+}
+
+/* 加载状态 */
+.hvrl-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 数据表格 */
+.hvrl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.hvrl-table thead {
+  background-color: #f5f5f5;
+}
+
+.hvrl-th {
+  border: 1px solid #b4c7dc;
+  padding: 8px 5px;
+  text-align: left;
+  font-weight: bold;
+  color: #000080; /* 深蓝色表头 */
+  white-space: nowrap;
+  min-width: 100px;
+  vertical-align: middle;
+}
+
+.hvrl-td {
+  border: 1px solid #b4c7dc;
+  padding: 6px 5px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* 偶数行背景色（浅蓝色） */
+.hvrl-row-even {
+  background-color: #e8eef8;
+}
+
+/* 奇数行背景色（白色） */
+.hvrl-row-odd {
+  background-color: #ffffff;
+}
+
+/* 复选框列 */
+.hvrl-checkbox-col {
+  width: 40px;
+  text-align: center;
+  padding: 6px 5px;
+  border: 1px solid #b4c7dc;
+}
+
+.hvrl-checkbox-col input[type="radio"] {
+  cursor: pointer;
+}
+
+/* 无数据提示 */
+.hvrl-no-data {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* 链接样式 */
+.hvrl-link a {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hvrl-link a:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* 计数显示 */
+.hvrl-count {
+  padding: 10px;
+  font-size: 12px;
+  color: #000000;
+  border-top: 1px solid #b4c7dc;
+  background-color: #f9f9f9;
+}
+
+/* 打印样式 */
+@media print {
+  .hvrl-container {
+    padding: 0;
+  }
+
+  .hvrl-button-bar {
+    display: none;
+  }
+
+  .hvrl-error-message,
+  .hvrl-success-message {
+    display: none;
+  }
+
+  .hvrl-table {
+    font-size: 10px;
+  }
+
+  .hvrl-th,
+  .hvrl-td {
+    padding: 4px 3px;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hvrl-container {
+    padding: 15px;
+  }
+
+  .hvrl-title {
+    font-size: 16px;
+  }
+
+  .hvrl-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    min-width: 60px;
+  }
+
+  .hvrl-table {
+    font-size: 11px;
+  }
+
+  .hvrl-th,
+  .hvrl-td {
+    padding: 4px 3px;
+    min-width: 80px;
+  }
+
+  .hvrl-count {
+    font-size: 11px;
+  }
+}

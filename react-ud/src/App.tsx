@@ -11,6 +11,7 @@ import VehicleSpecification from "./VehicleSpecification/VehicleSpecification";
 import HomologationVariables from "./HomologationVariables/HomologationVariables";
 import HomologationVariablesResultList from "./HomologationVariablesResultList/HomologationVariablesResultList";
 import HdocVariables from "./HdocVariables/HdocVariables";
+import HdocVariablesResultList from "./HdocVariablesResultList/HdocVariablesResultList";
 
 function App() {
   return (
@@ -46,6 +47,10 @@ function App() {
               <Route
                 path='/hdoc-variables'
                 element={<HdocVariables />}
+              />
+              <Route
+                path='/hdoc-variables-result-list'
+                element={<HdocVariablesResultList />}
               />
             </Route>
           </Routes>
