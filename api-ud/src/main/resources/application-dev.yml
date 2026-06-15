@@ -37,6 +37,7 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml #配置读取映射配置文件的路径
   type-handlers-package: com.bjpowernode.springboot28mybatis.domain # 读取指定包中的所有类并取别名
   configuration:
+    map-underscore-to-camel-case: true # 开启下划线转驼峰映射
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
 
 swagger3:

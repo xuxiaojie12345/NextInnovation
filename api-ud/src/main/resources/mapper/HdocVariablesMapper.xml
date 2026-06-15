@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+
+    <!-- 检查变量是否已存在 -->
+    <select id="countByVariable" resultType="int">
+        SELECT COUNT(*) FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.web.app.domain.Entity.HdocVariables">
+        INSERT INTO HDOC_VARIABLES (
+            VARIABLE,
+            TYPE,
+            DESCRIPTION,
+            REGISTER_DATETIME,
+            REGISTER_USER,
+            REGISTER_PROCESS,
+            UPDATE_DATETIME,
+            UPDATE_USER,
+            UPDATE_PROCESS
+        ) VALUES (
+            #{variable},
+            #{type},
+            #{description},
+            CURRENT_TIMESTAMP,
+            #{registerUser},
+            #{registerProcess},
+            CURRENT_TIMESTAMP,
+            #{updateUser},
+            #{updateProcess}
+        )
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="update" parameterType="com.web.app.domain.Entity.HdocVariables">
+        UPDATE HDOC_VARIABLES SET
+            TYPE = #{type},
+            DESCRIPTION = #{description},
+            UPDATE_DATETIME = CURRENT_TIMESTAMP,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE VARIABLE = #{variable}
+    </update>
+
+    <!-- 删除记录（物理删除） -->
+    <delete id="deleteByVariable">
+        DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </delete>
+
+</mapper>

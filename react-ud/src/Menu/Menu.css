@@ -1,11 +1,11 @@
 /* src/components/NavigationMenu/Menu.css */
 
 .navigation-menu {
-  width: 420px; /* 增加宽度 */
+  width: 420px;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   font-family: Arial, sans-serif;
-  margin-left: 20px; /* 添加左外边距，与屏幕边缘保持距离 */
+  margin-left: 20px;
 }
 
 .menu-header {
@@ -17,7 +17,7 @@
 
 .menu-header h1 {
   margin: 0;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -35,7 +35,7 @@
   padding: 8px 15px;
   font-weight: bold;
   color: #0056b3;
-  font-size: 19px;
+  font-size: 15px;
   background-color: #e9ecef;
   border-bottom: 1px solid #ddd;
 }
@@ -47,11 +47,11 @@
 }
 
 .menu-item {
-  padding: 8px 15px;
+  padding: 7px 15px;
   color: #333;
   cursor: pointer;
   transition: background-color 0.2s;
-  font-size: 18px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   white-space: nowrap; /* 防止文字折行 */
@@ -64,8 +64,8 @@
 }
 
 .arrow-icon {
-  margin-right: 8px;
-  font-size: 17px;
+  margin-right: 6px;
+  font-size: 13px;
   color: #888;
 }
 
@@ -77,8 +77,6 @@
 @media (max-width: 768px) {
   .navigation-menu {
     width: 100%;
-    max-width: 300px;
-    margin-left: 10px; /* 移动端也添加左外边距 */
   }
 
   .menu-header {
@@ -87,12 +85,12 @@
 
   .group-title {
     padding: 6px 10px;
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .menu-item {
-    padding: 6px 10px;
-    font-size: 17px;
+    padding: 5px 10px;
+    font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

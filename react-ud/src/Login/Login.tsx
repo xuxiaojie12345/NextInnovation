@@ -60,8 +60,10 @@ const Login = () => {
       const response = await authenticateUser(userId, password);
 
       if (response.success) {
-        // 登录成功，跳转到菜单页面
-        // 如果需要保存 token 或用户信息，可以在这里处理
+        // 登录成功，保存用户 ID 到 localStorage
+        localStorage.setItem('currentUser', userId.trim());
+        
+        // 跳转到菜单页面
         window.location.href = "/menu";
       } else {
         // 登录失败，显示后端返回的错误信息或默认信息

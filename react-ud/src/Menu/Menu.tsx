@@ -1,8 +1,11 @@
 // src/components/NavigationMenu/NavigationMenu.tsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Menu.css";
 
 const Menu: React.FC = () => {
+  const navigate = useNavigate();
+
   // 定义菜单数据结构
   interface MenuItem {
     id: string;
@@ -55,7 +58,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_rules",
           label: "Update user defined variables (rules)",
-          path: "/admin/rules",
+          path: "/homologation-variables",
           type: "link",
         },
         {
@@ -68,7 +71,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_existing",
           label: "Existing HDoc variables",
-          path: "/admin/existing",
+          path: "/hdoc-variables",
           type: "link",
         },
         {
@@ -216,7 +219,7 @@ const Menu: React.FC = () => {
   // 处理点击事件
   const handleItemClick = (path: string | undefined) => {
     if (path) {
-      window.location.href = path;
+      navigate(path);
     }
   };
 

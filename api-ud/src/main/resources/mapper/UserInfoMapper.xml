@@ -9,5 +9,6 @@
             REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
         FROM hdoc_user_infor
         WHERE USERID = #{userId}
+        LIMIT 1
     </select>
 </mapper>

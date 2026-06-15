@@ -2,7 +2,7 @@
 
 .vs-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   background-color: #ffffff;
   padding: 20px;
   box-sizing: border-box;
@@ -11,7 +11,7 @@
 
 /* 边框容器 */
 .vs-border-box {
-  max-width: 900px;
+  max-width: 600px;
   margin: 0 auto;
   border: 2px solid #b4c7dc; /* 浅蓝色边框 */
   padding: 20px;
@@ -46,7 +46,7 @@
 }
 
 .vs-info-col:first-child {
-  margin-right: 50px; /* 左右两列之间的间距 */
+  margin-right: 5px; /* 左右两列之间的间距 */
 }
 
 .vs-info-col-full {
@@ -59,7 +59,15 @@
   font-size: 14px;
   color: #000000;
   font-weight: normal;
-  min-width: 180px; /* 统一标签宽度，与Country of Operation一致 */
+  min-width: 150px; /* 统一标签宽度，与Country of Operation一致 */
+  text-align: left;
+  white-space: nowrap; /* 不换行 */
+}
+.vs-label2 {
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 100px; /* 统一标签宽度，与Country of Operation一致 */
   text-align: left;
   white-space: nowrap; /* 不换行 */
 }

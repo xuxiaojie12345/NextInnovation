@@ -170,22 +170,45 @@
 
 ## 6. 接口定义 (API Specification)
 
-### UD10HdocvariablesApi
-- **功能**：提供HDoc Variables的CRUD操作接口
-- **Method**：GET/POST/PUT/DELETE
-- **Endpoint**：/api/v1/ud10/hdoc-variables
+### 4.1 UD10HdocvariablesApi
 
-#### Request [请求格式]
+#### 4.1.1 搜索接口 (GET /search)
 
-##### GET /search
+- **功能**：提供HDoc Variables的CRUD操作接口。
+- **Method**: `POST`
+- **Endpoint**: `/api/ud10Hdocvariables/add`
+
+##### Request
+
 ```json
 {
   "variable": "FTLI",
   "type": "User Defined",
   "description": "Front load index"
 }
+```
 
-POST /add
+#### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "添加变量成功",
+  "data": {
+    "variable": "xxx"
+  }
+}
+```
+
+#### 4.1.2 新增接口 (POST /add)
+
+- **功能**：提供HDoc Variables的CRUD操作接口。
+- **Method**: `PUT`
+- **Endpoint**: `/api/ud10Hdocvariables/update`
+
+##### Request
+
+```json
 {
   "variable": "FTLI",
   "type": "User Defined",
@@ -193,8 +216,29 @@ POST /add
   "createdByUser": "admin",
   "date": "2023-09-01"
 }
+```
 
-PUT /update
+#### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "更新变量成功",
+  "data": {
+    "variable": "xxx"
+  }
+}
+```
+
+#### 4.1.3 更新接口 (PUT /update)
+
+- **功能**：提供HDoc Variables的CRUD操作接口。
+- **Method**: `DELETE`
+- **Endpoint**: `/api/ud10Hdocvariables/delete`
+
+##### Request
+
+```json
 {
   "variable": "FTLI",
   "type": "User Defined",
@@ -202,34 +246,17 @@ PUT /update
   "createdByUser": "admin",
   "date": "2023-09-01"
 }
+```
 
-DELETE /delete
-{
-  "variable": "FTLI"
-}
+#### Response Success (200)
 
-GET /export
+```json
 {
-  "variable": "FTLI",
-  "type": "User Defined"
-}
-
-Response Success (200)
-{
-  "success": true,
-  "message": "Record added successfully"
-}
-
-Response Error (400)
-{
-  "error": "Validation failed",
-  "message": "Variant already exists. Please enter the correct content"
-}
-
-Response Error (500)
-{
-  "error": "Internal Server Error",
-  "message": "Failed to process request"
+  "code": 200,
+  "msg": "删除变量成功",
+  "data": {
+    "variable": "xxx"
+  }
 }
 
 7. 异常处理 (Exception Handling)

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocUserDefinedRulesMapper">
+    
+    <!-- 查询所有产品类别主数据 -->
+    <select id="selectProductClassMaster" resultType="com.web.app.domain.Entity.ProductClassMaster">
+        SELECT * FROM PRODUCT_CLASS_MASTER
+    </select>
+    
+    <!-- 查询所有市场主数据 -->
+    <select id="selectMarketMaster" resultType="com.web.app.domain.Entity.MarketMaster">
+        SELECT * FROM MARKET_MASTER
+    </select>
+    
+    <!-- 查询所有HDOC变量 -->
+    <select id="selectHdocVariables" resultType="com.web.app.domain.Entity.HdocVariables">
+        SELECT VARIABLE FROM HDOC_VARIABLES
+    </select>
+    
+    <!-- 根据主键查询用户定义规则 -->
+    <select id="selectByPrimaryKey" resultType="com.web.app.domain.Entity.HdocUserDefinedRules">
+        SELECT * FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+    
+    <!-- 检查记录是否存在 -->
+    <select id="countByPrimaryKey" resultType="int">
+        SELECT COUNT(*) FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+    
+    <!-- 插入用户定义规则 -->
+    <insert id="insert" parameterType="com.web.app.domain.Entity.HdocUserDefinedRules">
+        INSERT INTO HDOC_USER_DEFINED_RULES (
+            PC, 
+            NUM, 
+            MARKET, 
+            VS, 
+            VS2, 
+            VARIABLE, 
+            VAL, 
+            USERID, 
+            UP_DATE, 
+            COMMENTS, 
+            ADD_DATE, 
+            REGISTER_DATETIME, 
+            REGISTER_USER, 
+            REGISTER_PROCESS, 
+            UPDATE_DATETIME, 
+            UPDATE_USER, 
+            UPDATE_PROCESS
+        ) VALUES (
+            #{pc}, 
+            #{num}, 
+            #{market}, 
+            #{vs}, 
+            #{vs2}, 
+            #{variable}, 
+            #{val}, 
+            #{userid}, 
+            #{upDate}, 
+            #{comments}, 
+            DATE_FORMAT(CURRENT_TIMESTAMP, '%Y%m'), 
+            CURRENT_TIMESTAMP, 
+            #{registerUser}, 
+            #{registerProcess}, 
+            CURRENT_TIMESTAMP, 
+            #{updateUser}, 
+            #{updateProcess}
+        )
+    </insert>
+    
+    <!-- 更新用户定义规则 -->
+    <update id="update" parameterType="com.web.app.domain.Entity.HdocUserDefinedRules">
+        UPDATE HDOC_USER_DEFINED_RULES 
+        SET 
+            VS = #{vs}, 
+            VS2 = #{vs2}, 
+            VARIABLE = #{variable}, 
+            VAL = #{val}, 
+            USERID = #{userid}, 
+            UP_DATE = #{upDate}, 
+            COMMENTS = #{comments}, 
+            UPDATE_DATETIME = CURRENT_TIMESTAMP, 
+            UPDATE_USER = #{updateUser}, 
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE 
+            PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </update>
+    
+    <!-- 软删除用户定义规则（更新删除日期） -->
+    <update id="softDelete">
+        UPDATE HDOC_USER_DEFINED_RULES 
+        SET 
+            DELETE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y%m'),
+            UPDATE_DATETIME = CURRENT_TIMESTAMP,
+            UPDATE_USER = #{updateUser}
+        WHERE 
+            PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </update>
+
+    <!-- ========== UD09 Methods ========== -->
+
+    <!-- UD09: 搜索用户定义规则（支持多条件模糊查询及操作符） -->
+    <!-- 操作符说明(映射)：eq(=) / ne(!=) / gt(>) / lt(<) -->
+    <select id="searchUserDefinedRules" resultType="com.web.app.domain.Entity.HdocUserDefinedRules">
+        SELECT 
+            PC,
+            NUM,
+            MARKET,
+            VARIABLE,
+            VAL,
+            VS,
+            VS2,
+            COMMENTS,
+            ADD_DATE,
+            DELETE_DATE,
+            REGISTER_USER,
+            REGISTER_DATETIME
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE 1=1
+            <!-- PC: 产品类别（必填，eq 或 ne） -->
+            <if test="pcOp == 'eq'">
+                AND PC = #{productClass}
+            </if>
+            <if test="pcOp == 'ne'">
+                AND PC != #{productClass}
+            </if>
+            <!-- NUM: 编号（必填，eq 或 gt 或 lt） -->
+            <if test="numOp == 'eq'">
+                AND NUM = #{number}
+            </if>
+            <if test="numOp == 'gt'">
+                AND NUM &gt; #{number}
+            </if>
+            <if test="numOp == 'lt'">
+                AND NUM &lt; #{number}
+            </if>
+            <!-- MARKET: 市场（必填，eq 或 ne） -->
+            <if test="marketOp == 'eq'">
+                AND MARKET = #{market}
+            </if>
+            <if test="marketOp == 'ne'">
+                AND MARKET != #{market}
+            </if>
+            <!-- VARIABLE: 变量（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="variable != null and variable != ''">
+                <if test="varOp == 'eq'">
+                    AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+                </if>
+                <if test="varOp == 'ne'">
+                    AND (VARIABLE NOT LIKE CONCAT('%', #{variable}, '%') OR VARIABLE IS NULL)
+                </if>
+            </if>
+            <!-- VAL: 值（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="value != null and value != ''">
+                <if test="valOp == 'eq'">
+                    AND VAL LIKE CONCAT('%', #{value}, '%')
+                </if>
+                <if test="valOp == 'ne'">
+                    AND (VAL NOT LIKE CONCAT('%', #{value}, '%') OR VAL IS NULL)
+                </if>
+            </if>
+            <!-- VS: 变体字符串1（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="variantString1 != null and variantString1 != ''">
+                <if test="vs1Op == 'eq'">
+                    AND VS LIKE CONCAT('%', #{variantString1}, '%')
+                </if>
+                <if test="vs1Op == 'ne'">
+                    AND (VS NOT LIKE CONCAT('%', #{variantString1}, '%') OR VS IS NULL)
+                </if>
+            </if>
+            <!-- VS2: 变体字符串2（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="variantString2 != null and variantString2 != ''">
+                <if test="vs2Op == 'eq'">
+                    AND VS2 LIKE CONCAT('%', #{variantString2}, '%')
+                </if>
+                <if test="vs2Op == 'ne'">
+                    AND (VS2 NOT LIKE CONCAT('%', #{variantString2}, '%') OR VS2 IS NULL)
+                </if>
+            </if>
+            <!-- COMMENTS: 备注（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="comments != null and comments != ''">
+                <if test="cmtOp == 'eq'">
+                    AND COMMENTS LIKE CONCAT('%', #{comments}, '%')
+                </if>
+                <if test="cmtOp == 'ne'">
+                    AND (COMMENTS NOT LIKE CONCAT('%', #{comments}, '%') OR COMMENTS IS NULL)
+                </if>
+            </if>
+            <!-- ADD_DATE: Add日期（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="addDate != null and addDate != ''">
+                <if test="addOp == 'eq'">
+                    AND ADD_DATE LIKE CONCAT('%', #{addDate}, '%')
+                </if>
+                <if test="addOp == 'ne'">
+                    AND (ADD_DATE NOT LIKE CONCAT('%', #{addDate}, '%') OR ADD_DATE IS NULL)
+                </if>
+            </if>
+            <!-- DELETE_DATE: Delete日期（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="deleteDate != null and deleteDate != ''">
+                <if test="delOp == 'eq'">
+                    AND DELETE_DATE LIKE CONCAT('%', #{deleteDate}, '%')
+                </if>
+                <if test="delOp == 'ne'">
+                    AND (DELETE_DATE NOT LIKE CONCAT('%', #{deleteDate}, '%') OR DELETE_DATE IS NULL)
+                </if>
+            </if>
+            <!-- REGISTER_USER: 创建用户（可选，eq 对应 LIKE, ne 对应 NOT LIKE） -->
+            <if test="createdByUser != null and createdByUser != ''">
+                <if test="userOp == 'eq'">
+                    AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%')
+                </if>
+                <if test="userOp == 'ne'">
+                    AND (REGISTER_USER NOT LIKE CONCAT('%', #{createdByUser}, '%') OR REGISTER_USER IS NULL)
+                </if>
+            </if>
+    </select>
+
+</mapper>

@@ -136,7 +136,7 @@ const VehicleSpecification = () => {
               <span className='vs-value'>{chassisNo}</span>
             </div>
             <div className='vs-info-col'>
-              <span className='vs-label'>Model:</span>
+              <span className='vs-label2'>Model:</span>
               <span className='vs-value'>{vehicleInfo?.model || "-"}</span>
             </div>
           </div>
@@ -146,8 +146,10 @@ const VehicleSpecification = () => {
               <span className='vs-value'>{vehicleInfo?.builtWeek || "-"}</span>
             </div>
             <div className='vs-info-col'>
-              <span className='vs-label'>Product type:</span>
-              <span className='vs-value'>{vehicleInfo?.productType || "-"}</span>
+              <span className='vs-label2'>Product type:</span>
+              <span className='vs-value'>
+                {vehicleInfo?.productType || "-"}
+              </span>
             </div>
           </div>
           <div className='vs-info-row'>
@@ -156,7 +158,7 @@ const VehicleSpecification = () => {
               <span className='vs-value'>{vehicleInfo?.vin || "-"}</span>
             </div>
             <div className='vs-info-col'>
-              <span className='vs-label'>Engine no:</span>
+              <span className='vs-label2'>Engine no:</span>
               <span className='vs-value'>{engineNo}</span>
             </div>
           </div>
@@ -170,26 +172,26 @@ const VehicleSpecification = () => {
           </div>
         </div>
 
-        {/* SYMBOL_STR表格区域 */}
-        <div className='vs-variant-section'>
-          <div className='vs-variant-grid'>
-            {variantList.map((variant, index) => (
-              <div key={index} className='vs-variant-item'>
-                <span
-                  className='vs-symbol'
-                  title={variant.description} // tooltip显示DESCRIPTION
-                >
-                  {variant.symbol}
-                </span>
-              </div>
+        {/* SYMBOL_STR表格区域 - 显示description */}
+        <div className='vs-snote-section'>
+          <div className='vs-snote-content'>
+            {variantList.map((variant) => (
+              <span
+                className='vs-symbol'
+                title={variant.description} // tooltip显示SYMBOL
+              >
+                {variant.symbol}&nbsp;
+              </span>
             ))}
           </div>
         </div>
 
         {/* S-Note NO区域 */}
-        <div className='vs-snote-section'>
-          <div className='vs-snote-content'>
-            {vehicleInfo?.customerAdap || "-"}
+        <div className='vs-variant-section'>
+          <div className='vs-variant-grid'>
+            <div className='vs-variant-item'>
+              {vehicleInfo?.customerAdap || "-"}
+            </div>
           </div>
         </div>
       </div>

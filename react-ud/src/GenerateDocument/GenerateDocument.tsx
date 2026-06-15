@@ -141,15 +141,20 @@ const GenerateDocument = () => {
     if (documentData?.act === "Y") {
       // 使用完整的底盘号（serie + chnr）
       const fullChassisNo = `${documentData.serie || ""}${documentData.chnr || ""}`;
-      
+
       // 获取market値（从UD04返回的countryOfOperation字段）
       const market = documentData.countryOfOperation || "";
-      
-      console.log("Navigating to Modify Document with chassis no:", fullChassisNo);
+
+      console.log(
+        "Navigating to Modify Document with chassis no:",
+        fullChassisNo,
+      );
       console.log("Market value from UD04:", market);
-      
+
       // 传递chassisNo和market参数
-      navigate(`/modify-document?chassisNo=${encodeURIComponent(fullChassisNo)}&market=${encodeURIComponent(market)}`);
+      navigate(
+        `/modify-document?chassisNo=${encodeURIComponent(fullChassisNo)}&market=${encodeURIComponent(market)}`,
+      );
     }
   };
 
@@ -182,20 +187,32 @@ const GenerateDocument = () => {
         {/* Chassis no - 可点击的链接 */}
         <div className='gd-info-group'>
           <span className='gd-label chassis-no-label'>Chassis no:</span>
-          <a 
-            href="#" 
-            onClick={(e) => {
-              e.preventDefault(); // 阻止默认行为
-              if (chassisNo && chassisNo !== "-") {
-                console.log("Navigating to Vehicle Specification with chassis no:", chassisNo);
-                navigate(`/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`);
-              }
-            }}
-            className='gd-link'
-            style={{ cursor: 'pointer', color: '#0000ff', textDecoration: 'underline' }}
-          >
-            {chassisNo || "-"}
-          </a>
+          <span className='gd-value'>
+            {chassisNo.substring(0, 4)}
+            <a
+              href='#'
+              onClick={(e) => {
+                e.preventDefault(); // 阻止默认行为
+                if (chassisNo && chassisNo !== "-") {
+                  console.log(
+                    "Navigating to Vehicle Specification with chassis no:",
+                    chassisNo,
+                  );
+                  navigate(
+                    `/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`,
+                  );
+                }
+              }}
+              className='gd-link'
+              style={{
+                cursor: "pointer",
+                color: "#0000ff",
+                textDecoration: "underline",
+              }}
+            >
+              {chassisNo.substring(4)}
+            </a>
+          </span>
         </div>
 
         {/* Ordernumber */}

@@ -2,7 +2,7 @@
 
 .md-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   background-color: #ffffff;
   padding: 20px;
   box-sizing: border-box;
@@ -50,7 +50,6 @@
 /* Chassis no加粗显示 */
 .md-chassis-no {
   font-weight: bold;
-  text-decoration: underline;
 }
 
 .md-link {

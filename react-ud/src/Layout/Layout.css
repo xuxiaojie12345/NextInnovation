@@ -1,0 +1,30 @@
+/* Layout.css - 左右分欄佈局 */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app-layout-menu {
+  flex: 0 0 420px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #f0f0f0;
+  border-right: 1px solid #ddd;
+}
+
+/* Layout 側邊欄內 Menu 填滿 sidebar */
+.app-layout-menu .navigation-menu {
+  width: 100%;
+  border: none;
+  margin-left: 0;
+}
+
+.app-layout-content {
+  flex: 1;
+  min-width: 0;
+  background-color: #ffffff;
+}

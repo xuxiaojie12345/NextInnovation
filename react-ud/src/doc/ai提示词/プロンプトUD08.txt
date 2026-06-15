@@ -139,10 +139,12 @@
 
 #### 5.1.2 API调用 (Backend Check)：
 - 调用 `UD08HomologationVariablesApi` 接口执行以下操作：
-  - 搜索：GET /api/v1/ud08/homologation-variables/search
-  - 新增：POST /api/v1/ud08/homologation-variables/add
-  - 更新：PUT /api/v1/ud08/homologation-variables/update
-  - 删除：DELETE /api/v1/ud08/homologation-variables/delete
+  - 搜索：GET /api/ud08HomologationVariables/getProductClassMaster
+  - 搜索：GET /api/ud08HomologationVariables/getMarketMaster
+  - 搜索：GET /api/ud08HomologationVariables/getHdocVariables
+  - 新增：POST /api/ud08HomologationVariables/add
+  - 更新：PUT /api/ud08HomologationVariables/update
+  - 删除：DELETE /api/ud08HomologationVariables/delete
 
 #### 5.2 结果处理：
 - 成功：显示对应操作成功消息，刷新页面或跳转
@@ -164,74 +166,163 @@
 ## 6. 接口定义 (API Specification)
 
 ### UD08HomologationVariablesApi
-- **功能**：提供Homologation Variables的CRUD操作接口
-- **Method**：GET/POST/PUT/DELETE
-- **Endpoint**：/api/v1/ud08/homologation-variables
 
-#### Request [请求格式]
+#### 4.1.1 搜索接口 (GET /search)
 
-##### GET /search
+- **功能**：提供Homologation Variables的R操作接口。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud08HomologationVariables/getProductClassMaster`
+
+##### Request
+
+```
+没有参数
+```
+
+##### Response Success (200)
+
 ```json
 {
-  "productClass": "UD",
-  "number": "123456",
-  "market": "IDN"
+  "code": 200,
+  "msg": "获取产品类别主数据成功",
+  "data": [
+    {
+      "pc": "xx",
+      "productName": "xxx"
+    }
+  ]
+}
+```
+
+#### 4.1.2 搜索接口 (GET /search)
+
+- **功能**：提供Homologation Variables的R操作接口。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud08HomologationVariables/getMarketMaster`
+
+##### Request
+
+```
+没有参数
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "获取市场主数据成功",
+  "data": [
+    {
+      "market": "xx",
+      "description": "xxx"
+    }
+  ]
+}
+```
+
+#### 4.1.3 搜索接口 (GET /search)
+
+- **功能**：提供Homologation Variables的R操作接口。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud08HomologationVariables/getHdocVariables`
+
+##### Request
+
+```
+没有参数
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "获取HDOC变量信息成功",
+  "data": [
+    {
+      "variable": "xx"
+    }
+  ]
+}
+```
+
+#### 4.1.4 搜索接口 (POST /add)
+
+- **功能**：提供Homologation Variables的C操作接口。
+- **Method**: `POST`
+- **Endpoint**: `/api/ud08HomologationVariables/add`
+
+##### Request
+
+```
+将画面项目Product class、Number、Market、Variable、Value、Variant string.1、Variant string.2请求参数，以JSON格式发送至后端服务。
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "添加用户定义规则成功",
+  "data": {
+    "pc": "xx",
+    "num": 1,
+    "market": "xxx"
+  }
+}
+```
+
+#### 4.1.5 搜索接口 (PUT /update)
+
+- **功能**：提供Homologation Variables的U操作接口。
+- **Method**: `PUT`
+- **Endpoint**: `/api/ud08HomologationVariables/update`
+
+##### Request
+
+```
+将画面项目Product class、Number、Market、Variable、Value、Variant string.1、Variant string.2请求参数，以JSON格式发送至后端服务。
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "更新用户定义规则成功",
+  "data": {
+    "pc": "xx",
+    "num": 1,
+    "market": "xxx"
+  }
 }
 
-POST /add
-{
-  "productClass": "UD",
-  "number": "123456",
-  "market": "IDN",
-  "variable": "TEMPLATE-FTLI",
-  "value": "150",
-  "variantString1": "FTLI-150",
-  "variantString2": "",
-  "comments": "Front load index",
-  "addDate": "202309",
-  "deleteDate": "",
-  "updateUser": "admin",
-  "updateDatetime": "2023-09-01 10:00:00"
-}
-PUT /update
-{
-  "productClass": "UD",
-  "number": "123456",
-  "market": "IDN",
-  "variable": "TEMPLATE-FTLI",
-  "value": "150",
-  "variantString1": "FTLI-150",
-  "variantString2": "",
-  "comments": "Updated front load index",
-  "addDate": "202309",
-  "deleteDate": "",
-  "updateUser": "admin",
-  "updateDatetime": "2023-09-01 10:00:00"
-}
-DELETE /delete
-{
-  "productClass": "UD",
-  "number": "123456",
-  "market": "IDN"
-}
+#### 4.1.6 搜索接口 (PUT /delete)
 
-Response Success (200)
-{
-  "success": true,
-  "message": "Record added successfully"
-}
+- **功能**：提供Homologation Variables的D操作接口。
+- **Method**: `PUT`
+- **Endpoint**: `/api/ud08HomologationVariables/delete`
 
-Response Error (400)
-{
-  "error": "Validation failed",
-  "message": "Primary key conflict, Please enter the correct content"
-}
+##### Request
 
-Response Error (500)
+```
+将画面项目Product class、Number、Market请求参数，以JSON格式发送至后端服务。
+
+```
+
+##### Response Success (200)
+
+```json
 {
-  "error": "Internal Server Error",
-  "message": "Failed to process request"
-}
+            "code": 200,
+            "msg": "删除用户定义规则成功",
+            "data": {
+                "pc": "xx",
+                "num": 1,
+                "market": "xxx"
+            }
+        }
 
 7. 异常处理 (Exception Handling)
 异常场景	处理方式	Message显示内容
