@@ -90,11 +90,7 @@
     
     <!-- 软删除用户定义规则（更新删除日期） -->
     <update id="softDelete">
-        UPDATE HDOC_USER_DEFINED_RULES 
-        SET 
-            DELETE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y%m'),
-            UPDATE_DATETIME = CURRENT_TIMESTAMP,
-            UPDATE_USER = #{updateUser}
+        DELETE FROM HDOC_USER_DEFINED_RULES 
         WHERE 
             PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
     </update>

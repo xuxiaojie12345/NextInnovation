@@ -67,8 +67,9 @@
 **操作步骤**：
 1. 页面加载时，从后端获取可用的市场列表
 2. 将市场列表填充到两个Market下拉列表中
-3. 模板下拉列表初始化为空或禁用状态
-4. 清空错误消息和成功消息区域
+3. 将\\172.17.0.63\hdoc\template\upload下的市场文件夹里的所有文件填充到Templates下拉列表中
+4. 模板下拉列表初始化为空或禁用状态
+5. 清空错误消息和成功消息区域
 
 ### 4.2 文件上传功能
 **功能说明**：用户选择模板文件和市场后点击Upload按钮，将文件上传到指定市场文件夹
@@ -76,7 +77,7 @@
 **操作步骤**：
 1. 用户点击Template File输入框选择文件
 2. 用户从Market下拉列表中选择目标市场
-3. 用户点击Upload file按钮
+3. 用户点击Upload file按钮,将文件上传到\\172.17.0.63\hdoc\template\upload下的对应的市场文件夹里，画面上Market下拉列表选哪个市场，就上传到哪个市场里面。
 4. 前端校验：检查是否选择了文件
    - 若未选择文件，显示错误消息"NO FILE UPLOADED"并终止流程
 5. 构建FormData对象，包含文件和market参数
@@ -103,7 +104,7 @@
 
 **操作步骤**：
 1. 用户从Market下拉列表中选择市场
-2. 系统根据所选市场动态加载该市场文件夹下的模板文件列表
+2. 系统根据所选市场动态加载\\172.17.0.63\hdoc\template\upload下的该市场文件夹下的文件列表
 3. 模板文件列表填充到Templates下拉列表中
 4. 用户从Templates下拉列表中选择要删除的模板
 5. 用户点击Delete按钮
@@ -240,34 +241,32 @@
 
 ## 6. 接口定义 (API Specification)
 
-### 6.1 获取市场列表API
-**功能**：获取可用的市场列表
+### 6.1.1 获取市场列表API
 
-**Method**：GET
+- **功能**：获取可用的市场列表。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud12UploadDeletetemplat/getMarketList`
 
-**Endpoint**：/api/template/markets（具体路径需根据实际API定义）
+#### Request
 
-**Request**：无请求参数
+无请求参数
 
-**Response Success (200)**：
+#### Response Success (200)
+
 ```json
-[
-  {
-    "marketCode": "JPN",
-    "marketName": "Japan"
-  },
-  {
-    "marketCode": "USA",
-    "marketName": "United States"
-  }
-]
+{
+  "code": 200,
+  "msg": "获取市场列表成功",
+  "data": [
+    {
+      "market": "xx"
+    }
+  ]
+}
 ```
 
-**成功响应参数说明**：
-- marketCode：市场代码，字符串类型，最大长度3字符，对应MARKET_MASTER表的MARKET字段
-- marketName：市场名称，字符串类型
+#### Response Error (500)
 
-**Response Error (500)**：
 ```json
 {
   "message": "Internal server error"
