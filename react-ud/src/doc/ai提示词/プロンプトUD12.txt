@@ -75,7 +75,7 @@
 **功能说明**：用户选择模板文件和市场后点击Upload按钮，将文件上传到指定市场文件夹
 
 **操作步骤**：
-1. 用户点击Template File输入框选择文件
+1. 用户点击Template File输入框选择本地文件，上传后
 2. 用户从Market下拉列表中选择目标市场
 3. 用户点击Upload file按钮,将文件上传到\\172.17.0.63\hdoc\template\upload下的对应的市场文件夹里，画面上Market下拉列表选哪个市场，就上传到哪个市场里面。
 4. 前端校验：检查是否选择了文件
@@ -105,7 +105,7 @@
 **操作步骤**：
 1. 用户从Market下拉列表中选择市场
 2. 系统根据所选市场动态加载\\172.17.0.63\hdoc\template\upload下的该市场文件夹下的文件列表
-3. 模板文件列表填充到Templates下拉列表中
+3. 文件列表填充到Templates下拉列表中
 4. 用户从Templates下拉列表中选择要删除的模板
 5. 用户点击Delete按钮
 6. 显示确认对话框"Do you really want to delete template?"

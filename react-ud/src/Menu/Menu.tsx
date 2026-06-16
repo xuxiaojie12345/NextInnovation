@@ -90,7 +90,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_templates",
           label: "Upload/Delete template",
-          path: "/admin/templates",
+          path: "/upload-delete-template",
           type: "link",
         },
         {

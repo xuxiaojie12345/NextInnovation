@@ -12,6 +12,7 @@ import HomologationVariables from "./HomologationVariables/HomologationVariables
 import HomologationVariablesResultList from "./HomologationVariablesResultList/HomologationVariablesResultList";
 import HdocVariables from "./HdocVariables/HdocVariables";
 import HdocVariablesResultList from "./HdocVariablesResultList/HdocVariablesResultList";
+import UploadDeleteTemplate from "./UploadDeleteTemplate/UploadDeleteTemplate";
 
 function App() {
   return (
@@ -51,6 +52,10 @@ function App() {
               <Route
                 path='/hdoc-variables-result-list'
                 element={<HdocVariablesResultList />}
+              />
+              <Route
+                path='/upload-delete-template'
+                element={<UploadDeleteTemplate />}
               />
             </Route>
           </Routes>

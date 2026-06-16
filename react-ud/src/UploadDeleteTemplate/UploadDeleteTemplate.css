@@ -1,0 +1,268 @@
+/* UploadDeleteTemplate.css - UD12模块 */
+
+.udt-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域标题 */
+.udt-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #b4c7dc;
+  padding-bottom: 5px;
+}
+
+/* 子标题 */
+.udt-subsection-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #cc0000; /* 红色 */
+  margin: 0 0 10px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域容器 */
+.udt-section {
+  max-width: 900px;
+  margin: 0 0 30px 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单组 */
+.udt-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* 标签 */
+.udt-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 120px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 文件输入框 */
+.udt-file-input {
+  width: 300px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.udt-file-input:hover {
+  border-color: #666666;
+}
+
+/* 下拉选择框 */
+.udt-select {
+  width: 100px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.udt-select:hover:not(:disabled) {
+  border-color: #666666;
+}
+
+.udt-select:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+.udt-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 按钮行 */
+.udt-button-row {
+  margin-top: 10px;
+  padding: 10px 0;
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  display: flex;
+  gap: 5px;
+}
+
+/* 按钮 */
+.udt-btn {
+  background-color: #d0d8e8;
+  border: 1px solid #a0a0c0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 100px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.udt-btn:hover:not(:disabled) {
+  background-color: #c0c8d8;
+  border-color: #8080a0;
+}
+
+.udt-btn:active:not(:disabled) {
+  background-color: #b0b8c8;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.udt-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 提示信息文本 */
+.udt-info-text {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+/* 描述文本 */
+.udt-description {
+  font-size: 12px;
+  color: #000000;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+/* 链接行 */
+.udt-link-row {
+  margin-top: 10px;
+}
+
+/* 链接样式 */
+.udt-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.udt-link:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* 错误消息显示 */
+.udt-error-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 成功消息显示 */
+.udt-success-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #f0fff0;
+  border-left: 3px solid #52c41a;
+  color: #52c41a;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 加载中覆盖层 */
+.udt-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.udt-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .udt-container {
+    padding: 15px;
+  }
+
+  .udt-section {
+    padding: 10px;
+  }
+
+  .udt-section-title {
+    font-size: 14px;
+  }
+
+  .udt-form-group {
+    flex-wrap: wrap;
+  }
+
+  .udt-label {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .udt-file-input {
+    width: 250px;
+    font-size: 12px;
+  }
+
+  .udt-select {
+    width: 120px;
+    font-size: 12px;
+  }
+
+  .udt-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    min-width: 80px;
+  }
+
+  .udt-info-text,
+  .udt-description {
+    font-size: 11px;
+  }
+
+  .udt-link {
+    font-size: 11px;
+  }
+
+  .udt-error-message,
+  .udt-success-message {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}

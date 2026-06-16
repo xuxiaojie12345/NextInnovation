@@ -40,6 +40,11 @@ mybatis:
     map-underscore-to-camel-case: true # 开启下划线转驼峰映射
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
 
+# 模板文件存储目录（Windows网络共享路径）
+template:
+  upload:
+    dir: //172.17.0.63/hdoc/template/upload
+
 swagger3:
   base-package: com.web.app.controller # 设置swagger扫描的controller所在的包
   name: PH # 设置作者的名称
