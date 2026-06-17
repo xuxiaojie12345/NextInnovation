@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * UD12 Service
- * 提供市场列表获取、模板文件上传/删除业务逻辑
+ * 提供市场列表获取、模板文件上传/删除/下载业务逻辑
  */
 public interface UD12Service {
 
@@ -41,4 +41,11 @@ public interface UD12Service {
      * @return API响应，包含文件名和市场代码
      */
     ApiResponse<?> deleteFile(String market, String fileName);
+
+    /**
+     * 获取模板文件存储根目录
+     *
+     * @return 根目录路径
+     */
+    String getUploadDir();
 }

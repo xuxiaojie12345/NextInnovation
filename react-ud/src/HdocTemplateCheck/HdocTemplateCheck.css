@@ -1,0 +1,221 @@
+/* HdocTemplateCheck.css - UD13模块 */
+
+.htc-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域标题 */
+.htc-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #b4c7dc;
+  padding-bottom: 5px;
+}
+
+/* 区域容器 */
+.htc-section {
+  max-width: 900px;
+  margin: 0 0 20px 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单组 */
+.htc-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* 标签 */
+.htc-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 120px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 文件输入框 */
+.htc-file-input {
+  width: 300px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.htc-file-input:hover {
+  border-color: #666666;
+}
+
+/* 按钮行 */
+.htc-button-row {
+  margin-top: 10px;
+  padding: 10px 0;
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  display: flex;
+  gap: 5px;
+}
+
+/* 按钮 */
+.htc-btn {
+  background-color: #d0d8e8;
+  border: 1px solid #a0a0c0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 100px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.htc-btn:hover:not(:disabled) {
+  background-color: #c0c8d8;
+  border-color: #8080a0;
+}
+
+.htc-btn:active:not(:disabled) {
+  background-color: #b0b8c8;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.htc-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误消息显示 */
+.htc-error-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+}
+
+/* 成功消息显示 */
+.htc-success-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #f0fff0;
+  border-left: 3px solid #52c41a;
+  color: #52c41a;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 变量列表 */
+.htc-variables-list {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #b4c7dc;
+}
+
+.htc-variables-list ul {
+  margin: 5px 0 0 0;
+  padding-left: 20px;
+}
+
+.htc-variables-list li {
+  font-size: 12px;
+  color: #000000;
+  margin-bottom: 5px;
+  font-family: 'Courier New', monospace;
+}
+
+/* 下载链接行 */
+.htc-download-row {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+}
+
+/* 链接样式 */
+.htc-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.htc-link:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* 加载状态 */
+.htc-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .htc-container {
+    padding: 15px;
+  }
+
+  .htc-section {
+    padding: 10px;
+  }
+
+  .htc-section-title {
+    font-size: 14px;
+  }
+
+  .htc-form-group {
+    flex-wrap: wrap;
+  }
+
+  .htc-label {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .htc-file-input {
+    width: 250px;
+    font-size: 12px;
+  }
+
+  .htc-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    min-width: 80px;
+  }
+
+  .htc-error-message,
+  .htc-success-message {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .htc-variables-list li {
+    font-size: 11px;
+  }
+
+  .htc-link {
+    font-size: 12px;
+  }
+}

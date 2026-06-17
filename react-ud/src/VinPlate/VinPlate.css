@@ -1,0 +1,236 @@
+/* VinPlate.css - UD15模块 */
+
+.vp-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域标题 */
+.vp-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #b4c7dc;
+  padding-bottom: 5px;
+}
+
+/* 区域容器 */
+.vp-section {
+  max-width: 900px;
+  margin: 0 0 20px 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单组 */
+.vp-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* 标签 */
+.vp-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 150px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 输入框 */
+.vp-input {
+  width: 200px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+}
+
+.vp-input:hover {
+  border-color: #666666;
+}
+
+.vp-input:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+/* 按钮行 */
+.vp-button-row {
+  margin-top: 10px;
+  padding: 10px 0;
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* 初始提示文本 */
+.vp-initial-message {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #000000;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+/* 按钮 */
+.vp-btn {
+  background-color: #d0d8e8;
+  border: 1px solid #a0a0c0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 120px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.vp-btn:hover:not(:disabled) {
+  background-color: #c0c8d8;
+  border-color: #8080a0;
+}
+
+.vp-btn:active:not(:disabled) {
+  background-color: #b0b8c8;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.vp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误消息显示 */
+.vp-error-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+}
+
+/* 成功消息显示 */
+.vp-success-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #f0fff0;
+  border-left: 3px solid #52c41a;
+  color: #52c41a;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 详细信息展示区域 */
+.vp-details {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #b4c7dc;
+}
+
+/* 详细信息行 */
+.vp-detail-row {
+  display: flex;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* 详细信息标签 */
+.vp-detail-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: bold;
+  min-width: 200px;
+  text-align: left;
+}
+
+/* 详细信息值 */
+.vp-detail-value {
+  font-size: 13px;
+  color: #000000;
+  flex: 1;
+  word-break: break-all;
+}
+
+/* 加载状态 */
+.vp-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .vp-container {
+    padding: 15px;
+  }
+
+  .vp-section {
+    padding: 10px;
+  }
+
+  .vp-section-title {
+    font-size: 14px;
+  }
+
+  .vp-form-group {
+    flex-wrap: wrap;
+  }
+
+  .vp-label {
+    min-width: 120px;
+    font-size: 12px;
+  }
+
+  .vp-input {
+    width: 180px;
+    font-size: 12px;
+  }
+
+  .vp-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    min-width: 100px;
+  }
+
+  .vp-error-message,
+  .vp-success-message {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .vp-details {
+    padding: 10px;
+  }
+
+  .vp-detail-row {
+    flex-direction: column;
+  }
+
+  .vp-detail-label {
+    min-width: auto;
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+
+  .vp-detail-value {
+    font-size: 12px;
+  }
+}

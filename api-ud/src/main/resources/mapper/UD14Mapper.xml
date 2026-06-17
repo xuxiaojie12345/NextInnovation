@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD14Mapper">
+
+    <!-- 查询所有市场主数据 -->
+    <select id="selectMarketMaster" resultType="com.web.app.domain.Entity.MarketMaster">
+        SELECT MARKET FROM MARKET_MASTER
+    </select>
+
+    <!-- 根据市场VAL值查询使用中的变量 -->
+    <select id="selectVariablesByVal" resultType="string">
+        SELECT DISTINCT VARIABLE
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE MARKET = #{market}
+          AND VAL = #{valValue}
+    </select>
+
+</mapper>

@@ -1,0 +1,308 @@
+/* ListAvailableTemplates.css - UD14模块 */
+
+.lat-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域标题 */
+.lat-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #b4c7dc;
+  padding-bottom: 5px;
+}
+
+/* 区域容器 */
+.lat-section {
+  max-width: 1200px;
+  margin: 0 0 20px 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单组 */
+.lat-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* 标签 */
+.lat-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 120px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 下拉选择框 */
+.lat-select {
+  width: 150px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.lat-select:hover:not(:disabled) {
+  border-color: #666666;
+}
+
+.lat-select:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+.lat-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 表格包装器 */
+.lat-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #b4c7dc;
+}
+
+/* 数据表格 */
+.lat-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* 表头 */
+.lat-th-icon {
+  width: 40px;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+  padding: 8px 5px;
+  text-align: center;
+  font-size: 12px;
+  color: #000080;
+  font-weight: bold;
+}
+
+.lat-th-filename {
+  width: 40%;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000080;
+  font-weight: bold;
+}
+
+.lat-th-used {
+  width: 20%;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000080;
+  font-weight: bold;
+}
+
+.lat-th-lastmod {
+  width: 25%;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000080;
+  font-weight: bold;
+}
+
+.lat-th-size {
+  width: 15%;
+  background-color: #e8eef8;
+  border: 1px solid #b4c7dc;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000080;
+  font-weight: bold;
+}
+
+/* 表格单元格 */
+.lat-td-icon {
+  border: 1px solid #b4c7dc;
+  padding: 5px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.lat-file-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.lat-td-filename {
+  border: 1px solid #b4c7dc;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000000;
+  word-break: break-all;
+}
+
+.lat-td-used {
+  border: 1px solid #b4c7dc;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000000;
+}
+
+.lat-td-lastmod {
+  border: 1px solid #b4c7dc;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000000;
+}
+
+.lat-td-size {
+  border: 1px solid #b4c7dc;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #000000;
+}
+
+/* 偶数行背景 */
+.lat-even-row {
+  background-color: #ffffff;
+}
+
+/* 奇数行背景 */
+.lat-odd-row {
+  background-color: #e8eef8;
+}
+
+/* 空行 */
+.lat-empty-row {
+  height: 30px;
+  background-color: #ffffff;
+}
+
+/* 文件名链接 */
+.lat-filename-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.lat-filename-link:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* 错误消息显示 */
+.lat-error-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 成功消息显示 */
+.lat-success-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #f0fff0;
+  border-left: 3px solid #52c41a;
+  color: #52c41a;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 加载状态 */
+.lat-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .lat-container {
+    padding: 15px;
+  }
+
+  .lat-section {
+    padding: 10px;
+  }
+
+  .lat-section-title {
+    font-size: 14px;
+  }
+
+  .lat-form-group {
+    flex-wrap: wrap;
+  }
+
+  .lat-label {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .lat-select {
+    width: 120px;
+    font-size: 12px;
+  }
+
+  .lat-th-icon,
+  .lat-th-filename,
+  .lat-th-used,
+  .lat-th-lastmod,
+  .lat-th-size {
+    font-size: 11px;
+    padding: 5px;
+  }
+
+  .lat-td-icon,
+  .lat-td-filename,
+  .lat-td-used,
+  .lat-td-lastmod,
+  .lat-td-size {
+    font-size: 11px;
+    padding: 3px 5px;
+  }
+
+  .lat-filename-link {
+    font-size: 11px;
+  }
+
+  .lat-error-message,
+  .lat-success-message {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}

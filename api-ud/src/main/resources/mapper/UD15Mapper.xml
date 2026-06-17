@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD15Mapper">
+
+    <!-- 根据CHNR查询VIN Plate信息 -->
+    <select id="selectByChnr" resultType="com.web.app.domain.Entity.HdocSendDataVinPlate">
+        SELECT
+            SERIE,
+            CHNR,
+            TYPE,
+            STATUS,
+            MSG,
+            REGISTER_DATETIME,
+            DOC_READY,
+            DOC_SENT,
+            XML_DOC
+        FROM HDOC_SEND_DATA_VIN_PLATE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <!-- 检查记录是否存在 -->
+    <select id="countByChnr" resultType="int">
+        SELECT COUNT(*)
+        FROM HDOC_SEND_DATA_VIN_PLATE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <!-- 更新Status为指定值 -->
+    <update id="updateStatus">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET
+            STATUS = #{status},
+            UPDATE_DATETIME = CURRENT_TIMESTAMP,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+
+    <!-- 更新Status和Type -->
+    <update id="updateStatusAndType">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET
+            STATUS = #{status},
+            TYPE = #{type},
+            UPDATE_DATETIME = CURRENT_TIMESTAMP,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+
+</mapper>

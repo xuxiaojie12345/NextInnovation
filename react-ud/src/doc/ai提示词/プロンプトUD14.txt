@@ -43,13 +43,13 @@
 **操作步骤**：
 1. 页面加载时初始化"Select Market"下拉列表，从MARKET_MASTER表获取所有可用市场
 2. 表格区域初始为空，不显示任何文件信息
-3. "Select Market"下拉列表默认值为空
+3. "Select Market"下拉列表默认值为"-"
 ### 4.2 市场选择与文件列表加载
 **功能说明**：用户选择市场后，系统自动加载该市场文件夹下的所有模板文件并展示详细信息。
 
 **操作步骤**：
 1. 用户在"Select Market"下拉列表中选择一个市场（如AUT、JPN等）
-2. 系统调用API获取所选市场文件夹下的所有文件信息
+2. 系统调用API获取\\172.17.0.63\hdoc\template\upload下对应的所选市场文件夹下的所有文件信息
 3. 同时查询HDOC_USER_DEFINED_RULES表，检查每个文件名是否被引用
 4. 将结果以表格形式展示，包含以下列：
    - Filename：文件名（带下载链接）
@@ -104,42 +104,34 @@
 ## 6. 接口定义 (API Specification)
 
 ### UD14SearchresultistApi
-- **功能**：获取指定市场下的模板文件列表及使用状态信息
-- **Method**：GET
-- **Endpoint**：/api/v1/ud14/list-templates
 
-**Request [请求格式]**：
+#### 6.1.1 获取市场主数据信息
+- **功能**：获取完整的市场实体列表。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud14Searchresultist/getmarkets`
+
+#### Request
+
+无需参数
+
+````
+
+#### Response Success (200)
+
 ```json
 {
-  "market": "AUT"
-}
-```
+            "code": 200,
+            "msg": "获取市场列表成功",
+            "data": [
+                {
+                    "market": "xx"
+                }
+            ]
+        }
+````
 
-**Response Success (200)**：
-```json
-{
-  "success": true,
-  "files": [
-    {
-      "filename": ".m003432.txt",
-      "used": "",
-      "lastModified": "2022-01-10 18:29",
-      "size": "317 Kb",
-      "downloadUrl": "/download/templates/AUT/.m003432.txt"
-    },
-    {
-      "filename": ".m003432.txt.170629.backup",
-      "used": "TEMPLATE-VIN-PLATE",
-      "lastModified": "2017-06-29 16:50",
-      "size": "377 Kb",
-      "downloadUrl": "/download/templates/AUT/.m003432.txt.170629.backup"
-    }
-  ],
-  "totalCount": 2
-}
-```
+#### Response Error (400)
 
-**Response Error (400)**：
 ```json
 {
   "error": "Invalid input",
@@ -147,11 +139,40 @@
 }
 ```
 
-**Response Error (500)**：
+#### Response Error (500)
+
 ```json
 {
   "error": "Internal Server Error",
   "message": "Failed to retrieve file list"
+}
+```
+
+#### 6.1.2 获取市场主数据信息
+
+- **功能**：获取完整的市场实体列表。
+- **Method**: `POST`
+- **Endpoint**: `/api/ud14Searchresultist/getvariablesbymarket`
+
+#### Request
+
+```json
+{
+  "Market": "xxx"
+}
+```
+
+#### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "根据市场获取变量列表成功",
+  "data": [
+    {
+      "variable": "xxx"
+    }
+  ]
 }
 ```
 

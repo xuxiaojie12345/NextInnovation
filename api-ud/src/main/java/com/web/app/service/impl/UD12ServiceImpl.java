@@ -230,4 +230,9 @@ public class UD12ServiceImpl implements UD12Service {
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
+
+    @Override
+    public String getUploadDir() {
+        return uploadDir;
+    }
 }

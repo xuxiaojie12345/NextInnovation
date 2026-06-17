@@ -95,16 +95,23 @@ const Menu: React.FC = () => {
         },
         {
           // ✅ 带有 Link
+          id: "admin_check_template",
+          label: "HDoc Template Check",
+          path: "/hdoc-template-check",
+          type: "link",
+        },
+        {
+          // ✅ 带有 Link
           id: "admin_list_templates",
           label: "List available templates",
-          path: "/admin/list-templates",
+          path: "/list-available-templates",
           type: "link",
         },
         {
           // ✅ 带有 Link
           id: "admin_pps_vin",
           label: "PPS Vin plate",
-          path: "/admin/pps-vin",
+          path: "/vin-plate",
           type: "link",
         },
         {
