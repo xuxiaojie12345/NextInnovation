@@ -1,0 +1,267 @@
+/* HDocUserAdministration.css - UD17模块 */
+
+.hvua-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 标题 */
+.hvua-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 边框容器 */
+.hvua-border-box {
+  max-width: 1400px;
+  margin: 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* 搜索区域 */
+.hvua-search-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* 角色权限配置区域 */
+.hvua-roles-section {
+  margin-bottom: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.hvua-role-group {
+  margin-bottom: 20px;
+  min-width: 250px;
+}
+
+/* 功能权限区域 */
+.hvua-function-section {
+  margin-bottom: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Market Super User区域 */
+.hvua-super-user-section {
+  margin-bottom: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* 表单行 */
+.hvua-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  line-height: 1.5;
+  gap: 10px;
+}
+
+/* 标签 */
+.hvua-label-required {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 100px;
+  text-align: left;
+}
+
+.hvua-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 150px;
+  text-align: left;
+}
+
+/* 复选框标签 */
+.hvua-checkbox-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  margin-left: 5px;
+  margin-right: 10px;
+  min-width: auto;
+}
+
+/* 输入框 */
+.hvua-input-short {
+  width: 150px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 8px;
+  font-size: 13px;
+  background-color: #ffffff;
+}
+
+.hvua-input-medium {
+  width: 250px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 8px;
+  font-size: 13px;
+  background-color: #f5f5f5;
+}
+
+.hvua-input-medium:read-only {
+  background-color: #f5f5f5;
+}
+
+/* 多选下拉框 */
+.hvua-select-multiple {
+  width: 60px;
+  height: 150px;
+  border: 1px solid #a0a0a0;
+  padding: 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+.hvua-select-multiple:disabled {
+  background-color: #f5f5f5;
+  opacity: 0.6;
+}
+
+.hvua-select-multiple:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+/* 按钮区域 */
+.hvua-button-bar {
+  background-color: #e8eef8;
+  margin-top: 20px;
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  border-top: 1px solid #b4c7dc;
+}
+
+/* 按钮样式 */
+.hvua-btn {
+  background-color: #e0e0f0;
+  border: 1px solid #a0a0c0;
+  padding: 6px 15px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.hvua-btn:hover:not(:disabled) {
+  background-color: #d0d0e0;
+  border-color: #8080a0;
+}
+
+.hvua-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hvua-btn-info {
+  background-color: #cce5ff;
+  border-color: #99c2ff;
+  font-weight: bold;
+  padding: 4px 10px;
+  min-width: 80px;
+}
+
+.hvua-btn-info:hover:not(:disabled) {
+  background-color: #b3d9ff;
+}
+
+.hvua-btn-primary {
+  background-color: #e0e0f0;
+  border-color: #a0a0c0;
+  color: #000000;
+  font-weight: normal;
+}
+
+.hvua-btn-primary:hover:not(:disabled) {
+  background-color: #d0d0e0;
+}
+
+.hvua-btn-danger {
+  background-color: #e0e0f0;
+  border-color: #a0a0c0;
+  color: #000000;
+  font-weight: normal;
+}
+
+.hvua-btn-danger:hover:not(:disabled) {
+  background-color: #d0d0e0;
+}
+
+/* 错误消息显示 */
+.hvua-error-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #fff5f5;
+  border-left: 3px solid #ff4d4f;
+  color: #ff4d4f;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 成功消息显示 */
+.hvua-success-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #f0fff0;
+  border-left: 3px solid #52c41a;
+  color: #52c41a;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+/* 加载状态 */
+.hvua-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hvua-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hvua-select-multiple {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .hvua-input-short,
+  .hvua-input-medium {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .hvua-button-bar {
+    flex-direction: column;
+  }
+
+  .hvua-btn {
+    width: 100%;
+  }
+}

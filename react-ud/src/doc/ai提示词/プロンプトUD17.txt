@@ -226,126 +226,107 @@
 
 ## 6. 接口定义 (API Specification)
 
-### UD17HDocUserAdministrationApi
-- **功能**：提供HDoc用户权限管理的查询、更新和删除接口
-- **Method**：GET/POST/DELETE
-- **Endpoint**：/api/v1/ud17/hdoc-user-admin
+### 6.1 UD17HDocUserAdministrationApi
 
-#### 6.1 查询用户信息接口
+#### 6.1.1 获取市场主数据信息
 
-**Request [请求格式]**：
+- **功能**：获取市场主数据信息
+- **Method**: `GET`
+- **Endpoint**: `/api/ud17/getmarketlist`
+
+##### Request
+
+无需请求参数
+
+````
+
+##### Response Success (200)
+
 ```json
 {
-  "action": "query",
-  "userId": "v0c6900"
-}
-```
+             "code": 200,
+             "msg": "获取市场列表成功",
+             "data": [
+                 {
+                     "market": "xx",
+                     "description": "xxx"
+                 }
+             ]
+         }
+````
 
-**Response Success (200)**：
+#### 6.1.2 获取用户实体信息
+
+- **功能**：获取用户实体信息
+- **Method**: `POST`
+- **Endpoint**: `/api/ud17/getuserinfo`
+
+##### Request
+
 ```json
 {
-  "success": true,
-  "userName": "John Smith",
-  "roles": {
-    "standardUser": {
-      "enabled": true,
-      "markets": ["-EU", "-UD", "IAD"]
-    },
-    "ruleAdmin": {
-      "enabled": false,
-      "markets": []
-    },
-    "templateAdmin": {
-      "enabled": true,
-      "markets": ["-EU", "ALB", "ARG"]
-    },
-    "documentAuthAdmin": {
-      "enabled": false,
-      "markets": []
-    },
-    "userAdmin": {
-      "enabled": false
-    },
-    "adaptationUser": {
-      "enabled": true,
-      "markets": ["-EU"]
-    }
-  },
-  "functions": {
-    "manageVariableList": true,
-    "showChangeVariantsFields": false
-  },
-  "marketSuperUser": ["-EU", "-UD", "IAD"]
-}
-```
-
-#### 6.2 更新权限接口
-
-**Request [请求格式]**：
-```json
-{
-  "action": "update",
   "userId": "v0c6900",
-  "roles": {
-    "standardUser": {
-      "enabled": true,
-      "markets": ["-EU", "-UD", "IAD", "ICZ"]
-    },
-    "ruleAdmin": {
-      "enabled": true,
-      "markets": ["IES", "IIT"]
-    },
-    "templateAdmin": {
-      "enabled": false,
-      "markets": []
-    },
-    "documentAuthAdmin": {
-      "enabled": true,
-      "markets": ["IPO", "IPT", "IRU"]
-    },
-    "userAdmin": {
-      "enabled": false
-    },
-    "adaptationUser": {
-      "enabled": true,
-      "markets": ["-EU", "ISE"]
-    }
-  },
-  "functions": {
-    "manageVariableList": true,
-    "showChangeVariantsFields": true
-  },
-  "marketSuperUser": ["-EU", "-UD"]
+  "userName": "xxx"
 }
 ```
 
-**Response Success (200)**：
+##### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "message": "权限更新成功"
+  "code": 200,
+  "msg": "获取用户信息成功",
+  "data": {
+    "userid": "xxx",
+    "username": "xxx",
+    "responsible": "xxx",
+    "userposition": "xxx",
+    "email": "xxx"
+  }
 }
 ```
 
-#### 6.3 删除权限接口
+#### 6.1.3 获取市场权限信息
 
-**Request [请求格式]**：
+- **功能**：获取市场权限信息
+- **Method**: `POST`
+- **Endpoint**: `/api/ud17/getuserpermissions`
+
+##### Request
+
 ```json
 {
-  "action": "delete",
   "userId": "v0c6900"
 }
 ```
 
-**Response Success (200)**：
+##### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "message": "权限删除成功"
+  "code": 200,
+  "msg": "获取用户权限成功",
+  "data": {
+    "functions": [
+      {
+        "function": "xxx",
+        "userid": "xxx"
+      }
+    ],
+    "markets": [
+      {
+        "userid": "xxx",
+        "market": "xxx",
+        "type": "xxx",
+        "bu": "xxx"
+      }
+    ]
+  }
 }
 ```
 
-**Response Error (400)**：
+##### Response Error (400)
+
 ```json
 {
   "error": "Validation failed",
@@ -353,11 +334,77 @@
 }
 ```
 
-**Response Error (500)**：
+##### Response Error (500)
+
 ```json
 {
   "error": "Internal Server Error",
   "message": "Failed to process request"
+}
+```
+
+#### 6.1.4 更新用户角色
+
+- **功能**：更新用户角色
+- **Method**: `PUT`
+- **Endpoint**: `/api/ud17/updaterole`
+
+##### Request
+
+```json
+{
+  "userId": "v0c6900",
+  "market": "xxx",
+  "type": "xxx",
+  "bu": "xxx",
+  "function": "xxx"
+}
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "更新用户角色成功",
+  "data": {
+    "userid": "xxx",
+    "market": "xxx",
+    "type": "xxx",
+    "bu": "xxx",
+    "function": "xxx"
+  }
+}
+```
+
+#### 6.1.5 删除用户角色
+
+- **功能**：删除用户角色
+- **Method**: `DELETE`
+- **Endpoint**: `/api/ud17/deleterole`
+
+##### Request
+
+```json
+{
+  "userId": "v0c6900",
+  "market": "xxx",
+  "type": "xxx",
+  "bu": "xxx",
+  "function": "xxx"
+}
+```
+
+##### Response Success (200)
+
+```json
+{
+  "code": 200,
+  "msg": "删除用户角色成功",
+  "data": {
+    "userid": "xxx",
+    "function": "xxx"
+  }
 }
 ```
 

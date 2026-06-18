@@ -16,6 +16,8 @@ import UploadDeleteTemplate from "./UploadDeleteTemplate/UploadDeleteTemplate";
 import HdocTemplateCheck from "./HdocTemplateCheck/HdocTemplateCheck";
 import ListAvailableTemplates from "./ListAvailableTemplates/ListAvailableTemplates";
 import VinPlate from "./VinPlate/VinPlate";
+import ADChange from "./ADChange/ADChange";
+import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
 
 function App() {
   return (
@@ -26,16 +28,23 @@ function App() {
             <Route path='/' element={<Login />} />
             <Route path='/TestMain' element={<TestMain />} />
             <Route path='/Menu' element={<Menu />} />
-
-            {/* 包含 Menu（左側）+ 內容（右側）的頁面 */}
             <Route element={<Layout />}>
               <Route
                 path='/generate-homologation-document'
                 element={<GenerateHomologationDocument />}
               />
-              <Route path='/generate-document' element={<GenerateDocument />} />
-              <Route path='/modify-document' element={<ModifyDocument />} />
-              <Route path='/save-modifications' element={<SaveModifications />} />
+              <Route
+                path='/generate-document'
+                element={<GenerateDocument />}
+              />
+              <Route
+                path='/modify-document'
+                element={<ModifyDocument />}
+              />
+              <Route
+                path='/save-modifications'
+                element={<SaveModifications />}
+              />
               <Route
                 path='/vehicle-specification'
                 element={<VehicleSpecification />}
@@ -71,6 +80,14 @@ function App() {
               <Route
                 path='/vin-plate'
                 element={<VinPlate />}
+              />
+              <Route
+                path='/ad-change'
+                element={<ADChange />}
+              />
+              <Route
+                path='/hdoc-user-administration'
+                element={<HDocUserAdministration />}
               />
             </Route>
           </Routes>

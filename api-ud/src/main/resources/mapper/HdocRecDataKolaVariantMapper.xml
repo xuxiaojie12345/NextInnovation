@@ -6,7 +6,7 @@
     <!-- 查询变体信息列表 -->
     <select id="selectVariantList" resultType="java.util.HashMap">
     SELECT
-        SUBSTR(SYMBOL, 1, 8) AS symbolPrefix,
+        LPAD(SUBSTRING(Symbol,1,8),8,' ') AS symbolPrefix,
         DESCRIPTION          AS description,
         FUNCTION_GROUP       AS functionGroup
     FROM
@@ -15,8 +15,7 @@
         FAMILY_ID LIKE CONCAT('%', #{familyId}, '%')
         AND VARIANT_ID LIKE CONCAT('%', #{variantId}, '%')
     ORDER BY
-        LPAD(FUNCTION_GROUP, 4, ' '),
-        FAMILY_ID
+        CONCAT(LPAD(FUNCTION_GROUP,4,' '), LPAD(FAMILY_ID,3,'0'))
     </select>
     
 </mapper>

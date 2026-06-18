@@ -266,13 +266,12 @@
 
 ### 6.1 UD16ADChangeApi
 
-**功能**: 添加新的AD Change记录
+- **功能**：添加新的AD Change记录。
+- **Method**: `POST`
+- **Endpoint**: `/api/ud16/add`
 
-**Method**: POST
+#### Request Body
 
-**Endpoint**: `/api/ud16ADChange/add`
-
-**Request Body**:
 ```json
 {
   "serieChnr": "JPCT-G28321",
@@ -280,25 +279,28 @@
 }
 ```
 
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| serieChnr | String | Y | AD Change系列编号，最大15字符 |
-| desc | String | Y | 描述信息，最大4000字符 |
+##### 参数说明
 
-**Response Success (200)**:
+| 参数名    | 类型   | 必填 | 说明                          |
+| :-------- | :----- | :--- | :---------------------------- |
+| serieChnr | String | Y    | AD Change系列编号，最大15字符 |
+| desc      | String | Y    | 描述信息，最大4000字符        |
+
+#### Response Success (200)
+
 ```json
 {
-            "code": 200,
-            "msg": "添加AD Change成功",
-            "data": {
-                "serie": "xxx",
-                "chnr": "xxx"
-            }
-        }
+  "code": 200,
+  "msg": "添加AD Change成功",
+  "data": {
+    "serie": "xxx",
+    "chnr": "xxx"
+  }
+}
 ```
 
-**Response Error (400/500)**:
+#### Response Error (400/500)
+
 ```json
 {
   "code": 400,
@@ -309,37 +311,39 @@
 
 ### 6.2 UD16ADChangeApi
 
-**功能**: 删除指定的AD Change记录
+- **功能**：删除指定的AD Change记录。
+- **Method**: `DELETE`
+- **Endpoint**: `/api/ud16/delete`
 
-**Method**: DELETE
+#### Request Body
 
-**Endpoint**: `/api/ud16ADChange/delete`
-
-**Request Body**:
 ```json
 {
   "serieChnr": "JPCT-G28321"
 }
 ```
 
-**参数说明**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| serieChnr | String | Y | 要删除的AD Change系列编号 |
+##### 参数说明
 
-**Response Success (200)**:
+| 参数名    | 类型   | 必填 | 说明                      |
+| :-------- | :----- | :--- | :------------------------ |
+| serieChnr | String | Y    | 要删除的AD Change系列编号 |
+
+#### Response Success (200)
+
 ```json
 {
-            "code": 200,
-            "msg": "删除AD Change成功",
-            "data": {
-                "serie": "xxx",
-                "chnr": "xxx"
-            }
-        }
+  "code": 200,
+  "msg": "删除AD Change成功",
+  "data": {
+    "serie": "xxx",
+    "chnr": "xxx"
+  }
+}
 ```
 
-**Response Error (400/500)**:
+#### Response Error (400/500)
+
 ```json
 {
   "code": 400,
@@ -350,33 +354,34 @@
 
 ### 6.3 UD16ADChangeApi
 
-**功能**: 检查AD Change记录是否存在及其状态
+- **功能**：检查AD Change记录是否存在及其状态。
+- **Method**: `GET`
+- **Endpoint**: `/api/ud16/check`
 
-**Method**: GET
+#### Request Parameters
 
-**Endpoint**: `/api/ud16ADChange/check`
+| 参数名    | 类型   | 必填 | 说明                      |
+| :-------- | :----- | :--- | :------------------------ |
+| serieChnr | String | Y    | 要检查的AD Change系列编号 |
 
-**Request Parameters**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| serieChnr | String | Y | 要检查的AD Change系列编号 |
+#### Response Success
 
-**Response Success:
 ```json
 {
-            "code": 200,
-            "msg": "检查AD Change成功",
-            "data": {
-                "serie": "xxx",
-                "chnr": "xxx",
-                "act": "xxx",
-                "bu": "xxx",
-                "reason": "xxx"
-            }
-        }
+  "code": 200,
+  "msg": "检查AD Change成功",
+  "data": {
+    "serie": "xxx",
+    "chnr": "xxx",
+    "act": "xxx",
+    "bu": "xxx",
+    "reason": "xxx"
+  }
+}
 ```
 
-**Response Error - 不存在 (404)**:
+#### Response Error - 不存在 (404)
+
 ```json
 {
   "code": 404,

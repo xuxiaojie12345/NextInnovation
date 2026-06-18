@@ -8,5 +8,100 @@
         SELECT DOCTYPE 
         FROM HDOC_DOCUMENT_LIST
     </select>
-    
+
+    <!-- ==================== UD17 用户管理 ==================== -->
+
+    <!-- 查询所有市场列表 -->
+    <select id="selectMarketList" resultType="com.web.app.domain.Entity.MarketMaster">
+        SELECT 
+            MARKET,
+            DESCRIPTION
+        FROM MARKET_MASTER
+    </select>
+
+    <!-- 根据UserId或UserName查询用户信息 -->
+    <select id="selectUserInfo" resultType="com.web.app.domain.Entity.UserInfo">
+        SELECT 
+            USERID,
+            USERNAME,
+            RESPONSIBLE,
+            USERPOSITION,
+            `E-MMAIL` AS EMAIL
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid} OR USERNAME = #{username}
+    </select>
+
+    <!-- 查询用户功能权限 -->
+    <select id="selectFunctionAuth" resultType="java.util.Map">
+        SELECT 
+            `FUNCTION`,
+            USERID
+        FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = #{userid}
+    </select>
+
+    <!-- 查询用户市场权限 -->
+    <select id="selectMarketAuth" resultType="java.util.Map">
+        SELECT 
+            USERID,
+            MARKET,
+            `TYPE`,
+            BU
+        FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid} AND `TYPE` IN (
+            SELECT `FUNCTION` 
+            FROM HDOC_FUNCTION_AUTH 
+            WHERE USERID = #{userid}
+        )
+    </select>
+
+    <!-- 更新HDOC_MARKET_AUTH表 -->
+    <update id="updateMarketAuth">
+        UPDATE HDOC_MARKET_AUTH 
+        SET 
+            USERID = #{userid},
+            MARKET = #{market},
+            `TYPE` = #{type},
+            BU = #{bu},
+            UPDATE_DATETIME = SYSDATE,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE 
+            USERID = #{userid} AND MARKET = #{market} AND `TYPE` = #{type} AND BU = #{bu}
+    </update>
+
+    <!-- 更新HDOC_FUNCTION_AUTH表 -->
+    <update id="updateFunctionAuth">
+        UPDATE HDOC_FUNCTION_AUTH 
+        SET 
+            `FUNCTION` = #{function},
+            USERID = #{userid},
+            UPDATE_DATETIME = SYSDATE,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE 
+            `FUNCTION` = #{function} AND USERID = #{userid}
+    </update>
+
+    <!-- 删除HDOC_MARKET_AUTH表记录 -->
+    <delete id="deleteMarketAuth">
+        DELETE FROM HDOC_MARKET_AUTH 
+        WHERE 
+            USERID = #{userid} AND MARKET = #{market} AND `TYPE` = #{type} AND BU = #{bu}
+    </delete>
+
+    <!-- 删除HDOC_FUNCTION_AUTH表记录 -->
+    <delete id="deleteFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH 
+        WHERE 
+            `FUNCTION` = #{function} AND USERID = #{userid}
+    </delete>
+
+    <!-- 根据UserId查询用户是否存在 -->
+    <select id="countUserById" resultType="int">
+        SELECT COUNT(*)
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid}
+    </select>
+
 </mapper>

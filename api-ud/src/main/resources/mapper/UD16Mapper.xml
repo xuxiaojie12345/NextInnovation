@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD16Mapper">
+
+    <!-- 查询AD Change信息 -->
+    <select id="selectByPrimaryKey" resultType="com.web.app.domain.Entity.HdocAdcaChange">
+        SELECT SERIE, CHNR, ACT, BU, REASON
+        FROM HDOC_ADCA_CHANGE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <!-- 检查记录是否存在 -->
+    <select id="countByPrimaryKey" resultType="int">
+        SELECT COUNT(*)
+        FROM HDOC_ADCA_CHANGE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.web.app.domain.Entity.HdocAdcaChange">
+        INSERT INTO HDOC_ADCA_CHANGE (
+            SERIE, CHNR, ACT, BU, REASON,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        ) VALUES (
+            #{serie}, #{chnr}, #{act}, #{bu}, #{reason},
+            CURRENT_TIMESTAMP, #{registerUser}, #{registerProcess},
+            CURRENT_TIMESTAMP, #{updateUser}, #{updateProcess}
+        )
+    </insert>
+
+    <!-- 逻辑删除（ACT置为'N'） -->
+    <update id="softDelete">
+        UPDATE HDOC_ADCA_CHANGE
+        SET
+            ACT = 'N',
+            UPDATE_DATETIME = CURRENT_TIMESTAMP,
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+
+</mapper>

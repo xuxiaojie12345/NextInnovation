@@ -1,0 +1,151 @@
+/* ADChange.css - UD16模块 */
+
+.adc-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 区域标题 */
+.adc-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080; /* 深蓝色 */
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #b4c7dc;
+  padding-bottom: 5px;
+}
+
+/* 区域容器 */
+.adc-section {
+  max-width: 900px;
+  margin: 0 0 20px 0;
+  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单组 */
+.adc-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* 标签 */
+.adc-label {
+  font-size: 13px;
+  color: #000000;
+  font-weight: normal;
+  min-width: 150px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 输入框 */
+.adc-input {
+  width: 200px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+}
+
+.adc-input:hover {
+  border-color: #666666;
+}
+
+.adc-input:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+/* 描述输入框（加宽） */
+.adc-input-desc {
+  width: 400px;
+  height: 24px;
+  border: 1px solid #a0a0a0;
+  padding: 2px 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+}
+
+.adc-input-desc:hover {
+  border-color: #666666;
+}
+
+.adc-input-desc:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
+/* 按钮行 */
+.adc-button-row {
+  margin-top: 10px;
+  padding: 10px 0;
+  background-color: #e8eef8; /* 浅蓝色背景 */
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* 初始提示文本 */
+.adc-initial-message {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #000000;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+/* 按钮 */
+.adc-btn {
+  background-color: #d0d8e8;
+  border: 1px solid #a0a0c0;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 120px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.adc-btn:hover {
+  background-color: #c0c8d8;
+}
+
+.adc-btn:active {
+  background-color: #b0b8c8;
+}
+
+/* 成功消息 */
+.adc-success-message {
+  margin-top: 15px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* 错误消息 */
+.adc-error-message {
+  margin-top: 15px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 3px;
+  font-weight: bold;
+}
