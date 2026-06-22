@@ -71,7 +71,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_existing",
           label: "Existing HDoc variables",
-          path: "/admin/existing",
+          path: "/hdoc-variables",
           type: "link",
         },
         {
@@ -90,21 +90,21 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_templates",
           label: "Upload/Delete template",
-          path: "/admin/templates",
+          path: "/upload-delete-template",
           type: "link",
         },
         {
           // ✅ 带有 Link
           id: "admin_list_templates",
           label: "List available templates",
-          path: "/admin/list-templates",
+          path: "/list-available-templates",
           type: "link",
         },
         {
           // ✅ 带有 Link
           id: "admin_pps_vin",
           label: "PPS Vin plate",
-          path: "/admin/pps-vin",
+          path: "/vin-plate",
           type: "link",
         },
         {
