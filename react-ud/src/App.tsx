@@ -2,12 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login/Login";
 import TestMain from "./Test/Test";
 import MenuLayout from "./Menu/MenuLayout";
-import HDoc from "./Generate/HDoc";
-import GenerateDoc from "./Generate/GenerateDoc";
-import ModifyDocument from "./Generate/ModifyDocument";
-import SaveModifications from "./Generate/SaveModifications";
-import VehicleSpecification from "./Generate/VehicleSpecification";
-import HomologationVariables from "./Admin/HomologationVariables";
+import HDoc from "./HDoc/HDoc";
+import GenerateDoc from "./GenerateDoc/GenerateDoc";
+import ModifyDocument from "./ModifyDocument/ModifyDocument";
+import SaveModifications from "./SaveModifications/SaveModifications";
+import VehicleSpecification from "./VehicleSpecification/VehicleSpecification";
+import HomologationVariables from "./HomologationVariables/HomologationVariables";
 
 function App() {
   return (

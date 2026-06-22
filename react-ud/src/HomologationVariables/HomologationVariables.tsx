@@ -469,7 +469,7 @@ const HomologationVariables: React.FC = () => {
             </select>
             <select
               className="hvars-select"
-              style={{ width: "100px" }}
+              style={{ width: "200px" }}
               value={pc}
               onChange={(e) => setPc(e.target.value)}
             >
