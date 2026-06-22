@@ -18,6 +18,7 @@ import ListAvailableTemplates from "./ListAvailableTemplates/ListAvailableTempla
 import VinPlate from "./VinPlate/VinPlate";
 import ADChange from "./ADChange/ADChange";
 import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
+import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
 
 function App() {
   return (
@@ -88,6 +89,10 @@ function App() {
               <Route
                 path='/hdoc-user-administration'
                 element={<HDocUserAdministration />}
+              />
+              <Route
+                path='/hdoc-user-doc-administration'
+                element={<HDocUserDocAdministration />}
               />
             </Route>
           </Routes>

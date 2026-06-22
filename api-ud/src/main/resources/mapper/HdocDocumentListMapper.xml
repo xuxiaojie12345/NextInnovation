@@ -43,51 +43,58 @@
     <!-- 查询用户市场权限 -->
     <select id="selectMarketAuth" resultType="java.util.Map">
         SELECT 
-            USERID,
-            MARKET,
-            `TYPE`,
-            BU
-        FROM HDOC_MARKET_AUTH
-        WHERE USERID = #{userid} AND `TYPE` IN (
-            SELECT `FUNCTION` 
-            FROM HDOC_FUNCTION_AUTH 
-            WHERE USERID = #{userid}
+            ma.USERID,
+            ma.MARKET,
+            ma.`TYPE`,
+            ma.BU
+        FROM HDOC_MARKET_AUTH ma
+        WHERE ma.USERID = #{userid} AND ma.`TYPE` IN (
+            SELECT 
+                CASE fa.`FUNCTION`
+                    WHEN 'User Administrator' THEN 'A'
+                    WHEN 'RULES' THEN 'R'
+                    WHEN 'TEMPLATE' THEN 'T'
+                    WHEN 'Document' THEN 'D'
+                    WHEN 'ADAPTATION DOC' THEN 'DOCMOD'
+                    WHEN 'market super user' THEN 'MCSU'
+                    ELSE fa.`FUNCTION`
+                END
+            FROM HDOC_FUNCTION_AUTH fa
+            WHERE fa.USERID = #{userid}
         )
     </select>
 
-    <!-- 更新HDOC_MARKET_AUTH表 -->
-    <update id="updateMarketAuth">
-        UPDATE HDOC_MARKET_AUTH 
-        SET 
-            USERID = #{userid},
-            MARKET = #{market},
-            `TYPE` = #{type},
-            BU = #{bu},
+    <!-- 更新HDOC_MARKET_AUTH表（存在则更新，不存在则插入） -->
+    <insert id="updateMarketAuth">
+        INSERT INTO HDOC_MARKET_AUTH (USERID, MARKET, `TYPE`, BU, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{market}, #{type}, #{bu}, SYSDATE(), #{updateUser}, #{updateProcess}, SYSDATE(), #{updateUser}, #{updateProcess})
+        ON DUPLICATE KEY UPDATE
             UPDATE_DATETIME = SYSDATE(),
             UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{updateProcess}
-        WHERE 
-            USERID = #{userid} AND MARKET = #{market} AND `TYPE` = #{type} AND BU = #{bu}
-    </update>
+    </insert>
 
-    <!-- 更新HDOC_FUNCTION_AUTH表 -->
-    <update id="updateFunctionAuth">
-        UPDATE HDOC_FUNCTION_AUTH 
-        SET 
-            `FUNCTION` = #{function},
-            USERID = #{userid},
+    <!-- 更新HDOC_FUNCTION_AUTH表（存在则更新，不存在则插入） -->
+    <insert id="updateFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH (`FUNCTION`, USERID, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{function}, #{userid}, SYSDATE(), #{updateUser}, #{updateProcess}, SYSDATE(), #{updateUser}, #{updateProcess})
+        ON DUPLICATE KEY UPDATE
             UPDATE_DATETIME = SYSDATE(),
             UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{updateProcess}
-        WHERE 
-            `FUNCTION` = #{function} AND USERID = #{userid}
-    </update>
+    </insert>
 
     <!-- 删除HDOC_MARKET_AUTH表记录 -->
     <delete id="deleteMarketAuth">
         DELETE FROM HDOC_MARKET_AUTH 
         WHERE 
             USERID = #{userid} AND MARKET = #{market} AND `TYPE` = #{type} AND BU = #{bu}
+    </delete>
+
+    <!-- 删除用户所有HDOC_MARKET_AUTH记录 -->
+    <delete id="deleteAllMarketAuth">
+        DELETE FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
     </delete>
 
     <!-- 删除HDOC_FUNCTION_AUTH表记录 -->
@@ -97,11 +104,69 @@
             `FUNCTION` = #{function} AND USERID = #{userid}
     </delete>
 
+    <!-- 删除用户所有HDOC_FUNCTION_AUTH记录 -->
+    <delete id="deleteAllFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = #{userid}
+    </delete>
+
     <!-- 根据UserId查询用户是否存在 -->
     <select id="countUserById" resultType="int">
         SELECT COUNT(*)
         FROM hdoc_user_infor
         WHERE USERID = #{userid}
     </select>
+
+    <!-- ==================== UD18 文档权限管理 ==================== -->
+
+    <!-- 查询所有文档列表 -->
+    <select id="selectDocumentList" resultType="java.util.Map">
+        SELECT 
+            DOCTYPE AS description
+        FROM HDOC_DOCUMENT_LIST
+    </select>
+
+    <!-- 查询用户文档权限 -->
+    <select id="selectUserDocAuth" resultType="java.util.Map">
+        SELECT 
+            DOCTYPE AS doctype
+        FROM HDOC_USER_DOC
+        WHERE USERID = #{userid}
+    </select>
+
+    <!-- 删除用户指定文档权限 -->
+    <delete id="deleteUserDocAuth">
+        DELETE FROM HDOC_USER_DOC
+        WHERE USERID = #{userid} AND DOCTYPE = #{doctype}
+    </delete>
+
+    <!-- 删除用户所有文档权限 -->
+    <delete id="deleteAllUserDocAuth">
+        DELETE FROM HDOC_USER_DOC
+        WHERE USERID = #{userid}
+    </delete>
+
+    <!-- 插入用户文档权限 -->
+    <insert id="insertUserDocAuth">
+        INSERT INTO HDOC_USER_DOC (
+            USERID,
+            DOCTYPE,
+            REGISTER_DATETIME,
+            REGISTER_USER,
+            REGISTER_PROCESS,
+            UPDATE_DATETIME,
+            UPDATE_USER,
+            UPDATE_PROCESS
+        ) VALUES (
+            #{userid},
+            #{doctype},
+            SYSDATE(),
+            #{registerUser},
+            #{registerProcess},
+            SYSDATE(),
+            #{updateUser},
+            #{updateProcess}
+        )
+    </insert>
 
 </mapper>

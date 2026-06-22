@@ -132,7 +132,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "user_doc_admin",
           label: "HDoc User Doc Administration",
-          path: "/user/doc-admin",
+          path: "/hdoc-user-doc-administration",
           type: "link",
         },
         {

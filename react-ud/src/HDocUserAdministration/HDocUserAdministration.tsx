@@ -16,16 +16,8 @@ interface UserInfo {
 }
 
 interface PermissionData {
-  functions: Array<{
-    function: string;
-    userid: string;
-  }>;
-  markets: Array<{
-    userid: string;
-    market: string;
-    type: string;
-    bu: string;
-  }>;
+  functions: Array<any>;
+  markets: Array<any>;
 }
 
 interface FormData {
@@ -103,8 +95,10 @@ const HDocUserAdministration = () => {
       }
 
       const data = await response.json();
+      console.log("【marketList】response:", JSON.stringify(data));
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
+        console.log("【marketList】count:", data.data.length);
       } else {
         setErrorMessage("获取市场列表失败，请联系管理员");
       }
@@ -162,7 +156,6 @@ const HDocUserAdministration = () => {
         // 设置用户名
         const currentUserId = formData.userId.trim();
         const userName = data.data.username || "";
-        setFormData({ ...formData, userName });
 
         // 获取用户权限配置（传入userName防止被覆盖）
         await fetchUserPermissions(currentUserId, userName);
@@ -211,87 +204,115 @@ const HDocUserAdministration = () => {
           userName: userName || formData.userName,
         };
 
+        // 辅助函数：将FUNCTION/TYPE的值统一转换为代码
+        // FUNCTION存的是描述名称(User Administrator、RULES等)
+        // TYPE存的是代码(A、R、T等)或"代码:描述"格式(U:USER、A：User Administrator等)
+        const toCode = (val: string) => {
+          const trimmed = val.trim();
+          // 尝试提取冒号前的代码前缀
+          const parts = trimmed.split(/[：:]/);
+          const first = parts[0].trim().toUpperCase();
+          // 常见FUNCTION描述名称 → 代码映射
+          const descToCode: Record<string, string> = {
+            "USER ADMINISTRATOR": "A",
+            RULES: "R",
+            TEMPLATE: "T",
+            USER: "U",
+            DOCUMENT: "D",
+            "ADAPTATION DOC": "DOCMOD",
+            "MARKET SUPER USER": "MCSU",
+          };
+          return descToCode[first] || first;
+        };
+
         // 解析functions数组
+        // FUNCTION列的值: User Administrator, RULES, TEMPLATE, USER, Document, ADAPTATION DOC, market super user
         if (permissionData.functions) {
-          permissionData.functions.forEach((func) => {
-            switch (func.function) {
-              case "Standard User":
+          permissionData.functions.forEach((func: any) => {
+            const functionCode = toCode(func.FUNCTION || func.function || "");
+            switch (functionCode) {
+              case "U":
                 updatedFormData.standardUserChecked = true;
                 break;
-              case "Rule Admin":
+              case "R":
                 updatedFormData.ruleAdminChecked = true;
                 break;
-              case "Template Admin":
+              case "T":
                 updatedFormData.templateAdminChecked = true;
                 break;
-              case "Document Auth Admin":
+              case "D":
                 updatedFormData.documentAuthAdminChecked = true;
                 break;
-              case "User Admin":
+              case "A":
                 updatedFormData.userAdminChecked = true;
                 break;
-              case "Adaptation user":
+              case "DOCMOD":
                 updatedFormData.adaptationUserChecked = true;
                 break;
-              case "Manage Variable List":
-                updatedFormData.manageVariableListChecked = true;
+              case "MCSU":
+                // MCSU是Market Super User，market用別枠管理
                 break;
             }
           });
         }
 
         // 解析markets数组
+        // TYPE列的值: A, R, T, D, DOCMOD, MCSU（纯代码）
         if (permissionData.markets) {
-          permissionData.markets.forEach((market) => {
-            switch (market.type) {
-              case "Standard User":
-                if (
-                  !updatedFormData.standardUserMarkets.includes(market.market)
-                ) {
-                  updatedFormData.standardUserMarkets.push(market.market);
+          permissionData.markets.forEach((market: any) => {
+            const marketCode = market.MARKET || market.market;
+            const marketType = toCode(market.TYPE || market.type || "");
+            switch (marketType) {
+              case "U":
+                if (!updatedFormData.standardUserMarkets.includes(marketCode)) {
+                  updatedFormData.standardUserMarkets.push(marketCode);
                 }
                 break;
-              case "Rule Admin":
-                if (!updatedFormData.ruleAdminMarkets.includes(market.market)) {
-                  updatedFormData.ruleAdminMarkets.push(market.market);
+              case "R":
+                if (!updatedFormData.ruleAdminMarkets.includes(marketCode)) {
+                  updatedFormData.ruleAdminMarkets.push(marketCode);
                 }
                 break;
-              case "Template Admin":
+              case "T":
                 if (
-                  !updatedFormData.templateAdminMarkets.includes(market.market)
+                  !updatedFormData.templateAdminMarkets.includes(marketCode)
                 ) {
-                  updatedFormData.templateAdminMarkets.push(market.market);
+                  updatedFormData.templateAdminMarkets.push(marketCode);
                 }
                 break;
-              case "Document Auth Admin":
+              case "D":
                 if (
-                  !updatedFormData.documentAuthAdminMarkets.includes(
-                    market.market,
-                  )
+                  !updatedFormData.documentAuthAdminMarkets.includes(marketCode)
                 ) {
-                  updatedFormData.documentAuthAdminMarkets.push(market.market);
+                  updatedFormData.documentAuthAdminMarkets.push(marketCode);
                 }
                 break;
-              case "Adaptation user":
+              case "DOCMOD":
                 if (
-                  !updatedFormData.adaptationUserMarkets.includes(market.market)
+                  !updatedFormData.adaptationUserMarkets.includes(marketCode)
                 ) {
-                  updatedFormData.adaptationUserMarkets.push(market.market);
+                  updatedFormData.adaptationUserMarkets.push(marketCode);
                 }
                 break;
-              case "Market Super User":
+              case "MCSU":
                 if (
-                  !updatedFormData.marketSuperUserMarkets.includes(
-                    market.market,
-                  )
+                  !updatedFormData.marketSuperUserMarkets.includes(marketCode)
                 ) {
-                  updatedFormData.marketSuperUserMarkets.push(market.market);
+                  updatedFormData.marketSuperUserMarkets.push(marketCode);
                 }
                 break;
             }
           });
         }
 
+        console.log("【formData result】selected markets:", {
+          standardUser: updatedFormData.standardUserMarkets,
+          ruleAdmin: updatedFormData.ruleAdminMarkets,
+          templateAdmin: updatedFormData.templateAdminMarkets,
+          docAuthAdmin: updatedFormData.documentAuthAdminMarkets,
+          adaptationUser: updatedFormData.adaptationUserMarkets,
+          marketSuperUser: updatedFormData.marketSuperUserMarkets,
+        });
         setFormData(updatedFormData);
       }
     } catch (error) {
@@ -326,175 +347,153 @@ const HDocUserAdministration = () => {
       setSuccessMessage("");
 
       // 构建请求数据
-      const requestData = {
-        userId: formData.userId,
-        roles: {
-          standardUser: formData.standardUserChecked
-            ? formData.standardUserMarkets
-            : [],
-          ruleAdmin: formData.ruleAdminChecked ? formData.ruleAdminMarkets : [],
-          templateAdmin: formData.templateAdminChecked
-            ? formData.templateAdminMarkets
-            : [],
-          documentAuthAdmin: formData.documentAuthAdminChecked
-            ? formData.documentAuthAdminMarkets
-            : [],
-          userAdmin: formData.userAdminChecked,
-          adaptationUser: formData.adaptationUserChecked
-            ? formData.adaptationUserMarkets
-            : [],
-          manageVariableList: formData.manageVariableListChecked,
-          marketSuperUser: formData.marketSuperUserMarkets,
-        },
-      };
-
       const API_BASE_URL = "http://localhost:8081";
       const currentUser = localStorage.getItem("currentUser") || "";
 
-      // 将前端角色数据转换为后端API格式并逐个发送
+      // 角色→TYPE代码(MARKET_AUTH) / FUNCTION描述(FUNCTION_AUTH) 映射
+      const roleMap: Array<{
+        key: string;
+        typeCode: string;
+        funcDesc: string;
+        markets: string[];
+        hasMarkets: boolean;
+      }> = [
+        {
+          key: "standardUser",
+          typeCode: "U",
+          funcDesc: "USER",
+          markets: formData.standardUserMarkets,
+          hasMarkets: true,
+        },
+        {
+          key: "ruleAdmin",
+          typeCode: "R",
+          funcDesc: "RULES",
+          markets: formData.ruleAdminMarkets,
+          hasMarkets: true,
+        },
+        {
+          key: "templateAdmin",
+          typeCode: "T",
+          funcDesc: "TEMPLATE",
+          markets: formData.templateAdminMarkets,
+          hasMarkets: true,
+        },
+        {
+          key: "documentAuthAdmin",
+          typeCode: "D",
+          funcDesc: "Document",
+          markets: formData.documentAuthAdminMarkets,
+          hasMarkets: true,
+        },
+        {
+          key: "adaptationUser",
+          typeCode: "DOCMOD",
+          funcDesc: "ADAPTATION DOC",
+          markets: formData.adaptationUserMarkets,
+          hasMarkets: true,
+        },
+        {
+          key: "marketSuperUser",
+          typeCode: "MCSU",
+          funcDesc: "market super user",
+          markets: formData.marketSuperUserMarkets,
+          hasMarkets: true,
+        },
+      ];
+
+      // Step1: 先删除该用户的所有权限
+      const deleteResponse = await fetch(
+        `${API_BASE_URL}/api/ud17HDocUserAdministration/deleteRole`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: formData.userId,
+            updateUser: currentUser,
+          }),
+        },
+      );
+      const deleteResult = await deleteResponse.json();
+      if (deleteResult.code !== 200) {
+        throw new Error("Delete existing roles failed");
+      }
+
+      // Step2: 再添加当前勾选的权限
       const roleUpdatePromises: Promise<Response>[] = [];
 
-      // Standard User
-      if (
-        requestData.roles.standardUser &&
-        Array.isArray(requestData.roles.standardUser)
-      ) {
-        requestData.roles.standardUser.forEach((market: string) => {
+      // 有market的角色（勾选+选了market才发）
+      roleMap.forEach((role) => {
+        const checked =
+          role.key === "marketSuperUser"
+            ? formData.marketSuperUserMarkets.length > 0
+            : (formData as any)[`${role.key}Checked`] === true;
+
+        if (checked && role.hasMarkets && role.markets.length > 0) {
+          role.markets.forEach((market) => {
+            roleUpdatePromises.push(
+              fetch(
+                `${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    userId: formData.userId,
+                    market,
+                    type: role.typeCode,
+                    bu: "",
+                    function: role.funcDesc,
+                    updateUser: currentUser,
+                  }),
+                },
+              ),
+            );
+          });
+        } else if (checked && !role.hasMarkets) {
+          // 有market但没选market → 只注册FUNCTION
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Standard User",
+                userId: formData.userId,
+                market: "",
+                type: "",
                 bu: "",
-                function: "Standard User",
+                function: role.funcDesc,
                 updateUser: currentUser,
               }),
             }),
           );
-        });
-      }
+        }
+      });
 
-      // Rule Admin
-      if (
-        requestData.roles.ruleAdmin &&
-        Array.isArray(requestData.roles.ruleAdmin)
-      ) {
-        requestData.roles.ruleAdmin.forEach((market: string) => {
-          roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Rule Admin",
-                bu: "",
-                function: "Rule Admin",
-                updateUser: currentUser,
-              }),
-            }),
-          );
-        });
-      }
-
-      // Template Admin
-      if (
-        requestData.roles.templateAdmin &&
-        Array.isArray(requestData.roles.templateAdmin)
-      ) {
-        requestData.roles.templateAdmin.forEach((market: string) => {
-          roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Template Admin",
-                bu: "",
-                function: "Template Admin",
-                updateUser: currentUser,
-              }),
-            }),
-          );
-        });
-      }
-
-      // Document Auth Admin
-      if (
-        requestData.roles.documentAuthAdmin &&
-        Array.isArray(requestData.roles.documentAuthAdmin)
-      ) {
-        requestData.roles.documentAuthAdmin.forEach((market: string) => {
-          roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Document Auth Admin",
-                bu: "",
-                function: "Document Auth Admin",
-                updateUser: currentUser,
-              }),
-            }),
-          );
-        });
-      }
-
-      // User Admin（无市场）
-      if (requestData.roles.userAdmin === true) {
+      // User Admin（无market）
+      if (formData.userAdminChecked) {
         roleUpdatePromises.push(
           fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              userId: requestData.userId,
+              userId: formData.userId,
               market: "",
               type: "",
               bu: "",
-              function: "User Admin",
+              function: "User Administrator",
               updateUser: currentUser,
             }),
           }),
         );
       }
 
-      // Adaptation user
-      if (
-        requestData.roles.adaptationUser &&
-        Array.isArray(requestData.roles.adaptationUser)
-      ) {
-        requestData.roles.adaptationUser.forEach((market: string) => {
-          roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Adaptation user",
-                bu: "",
-                function: "Adaptation user",
-                updateUser: currentUser,
-              }),
-            }),
-          );
-        });
-      }
-
-      // Manage Variable List（无市场）
-      if (requestData.roles.manageVariableList === true) {
+      // Manage Variable List（无market）
+      if (formData.manageVariableListChecked) {
         roleUpdatePromises.push(
           fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              userId: requestData.userId,
+              userId: formData.userId,
               market: "",
               type: "",
               bu: "",
@@ -503,29 +502,6 @@ const HDocUserAdministration = () => {
             }),
           }),
         );
-      }
-
-      // Market Super User
-      if (
-        requestData.roles.marketSuperUser &&
-        Array.isArray(requestData.roles.marketSuperUser)
-      ) {
-        requestData.roles.marketSuperUser.forEach((market: string) => {
-          roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: requestData.userId,
-                market,
-                type: "Market Super User",
-                bu: "",
-                function: "Market Super User",
-                updateUser: currentUser,
-              }),
-            }),
-          );
-        });
       }
 
       const responses = await Promise.all(roleUpdatePromises);
@@ -616,6 +592,17 @@ const HDocUserAdministration = () => {
     }
   };
 
+  // 市场列表排序：选中的排前面
+  const getSortedMarketList = (selectedMarkets: string[]) => {
+    return [...marketList].sort((a, b) => {
+      const aSelected = selectedMarkets.includes(a.market);
+      const bSelected = selectedMarkets.includes(b.market);
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      return 0;
+    });
+  };
+
   if (isLoading) {
     return <div className='hvua-loading'>加载中...</div>;
   }
@@ -697,11 +684,13 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.standardUserChecked}
             >
-              {marketList.map((market) => (
-                <option key={market.market} value={market.market}>
-                  {market.market}
-                </option>
-              ))}
+              {getSortedMarketList(formData.standardUserMarkets).map(
+                (market) => (
+                  <option key={market.market} value={market.market}>
+                    {market.market}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
@@ -732,7 +721,7 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.ruleAdminChecked}
             >
-              {marketList.map((market) => (
+              {getSortedMarketList(formData.ruleAdminMarkets).map((market) => (
                 <option key={market.market} value={market.market}>
                   {market.market}
                 </option>
@@ -773,11 +762,13 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.templateAdminChecked}
             >
-              {marketList.map((market) => (
-                <option key={market.market} value={market.market}>
-                  {market.market}
-                </option>
-              ))}
+              {getSortedMarketList(formData.templateAdminMarkets).map(
+                (market) => (
+                  <option key={market.market} value={market.market}>
+                    {market.market}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
@@ -817,11 +808,13 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.documentAuthAdminChecked}
             >
-              {marketList.map((market) => (
-                <option key={market.market} value={market.market}>
-                  {market.market}
-                </option>
-              ))}
+              {getSortedMarketList(formData.documentAuthAdminMarkets).map(
+                (market) => (
+                  <option key={market.market} value={market.market}>
+                    {market.market}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
@@ -875,11 +868,13 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.adaptationUserChecked}
             >
-              {marketList.map((market) => (
-                <option key={market.market} value={market.market}>
-                  {market.market}
-                </option>
-              ))}
+              {getSortedMarketList(formData.adaptationUserMarkets).map(
+                (market) => (
+                  <option key={market.market} value={market.market}>
+                    {market.market}
+                  </option>
+                ),
+              )}
             </select>
           </div>
         </div>
@@ -919,11 +914,13 @@ const HDocUserAdministration = () => {
                 );
               }}
             >
-              {marketList.map((market) => (
-                <option key={market.market} value={market.market}>
-                  {market.market}
-                </option>
-              ))}
+              {getSortedMarketList(formData.marketSuperUserMarkets).map(
+                (market) => (
+                  <option key={market.market} value={market.market}>
+                    {market.market}
+                  </option>
+                ),
+              )}
             </select>
           </div>
         </div>

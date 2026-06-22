@@ -42,4 +42,8 @@ public class HdocDocumentList {
     // 前端批量角色数据（roles对象）
     @JsonProperty("roles")
     private Map<String, Object> roles;
+
+    // UD18 文档权限管理
+    @JsonProperty("documentTypes")
+    private List<String> documentTypes;
 }

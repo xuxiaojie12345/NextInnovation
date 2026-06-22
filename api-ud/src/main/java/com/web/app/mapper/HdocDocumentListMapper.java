@@ -78,7 +78,50 @@ public interface HdocDocumentListMapper {
                            @Param("userid") String userid);
 
     /**
+     * 删除用户所有FUNCTION_AUTH记录
+     */
+    int deleteAllFunctionAuth(@Param("userid") String userid);
+
+    /**
+     * 删除用户所有MARKET_AUTH记录
+     */
+    int deleteAllMarketAuth(@Param("userid") String userid);
+
+    /**
      * 根据UserId查询用户是否存在
      */
     int countUserById(@Param("userid") String userid);
+
+    // ==================== UD18 文档权限管理 ====================
+
+    /**
+     * 查询所有文档列表（只取DESCRIPTION）
+     */
+    List<Map<String, String>> selectDocumentList();
+
+    /**
+     * 查询用户文档权限
+     */
+    List<Map<String, String>> selectUserDocAuth(@Param("userid") String userid);
+
+    /**
+     * 删除用户指定文档权限
+     */
+    int deleteUserDocAuth(@Param("userid") String userid,
+                          @Param("doctype") String doctype);
+
+    /**
+     * 删除用户所有文档权限
+     */
+    int deleteAllUserDocAuth(@Param("userid") String userid);
+
+    /**
+     * 插入用户文档权限
+     */
+    int insertUserDocAuth(@Param("userid") String userid,
+                          @Param("doctype") String doctype,
+                          @Param("registerUser") String registerUser,
+                          @Param("registerProcess") String registerProcess,
+                          @Param("updateUser") String updateUser,
+                          @Param("updateProcess") String updateProcess);
 }

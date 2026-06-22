@@ -220,23 +220,11 @@ public class UD17ServiceImpl implements UD17Service {
                 return ApiResponse.error(400, "USERID不能为空");
             }
 
-            // 删除HDOC_MARKET_AUTH表记录
-            if (!market.isEmpty() && !type.isEmpty()) {
-                int deletedCount = hdocDocumentListMapper.deleteMarketAuth(userId, market, type, bu);
-                if (deletedCount == 0) {
-                    log.warn("Market auth record not found for delete: userId={}, market={}, type={}, bu={}",
-                            userId, market, type, bu);
-                }
-            }
-
-            // 删除HDOC_FUNCTION_AUTH表记录
-            if (!function.isEmpty()) {
-                int deletedCount = hdocDocumentListMapper.deleteFunctionAuth(function, userId);
-                if (deletedCount == 0) {
-                    log.warn("Function auth record not found for delete: function={}, userId={}",
-                            function, userId);
-                }
-            }
+            // 删除该用户所有权限记录（全量替换）
+            int deletedMarket = hdocDocumentListMapper.deleteAllMarketAuth(userId);
+            int deletedFunction = hdocDocumentListMapper.deleteAllFunctionAuth(userId);
+            log.info("Deleted all permissions for user {}: {} market records, {} function records",
+                    userId, deletedMarket, deletedFunction);
 
             // 构建返回数据
             Map<String, Object> data = new HashMap<>();
