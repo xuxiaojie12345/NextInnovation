@@ -1,0 +1,60 @@
+package com.web.app.service.impl;
+
+import com.web.app.dto.UD03SelectHdocdocumentlistResponse;
+import com.web.app.entity.HdocDocumentList;
+import com.web.app.mapper.UD03SelectHdocdocumentlistMapper;
+import com.web.app.service.UD03SelectHdocdocumentlistService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * UD03文档类型列表服务实现类
+ */
+@Slf4j
+@Service
+public class UD03SelectHdocdocumentlistServiceImpl implements UD03SelectHdocdocumentlistService {
+    
+    @Autowired
+    private UD03SelectHdocdocumentlistMapper ud03SelectHdocdocumentlistMapper;
+    
+    @Override
+    public UD03SelectHdocdocumentlistResponse getHdocDocumentList() {
+        log.info("开始查询文档类型列表");
+        
+        UD03SelectHdocdocumentlistResponse response = new UD03SelectHdocdocumentlistResponse();
+        
+        try {
+            // 查询所有文档类型
+            List<HdocDocumentList> documentList = ud03SelectHdocdocumentlistMapper.selectAllDocumentTypes();
+            
+            // 转换为响应数据
+            List<UD03SelectHdocdocumentlistResponse.DocumentTypeData> dataList = new ArrayList<>();
+            if (documentList != null && !documentList.isEmpty()) {
+                for (HdocDocumentList doc : documentList) {
+                    UD03SelectHdocdocumentlistResponse.DocumentTypeData data = 
+                        new UD03SelectHdocdocumentlistResponse.DocumentTypeData();
+                    data.setDoctype(doc.getDoctype());
+                    dataList.add(data);
+                }
+            }
+            
+            response.setCode(200);
+            response.setMsg("查询成功");
+            response.setData(dataList);
+            
+            log.info("文档类型列表查询成功，共{}条记录", dataList.size());
+            
+        } catch (Exception e) {
+            log.error("查询文档类型列表异常", e);
+            response.setCode(500);
+            response.setMsg("服务器内部错误");
+            response.setData(new ArrayList<>());
+        }
+        
+        return response;
+    }
+}

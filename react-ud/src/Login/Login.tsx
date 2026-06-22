@@ -1,156 +1,280 @@
 import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
-// ... existing code ...
+import apiClient from "../api/config";
 
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
-const authenticationApi = async (
-  userID: string,
-  password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
-  });
-};
-
+/**
+ * 登录页面组件
+ * 
+ * 功能说明：
+ * - 用户身份验证，集成 ISAM 统一身份认证
+ * - 提供简洁的登录界面，清晰的错误提示
+ * - 密码输入掩码显示，保障安全性
+ * - 登录成功后缓存 UserID 用于后续会话管理
+ * 
+ * @component
+ * @returns {JSX.Element} 登录页面元素
+ */
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  // 状态管理 (对应设计书 6. 实现注意事项)
-  const [userID, setUserID] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // 处理 UserID 输入 (限制：半角英数字, MaxLength 10)
+  // ==================== 状态管理 ====================
+  // 对应设计书 6.1 状态管理
+  const [userID, setUserID] = useState<string>("");           // 用户ID输入值
+  const [password, setPassword] = useState<string>("");       // 密码输入值
+  const [message, setMessage] = useState<string>("");         // 普通错误消息
+  const [errorMessage, setErrorMessage] = useState<string>(""); // 账户锁定等特殊错误消息
+  const [isLoading, setIsLoading] = useState<boolean>(false); // 加载状态标识
+
+  // ==================== 常量定义 ====================
+  // 输入校验正则表达式（可复用）
+  const USER_ID_REGEX = /^[a-zA-Z0-9]*$/;                    // 半角英数字
+  const PASSWORD_REGEX = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/; // 半角英数字+符号
+  
+  // 输入长度限制
+  const MAX_USER_ID_LENGTH = 10;
+  const MAX_PASSWORD_LENGTH = 32;
+
+  // 账户锁定固定提示文字
+  const ACCOUNT_LOCKED_MESSAGE = `If you get error message: "Your account is locked. Please contact your system administrator." 
+Please try this alternative login link before contacting support： Login 
+We are working to find root cause of problem.`;
+
+  // ==================== 事件处理函数 ====================
+
+  /**
+   * 处理 UserID 输入变化
+   * 限制：只允许半角英数字，最大长度10字符
+   * 用户体验优化：用户重新输入时清空错误提示
+   * 
+   * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
+   */
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角英数字
-    if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 10) {
+    // 正则校验：只允许半角英数字，且不超过最大长度
+    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
       setUserID(val);
       // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage("");
+      if (errorMessage) setErrorMessage("");
     }
   };
 
-  // 处理 Password 输入 (限制：半角英数字+记号, MaxLength 32)
+  /**
+   * 处理 Password 输入变化
+   * 限制：只允许半角英数字及常见 ASCII 符号，最大长度32字符
+   * 用户体验优化：用户重新输入时清空错误提示
+   * 
+   * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
+   */
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：允许半角英数字及常见 ASCII 符号
-    if (
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(val) &&
-      val.length <= 32
-    ) {
+    // 正则校验：允许半角英数字及常见 ASCII 符号，且不超过最大长度
+    if (PASSWORD_REGEX.test(val) && val.length <= MAX_PASSWORD_LENGTH) {
       setPassword(val);
+      // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage("");
+      if (errorMessage) setErrorMessage("");
     }
   };
 
-  // 点击 Login 按钮触发 (对应设计书 3. 业务逻辑与校验规则)
+  /**
+   * 点击 Login 按钮触发登录流程
+   * 对应设计书 3. 业务逻辑与校验规则
+   * 
+   * 处理流程：
+   * 1. 前置处理：去除首尾空格
+   * 2. 空值校验（前端校验）
+   * 3. API 调用（后端校验）
+   * 4. 结果处理：认证成功跳转，认证失败显示错误
+   */
   const handleLogin = async () => {
-    // 1. 前置处理：去除首尾空格
+    // 1. 前置处理：获取输入值并去除首尾空格
     const trimmedUserID = userID.trim();
     const trimmedPassword = password.trim();
 
-    // 2. 空值校验 (Frontend Check)
+    // 2. 空值校验（前端校验）
+    // 对应设计书 3.2 校验详细规格表 No.1 和 No.2
     if (!trimmedUserID || !trimmedPassword) {
       setMessage("Username and password are required.");
       return; // 终止流程，不调用 API
     }
 
-    // 3. API 调用 (Backend Check)
+    // 3. API 调用（后端校验）
+    // 对应设计书 4.1 AuthenticationApi
     setIsLoading(true);
-    setMessage(""); // 清除旧消息
+    setMessage("");      // 清除旧消息
+    setErrorMessage(""); // 清除特殊错误消息
 
     try {
-      const result = await authenticationApi(trimmedUserID, trimmedPassword);
+      // 调用真实 API 接口进行身份验证
+      // Method: GET, Endpoint: /api/ud01/authentication
+      // 使用GET请求，通过URL参数传递userId和password
+      const response = await apiClient.get("/api/ud01/authentication", {
+        params: {
+          userId: trimmedUserID,
+          password: trimmedPassword,
+        },
+      });
 
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
+      // 4. 结果处理
+      // 后端返回格式：{ code: 200, msg: "登录成功", data: { ... } }
+      if (response.data.code === 200) {
+        // 认证成功（Code 200）
+        // 对应设计书 3.1.1 登录处理流程 - 认证成功分支
+        
+        // 缓存 UserID 到 localStorage（用于后续会话管理）
+        localStorage.setItem("userID", trimmedUserID);
+        
+        // 保存用户信息到 localStorage
+        if (response.data.data) {
+          localStorage.setItem("userName", response.data.data.username || "");
+          localStorage.setItem("userEmail", response.data.data.email || "");
+          // 如果有token，也保存起来
+          if (response.data.data.token) {
+            localStorage.setItem("token", response.data.data.token);
+          }
+        }
+        
+        // 清空消息提示
+        setMessage("");
+        setErrorMessage("");
+        
+        // 画面迁移：跳转到 Menu 画面 (UD02)
         navigate("/Menu");
       } else {
-        // 认证失败：显示指定错误信息
-        setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        // 认证失败（Code != 200 或业务错误）
+        // 对应设计书 3.2 校验详细规格表 No.3
+        setMessage(response.data.msg || "We didn't recognize the username or password you entered. Please try again.");
+        // 安全策略：清空密码字段
+        setPassword("");
       }
-    } catch (error) {
-      // 异常处理：网络错误或服务器错误
-      setMessage("System error. Please contact administrator.");
+    } catch (error: any) {
+      // 异常处理
+      // 对应设计书 5. 异常处理
+      
+      if (error.response) {
+        // 服务器返回错误响应
+        const statusCode = error.response.status;
+        const errorMsg = error.response.data?.msg;
+        
+        if (statusCode === 400) {
+          // 参数校验失败
+          setMessage(errorMsg || "Invalid input parameters.");
+        } else if (statusCode === 401) {
+          // 认证失败：用户名或密码错误
+          setMessage(errorMsg || "We didn't recognize the username or password you entered. Please try again.");
+          setPassword(""); // 清空密码字段
+        } else if (statusCode === 423) {
+          // 帐户锁定：ISAM返回特定码
+          // 对应设计书 5. 异常处理 - 帐户锁定
+          setErrorMessage(ACCOUNT_LOCKED_MESSAGE);
+        } else if (statusCode >= 500) {
+          // 服务器内部错误
+          setMessage("System error. Please try again later.");
+        } else {
+          // 其他服务器错误
+          setMessage(errorMsg || "System error. Please try again later.");
+        }
+      } else if (error.code === "ECONNABORTED") {
+        // 请求超时
+        // 对应设计书 5. 异常处理 - 请求超时
+        setMessage("Request timeout. Please check your network connection.");
+      } else {
+        // 网络异常或其他错误
+        // 对应设计书 5. 异常处理 - 网络异常、ISAM服务不可用
+        setMessage("System error. Please try again later.");
+      }
     } finally {
+      // 无论成功或失败，都重置加载状态
       setIsLoading(false);
     }
   };
 
+  // ==================== 渲染 UI ====================
   return (
     <div className='login-container'>
       <div className='login-box'>
-        <div className='login-header'>
-          <h2>Login</h2>
-        </div>
-
-        {/* Message Label: Output, Left Align, Red Color */}
-        {message && (
-          <div
-            className='error-message'
-            style={{
-              color: "#ff4d4f",
-              textAlign: "left",
-              marginBottom: "15px",
-              fontSize: "14px",
-              wordBreak: "break-word",
-            }}
-          >
-            {message}
+        {/* 账户锁定等特殊错误消息显示区域 */}
+        {/* 对应设计书 2.1 控件属性表 No.5 StaticMessage */}
+        {errorMessage && (
+          <div className='static-error-message'>
+            {errorMessage}
           </div>
         )}
 
+        {/* 登录表单 */}
         <form
           onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
+            e.preventDefault(); // 阻止表单默认提交行为
+            handleLogin();      // 执行登录逻辑
           }}
         >
-          {/* UserID: TextField, Input, Left Align */}
+          {/* UserID 输入框 */}
+          {/* 对应设计书 2.1 控件属性表 No.1 UserID */}
           <div className='form-group'>
-            <label htmlFor='userID'>UserID</label>
+            <label htmlFor='userID'>用户ID</label>
             <input
               id='userID'
               type='text'
               value={userID}
               onChange={handleUserIDChange}
-              placeholder='Enter User ID'
-              disabled={isLoading}
-              autoComplete='username'
+              placeholder='请输入用户ID'
+              disabled={isLoading}                    // 加载期间禁用输入
+              autoComplete='username'                 // 启用浏览器自动填充
+              maxLength={MAX_USER_ID_LENGTH}          // 最大长度限制
             />
           </div>
 
-          {/* Password: TextField, Input, Left Align, Masked */}
+          {/* Password 输入框 */}
+          {/* 对应设计书 2.1 控件属性表 No.2 Password */}
           <div className='form-group'>
-            <label htmlFor='password'>Password</label>
+            <label htmlFor='password'>密码</label>
             <input
               id='password'
-              type='password'
+              type='password'                         // 密码掩码显示
               value={password}
               onChange={handlePasswordChange}
-              placeholder='Enter Password'
-              disabled={isLoading}
-              autoComplete='current-password'
+              placeholder='请输入密码'
+              disabled={isLoading}                    // 加载期间禁用输入
+              autoComplete='current-password'         // 启用浏览器自动填充
+              maxLength={MAX_PASSWORD_LENGTH}         // 最大长度限制
             />
           </div>
+          
+          {/* 普通错误消息显示区域 */}
+          {/* 对应设计书 2.1 控件属性表 No.3 Message */}
+          {message && (
+            <div className='error-message'
+              style={{
+                  color: "#ff4d4f",
+                  textAlign: "left",
+                  marginBottom: "15px",
+                  fontSize: "14px",
+                  wordBreak: "break-word",
+                }}>
+              {message}
+            </div>
+          )}
 
-          {/* Login Button: Center Align, Active/Disabled Control */}
-          <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
+          {/* Login 登录按钮 */}
+          {/* 对应设计书 2.1 控件属性表 No.4 Login */}
+          <button 
+            type='submit' 
+            className='login-button' 
+            disabled={isLoading}                      // 加载期间禁用按钮，防止重复提交
+          >
+            {isLoading ? "处理中..." : "登录"}
           </button>
         </form>
+
+        {/* StaticMessage 固定提示文字 - 显示在按钮下方 */}
+        {/* 对应设计书 2.1 控件属性表 No.5 StaticMessage - 红色斜体，无边框 */}
+        <div className='static-message'>
+          If you get error message: "Your account is locked. Please contact your system administrator." 
+          Please try this alternative login link before contacting support： Login 
+          We are working to find root cause of problem.
+        </div>
       </div>
     </div>
   );

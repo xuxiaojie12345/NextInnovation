@@ -82,3 +82,18 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+.static-message {
+  color: #ff4d4f;
+  text-align: left;
+  margin-top: 15px;
+  margin-bottom: 0;
+  font-size: 13px;
+  word-break: break-word;
+  white-space: pre-line;
+  font-style: italic;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background-color: transparent;
+  animation: fadeIn 0.3s ease-in-out;
+}

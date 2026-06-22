@@ -1,0 +1,339 @@
+/* UD05 修改文档页面样式 */
+/* 遵循CSS样式隔离命名规范，所有选择器使用.ud05-container前缀 */
+
+/* ==================== 容器样式 ==================== */
+.ud05-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==================== 标题样式 ==================== */
+.ud05-container .ud05-title {
+  color: #003366;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* ==================== 错误消息样式 ==================== */
+.ud05-container .ud05-message {
+  width: 100%;
+  max-width: 1200px;
+  background-color: #ff4d4f;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ==================== 基本信息区域 ==================== */
+.ud05-container .ud05-info-section {
+  width: 100%;
+  max-width: 1100px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #d9e6f6;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+
+.ud05-container .ud05-info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ud05-container .ud05-info-item:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.ud05-container .ud05-info-label {
+  color: #333333;
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 150px;
+  margin-right: 10px;
+}
+
+.ud05-container .ud05-info-value {
+  color: #666666;
+  font-size: 15px;
+  flex: 1;
+}
+
+/* 链接样式 */
+.ud05-container .ud05-link {
+  color: #1890ff;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.ud05-container .ud05-link:hover {
+  color: #0050b3;
+}
+
+/* ==================== DataTable区域 ==================== */
+.ud05-container .ud05-table-section {
+  width: 100%;
+  max-width: 1100px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #c8dff2;
+  padding: 12px 12px 20px 12px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.ud05-container .ud05-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #d0e6fb;
+}
+
+/* 表头样式 */
+.ud05-container .ud05-th {
+  background-color: #eaf4ff;
+  color: #003366;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  border-bottom: 1px solid #c8e1ff;
+  white-space: nowrap;
+}
+
+/* 表格单元格样式 */
+.ud05-container .ud05-td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e6f0fa;
+  font-size: 13px;
+  color: #333333;
+  vertical-align: middle;
+}
+
+/* 修改行高亮样式 */
+.ud05-container .ud05-modified-row {
+  background-color: #fbfdff;
+}
+
+.ud05-container .ud05-modified-row:hover {
+  background-color: #f0fbff;
+}
+
+/* 空数据提示 */
+.ud05-container .ud05-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: #999999;
+  font-size: 14px;
+}
+
+/* ==================== 输入框样式 ==================== */
+.ud05-container .ud05-input {
+  width: 220px;
+  padding: 6px 10px;
+  border: 1px solid #cfdff0;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #333333;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.ud05-container .ud05-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ud05-container .ud05-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ud05-container .ud05-input::placeholder {
+  color: #bfbfbf;
+}
+
+/* ==================== 按钮区域 ==================== */
+.ud05-container .ud05-button-section {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Save按钮样式 */
+.ud05-container .ud05-btn {
+  padding: 8px 14px;
+  border: 1px solid #bcdaf7;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.ud05-container .ud05-btn-save {
+  background-color: #f5f9ff;
+  color: #003366;
+}
+
+.ud05-container .ud05-btn-save:hover:not(:disabled) {
+  background-color: #e9f4ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 80, 179, 0.12);
+}
+
+.ud05-container .ud05-btn-save:active:not(:disabled) {
+  background-color: #e1f0ff;
+  transform: translateY(0);
+}
+
+.ud05-container .ud05-btn:disabled {
+  background-color: #d9d9d9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板设备 (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+  .ud05-container {
+    padding: 30px 15px;
+  }
+
+  .ud05-container .ud05-title {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .ud05-container .ud05-info-section,
+  .ud05-container .ud05-table-section {
+    max-width: 900px;
+  }
+
+  .ud05-container .ud05-info-label {
+    min-width: 120px;
+    font-size: 14px;
+  }
+
+  .ud05-container .ud05-info-value {
+    font-size: 14px;
+  }
+
+  .ud05-container .ud05-th,
+  .ud05-container .ud05-td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* 手机设备 (< 768px) */
+@media screen and (max-width: 768px) {
+  .ud05-container {
+    padding: 20px 10px;
+  }
+
+  .ud05-container .ud05-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .ud05-container .ud05-info-section,
+  .ud05-container .ud05-table-section {
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .ud05-container .ud05-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ud05-container .ud05-info-label {
+    min-width: auto;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .ud05-container .ud05-info-value {
+    font-size: 13px;
+  }
+
+  .ud05-container .ud05-table {
+    font-size: 12px;
+  }
+
+  .ud05-container .ud05-th,
+  .ud05-container .ud05-td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .ud05-container .ud05-input {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .ud05-container .ud05-btn {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+}
+
+/* 小屏手机设备 (< 480px) */
+@media screen and (max-width: 480px) {
+  .ud05-container {
+    padding: 15px 8px;
+  }
+
+  .ud05-container .ud05-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .ud05-container .ud05-info-section,
+  .ud05-container .ud05-table-section {
+    padding: 12px;
+  }
+
+  .ud05-container .ud05-message {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+
+  .ud05-container .ud05-th,
+  .ud05-container .ud05-td {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .ud05-container .ud05-input {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .ud05-container .ud05-btn {
+    padding: 8px 25px;
+    font-size: 13px;
+  }
+}
