@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserInfoMapper">
+    
+    <!-- 用户信息结果映射 -->
+    <resultMap id="UserInfoResultMap" type="com.web.app.domain.entity.UserInfo">
+        <id property="userid" column="USERID"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="username" column="USERNAME"/>
+        <result property="responsible" column="RESPONSIBLE"/>
+        <result property="userposition" column="USERPOSITION"/>
+        <result property="email" column="EMAIL"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerProcess" column="REGISTER_PROCESS"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateProcess" column="UPDATE_PROCESS"/>
+    </resultMap>
+    
+    <!-- 根据用户ID和密码查询用户信息 -->
+    <select id="findByUserIdAndPassword" resultMap="UserInfoResultMap">
+        SELECT 
+            USERID,
+            PASSWORD,
+            USERNAME,
+            RESPONSIBLE,
+            USERPOSITION,
+            EMAIL,
+            REGISTER_DATETIME,
+            REGISTER_USER,
+            REGISTER_PROCESS,
+            UPDATE_DATETIME,
+            UPDATE_USER,
+            UPDATE_PROCESS
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid}
+          AND PASSWORD = #{password}
+    </select>
+    
+</mapper>

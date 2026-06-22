@@ -1,0 +1,116 @@
+请根据以下要求生成[HDoc Help]的详细设计文档：
+
+1.基本信息
+- **模块名称**：HDoc Help
+- **文档编号**: DES-HDocHelp-024
+- **作成日期**：2026-05-20
+
+2. 背景 (Background)
+请描述：
+本模块的核心功能和目标
+- 说明系统相关信息
+- 提供系统功能导航链接
+- 为用户提供系统使用指导
+面向的用户群体
+- 系统用户
+- 需要系统帮助信息的工作人员
+- 系统管理员
+用户体验方面的考虑
+- 提供直观的导航链接
+- 清晰的系统功能说明
+- 便捷的页面跳转方式
+安全性或特殊要求（如有）
+- 确保页面访问的安全性
+- 防止未授权的系统信息访问
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | HDoc Quick Guide | Link | - | - | Input | - | 左 | - | - | 跳转至Download and Print Quick Guides页面 |
+| 2   | List of document types. | Link | - | - | Input | - | 左 | - | - | 跳转至Document Types页面 |
+| 3   | Markets in HDoc | Link | - | - | Input | - | 左 | - | - | 跳转至Markets in HDoc页面 |
+| 4   | HDoc - Market Document Setting | Link | - | - | Input | - | 左 | - | - | 跳转至HDoc - Market Document Settings页面 |
+| 5   | Describation | Link | - | - | Input | - | - | - | - | - |
+| 6   | Other Information | Checkbox | - | - | Output | - | 左 | - | - | - |
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+4.1 HDoc快速指南功能
+功能说明：点击【HDoc Quick Guide】链接，跳转至「Download and Print Quick Guides」页面
+操作步骤：
+  1. 显示"HDoc Quick Guide"链接
+  2. 用户点击链接
+  3. 系统跳转至Download and Print Quick Guides页面
+  4. 显示快速指南下载和打印功能
+
+4.2 文档类型列表功能
+功能说明：点击【List of document types.】链接，跳转至「Document Types」页面
+操作步骤：
+  1. 显示"List of document types."链接
+  2. 用户点击链接
+  3. 系统跳转至Document Types页面
+  4. 显示文档类型列表信息
+
+4.3 市场信息功能
+功能说明：点击【Markets in HDoc】链接，跳转至「Markets in HDoc」页面
+操作步骤：
+  1. 显示"Markets in HDoc"链接
+  2. 用户点击链接
+  3. 系统跳转至Markets in HDoc页面
+  4. 显示市场信息列表
+
+4.4 市场文档设置功能
+功能说明：点击【HDoc - Market Document Settings】链接，跳转至「HDoc - Market Document Settings」页面
+操作步骤：
+  1. 显示"HDoc - Market Document Settings"链接
+  2. 用户点击链接
+  3. 系统跳转至HDoc - Market Document Settings页面
+  4. 显示市场文档设置功能
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+5.1 处理流程
+按步骤描述每个主要功能的处理流程，格式如下：
+开始：页面加载
+前置处理：准备页面元素
+空值校验等 (Frontend Check)：
+无特殊校验
+5.1.2 API调用 (Backend Check)：
+无API调用
+
+5.2 结果处理：
+成功：显示页面和导航链接
+失败：显示错误信息
+
+5.3 校验详细规格表
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 页面加载时 | 页面资源 | 页面不可用 | HDoc Help页面不可用 | 显示错误消息 |
+| 2 | 链接点击时 | 目标页面 | 目标页面不存在 | 目标页面不可用 | 显示错误消息 |
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+无API接口定义
+
+7. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 页面加载失败 | 显示系统错误消息 | HDoc Help页面加载失败，请稍后再试 |
+| 链接跳转失败 | 显示错误消息 | 目标页面不可用，请联系管理员 |
+
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：UD24_詳細設計.md
+  ## 补充事项
+- 参照img/UD24.png查看布局页面

@@ -1,0 +1,263 @@
+/**
+ * HomologationVariablesResultList 组件样式
+ * 认证变量搜索结果列表页面（UD09）
+ * 参照 src\doc\image\页面设计描述.txt UD08 布局风格
+ */
+
+/* 容器 */
+.result-list-container {
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+/* 页面标题 */
+.result-list-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222222;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* 副标题 */
+.result-list-subtitle {
+  font-size: 12px;
+  color: #999999;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* 标题下方分割线 */
+.title-divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin: 0 0 16px 0;
+}
+
+/* 面包屑导航 */
+.breadcrumb {
+  font-size: 12px;
+  color: #888888;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+.breadcrumb span {
+  color: #1890ff;
+  cursor: pointer;
+}
+
+.breadcrumb span:hover {
+  color: #40a9ff;
+}
+
+/* 搜索条件展示区域 */
+.search-conditions {
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #666666;
+}
+
+.search-conditions strong {
+  color: #333333;
+}
+
+/* 消息区域 */
+.result-message {
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.result-message.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.result-message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.result-message.warning {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #ad8b00;
+}
+
+/* 按钮组 */
+.result-button-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.result-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333333;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  text-align: center;
+}
+
+.result-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.result-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #d9d9d9;
+  color: #bbbbbb;
+}
+
+.result-btn.primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #ffffff;
+}
+
+.result-btn.primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.result-btn.danger {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.result-btn.danger:hover {
+  background-color: #ff4d4f;
+  color: #ffffff;
+}
+
+/* 搜索计数 */
+.result-count {
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+/* 数据表格 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #e8e8e8;
+}
+
+.data-table th {
+  background-color: #fafafa;
+  color: #333333;
+  font-weight: bold;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.data-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333333;
+  vertical-align: top;
+}
+
+.data-table tr:hover {
+  background-color: #f5f7fa;
+}
+
+.data-table tr.selected {
+  background-color: #e6f7ff;
+}
+
+/* 复选框列 */
+.checkbox-cell {
+  width: 32px;
+  text-align: center;
+}
+
+.checkbox-cell input[type="checkbox"] {
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+}
+
+/* 链接样式（Created by user列） */
+.user-link {
+  color: #1890ff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.user-link:hover {
+  color: #40a9ff;
+  text-decoration: underline;
+}
+
+/* 表格容器（水平滚动） */
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+/* 加载状态 */
+.loading-overlay {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #999999;
+}
+
+/* 空数据状态 */
+.empty-data {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #999999;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .result-list-container {
+    padding: 16px;
+  }
+
+  .result-button-group {
+    flex-direction: column;
+  }
+
+  .result-btn {
+    width: 100%;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,49 @@
+
+3. API功能概述
+    3.1.[AuthenticationApi]:用户信息的验证与管理
+    3.2：[UD12UploadDeleteTemplateApi]:文件的上传，删除，模板管理
+    3.3：[XXXXXApi]:
+    ............
+        
+4. 处理流程
+   【AuthenticationApi】
+    4.1 客户端通过POST请求访问接口 /api/XXXXX/login，将用户名、密码等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的 login() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 对密码格式、账号状态进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserMapper】数据访问层，根据用户名查询数据库中的用户信息，获取用户实体对象。
+
+    4.6 登录核心验证逻辑：
+        • 判断用户是否存在，不存在则返回“账号不存在”
+        • 比对前端传递密码与数据库加密密码是否一致
+        • 密码错误则返回“密码不正确”
+    4.7 验证全部通过后：
+        • 生成Token（包含用户ID、用户名等）
+        • 可记录登录日志（登录时间、IP、设备信息）
+        • 构建登录成功响应体，包含Token、用户基础信息
+
+    4.8 封装【LoginResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "登录成功",
+            "data": {
+                "token": "xxxx",
+                "userId": 1,
+                "username": "xxx"
+            }
+        }
+        
+   （TODO：请根据API一览和概要设计描述所有API）
+
+5. 数据库设计（TODO：请根据API一览和概要设计描述各个API的SQL）
+    【AuthenticationApi】
+    5.1 - 查询语句: 
+    SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor WHERE USERID = {userId} AND PASSWORD = {password}
+

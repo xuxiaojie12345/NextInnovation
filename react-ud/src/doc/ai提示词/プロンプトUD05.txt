@@ -1,0 +1,218 @@
+# Modify Document 详细设计提示词
+
+## 1. 基本信息
+- **模块名称**：ModifyDocument
+- **文档编号**: DES-ModifyDocument-001
+- **作成日期**：2026-05-20
+
+## 2. 背景 (Background)
+本模块的核心功能和目标：显示并修改文档变量值，支持查看模板文件和底盘详细信息。用户可以在当前页面修改变量值，然后跳转到确认页面查看修改内容
+
+面向的用户群体：车辆认证相关人员、需要修改认证文档变量的业务人员
+
+用户体验方面的考虑：提供清晰的变量对照界面，支持快速修改和保存；显示当前值和修改值的对比；提供模板文件下载功能
+
+安全性或特殊要求：需要用户登录认证；从上一页传递底盘信息；所有输入字段需进行长度校验
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | chassis no | Link | - | - | Output | - | 左 | 从前一画面传递 | 活性 (Enabled) | 底盘编号，来自前一页面。点击跳转到Vehicle Specification页面（UD07），查看底盘详细信息 |
+| 2   | Market | Label | - | - | Output | - | 左 | 从前一画面传递 | - | 市场信息，来自前一页面 |
+| 3   | Template文件 | Link | - | - | Output | - | 左 | 模板文件名 | - | 点击可下载.trf格式的模板文件(不含填充值)，如"Template: aus/UD_TEST.odt" |
+| 4   | Variable | DataTable | - | - | Output | - | 左 | - | - | 变量名列表，来自Template文件的Template项目 |
+| 5   | Description | DataTable | - | - | Output | - | 左 | - | - | 变量描述，来自HDOC_VARIABLES表的DESCRIPTION字段 |
+| 6   | Current value | DataTable | - | - | Output | - | 左 | 从HDOC_ADCA_MODIFICATION表获取NEWVAL | - | 当前值，从HDOC_ADCA_MODIFICATION表获取NEWVAL |
+| 7   | Modified value | DataTable | - | 500 | Input | - | 左 | Modify表中不存在则为空白 | 活性 | 修改后的值，对应HDOC_ADCA_MODIFICATION表的NEWVAL字段，最大长度500字符 |
+| 8   | Save | Button | - | - | Action | - | 中 | - | 活性 | 保存修改，校验通过后跳转到Save Modifications页面显示修改内容 |
+
+必须包含的控件类型：
+- Input控件（DataTable中的Modified value列）
+- Output控件（Label、Link、DataTable的其他列）
+- Action控件（Button）
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 页面初始化
+功能说明：页面加载时获取待修改变量列表，显示底盘信息和市场信息
+操作步骤：
+1. 从路由参数或localStorage获取SERIE（底盘系列号）和CHNO（底盘编号）
+2. 页面加载完成后，立即调用UD05ModifyDocumentApi
+3. API返回数据包括：chassisNo、market、templateFile、variables列表
+4. variables列表包含：variable（变量名）、description（描述）、currentValue（当前值）、modifiedValue（修改值）
+5. 在页面上方显示chassis no和Market标签
+6. 显示Template文件链接，格式为"Template: {templateFile}"
+7. 在DataTable中展示变量列表，包含Variable、Description、Current value、Modified value四列
+8. 如果某变量在HDOC_ADCA_MODIFICATION表中不存在记录，则Current value和Modified value均为空
+
+### 4.2 下载模板文件
+功能说明：下载对应的.trf模板文件（不含填充值）
+操作步骤：
+1. 用户点击Template文件链接（如"Template: aus/UD_TEST.odt"）
+2. 系统触发文件下载请求
+3. 下载对应的Vin Plate .trf文件（不包含已填充的值）
+4. 浏览器自动下载文件到本地
+
+### 4.3 查看底盘详细信息
+功能说明：跳转到底盘详细信息页面
+操作步骤：
+1. 用户点击Chassis no链接
+2. 系统跳转到对应底盘的详细信息页面
+3. 传递底盘编号作为URL参数或localStorage参数
+4. 目标页面显示该底盘的完整信息
+
+### 4.4 编辑修改值
+功能说明：用户在Modified value列输入修改后的值
+操作步骤：
+1. 用户在DataTable的Modified value列中输入新的值
+2. 输入框限制最大长度为500字符
+3. 可以修改多个变量的值
+4. 实时显示输入内容
+
+### 4.5 Save按钮点击处理
+功能说明：校验修改内容并跳转到确认页面
+操作步骤：
+1. 用户点击Save按钮
+2. 前端遍历DataTable，收集所有Modified value字段的值
+3. 检查是否至少有一个Modified value字段被修改（非空且与原值不同）
+4. 若所有Modified value字段均为空或未修改：
+   - 设置Message = "NO UNRELEASED VERSION EXISTS!"
+   - 在错误消息区域显示错误
+   - 终止流程，阻止跳转
+5. 检查每个Modified value字段长度是否超过500字符
+6. 若存在超过500字符的字段：
+   - 设置Message = "修改后的值长度不能超过500字符"
+   - 在错误消息区域显示错误
+   - 终止流程，阻止跳转
+7. 校验通过后，先调用UD05UpdateHdocAdcaModification（POST `/api/ud05/modifydocument/update`）保存所有修改值
+8. 保存成功后，通过 React Router 的 location state 传递 `{ chassisNo, serie }` 跳转到"Save Modifications"页面
+9. 在跳转页面显示所有修改内容供用户确认
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+开始：用户访问ModifyDocument页面
+前置处理：从路由参数或localStorage获取SERIE和CHNO
+API调用：
+调用UD05ModifyDocumentApi
+传递参数：{serie, chno}
+执行SQL关联查询：
+- HDOC_ADCA_MODIFICATION a LEFT JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE
+- 若HDOC_ADCA_MODIFICATION中不存在对应变量，则Current value和Modified value均为空
+结果处理：
+成功：填充DataTable，显示变量列表
+失败：显示错误消息
+
+### 5.2 下载模板文件流程
+开始：用户点击Template文件链接
+处理步骤：
+- 根据模板文件名，从服务器下载对应的.trf格式模板文件（不含填充值）
+结果处理：
+- 成功：浏览器触发文件下载
+- 失败：显示错误消息"Template file download failed."
+
+### 5.3 查看底盘详细信息流程
+开始：用户点击chassis no链接
+处理步骤：
+- 跳转到Vehicle Specification页面（UD07）
+- 携带参数chassisNo（SERIE + CHNO拼接）
+结果处理：
+- Vehicle Specification页面加载并显示底盘详细信息
+
+### 5.4 保存修改流程
+开始：用户点击Save按钮
+前置处理：遍历DataTable，收集所有Modified value字段的值
+空值校验等 (Frontend Check)：
+若所有Modified value字段均为空或未修改：
+设置Message = "NO UNRELEASED VERSION EXISTS!"
+终止流程
+若Modified value字段长度超过500：
+设置Message = "修改后的值长度不能超过500字符"
+终止流程
+结果处理：
+校验通过：先调用UD05UpdateHdocAdcaModification保存所有修改值，成功后通过 React Router location state 传递 { chassisNo, serie } 跳转到"Save Modifications"页面
+校验失败：在当前页面显示错误消息
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 页面加载时 | SERIE/CHNO参数 | 参数必须存在 | 缺少必要的底盘信息 | 返回上一页或显示错误 |
+| 2 | 点击Save按钮时 | Modified value | 所有字段均为空或未修改 | NO UNRELEASED VERSION EXISTS! | 在错误消息区域显示错误，阻止跳转 |
+| 3 | 点击Save按钮时 | Modified value | 任一字段长度超过500字符 | 修改后的值长度不能超过500字符 | 在错误消息区域显示错误，阻止跳转 |
+| 4 | API调用后 | 查询结果 | 未找到该底盘的修改记录 | 未找到该底盘的修改记录 | 显示提示信息或返回上一页 |
+
+## 6. 接口定义 (API Specification)
+
+### UD05ModifyDocumentApi (包含UD05SelectVariableModification)
+功能：获取待修改变量列表，包括变量名、描述、当前值等信息。通过关联查询HDOC_ADCA_MODIFICATION（左连接）HDOC_VARIABLES表获取变量数据
+Method：POST
+Endpoint：/api/modify/document/query
+
+Request
+```json
+{
+"serie": "string (底盘系列号)",
+"chno": "string (底盘编号)"
+}
+```
+
+Response Success (200)
+```json
+{
+"code": 200,
+"message": "success",
+"data": {
+"chassisNo": "string",
+"market": "string",
+"templateFile": "string",
+"variables": [
+{
+"variable": "string",
+"description": "string",
+"currentValue": "string",
+"modifiedValue": "string"
+}
+]
+}
+}
+```
+
+Response Error (404)
+```json
+{
+"code": 404,
+"message": "未找到该底盘的修改记录"
+}
+```
+
+Response Error (500)
+```json
+{
+"code": 500,
+"message": "查询失败，请稍后重试"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| UD05ModifyDocumentApi网络错误 | 捕获异常，显示友好提示 | 网络连接失败，请稍后重试 |
+| UD05ModifyDocumentApi超时 | 设置超时时间，超时后提示 | 请求超时，请检查网络连接 |
+| UD05ModifyDocumentApi数据库异常 | 记录日志，返回通用错误 | 系统异常，请联系管理员 |
+| 参数缺失 | 检查URL参数或localStorage | 缺少必要的底盘信息 |
+| 权限不足 | 检查用户登录状态 | 请先登录后再操作 |
+| 模板文件不存在 | 检查文件路径，返回错误 | 模板文件不存在，请联系管理员 |
+| localStorage读写失败 | 忽略错误，继续使用空值或默认值 | 不显示错误消息 |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD05_详细设计.md

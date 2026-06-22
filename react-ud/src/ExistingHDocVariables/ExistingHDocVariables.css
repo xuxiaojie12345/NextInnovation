@@ -1,0 +1,298 @@
+/**
+ * ExistingHDocVariables 组件样式
+ * 现有HDoc变量管理页面（UD10）
+ * 参照页面设计描述.txt UD10布局风格
+ */
+
+/* 容器 */
+.existing-hdoc-container {
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+/* 页面标题 */
+.existing-hdoc-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222222;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+
+/* 副标题 */
+.existing-hdoc-subtitle {
+  font-size: 12px;
+  color: #999999;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+/* 标题下方分割线 */
+.existing-hdoc-divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin: 0 0 16px 0;
+}
+
+/* 支持信息区域 */
+.existing-hdoc-support-info {
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.existing-hdoc-support-info p {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 消息区域 */
+.existing-hdoc-message {
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.existing-hdoc-message.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.existing-hdoc-message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+/* 按钮组 */
+.existing-hdoc-button-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* 操作按钮 */
+.existing-hdoc-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333333;
+  transition: all 0.2s ease;
+  min-width: 70px;
+  text-align: center;
+}
+
+.existing-hdoc-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.existing-hdoc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #d9d9d9;
+  color: #bbbbbb;
+}
+
+.existing-hdoc-btn.primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #ffffff;
+}
+
+.existing-hdoc-btn.primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* 表单区域 */
+.existing-hdoc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #e8e8e8;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* 表单行 */
+.existing-hdoc-form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 运算符选择器包装 */
+.existing-hdoc-operator-wrapper {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+/* 运算符选择器（参照 UD08 页面风格） */
+.existing-hdoc-operator-select {
+  width: 100%;
+  padding: 4px 2px;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+  border-radius: 0;
+  outline: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  height: 26px;
+}
+
+.existing-hdoc-operator-select:focus {
+  border-color: #666666;
+}
+
+/* 表单标签 */
+.existing-hdoc-form-label {
+  width: 150px;
+  text-align: left;
+  font-size: 14px;
+  color: #333333;
+  flex-shrink: 0;
+}
+
+/* 必填标记 */
+.existing-hdoc-form-label.required::after {
+  content: ' *';
+  color: #ff4d4f;
+}
+
+/* 表单控件包装 */
+.existing-hdoc-form-control {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* 文本输入框 */
+.existing-hdoc-input {
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+}
+
+.existing-hdoc-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 下拉选择框 */
+.existing-hdoc-select {
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.existing-hdoc-select:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 搜索结果计数 */
+.existing-hdoc-count {
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+/* 表格包装 */
+.existing-hdoc-table-wrapper {
+  margin-top: 10px;
+}
+
+/* 数据表格 */
+.existing-hdoc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #e8e8e8;
+}
+
+.existing-hdoc-table th {
+  background-color: #fafafa;
+  color: #333333;
+  font-weight: bold;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.existing-hdoc-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333333;
+  vertical-align: top;
+}
+
+.existing-hdoc-table tr:hover {
+  background-color: #e6f7ff;
+  cursor: pointer;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .existing-hdoc-container {
+    padding: 16px;
+  }
+
+  .existing-hdoc-button-group {
+    flex-direction: column;
+  }
+
+  .existing-hdoc-btn {
+    width: 100%;
+  }
+
+  .existing-hdoc-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .existing-hdoc-form-label {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .existing-hdoc-form-control {
+    width: 100%;
+  }
+}

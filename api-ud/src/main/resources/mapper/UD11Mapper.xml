@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD11Mapper">
+
+    <!-- HDOC_VARIABLES 结果映射 -->
+    <resultMap id="HdocVariableMap" type="com.web.app.domain.entity.HdocVariable">
+        <id column="VARIABLE" property="variable"/>
+        <result column="TYPE" property="type"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="USERID" property="userid"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- UD11Search: 根据搜索条件查询HDOC_VARIABLES变量定义列表 -->
+    <!-- 对应全体APIのプロンプト.txt 【UD11HdocvariablesApi】 5.1 查询语句 -->
+    <!-- Variable、Type字段使用等值匹配（= 或 !=） -->
+    <!-- Description、Created by user字段使用LIKE/NOT LIKE模糊匹配 -->
+    <!-- Date字段支持 =, >, < 比较运算符 -->
+    <select id="searchHdocVariables" resultMap="HdocVariableMap"
+            parameterType="com.web.app.domain.UD10SearchRequest">
+        SELECT VARIABLE, TYPE, DESCRIPTION, USERID,
+               REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM HDOC_VARIABLES
+        WHERE 1=1
+        <!-- Variable: 等值匹配（= 或 !=） -->
+        <if test="request.variable != null and request.variable != ''">
+            <choose>
+                <when test="request.variableOp == '!='">
+                    AND VARIABLE != #{request.variable}
+                </when>
+                <otherwise>
+                    AND VARIABLE = #{request.variable}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Type: 等值匹配（= 或 !=） -->
+        <if test="request.type != null and request.type != ''">
+            <choose>
+                <when test="request.typeOp == '!='">
+                    AND TYPE != #{request.type}
+                </when>
+                <otherwise>
+                    AND TYPE = #{request.type}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Description: 模糊匹配（LIKE 或 NOT LIKE） -->
+        <if test="request.description != null and request.description != ''">
+            <choose>
+                <when test="request.descriptionOp == '!='">
+                    AND DESCRIPTION NOT LIKE CONCAT('%', #{request.description}, '%')
+                </when>
+                <otherwise>
+                    AND DESCRIPTION LIKE CONCAT('%', #{request.description}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Created by user(userid): 模糊匹配（LIKE 或 NOT LIKE） -->
+        <if test="request.userid != null and request.userid != ''">
+            <choose>
+                <when test="request.useridOp == '!='">
+                    AND USERID NOT LIKE CONCAT('%', #{request.userid}, '%')
+                </when>
+                <otherwise>
+                    AND USERID LIKE CONCAT('%', #{request.userid}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Date(registerDatetime): 日期时间字符串比较（支持 =, >, < 三种） -->
+        <if test="request.registerDatetime != null and request.registerDatetime != ''">
+            <choose>
+                <when test="'GT'.equals(request.registerDatetimeOp)">
+                    AND REGISTER_DATETIME &gt; #{request.registerDatetime}
+                </when>
+                <when test="'LT'.equals(request.registerDatetimeOp)">
+                    AND REGISTER_DATETIME &lt; #{request.registerDatetime}
+                </when>
+                <otherwise>
+                    AND REGISTER_DATETIME = #{request.registerDatetime}
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY VARIABLE
+    </select>
+
+</mapper>

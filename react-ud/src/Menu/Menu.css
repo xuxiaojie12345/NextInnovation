@@ -1,76 +1,191 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
+/* Menu 整体布局 */
+.menu-layout {
+  height: 100vh;
+  min-height: 100vh;
 }
 
+/* 左侧 Sider 菜单区 */
+.menu-sider {
+  background: #001529;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 菜单头部-系统标题区域 */
 .menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-title {
+  text-align: center;
+  width: 100%;
+}
+
+.menu-user-info {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 菜单树容器 */
+.menu-tree-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.menu-tree-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.menu-tree-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* 菜单树样式 */
+.menu-tree {
+  border-right: none;
+  background: transparent;
+}
+
+/* 一级菜单样式 */
+.menu-tree .ant-menu-submenu-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 二级菜单样式 */
+.menu-tree .ant-menu-item {
+  font-size: 13px;
+  height: 40px;
+  line-height: 40px;
+  margin: 2px 0;
+}
+
+/* 选中菜单项高亮（对应详细设计 6.实现注意事项-UI细节） */
+.menu-tree .ant-menu-item-selected {
+  background-color: #1677ff !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.menu-tree .ant-menu-item-selected::after {
+  border-right: 3px solid #1677ff;
+}
+
+/* 菜单折叠按钮区域 */
+.menu-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 0;
   text-align: center;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
+.menu-collapse-btn {
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 16px;
+  transition: color 0.3s;
 }
 
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
+.menu-collapse-btn:hover {
+  color: #fff;
 }
 
-.menu-content {
-  padding: 0;
+/* 右侧内容区域布局 */
+.menu-content-layout {
+  background: #f5f5f5;
 }
 
-.menu-section {
-  border-bottom: 1px solid #ccc;
-}
-
-.menu-section:last-child {
-  border-bottom: none;
-}
-
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
-}
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu-item {
+/* 右侧 Header */
+.menu-content-header {
+  background: #fff;
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  justify-content: space-between;
+  height: 48px;
+  line-height: 48px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-collapse-trigger {
+  font-size: 18px;
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  color: #595959;
+  transition: color 0.3s;
 }
 
-.menu-item:hover {
-  background-color: #d5e3f0;
+.header-collapse-trigger:hover {
+  color: #1677ff;
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
+.header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
 }
 
-.menu-label {
-  flex: 1;
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-logout {
+  color: #1677ff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.header-logout:hover {
+  color: #1677ff;
+  text-decoration: underline;
+}
+
+/* 右侧内容区（对应详细设计2.2 右侧内容区） */
+.menu-content {
+  margin: 16px;
+  padding: 0;
+  background: #fff;
+  border-radius: 4px;
+  min-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .menu-sider {
+    position: absolute;
+    z-index: 100;
+    height: 100vh;
+  }
+
+  .menu-content {
+    margin: 8px;
+    min-height: calc(100vh - 64px);
+  }
+
+  .menu-content-header {
+    padding: 0 12px;
+  }
+
+  .header-title {
+    display: none;
+  }
 }

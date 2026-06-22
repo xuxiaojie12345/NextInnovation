@@ -4,7 +4,7 @@
   align-items: center;
   height: 100vh;
   background-color: #f0f2f5;
-  background-image: url("/src/fTRYDXFAD.jpeg");
+  background-image: url("../doc/image/UD01.jpeg");
   /* 建议改为 cover 以适配不同分辨率屏幕 */
   background-size: cover;
   background-position: center center;
@@ -23,11 +23,43 @@
   position: relative;
 }
 
-.login-header h2 {
+/* 系统标题样式 */
+.login-header {
   text-align: center;
+  margin-bottom: 20px;
+}
+
+.system-title {
+  font-size: 24px;
   color: #333;
-  margin-bottom: 30px;
-  margin-top: 0;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+.title-edb {
+  font-weight: 700;
+}
+
+.system-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* 支持信息样式 */
+.support-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.support-info p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+  text-align: left;
 }
 
 .form-group {
@@ -59,6 +91,30 @@
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
+/* 输入框错误状态样式 - 对应设计书 6.3.2 */
+.input-error {
+  border-color: #ff4444 !important;
+}
+
+.input-error:focus {
+  border-color: #ff4444 !important;
+  box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2) !important;
+}
+
+/* 错误消息样式 - 对应设计书 6.3.2 */
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 1px 1px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #fcc;
+  margin-bottom: 10px;
+  word-break: break-word;
+  min-height: 30px !important;
+}
+
 .login-button {
   width: 100%;
   padding: 12px;
@@ -81,4 +137,23 @@
 .login-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* 备用登录链接提示样式 */
+.maintenance-info {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.maintenance-info p {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 6px 0;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.maintenance-info p:last-child {
+  margin-bottom: 0;
 }

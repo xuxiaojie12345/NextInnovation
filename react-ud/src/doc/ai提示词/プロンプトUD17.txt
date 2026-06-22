@@ -1,0 +1,425 @@
+请根据以下要求生成HDoc用户管理页面的详细设计文档：
+
+## 1. 基本信息
+- **模块名称**：HDocUserAdministrationPage
+- **文档编号**: DES-HDocUserAdministrationPage-001
+- **作成日期**：2026-05-20
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于管理用户权限，主要功能包括：
+- 输入用户ID查询用户信息和权限
+- 从Saviynt系统获取用户名
+- 从HDOC_FUNCTION_AUTH表获取用户功能权限
+- 更新用户权限配置
+- 删除用户所有权限
+
+### 面向的用户群体
+需要管理用户权限的系统管理员
+
+### 用户体验考虑
+- 清晰的权限配置界面
+- 明确的错误提示信息
+- 支持快速更新和删除权限操作
+
+### 安全性要求
+- 用户ID必须存在于系统中才能执行操作
+- 防止未授权的权限修改
+- 支持HTTPS安全传输
+
+## 3. 画面项目定义 (Screen Parameters)
+
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | UserID | TextField | Y | 10 | Input | - | 左 | 空 | 活性 | 用户ID输入框 |
+| 2   | User Info | Button | - | - | Action | - | 中 | - | 活性 | 查询用户信息和权限 |
+| 3   | User | Label | - | - | Output | - | 左 | - | 活性 | 显示从Saviynt获取的用户名 |
+| 4   | Standard User | Checkbox | - | - | Input | - | 左 | - | 活性 | 标准用户权限复选框 |
+| 5   | Market | Pull-down List | - | - | Input | - | 左 | -EU | 活性 | Standard User对应的市场下拉列表，默认显示-EU |
+| 6   | Rule Admin | Checkbox | - | - | Input | - | 左 | - | 活性 | 规则管理员权限复选框 |
+| 7   | Market | Pull-down List | - | - | Input | - | 左 | - | 活性 | Rule Admin对应的市场下拉列表，从MARKET_MASTER表获取 |
+| 8   | Template Admin | Checkbox | - | - | Input | - | 左 | - | 活性 | 模板管理员权限复选框 |
+| 9   | Market | Pull-down List | - | - | Input | - | 左 | - | 活性 | Template Admin对应的市场下拉列表，从MARKET_MASTER表获取 |
+| 10  | Document Auth Admin | Checkbox | - | - | Input | - | 左 | - | 活性 | 文档认证管理员权限复选框 |
+| 11  | Market | Pull-down List | - | - | Input | - | 左 | - | 活性 | Document Auth Admin对应的市场下拉列表，从MARKET_MASTER表获取 |
+| 12  | User Admin | Checkbox | - | - | Input | - | 左 | - | 活性 | 用户管理员权限复选框 |
+| 13  | Adaptation user | Checkbox | - | - | Input | - | 左 | - | 活性 | 适配用户权限复选框 |
+| 14  | Market | Pull-down List | - | - | Input | - | 左 | -EU | 活性 | Adaptation user对应的市场下拉列表，默认显示-EU |
+| 15  | Manage Variable List | Checkbox | - | - | Input | - | 左 | - | 活性 | 管理变量列表权限复选框 |
+| 16  | Market Super User | Pull-down List | - | - | Input | - | 左 | - | 活性 | 市场超级用户下拉列表 |
+| 17  | Market | Pull-down List | - | - | Input | - | 左 | - | 活性 | Market Super User对应的市场下拉列表，从MARKET_MASTER表获取 |
+| 18  | Update Role | Button | - | - | Action | - | 中 | - | 活性 | 更新用户权限 |
+| 19  | Delete Role | Button | - | - | Action | - | 中 | - | 活性 | 删除用户所有权限 |
+
+**控件说明**：
+- Input控件：UserID文本框、Standard User复选框、Market下拉列表（多个）、Rule Admin复选框、Template Admin复选框、Document Auth Admin复选框、User Admin复选框、Adaptation user复选框、Manage Variable List复选框、Market Super User下拉列表
+- Output控件：User标签（显示用户名）
+- Action控件：User Info按钮、Update Role按钮、Delete Role按钮
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 页面初始化功能
+**功能说明**：页面加载时获取市场列表数据
+
+**操作步骤**：
+1. 页面加载时，调用**UD17HDocUserAdministrationApi**的**getMarketList**方法（GET `/api/ud17/markets`）获取市场列表
+2. API返回成功后，将市场数据填充到所有Market下拉列表中
+3. Standard User对应的Market下拉列表默认选择-EU
+4. Adaptation user对应的Market下拉列表默认选择-EU
+5. 其他Market下拉列表保持为空或第一个选项
+
+### 4.2 查询用户信息功能
+**功能说明**：用户输入UserID后点击User Info按钮，系统查询用户信息和权限
+
+**操作步骤**：
+1. 用户在UserID字段输入用户ID
+2. 用户点击User Info按钮
+3. 系统执行前端校验（必填项检查）
+4. 若前端校验通过，调用UD17HDocUserAdministrationApi的UD17Userinfo功能
+5. 从Saviynt系统获取用户名并显示在User标签中
+6. 从HDOC_FUNCTION_AUTH表获取用户功能权限
+7. 根据权限数据勾选对应的复选框
+8. 从DOC_MARKET_AUTH表获取用户市场权限
+9. 根据市场权限数据设置对应的Market下拉列表
+10. 若用户ID不存在，显示错误消息"We didn't recognize the userid you entered. Please try again."
+
+### 4.3 更新权限功能
+**功能说明**：用户修改权限配置后点击Update Role按钮，系统先检查用户是否存在，存在则更新用户权限
+
+**操作步骤**：
+1. 用户修改各个权限复选框和市场下拉列表的值
+2. 用户点击Update Role按钮
+3. 系统执行前端校验（UserID必填检查）
+4. 若前端校验通过，先调用UD17HDocUserAdministrationApi的UD17Userinfo功能检查UserID是否存在
+5. 若UserID不存在：显示错误消息"We didn't recognize the userid you entered. Please try again."，终止流程
+6. 若UserID存在：调用UD17HDocUserAdministrationApi的UD17UpdateRole功能更新权限
+7. 系统将权限数据更新到HDOC_FUNCTION_AUTH表和DOC_MARKET_AUTH表
+8. 更新成功后显示成功消息
+
+### 4.4 删除权限功能
+**功能说明**：用户点击Delete Role按钮，系统删除该用户的所有权限
+
+**操作步骤**：
+1. 用户点击Delete Role按钮
+2. 系统执行前端校验（UserID必填检查）
+3. 若前端校验通过，调用UD17HDocUserAdministrationApi的UD17DeleteRole功能
+4. 系统从HDOC_FUNCTION_AUTH表中删除该用户的所有功能权限记录
+5. 系统从DOC_MARKET_AUTH表中删除该用户的所有市场权限记录
+6. 删除成功后显示成功消息
+7. 清空页面上的所有权限配置（复选框取消勾选，Market下拉列表重置）
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 页面初始化流程
+**开始**：页面加载
+
+**处理步骤**：
+- 调用**UD17HDocUserAdministrationApi**的**getMarketList**方法（GET `/api/ud17/markets`）获取市场列表
+- 等待API响应
+- **成功**：
+  - 将所有Market下拉列表填充市场数据
+  - Standard User对应的Market下拉列表默认选择-EU
+  - Adaptation user对应的Market下拉列表默认选择-EU
+- **失败**：
+  - 显示错误消息"Failed to load market data. Please try again."
+
+#### 5.1.2 User Info处理流程
+**开始**：用户点击User Info按钮
+
+**前置处理**：
+- 获取UserID字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若UserID为空：
+  - 设置Error message = "UserID is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用UD17HDocUserAdministrationApi的UD17Userinfo功能
+- 请求参数包含userid
+- 等待API响应
+
+**结果处理**：
+- **成功（用户ID存在）**：
+  - 从响应中获取用户名，显示在User标签中
+  - 从响应中获取功能权限列表
+  - 根据功能权限勾选对应的复选框（Standard User、Rule Admin、Template Admin、Document Auth Admin、User Admin、Adaptation user、Manage Variable List）
+  - 从响应中获取市场权限列表
+  - 根据市场权限设置对应的Market下拉列表
+  - Market Super User下拉列表设置为对应的值
+  
+- **失败（用户ID不存在）**：
+  - 设置Error message = "We didn't recognize the userid you entered. Please try again."
+  - Error message显示为Error级别
+  - 清空User标签和所有权限配置
+  
+- **服务器错误**：
+  - 设置Error message = "System error. Please contact administrator."
+  - Error message显示为Error级别
+  - 保持当前页面
+
+#### 5.1.3 Update Role处理流程
+**开始**：用户点击Update Role按钮
+
+**前置处理**：
+- 获取UserID字段的当前值
+- 获取所有权限复选框的状态
+- 获取所有Market下拉列表的选中值
+- 获取Market Super User下拉列表的选中值
+
+**前端校验 (Frontend Check)**：
+- 若UserID为空：
+  - 设置Error message = "UserID is required."
+  - 终止流程，不调用API
+
+**存在性检查 (Backend Check)**：
+- 先调用UD17HDocUserAdministrationApi的UD17Userinfo功能，检查UserID是否存在
+- 若UserID不存在：
+  - 设置Error message = "We didn't recognize the userid you entered. Please try again."
+  - Error message显示为Error级别
+  - 终止流程，不执行更新
+
+**API调用 (Backend Check)**：
+- 若存在性检查通过，调用UD17HDocUserAdministrationApi的UD17UpdateRole功能
+- 请求参数包含userid、功能权限列表、市场权限列表
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 将功能权限数据更新到HDOC_FUNCTION_AUTH表
+  - 将市场权限数据更新到DOC_MARKET_AUTH表
+  - 显示成功消息"Role updated successfully."
+  - 清空Error message区域
+  
+- **失败（用户ID不存在）**：
+  - 设置Error message = "We didn't recognize the userid you entered. Please try again."
+  - Error message显示为Error级别
+  - 保持当前页面
+  
+- **服务器错误**：
+  - 设置Error message = "System error. Please contact administrator."
+  - Error message显示为Error级别
+  - 保持当前页面
+
+#### 5.1.4 Delete Role处理流程
+**开始**：用户点击Delete Role按钮
+
+**前置处理**：
+- 获取UserID字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若UserID为空：
+  - 设置Error message = "UserID is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用UD17HDocUserAdministrationApi的UD17DeleteRole功能
+- 请求参数包含userid
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 从HDOC_FUNCTION_AUTH表中删除该用户的所有功能权限记录
+  - 从DOC_MARKET_AUTH表中删除该用户的所有市场权限记录
+  - 显示成功消息"Role deleted successfully."
+  - 清空User标签
+  - 取消勾选所有权限复选框
+  - 重置所有Market下拉列表（Standard User和Adaptation user对应的Market恢复为-EU，其他恢复为空）
+  - 重置Market Super User下拉列表
+  
+- **失败（用户ID不存在）**：
+  - 设置Error message = "We didn't recognize the userid you entered. Please try again."
+  - Error message显示为Error级别
+  - 保持当前页面
+  
+- **服务器错误**：
+  - 设置Error message = "System error. Please contact administrator."
+  - Error message显示为Error级别
+  - 保持当前页面
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击User Info按钮时 | UserID | 值为空字符串或未填写 | "UserID is required." | 显示错误消息，终止流程，不调用API |
+| 2 | 点击Update Role按钮时 | UserID | 值为空字符串或未填写 | "UserID is required." | 显示错误消息，终止流程，不调用API |
+| 3 | 点击Delete Role按钮时 | UserID | 值为空字符串或未填写 | "UserID is required." | 显示错误消息，终止流程，不调用API |
+| 4 | User Info API调用后 | 用户ID存在性 | API返回用户ID不存在 | "We didn't recognize the userid you entered. Please try again." | 显示Error级别消息，清空用户信息和权限配置 |
+| 5 | Update Role前存在性检查 | 用户ID存在性 | UserID不存在 | "We didn't recognize the userid you entered. Please try again." | 显示Error级别消息，终止流程，不执行更新 |
+| 6 | Update Role API调用后 | 用户ID存在性 | API返回用户ID不存在 | "We didn't recognize the userid you entered. Please try again." | 显示Error级别消息，保持当前页面 |
+| 7 | Delete Role API调用后 | 用户ID存在性 | API返回用户ID不存在 | "We didn't recognize the userid you entered. Please try again." | 显示Error级别消息，保持当前页面 |
+| 8 | API调用后 | 网络/服务器 | API返回500或其他错误状态码 | "System error. Please contact administrator." | 显示Error级别消息，保持当前页面 |
+
+## 6. 接口定义 (API Specification)
+
+### getMarketList API
+**功能**：获取市场列表数据
+
+**Method**：GET
+
+**Endpoint**：/api/ud17/markets
+
+**Request**：无请求参数
+
+**Response Success (200)**：
+```json
+[
+  {
+    "market": "string",
+    "description": "string"
+  }
+]
+
+**Response Error (500)**：
+```json
+{
+  "message": "Internal server error"
+}
+```
+
+### UD17HDocUserAdministrationApi
+**功能**：管理用户权限，包括查询用户信息、更新权限、删除权限
+
+**Method**：POST
+
+**Endpoint**：/api/ud17/UD17HDocUserAdministrationApi
+
+**Request - UD17Userinfo操作**：
+```json
+{
+  "userid": "string",
+  "operation": "userinfo"
+}
+```
+
+**Request - UD17UpdateRole操作**：
+```json
+{
+  "userid": "string",
+  "operation": "updateRole",
+  "functionAuth": [
+    {
+      "function": "string"
+    }
+  ],
+  "marketAuth": [
+    {
+      "market": "string",
+      "type": "string",
+      "bu": "string"
+    }
+  ]
+}
+```
+
+**Request - UD17DeleteRole操作**：
+```json
+{
+  "userid": "string",
+  "operation": "deleteRole"
+}
+
+**Response Success (200) - userinfo操作**：
+```json
+{
+  "success": true,
+  "username": "string",
+  "functionAuth": [
+    {
+      "function": "string"
+    }
+  ],
+  "marketAuth": [
+    {
+      "market": "string",
+      "type": "string",
+      "bu": "string"
+    }
+  ]
+}
+
+**Response Success (200) - updateRole操作**：
+```json
+{
+  "success": true,
+  "message": "Role updated successfully."
+}
+```
+
+**Response Success (200) - deleteRole操作**：
+```json
+{
+  "success": true,
+  "message": "Role deleted successfully."
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "success": false,
+  "message": "We didn't recognize the userid you entered. Please try again."
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "success": false,
+  "message": "Internal server error"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络连接失败 | 捕获网络异常，显示通用错误消息 | "System error. Please contact administrator." |
+| API超时 | 设置超时时间（建议10秒），超时后显示错误 | "System error. Please contact administrator." |
+| getMarketList API失败 | 显示加载市场数据失败消息 | "Failed to load market data. Please try again." |
+| UD17HDocUserAdministrationApi返回404 | 显示用户ID不存在消息 | "We didn't recognize the userid you entered. Please try again." |
+| UD17HDocUserAdministrationApi返回500 | 显示系统错误消息 | "System error. Please contact administrator." |
+| JSON解析失败 | 捕获解析异常，显示系统错误 | "System error. Please contact administrator." |
+| 未预期的JavaScript错误 | 使用try-catch包裹关键代码，记录错误日志，显示系统错误 | "System error. Please contact administrator." |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有章节标题使用中文
+- 表格内容使用中文
+- 技术术语可保留英文（如API、TextField、Button等）
+- 错误消息和成功消息使用英文（与现有系统保持一致）
+- 保持与参考文档相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD17_详细设计.md
+
+## 补充事项
+- 参照img/UD17.png查看布局页面
+- 页面标题显示为"EDB Engineering Database - HDoc User Administration"
+- 路由路径为/HDocUserAdministration
+- 数据来源：
+  - Saviynt系统：获取用户名
+  - MARKET_MASTER表：获取市场列表
+  - HDOC_FUNCTION_AUTH表：存储和查询用户功能权限
+  - DOC_MARKET_AUTH表：存储和查询用户市场权限
+- 权限类型说明：
+  - Standard User：标准用户
+  - Rule Admin：规则管理员
+  - Template Admin：模板管理员
+  - Document Auth Admin：文档认证管理员
+  - User Admin：用户管理员
+  - Adaptation user：适配用户
+  - Manage Variable List：管理变量列表
+  - Market Super User：市场超级用户
+- Standard User和Adaptation user对应的Market下拉列表默认显示-EU
+- 其他Market下拉列表从MARKET_MASTER表获取数据
+- 所有操作都需要先验证用户ID是否存在
+- 用户ID不存在时显示Error级别的错误消息
+- 操作成功后应显示相应的成功消息
+- Delete Role操作会删除用户的所有功能权限和市场权限

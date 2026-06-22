@@ -1,0 +1,163 @@
+请根据以下要求生成Market Document Settings的详细设计文档：
+
+1.基本信息
+   文档编号:DES-UD20-1-001
+   模块名称:Market Document Settings（市场文档设置）
+   作成日:2026-06-03
+
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：实现市场文档设置功能，用户可以通过检索功能跳转到Market Document Settings List画面，选择一条记录并返回。还可以清空输入的信息、返回上级画面，以及更新现有的市场文档信息。
+  面向的用户群体：HDoc系统用户、需要管理市场文档配置的业务人员、系统管理员
+  用户体验方面的考虑：提供简洁直观的搜索界面，支持从前画面跳转到后画面并能携带查询条件，同时提供清空和返回功能，确保用户操作便捷 
+  安全性或特殊要求：用户需要具备相应的文档管理权限才能进行更新操作
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+  No		项目名				类别			必须		MaxLength			数据源_表				数据源_项目				I/O		允许文字					字符配置			初始值			显示控制			备注						
+  1		title				lable			-		-			-				-				Output		-					左			-			-			固定表示：HDoc - Market Document Settings
+  2		Document type				textfield			-		20			HDOC_DOCUMENT_LIST				DOCTYPE				Input		-					左			-			-			Update Mode时必须
+  3		Bussines unit				textfield			-		-			-				-				Input		-					左			-			-			固定表示：BU
+  4		User			textfield			-		16			HDOC_DOCUMENT_LIST				REGISTER_USER				Input		-					左			空			活性				
+  5		Date				textfield			-		-			HDOC_DOCUMENT_LIST				REGISTER_DATETIME				Input		-					左			空			活性			
+  6		Search				button			-		-			-				-				-		-					-			-			活性			
+  7		Clear				button			-		-			-				-				-		-					-			-			活性			
+  8		Back				button			-		-			-				-				-		-					-			-			活性			
+  9		Update Mode				button			-		-			-				-				-		-					-			-			活性			
+
+4. 功能描述 (Functional Description)
+  4.1 初期表示
+    功能说明：画面加载时显示初始表单页面，包含所有输入控件和按钮。从Market Document Settings List返回时，显示检索的结果和条件。
+    操作步骤：
+      1. 画面加载
+      2. 接收Market Document Settings List画面返回的结果和条件
+      3. 渲染画面
+  
+  4.2 Search 功能
+    功能说明：传递画面上的检索条件（可以一个多个或者空），跳转到Market Document Settings List画面
+    操作步骤：
+      1. 用户在表单中输入检索条件
+      2. 用户点击Search按钮
+      3. 系统获取画面中的检索条件（可以为空）
+      4. 传递这些参数并跳转到Market Document Settings List画面 
+
+  4.3 Back 功能
+    功能说明：点击Back按钮返回到前一个页面（不携带选择数据）
+    操作步骤：
+      1. 用户点击Back按钮
+      2. 返回到前一个页面
+
+  4.4 Clear 功能
+    功能说明：清除输入的检索条件内容
+    操作步骤：
+      1. 用户点击Clear按钮
+      2. 清空表单检索条件
+
+  4.5 Update Mode 功能
+    功能说明：更新现有的市场文档信息
+    操作步骤：
+      1. 输入需要更新的市场文档信息
+      2. 点击Update Mode按钮                                                                                                                                                                                                                                                                                                                                     
+      3. check验证
+      4. 调用API更新对应的HDOC_DOCUMENT_LIST表中的数据
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+  5.1 处理流程
+    5.1.1 初期表示处理：
+      开始：画面加载，显示页面标题"HDoc - Market Document Settings"
+      前置处理：需要判断初期化场合和后画面返回的场合；后画面返回时需要判断是后画面的Select按钮按下返回还是Back按钮按下返回
+      空值校验等 (Frontend Check)：无
+
+      API调用 (Backend Check)：无
+      结果处理：
+       初期化场合，显示初始画面；后画面返回的场合，接收传过来的数据并渲染画面
+
+    5.1.2 Search 处理：
+      开始：用户点击Search按钮 
+      前置处理：输入检索条件，点击Search按钮
+      空值校验等 (Frontend Check)：无
+      API调用 (Backend Check)：无
+        
+      结果处理：携带参数跳转到Market Document Settings List画面
+
+    5.1.3 Back处理：
+      开始：用户点击Back按钮
+      前置处理：无
+      空值校验等 (Frontend Check)：无
+      API调用 (Backend Check)：无 
+      结果处理：
+       成功：返回前页面
+
+    5.1.4 Clear处理：
+      开始：用户点击Clear按钮
+      前置处理：无
+      空值校验等 (Frontend Check)：无
+      API调用 (Backend Check)：无 
+      结果处理：清空输入的检索条件
+
+    5.1.5 Update Mode处理：
+      开始：用户点击Update Mode按钮
+      前置处理：获取输入的内容数据，点击Update Mode按钮
+      空值校验等 (Frontend Check)：Document type非空检验，数据唯一性检验
+
+      API调用 (Backend Check)：
+        调用API更新对应的HDOC_DOCUMENT_LIST表数据
+      结果处理：
+       成功：成功显示提示“更新成功”
+       失败：显示错误消息“更新失败”
+
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | Update Mode按钮点击 | Document type | Document type未选择 | Document type不能为空 | 显示错误消息终止流程 |
+   | 2 | Update Mode按钮点击 | Document type | Document type在表中不存在 | "Document type does not exists. Please enter the correct content." | 显示错误消息，终止流程  |
+
+6. 接口定义 (API Specification)
+  6.1 UD20-1UpdateHdocDocumentList
+     功能：获取市场文档设置列表信息
+     Method：GET
+     Endpoint：/api/ud20-1/UpdateHdocDocumentList
+
+     Request [请求格式]
+     {
+      "doctype":string,
+      "user":string,
+      "date":string
+     }
+
+     Response Success (200)
+     {
+       "status": "success",
+       "message": "更新成功"
+     }
+
+     Response Error (404)
+     {
+       "status": "error",
+       "message": "Document type does not exists. Please enter the correct content."
+     }
+
+     Response Error (500)
+     {
+       "status": "error",
+       "message": "更新失败"
+     }
+
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 数据库连接失败 | 记录错误日志，显示友好提示 | 系统暂时不可用，请联系管理员 |
+| API更新数据失败 | 显示空状态提示 | 文件类型不存在，请输入正确的内容 |
+| 更新操作失败 | 显示错误提示 | 更新失败 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：UD20-1_Market Document Setting_詳細設計.md
+  保存到：当前文件夹下的work目录

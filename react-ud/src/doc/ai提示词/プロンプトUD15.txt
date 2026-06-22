@@ -1,0 +1,522 @@
+请根据以下要求生成Vin Plate页面的详细设计文档：
+
+## 1. 基本信息
+- **模块名称**：VinPlatePage
+- **文档编号**: DES-VinPlatePage-001
+- **作成日期**：2026-05-20
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于查看和管理车辆底盘相关信息，主要功能包括：
+- 输入底盘号查询VIN Plate详细信息
+- 更新底盘状态为"0"（新規追加）
+- 更新底盘状态为"1"（xml doc 作成済み）
+- 将底盘状态更新为"0"并设置TYPE为"1"（basic）
+- 将底盘状态更新为"0"并设置TYPE为"2"（ADVANCED with weights）
+
+### 面向的用户群体
+需要管理和维护车辆底盘信息的授权用户，如数据管理员、质量管理人员等
+
+### 用户体验考虑
+- 简洁的操作界面，五个功能按钮清晰明了
+- 明确的错误提示信息
+- 快速的状态更新操作
+
+### 安全性要求
+- 底盘号必须存在于系统中才能执行操作
+- 防止非法字符输入
+- 支持HTTPS安全传输
+
+## 3. 画面项目定义 (Screen Parameters)
+
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis number | TextField | - | 15 | Input | - | 左 | 空 | 活性 | 底盘号输入框 |
+| 2   | View Info | Button | - | - | Action | - | 中 | - | 活性 | 查看VIN Plate详细信息 |
+| 3   | Set Regenerate | Button | - | - | Action | - | 中 | - | 活性 | 将底盘状态更新为"0"（新規追加） |
+| 4   | Set OK | Button | - | - | Action | - | 中 | - | 活性 | 将底盘状态更新为"1"（xml doc 作成済み） |
+| 5   | Change to Basic Info | Button | - | - | Action | - | 中 | - | 活性 | 将状态更新为"0"，TYPE更新为"1"（basic） |
+| 6   | Change to Advanced Info | Button | - | - | Action | - | 中 | - | 活性 | 将状态更新为"0"，TYPE更新为"2"（ADVANCED with weights） |
+| 7   | Chassis number | Label | - | - | Output | - | 左 | - | - | 显示当前输入的底盘号 |
+| 8   | Type | Label | - | 10 | Output | - | 左 | - | viewInfo成功后显示 | VIN Plate的类型（1=basic / 2=ADVANCED with weights） |
+| 9   | Status | Label | - | 10 | Output | - | 左 | - | viewInfo成功后显示 | VIN Plate的状态（0=新規追加 / 1=xml doc 作成済み） |
+| 10  | MSG | Label | - | 256 | Output | - | 左 | - | viewInfo成功后显示 | 消息文本 |
+| 11  | Register Datetime | Label | - | 20 | Output | - | 左 | - | viewInfo成功后显示 | 注册日期时间 |
+| 12  | DOC_READY | Label | - | 10 | Output | - | 左 | - | viewInfo成功后显示 | 文档就绪标志 |
+| 13  | DOC_SENT | Label | - | 10 | Output | - | 左 | - | viewInfo成功后显示 | 文档发送标志 |
+| 14  | XML_DOC | Label | - | 100 | Output | - | 左 | - | viewInfo成功后显示 | XML文档信息 |
+
+**控件说明**：
+- Input控件：Chassis number文本框
+- Output控件：Chassis number标签、Type标签、Status标签、MSG标签、Register Datetime标签、DOC_READY标签、DOC_SENT标签、XML_DOC标签
+- Action控件：View Info按钮、Set Regenerate按钮、Set OK按钮、Change to Basic Info按钮、Change to Advanced Info按钮
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 查看VIN Plate信息功能
+**功能说明**：用户输入底盘号后点击View Info按钮，系统查询并显示VIN Plate详细信息
+
+**操作步骤**：
+1. 用户在Chassis number字段输入底盘号
+2. 用户点击View Info按钮
+3. 系统调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ViewInfo** 方法（operation=viewInfo）
+4. 若底盘号存在，将API返回的TYPE、STATUS、MSG、REGISTER_DATETIME、DOC_READY、DOC_SENT、XML_DOC分别显示到对应的Label控件
+5. 若底盘号不存在，显示警告消息"Chassis number XXX not found."，清空各显示字段
+
+### 4.2 设置为再生成功能
+**功能说明**：用户输入底盘号后点击Set Regenerate按钮，系统将底盘状态更新为"0"（新規追加）
+
+**操作步骤**：
+1. 用户在Chassis number字段输入底盘号
+2. 用户点击Set Regenerate按钮
+3. 系统调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15SetRegenerate** 方法（operation=setRegenerate）
+4. 系统将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"
+5. 更新成功后显示成功消息
+6. 若底盘号不存在，显示警告消息"Chassis number XXX not found."
+
+### 4.3 设置为OK功能
+**功能说明**：用户输入底盘号后点击Set OK按钮，系统将底盘状态更新为"1"（xml doc 作成済み）
+
+**操作步骤**：
+1. 用户在Chassis number字段输入底盘号
+2. 用户点击Set OK按钮
+3. 系统调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15SetOK** 方法（operation=setOK）
+4. 系统将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"1"
+5. 更新成功后显示成功消息
+6. 若底盘号不存在，显示警告消息"Chassis number XXX not found."
+
+### 4.4 变更为基本信息功能
+**功能说明**：用户输入底盘号后点击Change to Basic Info按钮，系统将底盘状态更新为"0"，TYPE更新为"1"（basic）
+
+**操作步骤**：
+1. 用户在Chassis number字段输入底盘号
+2. 用户点击Change to Basic Info按钮
+3. 系统调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ChangetoBasicInfo** 方法（operation=changeToBasicInfo）
+4. 系统将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"，Type字段更新为"1"
+5. 更新成功后显示成功消息
+6. 若底盘号不存在，显示警告消息"Chassis number XXX not found."
+
+### 4.5 变更为高级信息功能
+**功能说明**：用户输入底盘号后点击Change to Advanced Info按钮，系统将底盘状态更新为"0"，TYPE更新为"2"（ADVANCED with weights）
+
+**操作步骤**：
+1. 用户在Chassis number字段输入底盘号
+2. 用户点击Change to Advanced Info按钮
+3. 系统调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ChangetoAdvancedInfo** 方法（operation=changeToAdvancedInfo）
+4. 系统将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"，Type字段更新为"2"
+5. 更新成功后显示成功消息
+6. 若底盘号不存在，显示警告消息"Chassis number XXX not found."
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 View Info处理流程
+**开始**：用户点击View Info按钮
+
+**前置处理**：
+- 获取Chassis number字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若Chassis number为空：
+  - 设置Error message = "Chassis number is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ViewInfo** 方法
+- 请求参数包含chassisNumber，operation="viewInfo"
+- 等待API响应
+
+**结果处理**：
+- **成功（底盘号存在）**：
+  - 将TYPE、STATUS、MSG、REGISTER_DATETIME、DOC_READY、DOC_SENT、XML_DOC分别显示到对应的Label控件
+  
+- **失败（底盘号不存在）**：
+  - 设置Error message = "Chassis number XXX not found."（XXX替换为实际输入的底盘号）
+  - Error message显示为Warning级别
+  - 保持当前页面
+
+#### 5.1.2 Set Regenerate处理流程
+**开始**：用户点击Set Regenerate按钮
+
+**前置处理**：
+- 获取Chassis number字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若Chassis number为空：
+  - 设置Error message = "Chassis number is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15SetRegenerate** 方法
+- 请求参数包含chassisNumber，operation="setRegenerate"
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"
+  - 显示成功消息"Status updated successfully."
+  
+- **失败（底盘号不存在）**：
+  - 设置Error message = "Chassis number XXX not found."（XXX替换为实际输入的底盘号）
+  - Error message显示为Warning级别
+  - 保持当前页面
+
+#### 5.1.3 Set OK处理流程
+**开始**：用户点击Set OK按钮
+
+**前置处理**：
+- 获取Chassis number字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若Chassis number为空：
+  - 设置Error message = "Chassis number is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15SetOK** 方法
+- 请求参数包含chassisNumber，operation="setOK"
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"1"
+  - 显示成功消息"Status updated successfully."
+  
+- **失败（底盘号不存在）**：
+  - 设置Error message = "Chassis number XXX not found."（XXX替换为实际输入的底盘号）
+  - Error message显示为Warning级别
+  - 保持当前页面
+
+#### 5.1.4 Change to Basic Info处理流程
+**开始**：用户点击Change to Basic Info按钮
+
+**前置处理**：
+- 获取Chassis number字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若Chassis number为空：
+  - 设置Error message = "Chassis number is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ChangetoBasicInfo** 方法
+- 请求参数包含chassisNumber，operation="changeToBasicInfo"
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"，Type字段更新为"1"
+  - 显示成功消息"Status and Type updated successfully."
+  
+- **失败（底盘号不存在）**：
+  - 设置Error message = "Chassis number XXX not found."（XXX替换为实际输入的底盘号）
+  - Error message显示为Warning级别
+  - 保持当前页面
+
+#### 5.1.5 Change to Advanced Info处理流程
+**开始**：用户点击Change to Advanced Info按钮
+
+**前置处理**：
+- 获取Chassis number字段的当前值
+
+**前端校验 (Frontend Check)**：
+- 若Chassis number为空：
+  - 设置Error message = "Chassis number is required."
+  - 终止流程，不调用API
+
+**API调用 (Backend Check)**：
+- 调用 **UD15SelecthdocsenddatavinplateApi** 的 **UD15ChangetoAdvancedInfo** 方法
+- 请求参数包含chassisNumber，operation="changeToAdvancedInfo"
+- 等待API响应
+
+**结果处理**：
+- **成功**：
+  - 将HDOC_SEND_DATA_VIN_PLATE表中对应底盘号的Status字段更新为"0"，Type字段更新为"2"
+  - 显示成功消息"Status and Type updated successfully."
+  
+- **失败（底盘号不存在）**：
+  - 设置Error message = "Chassis number XXX not found."（XXX替换为实际输入的底盘号）
+  - Error message显示为Warning级别
+  - 保持当前页面
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击任意按钮时 | Chassis number | 值为空字符串或未填写 | "Chassis number is required." | 显示错误消息，终止流程，不调用API |
+| 2 | API调用后 | 底盘号存在性 | API返回底盘号不存在 | "Chassis number XXX not found."（XXX为实际输入的底盘号） | 显示Warning级别消息，保持当前页面 |
+
+## 6. 接口定义 (API Specification)
+
+### UD15SelecthdocsenddatavinplateApi
+
+统一API名称空间，包含以下方法：**UD15ViewInfo**（查看VIN Plate信息）、**UD15SetRegenerate**（设置再生成）、**UD15SetOK**（设置为OK）、**UD15ChangetoBasicInfo**（变更为基本信息）、**UD15ChangetoAdvancedInfo**（变更为高级信息）。
+
+---
+
+### 6.1 UD15ViewInfo - 查看VIN Plate信息
+
+**功能**：根据底盘号查询VIN Plate详细信息
+
+**Method**：POST
+
+**Endpoint**：/api/ud15/UD15SelecthdocsenddatavinplateApi
+
+**Request**：
+```json
+{
+  "chassisNumber": "string (Max 15, Required)",
+  "operation": "viewInfo"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "chassisNumber": "string",
+    "type": "string",
+    "status": "string",
+    "msg": "string",
+    "registerDatetime": "2024-01-01T00:00:00",
+    "docReady": "string",
+    "docSent": "string",
+    "xmlDoc": "string"
+  }
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+### 6.2 UD15SetRegenerate - 设置再生成
+
+**功能**：将底盘状态更新为"0"（新規追加）
+
+**Method**：POST
+
+**Endpoint**：/api/ud15/UD15SelecthdocsenddatavinplateApi
+
+**Request**：
+```json
+{
+  "chassisNumber": "string (Max 15, Required)",
+  "operation": "setRegenerate"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "message": "Status updated to 0 (New Addition)",
+  "data": null
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+### 6.3 UD15SetOK - 设置为OK
+
+**功能**：将底盘状态更新为"1"（xml doc 作成済み）
+
+**Method**：POST
+
+**Endpoint**：/api/ud15/UD15SelecthdocsenddatavinplateApi
+
+**Request**：
+```json
+{
+  "chassisNumber": "string (Max 15, Required)",
+  "operation": "setOK"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "message": "Status updated to 1 (XML Doc Created)",
+  "data": null
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+### 6.4 UD15ChangetoBasicInfo - 变更为基本信息
+
+**功能**：将底盘状态更新为"0"，TYPE更新为"1"（basic）
+
+**Method**：POST
+
+**Endpoint**：/api/ud15/UD15SelecthdocsenddatavinplateApi
+
+**Request**：
+```json
+{
+  "chassisNumber": "string (Max 15, Required)",
+  "operation": "changeToBasicInfo"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "message": "Status updated to 0 and Type updated to 1 (Basic)",
+  "data": null
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+### 6.5 UD15ChangetoAdvancedInfo - 变更为高级信息
+
+**功能**：将底盘状态更新为"0"，TYPE更新为"2"（ADVANCED with weights）
+
+**Method**：POST
+
+**Endpoint**：/api/ud15/UD15SelecthdocsenddatavinplateApi
+
+**Request**：
+```json
+{
+  "chassisNumber": "string (Max 15, Required)",
+  "operation": "changeToAdvancedInfo"
+}
+```
+
+**Response Success (200)**：
+```json
+{
+  "code": 200,
+  "message": "Status updated to 0 and Type updated to 2 (ADVANCED with weights)",
+  "data": null
+}
+```
+
+**Response Error (404)**：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络连接失败 | 捕获网络异常，显示通用错误消息 | "System error. Please contact administrator." |
+| API超时 | 设置超时时间（建议10秒），超时后显示错误 | "System error. Please contact administrator." |
+| 服务器内部错误 | API返回500，显示系统错误消息 | "System error. Please contact administrator." |
+| JSON解析失败 | 捕获解析异常，显示系统错误 | "System error. Please contact administrator." |
+| 未预期的JavaScript错误 | 使用try-catch包裹关键代码，记录错误日志，显示系统错误 | "System error. Please contact administrator." |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有章节标题使用中文
+- 表格内容使用中文
+- 技术术语可保留英文（如API、TextField、Button等）
+- 错误消息和成功消息使用英文（与现有系统保持一致）
+- 保持与参考文档相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD15_详细设计.md
+
+## 补充事项
+- 参照img/UD15.png查看布局页面
+- 页面标题显示为"EDB Engineering Database - Vin Plate"
+- 路由路径为/VinPlate
+- 组件文件路径：src/VinPlate/VinPlate.tsx
+- 样式文件路径：src/VinPlate/VinPlate.css
+- 数据来源：HDOC_SEND_DATA_VIN_PLATE表
+- Status字段含义：
+  - "0"：新規追加
+  - "1"：xml doc 作成済み
+- Type字段含义：
+  - "1"：basic
+  - "2"：ADVANCED (with weights)
+- 所有按钮操作都需要先验证底盘号是否存在
+- 底盘号不存在时显示Warning级别的错误消息
+- 操作成功后应显示相应的成功消息

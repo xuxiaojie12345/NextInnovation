@@ -1,0 +1,542 @@
+# ExistingHDocVariables 详细设计提示词
+
+## 1. 基本信息
+- **模块名称**：ExistingHDocVariablesPage
+- **文档编号**: DES-ExistingHDocVariablesPage-001
+- **作成日期**：2026-05-20
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于管理HDOC_VARIABLES表中的变量定义记录，主要功能包括：
+- 显示从Homologation Variables画面传递的搜索条件
+- 支持新增、更新、删除变量定义记录
+- 支持清空输入字段
+- 支持返回前画面
+- 支持导出CSV文件
+- Variable字段作为主键进行唯一性校验
+
+### 面向的用户群体
+需要管理认证系统变量定义的授权用户，如系统管理员、配置管理人员等
+
+### 用户体验考虑
+- 清晰的表单布局
+- 明确的操作反馈
+- 便捷的数据导出功能
+- 完整的主键冲突检测
+
+### 安全性要求
+- 需要用户登录认证后才能访问
+- 变量定义修改需要权限控制
+- 支持HTTPS安全传输
+
+## 3. 画面项目定义 (Screen Parameters)
+
+请按照以下格式定义所有控件：
+
+| No. | 項目名 | 種別 | 必須 | MaxLength | I/O | 許容文字 | 文字配置 | 初期値 | 表示制御 | 备注 |
+|-----|--------|------|------|-----------|-----|----------|----------|--------|----------|------|
+| 1 | Variable | TextField | Y | 30 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 变量名，Add/Update/Delete按钮按下时必填，作为主键 |
+| 2 | Type | Pull-down List | - | 20 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 类型，固定选项：VDA、User Defined |
+| 3 | Description | TextField | - | 100 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 描述说明 |
+| 4 | Created by user | TextField | - | 16 | Input | 半角英数字+記号 | 左 | 空 | 活性 | 创建用户 |
+| 5 | Date | TextField | - | - | Input | 日付 | 左 | 空 | 活性 | 日期时间 |
+| 6 | Search | Button | - | - | Action | - | 中 | - | 活性 | 执行搜索操作，跳转到搜索结果页面 |
+| 7 | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入字段 |
+| 8 | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回前画面 |
+| 9 | Add | Button | - | - | Action | - | 中 | - | 活性 | 新增变量定义记录 |
+| 10 | Update | Button | - | - | Action | - | 中 | - | 活性 | 更新变量定义记录 |
+| 11 | Delete | Button | - | - | Action | - | 中 | - | 活性 | 删除变量定义记录 |
+| 12 | Excel | Button | - | - | Action | - | 中 | - | 活性 | 导出CSV文件 |
+
+**控件说明**：
+- Input控件：TextField和Pull-down List为输入控件，用于接收用户输入
+- Action控件：Search、Clear、Back、Add、Update、Delete、Excel按钮
+
+**Type下拉列表固定选项**：
+- VDA
+- User Defined
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 页面初始化功能
+**功能说明**：页面加载时显示从Homologation Variables画面传递的搜索条件
+
+**操作步骤**：
+1. 页面加载时，从URL参数或state中获取前画面传递的Variable值
+2. 将Variable值自动填充到Variable输入框中
+3. 其他字段保持为空
+4. 若未传递搜索条件，则所有字段均为空
+
+### 4.2 搜索功能
+**功能说明**：用户输入搜索条件后点击Search按钮，跳转到Existing HDoc Variables搜索结果页面
+
+**操作步骤**：
+1. 用户在表单中输入或修改搜索条件
+2. 用户点击Search按钮
+3. 系统将当前搜索条件保存到state或sessionStorage
+4. 使用React Router导航到/ExistingHDocVariables/Search路由
+5. 传递搜索条件作为URL参数或state
+6. 搜索结果页面根据条件显示匹配的变量定义列表
+
+### 4.3 清空功能
+**功能说明**：用户点击Clear按钮清空所有输入字段
+
+**操作步骤**：
+1. 用户点击Clear按钮
+2. 系统清空所有输入字段的值：
+   - Variable：清空
+   - Type：重置为请选择状态
+   - Description：清空
+   - Created by user：清空
+   - Date：清空
+3. 清空错误消息和成功消息区域
+
+### 4.4 返回功能
+**功能说明**：用户点击Back按钮返回到前画面
+
+**操作步骤**：
+1. 用户点击Back按钮
+2. 使用React Router navigate函数返回/HomologationVariables页面
+3. 可选：传递返回标志位
+
+### 4.5 新增功能
+**功能说明**：用户输入变量定义信息后点击Add按钮，新增一条变量定义记录
+
+**操作步骤**：
+1. 用户在表单中输入变量定义信息
+2. 用户点击Add按钮
+3. 前端校验：检查Variable字段是否为空
+4. 若Variable为空，显示错误消息并终止流程
+5. 调用UD10Add API（POST方法）
+6. 传递参数：完整的表单数据对象
+7. 等待API响应
+
+**后端处理**：
+- 检查Variable是否已存在于HDOC_VARIABLES表中
+- 若已存在，返回409错误
+- 若不存在，插入新记录
+- 返回成功响应
+
+**结果处理**：
+- **成功**：
+  - 显示成功消息"Record added successfully."
+  - 可选择清空表单或保留数据
+  
+- **失败（主键冲突）**：
+  - 显示错误消息"Variant already exists. Please enter the correct content"
+  - 保持当前表单数据不变
+  
+- **服务器错误**：
+  - 显示错误消息"System error. Please contact administrator."
+  - 保持当前表单数据不变
+
+### 4.6 更新功能
+**功能说明**：用户修改变量定义信息后点击Update按钮，更新现有的变量定义记录
+
+**操作步骤**：
+1. 用户在表单中输入或修改变量定义信息
+2. 用户点击Update按钮
+3. 前端校验：检查Variable字段是否为空
+4. 若Variable为空，显示错误消息并终止流程
+5. 调用UD10Update API（POST方法）
+6. 传递参数：完整的表单数据对象
+7. 等待API响应
+
+**后端处理**：
+- 检查Variable是否存在于HDOC_VARIABLES表中
+- 若不存在，返回404错误
+- 若存在，更新记录
+- 返回成功响应
+
+**结果处理**：
+- **成功**：
+  - 显示成功消息"Record updated successfully."
+  
+- **失败（记录不存在）**：
+  - 显示错误消息"Variant does not exists. Please enter the correct content"
+  - 保持当前表单数据不变
+  
+- **服务器错误**：
+  - 显示错误消息"System error. Please contact administrator."
+  - 保持当前表单数据不变
+
+### 4.7 删除功能
+**功能说明**：用户输入Variable后点击Delete按钮，删除对应的变量定义记录
+
+**操作步骤**：
+1. 用户在Variable字段中输入要删除的变量名
+2. 用户点击Delete按钮
+3. 前端校验：检查Variable字段是否为空
+4. 若Variable为空，显示错误消息并终止流程
+5. 调用UD10Delete API（POST方法）
+6. 传递参数：Variable字段值
+7. 等待API响应
+
+**后端处理**：
+- 检查Variable是否存在于HDOC_VARIABLES表中
+- 若不存在，返回404错误
+- 若存在，删除记录
+- 返回成功响应
+
+**结果处理**：
+- **成功**：
+  - 显示成功消息"Record deleted successfully."
+  - 清空表单字段
+  
+- **失败（记录不存在）**：
+  - 显示错误消息"Variant does not exists. Please enter the correct content"
+  - 保持当前表单数据不变
+  
+- **服务器错误**：
+  - 显示错误消息"System error. Please contact administrator."
+  - 保持当前表单数据不变
+
+### 4.8 导出CSV功能
+**功能说明**：用户点击Excel按钮将当前表单数据导出为CSV文件
+
+**操作步骤**：
+1. 用户点击Excel按钮
+2. 前端获取当前表单数据（Variable、Type、Description、Created by user、Date）
+3. 构建CSV内容：第一行为项目名（项目名与画面定义一致），第二行为当前表单的对应值
+4. 使用UTF-8 BOM编码生成CSV文件
+5. 浏览器下载CSV文件
+6. 文件名格式：HDOC_Variables_YYYYMMDD.csv
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 页面初始化流程
+**开始**：页面加载
+
+**处理步骤**：
+- 从URL参数或state中获取前画面传递的Variable值
+- 将Variable值填充到Variable输入框中
+- 其他字段保持为空
+- 清空错误消息和成功消息区域
+
+#### 5.1.2 搜索流程
+**开始**：用户点击Search按钮
+
+**处理步骤**：
+- 获取当前表单中的所有字段值
+- 构建搜索条件对象
+- 将搜索条件存储到state或sessionStorage
+- 使用React Router navigate到/ExistingHDocVariables/Search路由
+- 传递搜索条件作为URL参数或state
+
+#### 5.1.3 清空流程
+**开始**：用户点击Clear按钮
+
+**处理步骤**：
+- 清空所有输入字段的值
+- 重置Type下拉列表为请选择状态
+- 清空错误消息区域
+- 清空成功消息区域
+
+#### 5.1.4 返回流程
+**开始**：用户点击Back按钮
+
+**处理步骤**：
+- 使用React Router navigate返回/HomologationVariables页面
+- 可选：传递返回标志位
+
+#### 5.1.5 新增流程
+**开始**：用户点击Add按钮
+
+**前置处理**：
+- 校验Variable字段是否为空
+- 若为空，显示错误消息并终止流程
+
+**处理步骤**：
+- 构建请求参数对象，包含所有表单字段
+- 调用UD10Add API（POST方法）
+- 传递JSON格式的表单数据
+- 等待API响应
+
+**后端处理**：
+- 检查Variable是否已存在
+- 若存在，返回409错误
+- 若不存在，插入新记录到HDOC_VARIABLES表
+- 返回成功响应
+
+**结果处理**：
+- **成功（HTTP 200/201）**：
+  - 显示成功消息"Record added successfully."
+  - 可选择清空表单
+  
+- **主键冲突（HTTP 409）**：
+  - 显示错误消息"Variant already exists. Please enter the correct content"
+  
+- **服务器错误（HTTP 500）**：
+  - 显示错误消息"System error. Please contact administrator."
+
+#### 5.1.6 更新流程
+**开始**：用户点击Update按钮
+
+**前置处理**：
+- 校验Variable字段是否为空
+- 若为空，显示错误消息并终止流程
+
+**处理步骤**：
+- 构建请求参数对象，包含所有表单字段
+- 调用UD10Update API（POST方法）
+- 传递JSON格式的表单数据
+- 等待API响应
+
+**后端处理**：
+- 检查Variable是否存在
+- 若不存在，返回404错误
+- 若存在，更新HDOC_VARIABLES表中的记录
+- 返回成功响应
+
+**结果处理**：
+- **成功（HTTP 200）**：
+  - 显示成功消息"Record updated successfully."
+  
+- **记录不存在（HTTP 404）**：
+  - 显示错误消息"Variant does not exists. Please enter the correct content"
+  
+- **服务器错误（HTTP 500）**：
+  - 显示错误消息"System error. Please contact administrator."
+
+#### 5.1.7 删除流程
+**开始**：用户点击Delete按钮
+
+**前置处理**：
+- 校验Variable字段是否为空
+- 若为空，显示错误消息并终止流程
+
+**处理步骤**：
+- 构建请求参数对象，包含Variable字段
+- 调用UD10Delete API（POST方法）
+- 传递JSON格式的参数
+- 等待API响应
+
+**后端处理**：
+- 检查Variable是否存在
+- 若不存在，返回404错误
+- 若存在，从HDOC_VARIABLES表中删除记录
+- 返回成功响应
+
+**结果处理**：
+- **成功（HTTP 200）**：
+  - 显示成功消息"Record deleted successfully."
+  - 清空所有表单字段
+  
+- **记录不存在（HTTP 404）**：
+  - 显示错误消息"Variant does not exists. Please enter the correct content"
+  
+- **服务器错误（HTTP 500）**：
+  - 显示错误消息"System error. Please contact administrator."
+
+#### 5.1.8 导出CSV流程
+**开始**：用户点击Excel按钮
+
+**处理步骤**：
+- 调用导出API或前端生成CSV
+- 设置响应头Content-Type为text/csv
+- 设置Content-Disposition为attachment
+- 浏览器触发文件下载
+- 文件名格式：HDOC_Variables_YYYYMMDD.csv
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 | 动作 |
+|-----|---------|---------|---------|---------|------|
+| 1 | 点击Add按钮时 | Variable字段 | 字段为空 | "Variable is required." | 显示错误消息，终止流程 |
+| 2 | 点击Update按钮时 | Variable字段 | 字段为空 | "Variable is required." | 显示错误消息，终止流程 |
+| 3 | 点击Delete按钮时 | Variable字段 | 字段为空 | "Variable is required." | 显示错误消息，终止流程 |
+| 4 | UD10Add API调用后 | 主键唯一性 | Variable已存在 | "Variant already exists. Please enter the correct content" | 显示错误消息，保持表单数据 |
+| 5 | UD10Update API调用后 | 记录存在性 | Variable不存在 | "Variant does not exists. Please enter the correct content" | 显示错误消息，保持表单数据 |
+| 6 | UD10Delete API调用后 | 记录存在性 | Variable不存在 | "Variant does not exists. Please enter the correct content" | 显示错误消息，保持表单数据 |
+| 7 | UD10Add API调用后 | 网络/服务器 | API返回500或其他错误状态码 | "System error. Please contact administrator." | 显示错误消息，保持表单数据 |
+| 8 | UD10Update API调用后 | 网络/服务器 | API返回500或其他错误状态码 | "System error. Please contact administrator." | 显示错误消息，保持表单数据 |
+| 9 | UD10Delete API调用后 | 网络/服务器 | API返回500或其他错误状态码 | "System error. Please contact administrator." | 显示错误消息，保持表单数据 |
+
+## 6. 接口定义 (API Specification)
+
+### 6.1 UD10HdocvariablesApi（查询）
+**功能**：根据Variable查询变量定义详情（可选，用于回显数据）
+
+**Method**：GET
+
+**Endpoint**：/api/ud10/hdocvariables/{variable}
+
+**Request**：
+- 路径参数：variable（字符串类型，必填）
+
+**Response Success (200)**：
+```json
+{
+  "variable": "VAR001",
+  "type": "VDA",
+  "description": "Test variable description",
+  "userid": "admin",
+  "registerDatetime": "2022-12-02 05:11:45"
+}
+
+**Response Error (404)**：
+```json
+{
+  "message": "Variant does not exists"
+}
+```
+
+### 6.2 UD10Add
+**功能**：新增变量定义记录
+
+**Method**：POST
+
+**Endpoint**：/api/ud10/add（具体路径需根据实际API定义）
+
+**Request**：
+```json
+{
+  "variable": "VAR001",
+  "type": "VDA",
+  "description": "Test variable description",
+  "userid": "admin",
+  "registerDatetime": "2022-12-02 05:11:45"
+}
+
+**Response Success (201)**：
+```json
+{
+  "success": true,
+  "message": "Record added successfully."
+}
+```
+
+**Response Error (409 - 主键冲突)**：
+```json
+{
+  "success": false,
+  "message": "Variant already exists. Please enter the correct content"
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "success": false,
+  "message": "Internal server error"
+}
+```
+
+### 6.3 UD10Update
+**功能**：更新变量定义记录
+
+**Method**：POST
+
+**Endpoint**：/api/ud10/update（具体路径需根据实际API定义）
+
+**Request**：
+```json
+{
+  "variable": "VAR001",
+  "type": "User Defined",
+  "description": "Updated description",
+  "userid": "user1",
+  "registerDatetime": "2022-12-03 10:20:30"
+}
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "Record updated successfully."
+}
+```
+
+**Response Error (404 - 记录不存在)**：
+```json
+{
+  "success": false,
+  "message": "Variant does not exists. Please enter the correct content"
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "success": false,
+  "message": "Internal server error"
+}
+```
+
+### 6.4 UD10Delete
+**功能**：删除变量定义记录
+
+**Method**：POST
+
+**Endpoint**：/api/ud10/delete（具体路径需根据实际API定义）
+
+**Request**：
+```json
+{
+  "variable": "VAR001"
+}
+
+**Response Success (200)**：
+```json
+{
+  "success": true,
+  "message": "Record deleted successfully."
+}
+```
+
+**Response Error (404 - 记录不存在)**：
+```json
+{
+  "success": false,
+  "message": "Variant does not exists. Please enter the correct content"
+}
+```
+
+**Response Error (500)**：
+```json
+{
+  "success": false,
+  "message": "Internal server error"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 网络连接失败 | 捕获网络异常，显示通用错误消息 | "System error. Please contact administrator." |
+| API超时 | 设置超时时间（建议10秒），超时后显示错误 | "System error. Please contact administrator." |
+| UD10Add返回409 | 显示主键冲突错误消息 | "Variant already exists. Please enter the correct content" |
+| UD10Update返回404 | 显示记录不存在错误消息 | "Variant does not exists. Please enter the correct content" |
+| UD10Delete返回404 | 显示记录不存在错误消息 | "Variant does not exists. Please enter the correct content" |
+| UD10Add/Update/Delete返回500 | 显示系统错误消息 | "System error. Please contact administrator." |
+| JSON解析失败 | 捕获解析异常，显示系统错误 | "System error. Please contact administrator." |
+| 未预期的JavaScript错误 | 使用try-catch包裹关键代码，记录错误日志 | "System error. Please contact administrator." |
+| 用户未登录 | 检查会话状态，跳转到登录页面 | "Please login first" |
+| Variable字段为空点击Add/Update/Delete | 显示必填项错误消息 | "Variable is required." |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有章节标题使用中文
+- 表格内容使用中文
+- 技术术语可保留英文（如API、TextField、Button等）
+- 错误消息和成功消息使用英文（与现有系统保持一致）
+- 禁止出现日文术语
+- 保持与参考文档相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD10_详细设计.md
+
+## 补充事项
+- 参照img/UD10.png查看布局页面
+- 页面标题显示为"EDB Engineering Database - Existing HDoc Variables"
+- 路由路径为/ExistingHDocVariables
+- Add/Update/Delete操作都需要校验Variable字段是否为空
+- Add操作需要检测主键冲突（Variable已存在）
+- Update/Delete操作需要检测记录是否存在
+- CSV导出功能可使用前端库（如papaparse）实现
+- 所有CRUD操作针对HDOC_VARIABLES表

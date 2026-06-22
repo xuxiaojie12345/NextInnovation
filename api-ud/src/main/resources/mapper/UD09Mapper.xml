@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD09Mapper">
+
+    <resultMap id="HdocUserDefinedRulesMap" type="com.web.app.domain.entity.HdocUserDefinedRules">
+        <result property="pc" column="PC"/>
+        <result property="num" column="NUM"/>
+        <result property="market" column="MARKET"/>
+        <result property="vs" column="VS"/>
+        <result property="vs2" column="VS2"/>
+        <result property="variable" column="VARIABLE"/>
+        <result property="val" column="VAL"/>
+        <result property="userid" column="USERID"/>
+        <result property="upDate" column="UP_DATE"/>
+        <result property="comments" column="COMMENTS"/>
+        <result property="addDate" column="ADD_DATE"/>
+        <result property="deleteDate" column="DELETE_DATE"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerProcess" column="REGISTER_PROCESS"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateProcess" column="UPDATE_PROCESS"/>
+    </resultMap>
+
+    <!-- UD09Search: 根据条件动态查询 -->
+    <select id="searchUserDefinedRules" resultMap="HdocUserDefinedRulesMap"
+            parameterType="com.web.app.domain.UD08SearchRequest">
+        SELECT PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE,
+               REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE 1=1
+        <if test="productClass != null and productClass != ''">
+            <choose>
+                <when test="productClassOp == '!='">AND PC != #{productClass}</when>
+                <otherwise>AND PC = #{productClass}</otherwise>
+            </choose>
+        </if>
+        <if test="market != null and market != ''">
+            <choose>
+                <when test="marketOp == '!='">AND MARKET != #{market}</when>
+                <otherwise>AND MARKET = #{market}</otherwise>
+            </choose>
+        </if>
+        <if test="variable != null and variable != ''">
+            <choose>
+                <when test="variableOp == '!='">AND VARIABLE != #{variable}</when>
+                <otherwise>AND VARIABLE = #{variable}</otherwise>
+            </choose>
+        </if>
+        <if test="value != null and value != ''">
+            <choose>
+                <when test="valueOp == '!='">AND VAL != #{value}</when>
+                <otherwise>AND VAL = #{value}</otherwise>
+            </choose>
+        </if>
+        <if test="vs != null and vs != ''">
+            <choose>
+                <when test="vsOp == '!='">AND VS != #{vs}</when>
+                <otherwise>AND VS = #{vs}</otherwise>
+            </choose>
+        </if>
+        <if test="vs2 != null and vs2 != ''">
+            <choose>
+                <when test="vs2Op == '!='">AND VS2 != #{vs2}</when>
+                <otherwise>AND VS2 = #{vs2}</otherwise>
+            </choose>
+        </if>
+        <if test="comments != null and comments != ''">
+            <choose>
+                <when test="commentsOp == '!='">AND COMMENTS != #{comments}</when>
+                <otherwise>AND COMMENTS = #{comments}</otherwise>
+            </choose>
+        </if>
+        <if test="addDate != null and addDate != ''">
+            <choose>
+                <when test="addDateOp == '!='">AND ADD_DATE != #{addDate}</when>
+                <otherwise>AND ADD_DATE = #{addDate}</otherwise>
+            </choose>
+        </if>
+        <if test="deleteDate != null and deleteDate != ''">
+            <choose>
+                <when test="deleteDateOp == '!='">AND DELETE_DATE != #{deleteDate}</when>
+                <otherwise>AND DELETE_DATE = #{deleteDate}</otherwise>
+            </choose>
+        </if>
+        <if test="number != null and number != ''">
+            <choose>
+                <when test="'GT'.equals(numberOp)">AND NUM &gt; #{number}</when>
+                <when test="'LT'.equals(numberOp)">AND NUM &lt; #{number}</when>
+                <otherwise>AND NUM = #{number}</otherwise>
+            </choose>
+        </if>
+        <if test="updateUser != null and updateUser != ''">
+            <choose>
+                <when test="updateUserOp == '!='">AND REGISTER_USER != #{updateUser}</when>
+                <otherwise>AND REGISTER_USER = #{updateUser}</otherwise>
+            </choose>
+        </if>
+        <if test="updateDatetime != null and updateDatetime != ''">
+            <choose>
+                <when test="updateDatetimeOp == '!='">AND REGISTER_DATETIME != #{updateDatetime}</when>
+                <otherwise>AND REGISTER_DATETIME = #{updateDatetime}</otherwise>
+            </choose>
+        </if>
+        ORDER BY PC, MARKET, NUM
+    </select>
+
+    <!-- UD09SelectForDelete: 根据主键查询待删除记录 -->
+    <select id="selectByPrimaryKey" resultMap="HdocUserDefinedRulesMap">
+        SELECT PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS,
+               ADD_DATE, DELETE_DATE,
+               REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+
+    <!-- UD09DeleteSelected: 根据主键删除记录 -->
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </delete>
+
+</mapper>

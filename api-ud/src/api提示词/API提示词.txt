@@ -1,0 +1,359 @@
+﻿阅读一下项目结构
+
+
+
+数据库定义 react_ud_sql.txt
+
+不需要生成文档说明，不要添加未在需求中指定的功能
+
+重要：页面调用api处确认好正常参数数据传递， react 和 api侧。
+api参数第二个字母大写的情况 需要注意序列化问题。
+
+
+
+
+请严格按照 API模板.txt的内容 生成以下api内容 并 添加到 全体APIのプロンプト 文件中的3.4.5处 其余地方不要动，只在345末尾添加新的。
+其中4,5部分每个api序号都从4.1,5.1开始
+
+
+No.1 
+Login组件,做成 Api:authentication 主要功能如下。
+查询 hdoc_user_infor 表
+参数是 username 和 password
+返回表中所有字段
+将完整用户信息存储到 Session，key 为 'currentUser'
+其他页面可以通过 session.getAttribute('currentUser') 获取"
+
+No2 没有api
+
+No.3
+API:UD03SelectHdocdocumentlistApi 主要功能如下,
+查询 HDOC_DOCUMENT_LIST表 没有参数 全部检索
+ 用于下拉列表
+
+
+No.4
+API:UD04SelectGeneratedocumentApi 主要功能如下,
+
+参数为 Chassis series和 Chassis no
+查询并返回以下项目，参照对应表和字段
+画面取得数据只能取到1件，不存在复数件的场合
+No		項目名				種別			必須		MaxLength			データ元_テーブル				データ元_項目				I/O		許容文字					文字配置			初期値			表示制御			備考						
+1		Chassis no				label			-		15			前画面				"Chassis series
+Chassis no"				Output		-					左			-			-			Chassis series和Chassis no合并显示，格式：**series** **no**（series加粗，no下划线）									
+2		Ordernumber				label			-		16			HDOC_REC_DATA_OM				ORDERNUMBER				Output		-					左			-			-									
+3		Build week				label			-		10			HDOC_REC_DATA_OM				BUILD				Output		-					左			-			-									
+4		Spec week				label			-		10			HDOC_REC_DATA_OM				SPEC				Output		-					左			-			-									
+5		Market				label			-		10			HDOC_REC_DATA_VDA_GENERAL				COUNTRY_OF_OPERATION				Output		-					左			-			-			CountryOfOperation(VDA)						
+6		Master Market				label			-		-			-				-				Output		-					左			-			-			'-EU'で固定設定						
+7		S-Note NO				label			-		4000			HDOC_REC_DATA_OM				CUSTOMER_ADAP				Output		-					左			-			-									
+8		S-Note Message				label			-		256			-				-				Output		-					左			-			-			"S-Note情報あれば、下記を固定表示
+'The S-Notes above can affect homologation documents.'"						
+9		Load Index				label			-		10			HDOC_REC_DATA_KOLA_TIRE_MASTER				LOAD_INDEX				Output		-					左			-			-			Tire Master情報						
+10		Analyze Rules				link			-		10			-				-				Output		-					左			-			-									
+11		Modify Doc Link				link			-		1			HDOC_ADCA_CHANGE				ACT				Output		-					左			-			-			"AD-Changeが活性の場合、下記表示
+'After def change detected. Document need to be modified.'"						
+12		Using template				label			-		20			-				-				Output		-					左			VIN_PLATE_TEMPLATE_V1			-			静态固定显示，不从后台获取							
+13		Replacing parameters				label		-		4000				HDOC_ADCA_MODIFICATION						VARIABLE								Output		-					左					-					-					固定格式"AD Change. Modifying:"+VARIABLE，不取NEWVAL
+
+14		Generated document						link		-		-					-					-					-					Output		-					左					-					-					Link类型，显示"Generated document"，不实装点击功能						
+15		Date				label			-		20			サーバー				Date				Output		-					左			-			-			'2022-12-02 05:11:45'						
+16		HDoc version				label			-		20			プログラム				バージョン				Output		-					左			-			-									
+表关联条件请参照：
+SELECT om.ORDERNUMBER, om.BUILD, om.SPEC, om.CUSTOMER_ADAP, vda.COUNTRY_OF_OPERATION, tire.LOAD_INDEX, cha.ACT, admod.VARIABLE
+    FROM HDOC_REC_DATA_VDA_GENERAL vda
+     inner join HDOC_REC_DATA_OM om
+     on vda.SERIE = om.SERIE and vda.CHNR = om.CHNR
+     inner join HDOC_REC_DATA_KOLA_TIRE_MASTER tire
+     on vda.TRANS_TS = tire.TRANS_TS
+     inner join HDOC_ADCA_CHANGE cha
+     on vda.SERIE = cha.SERIE and vda.CHNR = cha.CHNR
+     inner join HDOC_ADCA_MODIFICATION admod
+     on vda.SERIE = admod.SERIE and vda.CHNR = admod.CHNO
+    WHERE
+        vda.SERIE = {series} AND
+        vda.CHNR = {Chassisno} AND
+        admod.STA = '0'
+
+No.5
+UD05ModifyDocumentApi
+请求方法①.UD05SelectVariableModification
+参数是SERIE和 CHNO
+参考关联条件HDOC_ADCA_MODIFICATION a Left join
+HDOC_VARIABLES b on
+a.VARIABLE = b.VARIABLE
+查询以下项目
+4		Variable						DataTable				-				-					HDOC_ADCA_MODIFICATION				VARIABLE							Output		-					左					-					-															
+5		Description							DataTable				-				-					HDOC_VARIABLES				DESCRIPTION						Output		-					左					-					-															
+6		Current value						DataTable				-				-					HDOC_ADCA_MODIFICATION				NEWVAL								Output		-					左					-					"Modifyに存在しない場合、HDOC_REC_DATA_KOLA_VARIANTからデータを取得"
+7		Modified value						DataTable				-		500					HDOC_ADCA_MODIFICATION				NEWVAL							Input		-					左					Modifyに存在しない場合、空白					
+
+请求方法②.UD05UpdateHdocAdcaModification
+表名HDOC_ADCA_MODIFICATION
+参数 SERIE、CHNO、VARIABLE、MODIFIEDVALUE
+更新字段HDOC_ADCA_MODIFICATION的NEWVAL，条件SERIE、CHNO、VARIABLE
+No.6
+UD06SaveModificationsApi
+请求方法 UD06SelectHdocAdcaModification
+表名 HDOC_ADCA_MODIFICATION
+取得项目：DOCTYPE，VERS，VARIABLE，NEWVAL，VERS
+参数 SERIE、CHNO
+
+查询以下项目
+No		項目名				種別			必須		MaxLength			データ元_テーブル				データ元_項目			
+3		Doctype				label			-		-			HDOC_ADCA_MODIFICATION				DOCTYPE			
+4		Version				label			-		-			HDOC_ADCA_MODIFICATION				VERS			
+5		Storing				label			-		-			HDOC_ADCA_MODIFICATION				"VARIABLE
+NEWVAL"			
+6		FOUND UNRELEASED VERSION				label			-		-			HDOC_ADCA_MODIFICATION				VERS			
+
+
+No.7
+UD07VehicleSpecificationApi
+初期表示的场合
+1.API呼出，前台参数（SERIE，CHNR ），通过两个sql取得整体数据
+sql1.通过（SERIE，CHNR ）接收,
+使用SERIE，CHNR关联三个表（
+HDOC_REC_DATA_OM ，
+HDOC_REC_DATA_VDA_GENERAL，
+HDOC_REC_DATA_VDA_VARIANTS ）取得数据（Model
+，Built week，Product type，，VIN，Country of Operation，FAMILY_ID,VARIANT_ID）
+sql2.
+sql1取得的项目（FAMILY_ID,VARIANT_ID）检索HDOC_REC_DATA_KOLA_VARIANT，取得对应数据
+
+最终需要显示的项目如下 
+Model				label			-		-			HDOC_REC_DATA_OM			
+Built week				label			-		-			HDOC_REC_DATA_OM			
+Product type				label			-		-			HDOC_REC_DATA_VDA_GENERAL			
+VIN				label			-		-			HDOC_REC_DATA_VDA_GENERAL			
+Engine no				label			-		-			"HDOC_REC_DATA_VDA_VARIANTS
+
+HDOC_REC_DATA_KOLA_VARIANT"			
+Country of Operation				label			-		-			HDOC_REC_DATA_VDA_GENERAL			
+SYMBOL_STR				label			-		-			"HDOC_REC_DATA_VDA_VARIANTS
+
+HDOC_REC_DATA_KOLA_VARIANT"			
+DESCRIPTION				tooltip			-		-			HDOC_REC_DATA_KOLA_VARIANT			
+S-Note NO				label			-		-			HDOC_REC_DATA_OM			
+
+08
+UD08HomologationVariablesApi
+
+前提：页面全项目
+Product class
+Number
+Market
+Variable
+Value
+Variant string.1
+Variant string.2
+Comments
+Add
+Delete
+Created by user
+Date
+
+请求方法①UD08SelectProductclassmaster
+Product class一覧を取得する。
+表名：PRODUCT_CLASS_MASTER
+取得所有项目，没有条件
+
+请求方法②UD08SelectMarketmaster
+Market一覧を取得する。
+表名：MARKET_MASTER
+取得所有项目，没有条件
+
+请求方法③UD08SelectHdocvariables
+User defined rules情報を取得する。
+表名：HDOC_VARIABLES
+取得项目：VARIABLE，没有条件
+
+请求方法④UD08Add
+2个检查
+Product、number,Market毎に重複する場合											Primary key conflict, Please enter the correct content																		
+Variantの入力内容はHDOC_VARIABLESに存在しない											Variant does not exist, Please enter the correct content																		
+
+HDOC_USER_DEFINED_RULES（登録）
+页面全项目登録
+
+请求方法⑤UD08Update
+3个检查
+Product、number,Market毎にレコードが存在しない											Data does not exist, Please enter the correct content																		
+Product、number,Market毎に重複する場合											Primary key conflict, Please enter the correct content																		
+Variantの入力内容はHDOC_VARIABLESに存在しない											Variant does not exist, Please enter the correct content																		
+
+HDOC_USER_DEFINED_RULES（更新）
+参数：页面全项目
+参数/条件是 Product class、Number、Market
+
+请求方法⑥UD08Delete
+一个检查
+Product、number,Market毎にレコードが存在しない											Data does not exist, Please enter the correct content																		
+
+HDOC_USER_DEFINED_RULES（删除）
+参数：页面全项目
+参数/条件是 Product class、Number、Market
+
+
+
+
+09
+UD09DeleteHdocuserdefinedrulesApi
+①ルール情報を取得する。
+表名：HDOC_USER_DEFINED_RULES
+取得项目：PC,NUM,MARKET,VAL,VS,VS2,ADD_DATE,DELETE_DATE,REGISTER_USER,REGISTER_DATETIME
+参数/条件:PC,NUM,MARKET
+
+②選択されるレコードを削除する。
+表名：HDOC_USER_DEFINED_RULES
+参数/条件：PC,NUM,MARKET
+
+
+
+10
+UD10HdocvariablesApi
+Variantの追加/更新/削除/検索を実施する。
+表名：HDOC_VARIABLES
+参数/条件：Variable,Type，Description， 其中variable，description均为like检索
+以Variable 为条件进行增删改,Type，Description，Created by user，Date这4个字段
+增删改之前先以Variable 为条件检索是否存在，如果不存在返回以下message
+
+增：Variant already exists. Please enter the correct content
+改：Variant does not  exists. Please enter the correct content
+删：Variant does not  exists. Please enter the correct content
+
+11
+UD11HdocvariablesApi
+初期表示，
+表名：HDOC_VARIABLES，以Variable，Type，Description，Created by user，Date 为条件进行全检索
+参数/条件：VARIABLE,TYPE,DESCR,REGISTER_USER,REGISTER_DATETIME 其中DESCR,REGISTER_USER 模糊检索
+ 
+
+12
+表名：MARKET_MASTER，检索项目：MARKET，无条件检索
+
+13
+无api
+
+14
+UD14SearchresultistApi
+初期表示
+表名：MARKET_MASTER，检索项目：MARKET，无条件检索
+
+Marketを選択して、該当Marketのフォルダーに格納してるファイル名を表示する。
+这里要读取文件暂时返回 固定值 deepseek01.txt~deepseek10.txt~
+
+表名：HDOC_USER_DEFINED_RULES，检索项目：VARIABLE
+参数/条件：market，fileName
+hdoc_UserDefinedRules.MarketCd ＝ {market} And
+hdoc_UserDefinedRules.Val ＝ {market}＋"/"+{fileName}
+
+複数件取得された場合、space分けで全部表示する。
+例：TEMPLATE-XML007 TEMPLATE-XML001
+
+
+15
+UD15SelecthdocsenddatavinplateApi
+请求方法1.UD15ViewInfo
+表名：HDOC_SEND_DATA_VIN_PLATE
+检索条件：SERIE，CHNR 检索项目：TYPE,STATUS,MSG,REGISTER_DATETIME,DOC_READY,DOC_SENT,XML_DOC,XML_DOC
+
+请求方法2.「Set Regenerate」ボタンを押下の場合
+表名：HDOC_SEND_DATA_VIN_PLATE
+参数/条件：SERIE,CHNR， 更新内容是 STATUS设置为0
+
+请求方法3.「Set OK」ボタンを押下の場合
+表名：HDOC_SEND_DATA_VIN_PLATE
+参数/条件：SERIE,CHNR， 更新内容是 STATUS设置为1
+
+请求方法4.「Change to Basic Info」ボタンを押下の場合
+表名：HDOC_SEND_DATA_VIN_PLATE
+参数/条件：SERIE,CHNR， 更新内容是 STATUS设置为0，TYPE设置为1
+
+
+请求方法5.「Change to Advanced Info」ボタンを押下の場合
+表名：HDOC_SEND_DATA_VIN_PLATE
+参数/条件：SERIE,CHNR， 更新内容是 STATUS设置为0，TYPE设置为2
+
+
+
+16
+UD16ADChangeApi
+请求方法1.UD16SelectHdocAdcaChange
+检查HDOC_ADCA_CHANGE是否存在数据
+参数/条件：SERIE,CHNR，REASON
+请求方法2.UD16InsertHdocAdcaChange
+addボタン押下，首先检查是HDOC_ADCA_CHANGE否存在数据 若没有执行下边登录操作
+登录项目 REASON
+参数/条件：SERIE,CHNR，REASON
+请求方法3.UD16UpdateHdocAdcaChange
+DELETEボタン押下，进行更新，伦理删除，
+更新项目ACT设置为N、UPDATE_DATETIME设置为当前时间now()、UPDATE_USER设置user、UPDATE_PROCESS设置为process
+参数：SERIE,CHNR,user，process。
+
+17
+UD17HDocUserAdministration​​Api
+1.初期表示：Market一覧を取得する。表名：MARKET_MASTER，无条件取得,取得项目：
+2.「User info」ボタンを押下の場合 UserNameを取得する。
+表名HDOC_USER_INFOR，条件userid，或者是useridを取得する，条件是UserName
+ 「 User info」ボタンを押下の場合該当ユーザの権限取得
+表名HDOC_FUNCTION_AUTH，条件userid，取得项目：FUNCTION，userid，然后再检索HDOC_MARKET_AUTH，检索条件：userid和FUNCTION，检索项目USERID，MARKET，TYPE，BU
+
+3.「Update Role」ボタンを押下，表HDOC_MARKET_AUTH更新，更新条件USERID，MARKET，TYPE，BU,更新项目：USERID，MARKET，TYPE，BU,UPDATE_DATETIME,UPDATE_USER,UPDATE_PROCESS
+      HDOC_FUNCTION_AUTH的更新条件FUNCTION，userid,更新项目：FUNCTION，userid,UPDATE_DATETIME,UPDATE_USER,UPDATE_PROCESS
+4.「Delete Role」ボタンを押下，表HDOC_MARKET_AUTH删除，删除条件USERID，MARKET，TYPE，BU
+       表HDOC_FUNCTION_AUTH删除，删除条件：FUNCTION，userid
+18 
+UD18HDocUserDocAdministrationApi
+1.画面初期化
+ドキュメント一覧を取得する。
+表名：HDOC_DOCUMENT_LIST，无条件检索，取得项目：DESCRIPTION
+2.「User Info」ボタンを押下
+①表名：HDOC_USER_INFOR,条件userId，UserNameを取得
+②表名：HDOC_FUNCTION_AUTH,条件userId，取得项目：FUNCTION
+②能检索到的情况下进行③的检索，③表名：HDOC_USER_DOC,条件userId，取得项目：DOCTYPE
+②不能检索到时，处理终了。
+3.「Update」ボタンを押下
+表名：HDOC_USER_DOC 先删再增 条件userId
+
+
+19
+UD19SearchResultListApi
+1.画面初期化
+Market一覧を取得する。
+表名：MARKET_MASTER 无条件检索
+2.「Search」ボタンを押下
+Userを入力して，表hdoc_user_infor检索条件：user    检索项目：userId
+userId入力して，表hdoc_user_infor检索条件：userId  检索项目：user
+3.Not setをチェックして、「Search」ボタンを押下
+すべてのユーザ，查询表MARKET_MASTER 内连接表hdoc_user_infor
+userid作为关联查询的条件（INNER JOIN），从HDOC_USER_INFOR（取得项目 userid，username），HDOC_MARKET_AUTH（market）将所需的数据据取得
+4.Ruleをチェックして、「Search」ボタンを押下
+从HDOC_USER_INFOR（取得项目 userid，username），HDOC_MARKET_AUTH（market）使用动态sql，将参数Rule，选择的market作为where条件，将取得的数据返回
+查询表MARKET_MASTER 内连接表hdoc_user_infor，条件RESPONSIBLE = Rule
+5.Templateをチェックして、「Search」ボタンを押下
+从HDOC_USER_INFOR（取得项目 userid，username），HDOC_MARKET_AUTH（market）使用动态sql，将参数Template，选择的market作为where条件，将取得的数据返回
+查询表MARKET_MASTER 内连接表hdoc_user_infor，条件RESPONSIBLE = Template
+
+3.4.5.取得项目USERID,USER,MARKET
+
+20
+UD20GetDocumentListApi
+ドキュメント一覧情報を取得する。
+1.画面初期化
+表名：HDOC_DOCUMENT_LIST 检索项目：DOCTYPE，REGISTER_USER，REGISTER_DATETIME  无检索条件
+
+21
+初期表示：表名MARKET_MASTER  检索项目：Market，Description，无检索条件
+
+22
+初期表示：表名HDOC_DOCUMENT_LIST  检索项目：DOCTYPE，Description，无检索条件
+
+23
+没有API
+24
+没有API
+
+25
+AuthenticationApi
+初期表示：HDOC_USER_INFOR检索，检索项目：Userid,Responsible,User Position,E-mail 检索条件/参数：Userid

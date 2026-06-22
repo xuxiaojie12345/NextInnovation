@@ -1,0 +1,375 @@
+# Market Document Settings List 详细设计文档
+
+## 1. 基本信息
+
+- **模块名称**：MarketDocumentSettingsList
+- **文档编号**: DES-MarketDocumentSettingsList-001
+- **作成日期**：2026-05-20
+
+请根据以下要求生成[Market Document Settings List]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[Market Document Settings List]-001
+   模块名称:[Market Document Settings List]
+   作成日:2026-05-25
+
+---
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于展示HDoc系统的市场文档设置列表，用户可以查看文档类型、业务单元、注册用户和注册日期等信息。用户可以选择某条记录并返回前画面，将选中的文档信息自动填充到前画面的相应字段中。该功能主要用于文档选择和配置，帮助用户快速定位和选择所需的文档模板。
+
+### 面向的用户群体
+- 具有文档管理权限的系统用户
+- 需要选择文档模板的业务人员
+- 需要查看文档注册信息的授权用户
+
+### 用户体验方面的考虑
+- 以表格形式清晰展示所有文档信息
+- 提供RadioBox单选机制，确保用户只能选择一个记录
+- 支持打印功能，方便用户保存文档列表
+- User列提供链接，可快速查看用户详细信息
+- Select操作后自动将数据传递到前画面，提升操作效率
+
+### 安全性或特殊要求
+- 需要从HDOC_DOCUMENT_LIST表读取文档信息
+- 所有数据均为只读展示（除选择操作外）
+- Select操作必须校验是否已选择记录
+- User链接跳转到EDB用户查看画面
+
+---
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Document type | TextField | - | 20 | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.DOCTYPE获取 |
+| 2   | Bussines unit | TextField | - | - | Output | - | - | BU | - | 固定显示'BU' |
+| 3   | User | TextField | - | 16 | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.REGISTER_USER获取，带链接 |
+| 4   | Date | TextField | - | - | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.REGISTER_DATETIME获取 |
+| 5   | Select | Button | - | - | Action | - | 中 | - | 活性 | 选择记录并返回前画面 |
+| 6   | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回前画面 |
+| 7   | Print | Button | - | - | Action | - | 中 | - | 活性 | 打印文档列表 |
+
+---
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 页面初始化
+
+**功能说明**: 页面加载时自动获取并展示文档列表信息
+
+**操作步骤**:
+1. 页面加载触发初始化事件
+2. 调用后端API `UD20GetDocumentListApi`的`UD20SelectHdocDocumentList`方法（operation=SELECT_HDOC_DOCUMENT_LIST），从HDOC_DOCUMENT_LIST表获取所有文档列表
+3. API返回文档列表数据，包括：
+   - Document type（DOCTYPE字段）
+   - Bussines unit（固定为'BU'）
+   - User（REGISTER_USER字段）
+   - Date（REGISTER_DATETIME字段）
+4. 将数据填充到DataTable中
+5. 为每行记录添加RadioBox控件（单选模式）
+6. 初始化时所有RadioBox均为未选中状态
+
+**结果反馈**: 
+- 成功：DataTable正确显示所有文档记录
+- 失败：若无数据，显示"No data found"错误消息
+
+### 4.2 Select操作
+
+**功能说明**: 用户选择一条记录后点击Select按钮，将选中的文档信息传递到前画面并关闭当前画面
+
+**操作步骤**:
+1. 用户在DataTable中点击某一行的RadioBox，选中该记录
+2. 用户点击Select按钮
+3. 系统执行前端校验：
+   - 检查是否有记录被选中
+   - 若未选中任何记录，报错"No data found"（Error级别）
+4. 获取选中记录的Document type、Bussines unit、User、Date信息
+5. 将选中的Document type等信息存储到状态管理或URL参数中
+6. 关闭当前画面，返回前画面
+7. 前画面接收数据后，自动将Document type等信息填充到相应字段
+
+**结果反馈**: 
+- 成功：当前画面关闭，前画面自动显示选中的文档信息
+- 失败：若未选择记录，显示"No data found"错误消息，不关闭画面
+
+### 4.3 Back操作
+
+**功能说明**: 用户点击Back按钮直接返回前画面，不传递任何数据
+
+**操作步骤**:
+1. 用户点击Back按钮
+2. 系统执行画面关闭操作
+3. 返回到调用本画面的前一个画面
+4. 前画面保持原有状态，不更新任何字段
+
+**结果反馈**: 
+- 成功：当前画面关闭，返回前画面
+- 失败：无
+
+### 4.4 Print操作
+
+**功能说明**: 用户点击Print按钮打印当前显示的文档列表信息
+
+**操作步骤**:
+1. 用户点击Print按钮
+2. 系统调用浏览器打印功能
+3. 生成打印预览，包含以下信息：
+   - 页面标题：HDoc - Market Document Settings
+   - 所有记录的Document type、Bussines unit、User、Date
+   - 打印时间戳
+4. 用户确认打印设置后执行打印
+
+**结果反馈**: 
+- 成功：打开打印预览窗口
+- 失败：若打印功能不可用，显示"打印功能不可用"提示
+
+### 4.5 User链接点击
+
+**功能说明**: 用户点击User列的链接查看该用户的详细信息
+
+**操作步骤**:
+1. 用户点击DataTable中某一行的User链接
+2. 系统获取该行的User值（REGISTER_USER）
+3. 打开新窗口或标签页，跳转到EDB用户查看画面
+4. 将User值作为参数传递给EDB用户查看画面
+5. EDB用户查看画面显示该用户的详细信息（Userid、Responsible、User Position、E-mail）
+
+**结果反馈**: 
+- 成功：打开EDB用户查看画面，显示用户详细信息
+- 失败：若用户不存在，显示"用户不存在"提示
+
+---
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 页面初始化流程
+
+**开始**: 页面加载事件触发
+
+**前置处理**: 
+- 无
+
+**API调用 (Backend Check)**:
+- 调用`UD20GetDocumentListApi`的`UD20SelectHdocDocumentList`方法（operation=SELECT_HDOC_DOCUMENT_LIST）
+- API内部逻辑：
+  1. 查询HDOC_DOCUMENT_LIST表，获取所有文档记录
+  2. 提取DOCTYPE、REGISTER_USER、REGISTER_DATETIME字段
+  3. 按REGISTER_DATETIME降序排序（最新注册的排在前面）
+  4. 返回文档列表
+
+**结果处理**:
+- 成功：
+  - 将文档列表填充到DataTable
+  - 为每行添加RadioBox控件
+  - Bussines unit列固定显示'BU'
+- 失败：
+  - 若无数据：显示"No data found"错误消息
+  - 若其他错误：显示具体错误消息
+
+#### 5.1.2 Select操作流程
+
+**开始**: 用户点击Select按钮
+
+**前置处理**: 
+- 获取当前选中的RadioBox状态
+- 确定哪一行被选中
+
+**空值校验 (Frontend Check)**:
+- 若没有RadioBox被选中：
+  - 设置Message = "No data found"
+  - Message级别 = Error
+  - 终止流程，不关闭画面
+
+**数据处理**:
+- 获取选中行的数据：
+  - Document type
+  - Bussines unit（固定为'BU'）
+  - User
+  - Date
+- 将数据存储到状态管理或URL参数中
+
+**画面迁移**:
+- 关闭当前画面
+- 返回前画面
+- 前画面接收数据并自动填充到相应字段
+
+**结果处理**:
+- 成功：
+  - 当前画面关闭
+  - 前画面显示选中的文档信息
+- 失败：
+  - 显示"No data found"错误消息
+  - 保持当前画面打开
+
+#### 5.1.3 Back操作流程
+
+**开始**: 用户点击Back按钮
+
+**处理逻辑**:
+- 无需校验
+- 直接执行画面关闭操作
+
+**结果处理**:
+- 成功：当前画面关闭，返回前画面
+- 失败：无
+
+#### 5.1.4 Print操作流程
+
+**开始**: 用户点击Print按钮
+
+**处理逻辑**:
+- 调用浏览器打印API（window.print()）
+- 生成打印内容，包含：
+  - 页面标题
+  - DataTable所有数据
+  - 打印时间
+
+**结果处理**:
+- 成功：打开打印预览窗口
+- 失败：显示"打印功能不可用"提示
+
+#### 5.1.5 User链接点击流程
+
+**开始**: 用户点击User链接
+
+**处理逻辑**:
+- 获取该行的User值
+- 构建EDB用户查看画面的URL，携带User参数
+- 打开新窗口或标签页
+
+**结果处理**:
+- 成功：打开EDB用户查看画面
+- 失败：若用户不存在，显示错误提示
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | Select操作 | RadioBox选择状态 | 必须有且仅有一个记录被选中 | "No data found" | 终止流程，显示Error级别错误消息 |
+| 2 | 页面初始化 | HDOC_DOCUMENT_LIST表 | 至少存在一条记录 | "No data found" | 显示错误消息，DataTable为空 |
+| 3 | User链接点击 | User值 | User必须在Saviynt系统中存在 | "用户不存在" | 显示错误提示，不打开新窗口 |
+
+---
+
+## 6. 接口定义 (API Specification)
+
+### UD20GetDocumentListApi
+
+统一API名称空间，包含以下方法：**UD20SelectHdocDocumentList**（文档列表查询）。
+
+---
+
+### 6.1 UD20SelectHdocDocumentList - 文档列表查询
+
+**功能**: 获取市场文档设置列表数据
+
+**Method**: POST
+
+**Endpoint**: `/api/ud20/UD20GetDocumentListApi`
+
+**Request**:
+```json
+{
+  "operation": "SELECT_HDOC_DOCUMENT_LIST"
+}
+```
+
+**Response Success (200)**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "documentType": "COC_EUB1",
+      "bussinesUnit": "VBC",
+      "user": "-",
+      "date": "2026-05-20 10:30:00"
+    },
+    {
+      "documentType": "COC_EU",
+      "bussinesUnit": "VTC",
+      "user": "ADMIN01",
+      "date": "2026-05-19 15:45:00"
+    }
+  ]
+}
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "documentType": "COC_EUB1",
+      "bussinesUnit": "VBC",
+      "user": "-",
+      "date": "2026-05-20 10:30:00"
+    },
+    {
+      "documentType": "COC_EU",
+      "bussinesUnit": "VTC",
+      "user": "ADMIN01",
+      "date": "2026-05-19 15:45:00"
+    },
+    {
+      "documentType": "CL_TOTAL",
+      "bussinesUnit": "VTC",
+      "user": "-",
+      "date": "2026-05-18 09:20:00"
+    }
+  ]
+}
+```
+
+**响应字段说明**:
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| documentType | String | 文档类型，来自HDOC_DOCUMENT_LIST.DOCTYPE，最大20字符 |
+| bussinesUnit | String | 业务单元，固定显示'BU'或实际业务单元代码 |
+| user | String | 注册用户，来自HDOC_DOCUMENT_LIST.REGISTER_USER，最大16字符，若为空显示'-' |
+| date | String | 注册日期时间，来自HDOC_DOCUMENT_LIST.REGISTER_DATETIME，格式：YYYY-MM-DD HH:mm:ss |
+
+**Response Error (500)**:
+```json
+{
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+---
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 未选择记录就点击Select | 前端校验拦截，不发起后续操作 | "No data found"（Error级别） |
+| HDOC_DOCUMENT_LIST表无数据 | API返回空数据，前端显示错误消息 | "No data found" |
+| 数据库连接异常 | API返回500错误，前端显示通用错误消息 | "系统错误，请稍后重试" |
+| API超时 | 前端捕获超时异常，显示超时提示 | "请求超时，请检查网络连接后重试" |
+| 网络异常 | 前端捕获网络异常，显示网络错误提示 | "网络连接失败，请检查网络设置" |
+| 打印功能不可用 | 前端捕获打印异常，显示提示消息 | "打印功能不可用" |
+| User在Saviynt中不存在 | 前端校验或API返回错误，显示提示 | "用户不存在" |
+| 前画面未正确接收数据 | 前端显示警告消息 | "数据传递失败，请重新选择" |
+
+---
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档（内部設計模板.md）相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD20_详细设计.md
+
+## 补充事项
+- 参照img/UD20.png查看布局页面

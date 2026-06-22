@@ -1,0 +1,167 @@
+# Save Modifications 详细设计提示词
+
+## 1. 基本信息
+- **模块名称**：SaveModifications
+- **文档编号**: DES-SaveModifications-001
+- **作成日期**：2026-05-20
+
+## 2. 背景 (Background)
+本模块的核心功能和目标：显示从Modify Document页面传递过来的修改内容，供用户确认。用户查看修改信息后，可以点击Close按钮关闭当前页面
+
+面向的用户群体：车辆认证相关人员、需要确认文档变量修改内容的业务人员
+
+用户体验方面的考虑：清晰展示修改前后的对比信息；简洁的确认界面；快速关闭功能
+
+安全性或特殊要求：需要用户登录认证；从前一页面传递底盘信息和修改数据
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis serie | Label | - | - | Output | - | 左 | 从前一画面传递 | - | 底盘系列号，获取'-'前的内容 |
+| 2   | Chassis number | Label | - | - | Output | - | 左 | 从前一画面传递 | - | 底盘编号，获取'-'后的内容 |
+| 3   | Doctype | Label | - | - | Output | - | 左 | 从API返回 | - | 文档类型，来自HDOC_ADCA_MODIFICATION表的DOCTYPE字段 |
+| 4   | Version | Label | - | - | Output | - | 左 | 从API返回 | - | 版本号，来自HDOC_ADCA_MODIFICATION表的VERS字段 |
+| 5   | Storing | Label | - | - | Output | - | 左 | 从API返回 | - | 存储信息，包含VARIABLE和NEWVAL，来自HDOC_ADCA_MODIFICATION表 |
+| 6   | FOUND UNRELEASED VERSION | Label | - | - | Output | - | 左 | 从API返回 | - | 发现的未发布版本信息，来自HDOC_ADCA_MODIFICATION表的VERS字段 |
+| 7   | Message | Label | - | - | Output | - | 左 | "VERSION IS RELEASED" | - | 消息提示，固定显示"VERSION IS RELEASED" |
+| 8   | Close | Button | - | - | Action | - | 中 | - | 活性 | 关闭当前页面 |
+
+必须包含的控件类型：
+- Output控件（Label）
+- Action控件（Button）
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 页面初始化
+功能说明：页面加载时获取并显示修改内容信息
+操作步骤：
+1. 从路由参数或localStorage获取SERIE（底盘系列号）和CHNO（底盘编号）
+2. 页面加载完成后，立即调用UD06SaveModificationsApi
+3. API返回数据包括：chassisSerie、chassisNumber、doctype、version、storing、foundUnreleasedVersion等信息
+4. 解析Chassis serie：从完整的底盘信息中提取'-'符号前的部分
+5. 解析Chassis number：从完整的底盘信息中提取'-'符号后的部分
+6. 在页面上方显示Chassis serie和Chassis number标签
+7. 显示Doctype、Version、Storing、FOUND UNRELEASED VERSION等信息
+8. 在Message区域显示固定消息"VERSION IS RELEASED"
+
+### 4.2 显示修改内容
+功能说明：展示从HDOC_ADCA_MODIFICATION表获取的修改信息
+操作步骤：
+1. 显示Doctype字段值（文档类型）
+2. 显示Version字段值（版本号）
+3. 显示Storing信息，包含变量名（VARIABLE）和新值（NEWVAL）
+4. 显示FOUND UNRELEASED VERSION信息，标识是否存在未发布的版本
+5. 所有信息以只读方式展示，不可编辑
+
+### 4.3 Close按钮点击处理
+功能说明：关闭当前页面
+操作步骤：
+1. 用户点击Close按钮
+2. 系统关闭当前Save Modifications页面
+3. 返回到前一页面（Modify Document页面）或关闭弹窗/对话框
+4. 不执行任何保存操作，仅作为信息确认页面
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+开始：用户从Modify Document页面跳转到Save Modifications页面
+前置处理：从路由参数或localStorage获取SERIE和CHNO
+API调用：
+调用UD06SaveModificationsApi
+传递参数：{serie, chno}
+查询HDOC_ADCA_MODIFICATION表获取修改信息
+结果处理：
+成功：填充页面字段，显示修改内容
+失败：显示错误消息
+
+### 5.2 底盘信息解析规则
+Chassis serie提取：
+- 从完整的底盘信息字符串中查找'-'分隔符
+- 提取'-'符号前的所有内容作为Chassis serie
+- 若不存在'-'符号，则使用完整字符串
+
+Chassis number提取：
+- 从完整的底盘信息字符串中查找'-'分隔符
+- 提取'-'符号后的所有内容作为Chassis number
+- 若不存在'-'符号，则Chassis number为空
+
+### 5.3 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 页面加载时 | SERIE/CHNO参数 | 参数必须存在 | 缺少必要的底盘信息 | 返回上一页或显示错误 |
+| 2 | API调用后 | 查询结果 | 未找到该底盘的修改记录 | 未找到修改记录 | 显示提示信息 |
+
+## 6. 接口定义 (API Specification)
+
+### UD06SaveModificationsApi (包含UD06SelectHdocAdcaModification)
+功能：获取ADCA修改信息，包括文档类型、版本号、存储信息等。从HDOC_ADCA_MODIFICATION表查询指定底盘的修改记录
+Method：POST
+Endpoint：/api/savemodifications/query
+
+Request
+```json
+{
+"serie": "string (底盘系列号)",
+"chno": "string (底盘编号)"
+}
+```
+
+Response Success (200)
+```json
+{
+"code": 200,
+"message": "success",
+"data": {
+"chassisSerie": "string",
+"chassisNumber": "string",
+"doctype": "string",
+"version": "string",
+"storing": {
+"variable": "string",
+"newval": "string"
+},
+"foundUnreleasedVersion": "string"
+}
+}
+```
+
+Response Error (404)
+```json
+{
+"code": 404,
+"message": "未找到该底盘的修改记录"
+}
+```
+
+Response Error (500)
+```json
+{
+"code": 500,
+"message": "查询失败，请稍后重试"
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| UD06SaveModificationsApi网络错误 | 捕获异常，显示友好提示 | 网络连接失败，请稍后重试 |
+| UD06SaveModificationsApi超时 | 设置超时时间，超时后提示 | 请求超时，请检查网络连接 |
+| UD06SaveModificationsApi数据库异常 | 记录日志，返回通用错误 | 系统异常，请联系管理员 |
+| 参数缺失 | 检查URL参数或localStorage | 缺少必要的底盘信息 |
+| 权限不足 | 检查用户登录状态 | 请先登录后再操作 |
+| 未找到修改记录 | 显示提示信息 | 未找到该底盘的修改记录 |
+
+## 8. 语言要求
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文
+- 技术术语可保留英文
+- 保持与参考文档相同的格式结构
+
+## 9. 输出要求
+- 生成完整的Markdown格式文档
+- 文件名格式：UD06_详细设计.md
+## 补充事项
+- 参照img/UD06.png查看布局页面

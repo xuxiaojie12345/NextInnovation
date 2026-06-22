@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD08Mapper">
+
+    <!-- PRODUCT_CLASS_MASTER 结果映射 -->
+    <resultMap id="ProductClassMasterMap" type="com.web.app.domain.entity.ProductClassMaster">
+        <id column="PC" property="pc"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- MARKET_MASTER 结果映射 -->
+    <resultMap id="MarketMasterMap" type="com.web.app.domain.entity.MarketMaster">
+        <id column="MARKET" property="market"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- HDOC_VARIABLES 结果映射 -->
+    <resultMap id="HdocVariableMap" type="com.web.app.domain.entity.HdocVariable">
+        <id column="VARIABLE" property="variable"/>
+        <result column="TYPE" property="type"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="USERID" property="userid"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- HDOC_USER_DEFINED_RULES 结果映射 -->
+    <resultMap id="HdocUserDefinedRulesMap" type="com.web.app.domain.entity.HdocUserDefinedRules">
+        <id column="PC" property="pc"/>
+        <id column="NUM" property="num"/>
+        <id column="MARKET" property="market"/>
+        <result column="VS" property="vs"/>
+        <result column="VS2" property="vs2"/>
+        <result column="VARIABLE" property="variable"/>
+        <result column="VAL" property="val"/>
+        <result column="USERID" property="userid"/>
+        <result column="UP_DATE" property="upDate"/>
+        <result column="COMMENTS" property="comments"/>
+        <result column="ADD_DATE" property="addDate"/>
+        <result column="DELETE_DATE" property="deleteDate"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- UD08SelectProductclassmaster: 查询所有产品类别 -->
+    <select id="selectAllProductClassMaster" resultMap="ProductClassMasterMap">
+        SELECT PC, DESCRIPTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM PRODUCT_CLASS_MASTER
+        ORDER BY PC
+    </select>
+
+    <!-- UD08SelectMarketmaster: 查询所有市场信息 -->
+    <select id="selectAllMarketMaster" resultMap="MarketMasterMap">
+        SELECT MARKET, DESCRIPTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM MARKET_MASTER
+        ORDER BY MARKET
+    </select>
+
+    <!-- UD08SelectHdocvariables: 查询所有HDOC变量 -->
+    <select id="selectAllHdocVariables" resultMap="HdocVariableMap">
+        SELECT VARIABLE, TYPE, DESCRIPTION, USERID,
+               REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM HDOC_VARIABLES
+        ORDER BY VARIABLE
+    </select>
+
+    <!-- 根据主键查询用户自定义规则 -->
+    <select id="selectByPrimaryKey" resultMap="HdocUserDefinedRulesMap">
+        SELECT PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS,
+               ADD_DATE, DELETE_DATE,
+               REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+
+    <!-- 检查主键是否已存在 -->
+    <select id="countByPrimaryKey" resultType="int">
+        SELECT COUNT(1) FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </select>
+
+    <!-- 检查主键是否已存在（排除自身） -->
+    <select id="countByPrimaryKeyExcludeSelf" resultType="int">
+        SELECT COUNT(1) FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+          AND NOT (PC = #{oldPc} AND NUM = #{oldNum} AND MARKET = #{oldMarket})
+    </select>
+
+    <!-- 根据Variable查询HDOC_VARIABLES是否存在 -->
+    <select id="countByVariable" resultType="int">
+        SELECT COUNT(1) FROM HDOC_VARIABLES
+        WHERE VARIABLE = #{variable}
+    </select>
+
+    <!-- UD08Add: 新增用户自定义规则 -->
+    <insert id="insert" parameterType="com.web.app.domain.entity.HdocUserDefinedRules">
+        INSERT INTO HDOC_USER_DEFINED_RULES (
+            PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS,
+            ADD_DATE, DELETE_DATE,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        ) VALUES (
+            #{pc}, #{num}, #{market}, #{vs}, #{vs2}, #{variable}, #{val}, #{userid}, #{upDate}, #{comments},
+            #{addDate}, #{deleteDate},
+            #{registerDatetime}, #{registerUser}, #{registerProcess},
+            #{updateDatetime}, #{updateUser}, #{updateProcess}
+        )
+    </insert>
+
+    <!-- UD08Update: 动态更新用户自定义规则，仅更新有入力的字段 -->
+    <update id="updateByPrimaryKey" parameterType="com.web.app.domain.entity.HdocUserDefinedRules">
+        UPDATE HDOC_USER_DEFINED_RULES
+        <set>
+            <if test="variable != null">VARIABLE = #{variable},</if>
+            <if test="val != null">VAL = #{val},</if>
+            <if test="vs != null">VS = #{vs},</if>
+            <if test="vs2 != null">VS2 = #{vs2},</if>
+            <if test="comments != null">COMMENTS = #{comments},</if>
+            <if test="addDate != null">ADD_DATE = #{addDate},</if>
+            <if test="deleteDate != null">DELETE_DATE = #{deleteDate},</if>
+            <if test="registerUser != null">REGISTER_USER = #{registerUser},</if>
+            <if test="updateDatetime != null">UPDATE_DATETIME = #{updateDatetime},</if>
+            <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
+            <if test="updateProcess != null">UPDATE_PROCESS = #{updateProcess},</if>
+        </set>
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </update>
+
+    <!-- UD08Delete: 删除用户自定义规则 -->
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </delete>
+
+    <!-- UD08Search: 根据搜索条件查询用户自定义规则列表 -->
+    <!-- 支持PC、NUM、MARKET、VARIABLE等字段的可选条件查询 -->
+    <!-- 每个字段配合 productClassOp/numberOp/... 运算符动态生成条件 -->
+    <!-- Number和Date字段支持 =, !=, >, <, >=, <= 比较运算符 -->
+    <!-- 其他字段支持 =, !=（模糊字段为 LIKE / NOT LIKE） -->
+    <select id="searchUserDefinedRules" resultMap="HdocUserDefinedRulesMap"
+            parameterType="com.web.app.domain.UD08SearchRequest">
+        SELECT PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS,
+               ADD_DATE, DELETE_DATE,
+               REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE 1=1
+        <!-- ProductClass: 等值匹配（= 或 !=） -->
+        <if test="request.productClass != null and request.productClass != ''">
+            <choose>
+                <when test="request.productClassOp == '!='">
+                    AND PC != #{request.productClass}
+                </when>
+                <otherwise>
+                    AND PC = #{request.productClass}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Number: 数值比较（支持 =, >, < 三种） -->
+        <if test="request.number != null and request.number != ''">
+            <choose>
+                <when test="'GT'.equals(request.numberOp)">
+                    AND NUM &gt; #{request.number}
+                </when>
+                <when test="'LT'.equals(request.numberOp)">
+                    AND NUM &lt; #{request.number}
+                </when>
+                <otherwise>
+                    AND NUM = #{request.number}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Market: 等值匹配（= 或 !=） -->
+        <if test="request.market != null and request.market != ''">
+            <choose>
+                <when test="request.marketOp == '!='">
+                    AND MARKET != #{request.market}
+                </when>
+                <otherwise>
+                    AND MARKET = #{request.market}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Variable: 模糊匹配（LIKE 或 NOT LIKE） -->
+        <if test="request.variable != null and request.variable != ''">
+            <choose>
+                <when test="request.variableOp == '!='">
+                    AND VARIABLE NOT LIKE CONCAT('%', #{request.variable}, '%')
+                </when>
+                <otherwise>
+                    AND VARIABLE LIKE CONCAT('%', #{request.variable}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Value: 模糊匹配（LIKE 或 NOT LIKE） -->
+        <if test="request.value != null and request.value != ''">
+            <choose>
+                <when test="request.valueOp == '!='">
+                    AND VAL NOT LIKE CONCAT('%', #{request.value}, '%')
+                </when>
+                <otherwise>
+                    AND VAL LIKE CONCAT('%', #{request.value}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- VS: 模糊匹配 -->
+        <if test="request.vs != null and request.vs != ''">
+            <choose>
+                <when test="request.vsOp == '!='">
+                    AND VS NOT LIKE CONCAT('%', #{request.vs}, '%')
+                </when>
+                <otherwise>
+                    AND VS LIKE CONCAT('%', #{request.vs}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- VS2: 模糊匹配 -->
+        <if test="request.vs2 != null and request.vs2 != ''">
+            <choose>
+                <when test="request.vs2Op == '!='">
+                    AND VS2 NOT LIKE CONCAT('%', #{request.vs2}, '%')
+                </when>
+                <otherwise>
+                    AND VS2 LIKE CONCAT('%', #{request.vs2}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- Comments: 模糊匹配 -->
+        <if test="request.comments != null and request.comments != ''">
+            <choose>
+                <when test="request.commentsOp == '!='">
+                    AND COMMENTS NOT LIKE CONCAT('%', #{request.comments}, '%')
+                </when>
+                <otherwise>
+                    AND COMMENTS LIKE CONCAT('%', #{request.comments}, '%')
+                </otherwise>
+            </choose>
+        </if>
+        <!-- ADD_DATE: 等值匹配（= 或 !=） -->
+        <if test="request.addDate != null and request.addDate != ''">
+            <choose>
+                <when test="request.addDateOp == '!='">
+                    AND ADD_DATE != #{request.addDate}
+                </when>
+                <otherwise>
+                    AND ADD_DATE = #{request.addDate}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- DELETE_DATE: 等值匹配（= 或 !=） -->
+        <if test="request.deleteDate != null and request.deleteDate != ''">
+            <choose>
+                <when test="request.deleteDateOp == '!='">
+                    AND DELETE_DATE != #{request.deleteDate}
+                </when>
+                <otherwise>
+                    AND DELETE_DATE = #{request.deleteDate}
+                </otherwise>
+            </choose>
+        </if>
+        <!-- UPDATE_DATETIME: 日期时间字符串比较（支持 =, >, < 三种） -->
+        <if test="request.updateDatetime != null and request.updateDatetime != ''">
+            <choose>
+                <when test="'GT'.equals(request.updateDatetimeOp)">
+                    AND UPDATE_DATETIME &gt; #{request.updateDatetime}
+                </when>
+                <when test="'LT'.equals(request.updateDatetimeOp)">
+                    AND UPDATE_DATETIME &lt; #{request.updateDatetime}
+                </when>
+                <otherwise>
+                    AND UPDATE_DATETIME = #{request.updateDatetime}
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY PC, MARKET, NUM
+    </select>
+
+    <!-- UD09BatchDelete: 根据主键单条删除（循环调用） -->
+    <delete id="batchDeleteByPrimaryKey">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
+    </delete>
+
+</mapper>

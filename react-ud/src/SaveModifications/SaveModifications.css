@@ -1,0 +1,191 @@
+/* =====================================================
+   SaveModifications 组件样式 - UD06 保存修改页面
+   对应详细设计：DES-SaveModifications-001
+   布局风格：白色卡片 + 圆角阴影，与系统风格统一
+   ===================================================== */
+
+/* 页面容器 - 居中白色卡片 */
+.save-modifications-container {
+  padding: 24px;
+  max-width: 780px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 页面标题区域 */
+.page-header {
+  border-bottom: 2px solid #003087;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  color: #003087;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 加载中提示 */
+.loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* 错误消息区域 - 浅红背景红色边框 */
+.error-message-area {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.error-message-area p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* 底盘信息区域 */
+.vehicle-info-section {
+  margin-bottom: 0;
+}
+
+/* 修改信息区域 */
+.modification-info-section {
+  margin-bottom: 0;
+}
+
+/* 通用信息行 */
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.info-item label {
+  font-weight: normal;
+  color: #333;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.info-item span {
+  color: #003087;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* Doctype - 上不留空行 */
+.item-doctype {
+  margin-top: 0;
+}
+
+/* Version - 上下留空行 */
+.item-version {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* FOUND UNRELEASED VERSION 区域 */
+.found-version-section {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.6;
+}
+
+.found-version-section label {
+  font-weight: normal;
+  color: #333;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.found-version-section span {
+  color: #003087;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* Message 区域 - 固定显示 VERSION IS RELEASED */
+.message-section {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background-color: #006d2a;
+  border-radius: 4px;
+  max-width: 195px;
+}
+
+.release-message {
+  color: #000;
+  font-weight: bold;
+  font-size: 15px;
+  margin: 0;
+  text-align: center;
+}
+
+/* 按钮区域 */
+.button-section {
+  text-align: center;
+  padding-top: 10px;
+}
+
+.close-button {
+  padding: 10px 30px;
+  background-color: #e8f4f8;
+  color: #003057;
+  border: 2px solid #b0d4e8;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 100px;
+}
+
+.close-button:hover:not(:disabled) {
+  background-color: #d0e8f0;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.close-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 响应式 - 小屏幕 */
+@media (max-width: 768px) {
+  .save-modifications-container {
+    padding: 16px;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-item label {
+    min-width: auto;
+    margin-bottom: 2px;
+  }
+
+  .found-version-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .found-version-section label {
+    min-width: auto;
+    margin-bottom: 2px;
+  }
+}

@@ -1,0 +1,244 @@
+/* =====================================================
+   ModifyDocument 组件样式 - UD05 文档修改页面
+   对应详细设计：DES-ModifyDocument-001
+   布局风格：白色卡片 + 圆角阴影，与 Login 组件保持统一
+   ===================================================== */
+
+/* 页面容器 - 居中白色卡片 */
+.modify-document-container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 页面标题区域 */
+.page-header {
+  border-bottom: 2px solid #003087;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  color: #003087;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 加载中提示 */
+.loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* 错误消息区域 - 浅红背景红色边框 */
+.error-message-area {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.error-message-area p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* 消息提示区域（校验失败等） - 黄色背景 */
+.message-area {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ad6800;
+  font-weight: bold;
+}
+
+.message-area p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* 底盘信息区域 */
+.vehicle-info-section {
+  margin-bottom: 20px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.info-item label {
+  font-weight: normal;
+  min-width: 150px;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.info-item span {
+  color: #003087;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* 模板文件链接区域 */
+.template-section {
+  margin-bottom: 20px;
+}
+
+.template-link {
+  color: #1890ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.template-link:hover {
+  color: #40a9ff;
+}
+
+/* DataTable 区域 */
+.data-table-section {
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.variable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.variable-table thead th {
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+}
+
+.variable-table tbody td {
+  border: 1px solid #e8e8e8;
+  padding: 8px 12px;
+  color: #333;
+  vertical-align: middle;
+}
+
+.variable-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.variable-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+/* 列宽定义 */
+.col-variable {
+  width: 15%;
+}
+
+.col-description {
+  width: 30%;
+}
+
+.col-current {
+  width: 20%;
+}
+
+.col-modified {
+  width: 35%;
+}
+
+/* Save 按钮 - 表格头部行，与表头样式融合 */
+.col-save {
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.save-button {
+  padding: 5px 18px;
+  background-color: #e8f4f8;
+  color: #003057;
+  border: 2px solid #b0d4e8;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #d0e8f0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modified value 输入框 */
+.modified-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.modified-input:focus {
+  border-color: #1890ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.modified-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 空数据提示 */
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 14px;
+}
+
+
+
+/* 响应式 - 小屏幕 */
+@media (max-width: 768px) {
+  .modify-document-container {
+    padding: 16px;
+  }
+
+  .variable-table {
+    font-size: 13px;
+  }
+
+  .variable-table thead th,
+  .variable-table tbody td {
+    padding: 6px 8px;
+  }
+}

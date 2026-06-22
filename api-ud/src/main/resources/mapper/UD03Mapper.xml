@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD03Mapper">
+
+    <!-- 查询所有文档类型（全检索HDOC_DOCUMENT_LIST表） -->
+    <select id="selectAllDocumentTypes" resultType="com.web.app.domain.entity.DocumentType">
+        SELECT 
+            DOCTYPE as doctype,
+            DESCRIPTION as description,
+            REGISTER_DATETIME as registerDatetime,
+            REGISTER_USER as registerUser,
+            REGISTER_PROCESS as registerProcess,
+            UPDATE_DATETIME as updateDatetime,
+            UPDATE_USER as updateUser,
+            UPDATE_PROCESS as updateProcess
+        FROM HDOC_DOCUMENT_LIST
+        ORDER BY DOCTYPE
+    </select>
+
+</mapper>

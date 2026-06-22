@@ -1,0 +1,225 @@
+/**
+ * ExistingHDocVariablesResultList 组件样式
+ * 现有HDoc变量搜索结果列表页面（UD11）
+ * 参照页面设计描述.txt UD05/UD08/UD09 布局风格
+ */
+
+/* 容器 */
+.ud11-container {
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+/* 页面标题 */
+.ud11-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222222;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+
+/* 副标题 */
+.ud11-subtitle {
+  font-size: 12px;
+  color: #999999;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+/* 标题下方分割线 */
+.ud11-divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin: 0 0 16px 0;
+}
+
+/* 加载中 */
+.ud11-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 14px;
+  color: #999999;
+}
+
+/* 面包屑导航 */
+.ud11-breadcrumb {
+  font-size: 12px;
+  color: #888888;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+.ud11-breadcrumb span {
+  color: #1890ff;
+  cursor: pointer;
+}
+
+.ud11-breadcrumb span:hover {
+  color: #40a9ff;
+}
+
+/* 消息区域 */
+.ud11-message {
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.ud11-message.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.ud11-message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.ud11-message.warning {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #ad8b00;
+}
+
+/* 按钮组 */
+.ud11-button-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* 操作按钮 */
+.ud11-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333333;
+  transition: all 0.2s ease;
+  min-width: 70px;
+  text-align: center;
+}
+
+.ud11-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.ud11-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #d9d9d9;
+  color: #bbbbbb;
+}
+
+/* 搜索计数 */
+.ud11-count {
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+/* 表格包装 */
+.ud11-table-wrapper {
+  overflow-x: auto;
+}
+
+/* 数据表格 */
+.ud11-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #e8e8e8;
+}
+
+.ud11-table th {
+  background-color: #fafafa;
+  color: #333333;
+  font-weight: bold;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.ud11-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333333;
+  vertical-align: top;
+}
+
+.ud11-table tr:hover {
+  background-color: #e6f7ff;
+  cursor: pointer;
+}
+
+/* 选中行样式 */
+.ud11-table tr.ud11-row-selected {
+  background-color: #e6f7ff;
+}
+
+/* 行指示器列（选中标记） */
+.ud11-row-indicator {
+  width: 32px;
+  text-align: center;
+}
+
+/* 选中标记 */
+.ud11-check-mark {
+  color: #1890ff;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* 用户链接样式 */
+.ud11-user-link {
+  color: #1890ff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ud11-user-link:hover {
+  color: #40a9ff;
+}
+
+/* 空数据提示 */
+.ud11-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 14px;
+  color: #999999;
+  border: 1px dashed #e8e8e8;
+  border-radius: 4px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .ud11-container {
+    padding: 16px;
+  }
+
+  .ud11-button-group {
+    flex-direction: column;
+  }
+
+  .ud11-btn {
+    width: 100%;
+  }
+}
