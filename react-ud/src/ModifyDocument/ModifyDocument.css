@@ -1,0 +1,161 @@
+/* ── Modify Document（Menu 右侧显示） ── */
+.modify-doc-container {
+  width: 100%;
+  max-width: 960px;
+  padding: 20px 24px;
+  border: 2px solid #acb7ee;
+  /* border-radius: 6px; */
+  box-sizing: border-box;
+}
+
+.modify-doc-loading {
+  padding: 40px 0;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.modify-doc-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #002182;
+  text-align: left;
+}
+
+/* ── 情報エリア（Chassis no / Market を2行で表示） ── */
+.modify-doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 50px;
+}
+
+.modify-doc-info-item {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.modify-doc-info-item .info-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 13px;
+}
+
+.modify-doc-info-item .info-value {
+  font-size: 13px;
+  color: #333;
+}
+
+/* ── Template ファイルリンク ── */
+.modify-doc-template {
+  margin-bottom: 50px;
+  text-align: left;
+}
+
+.modify-doc-template-link {
+  color: #002182;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 13px;
+}
+
+.modify-doc-template-link:hover {
+  color: #001a66;
+}
+
+.modify-doc-error {
+  padding: 10px 14px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ── 大枠テーブル ── */
+.modify-doc-table-wrapper {
+  /* border: 2px solid #a1aeeb; */
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* ── Save ボタン行 ── */
+.modify-doc-save-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: #f1f3ff;
+  border: 2px solid #a1aeeb;
+  border-bottom: none;
+}
+
+.modify-doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.modify-doc-table th {
+  background-color: #ffffff;
+  color: #333;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  border: 2px solid #a1aeeb;
+}
+
+.modify-doc-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+  border: 2px solid #a1aeeb;
+}
+
+/* 背景色を白と #f1f3ff で交互に */
+.modify-doc-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.modify-doc-table tbody tr:nth-child(even) {
+  background-color: #f1f3ff;
+}
+
+.modify-doc-table tbody tr:hover {
+  background-color: #e0e8ff;
+}
+
+.td-var { font-weight: 500; color: #002182; }
+.td-desc { color: #555; }
+.td-current { color: #333; }
+
+.modify-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.modify-input:focus {
+  outline: none;
+  border-color: #002182;
+  box-shadow: 0 0 0 2px rgba(0, 33, 130, 0.1);
+}
+
+.modify-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.modify-doc-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+

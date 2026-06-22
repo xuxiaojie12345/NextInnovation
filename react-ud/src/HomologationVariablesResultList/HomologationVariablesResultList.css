@@ -1,0 +1,216 @@
+/* ═══════════════════════════════════════════
+   Homologation Variables Result List
+   参照画像: react-ud/src/doc/image/Homologation Variables Result List_1.png
+   ═══════════════════════════════════════════ */
+
+/* ── 外层容器 ── */
+.hv-result-container {
+  width: 90%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #8698e6;
+}
+
+/* ── 标题区域 ── */
+.hv-result-header {
+  /* background-color: #002060; */
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.hv-result-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 0.3px;
+}
+
+/* ── 件数表示（表格下方） ── */
+.hv-result-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 8px;
+  text-align: left;
+  /* border: 2px solid #acb7ee; */
+  /* border-top: none; */
+}
+
+/* ── エラー・空メッセージ ── */
+.hv-result-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.hv-result-empty {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+.hv-result-loading {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+/* ── テーブル外枠 ── */
+.hv-result-table-wrapper {
+  overflow-x: auto;
+  /* border: 2px solid #acb7ee;
+  border-top: none; */
+  margin: 10px;
+}
+
+/* ── データテーブル ── */
+.hv-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+/* ── ヘッダー行 ── */
+
+.hv-result-table th {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  color: #00006d;
+  /* background-color: #002060; */
+  white-space: normal;
+  word-break: break-word;
+  border: none;
+  position: sticky;
+  top: 0;
+  min-width: 90px;
+}
+
+.hv-th-noborder {
+  border: none !important;
+}
+
+/* 必须字段 * 标记 */
+.hv-th-required::before {
+  content: '*';
+  color: #e53935;
+  font-weight: 700;
+  margin-right: 1px;
+}
+
+/* 下划线字段 */
+.hv-th-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 第二行副文本 */
+.hv-th-subtext {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00006d;
+  white-space: nowrap;
+}
+
+/* radio列 */
+.th-check,
+.td-check {
+  width: 30px;
+  text-align: center;
+}
+
+.td-check input,
+.th-check input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* ── 明細行 ── */
+.hv-result-table td {
+  padding: 4px 8px;
+  color: #333;
+  font-size: 11px;
+}
+
+/* 内部格子之间有边框，外侧无边框 */
+.hv-result-table tbody td {
+  border: 1px solid #8698e6;
+}
+
+/* 第一行无上边框 */
+.hv-result-table tbody tr:first-child td {
+  border-top: none;
+}
+
+/* 最后一行无下边框 */
+.hv-result-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 最左侧列无左边框 */
+.hv-result-table tbody td:first-child {
+  border-left: none;
+}
+
+/* 最右侧列无右边框 */
+.hv-result-table tbody td:last-child {
+  border-right: none;
+}
+
+/* 交互背景色：奇数行白色、偶数行 #f1f3ff */
+.hv-result-table tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+.hv-result-table tbody tr:nth-child(even) td {
+  background-color: #f1f3ff;
+}
+
+.hv-result-table tbody tr:hover td {
+  background-color: #e0e8ff;
+}
+
+.hv-result-table tbody tr.selected td {
+  background-color: #dde8f8;
+}
+
+/* ── Created by user リンク ── */
+.link-user {
+  color: #002060;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.link-user:hover {
+  color: #001a4d;
+}
+
+/* ── ボタンエリア ── */
+.hv-result-btn-table {
+  width: calc(100% - 20px);
+  border-collapse: collapse;
+  border: 2px solid #acb7ee;
+  border-left: none;
+  border-right: none;
+  background-color: #f1f3ff;
+  margin: 10px;
+}
+
+.hv-result-btn-cell {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.hv-result-btn-cell .btn {
+  margin-right: 6px;
+}
+
+

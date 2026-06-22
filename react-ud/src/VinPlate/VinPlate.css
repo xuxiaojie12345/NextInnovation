@@ -1,0 +1,173 @@
+/* ═══════════════════════════════════════════
+   Vin Plate Module
+   ═══════════════════════════════════════════ */
+
+.vp-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.vp-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.vp-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ── 消息提示 ── */
+.vp-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.vp-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+/* ── 输入区域 ── */
+.vp-input-section {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.vp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.vp-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 110px;
+  text-align: left;
+}
+
+.vp-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.vp-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.vp-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.vp-btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+
+/* ── 信息展示区域 ── */
+.vp-info-section {
+  padding: 10px;
+}
+
+.vp-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.vp-info-table td {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 12px;
+}
+
+.vp-info-label {
+  font-weight: 700;
+  color: #333;
+  background-color: #f1f3ff;
+  width: 180px;
+  white-space: nowrap;
+}
+
+.vp-info-value {
+  color: #333;
+}
+
+/* ── XML 数据展示 ── */
+.vp-xml-section {
+  margin-top: 16px;
+}
+
+.vp-xml-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1c2771;
+  margin: 0 0 8px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid #acb7ee;
+}
+
+.vp-xml-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.vp-xml-table th {
+  background-color: #002060;
+  color: #ffffff;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #9fb6d4;
+}
+
+.vp-xml-table td {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 12px;
+  color: #333;
+}
+
+.vp-xml-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* ── 无数据 ── */
+.vp-no-data {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}

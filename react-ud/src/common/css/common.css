@@ -1,0 +1,86 @@
+/* ═══════════════════════════════════════════
+   common.css — プロジェクト共通スタイル
+   App.tsx および各画面コンポーネントで import
+   ═══════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════
+   汎用ボタン（.btn）
+   全画面統一のクラシックボタンスタイル
+   ═══════════════════════════════════════════ */
+.btn {
+  display: inline-block !important;
+  padding: 8px 16px !important;
+  background-color: #dce1ff !important;
+  border: 1px outset #ccc !important;
+  border-radius: 3px !important;
+  color: #1c2771 !important;
+  font-family: sans-serif !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.2) !important;
+  cursor: pointer !important;
+  line-height: normal !important;
+  text-decoration: none !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  font-weight: 400 !important;
+}
+
+.btn:active {
+  border-style: inset !important;
+  box-shadow: none !important;
+}
+
+.btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+
+
+/* ═══════════════════════════════════════════
+   エラーメッセージボックス
+   ═══════════════════════════════════════════ */
+.message-error {
+  padding: 10px 14px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.message-success {
+  padding: 10px 14px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+  color: #389e0d;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ═══════════════════════════════════════════
+   コンテナ共通枠線
+   ═══════════════════════════════════════════ */
+.container-border {
+  border: 2px solid #acb7ee;
+  box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════
+   テーブル共通ヘッダー（濃青色）
+   ═══════════════════════════════════════════ */
+.table-header-dark {
+  background-color: #002060;
+  color: #ffffff;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #9fb6d4;
+}

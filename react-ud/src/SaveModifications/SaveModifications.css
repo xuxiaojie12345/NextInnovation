@@ -1,0 +1,146 @@
+/* ── Save Modifications（Menu 右侧显示） ── */
+.save-mod-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px 20px;
+  border: 2px solid #acb7ee;
+  /* border-radius: 6px; */
+  box-sizing: border-box;
+}
+
+.save-mod-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #002182;
+  text-align: left;
+}
+
+.save-mod-error {
+  padding: 10px 14px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ── 情報エリア：1行1項目、左詰め ── */
+.save-mod-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.save-mod-info-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.save-mod-info-row .info-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 13px;
+}
+
+.save-mod-info-row .info-value {
+  font-size: 13px;
+  color: #333;
+}
+
+/* ── Version（下30px） ── */
+.save-mod-version-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 30px;
+  /* margin-bottom: 50px; */
+}
+
+.save-mod-version-row .info-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 13px;
+}
+
+.save-mod-version-row .info-value {
+  font-size: 13px;
+  color: #333;
+}
+
+.save-mod-unreleased {
+  padding: 10px 14px;
+  background-color: #fff7e6;
+  border: 1px solid #ffe58f;
+  border-radius: 4px;
+  color: #ad6800;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.save-mod-section {
+  margin-bottom: 16px;
+}
+
+.save-mod-section-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #002182;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.save-mod-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.save-mod-table th {
+  background-color: #002182;
+  color: #fff;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.save-mod-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.save-mod-table tbody tr:hover {
+  background-color: #f5f7ff;
+}
+
+.td-var { font-weight: 500; color: #002182; }
+.td-val { color: #333; }
+
+/* ── VERSION IS RELEASED（背景色 #008000） ── */
+.save-mod-message {
+  padding: 2px;
+  background-color: #008000;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: left;
+  width: 135px;
+}
+
+.save-mod-actions {
+  display: flex;
+  gap: 10px;
+}
+

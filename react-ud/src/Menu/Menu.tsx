@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import './Menu.css';
 
 interface MenuItem {
@@ -6,108 +7,130 @@ interface MenuItem {
   path?: string;
 }
 
-interface MenuSection {
+interface MenuCategory {
   title: string;
   items: MenuItem[];
 }
 
-const Menu: React.FC = () => {
-  const menuSections: MenuSection[] = [
-    {
-      title: 'Generate Document',
-      items: [
-        { label: 'Generate Doc' },
-        { label: 'Generate in Batch' },
-        { label: 'Regdata Archive' },
-        { label: 'Regdata Batch' },
-      ],
-    },
-    {
-      title: 'Admin',
-      items: [
-        { label: 'Update user defined variables (rules)' },
-        { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
-        { label: 'Unlock Document' },
-        { label: 'HDoc Number Series' },
-        { label: 'Upload/Delete template' },
-        { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
-      ],
-    },
-    {
-      title: 'User Administration',
-      items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
-        { label: 'Change Password' },
-        { label: 'User Position' },
-      ],
-    },
-    {
-      title: 'Archive',
-      items: [
-        { label: 'Search' },
-        { label: 'Upload Document' },
-      ],
-    },
-    {
-      title: 'Documentation',
-      items: [
-        { label: 'User Guide' },
-        { label: 'AD/CA Change Guide' },
-        { label: 'Vin plate Guide FM/FH' },
-        { label: 'Archive Guide' },
-        { label: 'Privacy' },
-      ],
-    },
-  ];
+const MENU_CATEGORIES: MenuCategory[] = [
+  {
+    title: 'Generate',
+    items: [
+      { label: 'Generate Doc', path: '/menu/generate-doc' },
+      { label: 'Generate in Batch' },
+      { label: 'Regdata Archive' },
+      { label: 'Regdata Batch' },
+    ],
+  },
+  {
+    title: 'Admin',
+    items: [
+      { label: 'Update user defined variables (rules)', path: '/menu/homologation-variables' },
+      { label: 'Update user defined variables (UNICODE rules)' },
+      { label: 'Existing HDoc variables', path: '/menu/existing-hdoc-vars' },
+      { label: 'Unlock Document' },
+      { label: 'HDoc Number Series' },
+      { label: 'Upload/Delete template', path: '/menu/upload-delete-template' },
+      { label: 'List available templates', path: '/menu/list-templates' },
+      { label: 'VPPS Vin plate', path: '/menu/vin-plate' },
+      { label: 'AD/CA Change', path: '/menu/ad-ca-change' },
+    ],
+  },
+  {
+    title: 'User Administration',
+    items: [
+      { label: 'HDoc User Administration', path: '/menu/hdoc-user-admin' },
+      { label: 'HDoc User Doc Administration', path: '/menu/hdoc-user-doc-admin' },
+      { label: 'Search User', path: '/menu/search-user' },
+      { label: 'Change Password' },
+      { label: 'User Position' },
+    ],
+  },
+  {
+    title: 'Archive',
+    items: [
+      { label: 'Search' },
+      { label: 'Upload Document' },
+    ],
+  },
+  {
+    title: 'Documentation',
+    items: [
+      { label: 'User Guide', path: '/menu/guide-user' },
+      { label: 'AD/CA Change Guide', path: '/menu/guide-ad-ca' },
+      { label: 'Vin plate Guide FM/FH', path: '/menu/guide-vin-plate' },
+      { label: 'Archive Guide', path: '/menu/guide-archive' },
+      { label: 'Privacy', path: '/menu/privacy' },
+    ],
+  },
+];
 
-  const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+const Menu: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const username = localStorage.getItem('username') || localStorage.getItem('userId') || 'User';
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    navigate('/login', { replace: true });
   };
 
-  return (
-    <div className="menu-container">
-      <div className="menu-header">
-        <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-            const parent = (e.target as HTMLImageElement).parentElement;
-            if (parent) {
-              const textLogo = document.createElement('div');
-              textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
-              parent.appendChild(textLogo);
-            }
-          }}
-        />
-      </div>
+  const handleItemClick = (item: MenuItem) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+  };
 
-      <div className="menu-content">
-        {menuSections.map((section, index) => (
-          <div key={index} className="menu-section">
-            <h3 className="section-title">{section.title}</h3>
-            <ul className="menu-list">
-              {section.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex} 
-                  className="menu-item"
-                  onClick={() => handleMenuItemClick(item)}
+  // 当前路径是否为菜单根路径（无子路由选中）
+  const isRootMenu = location.pathname === '/menu';
+
+  return (
+    <div className="menu-root">
+      <aside className="menu-sidebar">
+        <div className="sidebar-header">
+          <h2>Generate Document</h2>
+        </div>
+
+        <nav className="sidebar-nav">
+          {MENU_CATEGORIES.map((cat) => (
+            <div key={cat.title} className="menu-section">
+              <div className="section-title">{cat.title}</div>
+              {cat.items.map((item) => (
+                <div
+                  key={item.label}
+                  className={`menu-item${location.pathname === item.path ? ' active' : ''}${!item.path ? ' disabled' : ''}`}
+                  onClick={() => handleItemClick(item)}
                 >
-                  <span className="menu-arrow">»</span>
-                  <span className="menu-label">{item.label}</span>
-                </li>
+                 <span className="menu-arrow">»</span>
+                 {item.label}
+                </div>
               ))}
-            </ul>
-          </div>
-        ))}
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      <main className="menu-main">
+        {isRootMenu ? (
+          <>
+            {/* <h1>Select a menu item to get started</h1> */}
+            <h2 style={{ marginTop: '40px', textAlign: 'left', color: '#1c2771' }}>
+              Welcome to the HDoc system. Please select an option from the menu on the left.
+            </h2>
+          </>
+        ) : (
+          <Outlet />
+        )}
+      </main>
+
+      <div className="sidebar-footer">
+        <div className="user-info">
+          <span className="user-icon">👤</span>
+          <span className="user-name">{username}</span>
+        </div>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );

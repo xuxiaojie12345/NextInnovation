@@ -1,68 +1,89 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
+/* ── 全体レイアウト ── */
+.menu-root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  /* color: #333; */
+  font-size: 14px;
 }
 
-.menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
-  text-align: center;
+/* ── サイドバー ── */
+.menu-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: #dddddd;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid #d0d0d0;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
+.sidebar-header {
+  padding: 14px 20px 12px;
+  background-color: #000f60;
+  border-bottom: 1px solid #d0d0d0;
 }
 
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
 }
 
-.menu-content {
+/* ── ナビゲーション（スクロールなし） ── */
+.sidebar-nav {
+  flex: 1;
+  overflow: hidden;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ── セクション ── */
 .menu-section {
-  border-bottom: 1px solid #ccc;
-}
-
-.menu-section:last-child {
-  border-bottom: none;
+  /* 各セクションは連続して表示 */
 }
 
 .section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 6px 16px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #002182;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  background-color: #e3e3e3;
+  line-height: 1.4;
+  margin-top: 9px;
+  text-align: left;
 }
 
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+/* ── メニュー項目 ── */
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  gap: 8px;
+  padding: 4px 16px;
+  font-size: 12px;
+  color: #002182;
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  transition: background-color 0.12s;
+  line-height: 1.7;
+  background-color: #dddddd;
+  text-align: left;
 }
 
 .menu-item:hover {
-  background-color: #d5e3f0;
+  background-color: #d0e4f5;
+}
+
+.menu-item.active {
+  background-color: #c0d8f0;
+  font-weight: 600;
+  border-left: 3px solid #002182;
 }
 
 .menu-arrow {
@@ -71,6 +92,71 @@
   font-size: 12px;
 }
 
-.menu-label {
+/* ── 右上ユーザー情報バー ── */
+.sidebar-footer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 20px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #d0d0d0;
+  border-left: 1px solid #d0d0d0;
+  border-radius: 0 0 0 6px;
+  z-index: 100;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-icon {
+  font-size: 16px;
+}
+
+.user-name {
+  font-size: 13px;
+  color: #333;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #aaa;
+  color: #555;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.logout-btn:hover {
+  background-color: #ddd;
+  color: #222;
+}
+
+/* ── メインコンテンツ ── */
+.menu-main {
   flex: 1;
+  padding: 45px 36px;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+.menu-main h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 500;
+  color: #222;
+  text-align: left;
+}
+
+.menu-main p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
 }

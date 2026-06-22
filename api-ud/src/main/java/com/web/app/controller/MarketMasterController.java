@@ -1,0 +1,32 @@
+package com.web.app.controller;
+
+import com.web.app.dto.ApiResponse;
+import com.web.app.entity.MarketMaster;
+import com.web.app.service.MarketMasterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/v1/hdoc/ud21")
+@CrossOrigin(origins = "*")
+public class MarketMasterController {
+
+    @Autowired
+    private MarketMasterService marketMasterService;
+
+    @PostMapping("/markets")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMarkets() {
+        try {
+            List<MarketMaster> marketList = marketMasterService.selectAllMarkets();
+            Map<String, Object> data = new HashMap<>();
+            data.put("marketList", marketList != null ? marketList : new ArrayList<>());
+            return ResponseEntity.ok(ApiResponse.success(data));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+        }
+    }
+}

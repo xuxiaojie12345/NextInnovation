@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════
+   Existing HDoc Variables Result List
+   参照画像: react-ud/src/doc/image/Existing HDoc Variables Result List_1.png
+   ═══════════════════════════════════════════ */
+
+/* ── 外层容器 ── */
+.ehvr-container {
+  width: 90%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #8698e6;
+}
+
+/* ── 标题区域 ── */
+.ehvr-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.ehvr-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ── 件数表示（表格下方） ── */
+.ehvr-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+/* ── エラー・空メッセージ ── */
+.ehvr-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.ehvr-empty {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+/* ── 按钮 Table ── */
+.ehvr-btn-table {
+  width: calc(100% - 20px);
+  border-collapse: collapse;
+  border: 2px solid #acb7ee;
+  border-left: none;
+  border-right: none;
+  background-color: #f1f3ff;
+  margin:10px;
+}
+
+.ehvr-btn-cell {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.ehvr-btn-cell .btn {
+  margin-right: 6px;
+}
+
+/* ── テーブル外枠 ── */
+.ehvr-table-wrapper {
+  overflow-x: auto;
+  margin: 10px;
+}
+
+/* ── データテーブル ── */
+.ehvr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+/* ── ヘッダー行 ── */
+.ehvr-table th {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  color: #00006d;
+  white-space: normal;
+  word-break: break-word;
+  border: none;
+  position: sticky;
+  top: 0;
+  min-width: 90px;
+}
+
+.ehvr-th-noborder {
+  border: none !important;
+}
+
+/* 下划线字段 */
+.ehvr-th-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* radio列 */
+.th-check,
+.td-check {
+  width: 30px;
+  text-align: center;
+}
+
+.td-check input,
+.th-check input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* ── 明細行 ── */
+.ehvr-table td {
+  padding: 4px 8px;
+  color: #333;
+  font-size: 11px;
+}
+
+/* 内部格子之间有边框，外侧无边框 */
+.ehvr-table tbody td {
+  border: 1px solid #8698e6;
+}
+
+/* 第一行无上边框 */
+.ehvr-table tbody tr:first-child td {
+  border-top: none;
+}
+
+/* 最后一行无下边框 */
+.ehvr-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 最左侧列无左边框 */
+.ehvr-table tbody td:first-child {
+  border-left: none;
+}
+
+/* 最右侧列无右边框 */
+.ehvr-table tbody td:last-child {
+  border-right: none;
+}
+
+/* 交互背景色：奇数行白色、偶数行 #f1f3ff */
+.ehvr-table tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+.ehvr-table tbody tr:nth-child(even) td {
+  background-color: #f1f3ff;
+}
+
+.ehvr-table tbody tr:hover td {
+  background-color: #e0e8ff;
+}
+
+.ehvr-table tbody tr.selected td {
+  background-color: #dde8f8;
+}
+
+/* ── Created by user リンク ── */
+.link-user {
+  color: #002060;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.link-user:hover {
+  color: #001a4d;
+}

@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════
+   EDB User View Module
+   ═══════════════════════════════════════════ */
+
+.edb-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.edb-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.edb-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.edb-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.edb-input-table {
+  width: 100%;
+  border-collapse: collapse;
+  padding: 4px 10px;
+}
+
+.edb-input-table td {
+  padding: 4px 4px;
+}
+
+.edb-label-cell {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+  width: 50px;
+}
+
+.edb-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  width: 180px;
+}
+
+.edb-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.edb-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.edb-info-section {
+  padding: 10px;
+}
+
+.edb-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.edb-info-table th {
+  background-color: #002060;
+  color: #ffffff;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #9fb6d4;
+}
+
+.edb-info-table td {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 12px;
+  color: #333;
+}

@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════
+   List Available Templates Module
+   ═══════════════════════════════════════════ */
+
+.lat-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.lat-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.lat-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ── 消息提示 ── */
+.lat-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.lat-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+/* ── 表单区域 ── */
+.lat-form {
+  padding: 8px 10px;
+}
+
+.lat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.lat-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 100px;
+  text-align: left;
+}
+
+.lat-select {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.lat-select:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.lat-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ── 表格区域 ── */
+.lat-table-section {
+  padding: 0 10px 10px 10px;
+}
+
+.lat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+/* ── 表头行：无背景色，带上边框 ── */
+.lat-table thead tr {
+  border-bottom: 1px solid #8698e6;
+}
+
+.lat-table thead tr th {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  color: #00006d;
+  border: none;
+  white-space: nowrap;
+  border-left: 1px solid #8698e6;
+}
+
+/* ── 明细行 ── */
+.lat-table tbody td {
+  padding: 4px 8px;
+  color: #333;
+  font-size: 12px;
+  border: 1px solid #8698e6;
+}
+
+/* 第一行无上边框 */
+.lat-table tbody tr:first-child td {
+  border-top: none;
+}
+
+/* 第一行无上边框 */
+.lat-table thead th:first-child {
+  border-left: none;
+}
+
+/* 最后一行无下边框 */
+.lat-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 最左侧列无左边框 */
+.lat-table tbody td:first-child {
+  border-left: none;
+}
+
+/* 最右侧列无右边框 */
+.lat-table tbody td:last-child {
+  border-right: none;
+}
+
+/* 交互背景色：奇数行白色、偶数行 #f1f3ff */
+.lat-table tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+.lat-table tbody tr:nth-child(even) td {
+  background-color: #f1f3ff;
+}
+
+.lat-table tbody tr:hover td {
+  background-color: #e0e8ff;
+}
+
+/* ── 文件图标列 ── */
+.lat-th-icon {
+  width: 32px;
+  text-align: center;
+}
+
+.lat-td-icon {
+  width: 32px;
+  text-align: center;
+}
+
+.lat-file-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ── 空数据行 ── */
+.lat-empty-cell {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+/* ── 下载链接 ── */
+.lat-download-link {
+  color: #1c2771;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.lat-download-link:hover {
+  color: #002060;
+}
+
+/* ── 空数据 ── */
+.lat-empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}

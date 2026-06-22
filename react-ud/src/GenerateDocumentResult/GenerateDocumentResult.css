@@ -1,0 +1,155 @@
+/* ── Generate Document Result（Menu 右侧显示） ── */
+.gen-doc-result-container {
+  width: 100%;
+  max-width: 720px;
+  padding: 16px 20px;
+  border: 2px solid #acb7ee;
+  /* border-radius: 6px; */
+  box-sizing: border-box;
+}
+
+.gen-doc-result-title {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #002182;
+  text-align: left;
+}
+
+.gen-doc-result-loading {
+  text-align: center;
+  padding: 80px 0;
+  font-size: 16px;
+  color: #888;
+}
+
+.gen-doc-result-error {
+  padding: 16px 20px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* ── 信息列表（平坦布局，无 section 标题） ── */
+.info-list {
+  margin-bottom: 8px;
+}
+
+.doc-section {
+  margin-top: 4px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 3px 0;
+  /* border-bottom: 1px solid #f0f0f0; */
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .info-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.info-row .info-label::after {
+  content: '：';
+}
+
+.info-row .info-value {
+  font-size: 13px;
+  color: #333;
+}
+
+.s-note-value {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.link-chassis {
+  color: #002182;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.link-chassis:hover {
+  color: #e53935;
+}
+
+.s-note-message {
+  margin-top: -3px;
+  margin-bottom: 16px;
+  padding: 2px 5px;
+  /* background-color: #fff7e6;
+  border: 1px solid #ffe58f;
+  border-radius: 4px; */
+  color:red;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.link-like {
+  color: #aca4a0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: #aca4a0;
+}
+
+.link-like:hover {
+  color: #aca4a0;
+}
+
+. {
+  color: #aca4a0;
+  font-weight: bold; /* 粗体 */
+  text-decoration: underline; /* 下划线 */
+  /* 可选：去除默认hover样式，按需开启 */
+}
+
+/* 可选：hover 保持样式不变 */
+.custom-link:hover {
+  color: #aca4a0;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.modify-warning {
+  color: #e53935;
+  font-weight: 500;
+}
+
+/* ── 错误日志 ── */
+.error-log {
+  margin: 4px 0 8px 180px;
+  padding: 8px 12px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+}
+
+.error-log-line {
+  font-size: 12px;
+  color: #e53935;
+  line-height: 1.6;
+  font-family: Consolas, monospace;
+}
+
+.gen-doc-result-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+}
+
+
+
+

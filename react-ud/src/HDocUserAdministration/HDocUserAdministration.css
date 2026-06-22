@@ -1,0 +1,255 @@
+/* ═══════════════════════════════════════════
+   HDoc User Administration Module
+   ═══════════════════════════════════════════ */
+
+.hua-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.hua-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.hua-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.hua-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.hua-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+/* ── 输入区域表格 ── */
+.hua-input-table {
+  width: auto;
+  border-collapse: collapse;
+  padding: 4px 10px;
+}
+
+.hua-input-table td {
+  padding: 4px 4px;
+  vertical-align: top;
+}
+
+.hua-label-cell {
+  white-space: nowrap;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+  width: 180px;
+  padding-right: 4px;
+  padding-left: 120px;
+}
+
+.hua-value {
+  font-size: 12px;
+  color: #333;
+  padding-left: 8px;
+}
+
+.hua-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  width: 160px;
+}
+
+.hua-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.hua-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* USER INFO 按钮与输入框间距 */
+.hua-btn-inline {
+  margin-left: 10px;
+}
+
+/* password 输入框左间距 */
+.hua-pwd-wrapper {
+  margin-left: 54px;
+}
+
+/* ── 表单区块 ── */
+.hua-form-section {
+  padding: 10px;
+}
+
+/* ── 网格行 ── */
+.hua-grid-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* ── 网格单元格 ── */
+.hua-grid-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 150px;
+  flex: 1;
+}
+
+.hua-cell-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  float: left;
+}
+
+.hua-cell-header .hua-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.hua-cell-header input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* Manage Variable List: label 在左 checkbox 在右 */
+.hua-cell-header-reverse {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.hua-cell-header-reverse .hua-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.hua-cell-header-reverse input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* Market Super User: label 在左, select 在右, 同行排列 */
+.hua-cell-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  flex: 1;
+}
+
+.hua-cell-row .hua-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* ── 列表框（多选） ── */
+.hua-listbox {
+  padding: 2px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  min-width: 140px;
+  width: 150px;
+  height: 190px;
+}
+
+.hua-listbox:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.hua-listbox:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ── Roles 侧边栏布局 ── */
+.hua-roles-sidebar-layout {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hua-roles-sidebar {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1c2771;
+  padding: 8px 4px;
+  min-width: 180px;
+  text-align: left;
+}
+
+.hua-roles-content {
+  flex: 1;
+  min-width: 0;
+  margin-left: -16px;
+}
+
+/* ── 按钮行 ── */
+.hua-btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 2px solid #acb7ee;
+  background-color: #f1f3ff;
+  margin: -10px;
+  margin-top: 0;
+
+}
+
+/* Manage Variable List label 右间距 */
+.hua-label-mvl {
+  margin-right: 53px;
+}
+
+/* Market Super User label 右间距 */
+.hua-label-msu {
+  margin-right: 65px;
+}

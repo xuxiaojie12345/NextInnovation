@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserAdminMapper">
+
+    <select id="selectUserAuth" resultType="map">
+        SELECT u.USERID, u.USERNAME, f.`FUNCTION`, m.MARKET
+        FROM hdoc_user_infor u
+        LEFT JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID
+        LEFT JOIN hdoc_market_auth m ON m.USERID = f.USERID
+            AND m.`TYPE` = CASE f.`FUNCTION`
+                WHEN 'User Administrator' THEN 'A'
+                WHEN 'RULES' THEN 'R'
+                WHEN 'TEMPLATE' THEN 'T'
+                WHEN 'USER' THEN 'U'
+                WHEN 'Document' THEN 'D'
+                WHEN 'ADAPTATION DOC' THEN 'DOCMOD'
+                WHEN 'market super user' THEN 'MCSU'
+            END
+        WHERE u.USERID = #{userid}
+    </select>
+
+    <delete id="deleteFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+    </delete>
+
+    <delete id="deleteMarketAuth">
+        DELETE FROM hdoc_market_auth WHERE USERID = #{userid}
+    </delete>
+
+    <insert id="insertFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH (USERID, `FUNCTION`,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{function},
+            NOW(), #{currentUser}, 'UD17UpdateRole',
+            NOW(), #{currentUser}, 'UD17UpdateRole')
+    </insert>
+
+    <insert id="insertMarketAuth">
+        INSERT INTO hdoc_market_auth (USERID, MARKET, `TYPE`, BU,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{market}, #{type}, 'UD',
+            NOW(), #{currentUser}, 'UD17UpdateRole',
+            NOW(), #{currentUser}, 'UD17UpdateRole')
+    </insert>
+
+</mapper>

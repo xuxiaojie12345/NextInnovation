@@ -1,0 +1,150 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
+import '../common/css/common.css';
+import './MarketDocumentSettingsResultList.css';
+
+interface DocumentRecord {
+  doctype: string;
+  businessUnit: string;
+  registerUser: string;
+  registerDatetime: string;
+}
+
+const MarketDocumentSettingsResultList: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = location.state as { doctype?: string; registerUser?: string; registerDatetime?: string } | null;
+
+  const [results, setResults] = useState<DocumentRecord[]>([]);
+  const [selectedIdx, setSelectedIdx] = useState<number>(-1);
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      try {
+        const res = await api.post<{ documents: DocumentRecord[] }>('/ud20/getDocumentList', {
+          doctype: state?.doctype || '',
+          registerUser: state?.registerUser || '',
+          registerDatetime: state?.registerDatetime || '',
+        });
+        if (res.code === 200 && res.data) {
+          const docs = (res.data.documents || []).map((d) => ({
+            ...d,
+            businessUnit: 'BU',
+          }));
+          setResults(docs);
+          if (docs.length === 0) {
+            setMessage('没有找到符合条件的文档');
+          }
+        } else {
+          setMessage('没有找到符合条件的文档');
+        }
+      } catch {
+        setMessage('系统暂时不可用，请稍后重试');
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [state?.doctype, state?.registerUser, state?.registerDatetime]);
+
+  const handleSelect = () => {
+    if (selectedIdx < 0) {
+      setMessage('No data found');
+      return;
+    }
+    const record = results[selectedIdx];
+    navigate('/menu/market-document-setting', {
+      state: {
+        doctype: record.doctype,
+        registerUser: record.registerUser,
+        registerDatetime: record.registerDatetime,
+      },
+    });
+  };
+
+  const handleBack = () => {
+    navigate('/menu/market-document-setting');
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleUserClick = (userId: string) => {
+    navigate('/menu/edb-user-view', { state: { userid: userId } });
+  };
+
+  return (
+    <div className="mdsr-container">
+      <div className="mdsr-header">
+        <h1>HDoc - Market Document Setting</h1>
+      </div>
+
+      {message && <div className="mdsr-error">{message}</div>}
+
+      <table className="mdsr-btn-table">
+        <tbody>
+          <tr>
+            <td className="mdsr-btn-cell">
+              <button className="btn" onClick={handleSelect} disabled={selectedIdx < 0}>Select</button>
+              <button className="btn" onClick={handleBack}>Back</button>
+              <button className="btn" onClick={handlePrint}>Print</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      {isLoading ? (
+        <div className="mdsr-loading">Loading...</div>
+      ) : results.length > 0 ? (
+        <div className="mdsr-table-wrapper">
+          <table className="mdsr-table">
+            <thead>
+              <tr>
+                <th className="mdsr-th-check"></th>
+                <th>Document type</th>
+                <th>Business unit</th>
+                <th>User</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((row, idx) => (
+                <tr key={idx} className={selectedIdx === idx ? 'selected' : ''}>
+                  <td className="mdsr-td-check">
+                    <input
+                      type="radio"
+                      name="selectedRow"
+                      checked={selectedIdx === idx}
+                      onChange={() => setSelectedIdx(idx)}
+                    />
+                  </td>
+                  <td>{row.doctype}</td>
+                  <td>{row.businessUnit}</td>
+                  <td>
+                    <span
+                      className="mdsr-link-user"
+                      onClick={() => handleUserClick(row.registerUser)}
+                    >
+                      {row.registerUser}
+                    </span>
+                  </td>
+                  <td>{row.registerDatetime ? row.registerDatetime.substring(0, 10) : ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        !isLoading && <div className="mdsr-empty">没有找到符合条件的文档</div>
+      )}
+
+      <div className="mdsr-count">Number of lines found: {results.length}</div>
+    </div>
+  );
+};
+
+export default MarketDocumentSettingsResultList;

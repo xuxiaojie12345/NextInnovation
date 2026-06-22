@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD19Mapper">
+
+    <select id="selectAllMarketCodes" resultType="string">
+        SELECT MARKET FROM MARKET_MASTER
+    </select>
+
+    <select id="searchHdoc" resultType="map">
+        SELECT u.USERID, u.USERNAME, m.MARKET
+        FROM HDOC_USER_INFOR u
+        INNER JOIN HDOC_MARKET_AUTH m ON u.USERID = m.USERID
+        WHERE 1=1
+        <if test="userid != null and userid != ''"> AND u.USERID LIKE CONCAT('%', #{userid}, '%')</if>
+        <if test="username != null and username != ''"> AND u.USERNAME LIKE CONCAT('%', #{username}, '%')</if>
+        <if test="market != null and market != ''"> AND m.MARKET = #{market}</if>
+        <if test="type != null and type != ''"> AND m.TYPE = #{type}</if>
+    </select>
+
+</mapper>

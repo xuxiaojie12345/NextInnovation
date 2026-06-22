@@ -1,0 +1,146 @@
+/* ── Generate Homologation Document（Menu 右侧显示） ── */
+
+/* 页面根容器 */
+.generate-doc-page {
+  width: 50%;
+  max-width: 800px;
+  padding: 0;
+  /* margin-top: 20px; */
+}
+
+/* ── 顶部标题栏 ── */
+.gen-doc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 2px solid #acb7ee;
+  /* border-bottom: none; */
+  /* border-radius: 6px 6px 0 0; */
+  margin-bottom: 0;
+}
+
+.gen-doc-header-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+/* ── 内容容器（卡片） ── */
+.generate-doc-container {
+  width: 100%;
+  max-width: 800px;
+  background-color: #ffffff;
+  border: 2px solid #acb7ee;
+  border-top: none;
+  /* border-radius: 0 0 6px 6px; */
+  padding: 24px 24px 0;
+  box-sizing: border-box;
+}
+
+/* ── 错误信息 ── */
+.generate-doc-error {
+  padding: 10px 14px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ── 表单 ── */
+.generate-doc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+  min-width: 140px;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #e53935;
+}
+
+.form-input,
+.form-select {
+  width: 320px;
+  padding: 9px 12px;
+  border: 1px solid #acb7ee;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #002182;
+  box-shadow: 0 0 0 2px rgba(0, 33, 130, 0.12);
+}
+
+.form-input:disabled,
+.form-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ── 按钮区域（带上下边框和背景） ── */
+.form-actions-wrapper {
+  margin: 0 -24px;
+  padding: 1px 24px;
+  border-top: 2px solid #acb7ee;
+  border-bottom: 0px solid #acb7ee;
+  background-color: #f1f3ff;
+   margin-top: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  padding: 6px 0;
+  justify-content: flex-start;
+ 
+}
+
+
+
+/* ── 底部支持信息 ── */
+.gen-doc-support {
+  margin: 0 -24px;
+  padding: 14px 24px 16px;
+  border-top: 2px solid #acb7ee;
+  font-size: 12px;
+  color: #888;
+  text-align: left;
+}
+
+.gen-doc-support a {
+  color: #002182;
+  text-decoration: none;
+}
+
+.gen-doc-support a:hover {
+  text-decoration: underline;
+}

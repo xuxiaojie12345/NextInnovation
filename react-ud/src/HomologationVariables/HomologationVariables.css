@@ -1,0 +1,241 @@
+/* ═══════════════════════════════════════════
+   Homologation Variables
+   画面构成：按钮 Table + 条件 Table
+   ═══════════════════════════════════════════ */
+
+/* ── 外层容器 ── */
+.homologation-vars-container {
+  width: 60%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+/* ── 标题区域（深蓝色条） ── */
+.homologation-vars-header {
+  /* background-color: #002060; */
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.homologation-vars-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════════
+   第一部分：按钮 Table
+   背景色 #f1f3ff，按钮背景色 #bdc3df
+   ═══════════════════════════════════════════ */
+.hv-btn-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #acb7ee;
+  border-left: none;
+  border-right: none;
+  background-color: #f1f3ff;
+  margin-top: 0;
+}
+
+.hv-btn-cell {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.hv-btn-cell .btn {
+  margin-right: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   第二部分：查询条件列表（无背景色、无边框线）
+   ═══════════════════════════════════════════ */
+.hv-cond-list {
+  padding: 8px 10px;
+  /* border: 2px solid #acb7ee;
+  border-top: none; */
+}
+
+.hv-cond-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+                /* 项目名标签（加粗） */
+.hv-cond-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 110px;
+  text-align: left;
+}
+
+.hv-cond-label.required::after {
+  content: ' *';
+  color: #e53935;
+  font-weight: 700;
+}
+
+/* ── 运算符下拉列表（短固定宽度） ── */
+.hv-op-select {
+  width: 55px;
+  padding: 3px 2px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  text-align: center;
+  appearance: auto;
+  flex-shrink: 0;
+}
+
+.hv-op-select:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.hv-op-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+
+
+/* ── 条件值控件（输入框/下拉框，根据内容自适应） ── */
+.hv-cond-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  /* 不设 width:100%，根据内容自适应长度 */
+  min-width: 120px;
+  max-width: 400px;
+  flex: 0 1 auto;
+}
+
+.hv-cond-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.hv-cond-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* 当下拉选择框用作条件值时 */
+.hv-cond-select {
+  min-width: 180px;
+}
+
+/* Product class 下拉框加宽 50px */
+.hv-row-product-class .hv-cond-select {
+  min-width: 230px;
+}
+
+/* Variable 输入框加宽 50px */
+.hv-row-variable .hv-cond-input {
+  min-width: 170px;
+}
+
+/* Value 输入框宽度减少 300px */
+.hv-row-value .hv-cond-input {
+  min-width: 120px;
+  width: calc(100% - 300px);
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+/* Comments 输入框宽度减少 300px */
+.hv-row-comments .hv-cond-input {
+  min-width: 120px;
+  width: calc(100% - 300px);
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+/* Created by user 输入框加宽 20px */
+.hv-row-created-by .hv-cond-input {
+  min-width: 140px;
+}
+
+/* Date 输入框加宽 30px */
+.hv-row-date .hv-cond-input {
+  min-width: 150px;
+}
+
+/* Variant string 两行容器 */
+.hv-row-variant {
+  align-items: flex-start;
+}
+
+.hv-row-variant > .hv-cond-label {
+  padding-top: 3px;
+}
+
+.hv-variant-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.hv-variant-subrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hv-variant-subrow .hv-cond-input {
+  min-width: 120px;
+  width: calc(100% - 300px);
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+/* ── 输入框后面的追加文字 ── */
+.hv-input-suffix {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+/* ═══════════════════════════════════════════
+   消息提示
+   ═══════════════════════════════════════════ */
+.hv-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.hv-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+

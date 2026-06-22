@@ -1,0 +1,122 @@
+/* ── Vehicle Specification（Menu 右侧显示） ── */
+.vs-container {
+  width: 100%;
+  max-width: 760px;
+  padding: 16px 20px;
+  border: 2px solid #acb7ee;
+  box-sizing: border-box;
+}
+
+.vs-loading {
+  padding: 40px 0;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.vs-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #002182;
+  text-align: left;
+}
+
+.vs-error {
+  padding: 10px 14px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ── セクションヘッダー（左詰め） ── */
+.vs-section-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #002182;
+  text-align: left;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  /* border-bottom: 1px solid #e0e0e0; */
+}
+
+/* ── 4列情報テーブル（項目名: | 値 | 項目名: | 値） ── */
+.vs-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.vs-info-table .info-label {
+  font-weight: 700;
+  color: #555;
+  text-align: left;
+  padding: 4px 8px 4px 0;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.vs-info-table .info-value {
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  padding: 4px 16px 4px 0;
+}
+
+/* ── KOLA シンボルリスト（左詰め） ── */
+/* ── KOLA シンボルリスト（左詰め） ── */
+.vs-symbol-list {
+  /* display: flex;
+  flex-direction: column; */
+  /* gap: 4px; */
+}
+
+.vs-symbol-item {
+  padding: 4px 0;
+  text-align: left;
+}
+
+.td-symbol {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  color: black;
+  cursor: help;
+  font-size: 13px;
+}
+
+/* ── フッター：S-Note NO ── */
+.vs-footer {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.vs-link-text {
+  color: #333;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.vs-link-text:active {
+  color: #002182;
+  text-decoration: underline;
+}
+
+.vs-empty {
+  padding: 20px 0;
+  color: #888;
+  font-size: 13px;
+}
+
+.vs-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+

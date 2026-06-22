@@ -1,0 +1,143 @@
+/* ═══════════════════════════════════════════
+   Search User Module
+   ═══════════════════════════════════════════ */
+
+.su-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.su-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.su-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.su-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.su-form {
+  padding: 8px 10px;
+}
+
+.su-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.su-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 80px;
+  text-align: left;
+}
+
+.su-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.su-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.su-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.su-select {
+  min-width: 200px;
+}
+
+.su-radio-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.su-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+}
+
+.su-radio-label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.su-btn-row {
+  padding: 8px 0;
+}
+
+.su-table-section {
+  padding: 0 10px 10px 10px;
+}
+
+.su-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.su-table th {
+  background-color: #002060;
+  color: #ffffff;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #9fb6d4;
+}
+
+.su-table td {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 12px;
+  color: #333;
+}
+
+.su-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.su-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 8px;
+  text-align: left;
+}

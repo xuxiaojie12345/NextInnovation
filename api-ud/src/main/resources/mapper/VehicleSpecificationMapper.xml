@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.VehicleSpecificationMapper">
+
+    <select id="selectVehicleBase" resultType="map">
+        SELECT om.model, om.BUILD, ge.PRODUCT_TYPE, ge.VIN, om.SYMBOL_STR,
+               ge.COUNTRY_OF_OPERATION, om.CUSTOMER_ADAP,
+               ants.FAMILY_ID, ants.VARIANT_ID
+        FROM HDOC_REC_DATA_OM om
+        LEFT JOIN HDOC_REC_DATA_VDA_GENERAL ge ON om.SERIE = ge.SERIE AND om.CHNR = ge.CHNR
+        LEFT JOIN HDOC_REC_DATA_VDA_VARIANTS ants ON ants.SERIE = ge.SERIE AND ants.CHNR = ge.CHNR
+        WHERE om.SERIE = #{serie} AND om.CHNR = #{chno}
+    </select>
+
+    <select id="selectKolaList" resultType="map">
+        SELECT SYMBOL, DESCRIPTION FROM HDOC_REC_DATA_KOLA_VARIANT
+        WHERE FAMILY_ID = #{familyId} AND VARIANT_ID = #{variantId}
+    </select>
+
+</mapper>

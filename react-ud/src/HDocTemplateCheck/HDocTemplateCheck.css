@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════
+   HDoc Template Check
+   ═══════════════════════════════════════════ */
+
+.htc-container {
+  width: 40%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.htc-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.htc-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.htc-form {
+  padding: 10px 16px;
+}
+
+/* ── Form Table ── */
+.htc-form-table {
+  border-collapse: collapse;
+  border: 2px solid #acb7ee;
+  width: 100%;
+}
+
+.htc-form-table td {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.htc-label {
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+  text-align: left;
+}
+
+.htc-value {
+  color: #333;
+  text-align: left;
+}
+
+/* ── 按钮行：背景色 + 边框 ── */
+.htc-btn-row {
+  background-color: #f1f3ff;
+  border: 2px solid #acb7ee;
+  border-left: none;
+  border-right: none;
+}
+
+.htc-result {
+  font-size: 12px;
+  font-weight: 600;
+  color: #389e0d;
+  padding: 8px 0 4px 0;
+}
+
+.htc-download-area {
+  padding: 8px 0 4px 0;
+}
+
+.htc-download-link {
+  color: #1890ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.htc-download-link:hover {
+  color: #0050b3;
+}
+
+.htc-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin: 6px 10px;
+}
+
+.htc-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin: 6px 10px;
+}

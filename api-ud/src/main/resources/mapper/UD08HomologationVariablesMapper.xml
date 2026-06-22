@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD08HomologationVariablesMapper">
+
+    <select id="selectProductClassMaster" resultType="com.web.app.entity.ProductClassMaster">
+        SELECT PC, DESCRIPTION FROM product_class_master
+    </select>
+
+    <select id="selectMarketMaster" resultType="com.web.app.entity.MarketMaster">
+        SELECT MARKET, DESCRIPTION FROM market_master
+    </select>
+
+    <select id="countVariable" resultType="int">
+        SELECT COUNT(*) FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </select>
+
+    <select id="countDefinedRules" resultType="int">
+        SELECT COUNT(*) FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND num = #{num} AND MARKET = #{market}
+    </select>
+
+    <insert id="insertRule">
+        INSERT INTO HDOC_USER_DEFINED_RULES (PC, num, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{pc}, #{num}, #{market}, #{variable}, #{val}, #{vs}, #{vs2}, #{comments}, #{addDate}, #{deleteDate},
+            NOW(), #{registerUser}, 'UD08Add',
+            NOW(), #{updateUser}, 'UD08Add')
+    </insert>
+
+    <update id="updateRule">
+        UPDATE HDOC_USER_DEFINED_RULES
+        SET VARIABLE = #{variable},
+            VAL = #{val},
+            VS = #{vs},
+            VS2 = #{vs2},
+            COMMENTS = #{comments},
+            ADD_DATE = #{addDate},
+            DELETE_DATE = #{deleteDate},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_PROCESS = 'UD08Update'
+        WHERE PC = #{pc} AND num = #{num} AND MARKET = #{market}
+    </update>
+
+    <delete id="deleteRule">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc} AND num = #{num} AND MARKET = #{market}
+    </delete>
+
+    <select id="searchRules" resultType="map">
+        SELECT PC, num, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE,
+               REGISTER_USER, REGISTER_DATETIME, UPDATE_USER, UPDATE_DATETIME
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE 1=1
+        <!-- Product class -->
+        <if test="pc != null and pc != ''">
+            <choose>
+                <when test='pcOp1 == "!="'> AND PC != #{pc}</when>
+                <when test='pcOp1 == ">"'> AND PC &gt; #{pc}</when>
+                <when test='pcOp1 == "&lt;"'> AND PC &lt; #{pc}</when>
+                <otherwise> AND PC = #{pc}</otherwise>
+            </choose>
+        </if>
+        <!-- Number -->
+        <if test="num != null and num != ''">
+            <choose>
+                <when test='numOp1 == "!="'> AND num != #{num}</when>
+                <when test='numOp1 == ">"'> AND num &gt; #{num}</when>
+                <when test='numOp1 == "&lt;"'> AND num &lt; #{num}</when>
+                <otherwise> AND num = #{num}</otherwise>
+            </choose>
+        </if>
+        <!-- Market -->
+        <if test="market != null and market != ''">
+            <choose>
+                <when test='marketOp1 == "!="'> AND MARKET != #{market}</when>
+                <when test='marketOp1 == ">"'> AND MARKET &gt; #{market}</when>
+                <when test='marketOp1 == "&lt;"'> AND MARKET &lt; #{market}</when>
+                <otherwise> AND MARKET = #{market}</otherwise>
+            </choose>
+        </if>
+        <!-- Variable -->
+        <if test="variable != null and variable != ''">
+            <choose>
+                <when test='variableOp1 == "!="'> AND VARIABLE != #{variable}</when>
+                <when test='variableOp1 == ">"'> AND VARIABLE &gt; #{variable}</when>
+                <when test='variableOp1 == "&lt;"'> AND VARIABLE &lt; #{variable}</when>
+                <otherwise> AND VARIABLE = #{variable}</otherwise>
+            </choose>
+        </if>
+        <!-- Value -->
+        <if test="val != null and val != ''">
+            <choose>
+                <when test='valOp1 == "!="'> AND VAL != #{val}</when>
+                <when test='valOp1 == ">"'> AND VAL &gt; #{val}</when>
+                <when test='valOp1 == "&lt;"'> AND VAL &lt; #{val}</when>
+                <otherwise> AND VAL = #{val}</otherwise>
+            </choose>
+        </if>
+        <!-- Variant string 条件1 -->
+        <if test="vs != null and vs != ''">
+            <choose>
+                <when test='vsOp1 == "!="'> AND VS != #{vs}</when>
+                <when test='vsOp1 == ">"'> AND VS &gt; #{vs}</when>
+                <when test='vsOp1 == "&lt;"'> AND VS &lt; #{vs}</when>
+                <otherwise> AND VS = #{vs}</otherwise>
+            </choose>
+        </if>
+        <!-- Variant string 条件2 -->
+        <if test="vsVal2 != null and vsVal2 != ''">
+            <choose>
+                <when test='vsOp2 == "!="'> AND VS != #{vsVal2}</when>
+                <when test='vsOp2 == ">"'> AND VS &gt; #{vsVal2}</when>
+                <when test='vsOp2 == "&lt;"'> AND VS &lt; #{vsVal2}</when>
+                <otherwise> AND VS = #{vsVal2}</otherwise>
+            </choose>
+        </if>
+        <!-- Comments -->
+        <if test="comments != null and comments != ''">
+            <choose>
+                <when test='commentsOp1 == "!="'> AND COMMENTS != #{comments}</when>
+                <when test='commentsOp1 == "&lt;"'> AND COMMENTS &lt; #{comments}</when>
+                <otherwise> AND COMMENTS = #{comments}</otherwise>
+            </choose>
+        </if>
+        <!-- Add Date -->
+        <if test="addDate != null and addDate != ''">
+            <choose>
+                <when test='addDateOp1 == "!="'> AND ADD_DATE != #{addDate}</when>
+                <when test='addDateOp1 == "&lt;"'> AND ADD_DATE &lt; #{addDate}</when>
+                <otherwise> AND ADD_DATE = #{addDate}</otherwise>
+            </choose>
+        </if>
+        <!-- Delete Date -->
+        <if test="deleteDate != null and deleteDate != ''">
+            <choose>
+                <when test='deleteDateOp1 == "!="'> AND DELETE_DATE != #{deleteDate}</when>
+                <when test='deleteDateOp1 == "&lt;"'> AND DELETE_DATE &lt; #{deleteDate}</when>
+                <otherwise> AND DELETE_DATE = #{deleteDate}</otherwise>
+            </choose>
+        </if>
+        <!-- Created by user (REGISTER_USER) -->
+        <if test="createdBy != null and createdBy != ''">
+            <choose>
+                <when test='createdByOp1 == "!="'> AND REGISTER_USER != #{createdBy}</when>
+                <when test='createdByOp1 == "&lt;"'> AND REGISTER_USER &lt; #{createdBy}</when>
+                <otherwise> AND REGISTER_USER = #{createdBy}</otherwise>
+            </choose>
+        </if>
+        <!-- Date (REGISTER_DATETIME) -->
+        <if test="date != null and date != ''">
+            <choose>
+                <when test='dateOp1 == "!="'> AND REGISTER_DATETIME != #{date}</when>
+                <when test='dateOp1 == "&lt;"'> AND REGISTER_DATETIME &lt; #{date}</when>
+                <otherwise> AND REGISTER_DATETIME = #{date}</otherwise>
+            </choose>
+        </if>
+        ORDER BY PC, MARKET, num
+    </select>
+
+    <delete id="deleteSelectedRules">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE
+        <foreach collection="records" item="rec" separator=" OR ">
+            (PC = #{rec.pc} AND num = #{rec.num} AND MARKET = #{rec.market})
+        </foreach>
+    </delete>
+
+</mapper>

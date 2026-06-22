@@ -1,0 +1,77 @@
+/* ═══════════════════════════════════════════
+   Document Types Module
+   ═══════════════════════════════════════════ */
+
+.dt-container {
+  width: 80%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.dt-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.dt-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.dt-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.dt-loading {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+.dt-empty {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+.dt-table-section {
+  padding: 10px;
+}
+
+.dt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.dt-table th {
+  background-color: #002060;
+  color: #ffffff;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #9fb6d4;
+}
+
+.dt-table td {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 12px;
+  color: #333;
+}
+
+.dt-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

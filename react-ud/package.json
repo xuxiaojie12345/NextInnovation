@@ -50,6 +50,7 @@
       "react-app/jest"
     ]
   },
+  "proxy": "http://localhost:8080",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -64,6 +65,7 @@
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.3.3",
+    "http-proxy-middleware": "^2.0.9",
     "sass": "^1.72.0"
   }
 }

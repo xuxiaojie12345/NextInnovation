@@ -1,0 +1,18 @@
+package com.web.app.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+@Mapper
+public interface UD19Mapper {
+
+    List<String> selectAllMarketCodes();
+
+    List<Map<String, Object>> searchHdoc(@Param("userid") String userid,
+                                         @Param("username") String username,
+                                         @Param("market") String market,
+                                         @Param("type") String type);
+}

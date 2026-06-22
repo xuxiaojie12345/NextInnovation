@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════════════
+   Upload & Delete Template
+   ═══════════════════════════════════════════ */
+
+.udt-container {
+  width: 40%;
+  padding: 20px;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.udt-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.udt-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ── Section ── */
+.udt-section {
+  /* padding: 10px 16px; */
+  /* border-top: 1px solid #acb7ee; */
+}
+
+.udt-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #002060;
+  margin: 0 0 8px 0;
+  text-align: left;
+}
+
+/* ── Form Table ── */
+.udt-form-table {
+  border-collapse: collapse;
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border: 2px solid #acb7ee;
+  /* border-bottom: none; */
+}
+
+.udt-form-table td {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.udt-label {
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+  text-align: left;
+}
+
+.udt-value {
+  color: #333;
+  text-align: left;
+}
+
+/* ── 按钮行：背景色 + 边框 ── */
+.udt-btn-row {
+  background-color: #f1f3ff;
+  border-top: 2px solid #acb7ee;
+  width: 100%;
+}
+
+.udt-select {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  min-width: 150px;
+}
+
+.udt-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ── Link Area ── */
+.udt-link-area {
+  padding: 10px 16px;
+  /* border-top: 1px solid #acb7ee; */
+}
+
+.udt-link {
+  color: #1890ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.udt-link:hover {
+  color: #0050b3;
+}
+
+/* ── Messages ── */
+.udt-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin: 6px 10px;
+}
+
+.udt-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin: 6px 10px;
+}

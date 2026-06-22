@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+
+    <insert id="insertVariable">
+        INSERT INTO hdoc_variables (VARIABLE, TYPE, DESCRIPTION,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{variable}, #{type}, #{description},
+            NOW(), #{currentUser}, 'UD10HdocvariablesApi',
+            NOW(), #{currentUser}, 'UD10HdocvariablesApi')
+    </insert>
+
+    <update id="updateVariable">
+        UPDATE hdoc_variables
+        SET TYPE = #{type},
+            DESCRIPTION = #{description},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{currentUser},
+            UPDATE_PROCESS = 'UD10HdocvariablesApi'
+        WHERE VARIABLE = #{variable}
+    </update>
+
+    <delete id="deleteVariable">
+        DELETE FROM hdoc_variables WHERE VARIABLE = #{variable}
+    </delete>
+
+    <select id="searchVariables" resultType="map">
+        SELECT VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME
+        FROM hdoc_variables
+        WHERE 1=1
+        <if test="variable != null and variable != ''">
+            <choose>
+                <when test='variableOp == "!="'> AND VARIABLE != #{variable}</when>
+                <when test='variableOp == "&gt;"'> AND VARIABLE &gt; #{variable}</when>
+                <when test='variableOp == "&lt;"'> AND VARIABLE &lt; #{variable}</when>
+                <otherwise> AND VARIABLE = #{variable}</otherwise>
+            </choose>
+        </if>
+        <if test="type != null and type != ''">
+            <choose>
+                <when test='typeOp == "!="'> AND TYPE != #{type}</when>
+                <when test='typeOp == "&gt;"'> AND TYPE &gt; #{type}</when>
+                <when test='typeOp == "&lt;"'> AND TYPE &lt; #{type}</when>
+                <otherwise> AND TYPE = #{type}</otherwise>
+            </choose>
+        </if>
+        <if test="description != null and description != ''">
+            <choose>
+                <when test='descriptionOp == "!="'> AND DESCRIPTION != #{description}</when>
+                <when test='descriptionOp == "&gt;"'> AND DESCRIPTION &gt; #{description}</when>
+                <when test='descriptionOp == "&lt;"'> AND DESCRIPTION &lt; #{description}</when>
+                <otherwise> AND DESCRIPTION = #{description}</otherwise>
+            </choose>
+        </if>
+        <if test="registerUser != null and registerUser != ''">
+            <choose>
+                <when test='registerUserOp == "!="'> AND REGISTER_USER != #{registerUser}</when>
+                <when test='registerUserOp == "&gt;"'> AND REGISTER_USER &gt; #{registerUser}</when>
+                <when test='registerUserOp == "&lt;"'> AND REGISTER_USER &lt; #{registerUser}</when>
+                <otherwise> AND REGISTER_USER = #{registerUser}</otherwise>
+            </choose>
+        </if>
+        <if test="registerDatetime != null and registerDatetime != ''">
+            <choose>
+                <when test='registerDatetimeOp == "!="'> AND REGISTER_DATETIME != #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&gt;"'> AND REGISTER_DATETIME &gt; #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&lt;"'> AND REGISTER_DATETIME &lt; #{registerDatetime}</when>
+                <otherwise> AND REGISTER_DATETIME = #{registerDatetime}</otherwise>
+            </choose>
+        </if>
+        ORDER BY VARIABLE
+    </select>
+
+</mapper>

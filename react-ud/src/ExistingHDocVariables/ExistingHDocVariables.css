@@ -1,0 +1,180 @@
+/* ═══════════════════════════════════════════
+   Existing HDoc Variables
+   画面构成：按钮 Table + 表单区域
+   ═══════════════════════════════════════════ */
+
+/* ── 外层容器 ── */
+.ehv-container {
+  width: 60%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+/* ── 标题区域 ── */
+.ehv-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.ehv-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ═══════════════════════════════════════════
+   按钮 Table
+   ═══════════════════════════════════════════ */
+.ehv-btn-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #acb7ee;
+  border-left: none;
+  border-right: none;
+  background-color: #f1f3ff;
+  margin-top: 0;
+}
+
+.ehv-btn-cell {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.ehv-btn-cell .btn {
+  margin-right: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   表单区域
+   ═══════════════════════════════════════════ */
+.ehv-form {
+  padding: 8px 10px;
+}
+
+.ehv-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.ehv-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 120px;
+  text-align: left;
+}
+
+.ehv-label.required::after {
+  content: ' *';
+  color: #e53935;
+  font-weight: 700;
+}
+
+.ehv-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.ehv-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.ehv-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.ehv-select {
+  min-width: 200px;
+}
+
+/* ── 运算符下拉列表 ── */
+.ehv-op-select {
+  width: 55px;
+  padding: 3px 2px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  text-align: center;
+  appearance: auto;
+  flex-shrink: 0;
+}
+
+.ehv-op-select:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.ehv-op-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ── Variable 输入框增加 30px ── */
+.ehv-input-variable {
+  min-width: 230px;
+}
+
+/* ── Description 上下间距 40px，输入框宽度 100% - 50px ── */
+.ehv-row-description {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.ehv-input-description {
+  min-width: 120px;
+  width: calc(100% - 50px);
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+/* ── Created by user 输入框减少 20px ── */
+.ehv-input-created-by {
+  min-width: 180px;
+}
+
+/* ── Date 输入框减少 5px ── */
+.ehv-input-date {
+  min-width: 195px;
+}
+
+/* ═══════════════════════════════════════════
+   消息提示
+   ═══════════════════════════════════════════ */
+.ehv-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.ehv-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}

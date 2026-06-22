@@ -1,0 +1,100 @@
+/* ═══════════════════════════════════════════
+   AD/CA Change Module
+   ═══════════════════════════════════════════ */
+
+.adca-container {
+  width: 60%;
+  padding: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+
+.adca-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.adca-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ── 消息提示 ── */
+.adca-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.adca-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+/* ── 表单区域 ── */
+.adca-form {
+  padding: 8px 10px;
+}
+
+.adca-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.adca-label {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  min-width: 90px;
+  text-align: left;
+}
+
+.adca-input {
+  padding: 3px 5px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: normal;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.adca-input:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.adca-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.adca-input-desc {
+  min-width: 300px;
+  max-width: 600px;
+}
+
+/* ── 按钮行 ── */
+.adca-btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  margin-top: 8px;
+}
