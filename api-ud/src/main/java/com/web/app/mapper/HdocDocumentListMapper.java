@@ -124,4 +124,14 @@ public interface HdocDocumentListMapper {
                           @Param("registerProcess") String registerProcess,
                           @Param("updateUser") String updateUser,
                           @Param("updateProcess") String updateProcess);
+
+    // ==================== UD19 用户搜索 ====================
+
+    /**
+     * 搜索用户（动态条件）
+     */
+    List<Map<String, Object>> searchUsers(@Param("userid") String userid,
+                                          @Param("username") String username,
+                                          @Param("functionCode") String functionCode,
+                                          @Param("market") String market);
 }

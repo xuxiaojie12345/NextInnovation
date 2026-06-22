@@ -46,4 +46,47 @@ public class HdocDocumentList {
     // UD18 文档权限管理
     @JsonProperty("documentTypes")
     private List<String> documentTypes;
+
+    // UD19 搜索参数
+    private String searchType;
+    @JsonProperty("user")
+    private String searchUser;
+
+    // ============================================================
+    // 手动添加的 getter/setter（Lombok 因字段名冲突跳过了这些）
+    // ============================================================
+
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid = userid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
 }

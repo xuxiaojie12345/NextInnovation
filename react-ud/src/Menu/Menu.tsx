@@ -139,7 +139,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "user_search",
           label: "Search User",
-          path: "/user/search",
+          path: "/search-user",
           type: "link",
         },
         {

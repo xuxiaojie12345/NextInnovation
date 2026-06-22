@@ -19,6 +19,7 @@ import VinPlate from "./VinPlate/VinPlate";
 import ADChange from "./ADChange/ADChange";
 import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
 import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
+import SearchUser from "./SearchUser/SearchUser";
 
 function App() {
   return (
@@ -93,6 +94,10 @@ function App() {
               <Route
                 path='/hdoc-user-doc-administration'
                 element={<HDocUserDocAdministration />}
+              />
+              <Route
+                path='/search-user'
+                element={<SearchUser />}
               />
             </Route>
           </Routes>

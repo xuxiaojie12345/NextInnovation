@@ -146,6 +146,36 @@
         WHERE USERID = #{userid}
     </delete>
 
+    <!-- ==================== UD19 用户搜索 ==================== -->
+
+    <!-- 搜索用户（动态条件） -->
+    <select id="searchUsers" resultType="java.util.Map">
+        SELECT
+            u.USERID AS userid,
+            u.USERNAME AS `user`,
+            GROUP_CONCAT(DISTINCT m.MARKET ORDER BY m.MARKET SEPARATOR ',') AS market
+        FROM hdoc_user_infor u
+        INNER JOIN HDOC_MARKET_AUTH m ON u.USERID = m.USERID
+        <if test="functionCode != null and functionCode != ''">
+        INNER JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID
+        </if>
+        <where>
+            <if test="userid != null and userid != ''">
+                u.USERID = #{userid}
+            </if>
+            <if test="username != null and username != ''">
+                AND u.USERNAME = #{username}
+            </if>
+            <if test="functionCode != null and functionCode != ''">
+                AND f.`FUNCTION` = #{functionCode}
+            </if>
+            <if test="market != null and market != ''">
+                AND m.MARKET = #{market}
+            </if>
+        </where>
+        GROUP BY u.USERID, u.USERNAME
+    </select>
+
     <!-- 插入用户文档权限 -->
     <insert id="insertUserDocAuth">
         INSERT INTO HDOC_USER_DOC (
