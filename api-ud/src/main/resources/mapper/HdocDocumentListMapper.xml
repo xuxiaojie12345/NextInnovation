@@ -26,7 +26,7 @@
             USERNAME,
             RESPONSIBLE,
             USERPOSITION,
-            `E-MMAIL` AS EMAIL
+            "E-MMAIL" AS eMmail
         FROM hdoc_user_infor
         WHERE USERID = #{userid} OR USERNAME = #{username}
     </select>
@@ -63,7 +63,7 @@
             MARKET = #{market},
             `TYPE` = #{type},
             BU = #{bu},
-            UPDATE_DATETIME = SYSDATE,
+            UPDATE_DATETIME = SYSDATE(),
             UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{updateProcess}
         WHERE 
@@ -76,7 +76,7 @@
         SET 
             `FUNCTION` = #{function},
             USERID = #{userid},
-            UPDATE_DATETIME = SYSDATE,
+            UPDATE_DATETIME = SYSDATE(),
             UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{updateProcess}
         WHERE 

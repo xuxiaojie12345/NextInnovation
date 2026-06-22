@@ -77,9 +77,9 @@ public class UD17Controller {
 
     /**
      * 更新用户角色
-     * PUT /api/ud17HDocUserAdministration/updateRole
+     * POST /api/ud17HDocUserAdministration/updateRole
      */
-    @PutMapping("/updateRole")
+    @PostMapping("/updateRole")
     public ResponseEntity<ApiResponse<?>> updateRole(@RequestBody HdocDocumentList request) {
         log.info("========== UD17 Controller: Update Role ==========");
         log.info("userId: {}, market: {}, type: {}, bu: {}, function: {}",

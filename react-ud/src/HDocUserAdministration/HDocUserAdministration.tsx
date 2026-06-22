@@ -161,10 +161,11 @@ const HDocUserAdministration = () => {
       if (data.code === 200 && data.data) {
         // 设置用户名
         const currentUserId = formData.userId.trim();
-        setFormData({ ...formData, userName: data.data.username || "" });
+        const userName = data.data.username || "";
+        setFormData({ ...formData, userName });
 
-        // 获取用户权限配置
-        await fetchUserPermissions(currentUserId);
+        // 获取用户权限配置（传入userName防止被覆盖）
+        await fetchUserPermissions(currentUserId, userName);
       } else {
         setErrorMessage(
           "We didn't recognize the userid you entered. Please try again.",
@@ -181,7 +182,7 @@ const HDocUserAdministration = () => {
   };
 
   // 获取用户权限配置
-  const fetchUserPermissions = async (userId: string) => {
+  const fetchUserPermissions = async (userId: string, userName?: string) => {
     try {
       const API_BASE_URL = "http://localhost:8081";
       const response = await fetch(
@@ -204,8 +205,11 @@ const HDocUserAdministration = () => {
       if (data.code === 200 && data.data) {
         const permissionData: PermissionData = data.data;
 
-        // 解析并填充表单数据
-        const updatedFormData = { ...formData };
+        // 解析并填充表单数据（保留传入的userName）
+        const updatedFormData = {
+          ...formData,
+          userName: userName || formData.userName,
+        };
 
         // 解析functions数组
         if (permissionData.functions) {
@@ -358,7 +362,7 @@ const HDocUserAdministration = () => {
         requestData.roles.standardUser.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
@@ -381,7 +385,7 @@ const HDocUserAdministration = () => {
         requestData.roles.ruleAdmin.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
@@ -404,7 +408,7 @@ const HDocUserAdministration = () => {
         requestData.roles.templateAdmin.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
@@ -427,7 +431,7 @@ const HDocUserAdministration = () => {
         requestData.roles.documentAuthAdmin.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
@@ -446,7 +450,7 @@ const HDocUserAdministration = () => {
       if (requestData.roles.userAdmin === true) {
         roleUpdatePromises.push(
           fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-            method: "PUT",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userId: requestData.userId,
@@ -468,7 +472,7 @@ const HDocUserAdministration = () => {
         requestData.roles.adaptationUser.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
@@ -487,7 +491,7 @@ const HDocUserAdministration = () => {
       if (requestData.roles.manageVariableList === true) {
         roleUpdatePromises.push(
           fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-            method: "PUT",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userId: requestData.userId,
@@ -509,7 +513,7 @@ const HDocUserAdministration = () => {
         requestData.roles.marketSuperUser.forEach((market: string) => {
           roleUpdatePromises.push(
             fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "PUT",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: requestData.userId,
