@@ -1,0 +1,397 @@
+/* GeneratedDocument页面样式 - 严格按照设计图实现 */
+
+.generated-document-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+.generated-document-content {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003f87;
+  margin-bottom: 30px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.error-message-area {
+  color: #ff4d4f;
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: left;
+  word-break: break-word;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Chassis no行 - 特殊样式 */
+.chassis-no-row {
+  margin-bottom: 4px; /* 与Ordernumber间距很小 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.chassis-no-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin-right: 8px;
+}
+
+.chassis-no-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.chassis-no-link:hover {
+  color: #0052a3;
+  text-decoration: underline;
+}
+
+/* Ordernumber行 */
+.ordernumber-row {
+  margin-bottom: 20px; /* 与下一组的间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.ordernumber-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  margin-right: 8px;
+}
+
+.ordernumber-value {
+  color: #333;
+  word-break: break-all;
+}
+
+/* Build week到Master Market组 - 紧凑排列 */
+.build-week-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.spec-week-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.market-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.master-market-row {
+  margin-bottom: 25px; /* 与下一组（Load Index）的间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.default-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  margin-right: 8px;
+}
+
+.default-value {
+  color: #333;
+  word-break: break-all;
+}
+
+/* Load Index组 - 4个项目紧凑排列 */
+.front-load-index-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.front-speed-index-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.drive-load-index-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.drive-speed-index-row {
+  margin-bottom: 20px; /* 与Analyze Rules的间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Analyze Rules链接 */
+.analyze-rules-row {
+  margin-bottom: 15px; /* 与红色警告信息的间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.analyze-rules-link {
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.analyze-rules-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+/* 红色警告信息 */
+.modify-warning-row {
+  margin-bottom: 15px; /* 与Using template的间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.modify-warning-link {
+  color: #ff1824;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.modify-warning-link:hover {
+  color: #cc141e;
+  text-decoration: underline;
+}
+
+/* Using template行 */
+.using-template-row {
+  margin-bottom: 4px; /* 与Replacing parameters间距很小 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.using-template-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  margin-right: 8px;
+}
+
+.using-template-value {
+  color: #333;
+  word-break: break-all;
+}
+
+/* Replacing parameters标题 */
+.replacing-params-title-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.replacing-params-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin-right: 8px;
+}
+
+/* Information parameter行 */
+.information-parameter-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.info-param-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.info-param-link:hover {
+  color: #0052a3;
+  text-decoration: underline;
+}
+
+/* ERROR行 */
+.error-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Generated document链接 */
+.generated-doc-row {
+  margin-bottom: 80px; /* 与底部Date的大间距 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.generated-doc-link {
+  color: #003f87;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.generated-doc-link:hover {
+  color: #002d61;
+  text-decoration: underline;
+}
+
+/* Date行 */
+.date-row {
+  margin-bottom: 4px; /* 与HDoc version间距很小 */
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #666;
+}
+
+.date-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #666;
+  margin-right: 8px;
+}
+
+.date-value {
+  color: #666;
+  word-break: break-all;
+}
+
+/* HDoc version行 */
+.hdoc-version-row {
+  margin-bottom: 0;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #666;
+}
+
+.hdoc-version-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #666;
+  margin-right: 8px;
+}
+
+.hdoc-version-value {
+  color: #666;
+  word-break: break-all;
+}
+
+/* S-Note相关样式 */
+.s-note-no-row {
+  margin-bottom: 4px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #333;
+}
+
+.s-note-message-row {
+  margin-bottom: 20px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #ff7875;
+  font-style: italic;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .generated-document-content {
+    padding: 20px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .chassis-no-row,
+  .ordernumber-row,
+  .build-week-row,
+  .spec-week-row,
+  .market-row,
+  .master-market-row,
+  .front-load-index-row,
+  .front-speed-index-row,
+  .drive-load-index-row,
+  .drive-speed-index-row,
+  .analyze-rules-row,
+  .modify-warning-row,
+  .using-template-row,
+  .replacing-params-title-row,
+  .information-parameter-row,
+  .error-row,
+  .generated-doc-row,
+  .date-row,
+  .hdoc-version-row,
+  .s-note-no-row,
+  .s-note-message-row {
+    font-size: 13px;
+  }
+}

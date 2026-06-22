@@ -1,0 +1,190 @@
+/* HdocTemplateCheck页面容器 - 使用htc前缀避免与其他画面冲突 */
+.htc-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.htc-content {
+  background-color: white;
+  border: none;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 700px;
+  border: 1px solid #a5b9ee;
+}
+
+/* 区域标题样式 */
+.htc-section-title {
+  color: #003f87;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.htc-section-solid{
+  border: 1px solid #b9c6ec;
+  padding: 15px;
+  border-radius: 3px;
+}
+/* 表单组样式 */
+.htc-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+/* Label样式 */
+.htc-label {
+  font-weight: normal;
+  min-width: 120px;
+  color: #333;
+  text-align: left;
+}
+
+/* 文件输入框样式 */
+.htc-file-input {
+  padding: 4px 6px;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  background-color: white;
+}
+
+.htc-file-input:hover {
+  border-color: #999;
+}
+
+/* 文件状态文本 */
+/* .htc-file-status {
+  margin-left: 10px;
+  color: #666;
+  font-size: 13px;
+} */
+
+/* 按钮行样式 */
+.htc-button-row {
+  background-color: #dce1f3;
+  padding: 8px 10px;
+  border-radius: 1px;
+  display: flex;
+  gap: 8px;
+  width:677px;  
+  margin-left: -16px;
+  margin-bottom: -16px;
+  border: 1px solid #a5b9ee;
+}
+
+/* 操作按钮样式 */
+.htc-action-button {
+  padding: 4px 12px;
+  background-color: #bcc4f0;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.htc-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.htc-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误信息样式 */
+.htc-error-message {
+  color: #ff0000;
+  font-size: 13px;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* 下载链接区域 */
+.htc-download-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  /* border-top: 1px solid #e0e0e0; */
+}
+
+/* 下载链接样式 */
+.htc-download-link {
+  color: #0066cc;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.htc-download-link:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* Loading状态 */
+.htc-loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .htc-content {
+    padding: 15px;
+  }
+  
+  .htc-section-title {
+    font-size: 16px;
+  }
+  
+  .htc-form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .htc-label {
+    min-width: auto;
+    margin-bottom: 5px;
+  }
+  
+  .htc-file-input {
+    width: 100%;
+  }
+  
+  .htc-file-status {
+    margin-left: 0;
+    margin-top: 5px;
+  }
+  
+  .htc-button-row {
+    flex-direction: column;
+  }
+  
+  .htc-action-button {
+    width: 100%;
+  }
+  
+  .htc-error-message {
+    font-size: 12px;
+  }
+  
+  .htc-download-link {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,183 @@
+/* EdbUserView页面容器 - 使用euv前缀避免与其他画面冲突 */
+.euv-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.euv-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* 标题样式 */
+.euv-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* 按钮区域 - 浅蓝色背景 */
+.euv-button-row {
+  background-color: #edf1f8;/* 浅蓝色背景，严格按照图片 */
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+/* 操作按钮样式 */
+.euv-action-button {
+  padding: 6px 16px;
+  background-color: #bcc4f0; /* 淡蓝色背景，严格按照图片 */
+  border: 1px solid #ccc; /* solid边线，严格按照图片 */
+  color: #000;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.euv-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6; /* 悬停时变深，严格按照图片 */
+}
+
+.euv-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading状态 */
+.euv-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 表单区域 - 带边框 */
+.euv-form-section {
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+/* 表单行 */
+.euv-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.euv-form-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 标签样式 */
+.euv-label {
+  width: 150px;
+  font-weight: bold;
+  color: #000;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* 操作符下拉列表 */
+.euv-select-operator {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #999;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* 输入框样式 - 只读禁用状态 */
+.euv-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #999;
+  background-color: #fff;
+  font-size: 14px;
+  color: #000;
+}
+
+.euv-input:read-only {
+  background-color: #fff;
+  cursor: default;
+}
+
+.euv-input:disabled {
+  background-color: #fff;
+  cursor: default;
+}
+
+/* 特定输入框宽度 */
+.euv-input-userid {
+  max-width: 200px;
+}
+
+.euv-input-responsible {
+  max-width: 300px;
+}
+
+.euv-input-userposition {
+  max-width: 250px;
+}
+
+.euv-input-email {
+  max-width: 400px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .euv-content {
+    padding: 15px;
+  }
+  
+  .euv-title {
+    font-size: 20px;
+  }
+  
+  .euv-button-row {
+    padding: 8px 10px;
+  }
+  
+  .euv-action-button {
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+  
+  .euv-form-section {
+    padding: 10px;
+  }
+  
+  .euv-form-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .euv-label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .euv-select-operator {
+    width: 50px;
+  }
+  
+  .euv-input {
+    width: calc(100% - 60px);
+  }
+}

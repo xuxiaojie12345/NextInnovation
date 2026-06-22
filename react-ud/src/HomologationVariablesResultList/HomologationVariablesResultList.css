@@ -1,0 +1,199 @@
+/* HomologationVariablesResultList页面容器 */
+.homologation-variables-result-list-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 - 蓝色边框 */
+.homologation-variables-result-list-content {
+  background-color: white;
+  border: 1px solid #99b4d1;
+  border-radius: 3px;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 1400px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 页面标题 */
+.page-title {
+  color: #003f87;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: left;
+  margin-top: 0;
+}
+
+/* 按钮组区域 - 浅蓝色背景 */
+.button-group {
+  background-color: #e8f0fe;
+  padding: 8px 10px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  display: flex;
+  gap: 8px;
+}
+
+/* 操作按钮样式 */
+.action-button {
+  padding: 4px 12px;
+  background-color: #c5d9f1;
+  color: #333;
+  border: 1px solid #8fa4c7;
+  border-radius: 2px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #a8c4e6;
+}
+
+/* Delete Selected按钮特殊样式 */
+.delete-button {
+  margin-left:100px;
+}
+
+/* 表格容器 */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 15px;
+}
+
+/* DataTable样式 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #333;
+}
+
+/* 表头样式 */
+.data-table thead {
+  background-color: #f0f4f8;
+}
+
+.data-table th {
+  padding: 8px 6px;
+  text-align: left;
+  font-weight: bold;
+  color: #003f87;
+  border-bottom: 2px solid #99b4d1;
+  white-space: nowrap;
+  text-decoration: underline;
+}
+
+/* 必填列标识 */
+/* .required-column {
+  color: #ff0000 !important;
+} */
+
+/* 表格单元格 */
+.data-table td {
+  padding: 6px;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* 复选框列 */
+.checkbox-column {
+  width: 30px;
+  text-align: center;
+}
+
+.checkbox-column input[type='radio'] {
+  cursor: pointer;
+}
+
+/* 选中行样式 */
+.selected-row {
+  background-color: #fffacd !important;
+}
+
+.selected-row td {
+  border-bottom: 1px solid #ffd700;
+}
+
+/* Link文本样式 */
+.link-text {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* Count显示 */
+.count-display {
+  font-size: 13px;
+  color: #333;
+  text-align: left;
+  margin-top: 10px;
+  padding: 8px 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Loading状态 */
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .homologation-variables-result-list-content {
+    padding: 15px;
+  }
+  
+  .page-title {
+    font-size: 16px;
+  }
+  
+  .data-table {
+    font-size: 11px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 4px 3px;
+  }
+  
+  .button-group {
+    flex-wrap: wrap;
+  }
+  
+  .action-button {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    font-size: 10px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 3px 2px;
+    max-width: 100px;
+  }
+  
+  .count-display {
+    font-size: 12px;
+  }
+}

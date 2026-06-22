@@ -1,0 +1,110 @@
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-Content: center;
+      align-Items: center;
+      background-Color: #000;
+      font-Family: Arial, sans-serif;
+    }
+    .backgroundLayer {
+      position: absolute;
+      background-image: url(../images/fTRYDXFAD.jpeg);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-Size: cover;
+      background-Position: center;
+      background-Repeat: no-repeat;
+      opacity: 0.6;
+      z-Index: 1;
+    }
+    .card {
+      position: relative;
+      z-Index: 2;
+      background-Color: rgba(255, 255, 255, 0);
+      
+      padding: 40px 50px;
+      border-Radius: 8px;
+      box-Shadow: 0 10px 25px rgba(255, 255, 255, 0);
+      width: 100%;
+      max-Width: 600px;
+      text-Align: left;
+      margin-Left: 600px;
+      margin-Top: 30px;
+
+    }
+
+    .formGroup { margin-Bottom: 15px }
+    .input {
+      width: 50%;
+      padding: 12px 15px;
+      font-Size: 14px;
+      border: 1px solid #ccc;
+      border-Radius: 4px;
+      box-Sizing: border-box;
+    }
+     .messageContainer {
+      display: block; 
+      width: 100%;
+    }
+    /* // 警告样式 (黄色) */
+    .warningBox {
+      width: 45%;
+      padding: 10px 15px;
+      margin-Top: 0px;     
+      margin-Bottom: 15px;
+      border-Radius: 4px;
+      font-Size: 15px;
+      color: #856404;
+      background-Color: #fff3cd;
+      border: 1px solid #ffeeba;
+    }
+    /* // 错误样式 (红色边框，白色背景，红色文字) */
+    .errorBox {
+      width: 45%;
+      /* // 保持换行 */
+      white-Space: pre-wrap; 
+      padding: 10px 15px;
+      margin-Top: 0px;      
+      margin-Bottom: 15px;
+      margin: 15px 0px 20px 0px;
+      border-Radius: 4px;
+      font-Size: 15px;
+      color: #dc3545;
+      border: 1px solid #e9f0ec81;
+
+    }
+    .button {
+      width: 50%;
+      padding: 12px;
+      background-Color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-Radius: 4px;
+      font-Size: 16px;
+      color: #333;
+      cursor: pointer;
+      font-Weight: 500;
+    }
+    .footer {
+      margin-Top: 50px;
+      font-Size: 14px;
+      color: #d9534f;
+      line-Height: 1.5,
+    }
+    .footer p {
+      margin: 0 0 5px 0;
+    }
+    .footer p:last-child {
+      margin: 0;
+    }
+    .link {
+      color: #d9534f;
+      text-Decoration: underline;
+      font-Weight: bold;
+      cursor: pointer;
+    }
+  

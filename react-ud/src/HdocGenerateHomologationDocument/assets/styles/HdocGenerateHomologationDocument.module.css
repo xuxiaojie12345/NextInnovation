@@ -1,0 +1,125 @@
+/* HdocGenerateHomologationDocument 样式文件 */
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  color: #003f87;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.errorMessageArea {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 4px;
+}
+
+.formContainer {
+  border: 1px solid #003f87;
+  padding: 20px;
+  height: 400px;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  width: 150px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin-right: 10px;
+}
+
+.input,
+.select {
+  width: 200px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  background-color: #ffffff;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #003f87;
+  box-shadow: 0 0 3px rgba(0, 63, 135, 0.3);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border: 1px solid #003f87;
+  margin-top: -21px;
+  background-color: #eeeff3;
+}
+
+.button {
+  padding: 6px 20px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  background-color: #bcc4f0;
+  cursor: pointer;
+  color: #333333;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #bcc4f0;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.helpButton {
+  margin-left: 120px; /* Help按钮靠右对齐 */
+}
+
+.footer {
+  margin-top: 10px;
+  padding-top: 15px;
+  font-size: 13px;
+  color: #666666;
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #003f87;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

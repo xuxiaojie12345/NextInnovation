@@ -1,0 +1,243 @@
+/* MarketDocumentSettings页面容器 - 使用mds前缀避免与其他画面冲突 */
+.mds-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.mds-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* 标题样式 */
+.mds-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* 按钮区域 */
+.mds-button-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: #e8f0fe;
+  border: 1px solid #ccc;
+}
+
+/* 操作按钮样式 */
+.mds-action-button {
+  padding: 6px 16px;
+  background-color: #c5d9f1;
+  color: #333;
+  border: 1px solid #8fa4c7;
+  border-radius: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mds-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.mds-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Update Mode按钮特殊样式 */
+.mds-update-button {
+  background-color: #d4e5f7;
+}
+
+/* 表单区域 */
+.mds-form-section {
+  border: 1px solid #ccc;
+  padding: 15px;
+}
+
+/* 表单行样式 */
+.mds-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.mds-form-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Label样式 */
+.mds-label {
+  font-weight: normal;
+  min-width: 150px;
+  color: #333;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 操作符下拉列表 */
+.mds-select-operator {
+  padding: 4px 8px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+  width: 60px;
+  margin-right: 10px;
+}
+
+.mds-select-operator:focus {
+  border-color: #003f87;
+}
+
+.mds-select-operator:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* 输入框通用样式 */
+.mds-input {
+  padding: 6px 10px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  outline: none;
+}
+
+.mds-input:focus {
+  border-color: #003f87;
+}
+
+.mds-input:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* Document type输入框 */
+.mds-input-document-type {
+  width: 250px;
+}
+
+/* Market输入框 */
+.mds-input-market {
+  width: 150px;
+}
+
+/* User输入框 */
+.mds-input-user {
+  width: 200px;
+}
+
+/* Date输入框 */
+.mds-input-date {
+  width: 200px;
+}
+
+/* 下拉列表通用样式 */
+.mds-select {
+  padding: 4px 8px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.mds-select:focus {
+  border-color: #003f87;
+}
+
+.mds-select:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* Setting下拉列表 */
+.mds-select-setting {
+  width: 200px;
+}
+
+/* Business unit下拉列表 */
+.mds-select-business-unit {
+  width: 100px;
+}
+
+/* 错误信息样式 */
+.mds-error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* Loading状态 */
+.mds-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .mds-content {
+    padding: 15px;
+  }
+  
+  .mds-title {
+    font-size: 20px;
+  }
+  
+  .mds-button-row {
+    flex-wrap: wrap;
+  }
+  
+  .mds-action-button {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .mds-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .mds-label {
+    margin-bottom: 8px;
+    min-width: auto;
+  }
+  
+  .mds-select-operator {
+    margin-bottom: 8px;
+  }
+  
+  .mds-input,
+  .mds-select {
+    width: 100% !important;
+  }
+}

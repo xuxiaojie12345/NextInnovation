@@ -1,0 +1,236 @@
+/* HDocUserDocAdministration页面容器 - 使用huda前缀避免与其他画面冲突 */
+.huda-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.huda-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* 标题样式 */
+.huda-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* 表单行样式 */
+.huda-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+/* Label样式 */
+.huda-label {
+  font-weight: normal;
+  min-width: 80px;
+  color: #333;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 必填项标识 */
+.huda-required::after {
+  content: ' *';
+  color: #ff0000;
+}
+
+/* 输入框通用样式 */
+.huda-input {
+  padding: 6px 10px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  outline: none;
+}
+
+.huda-input:focus {
+  border-color: #003f87;
+}
+
+.huda-input:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* UserID输入框 */
+.huda-input-userid {
+  width: 200px;
+  margin-right: 10px;
+}
+
+/* User Info按钮样式 */
+.huda-info-button {
+  padding: 6px 16px;
+  background-color: #bcc4f0;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.huda-info-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.huda-info-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* User名称显示 */
+.huda-user-name {
+  font-size: 14px;
+  color: #333;
+  font-weight: normal;
+}
+
+/* Document多选下拉列表区域 */
+.huda-document-section {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+/* 下拉列表样式 */
+.huda-select {
+  padding: 4px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+  width: 90%;
+  margin-left: 90px;
+}
+
+.huda-select:focus {
+  border-color: #003f87;
+}
+
+.huda-select:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* Document下拉列表（大尺寸） */
+.huda-select-document {
+  height: 300px;
+  overflow-y: auto;
+}
+
+/* 高亮显示的选项（用户已有权限） */
+.huda-option-highlighted {
+  background-color: #ffffcc;
+  font-weight: bold;
+}
+
+/* 错误信息样式 */
+.huda-error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* Loading状态 */
+.huda-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 底部UPDATE按钮区域 */
+.huda-bottom-button {
+  display: flex;
+  justify-content: flex-start;
+   background-color: #dce1f3;
+   
+  padding: 8px 10px;
+  width:931px;  
+  margin-left: -25px;
+  margin-bottom: -21px;
+}
+
+/* UPDATE按钮样式 */
+.huda-update-button {
+  padding: 6px 30px;
+  background-color:#bcc4f0;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.huda-update-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.huda-update-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .huda-content {
+    padding: 15px;
+  }
+  
+  .huda-title {
+    font-size: 20px;
+  }
+  
+  .huda-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .huda-label {
+    margin-bottom: 8px;
+  }
+  
+  .huda-input-userid {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .huda-info-button {
+    width: 100%;
+  }
+  
+  .huda-select-document {
+    height: 200px;
+  }
+  
+  .huda-update-button {
+    width: 100%;
+  }
+}

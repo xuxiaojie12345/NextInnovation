@@ -1,0 +1,167 @@
+/* ==========================================
+   Hdoc Menu 画面样式 - 垂直空间极致压缩版 + 左右分栏布局
+   ========================================== */
+  
+/* 主容器：固定满屏高度，禁止整体溢出 */
+.menuContainer {
+  display: flex;
+  flex-direction: row; /* 改为横向布局 */
+  height: 100vh;
+  background-color: #e8e8e8;
+  overflow: hidden;
+}
+
+/* Logo 容器：顶部空间压到极限 */
+.logoContainer {
+  width: 100%;
+  background-color: #003057;
+  padding:4px 30px; /* 顶部/底部只留4px */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo {
+  font-family: "Volvo Broad", "Clarendon Text","Times New Roman",serif !important;
+  font-size: 30px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+
+/* 左侧菜单区域：占25%宽度 */
+.leftSidebar {
+  width: 25%;
+  min-width: 400px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color: #e8e8e8;
+  border-right: 2px solid #ccc;
+  flex-shrink: 0;
+}
+
+/* 菜单内容区域：占满剩余高度 */
+.menuContent {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 分类容器：上下内边距清零 */
+.categoryContainer {
+  margin: 0;
+  background-color: #e8e8e8;
+  padding: 0px 16px; /* 只留左右内边距 */
+}
+
+/* 一级分类标题：无任何垂直空白 */
+.categoryTitle {
+  padding: 0 !important;
+  font-weight: 700 !important;
+  color: #003057 !important;
+  font-size: 16px !important;
+  margin: 0 !important;
+  line-height: 1; /* 关键：行高=字号，无额外间距 */
+}
+
+/* 二级分类标题：同样清零垂直空间 */
+.subCategoryTitle {
+  padding: 0 0 0 8px !important;
+  font-weight: 700 !important;
+  color: #003057 !important;
+  font-size: 11px !important;
+  margin: 0 !important;
+  line-height: 1;
+}
+
+/* 菜单列表：无内外边距 */
+.menuList {
+  padding: 0;
+  margin: 0;
+}
+
+/* 【核心修改】菜单项：垂直空间压到极限 */
+.menuItem {
+  /* 把你看到的上下空白全部清零 */
+  padding: 0 0 0 12px !important;
+  margin: 0 !important;
+  min-height: unset !important; /* 强制取消任何默认最小高度 */
+  line-height: 1 !important; /* 文字行高和文字本身等高，无额外间距 */
+  transition: background-color 0.2s;
+}
+
+.menuItem:hover {
+  background-color: #d0d0d0;
+}
+
+/* 菜单项文字：同样压到极限 */
+.menuItemText {
+  display: flex;
+  font-size: 10px !important;
+  color: #003057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+.menuItemText::before {
+  content: "» ";
+  display: inline-block;
+  color: #666666;
+  margin-right: 8px; /* 箭头和文字的间距也缩小 */
+}
+
+/* 加载/错误容器 */
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #e8e8e8;
+  overflow: hidden;
+}
+
+/* ==========================================
+   右侧内容区域样式
+   ========================================== */
+
+/* 右侧内容区域：占75%宽度 */
+.rightContent {
+  flex: 1;
+  background-color: #ffffff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* 内容区域内部容器 */
+.contentWrapper {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+/* 欢迎/提示区域（当没有选中菜单项时显示） */
+.welcomeArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.welcomeMessage {
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}

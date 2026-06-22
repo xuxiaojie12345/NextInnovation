@@ -1,0 +1,189 @@
+/* HomologationVariables页面容器 */
+.homologation-variables-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 - 蓝色边框 */
+.homologation-variables-content {
+  background-color: white;
+  border: 1px solid #99b4d1;
+  border-radius: 3px;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 页面标题 */
+.page-title {
+  color: #003f87;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: left;
+  margin-top: 0;
+}
+
+/* 按钮组区域 - 浅蓝色背景 */
+.button-group {
+  background-color: #e8f0fe;
+  padding: 8px 10px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  display: flex;
+  gap: 8px;
+}
+
+/* 操作按钮样式 */
+.action-button {
+  padding: 4px 12px;
+  background-color: #c5d9f1;
+  color: #333;
+  border: 1px solid #8fa4c7;
+  border-radius: 2px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #a8c4e6;
+}
+
+/* 表单容器 */
+.form-container {
+  padding: 0 10px;
+}
+
+/* 表单行 */
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+/* Label样式 */
+.form-label {
+  min-width: 140px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* 必填项标识 */
+.form-label.required::before {
+  content: '*';
+  color: #ff0000;
+  margin-right: 4px;
+}
+
+/* 操作符 = */
+.operator {
+  margin: 0 8px;
+  color: #333;
+  font-weight: bold;
+  min-width: 35px;
+  text-align: center;
+  border: 1px solid #333;
+  border-radius: 1px;
+}
+
+/* 下拉框样式 */
+.form-select {
+  padding: 3px 6px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #003f87;
+}
+
+/* 短下拉框 */
+.form-select.short {
+  width: 110px;
+}
+
+/* 输入框样式 */
+.form-input {
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #333;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #003f87;
+}
+
+/* 短输入框 */
+.form-input.short {
+  width: 100px;
+}
+
+/* 中等输入框 */
+.form-input.medium {
+  width: 200px;
+}
+
+/* 长输入框 */
+.form-input.long {
+  width: 600px;
+}
+
+/* 自动填充文本提示 */
+.auto-text {
+  margin-left: 520px;
+  color: #666;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .homologation-variables-content {
+    padding: 15px;
+  }
+  
+  .page-title {
+    font-size: 16px;
+  }
+  
+  .form-row {
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  
+  .form-label {
+    min-width: 120px;
+    font-size: 12px;
+  }
+  
+  .form-input.long,
+  .form-input.medium {
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .button-group {
+    flex-wrap: wrap;
+  }
+  
+  .action-button {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}

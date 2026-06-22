@@ -1,0 +1,276 @@
+/* VinPlate页面容器 - 使用vp前缀避免与其他画面冲突 */
+.vp-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.vp-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* 标题样式 */
+.vp-title {
+  color: #003f87;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-align: left;
+
+  padding-bottom: 10px;
+}
+
+/* 输入框区域 */
+.vp-input-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.vp-hint-solide{
+  border:1px solid #b9c6ec;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+/* Label样式 */
+.vp-label {
+  font-weight: normal;
+  min-width: 150px;
+  color: #333;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 输入框样式 */
+.vp-input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  outline: none;
+  width: 200px;
+}
+
+.vp-input:focus {
+  border-color: #003f87;
+}
+
+.vp-input:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* 按钮行样式 */
+.vp-button-row {
+  display: flex;
+  border:1px solid #b9c6ec;
+  background-color:#eaecf5;
+  margin-bottom: 0px;
+  gap: 60px;
+ 
+  flex-wrap: wrap;
+}
+
+/* 操作按钮样式 */
+.vp-action-button {
+  padding: 6px 16px;
+  background-color: #d9ddf8;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.vp-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.vp-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误信息样式 */
+.vp-error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* 提示文本样式 */
+.vp-hint-text {
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Loading状态 */
+.vp-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 详细信息区域 */
+.vp-detail-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+/* 基本信息组 */
+.vp-info-group {
+  margin-bottom: 20px;
+}
+
+.vp-info-item {
+  display: flex;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.vp-info-label {
+  font-weight: bold;
+  min-width: 180px;
+  color: #333;
+}
+
+.vp-info-value {
+  color: #333;
+  flex: 1;
+}
+
+/* 子区域样式 */
+.vp-subsection {
+  margin-top: 20px;
+}
+
+.vp-subsection-title {
+  color: #003f87;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+/* 列表样式 */
+.vp-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.vp-list li {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* VP Data表格样式 */
+.vp-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.vp-data-table thead {
+  background-color: #e8f0fe;
+}
+
+.vp-data-table th {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid #003f87;
+  border-right: 1px solid #ccc;
+  font-weight: bold;
+  color: #003f87;
+}
+
+.vp-data-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  color: #333;
+}
+
+.vp-data-table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.vp-data-table tr:nth-child(odd) {
+  background-color: #e8f0fe;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .vp-content {
+    padding: 15px;
+  }
+  
+  .vp-title {
+    font-size: 18px;
+  }
+  
+  .vp-input-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .vp-label {
+    margin-bottom: 8px;
+  }
+  
+  .vp-input {
+    width: 100%;
+  }
+  
+  .vp-button-row {
+    flex-direction: column;
+  }
+  
+  .vp-action-button {
+    width: 100%;
+  }
+  
+  .vp-info-item {
+    flex-direction: column;
+  }
+  
+  .vp-info-label {
+    min-width: auto;
+    margin-bottom: 4px;
+  }
+  
+  .vp-data-table {
+    font-size: 12px;
+  }
+  
+  .vp-data-table th,
+  .vp-data-table td {
+    padding: 6px 8px;
+  }
+}

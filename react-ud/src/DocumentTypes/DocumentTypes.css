@@ -1,0 +1,127 @@
+/* DocumentTypes页面容器 - 使用dt前缀避免与其他画面冲突 */
+.dt-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.dt-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* 标题样式 */
+.dt-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* Loading状态 */
+.dt-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* DataTable容器 */
+.dt-table-container {
+  overflow-x: auto;
+}
+
+/* 表格样式 - 严格按照图片的边线颜色和格式，表格边框有两条线 */
+.dt-table {
+  width: 100%;
+  border-collapse: separate; /* 使用separate而不是collapse，实现双线边框效果 */
+  border-spacing: 3px;
+  font-size: 13px;
+  border: 1px solid #000; /* 外边框第一条线 */
+}
+
+/* 表头样式 */
+.dt-table thead {
+  background-color: #ffffff;
+}
+
+.dt-th-key,
+.dt-th-description {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: bold;
+  color: #000;
+  border: 1px solid #000; /* 单元格边框第二条线 */
+  border-bottom: 1px solid #000; /* 表头底部加粗边框 */
+  background-color: #ffffff;
+}
+
+.dt-th-key {
+  width: 150px;
+}
+
+.dt-th-description {
+  width: auto;
+}
+
+/* 表格单元格样式 - 严格按照图片的双线边框效果 */
+.dt-td-key,
+.dt-td-description {
+  padding: 6px 10px;
+  border: 1px solid #000; /* 单元格边框 */
+  color: #000;
+  background-color: #ffffff;
+  vertical-align: top;
+}
+
+/* Description列允许文本换行 */
+.dt-td-description {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+/* 空数据提示 */
+.dt-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  border: 1px solid #000;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dt-content {
+    padding: 15px;
+  }
+  
+  .dt-title {
+    font-size: 20px;
+  }
+  
+  .dt-th-key,
+  .dt-th-description {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .dt-td-key,
+  .dt-td-description {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  
+  .dt-th-key {
+    width: 100px;
+  }
+}

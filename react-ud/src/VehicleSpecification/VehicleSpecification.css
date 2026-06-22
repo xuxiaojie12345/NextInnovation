@@ -1,0 +1,127 @@
+/* VehicleSpecification页面容器 */
+.vehicle-specification-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 - 蓝色边框 */
+.vehicle-specification-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  border-radius: 4px;
+  padding: 25px 30px;
+  width: 100%;
+  max-width: 950px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 页面标题 - 深蓝色粗体 */
+.page-title {
+  color: #003f87;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: left;
+  margin-top: 0;
+}
+
+/* 两列布局行 */
+.info-row-two-column {
+  display: flex;
+  margin-bottom: 8px;
+  gap: 300px;
+}
+
+/* 单个信息项 */
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  color: #333;
+  flex: 1;
+}
+
+/* 单列布局行 */
+.info-row-single {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Label样式 - 加粗 */
+.label {
+  font-weight: bold;
+  min-width: 160px;
+  color: #333;
+  margin-right: 8px;
+}
+
+/* Value样式 */
+.value {
+  flex: 1;
+  color: #333;
+  word-break: break-all;
+}
+
+/* SYMBOL_STR 网格容器 - 多列显示 */
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 4px 8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+/* SYMBOL单元格 */
+.symbol-cell {
+  font-size: 12px;
+  color: #333;
+  cursor: help;
+  padding: 2px 0;
+}
+
+/* SYMBOL文本 - 等宽字体 */
+.symbol-text {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.5px;
+  white-space: pre; /* 保留空格 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .vehicle-specification-content {
+    padding: 15px 20px;
+  }
+  
+  .page-title {
+    font-size: 18px;
+  }
+  
+  .info-row-two-column {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .info-item,
+  .info-row-single {
+    font-size: 13px;
+  }
+  
+  .label {
+    min-width: 140px;
+  }
+  
+  .symbol-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+  
+  .symbol-text {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,251 @@
+/* MarketDocumentSettingsList页面容器 - 使用mdsl前缀避免与其他画面冲突 */
+.mdsl-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.mdsl-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* 标题样式 */
+.mdsl-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* 按钮区域 */
+.mdsl-button-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: #edf1f8;
+  border: 1px solid #ccc;
+}
+
+/* 操作按钮样式 */
+.mdsl-action-button {
+  padding: 6px 16px;
+  background-color: #bcc4f0;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mdsl-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.mdsl-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误信息样式 */
+.mdsl-error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* Loading状态 */
+.mdsl-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* DataTable容器 */
+.mdsl-table-container {
+  /* border: 1px solid #ccc; */
+  overflow-x: auto;
+}
+
+/* 表格样式 */
+.mdsl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* 表头样式 */
+/* .mdsl-table thead {
+  background-color: #e8f0fe;
+} */
+
+.mdsl-th-radio,
+.mdsl-th-doctype,
+.mdsl-th-businessunit,
+.mdsl-th-user,
+.mdsl-th-date {
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  color: #003f87;
+  border-bottom: 2px solid #ccc;
+}
+
+.mdsl-th-radio {
+  width: 40px;
+  text-align: center;
+}
+
+.mdsl-th-doctype {
+  width: 200px;
+  text-decoration: underline;
+}
+
+.mdsl-th-businessunit {
+  width: 150px;
+  text-decoration: underline;
+}
+
+.mdsl-th-user {
+  width: 200px;
+  text-decoration: underline;
+}
+
+.mdsl-th-date {
+  width: 200px;
+  text-decoration: underline;
+}
+
+/* 表格行样式 - 第一行和第二行背景颜色不一样 */
+.mdsl-row-even {
+  background-color: #ffffff; /* 偶数行白色 */
+}
+
+.mdsl-row-odd {
+  background-color: #e8f0fe; /* 奇数行浅蓝色 */
+}
+
+.mdsl-td-radio,
+.mdsl-td-doctype,
+.mdsl-td-businessunit,
+.mdsl-td-user,
+.mdsl-td-date {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+}
+
+.mdsl-td-radio {
+  text-align: center;
+}
+
+/* Radio Box样式 */
+.mdsl-td-radio input[type='radio'] {
+  cursor: pointer;
+}
+
+.mdsl-td-radio input[type='radio']:disabled {
+  cursor: not-allowed;
+}
+
+/* User Link样式 */
+.mdsl-user-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.mdsl-user-link:hover {
+  color: #003f87;
+}
+
+/* 空数据提示 */
+.mdsl-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+/* 打印样式优化 */
+@media print {
+  .mdsl-button-row,
+  .mdsl-error-message,
+  .mdsl-loading {
+    display: none;
+  }
+  
+  .mdsl-content {
+    border: none;
+    padding: 0;
+  }
+  
+  .mdsl-table-container {
+    border: 1px solid #000;
+  }
+  
+  .mdsl-table thead {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .mdsl-row-odd {
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .mdsl-content {
+    padding: 15px;
+  }
+  
+  .mdsl-title {
+    font-size: 20px;
+  }
+  
+  .mdsl-button-row {
+    flex-wrap: wrap;
+  }
+  
+  .mdsl-action-button {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .mdsl-th-doctype,
+  .mdsl-th-businessunit,
+  .mdsl-th-user,
+  .mdsl-th-date {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .mdsl-td-doctype,
+  .mdsl-td-businessunit,
+  .mdsl-td-user,
+  .mdsl-td-date {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

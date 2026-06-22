@@ -1,0 +1,220 @@
+/* DownloadAndPrintQuickGuides页面容器 - 使用dapg前缀避免与其他画面冲突 */
+.dapg-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.dapg-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 0;
+  width: 65%;
+  max-width: 1400px;
+}
+
+/* 顶部蓝色标题栏 */
+.dapg-header {
+  background-color: #000080; /* 深蓝色背景 */
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.dapg-title {
+  
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Back按钮样式 */
+.dapg-back-button {
+  padding: 6px 16px;
+  background-color: transparent;
+  color: #000080;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.dapg-back-button:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.dapg-back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 标题样式 */
+.dapg-title {
+  color: #ff6600; /* 橙色标题 */
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  text-align: left;
+}
+
+/* Loading状态 */
+.dapg-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* Quick Guides卡片展示区（上部） */
+.dapg-cards-section {
+  padding: 30px 40px;
+}
+
+/* 卡片网格布局 */
+.dapg-cards-grid {
+  display: inline-grid;
+  grid-template-columns: repeat(8, 0.6fr);
+  gap: 2px;
+}
+
+/* 单个卡片项 */
+.dapg-card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* 图片区域 - 留出图片位置 */
+.dapg-card-image {
+  width: 70px;
+  height: 100px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.dapg-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Link区域 - 与图片位置上下对齐 */
+.dapg-card-link {
+  color: #0000cc; /* 蓝色链接 */
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1.3;
+}
+
+.dapg-card-link:hover {
+  color: #000099;
+}
+
+/* Note提示信息 */
+.dapg-note {
+  padding: 20px 40px;
+  color: #333;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Volvo 3P Quick Guides链接列表（下部） */
+.dapg-volvo3p-section {
+  padding: 0 40px 30px 40px;
+}
+
+/* Volvo 3P标题 */
+.dapg-volvo3p-title {
+  color: #ff6600; /* 橙色标题 */
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  margin-top: 0;
+}
+
+/* Volvo 3P链接列表 */
+.dapg-volvo3p-list {
+  list-style-type: disc;
+  margin-left: 20px;
+  padding: 0;
+}
+
+.dapg-volvo3p-list li {
+  margin-bottom: 8px;
+}
+
+/* Volvo 3P链接样式 */
+.dapg-volvo3p-link {
+  color: #0000cc; /* 蓝色链接 */
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.dapg-volvo3p-link:hover {
+  color: #000099;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .dapg-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dapg-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .dapg-title {
+    font-size: 18px;
+  }
+  
+  .dapg-cards-section {
+    padding: 20px;
+  }
+  
+  .dapg-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .dapg-card-image {
+    width: 100px;
+    height: 130px;
+  }
+  
+  .dapg-card-link,
+  .dapg-volvo3p-link {
+    font-size: 12px;
+  }
+  
+  .dapg-note {
+    padding: 15px 20px;
+    font-size: 12px;
+  }
+  
+  .dapg-volvo3p-section {
+    padding: 0 20px 20px 20px;
+  }
+  
+  .dapg-volvo3p-title {
+    font-size: 14px;
+  }
+}

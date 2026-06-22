@@ -1,0 +1,318 @@
+/* HdocUserAdministration页面容器 - 使用hua前缀避免与其他画面冲突 */
+.hua-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* 内容区域 */
+.hua-content {
+  background-color: white;
+  border: 2px solid #003f87;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* 标题样式 */
+.hua-title {
+  color: #003f87;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-align: left;
+}
+
+/* 表单行样式 */
+.hua-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+/* Label样式 */
+.hua-label {
+  font-weight: normal;
+  min-width: 100px;
+  color: #333;
+  text-align: left;
+  margin-right: 10px;
+}
+
+/* 必填项标识 */
+.hua-required::after {
+  content: ' *';
+  color: #ff0000;
+}
+
+/* 输入框通用样式 */
+.hua-input {
+  padding: 6px 10px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  outline: none;
+}
+
+.hua-input:focus {
+  border-color: #003f87;
+}
+
+.hua-input:disabled,
+.hua-input[readonly] {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* UserID输入框（短） */
+.hua-input-short {
+  width: 120px;
+  margin-right: 10px;
+  
+}
+.hua-input-short1 {
+  width: 120px;
+  margin-left: 200px;
+  
+}
+/* User输入框（中等） */
+.hua-input-medium {
+  width: 200px;
+  margin-right: 10px;
+}
+
+/* USER INFO按钮样式 */
+.hua-info-button {
+  padding: 4px 12px;
+  background-color: #c5d9f1;
+  color: #333;
+  border: 1px solid #8fa4c7;
+  border-radius: 2px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hua-info-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.hua-info-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 权限区域 */
+.hua-permissions-section {
+  margin-top: 20px;
+}
+
+/* Checkbox行样式 */
+.hua-checkbox-row {
+  display: flex;
+  gap: 80px;
+  margin-left: 110px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+/* Checkbox标签样式 */
+.hua-checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+}
+
+.hua-checkbox-label input[type='checkbox'] {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+/* Market下拉列表行 */
+.hua-market-selects-row {
+  display: flex;
+  gap: 100px;
+  margin-bottom: 20px;
+  margin-left: 110px;
+}
+
+/* 下拉列表样式 */
+.hua-select {
+  padding: 4px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 12px;
+  color: #333;
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.hua-select:focus {
+  border-color: #003f87;
+}
+
+.hua-select:disabled {
+  background-color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+/* 小尺寸下拉列表 */
+.hua-select-small {
+  width: 80px;
+  height: 120px;
+}
+
+/* Adaptation下拉列表 */
+.hua-select-adaptation {
+  width: 80px;
+  height: 120px;
+  margin-left: 180px;
+}
+
+/* Market super user下拉列表 */
+.hua-select-market-super {
+  width: 80px;
+  height: 120px;
+}
+
+/* Roles区域 */
+.hua-roles-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.hua-roles-label {
+  font-weight: normal;
+  min-width: 100px;
+  color: #333;
+  margin-right: 10px;
+}
+
+.hua-adaptation-label {
+  margin-left: 180px;
+}
+
+/* Manage Variable List行 */
+.hua-manage-variable-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Market super user行 */
+.hua-market-super-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* 错误信息样式 */
+.hua-error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffcccc;
+  border-radius: 3px;
+}
+
+/* Loading状态 */
+.hua-loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* 底部按钮区域 */
+.hua-bottom-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #ccc;
+  background-color: #e8f0fe;
+  padding: 15px;
+}
+
+/* 操作按钮样式 */
+.hua-action-button {
+  padding: 6px 20px;
+  background-color: #c5d9f1;
+  color: #333;
+  border: 1px solid #8fa4c7;
+  border-radius: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hua-action-button:hover:not(:disabled) {
+  background-color: #a8c4e6;
+}
+
+.hua-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hua-content {
+    padding: 15px;
+  }
+  
+  .hua-title {
+    font-size: 20px;
+  }
+  
+  .hua-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .hua-label {
+    margin-bottom: 8px;
+  }
+  
+  .hua-input-short,
+  .hua-input-medium {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .hua-checkbox-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .hua-market-selects-row {
+    flex-wrap: wrap;
+  }
+  
+  .hua-select-small {
+    width: 100%;
+    height: 80px;
+  }
+  
+  .hua-bottom-buttons {
+    flex-direction: column;
+  }
+  
+  .hua-action-button {
+    width: 100%;
+  }
+}
