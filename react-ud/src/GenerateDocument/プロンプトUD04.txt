@@ -1,0 +1,95 @@
+================================================================================
+                        UD HDoc & VBI(UDBI) 替换项目
+                                画面功能设计书
+                              生成文档
+================================================================================
+
+【修订履历】
+版本   变更位置   变更内容                                     变更理由               作成日/变更日      作成者/变更者   备注
+------------------------------------------------------------------------------------------------------------------------
+1.0               新建                                     新建                  2022-11-21        UD 劉
+1.1               画面布局与项目定义书                       删除S-Note说明显示    2022-12-21        UD 李
+1.2               画面布局与项目定义书                       添加错误消息区域      2022-12-21        UD 李
+
+================================================================================
+【画面布局】
+
+项目名: UD HDoc & VBI(UDBI)替换
+业务名: HDOC
+系统名: HDOC
+画面ID: Generate Doc
+画面名: Generate Doc
+作成日: 2022-11-21
+作成者: UD 劉
+
+概要处理:
+1. 初始显示
+   根据前画面的设定条件，调用VPPS VIN PLATE创建批处理，创建VIN Plate。
+   (1) 显示对应Chassis的接收信息。
+   (2) 显示对应Chassis的S-Note信息。
+   (3) 显示对应Chassis的Tire Master信息。
+   (4) 点击链接'Analyze Rules'，跳转到「HDOC DEBUG」画面。
+   (5) 如果对应Chassis的AD-Change状态为活性，Modify链接显示为红色。
+       点击链接，跳转到「修改文档」画面。
+   (6) 显示VIN Plate的名称和参数。
+   (7) 点击链接'Generated document'，下载「Vin Plate」的.trf文件(含值)。
+   (8) 点击链接'Chassis no'，显示对应Chassis的详细信息。
+   (9) 显示当前时间。
+   (10) 显示当前程序版本。
+
+2. 修改文档画面
+   显示可修改的项目。
+
+3. HDOC DEBUG画面
+   显示搜索条件的设定画面。
+
+4. VDA - Vehicle Specification画面
+   显示Chassis的详细信息。
+
+================================================================================
+【项目定义书】 - 项目定义_生成文档
+
+No.   项目名                 类型  必填 MaxLength 数据来源表                    数据来源项目                         I/O    允许字符 字符配置 初始值 显示控制 备注
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+1     Chassis no            label  -       15    前画面                              Chassis series / Chassis no        Output  -       左      -      -       -
+2     Ordernumber           label  -       16    HDOC_REC_DATA_OM                   ORDERNUMBER                        Output  -       左      -      -       -
+3     Build week            label  -       10    HDOC_REC_DATA_OM                   BUILD                              Output  -       左      -      -       -
+4     Spec week             label  -       10    HDOC_REC_DATA_OM                   SPEC                               Output  -       左      -      -       -
+5     Market                label  -       10    HDOC_REC_DATA_VDA_GENERAL          COUNTRY_OF_OPERATION               Output  -       左      -      -       CountryOfOperation(VDA)
+6     Master Market         label  -       -     -                                  -                                  Output  -       左      -      -       '-EU'固定设置
+7     S-Note NO             label  -       4000  HDOC_REC_DATA_OM                   CUSTOMER_ADAP                      Output  -       左      -      -       -
+8     S-Note Desc           label  -       256   HDOC_REC_DATA_KAP_SNOTE            DESCRIPTION                        Output  -       左      -      -       -
+9     S-Note Message        label  -       256   -                                  -                                  Output  -       左      -      -       如果有S-Note信息则固定显示：'The S-Notes above can affect homologation documents.'
+10    Load Index            label  -       10    HDOC_REC_DATA_KOLA_TIRE_MASTER     LOAD_INDEX                         Output  -       左      -      -       Tire Master信息
+11    Analyze Rules         link   -       10    -                                  -                                  Output  -       左      -      -       -
+12    Modify Doc Link       link   -       1     HDOC_ADCA_CHANGE                   ACT                                Output  -       左      -      -       AD-Change为活性时显示：'After def change detected. Document need to be modified.'
+13    Using template        label  -       20    VPPS VIN PLATE创建批处理           Template                           Output  -       左      -      -       -
+14    Replacing parameters  label  -       40    HDOC_ADCA_MODIFICATION             VARIABLE / NEWVAL                  Output  -       左      -      -       -
+15    Generated document    link   -       -     -                                  -                                  Output  -       左      -      -       VPPS VIN PLATE创建批处理创建的VIN Plate文件链接
+16    Date                  label  -       20    服务器                             Date                               Output  -       左      -      -       '2022-12-02 05:11:45'
+17    HDoc version          label  -       20    程序                               版本                                Output  -       左      -      -       -
+18    Error message area    label  -       -     -                                  -                                  Output  -       左      -      -       -
+
+================================================================================
+【输入输出表一览】
+
+No.   表/视图/文件           物理名                            操作CRUD   备注
+--------------------------------------------------------------------------------------------
+1     OM(RP500)接收数据      HDOC_REC_DATA_OM                  R         获取OM信息
+2     VDA接收数据            HDOC_REC_DATA_VDA_GENERAL         R         获取VDA信息
+3     KOLA接收数据(tire master) HDOC_REC_DATA_KOLA_TIRE_MASTER  R         获取KOLA信息
+4     ADCA Change表          HDOC_ADCA_CHANGE                  R         获取AD-Chang信息，保存变更信息
+5     ADCA Change对象项目表  HDOC_ADCA_MODIFICATION            R         获取Modify信息，保存变更信息
+6     Template文件           Template文件                       R         VPPS VIN PLATE创建批处理创建的VIN Plate文件
+
+================================================================================
+【检查规格】 - 项目检查规格
+
+No.   检查对象           检查内容                                                     错误消息                                                                               错误级别
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1     批处理执行结果     批处理异常终止：VIN Plate创建失败                                 Batch processing failed: Failed to make the Inplate\nError reson:XXX                      Error
+2     Template获取      Vin Plate的Template文件不存在时                                  Can not find template for doctype VIN-PLATE                                            Error
+3     Template获取      Template的文件名不存在于HDOC_USER_DEFINED_RULES中                Can not find TEMPLATE-VIN-PLATE. No match in user defined rules.                       Error
+4     Template获取      Template中的参数不存在于HDOC_USER_DEFINED_RULES中                No template rule defined for this truck.\nXXX\nXXX                                     Error
+
+================================================================================
