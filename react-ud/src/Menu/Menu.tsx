@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 
 interface MenuItem {
@@ -12,6 +13,8 @@ interface MenuSection {
 }
 
 const Menu: React.FC = () => {
+  const navigate = useNavigate();
+
   const menuSections: MenuSection[] = [
     {
       title: 'Generate Document',
@@ -70,6 +73,16 @@ const Menu: React.FC = () => {
     console.log('Clicked:', item.label);
   };
 
+  const handleLogout = () => {
+    // ローカルストレージから認証情報をクリア
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    // ログイン画面へ遷移
+    navigate('/');
+  };
+
+  const username = localStorage.getItem('username') || '';
+
   return (
     <div className="menu-container">
       <div className="menu-header">
@@ -83,7 +96,7 @@ const Menu: React.FC = () => {
             if (parent) {
               const textLogo = document.createElement('div');
               textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
+              textLogo.textContent = 'NEXTINNOVATION';
               parent.appendChild(textLogo);
             }
           }}
@@ -108,6 +121,19 @@ const Menu: React.FC = () => {
             </ul>
           </div>
         ))}
+      </div>
+
+      <div className="menu-footer">
+        {username && (
+          <div className="user-info">
+            <span className="user-icon">👤</span>
+            <span className="user-name">{username}</span>
+          </div>
+        )}
+        <button className="logout-button" onClick={handleLogout}>
+          <span className="logout-icon">⏻</span>
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );
