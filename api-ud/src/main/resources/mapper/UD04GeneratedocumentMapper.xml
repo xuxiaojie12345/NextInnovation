@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD04GeneratedocumentMapper">
+
+    <!-- 5.3 联合查询结果映射 -->
+    <resultMap id="GeneratedocumentQueryResultMap" type="com.web.app.entity.GeneratedocumentQueryResult">
+        <result property="ordernumber" column="ORDERNUMBER"/>
+        <result property="build" column="BUILD"/>
+        <result property="spec" column="SPEC"/>
+        <result property="sNoteNO" column="sNoteNO"/>
+        <result property="market" column="market"/>
+        <result property="loadIndex" column="loadIndex"/>
+        <result property="act" column="ACT"/>
+        <result property="variable" column="VARIABLE"/>
+        <result property="newval" column="NEWVAL"/>
+    </resultMap>
+
+    <!-- 5.3: 根据Chassis no、Ordernumber、Market联合查询全量信息 -->
+    <select id="selectGeneratedocument" resultMap="GeneratedocumentQueryResultMap">
+        SELECT
+            OM.ORDERNUMBER,
+            OM.BUILD,
+            OM.SPEC,
+            OM.CUSTOMER_ADAP AS sNoteNO,
+            GENERAL.COUNTRY_OF_OPERATION AS market,
+            MASTER.LOAD_INDEX AS loadIndex,
+            HDOC_ADCA_CHANGE.ACT,
+            MODIFICATION.VARIABLE,
+            MODIFICATION.NEWVAL
+        FROM
+            HDOC_REC_DATA_OM OM
+        INNER JOIN HDOC_REC_DATA_VDA_GENERAL GENERAL
+            ON OM.SERIE = GENERAL.SERIE
+            AND OM.CHNR = GENERAL.CHNR
+        INNER JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER MASTER
+            ON GENERAL.BRAND_ID = MASTER.BRAND
+        INNER JOIN HDOC_ADCA_CHANGE
+            ON OM.SERIE = HDOC_ADCA_CHANGE.SERIE
+            AND OM.CHNR = HDOC_ADCA_CHANGE.CHNR
+        INNER JOIN HDOC_ADCA_MODIFICATION MODIFICATION
+            ON OM.SERIE = MODIFICATION.SERIE
+            AND OM.CHNR = MODIFICATION.CHNO
+        WHERE
+            OM.SERIE = #{chassisSeries}
+            AND OM.CHNR = #{chassisNo}
+            AND OM.TRANS_TS = #{documentType}
+    </select>
+
+</mapper>

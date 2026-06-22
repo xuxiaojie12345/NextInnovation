@@ -1,0 +1,44 @@
+/* ========================================
+   SidebarLayout - 全局侧边栏布局
+   ======================================== */
+
+.sidebar-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 300px;
+  min-width: 260px;
+  max-width: 360px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+  background-color: #e8e8e8;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 240px;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+}

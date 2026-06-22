@@ -57,9 +57,69 @@ export const authApi = {
  * 文档相关 API
  */
 export const documentApi = {
-  // 获取文档类型列表
+  // 获取文档类型列表（POST方式）
   getDocumentTypes: () =>
     apiRequest("/api/UD03SelectHdocdocumentlistApi/types", "POST"),
+
+  // 获取文档类型列表（GET方式 - 根据内部设计UD03规格）
+  getDocumentTypesGet: () =>
+    apiRequest("/api/UD03SelectHdocdocumentlistApi/types", "GET"),
+
+  // UD04 - 获取车辆铭牌生成结果
+  getSelectGeneratedocument: (params: {
+    chassisSeries: string;
+    chassisNo: string;
+    documentType: string;
+  }) =>
+    apiRequest(
+      "/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument",
+      "POST",
+      params,
+    ),
+
+  // UD05 - 查询变量修改信息
+  getSelectVariableModification: (params: { serie: string; chno: string }) =>
+    apiRequest(
+      "/api/UD05ModifyDocumentApi/UD05SelectVariableModification",
+      "POST",
+      params,
+    ),
+
+  // UD06 - 获取修改状态信息
+  getSelectHdocAdcaModification: (params: {
+    chassisSerie: string;
+    chassisNumber: string;
+  }) =>
+    apiRequest(
+      "/api/UD06SaveModificationsApi/UD06SelectHdocAdcaModification",
+      "POST",
+      params,
+    ),
+
+  // UD05 - 提交文档修改
+  // UD07 - 获取VDA车辆规格信息
+  getVehicleSpecification: (chassisNo: string) =>
+    apiRequest(
+      "/api/UD07VehicleSpecificationApi/Select/" +
+        encodeURIComponent(chassisNo),
+      "GET",
+    ),
+
+  updateHdocAdcaModification: (params: {
+    chassisNo: string;
+    market: string;
+    templateFile: string;
+    modifications: Array<{
+      variable: string;
+      currentValue: string;
+      modifiedValue: string;
+    }>;
+  }) =>
+    apiRequest(
+      "/api/UD05ModifyDocumentApi/UD05UpdateHdocAdcaModification",
+      "POST",
+      params,
+    ),
 };
 
 /**
@@ -187,4 +247,46 @@ export const marketDocumentApi = {
   // 更新文档设置
   updateDocument: (params: any) =>
     apiRequest("/api/UD20MarketDocumentSettingsApi/update", "POST", params),
+};
+
+/**
+ * UD08 - 认证参数管理 (Homologation Variables) API
+ */
+export const homologationVariablesApi = {
+  // 获取 Product Class 下拉列表
+  getProductClassMaster: () =>
+    apiRequest(
+      "/api/UD08HomologationVariablesApi/UD08SelectProductclassmaster",
+      "GET",
+    ),
+
+  // 获取 Market 下拉列表
+  getMarketMaster: () =>
+    apiRequest(
+      "/api/UD08HomologationVariablesApi/UD08SelectMarketmaster",
+      "GET",
+    ),
+
+  // 获取 HDoc Variables 下拉列表
+  getHdocVariables: () =>
+    apiRequest(
+      "/api/UD08HomologationVariablesApi/UD08SelectHdocvariables",
+      "GET",
+    ),
+
+  // 新增记录
+  add: (params: any) =>
+    apiRequest("/api/UD08HomologationVariablesApi/UD08Add", "POST", params),
+
+  // 更新记录
+  update: (params: any) =>
+    apiRequest("/api/UD08HomologationVariablesApi/UD08Update", "PUT", params),
+
+  // 删除记录
+  delete: (params: any) =>
+    apiRequest(
+      "/api/UD08HomologationVariablesApi/UD08Delete",
+      "DELETE",
+      params,
+    ),
 };

@@ -20,5 +20,5 @@ public interface HdocAdcaModificationMapper {
      * 更新修改值
      */
     int updateNewVal(@Param("serie") String serie, @Param("chno") String chno, 
-                     @Param("description") String description, @Param("modifiedValue") String modifiedValue);
+                     @Param("variable") String variable, @Param("modifiedValue") String modifiedValue);
 }

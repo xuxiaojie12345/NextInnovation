@@ -2,78 +2,104 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UD02.css";
 
-// 类型定义
+// ===== 类型定义 =====
+
+/** 用户信息 */
 interface User {
   userId: string;
   name: string;
   token: string;
 }
 
+/** 菜单项 */
 interface MenuItem {
   label: string;
   path: string;
 }
 
+/** 菜单组 */
 interface MenuGroup {
   id: string;
   title: string;
   items: MenuItem[];
 }
 
+// ===== 辅助函数 =====
+
+/**
+ * 从 localStorage 读取当前登录用户信息
+ * @returns User | null
+ */
 const getCurrentUser = (): User | null => {
-  console.log("=== UD02: 开始读取用户信息 ===");
-
-  const userStr = localStorage.getItem("user_info");
-  console.log("从 localStorage 读取的 user_info:", userStr);
-
-  if (!userStr) {
-    console.error("错误：localStorage 中没有 user_info");
-    return null;
-  }
-
   try {
+    const userStr = localStorage.getItem("user_info");
+    if (!userStr) return null;
+
     const userInfo = JSON.parse(userStr);
-    console.log("解析后的 userInfo 对象:", userInfo);
-
     const token = localStorage.getItem("auth_token");
-    console.log("从 localStorage 读取的 auth_token:", token);
-
-    const user: User = {
+    return {
       userId: userInfo.userId || "",
       name: userInfo.name || "",
       token: token || "",
     };
-
-    console.log("最终返回的 user 对象:", user);
-    return user;
-  } catch (error) {
-    console.error("解析用户信息失败:", error);
+  } catch {
+    // 解析失败时返回 null，触发重定向至登录页
     return null;
   }
 };
 
-const UD02: React.FC = () => {
+// ===== 菜单配置（严格按画面参数定义） =====
+
+const MENU_STRUCTURE: MenuGroup[] = [
+  {
+    id: "generate",
+    title: "Generate",
+    items: [{ label: "Generate Doc", path: "/UD03" }],
+  },
+  {
+    id: "admin",
+    title: "Admin",
+    items: [
+      {
+        label: "Update user defined variables (rules)",
+        path: "/UD08",
+      },
+      { label: "Existing HDoc variables", path: "/admin/existing-vars" },
+      { label: "Upload/Delete template", path: "/admin/template-upload" },
+      { label: "List available templates", path: "/admin/list-templates" },
+      { label: "VPPS Vin plate", path: "/admin/vpps-vin" },
+      { label: "AD/CA Change", path: "/admin/adca-change" },
+    ],
+  },
+  {
+    id: "user-administration",
+    title: "User Administration",
+    items: [
+      { label: "HDoc User Administration", path: "/user/hdoc-admin" },
+      { label: "HDoc User Doc Administration", path: "/user/hdoc-doc-admin" },
+      { label: "Search User", path: "/user/search" },
+    ],
+  },
+  {
+    id: "documentation",
+    title: "Documentation",
+    items: [{ label: "User Guide", path: "/docs/user-guide" }],
+  },
+];
+
+// ===== 主菜单组件 =====
+
+const UD02 = React.memo(() => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 3.1 处理流程 - Page Mount 检查
+  // 3.1 处理流程 - Page Mount: 会话校验
   useEffect(() => {
     const currentUser = getCurrentUser();
 
-    console.log(
-      "-1-----------------------" + currentUser + "------------------------",
-    );
-    // console.log("-2-----------------------"+ currentUser.token+ "------------------------");
-    console.log(
-      "-3-----------------------" + currentUser + "------------------------",
-    );
     // 校验详细规格表 No.1: Session Check
-    if (
-      !currentUser ||
-      !currentUser.token ||
-      isTokenExpired(currentUser.token)
-    ) {
+    if (!currentUser || !currentUser.token) {
       // 会话过期或无用户，重定向至登录页
       navigate("/UD01", { replace: true });
       return;
@@ -83,117 +109,67 @@ const UD02: React.FC = () => {
     setIsLoading(false);
   }, [navigate]);
 
-  // 辅助函数：检查 Token 是否过期 (简化逻辑)
-  const isTokenExpired = (token: string): boolean => {
-    // 实际项目中应解析 JWT 或调用后端验证
-    return false;
-  };
-
-  // 处理菜单项点击 - 直接路由跳转
+  // 处理菜单项点击 - 路由跳转
   const handleLinkClick = (path: string) => {
     navigate(path);
   };
 
   if (isLoading) {
-    return <div className="main-menu-container">加载中...</div>;
+    return (
+      <div className="main-menu-container">
+        <div className="loading-message">加载中...</div>
+      </div>
+    );
   }
-
-  // 菜单配置数据
-  const menuStructure: MenuGroup[] = [
-    {
-      id: "group1",
-      title: "Generate Document",
-      items: [
-        { label: "Generate Doc", path: "/generate/doc" },
-        { label: "Generate Batch", path: "/generate/batch" },
-        { label: "Register Archive", path: "/archive/register" },
-        { label: "Register Batch", path: "/archive/register-batch" },
-      ],
-    },
-    {
-      id: "group2",
-      title: "Admin",
-      items: [
-        { label: "Update Rules", path: "/admin/rules" },
-        { label: "Update Unicode", path: "/admin/unicode" },
-        { label: "Existing Vars", path: "/admin/vars" },
-        { label: "Unlock Doc", path: "/admin/unlock" },
-        { label: "H Doc Series", path: "/admin/h-series" },
-        { label: "Template Mgmt", path: "/admin/templates" },
-        { label: "List Templates", path: "/admin/list-templates" },
-        { label: "VPPS Vin", path: "/admin/vpps-vin" },
-        { label: "ADCA Change", path: "/admin/adca-change" },
-      ],
-    },
-    {
-      id: "group3",
-      title: "User Administration",
-      items: [
-        { label: "User Admin", path: "/user/admin" },
-        { label: "User Doc Admin", path: "/user/doc-admin" },
-        { label: "Search User", path: "/user/search" },
-        { label: "Change Password", path: "/user/change-pwd" },
-        { label: "User Pos", path: "/user/pos" },
-      ],
-    },
-    {
-      id: "group4",
-      title: "Archive",
-      items: [
-        { label: "Archive Search", path: "/archive/search" },
-        { label: "Upload Doc", path: "/archive/upload" },
-      ],
-    },
-    {
-      id: "group5",
-      title: "Documentation",
-      items: [
-        { label: "User Guide", path: "/docs/user-guide" },
-        { label: "ADCA Guide", path: "/docs/adca-guide" },
-        { label: "Vin Plate Guide", path: "/docs/vin-plate-guide" },
-        { label: "Archive Guide", path: "/docs/archive-guide" },
-        { label: "Privacy Policy", path: "/docs/privacy" },
-      ],
-    },
-  ];
 
   return (
     <div className="main-menu-container">
-      {/* HeaderLogo */}
+      {/* HeaderLogo: 白色字体，蓝色背景底板 */}
       <header className="header">
         <div className="header-logo">VOLVO</div>
       </header>
 
-      <main className="content">
-        {menuStructure.map((group) => (
+      {/* 菜单区域：浅灰色背景，靠左对齐 */}
+      <nav className="menu-nav">
+        {MENU_STRUCTURE.map((group) => (
           <div key={group.id} className="menu-group">
-            {/* MenuGroup Title */}
+            {/* 模块标题（Label）：常显，不可点击 */}
             <h2 className="group-title">{group.title}</h2>
 
-            <ul className="menu-list">
-              {group.items.map((item, index) => (
-                <li key={index} className="menu-item">
-                  <span
-                    className="menu-link"
-                    onClick={() => handleLinkClick(item.path)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        handleLinkClick(item.path);
-                      }
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {/* 子菜单项列表 */}
+            {group.items.length > 0 && (
+              <ul className="menu-list">
+                {group.items.map((item, index) => (
+                  <li key={index} className="menu-item">
+                    <span
+                      className="menu-link"
+                      onClick={() => handleLinkClick(item.path)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          handleLinkClick(item.path);
+                        }
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
-      </main>
+
+        {/* 用户信息显示 */}
+        {user && (
+          <div className="user-info">
+            <span>Logged in as: {user.name}</span>
+          </div>
+        )}
+      </nav>
     </div>
   );
-};
+});
 
 export default UD02;

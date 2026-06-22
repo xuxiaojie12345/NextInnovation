@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocRecDataVdaVariantMapper">
+
+    <resultMap id="VdaVariantResultMap" type="com.web.app.entity.HdocRecDataVdaVariant">
+        <result property="chassisNo" column="CHASSIS_NO"/>
+        <result property="symbol" column="SYMBOL"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
+
+    <resultMap id="VehicleBasicInfoMap" type="com.web.app.entity.VehicleBasicInfo">
+        <result property="familyId" column="FAMILY_ID"/>
+        <result property="variantId" column="VARIANT_ID"/>
+        <result property="model" column="MODEL"/>
+        <result property="builtWeek" column="BUILD"/>
+        <result property="customerAdap" column="CUSTOMER_ADAP"/>
+        <result property="productType" column="PRODUCT_TYPE"/>
+        <result property="vin" column="VIN"/>
+        <result property="countryOfOperation" column="COUNTRY_OF_OPERATION"/>
+    </resultMap>
+
+    <resultMap id="KolaVariantSymbolMap" type="com.web.app.entity.KolaVariantSymbol">
+        <result property="symbolStr" column="SYMBOL_STR"/>
+        <result property="functionGroup" column="FUNCTION_GROUP"/>
+    </resultMap>
+
+    <resultMap id="KapSnoteMap" type="com.web.app.entity.KapSnote">
+        <result property="snoteNo" column="SNOTE_NO"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
+
+    <!-- 根据底盘编号查询VDA Variant数据 -->
+    <select id="selectByChassisNo" resultMap="VdaVariantResultMap">
+        SELECT CHASSIS_NO, SYMBOL, DESCRIPTION
+        FROM HDOC_REC_DATA_VDA_VARIANTS
+        WHERE CHASSIS_NO = #{chassisNo}
+    </select>
+
+    <!-- 5.6-1: 查询车辆基本信息和VDA FAMILY_ID/VARIANT_ID -->
+    <select id="selectVehicleBasicInfo" resultMap="VehicleBasicInfoMap">
+        select 
+         VARIANTS.FAMILY_ID,
+         VARIANTS.VARIANT_ID,
+         OM.MODEL,
+         OM.BUILD,
+         OM.CUSTOMER_ADAP,
+         GENERAL.PRODUCT_TYPE,
+         GENERAL.VIN,
+         GENERAL.COUNTRY_OF_OPERATION
+        from 
+         HDOC_REC_DATA_VDA_VARIANTS  VARIANTS
+        INNER JOIN 
+        HDOC_REC_DATA_OM OM
+         ON VARIANTS.SERIE = OM.SERIE
+         AND VARIANTS.CHNR = OM.CHNR
+        INNER JOIN
+        HDOC_REC_DATA_VDA_GENERAL GENERAL
+         ON VARIANTS.SERIE = GENERAL.SERIE
+         AND VARIANTS.CHNR = GENERAL.CHNR
+        where
+          VARIANTS.SERIE = #{serie}
+          AND VARIANTS.CHNR = #{chnr}
+    </select>
+
+    <!-- 5.6-KAP: 根据SERIE/CHNR查询S-Note数据（返回CUSTOMER_ADAP，映射到snoteNo） -->
+    <select id="selectSNoteBySerieChnr" resultMap="KapSnoteMap">
+        SELECT CUSTOMER_ADAP AS SNOTE_NO
+        FROM HDOC_REC_DATA_OM
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </select>
+
+    <!-- 5.6-2: 根据FAMILY_ID/VARIANT_ID查询SYMBOL_STR -->
+    <select id="selectKolaVariantsByFamily" resultMap="KolaVariantSymbolMap">
+        SELECT
+            LPAD(SUBSTRING(VARIANT.SYMBOL, 1, 8), 8, ' ') AS SYMBOL_STR,
+            VARIANT.FUNCTION_GROUP
+        FROM 
+            HDOC_REC_DATA_KOLA_VARIANT VARIANT
+        WHERE
+            VARIANT.FAMILY_ID = #{familyId}
+            AND VARIANT.VARIANT_ID = #{variantId}
+    </select>
+
+</mapper>

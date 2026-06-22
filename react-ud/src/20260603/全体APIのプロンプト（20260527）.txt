@@ -78,7 +78,7 @@
         
 4. 处理流程
    【AuthenticationApi】
-    4.1 客户端通过POST请求访问接口 /api/AuthenticationApi/login，将用户名、密码等请求参数，以JSON格式发送至后端服务。
+    4.1 客户端通过GET请求访问接口 /api/AuthenticationApi/login，将用户名、密码等请求参数，以JSON格式发送至后端服务。
 
     4.2 后端【LoginController】接收前端请求，通过【LoginRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
 
@@ -97,18 +97,15 @@
         • 密码错误则返回“密码不正确”
 
     4.7 验证全部通过后：
-        • 生成Token（包含用户ID、用户名等）
-        • 可记录登录日志（登录时间、IP、设备信息）
-        • 构建登录成功响应体，包含Token、用户基础信息
+        • 构建登录成功响应体
 
     4.8 封装【LoginResponse】响应对象，统一返回标准格式：
         {
             "code": 200,
             "msg": "登录成功",
             "data": {
-                "token": "xxxx",
-                "userId": 1,
-                "username": "xxx"
+                "userId": "xxxx",
+                ······
             }
         }
 ----------------------------------------------------------------------------------------------------------------
@@ -265,11 +262,11 @@
         }
 ----------------------------------------------------------------------------------------------------------------
    【UD07VehicleSpecificationApi】
-    4.1 客户端通过POST请求访问接口 /api/UD07VehicleSpecificationApi/Select，将Chassis no请求参数，以JSON格式发送至后端服务。
+    4.1 客户端通过POST请求访问接口 /api/UD07VehicleSpecificationApi/Select，将chassisNo请求参数，发送至后端服务。
 
-    4.2 后端【UD07VehicleSpecificationController】接收前端请求，通过【UD07VehicleSpecificationRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+    4.2 后端【UD07VehicleSpecificationController】接收前端请求，校验请求参数，完成请求入口层的参数接收与初步格式验证。
 
-    4.3 控制器层调用【UD07VehicleSpecificationService】接口中的方法，将校验后的请求对象传递至业务逻辑层处理。
+    4.3 控制器层调用【UD07VehicleSpecificationService】接口中的方法，将校验后的请求参数传递至业务逻辑层处理。
 
     4.4 【UD07VehicleSpecificationServiceImpl】业务实现层执行核心登录逻辑：
         • 对请求参数进行非空、长度、格式等合法性校验
@@ -278,7 +275,10 @@
     4.5 业务层通过【***Mapper】数据访问层，根据用户名查询数据库中的信息。
 
     4.6 登录核心验证逻辑：
-        • 判断查询数据是否存在，不存在则返回“数据不存在”
+       • 根据 chassisNo 查询 HDOC_REC_DATA_VDA_VARIANTS 表获取 FAMILY_ID, VARIANT_ID
+       • 根据上一步获取的 FAMILY_ID, VARIANT_ID 查询 HDOC_REC_DATA_KOLA_VARIANT 表获取 SYMBOL, FUNCTION_GROUP, DESCRIPTION
+       • 对 HDOC_REC_DATA_KOLA_VARIANT 返回的 SYMBOL 进行格式化处理：截取前8位，不足8位时右侧补充半角空格
+       • 组装所有查询到的数据（Model, Build Week, VIN, Engine No, Country Of Operation, S-Note NO, 格式化后的 SYMBOL_STR, DESCRIPTION）
 
     4.7 验证全部通过后：
         • 构建查询成功响应体，
@@ -1127,46 +1127,33 @@
     【UD04SelectGeneratedocumentApi】
     5.3 - 查询语句: 
     -- 功能：根据Chassis no、Ordernumber、Market，联合查询全量信息
-        SELECT
-          -- 1. OM受信データ (基本情報)
-          om.*,
-          -- 2. VDA受信データ (車両仕様)
-          vda.*,
-          -- 3. KOLAタイヤマスタ (タイヤ情報)
-          tire.*,
-          -- 4. ADCA Change履歴
-          adc.CHANGE_CONTENT,
-          adc.MODIFY_DATE,
-          -- 5. ADCA変更対象項目
-          adm.MODIFY_ITEM,
-          adm.OLD_VALUE,
-          adm.NEW_VALUE,
-          -- 6. VIN Plate Templateファイルパス
-          tpl.FILE_PATH AS VIN_PLATE_TEMPLATE
-        FROM
-          HDOC_REC_DATA_OM om
-        INNER JOIN HDOC_REC_DATA_VDA_GENERAL vda
-          ON om.CHASSIS_NO = vda.CHASSIS_NO
-          AND om.ORDERNUMBER = vda.ORDERNUMBER
-          AND om.MARKET = vda.MARKET
-        LEFT JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER tire
-          ON om.CHASSIS_NO = tire.CHASSIS_NO
-        LEFT JOIN HDOC_ADCA_CHANGE adc
-          ON om.CHASSIS_NO = adc.CHASSIS_NO
-        LEFT JOIN HDOC_ADCA_MODIFICATION adm
-          ON adc.CHANGE_ID = adm.CHANGE_ID
-        -- VIN Plate模板文件（VPPS批量生成）
-        LEFT JOIN (
-          SELECT CHASSIS_NO, FILE_PATH FROM Templateファイル
-        ) tpl
-          ON om.CHASSIS_NO = tpl.CHASSIS_NO
-        -- 传入条件
+        select 
+         OM.ORDERNUMBER,
+         OM.BUILD,
+         OM.SPEC,
+         OM.CUSTOMER_ADAP as sNoteNO,
+         GENERAL.COUNTRY_OF_OPERATION as market,
+         MASTER.LOAD_INDEX as loadIndex,
+         CHANGE.ACT,
+         MODIFICATION.VARIABLE,
+         MODIFICATION.NEWVAL
+        form 
+          HDOC_REC_DATA_OM OM
+        INNER JOIN HDOC_REC_DATA_VDA_GENERAL GENERAL
+          ON OM.SERIE = GENERAL.SERIE
+          AND OM.CHNR = GENERAL.CHNR
+        INNER JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER MASTER
+          ON GENERAL.BRAND_ID = MASTER.BRAND
+        INNER JOIN HDOC_ADCA_CHANGE CHANGE
+          ON OM.SERIE = CHANGE.SERIE
+          AND OM.CHNR = CHANGE.CHNR
+        INNER JOIN HDOC_ADCA_MODIFICATION
+          ON OM.SERIE = MODIFICATION.SERIE
+          AND OM.CHNR = MODIFICATION.CHNR
         WHERE
-          om.CHASSIS_NO = :Chassis_no
-          AND om.ORDERNUMBER = :Ordernumber
-          AND om.MARKET = :Market
-        ORDER BY
-          adc.MODIFY_DATE DESC;
+         OM.CHASSIS_NO = #{chassisNo}
+         AND OM.ORDERNUMBER = #{ordernumber}
+         AND OM.MARKET = #{market}
 ----------------------------------------------------------------------------------------------------------------
     【UD05ModifyDocumentApi】
     5.4 - 查询语句: 
@@ -1180,7 +1167,48 @@
 ----------------------------------------------------------------------------------------------------------------
     【UD07VehicleSpecificationApi】
     5.6 - 查询语句: 
-    SELECT vda.*, kola.* FROM HDOC_REC_DATA_VDA_VARIANTS vda INNER JOIN HDOC_REC_DATA_KOLA_VARIANT kola ON vda.CHASSIS_NO = kola.CHASSIS_NO WHERE vda.CHASSIS_NO = Chassis_no
+      SELECT
+        OM.MODEL,
+        OM.BUILD,
+        GENERAL.PRODUCT_TYPE,
+        GENERAL.VIN,
+        KOLA.SYMBOL,
+        GENERAL.COUNTRY_OF_OPERATION,
+        VDA.FAMILY_ID,
+        VDA.VARIANT_ID,
+        OM.CUSTOMER_ADAP
+      FROM
+        HDOC_REC_DATA_VDA_GENERAL GENERAL
+      INNER JOIN
+        HDOC_REC_DATA_OM OM
+      ON
+          OM.SERIE = GENERAL.SERIE
+      AND OM.CHNR = GENERAL.CHNR
+      INNER JOIN
+        HDOC_REC_DATA_VDA_VARIANTS VDA
+      ON
+          GENERAL.SERIE = VDA.SERIE
+      AND GENERAL.CHNR = VDA.CHNR
+      INNER JOIN
+        HDOC_REC_DATA_KOLA_VARIANT KOLA
+      ON
+          VDA.FAMILY_ID = KOLA.FAMILY_ID
+      AND VDA.VARIANT_ID = KOLA.VARIANT_ID
+      WHERE
+        GENERAL.SERIE = {serie}
+        AND GENERAL.CHNR = {number}
+
+      SELECT
+        LPAD(SUBSTRING(KOLA.SYMBOL, 1, 8), 8, ' ') AS SYMBOL_STR,
+        KOLA.FUNCTION_GROUP,
+        KOLA.DESCRIPTION
+      FROM
+        HDOC_REC_DATA_KOLA_VARIANT KOLA
+      WHERE
+        KOLA.FAMILY_ID = {family_id}
+        AND KOLA.VARIANT_ID = {variant_id}
+      ORDER BY
+          CONCAT(LPAD(KOLA.FUNCTION_GROUP, 4, ' '), LPAD(VDA.FAMILY_ID, 3, ' '))
 ----------------------------------------------------------------------------------------------------------------
     【UD08HomologationVariablesApi】
     5.7 

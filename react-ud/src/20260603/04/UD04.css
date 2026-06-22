@@ -1,0 +1,198 @@
+/* ========================================
+   UD04 - VIN Plate Generation Result
+   ======================================== */
+
+.ud04-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.ud04-header {
+  background-color: #003057;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.ud04-header-logo {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.ud04-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 20px;
+}
+
+.ud04-content-box {
+  width: 100%;
+  max-width: 580px;
+  background-color: #ffffff;
+  border: 2px solid #3b6da0;
+  border-radius: 0;
+  padding: 24px 28px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ud04-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 16px;
+  color: #888888;
+}
+
+/* ── ページタイトル ── */
+.ud04-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 18px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+/* ── エラーメッセージ ── */
+.ud04-error-area {
+  color: #cf1322;
+  font-size: 13px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 2px;
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ── 基本情報セクション ── */
+.ud04-section {
+  margin-bottom: 12px;
+}
+
+.ud04-info-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4px;
+  line-height: 1.7;
+}
+
+.ud04-info-label {
+  width: 170px;
+  min-width: 170px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+  text-align: left;
+}
+
+.ud04-info-value {
+  font-size: 13px;
+  color: #262626;
+  text-align: left;
+  word-break: break-all;
+}
+
+/* ── リンク ── */
+.ud04-link {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #003057;
+}
+
+.ud04-link:hover {
+  color: #001d3d;
+  text-decoration: underline;
+}
+
+.ud04-link-doc {
+  font-size: 13px;
+  color: #003057;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.ud04-link-doc:hover {
+  color: #001d3d;
+}
+
+/* ── S-Notes ── */
+.ud04-snote-section {
+  padding: 10px 0;
+  margin-bottom: 12px;
+  border-top: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.ud04-snote-item {
+  font-size: 13px;
+  color: #262626;
+  line-height: 1.7;
+}
+
+.ud04-snote-warning {
+  font-size: 13px;
+  color: #cf1322;
+  font-weight: 500;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* ── AD Change ── */
+.ud04-adchange-section {
+  padding: 10px 0;
+  margin-bottom: 12px;
+  border-top: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.ud04-adchange-link {
+  font-size: 13px;
+  color: #cf1322;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline-block;
+  line-height: 1.5;
+}
+
+.ud04-adchange-link:hover {
+  color: #a8071a;
+}
+
+/* ── 置換パラメータ ── */
+.ud04-replaced-section {
+  padding: 10px 0;
+  margin-bottom: 12px;
+  border-top: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+/* ── フッター ── */
+.ud04-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid #d9d9d9;
+  font-size: 12px;
+  color: #595959;
+}

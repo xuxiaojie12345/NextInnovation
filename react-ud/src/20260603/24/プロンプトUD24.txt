@@ -1,0 +1,56 @@
+  1.基本信息
+   文档编号:DES-User Guide-001
+   模块名称:User Guide
+   作成日:2026-05-25
+  
+2.背景 (Background)
+  本模块的核心功能和目标：
+  User Guide 画面作为 HDoc 系统的帮助导航主页，提供了通往各个帮助子模块的入口。主要功能包括跳转到快速指南下载页、文档类型列表页、市场信息页以及市场文档设置页。该画面旨在帮助用户快速定位所需的信息和支持资源。
+  
+  面向的用户群体：
+  所有 HDoc 系统用户，特别是需要寻求帮助、了解系统功能或配置市场相关文档的用户。
+  
+  用户体验方面的考虑：
+  - 简洁导航：采用清晰的链接列表布局，减少用户寻找帮助信息的时间。
+  - 一致性：保持与系统整体风格一致的 UI 设计，提供熟悉的交互体验。
+  - 响应式：确保在不同设备上链接易于点击和阅读。
+  
+  安全性或特殊要求：
+  - 访问控制：确保只有登录用户才能访问帮助文档，防止未授权访问内部资料。
+  
+
+3. 画面项目定义 (Screen Parameters)
+  | No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | 数据源_表 (Source Table) | 数据源_項目 (Source Field) | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+  |-----|--------------|-------------|-----------|-----------|----------------------------------|------------------------------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+  | 1   | HDoc Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 跳转到Download and Print Quick Guides页面 |
+  | 2   | List of document types. | Link | - | - | - | - | Action | - | 左 | - | 活性 | 跳转到Document Types页面 |
+  | 3   | Markets in Hdoc | Link | - | - | - | - | Action | - | 左 | - | 活性 | 跳转到Markets in Hdoc页面 |
+  | 4   | HDoc - Market Document Setting | Link | - | - | - | - | Action | - | 左 | - | 活性 | 跳转到Market Document Settings List页面 |
+ 
+4. 功能描述 (Functional Description)
+   无
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+   无
+
+6. 接口定义 (API Specification)
+   无
+
+7. 异常处理 (Exception Handling)
+  | 异常场景 | 处理方式 | Message显示内容 |
+  |---------|---------|----------------|
+  | 路由跳转失败 | 捕获前端路由错误，重定向至首页或错误页 | 页面跳转失败，请稍后重试 |
+  | 会话过期 | 检测到 Token 失效，重定向至登录页 | 会话已过期，请重新登录 |
+  | 网络中断 | 检测网络连接状态，提示用户检查网络 | 网络连接异常，请检查您的网络设置 |
+
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\AIWork\NextInnovation\react-ud\work\F:\AIWork\NextInnovation\react-ud\work\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：詳細設計UD24.md
+  保存到：F:\AIWork\NextInnovation\react-ud\work

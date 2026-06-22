@@ -1,0 +1,76 @@
+/* ========================================
+   UD24 - HDoc Help モーダル
+   ======================================== */
+
+.ud24-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ud24-modal {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  width: 400px;
+  max-width: 90%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.ud24-header {
+  background-color: #003057;
+  padding: 12px 20px;
+}
+
+.ud24-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ud24-body {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.ud24-message {
+  font-size: 16px;
+  color: #333333;
+  margin: 0;
+}
+
+.ud24-footer {
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ud24-close-btn {
+  min-width: 100px;
+  height: 32px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #7a9eb3;
+  background-color: #e8f0f8;
+  color: #003057;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ud24-close-btn:hover {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud24-close-btn:active {
+  background-color: #c0d8e8;
+}

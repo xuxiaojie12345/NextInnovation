@@ -9,7 +9,7 @@
 本模块是 VOLVO 公司内部工程数据库系统的主导航界面。用户在成功登录后进入此页面。
 
    核心功能和目标：
-       提供清晰的功能导航，将系统功能划分为“Generate Document”、“User Administration”、“Archive”和“Documentation”四大模块。
+       提供清晰的功能导航，将系统功能划分为“Generate”、“Admin”、“User Administration”和“Documentation”四大模块。
        渲染菜单项。
        作为系统操作的入口，点击菜单项触发相应的业务功能或页面跳转。
    面向的用户群体：
@@ -26,13 +26,14 @@
 |-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
 | 1   | HeaderLogo | Label/Image | - | - | Output | - | 左 | VOLVO| 常显 | 白色字体，蓝色背景底板 |
 | 2   | Generate | Label | - | - | Output | - | 左 | Generate | 常显 | 模块标题 |
+| 5   | Generate Doc​ | Link/Button | - | - | Action | - | 左 | Generate Doc​ | 活性 | - |
 | 3   | Admin | Label | - | - | Output | - | 左 | Admin | 常显 | 模块标题 |
 | 4   | Update user defined variables (rules)​ | Link/Button | - | - | Action | - | 左 | Update user defined variables (rules) | 活性 | - |
-| 5    | Existing HDoc variables | Link/Button | - | - | Action | - | 左 | Existing HDoc variables | 活性 | - |
-| 6    | Upload/Delete template | Link/Button | - | - | Action | - | 左 | Upload/Delete template | 活性 | - |
-| 7    | List available templates | Link/Button | - | - | Action | - | 左 | List available templates | 活性 | - |
-| 8    | VPPS Vin plate​ | Link/Button | - | - | Action | - | 左 | VPPS Vin plate | 活性 | - |
-| 9    | AD/CA Change​  | Link/Button | - | - | Action | - | 左 | AD/CA Change​ | 活性 | - |
+| 5   | Existing HDoc variables | Link/Button | - | - | Action | - | 左 | Existing HDoc variables | 活性 | - |
+| 6   | Upload/Delete template | Link/Button | - | - | Action | - | 左 | Upload/Delete template | 活性 | - |
+| 7   | List available templates | Link/Button | - | - | Action | - | 左 | List available templates | 活性 | - |
+| 8   | VPPS Vin plate​ | Link/Button | - | - | Action | - | 左 | VPPS Vin plate | 活性 | - |
+| 9   | AD/CA Change​  | Link/Button | - | - | Action | - | 左 | AD/CA Change​ | 活性 | - |
 | 10  | User Administration | Label | - | - | Output | - | 左 | User Administration | 常显 | 模块标题 |
 | 11  | HDoc User Administration​ | Link/Button | - | - | Action | - | 左 | HDoc User Administration​ | 活性 | - |
 | 12  | HDoc User Doc Administration | Link/Button | - | - | Action | - | 左 | HDoc User Doc Administration | 活性 | - |

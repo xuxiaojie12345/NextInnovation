@@ -1,0 +1,85 @@
+  1.基本信息
+   文档编号:DES-Download and Print Quick Guides-001
+   模块名称:Download and Print Quick Guides
+   作成日:2026-05-21
+  
+2. 背景 (Background)
+  本模块的核心功能和目标：
+  Download and Print Quick Guides 画面旨在为用户提供一系列快速入门指南（Quick Guides）的预览和下载功能。用户可以在页面上直接查看指南的缩略图，并点击链接下载对应的 PDF 或图片文件。此外，页面还区分了内网版本（Intranet version）和外部可用版本，并列出了当前不可用（非活性）的指南链接，以便用户了解系统支持的范围。
+  
+  面向的用户群体：
+  HDoc 系统的所有用户，特别是新用户或需要查阅特定模块操作手册的业务人员和技术支持人员。
+  
+  用户体验方面的考虑：
+  - 可视化预览：通过展示图片（picture1-picture8），用户可以直观地识别所需的指南。
+  - 清晰的分类：将可用的指南与不可用的指南分开显示，避免用户点击无效链接产生困惑。
+  - 便捷的导航：提供“Back”链接，方便用户返回上一级帮助菜单。
+  - 提示信息：在页面底部添加 Note，说明字体移除等技术细节，保持信息透明。
+  
+  安全性或特殊要求：
+  - 文件访问权限：确保只有经过认证的用户才能下载内部指南文件。
+  - 链接有效性：定期检查非活性链接的状态，若未来可用需及时更新前端状态。
+
+
+3. 画面项目定义 (Screen Parameters)
+  | No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | 数据源_表 (Source Table) | 数据源_項目 (Source Field) | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+  |-----|--------------|-------------|-----------|-----------|----------------------------------|------------------------------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+  | 1   | Back | Link | - | - | - | - | Action | - | 左 | - | 活性 | 跳转到HDoc Help页面 |
+  | 2   | Download and Print Quick Guides | Label | - | - | - | - | Output | - | 左 | - | - | - |
+  | 3   | picture1 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 4   | WIS Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture1 图片 |
+  | 5   | picture2 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 6   | PERF Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture2 图片 |
+  | 7   | picture3 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 8   | W8 Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture3 图片 |
+  | 9   | picture4 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 10   | HDoc Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture4 图片 |
+  | 11   | picture5 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 12   | EDB Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture5 图片 |
+  | 13   | picture6 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 14   | COS Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture6 图片 |
+  | 15   | picture7 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 16   | VBI Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture7 图片 |
+  | 17   | version7 | Label | - | - | - | - | Output | - | 左 | - | - | 固定文字:'(Intranet version)' |
+  | 18   | picture8 | img | - | - | - | - | Output | - | 左 | - | - | - |
+  | 19   | VBI Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 活性 | 下载picture8 图片 |
+  | 20   | version8 | Label | - | - | - | - | Output | - | 左 | - | - | 固定文字:'(Intranet version)' |
+  | 21   | Note | Label | - | - | - | - | Output | - | 左 | - | - | 固定文字:'(Note that the font Volvo Broad is removed from the Quick Guides because of problems)' |
+  | 22   | Volvo 3P Quick Guides | Label | - | - | - | - | Output | - | 左 | - | - | - |
+  | 23   | EDB Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 24   | KRS Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 25   | CVM Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 26   | AVP Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 27   | KAX Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 28   | CAE Homepage Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 29   | BPP Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 30   | SPC Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+  | 31   | WebFRAME Quick Guide | Link | - | - | - | - | Action | - | 左 | - | 非活性 | - |
+
+4. 功能描述 (Functional Description)
+   无
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+   无
+
+6. 接口定义 (API Specification)
+   无
+
+7. 异常处理 (Exception Handling)
+  | 异常场景 | 处理方式 | Message显示内容 |
+  |---------|---------|----------------|
+  | 图片加载失败 | 显示默认占位图或破碎图标 | 图片加载失败 |
+  | 文件下载失败 | 捕获网络错误，提示用户重试 | 下载失败，请检查网络连接后重试 |
+  | 链接访问受限 | 检测用户权限，若无权限则禁用链接或提示 | 您没有权限访问此资源 |
+  | 服务器资源不存在 | 返回 404 错误处理 | 请求的资源不存在 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\AIWork\NextInnovation\react-ud\work\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：詳細設計UD23.md
+  保存到：F:\AIWork\NextInnovation\react-ud\work

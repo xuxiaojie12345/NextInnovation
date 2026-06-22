@@ -13,15 +13,13 @@
   - 认证管理人员
 
   用户体验方面的考虑：
-  - 界面简洁，仅包含必要输入项
+  - 界面简洁，仅包含必要输入项(左侧为入力框名称，右侧为入力框以及下拉框，入力框和下拉框左面的对齐的。底板的三个按钮都为浅蓝色，按钮中的字体为深蓝色)
   - 支持自动回填上次输入内容
   - 提供帮助链接，便于用户查阅说明
   - 所有操作均有明确反馈提示
 
   安全性或特殊要求：
-  - 仅允许授权用户访问此页面
   - 输入字段需校验格式与长度
-  - 所有通信使用 HTTPS 加密
   - 不暴露敏感信息
 
 3. 画面项目定义 (Screen Parameters)
@@ -66,6 +64,7 @@
 5. 业务逻辑与校验规则 (Business Logic & Checks)
 
    5.1 处理流程
+            初期处理：调用 `GET /api/UD03SelectHdocdocumentlistApi/types` 获取文档类型列表（调用API时，没有入力参数，是取得表里面的全部数据，没有检索条件，把返回的数据反应到画面上的下拉列表中）
 
       开始：用户点击 Submit / Reset / Help 按钮
       前置处理：获取输入参数
@@ -78,9 +77,6 @@
        若点击 Submit 且 Document type 未选择：
         设置Message = “Please select a document type.”
         终止流程
-
-      5.1.2 API调用 (Backend Check)：
-        调用 `GET /api/UD03SelectHdocdocumentlistApi/types` 获取文档类型列表
 
    5.2 结果处理：
        成功：跳转至文档生成页面

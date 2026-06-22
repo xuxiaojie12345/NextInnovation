@@ -12,17 +12,17 @@
     
     <!-- 根据条件查询 -->
     <select id="selectByCondition" resultMap="HdocAdcaModificationResultMap">
-        SELECT a.NEWVAL, b.DESCRIPTION 
+        SELECT a.SERIE, a.CHNO, a.VARIABLE, b.DESCRIPTION, a.NEWVAL
         FROM HDOC_ADCA_MODIFICATION a 
         LEFT JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE 
-        WHERE SERIE = #{serie} AND CHNO = #{chno}
+        WHERE a.SERIE = #{serie} AND a.CHNO = #{chno}
     </select>
     
     <!-- 更新修改值 -->
     <update id="updateNewVal">
         UPDATE HDOC_ADCA_MODIFICATION 
         SET NEWVAL = #{modifiedValue} 
-        WHERE SERIE = #{serie} AND CHNO = #{chno} AND DESCRIPTION = #{description}
+        WHERE SERIE = #{serie} AND CHNO = #{chno} AND VARIABLE = #{variable}
     </update>
     
 </mapper>

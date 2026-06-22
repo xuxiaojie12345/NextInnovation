@@ -35,14 +35,13 @@
 | 7   | S-Note NO | label | - | 4000 | Output | - | 左 | - | - | 显示 S-Notes 编号列表 |
 | 8   | S-Note Message | label | - | 256 | Output | - | 左 | - | - | 若存在则显示提示：“The S-Notes above can affect homologation documents.” |
 | 9   | Load Index | label | - | 10 | Output | - | 左 | - | - | Tire Master 数据来源 |
-| 10  | Analyze Rules | link | - | 10 | Output | - | 左 | - | - | 链接至规则分析页面 |
-| 11  | Modify Doc Link | link | - | 1 | Output | - | 左 | - | - | AD-Change 启用时显示红色，点击跳转至修改页面 |
-| 12  | Using template | label | - | 20 | Output | - | 左 | - | - | 显示模板名称，如 _eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf |
-| 13  | Replacing parameters | label | - | 40 | Output | - | 左 | - | - | 显示被替换参数，如 AXLE_CONF, WB_MM |
-| 14  | Generated document | link | - | - | Output | - | 左 | - | - | 点击下载填充后的 .rtf 文件 |
-| 15  | Date | label | - | 20 | Output | - | 左 | - | - | 当前系统时间 |
-| 16  | HDoc version | label | - | 20 | Output | - | 左 | - | - | 当前程序版本 |
-| 17  | Error message area | label | - | - | Output | - | 左 | - | - | 显示错误信息，若无则为空 |
+| 10  | Modify Doc Link | link | - | 1 | Output | - | 左 | - | - | AD-Change 启用时显示红色，点击跳转至修改页面 |
+| 11  | Using template | label | - | 20 | Output | - | 左 | - | - | 显示模板名称，如 _eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf |
+| 12  | Replacing parameters | label | - | 40 | Output | - | 左 | - | - | 显示被替换参数，如 AXLE_CONF, WB_MM |
+| 13  | Generated document | link | - | - | Output | - | 左 | - | - | 点击下载填充后的 .rtf 文件 |
+| 14  | Date | label | - | 20 | Output | - | 左 | - | - | 当前系统时间 |
+| 15  | HDoc version | label | - | 20 | Output | - | 左 | - | - | 当前程序版本 |
+| 16  | Error message area | label | - | - | Output | - | 左 | - | - | 显示错误信息，若无则为空 |
 
 4. 功能描述 (Functional Description)
 
@@ -120,7 +119,7 @@
         终止流程
 
       5.1.2 API调用 (Backend Check)：
-        调用 `GET /api/UD04SelectGeneratedocumentApi/{chassisNo，ordernumber，market}` 获取完整数据
+        调用 `GET /api/UD04SelectGeneratedocumentApi/SelectGeneratedocument` 获取完整数据
 
    5.2 结果处理：
        成功：正常渲染所有字段
@@ -141,7 +140,7 @@
 
      功能：获取指定底盘的车辆铭牌生成结果
      Method：GET
-     Endpoint：/api/UD04SelectGeneratedocumentApi/{chassisNo，ordernumber，market}
+     Endpoint：/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument
 
      Request [json]
      {"1","2","3"}
@@ -179,5 +178,4 @@
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
 | 模板文件缺失 | 显示错误并阻止生成 | “无法找到模板文件，请联系管理员” |
 | 批处理失败 | 显示具体错误码 | “Batch processing failed: Failed to make the Inplate Error reson:XXX” |
-| 权限不足 | 禁用下载链接 | “您没有权限访问此文件” |
 | 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
