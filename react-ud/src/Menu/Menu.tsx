@@ -1,113 +1,152 @@
-import React from 'react';
-import './Menu.css';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./Menu.css";
 
+// 定义菜单项的类型
 interface MenuItem {
+  id: string;
   label: string;
-  path?: string;
+  to: string;
+  children?: MenuItem[];
 }
 
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
+// 预定义的菜单结构
+const menuItems: MenuItem[] = [
+  {
+    id: "generate",
+    label: "Generate Document",
+    to: "#",
+    children: [
+      { id: "generate-doc", label: ">>  Generate Doc", to: "/menu/HDoc" },
+    ],
+  },
+  {
+    id: "admin",
+    label: "Admin",
+    to: "#",
+    children: [
+      {
+        id: "update-vars-rules",
+        label: ">>  Update user defined variables (rules)",
+        to: "/menu/homologation-variables",
+      },
+      {
+        id: "existing-hdoc-vars",
+        label: ">>  Existing HDoc variables",
+        to: "/admin/existing-hdoc-vars",
+      },
+      {
+        id: "unlock-doc",
+        label: ">>  Unlock Document",
+        to: "/admin/unlock-doc",
+      },
+      {
+        id: "upload-delete-template",
+        label: ">>  Upload/Delete template",
+        to: "/admin/upload-delete-template",
+      },
+      {
+        id: "list-available-templates",
+        label: ">>  List available templates",
+        to: "/admin/list-available-templates",
+      },
+      {
+        id: "vpps-vin-plate",
+        label: ">>  VPPS Vin plate",
+        to: "/admin/vpps-vin-plate",
+      },
+      {
+        id: "ad-ca-change",
+        label: ">>  AD/CA Change",
+        to: "/admin/ad-ca-change",
+      },
+    ],
+  },
+  {
+    id: "user-admin",
+    label: "User Administration",
+    to: "#",
+    children: [
+      {
+        id: "hdoc-user-admin",
+        label: ">>  HDoc User Administration",
+        to: "/user-admin/hdoc-user-admin",
+      },
+      {
+        id: "hdoc-user-doc-admin",
+        label: ">>  HDoc User Doc Administration",
+        to: "/user-admin/hdoc-user-doc-admin",
+      },
+      {
+        id: "search-user",
+        label: ">>   Search User",
+        to: "/user-admin/search-user",
+      },
+    ],
+  },
+  {
+    id: "documentation",
+    label: "Documentation",
+    to: "#",
+    children: [
+      {
+        id: "user-guide",
+        label: ">>  User Guide",
+        to: "/documentation/user-guide",
+      },
+    ],
+  },
+];
 
 const Menu: React.FC = () => {
-  const menuSections: MenuSection[] = [
-    {
-      title: 'Generate Document',
-      items: [
-        { label: 'Generate Doc' },
-        { label: 'Generate in Batch' },
-        { label: 'Regdata Archive' },
-        { label: 'Regdata Batch' },
-      ],
-    },
-    {
-      title: 'Admin',
-      items: [
-        { label: 'Update user defined variables (rules)' },
-        { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
-        { label: 'Unlock Document' },
-        { label: 'HDoc Number Series' },
-        { label: 'Upload/Delete template' },
-        { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
-      ],
-    },
-    {
-      title: 'User Administration',
-      items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
-        { label: 'Change Password' },
-        { label: 'User Position' },
-      ],
-    },
-    {
-      title: 'Archive',
-      items: [
-        { label: 'Search' },
-        { label: 'Upload Document' },
-      ],
-    },
-    {
-      title: 'Documentation',
-      items: [
-        { label: 'User Guide' },
-        { label: 'AD/CA Change Guide' },
-        { label: 'Vin plate Guide FM/FH' },
-        { label: 'Archive Guide' },
-        { label: 'Privacy' },
-      ],
-    },
-  ];
+  const location = useLocation();
 
-  const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+  // 判断当前路由是否匹配某个菜单项
+  const isActive = (path: string): boolean => {
+    return location.pathname === path;
+  };
+
+  // 渲染菜单项
+  const renderMenuItem = (item: MenuItem) => {
+    const hasChildren = item.children && item.children.length > 0;
+
+    return (
+      <div key={item.id} className="menu-group">
+        {/* 父级菜单标题 (仅作为标签，不可点击或点击无折叠效果) */}
+        <div className="menu-parent-label">{item.label}</div>
+
+        {/* 子菜单列表 - 始终显示 */}
+        {hasChildren && (
+          <div className="submenu-list">
+            {item.children?.map((child) => (
+              <Link
+                key={child.id}
+                to={child.to}
+                className={`submenu-link ${isActive(child.to) ? "active" : ""}`}
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* 如果没有子项（例如 Generate Doc 直接链接的情况，可根据实际需求调整） */}
+        {!hasChildren && (
+          <Link
+            to={item.to}
+            className={`submenu-link ${isActive(item.to) ? "active" : ""}`}
+          >
+            {item.label}
+          </Link>
+        )}
+      </div>
+    );
   };
 
   return (
     <div className="menu-container">
-      <div className="menu-header">
-        <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-            const parent = (e.target as HTMLImageElement).parentElement;
-            if (parent) {
-              const textLogo = document.createElement('div');
-              textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
-              parent.appendChild(textLogo);
-            }
-          }}
-        />
-      </div>
-
       <div className="menu-content">
-        {menuSections.map((section, index) => (
-          <div key={index} className="menu-section">
-            <h3 className="section-title">{section.title}</h3>
-            <ul className="menu-list">
-              {section.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex} 
-                  className="menu-item"
-                  onClick={() => handleMenuItemClick(item)}
-                >
-                  <span className="menu-arrow">»</span>
-                  <span className="menu-label">{item.label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        {menuItems.map((item) => renderMenuItem(item))}
       </div>
     </div>
   );

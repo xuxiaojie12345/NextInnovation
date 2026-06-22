@@ -1,0 +1,246 @@
+/* ModifyDocument 页面容器 */
+.moddoc-page-wrapper {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px 30px;
+  max-width: 950px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+/* 内容区域 */
+.moddoc-content-area {
+  padding: 10px;
+  border: 3px solid #a6b2ec;
+  width: 100%;
+}
+
+/* 标题 - 深蓝色左对齐 */
+.moddoc-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* エラーメッセージ */
+.moddoc-error-msg {
+  color: #ff0000;
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+/* ヘッダー情報エリア */
+.moddoc-header {
+  margin-bottom: 20px;
+}
+
+.moddoc-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.moddoc-header-label {
+  font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+}
+
+.moddoc-header-value {
+  color: #000;
+}
+
+.moddoc-header-separator {
+  margin: 0 6px;
+}
+
+/* Chassis no リンク */
+.moddoc-chassis-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.moddoc-chassis-link:hover {
+  color: #0000cc;
+}
+
+/* Template 行 */
+.moddoc-template-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  margin: 8px 0px;
+}
+
+.moddoc-template-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: normal;
+  margin: 40px 0px;
+}
+
+.moddoc-template-link:hover {
+  color: #0000cc;
+}
+
+/* テーブルラッパー */
+.moddoc-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border: 2px solid #b0baef;
+}
+
+/* テーブル */
+.moddoc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* テーブルヘッダー */
+.moddoc-th {
+  color: #000000;
+  text-align: left;
+  padding: 5px 10px;
+  border: 2px solid #b0baef;
+  white-space: nowrap;
+}
+
+.moddoc-th-variable {
+  font-weight: bold;
+  width: 18%;
+}
+
+.moddoc-th-desc {
+  font-weight: bold;
+  width: 32%;
+}
+
+.moddoc-th-current {
+  font-weight: bold;
+  width: 20%;
+}
+
+.moddoc-th-modified {
+  font-weight: bold;
+  width: 30%;
+}
+
+/* テーブル行 */
+.moddoc-tr:nth-child(even) {
+  background-color: #eef0ff;
+}
+
+.moddoc-tr:hover {
+  background-color: #f1f3ff;
+}
+
+/* テーブルセル */
+.moddoc-td {
+  padding: 6px 10px;
+  border: 2px solid #b0baef;
+  color: #000;
+  vertical-align: middle;
+}
+
+.moddoc-td-variable {
+  color: #333;
+}
+
+.moddoc-td-desc {
+  color: #333;
+}
+
+.moddoc-td-current {
+  color: #333;
+}
+
+.moddoc-td-modified {
+  padding: 4px 8px;
+}
+
+/* Modified value 入力欄 */
+.moddoc-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 14px;
+  border: 2px solid #9e9e9e;
+  border-radius: 2px;
+  box-sizing: border-box;
+  outline: none;
+  font-family: Arial, sans-serif;
+}
+
+.moddoc-input:focus {
+  border-color: #000080;
+  outline: 1px solid #000080;
+}
+
+.moddoc-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* データなし表示 */
+.moddoc-no-data {
+  text-align: center;
+  color: #999;
+  padding: 30px 10px;
+}
+
+/* ボタン行 */
+.moddoc-button-row {
+  display: flex;
+  background-color: #eef0ff;
+}
+
+/* ローディングメッセージ */
+.moddoc-loading-msg {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .moddoc-page-wrapper {
+    padding: 15px;
+  }
+
+  .moddoc-title {
+    font-size: 16px;
+  }
+
+  .moddoc-header-row,
+  .moddoc-template-row {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .moddoc-table {
+    font-size: 12px;
+  }
+
+  .moddoc-th,
+  .moddoc-td {
+    padding: 5px 6px;
+  }
+
+  .moddoc-input {
+    font-size: 12px;
+  }
+}

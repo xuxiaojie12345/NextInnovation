@@ -1,0 +1,137 @@
+/* VDA - Vehicle Specification 页面 */
+.vspec-page-wrapper {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  min-height: 100%;
+}
+
+.vspec-container {
+  max-width: 700px;
+  border: 1px solid #4472c4;
+  padding: 5px;
+}
+
+.vspec-title {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 25px;
+  margin-top: 0;
+}
+
+.vspec-error {
+  color: #ff0000;
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.vspec-loading {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+.vspec-row {
+  margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.vspec-field {
+  display: flex;
+  align-items: flex-start;
+}
+
+.vspec-label {
+  font-weight: bold;
+  color: #000;
+  min-width: 120px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.vspec-value {
+  color: #757474;
+  flex: 1;
+}
+
+/* SYMBOL_STR 区域 */
+.vspec-symbol-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.vspec-symbol-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vspec-symbol-item {
+  position: relative;
+  display: inline-block;
+  border-radius: 3px;
+  font-size: 14px;
+  font-family: "Courier New", monospace;
+  color: #000000;
+  cursor: default;
+}
+
+/* Tooltip */
+.vspec-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+}
+
+.vspec-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* S-Note NO 区域 */
+.vspec-snote-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.vspec-snote-line {
+  font-size: 12px;
+  color: #000;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+@media (max-width: 768px) {
+  .vspec-page-wrapper {
+    padding: 15px;
+  }
+  .vspec-label {
+    min-width: 130px;
+  }
+}

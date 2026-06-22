@@ -1,0 +1,218 @@
+/* GenerateDoc 页面容器 - 白色背景，左右padding 30px */
+.gendoc-page-wrapper {
+  min-height: 800px;
+  background-color: #ffffff;
+  margin: 10px auto;
+  max-width: 500px;
+  padding: 20px 30px;
+  border: 1px solid #000080;
+}
+
+/* 内容区域 - 无max-width限制 */
+.gendoc-content-area {
+  width: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 标题 - 18px粗体深蓝色(#000080)，左对齐 */
+.gendoc-main-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* 信息展示区域 */
+.gendoc-info-block {
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+/* 信息行 - 标签140px宽，行间距6px，flex横向布局 */
+.gendoc-info-line {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 标签样式 - 140px宽 */
+.gendoc-label-text {
+  font-weight: normal;
+  color: #000;
+  min-width: 140px;
+  display: inline-block;
+}
+
+/* 值样式 */
+.gendoc-value-text {
+  color: #000;
+  flex: 1;
+}
+
+/* Chassis no链接 - 蓝色下划线 */
+.gendoc-chassis-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.gendoc-chassis-link:hover {
+  color: #0000cc;
+}
+
+/* S-Note NO - 独立一行，不在label/value结构中 */
+.gendoc-snote-no {
+  margin-top: 50px;
+  margin-bottom: 5px;
+  color: #000;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* S-Note Message - 红色(#ff0000) */
+.gendoc-snote-message {
+  color: #ff0000;
+  margin-bottom: 15px;
+  font-style: normal;
+}
+
+/* 轮胎信息区域 */
+.gendoc-tire-section {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.gendoc-tire-line {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.gendoc-tire-label {
+  font-weight: normal;
+  color: #000;
+  min-width: 140px;
+  display: inline-block;
+}
+
+.gendoc-tire-value {
+  color: #000;
+  flex: 1;
+}
+
+/* Analyze Rules - 独立蓝色链接，不在info-row中 */
+.gendoc-analyze-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.gendoc-analyze-link:hover {
+  color: #0000cc;
+}
+
+/* AD-Change警告 - 红色(#ff0000) */
+.gendoc-adchange-warning {
+  color: #ff0000;
+  font-weight: normal;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 模板和参数区域 */
+.gendoc-template-block {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+/* Replacing parameters - 整体块 */
+.gendoc-param-block {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.gendoc-param-title {
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 4px;
+}
+
+.gendoc-param-values {
+  color: #000;
+}
+
+/* Replacing parameters - 缩进显示 */
+.gendoc-param-indented {
+  margin-left: 0;
+  margin-bottom: 4px;
+  color: #000;
+}
+
+/* Generated document - 蓝色加粗链接 */
+.gendoc-generated-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.gendoc-generated-link:hover {
+  color: #0000cc;
+}
+
+/* Date/Version - 上边距40px */
+.gendoc-footer-section {
+  margin-top: 60px;
+  padding-top: 0;
+}
+
+/* 错误消息区域 */
+.gendoc-error-display {
+  color: #ff0000;
+  background-color: transparent;
+  border: none;
+  padding: 10px 0;
+  font-size: 15px;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+/* 加载状态消息 */
+.gendoc-loading-msg {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .gendoc-page-wrapper {
+    padding: 15px;
+  }
+
+  .gendoc-main-title {
+    font-size: 16px;
+  }
+
+  .gendoc-info-block {
+    font-size: 12px;
+  }
+
+  .gendoc-label-text,
+  .gendoc-tire-label {
+    min-width: 100px;
+  }
+
+  .gendoc-param-indented {
+    margin-left: 100px;
+  }
+}

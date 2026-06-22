@@ -1,0 +1,84 @@
+/* SaveModifications 页面（在 Menu 右侧中间显示） */
+.svmod-page-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  padding: 20px;
+}
+.svmod-page-content {
+  padding: 20px;
+  max-width: 560px;
+  width: 100%;
+  border: 1px solid #507bc8;
+}
+.svmod-page-title {
+  font-size: 25px;
+  font-weight: bold;
+  color: #000080;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+.svmod-error {
+  color: #ff0000;
+  background-color: #fff0f0;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+.svmod-loading {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+.svmod-content {
+  margin-bottom: 20px;
+}
+.svmod-field {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  font-size: 15px;
+}
+.svmod-label {
+  color: #000;
+  min-width: 200px;
+  display: inline-block;
+}
+.svmod-value {
+  color: #000;
+  flex: 1;
+}
+.svmod-message {
+  margin-top: 15px;
+  background-color: #008000;
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  display: inline-block;
+}
+.svmod-button-row {
+  display: flex;
+  gap: 10px;
+}
+.svmod-btn-close {
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #807f7f;
+  border-radius: 3px;
+  background-color: #dce1ff;
+  color: #485a9d;
+}
+.svmod-btn-close:hover {
+  background-color: #e0e0e0;
+}
+@media (max-width: 768px) {
+  .svmod-label {
+    min-width: 140px;
+  }
+}

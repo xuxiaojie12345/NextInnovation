@@ -1,0 +1,225 @@
+请根据以下要求生成[Homologation Variables Result List]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-HomologationVariableResultList-009
+   模块名称:Homologation Variables Result List
+   作成日:2026-05-29
+
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：本模块用于展示根据上一页面查询条件检索出的认证参数结果。用户可以查看认证参数详情，选择特定记录返回上级页面，也可以执行删除、打印等操作。
+  面向的用户群体：内部业务操作人员、技术支持人员。
+  用户体验方面的考虑：
+    1.清晰展示认证参数的各项信息
+    2.提供便捷的操作按钮（选择、返回、打印、删除）
+    3.支持链接跳转查看用户详细信息
+    4.显示检索结果总数量
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+1	Product class	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.PC；【ソート順】Product Class, Market, Number
+2	Number	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.NUM
+3	Market	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.MARKET
+4	Variable	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.VARIABLE
+5	Value	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.VAL
+6	Variant string	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.VS、VS2
+7	Comments	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.COMMENTS
+8	Add	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.ADD_DATE
+9	Delete	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.DELETE_DATE
+10	Created by user	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.REGISTER_USER；点击后跳转至「EDB User View」界面
+11	Date	DataTable	-	-	Output	-	左	-	-	数据来源：HDOC_USER_DEFINED_RULES.REGISTER_DATETIME
+12	Count	label	-	-	Output	-	左	-	-	检索結果件数：Number of lines found: XXX
+13	Select	button	-	-	Action	-	中	-	活性	勾选数据记录后点击，页面返回至上级Homologation Variables画面，并自动回填所选记录的全部内容
+14	Back	button	-	-	Action	-	中	-	活性	页面跳转回上级认证参数界面，同时自动恢复此前的查询条件
+15	Print	button	-	-	Action	-	中	-	活性	打印当前检索结果
+16	Delete selected	button	-	-	Action	-	中	-	活性	删除已勾选的数据记录
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+
+    4.1.1 页面初始化与数据展示 (Initial Load & Data Display)
+    功能说明：根据上一页面的查询条件，展示对应检索结果。
+    开始：页面加载（OnLoad），接收前画面传入的参数。
+    操作步骤：
+      1. 接收前画面传入的查询条件（pc, number, market, variable等）。
+      2. 调用 UD09DeleteHdocuserdefinedrulesApi 的 UD09Search 方法获取规则信息。
+      3. 在DataTable中展示检索结果。
+      4. 在Count标签中显示检索结果总数量。
+    结果处理：
+      成功： DataTable正确展示数据，Count标签显示数量。
+      失败： 显示错误消息。
+
+    4.1.2 选择记录流程 (Select)
+    功能说明：勾选数据记录后点击【Select】按钮，页面返回至上级Homologation Variables画面，并自动回填所选记录的全部内容。
+      开始：点击【Select】按钮
+      前置处理：检查是否有选中的记录
+      空值校验等 (Frontend Check)：
+        若没有选中记录：
+          设置Message = "没有选择记录"
+          终止流程
+      操作步骤：
+        1. 用户在DataTable中勾选一条或多条记录。
+        2. 点击【Select】按钮。
+        3. 系统获取所选记录的全部内容。
+        4. 页面返回至上一级，并将所选记录内容自动回填到上级页面。
+      结果处理
+        成功： 页面返回并回填所选记录。
+        失败： "操作失败：[错误消息]"
+
+    4.1.3 返回上级流程 (Back)
+    功能说明：点击【Back】按钮，页面跳转回上级认证参数界面，同时自动恢复此前的查询条件。
+      开始：点击【Back】按钮
+      操作步骤：
+        1. 用户点击【Back】按钮。
+        2. 系统保存当前页面的查询条件。
+        3. 页面跳转回上级认证参数界面，并恢复此前的查询条件。
+      结果处理：
+        成功： 返回上级页面并恢复查询条件。
+        失败： 无（纯前端页面跳转操作）。
+
+    4.1.4 打印流程 (Print)
+    功能说明：点击【Print】按钮，打印当前检索结果。
+      开始：点击【Print】按钮
+      操作步骤：
+        1. 用户点击【Print】按钮。
+        2. 系统准备当前DataTable中的所有数据。
+        3. 启动浏览器打印功能，打印当前检索结果。
+      结果处理：
+        成功： 浏览器打印对话框打开。
+        失败： 无（纯前端操作）。
+
+    4.1.5 删除记录流程 (Delete Selected)
+    功能说明：点击【Delete Selected】按钮，删除已勾选的数据记录。
+      开始：点击【Delete Selected】按钮
+      前置处理：检查是否有选中的记录
+      空值校验等 (Frontend Check)：
+        若没有选中记录：
+          设置Message = "没有选择要删除的记录"
+          终止流程
+      操作步骤：
+        1. 用户在DataTable中勾选一条或多条记录。
+        2. 点击【Delete Selected】按钮。
+        3. 系统弹出确认对话框。
+        4. 用户确认删除操作。
+      4.1.5.1 API调用 (Backend Check)：
+        调用UD09DeleteHdocuserdefinedrulesApi 的 UD09DeleteSelected 方法删除选中的记录。
+      结果处理：
+        成功： "选择的记录已成功删除"，刷新DataTable。
+        失败： "操作失败：[错误消息]"
+
+    4.1.6 查看用户信息流程 (Created by user Link)
+    功能说明：点击【Created by user】列的链接，跳转至「EDB User View」界面。
+      开始：用户点击DataTable中"Created by user"列的链接
+      操作步骤：
+        1. 用户点击DataTable中"Created by user"列的链接。
+        2. 系统获取该用户名信息。
+        3. 跳转至「EDB User View」界面查看用户详细信息。
+      结果处理：
+        成功： 跳转至EDB User View界面。
+        失败： 无（纯前端页面跳转操作）。
+
+   4.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   1	Select按钮点击时	选择记录	选择的记录不存在	没有选择记录	处理结束，显示错误消息
+   2	Delete Selected按钮点击时	选择记录	选择的记录不存在	没有选择要删除的记录	处理结束，显示错误消息
+   3	API调用时	数据库连接	连接错误发生	数据库连接错误	显示错误消息，中断处理
+   4	删除确认时	删除确认	用户选择取消	删除操作已取消	中止删除处理
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [UD09DeleteHdocuserdefinedrulesApi - UD09Search]
+     功能：根据前画面传入的参数，获取规则信息
+     Method：GET
+     Endpoint：/api/ud09/search
+
+     Request [json]
+     {
+       "pc": "string",
+       "number": "string",
+       "market": "string"
+     }
+
+     Response Success (200)
+     {
+      "code": 200,
+      "message": "Success",
+      "data": {
+      "records": [
+       {
+        "pc": "String",
+        "num": "String", 
+        "market": "String",
+        "variable": "String",
+        "val": "String",
+        "vs": "String",
+        "vs2": "String",
+        "comments": "String",
+        "add_date": "String",
+        "delete_date": "String",
+        "register_user": "String",
+        "register_datetime": "String"
+       }
+       ],
+      "count": 0
+     }
+    }
+
+     Response Error (500/400)
+     {
+      "code": 500,
+      "message": "获取数据失败"
+    }
+
+   [UD09DeleteHdocuserdefinedrulesApi - UD09DeleteSelected]
+     功能：将选中的数据从数据库中删除
+     Method：POST
+     Endpoint：/api/ud09/deleteselected
+
+     Request [json]
+     {
+       "pc": "string",
+       "number": "string",
+       "market": "string"
+     }
+
+     Response Success (200)
+       {
+        "code": 200,
+        "msg": "记录删除成功",
+        "data": null
+       }
+
+     Response Error (500/400)
+     {
+      "code": 500,
+      "message": "获取数据失败"
+    }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+API执行异常	捕获异常，记录日志，返回错误码	数据获取失败：[Exception Message]
+数据库连接失败	连接池异常捕获	数据库连接错误
+查询结果为空	数据查询结果验证	查询条件没有找到相应的数据
+网络/API超时	前端超时处理	系统超时，请稍后再试
+删除操作失败	删除异常捕获	记录删除失败：[Exception Message]
+用户取消删除	用户操作验证	删除操作已取消
+
+7.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+8.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

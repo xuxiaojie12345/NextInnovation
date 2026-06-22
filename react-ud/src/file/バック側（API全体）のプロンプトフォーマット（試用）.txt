@@ -1,0 +1,140 @@
+请严格按照以下要求，生成所有【API】的逻辑代码
+
+1.Entity
+根据这个文档生成一下文件 F:\★王建徳\tongyilingma_test\NextInnovation\api-ud\src\react_ud_sql.txt    
+    1.1.生成相关的entity实体类，以文件中每个表名进行创建，命名规则使用驼峰名规则，如表【user】，实体类名为User
+根据这个文档只生成Entity
+
+2.整体架构
+    2.1 技术栈
+    核心框架: Spring Boot 2.7.6
+    持久层: MyBatis 2.2.2 + Druid 1.2.5 连接池
+    数据库: MySQL
+    API 文档: Swagger 3.0.0 (Springfox)
+    日志框架: Log4j2 (替代默认日志系统)
+    构建工具: Maven
+    编程语言: Java 1.8
+    辅助库: Lombok, PageHelper, commons-lang
+
+    2.2 项目结构
+    ├── src
+    │   └── main
+    │       ├── java
+    │       │   └── com
+    │       │       └── web
+    │       │           └── app
+    │       │               ├── config           配置类
+    │       │               ├── controller       控制器层
+    │       │               ├── dto              数据传输对象
+    │       │               ├── entity           实体类
+    │       │               ├── mapper           数据访问层
+    │       │               ├── service          业务逻辑层
+    │       │               │   └── impl         业务逻辑实现
+    │       │               └── Application.java  主启动类
+    │       └── resources
+    │           ├── mapper                     MyBatis 映射文件
+    │           ├── sql                        SQL 脚本
+    │           ├── application-dev.yml        开发环境配置
+    │           ├── application-prod.yml       生产环境配置
+    │           ├── application-test.yml       测试环境配置
+    │           ├── application.yml            主配置文件
+    │           ├── log4j2-dev.xml             开发环境日志配置
+    │           ├── log4j2-prod.xml            生产环境日志配置
+    │           └── log4j2-test.xml            测试环境日志配置
+    ├── README.md
+    ├── mvnw.cmd
+    └── pom.xml
+
+2.3 模块组成
+    控制器: [XXXXXController] (src/main/java/com/example/demo/controller/XXXXXController.java) - 处理认证请求
+    服务接口: [XXXXXService](src/main/java/com/example/demo/service/XXXXXService.java) - 定义认证服务方法
+    服务实现: [XXXXXServiceImpl](src/main/java/com/example/demo/service/impl/XXXXXServiceImpl.java) - 实现认证逻辑
+    数据访问: [UserMapper]+ [UserMapper.xml](src/main/java/com/example/demo/mapper/UserMapper.xml) - 用户数据访问
+    数据传输对象: [LoginRequest]()/[LoginResponse]() - 认证请求/响应对象
+    实体类: [User](src/main/java/com/example/demo/entity/User.java) - 用户实体
+
+3. API功能概述
+    例：3.1.[AuthenticationApi]:用户信息的验证与管理
+    3.2：[UD12UploadDeleteTemplateApi]:文件的上传，删除，模板管理
+    3.3：[XXXXXApi]:
+    ............
+        
+4. 处理流程
+   【AuthenticationApi】
+    4.1 客户端通过POST请求访问接口 /api/XXXXX/login，将用户名、密码等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的 login() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 对密码格式、账号状态进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserMapper】数据访问层，根据用户名查询数据库中的用户信息，获取用户实体对象。
+
+    4.6 登录核心验证逻辑：
+        • 判断用户是否存在，不存在则返回“账号不存在”
+        • 比对前端传递密码与数据库加密密码是否一致
+        • 密码错误则返回“密码不正确”
+    4.7 验证全部通过后：
+        • 生成Token（包含用户ID、用户名等）
+        • 可记录登录日志（登录时间、IP、设备信息）
+        • 构建登录成功响应体，包含Token、用户基础信息
+
+    4.8 封装【LoginResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "登录成功",
+            "data": {
+                "token": "xxxx",
+                "userId": 1,
+                "username": "xxx"
+            }
+        }
+        
+    根据模块组成部分结构生成【UD12UploadDeleteTemplateApi】相关代码
+    4.1 客户端通过POST请求访问接口 /api/market/upload，将Template File、Market等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【UploadDeleteTemplateController】接收前端请求，通过【UploadDeleteTemplateRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【UploadDeleteTemplateService】接口中的方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【UploadDeleteTemplateServiceImpl】业务实现层执行核心登录逻辑：
+        • 对Template File文件进行大小检证
+        • 对Market进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过后将文件上传到服务器端，并返回文件上传结果，服务器地址为https://172.17.0.63/F:/hdoc/template/upload
+
+    4.8 封装【UploadDeleteTemplateResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "上传成功",
+            "data": {
+                "XXX"："XXXClass",
+                "YYYY"："YYYYList",
+                ...
+            }
+        }
+
+    ............（TODO：请根据API一览和概要设计描述所有API）
+
+5. 数据库设计（TODO：请根据API一览和概要设计描述各个API的SQL）
+    【AuthenticationApi】
+    5.1表名: hdoc_user_infor
+    - 字段: USERID、PASSWORD、USERNAME等
+    - 查询语句: SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor WHERE USERID = {userId} AND PASSWORD = {password}
+
+6. 开发指导原则
+
+6.1 代码编写规范
+    - 遵循MVC三层架构模式
+    - 使用Lombok减少样板代码
+    - 保持Controller、Service、Mapper层职责分离
+
+6.2 错误处理
+    - 对输入参数进行验证
+    - 合理捕获和处理异常
+    - 返回有意义的错误信息

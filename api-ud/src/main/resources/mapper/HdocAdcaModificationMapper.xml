@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaModificationMapper">
+
+    <!-- 结果映射 - HdocAdcaModification实体 -->
+    <resultMap id="HdocAdcaModificationResultMap" type="com.web.app.domain.HdocAdcaModification">
+        <id property="serie" column="SERIE"/>
+        <id property="chno" column="CHNO"/>
+        <id property="variable" column="VARIABLE"/>
+        <result property="doctype" column="DOCTYPE"/>
+        <result property="lang" column="LANG"/>
+        <result property="vers" column="VERS"/>
+        <result property="newval" column="NEWVAL"/>
+        <result property="sta" column="STA"/>
+        <result property="bu" column="BU"/>
+        <result property="releaseUser" column="RELEASE_USER"/>
+        <result property="releaseDateTime" column="RELEASE_DATE_TIME"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerProcess" column="REGISTER_PROCESS"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateProcess" column="UPDATE_PROCESS"/>
+    </resultMap>
+
+    <!--
+        结果映射 - VariableModificationItem
+        对应SQL: variables.DESCRIPTION, modification.VARIABLE, modification.NEWVAL
+    -->
+    <resultMap id="VariableModificationResultMap" type="com.web.app.domain.VariableModificationItem">
+        <result property="variableName" column="VARIABLE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="currentValue" column="NEWVAL"/>
+    </resultMap>
+
+    <!--
+        查询语句:
+        SELECT
+          variables.DESCRIPTION,
+          modification.VARIABLE,
+          modification.NEWVAL
+        FROM HDOC_VARIABLES  variables
+        LEFT JOIN HDOC_ADCA_MODIFICATION  modification
+        ON variables.VARIABLE = modification.VARIABLE
+        WHERE
+          modification.SERIE  =  #{serie}
+          AND modification.CHNO  =  #{chno}
+    -->
+    <select id="selectBySerieAndChno" resultMap="VariableModificationResultMap">
+        SELECT
+            variables.DESCRIPTION,
+            modification.VARIABLE,
+            modification.NEWVAL
+        FROM HDOC_VARIABLES  variables
+        LEFT JOIN HDOC_ADCA_MODIFICATION  modification
+        ON variables.VARIABLE = modification.VARIABLE
+        WHERE
+            modification.SERIE  =  #{serie}
+            AND modification.CHNO  =  #{chno}
+    </select>
+
+    <!--
+        更新语句:
+        UPDATE HDOC_ADCA_MODIFICATION
+        SET
+          NEWVAL = #{newValue},
+          UPDATE_DATETIME = NOW(),
+          UPDATE_USER = #{updateUser},
+          UPDATE_PROCESS = 'UD05ModifyDocumentApi'
+        WHERE
+          SERIE  =  #{serie}
+          AND CHNO  =  #{chno}
+          AND VARIABLE  =  #{variable}
+    -->
+    <update id="updateNewVal">
+        UPDATE HDOC_ADCA_MODIFICATION
+        SET
+            NEWVAL = #{newValue},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = 'UD05ModifyDocumentApi'
+        WHERE
+            SERIE  =  #{serie}
+            AND CHNO  =  #{chno}
+            AND VARIABLE  =  #{variable}
+    </update>
+
+    <!--
+        UD06 - 查询修改详情
+        查询语句:
+        SELECT DOCTYPE, VERS, CONCAT(VARIABLE, '=', NEWVAL) AS Storing
+        FROM HDOC_ADCA_MODIFICATION
+        WHERE SERIE = #{serie} AND CHNO = #{chno}
+    -->
+    <select id="selectModificationDetails" resultType="java.util.LinkedHashMap">
+        SELECT
+            DOCTYPE,
+            VERS,
+            CONCAT(VARIABLE, '=', NEWVAL) AS Storing
+        FROM HDOC_ADCA_MODIFICATION
+        WHERE SERIE = #{serie}
+          AND CHNO = #{chno}
+        ORDER BY VARIABLE
+    </select>
+
+</mapper>

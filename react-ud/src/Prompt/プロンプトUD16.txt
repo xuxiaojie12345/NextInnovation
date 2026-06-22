@@ -1,0 +1,182 @@
+请根据以下要求生成[AD Change]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-[ADChange]-016
+   模块名称:AD Change
+   作成日:2026-06-02
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：对车型 - 底盘编号（Serie-Chnr）执行新增、删除、校验操作，管理AD Change相关的车型底盘信息。
+  面向的用户群体：生产线操作员、质量控制人员、系统管理员
+  用户体验方面的考虑：
+    1.提供直观的操作界面
+    2.实时反馈操作结果
+    3.清晰的错误提示信息 
+  安全性或特殊要求：
+    1.确保数据操作的安全性和一致性
+    2.防止重复添加相同数据
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Serie-Chnr | TextField | - | 15 | Input | - | 左 | - | 活性 | 车型-底盘编号输入框 |
+| 2   | Desc | TextField | - | 4000 | Input | - | 左 | - | 活性 | 描述信息输入框 |
+| 3   | ADD | Button | - | - | Action | - | 中 | - | 活性 | 新增按钮 |
+| 4   | DELETE | Button | - | - | Action | - | 中 | - | 活性 | 删除按钮 |
+| 5   | CHECK | Button | - | - | Action | - | 中 | - | 活性 | 校验按钮 |
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+  4.1 新增功能
+  功能说明：对车型-底盘编号执行新增操作
+  操作步骤：
+    1. 输入Serie-Chnr和Desc信息
+    2. 点击ADD按钮
+    3. 系统调用UD16SelectHdocAdcaChange方法检查数据是否存在
+    4. 若数据不存在，调用UD16InsertHdocAdcaChange方法插入数据；若存在，显示错误信息"AFTER DEF CHANGE IS NOT ACTIVATED"
+
+  4.2 删除功能
+  功能说明：对车型-底盘编号执行删除操作
+  操作步骤：
+    1. 输入Serie-Chnr信息
+    2. 点击DELETE按钮
+    3. 系统调用UD16UpdateHdocAdcaChange方法删除数据
+    4. 显示操作结果
+
+  4.3 校验功能
+  功能说明：无实际功能
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+  5.1 处理流程
+  按步骤描述每个主要功能的处理流程，格式如下：
+
+    5.1.1 新增操作处理流程 (Add)
+    功能说明：对车型-底盘编号执行新增操作。
+      开始：点击Add按钮
+      前置处理：获取用户输入的Serie-Chnr和Desc信息
+      空值校验等 (Frontend Check)：
+        若`Serie-Chnr`为空：
+          设置Message = "AFTER DEF CHANGE IS NOT ACTIVATED"
+          终止流程
+      操作步骤：
+        1. 输入Serie-Chnr和Desc信息。
+        2. 点击ADD按钮。
+        3. 系统调用UD16SelectHdocAdcaChange方法检查数据是否存在。
+        4. 若数据不存在，调用UD16InsertHdocAdcaChange方法插入数据；若存在，显示错误信息"AFTER DEF CHANGE IS NOT ACTIVATED"。
+      API调用 (Backend Check)：
+        调用UD16ADChangeApi
+      结果处理：
+        成功：显示"新增成功"消息。
+        失败：显示错误消息，如"AFTER DEF CHANGE IS NOT ACTIVATED"。
+
+    5.1.2 删除操作处理流程 (Delete)
+    功能说明：对车型-底盘编号执行删除操作。
+      开始：点击DELETE按钮
+      前置处理：获取用户输入的Serie-Chnr信息
+      空值校验等 (Frontend Check)：
+        若`Serie-Chnr`为空：
+          设置Message = "请输入车型-底盘编号"
+          终止流程
+      操作步骤：
+        1. 输入Serie-Chnr信息。
+        2. 点击DELETE按钮。
+        3. 系统调用UD16UpdateHdocAdcaChange方法删除数据。
+        4. 显示操作结果。
+      API调用 (Backend Check)：
+        调用UD16ADChangeApi
+      结果处理：
+        成功：显示"删除成功"消息。
+        失败：显示错误消息。
+
+    5.1.3 校验操作处理流程 (Check)
+    功能说明：无实际功能。
+      开始：点击CHECK按钮
+      操作步骤：
+        1. 点击CHECK按钮。
+        2. 系统调用UD16SelectHdocAdcaChange方法检查数据是否存在。
+      API调用 (Backend Check)：
+        调用UD16ADChangeApi
+      结果处理：
+        成功：显示"数据已存在/不存在"消息。
+        失败：显示错误信息。
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击按钮时 | `Serie-Chnr` | 为空 | 请输入车型-底盘编号 | 显示错误消息，焦点返回输入框 |
+| 2 | 点击ADD按钮时 | 数据库查询 | 数据已存在 | AFTER DEF CHANGE IS NOT ACTIVATED | 显示错误消息 |
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+UD16InsertHdocAdcaChange方法
+功能：点击ADD按钮后，存在check通过的场合，将数据登录进数据库中
+Method：POST
+Endpoint：/api/ad-change/insert
+
+Request [json]
+{
+  "serie": "string"，
+  "chnr": "string"
+  "desc": "string"
+}
+
+Response Success (200)
+{
+  "code": 200,
+  "msg": "新增成功",
+  "data": null
+}
+
+Response Error (400)
+{
+  "code": 400,
+  "msg": "AFTER DEF CHANGE IS NOT ACTIVATED"
+  "data": null
+}
+
+UD16UpdateHdocAdcaChange方法
+功能：点击DELETE按钮后，利用参数Serie-Chnr删除数据。
+Method：POST
+Endpoint：/api/ad-change/delete
+
+Request [json]
+{
+  "serie": "string"，
+  "chnr": "string"
+}
+
+Response Success (200)
+{
+  "code": 200,
+  "msg": "删除成功",
+  "data": null
+}
+
+Response Error (404)
+{
+  "code": 404,
+  "msg": "删除失败"。
+  "data": null
+}
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 数据已存在 | 显示错误消息 | AFTER DEF CHANGE IS NOT ACTIVATED |
+| 数据库连接失败 | 显示系统错误消息 | 系统暂时不可用，请稍后再试 |
+| 网络请求超时 | 显示超时提示 | 请求超时，请检查网络连接 |
+
+8.语言要求
+文档使用中文编写
+所有错误消息和成功消息使用中文
+技术术语可保留英文
+保持与参考文档（内部設計模板.md）相同的格式结构
+
+9.输出要求
+生成完整的Markdown格式文档
+文件名格式：ADChange_詳細設計.md
+保存到：当前文件夹下的work目录

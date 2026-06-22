@@ -1,0 +1,152 @@
+请根据以下要求生成[Market Document Settings List]的详细设计文档：
+
+1.基本信息
+文档编号:DES-MarketDocumentSettingsList-020
+模块名称:Market Document Settings List
+作成日:2026-06-04
+
+2. 背景 (Background)
+请描述：
+本模块的核心功能和目标
+- 展示文档查询结果
+- 支持选择记录、返回上级页面、打印和查看用户详情等功能
+面向的用户群体
+- 系统管理员
+- 文档管理人员
+- 用户信息查询人员
+用户体验方面的考虑
+- 提供直观的结果展示界面
+- 支持多种操作方式
+- 明确的操作反馈
+安全性或特殊要求（如有）
+- 确保文档信息查询的安全性
+- 防止未授权的文档信息访问
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Document type | TextField | - | 20 | Output | - | 左 | - | - | 来源于HDOC_DOCUMENT_LIST.DOCTYPE |
+| 2   | Business unit | TextField | - | - | Output | - | 左 | - | - | 固定表示：BU |
+| 3   | User | TextField | - | 16 | Output | - | 左 | - | - | 来源于HDOC_DOCUMENT_LIST.REGISTER_USER |
+| 4   | Date | TextField | - | - | Output | - | 左 | - | - | 来源于HDOC_DOCUMENT_LIST.REGISTER_DATETIME |
+| 5   | Select | Button | - | - | Action | - | - | - | 活性 | - |
+| 6   | Back | Button | - | - | Action | - | - | - | 活性 | - |
+| 7   | Print | Button | - | - | Action | - | - | - | 活性 | - |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+4.1 处理流程
+按步骤描述每个主要功能的处理流程，格式如下：
+
+    4.1.1 选择记录功能 (Select)
+    功能说明：勾选记录后点击「Select」按钮，跳转至上一页面并自动回填选中的数据。
+      开始：点击Select按钮
+      前置处理：获取用户勾选的记录
+      空值校验等 (Frontend Check)：
+        若未勾选任何记录：
+          设置Message = "No data found"
+          终止流程
+      操作步骤：
+        1. 勾选需要选择的记录。
+        2. 点击Select按钮。
+        3. 系统验证是否选择了记录。
+        4. 跳转至上一页面并回填选中的数据。
+      API调用 (Backend Check)：
+        调用UD20GetDocumentListApi
+      结果处理：
+        成功：跳转至上一页面并回填选中的数据。
+        失败：显示错误消息"No data found"。
+
+    4.1.2 返回功能 (Back)
+    功能说明：点击「Back」按钮，返回前序页面。
+      开始：点击Back按钮
+      操作步骤：
+        1. 点击Back按钮。
+        2. 系统返回前序页面。
+        3. 不保存当前页面的任何更改。
+      结果处理：
+        成功：返回前序页面。
+        失败：无（纯前端页面跳转操作）。
+
+    4.1.3 打印功能 (Print)
+    功能说明：点击「Print」按钮，打印查询结果。
+      开始：点击Print按钮
+      操作步骤：
+        1. 点击Print按钮。
+        2. 系统打开打印对话框。
+        3. 用户选择打印机并打印查询结果。
+      结果处理：
+        成功：打印对话框打开。
+        失败：无（纯前端操作）。
+
+    4.1.4 用户详情查看功能 (User Link)
+    功能说明：点击「User」链接，跳转到EDB User View画面，查看用户详情信息。
+      开始：点击User链接
+      操作步骤：
+        1. 点击User链接。
+        2. 系统获取对应的用户信息。
+        3. 跳转到EDB User View画面显示用户详情。
+      结果处理：
+        成功：跳转至EDB User View画面。
+        失败：无（纯前端页面跳转操作）。
+
+4.2 校验详细规格表       
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击Select按钮时 | 勾选记录 | 未勾选任何记录 | No data found | 显示错误消息 |
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+UD20SelectHdocDocumentList方法
+功能：根据前画面传入的参数，获取文档一览情报
+Method：GET
+Endpoint：/api/marketdocumentsettingslist/documentlist
+
+Request [json]
+
+Response Success (200)
+```json
+{
+  "code": 200,
+  "msg": "查询成功",
+  "data": {
+    "documents": [
+      {
+        "doctype": "string",
+        "registerUser": "string",
+        "registerDatetime": "string"
+      }
+    ]
+  }
+}
+```
+
+Response Error (400)
+```json
+{
+  "code": 400,
+  "msg": "查询失败",
+  "data": null
+}
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 未选择记录点击Select | 显示错误消息 | No data found |
+| 数据库连接失败 | 显示系统错误消息 | 系统暂时不可用，请稍后再试 |
+| 网络请求超时 | 显示超时提示 | 请求超时，请检查网络连接 |
+
+7.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+8.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

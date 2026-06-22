@@ -1,0 +1,706 @@
+<!DOCTYPE html><html><head>
+      <title>詳細設計UD015</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\licuiping\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.30\crossnote\dependencies\katex\katex.min.css">
+      
+      
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-details{margin:0;padding:0;border:none}.markdown-preview .md-toc summary.md-toc-link-wrapper{cursor:pointer;list-style-position:outside}.markdown-preview .md-toc summary.md-toc-link-wrapper::marker{font-size:.85em}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='0']{margin-left:12px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='1']{margin-left:28px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='2']{margin-left:44px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='3']{margin-left:60px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='4']{margin-left:76px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='5']{margin-left:80px}.markdown-preview a.tag,.markdown-preview a.tag:active,.markdown-preview a.tag:link,.markdown-preview a.tag:visited,.markdown-preview span.tag:not(.token){display:inline-block;background-color:var(--vscode-badge-background,rgba(127,127,127,.18));color:var(--vscode-badge-foreground,currentColor);border-radius:2em;font-size:.85em;font-weight:500;padding:.05em .55em;line-height:1.5;white-space:nowrap;text-decoration:none;text-shadow:none;box-shadow:none;transition:background-color .12s ease,opacity .12s ease}.markdown-preview a.tag{cursor:pointer}.markdown-preview a.tag:focus,.markdown-preview a.tag:hover{background-color:var(--vscode-badge-background,rgba(127,127,127,.32));color:var(--vscode-badge-foreground,currentColor);opacity:.85;text-decoration:none;outline:0}.markdown-preview .wikilink-embed-content{border-left:3px solid var(--vscode-textBlockQuote-border,rgba(128,128,128,.3));background:var(--vscode-textBlockQuote-background,rgba(128,128,128,.05));margin:.5em 0;padding:.5em .75em;border-radius:0 3px 3px 0}.markdown-preview .wikilink-embed-content.wikilink-embed-error{border-left-color:var(--vscode-errorForeground,#cf222e);color:var(--vscode-errorForeground,#cf222e);font-style:italic;opacity:.8}.markdown-preview .wikilink-embed-content h1:first-child,.markdown-preview .wikilink-embed-content h2:first-child,.markdown-preview .wikilink-embed-content h3:first-child,.markdown-preview .wikilink-embed-content h4:first-child,.markdown-preview .wikilink-embed-content h5:first-child,.markdown-preview .wikilink-embed-content h6:first-child{margin-top:.25em}.markdown-preview .wikilink-embed-content .wikilink-embed-content{margin:.25em 0;padding:.25em .5em}.markdown-preview .block-id{display:none}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));border:4px solid var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));background-clip:content-box}.scrollbar-style::-webkit-scrollbar-thumb:hover{background-color:var(--vscode-scrollbarSlider-hoverBackground,rgba(120,120,120,.66))}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));border:4px solid var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb:hover{background-color:var(--vscode-scrollbarSlider-hoverBackground,rgba(120,120,120,.66))}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-details{margin:0;padding:0;border:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='0']{padding-left:0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='1']{padding-left:16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='2']{padding-left:32px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='3']{padding-left:48px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='4']{padding-left:64px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='5']{padding-left:80px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. -->
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script>
+    </head>
+    <body for="html-export">
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="vin-plate-模块-ud15-详细设计说明书">Vin Plate 模块 (UD15) 详细设计说明书 </h1>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">文档编号</th>
+<th style="text-align:left">DES-VinPlate-015</th>
+<th style="text-align:left">版本号</th>
+<th style="text-align:left">v1.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>模块名称</strong></td>
+<td style="text-align:left">Vin Plate</td>
+<td style="text-align:left"><strong>作成日</strong></td>
+<td style="text-align:left">2026-06-17</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>作成者</strong></td>
+<td style="text-align:left">Deepseek</td>
+<td style="text-align:left"><strong>状态</strong></td>
+<td style="text-align:left">正式稿</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-背景-background">1. 背景 (Background) </h2>
+<p>本模块用于输入底盘号（Chassis Number）后查询并展示VIN Plate的详细信息，提供多种操作功能，包括查看信息、设置重新生成状态、设置完成状态以及更改信息类型，支持基础信息和高级信息（含重量数据）两种类型管理。</p>
+<ul>
+<li><strong>核心功能和目标</strong>：
+<ol>
+<li>输入底盘号（Chassis Number）后查询并展示VIN Plate的详细信息。</li>
+<li>提供多种操作功能，包括查看信息、设置重新生成状态、设置完成状态以及更改信息类型。</li>
+<li>支持基础信息和高级信息（含重量数据）两种类型管理。</li>
+</ol>
+</li>
+<li><strong>面向的用户群体</strong>：生产线操作员、质量控制人员、系统管理员。</li>
+<li><strong>用户体验方面的考虑</strong>：
+<ol>
+<li>提供直观的界面布局，清晰区分输入区域和结果显示区域。</li>
+<li>实时反馈操作结果，确保用户能够及时了解操作状态。</li>
+<li>提供明确的错误提示，帮助用户快速定位和解决问题。</li>
+</ol>
+</li>
+<li><strong>安全性或特殊要求</strong>：
+<ul>
+<li>对于不存在的底盘号提供明确警告。</li>
+<li>确保数据库操作的安全性和一致性。</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
+<h3 id="21-控件属性表">2.1 控件属性表 </h3>
+<p>根据需求，各输入输出项的详细定义如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">項目名 (Item)</th>
+<th style="text-align:left">種別 (Type)</th>
+<th style="text-align:center">必須 (Req)</th>
+<th style="text-align:center">MaxLength</th>
+<th style="text-align:center">I/O</th>
+<th style="text-align:left">許容文字 (Allowed Chars)</th>
+<th style="text-align:center">文字配置 (Align)</th>
+<th style="text-align:center">初期値 (Default)</th>
+<th style="text-align:center">表示制御 (Control)</th>
+<th style="text-align:left">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Chassis number</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">底盘号输入框</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>View Info</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">查看VIN Plate详细信息</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Set Regenerate</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">设置为重新生成状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Set OK</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">设置为完成状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Change to Basic Info</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">更改为基础信息类型</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Change to Advanced Info</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">更改为高级信息类型</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Chassis number</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示当前底盘号</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Plate type</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示铭牌类型</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Status</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示当前状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Error Message</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Def.</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示注册时间</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Data ready</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示文档就绪状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Sent to CAB factory</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示发送至工厂状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Print items</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示打印项信息(XML_DOC中的PrintItemName)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>VP Data</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">显示变体信息(XML_DOC中的各Variant名和Value)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>注</strong>：</p>
+<ul>
+<li>Chassis number 输入框为必填项，最大长度15位。</li>
+<li>操作按钮包括查看、设置状态、更改类型等功能。</li>
+</ul>
+</blockquote>
+<h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
+<p>所有操作逻辑均在用户点击相应按钮时执行。</p>
+<h3 id="31-处理流程">3.1 处理流程 </h3>
+<h4 id="311-view-info查看vin-plate信息">3.1.1 View Info（查看VIN Plate信息） </h4>
+<ul>
+<li><strong>功能说明</strong>：输入底盘号后点击【View Info】按钮，展示VIN Plate详细信息。</li>
+<li><strong>开始</strong>：点击【View Info】按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的底盘号。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 <code>Chassis number</code> 为空：
+<ul>
+<li>设置 <code>Message</code> = <code>"请输入底盘号"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>在 <code>Chassis number</code> 输入框中录入底盘号。</li>
+<li>点击【View Info】按钮。</li>
+<li>系统调用 <code>UD15ViewInfo</code> 接口获取VIN Plate详细信息。</li>
+<li>在页面上显示VIN Plate的详细信息。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD15SelecthdocsenddatavinplateApi</code> 的 <code>UD15ViewInfo</code> 方法。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示VIN Plate详细信息。</li>
+<li>失败：显示错误消息，如 <code>"Chassis number XXX not found."</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="312-set-regenerate设置重新生成状态">3.1.2 Set Regenerate（设置重新生成状态） </h4>
+<ul>
+<li><strong>功能说明</strong>：将对应底盘状态更新为0（新增）。</li>
+<li><strong>开始</strong>：点击【Set Regenerate】按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的底盘号。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 <code>Chassis number</code> 为空：
+<ul>
+<li>设置 <code>Message</code> = <code>"请输入底盘号"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>在 <code>Chassis number</code> 输入框中录入底盘号。</li>
+<li>点击【Set Regenerate】按钮。</li>
+<li>系统调用 <code>UD15SetRegenerate</code> 接口将该 Chassis 的 STATUS 更新为0（新规追加）。</li>
+<li>显示操作结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD15SelecthdocsenddatavinplateApi</code> 的 <code>UD15SetRegenerate</code> 方法。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示操作结果。</li>
+<li>失败：显示错误消息，如 <code>"Chassis number XXX not found."</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="313-set-ok设置完成状态">3.1.3 Set OK（设置完成状态） </h4>
+<ul>
+<li><strong>功能说明</strong>：将对应底盘状态更新为1（已生成XML doc文档）。</li>
+<li><strong>开始</strong>：点击【Set OK】按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的底盘号。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 <code>Chassis number</code> 为空：
+<ul>
+<li>设置 <code>Message</code> = <code>"请输入底盘号"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>在 <code>Chassis number</code> 输入框中录入底盘号。</li>
+<li>点击【Set OK】按钮。</li>
+<li>系统调用 <code>UD15SetOK</code> 接口将该 Chassis 的 STATUS 更新为1（已生成XML doc文档）。</li>
+<li>显示操作结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD15SelecthdocsenddatavinplateApi</code> 的 <code>UD15SetOK</code> 方法。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示操作结果。</li>
+<li>失败：显示错误消息，如 <code>"Chassis number XXX not found."</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="314-change-to-basic-info更改为基础信息类型">3.1.4 Change to Basic Info（更改为基础信息类型） </h4>
+<ul>
+<li><strong>功能说明</strong>：底盘状态改为0（新增），类型改为1（基础）。</li>
+<li><strong>开始</strong>：点击【Change to Basic Info】按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的底盘号。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 <code>Chassis number</code> 为空：
+<ul>
+<li>设置 <code>Message</code> = <code>"请输入底盘号"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>在 <code>Chassis number</code> 输入框中录入底盘号。</li>
+<li>点击【Change to Basic Info】按钮。</li>
+<li>系统调用 <code>UD15ChangetoBasicInfo</code> 接口将该 Chassis 的 STATUS 更新为0（新规追加），TYPE 改为1（basic）。</li>
+<li>显示操作结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD15SelecthdocsenddatavinplateApi</code> 的 <code>UD15ChangetoBasicInfo</code> 方法。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示操作结果。</li>
+<li>失败：显示错误消息，如 <code>"Chassis number XXX not found."</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="315-change-to-advanced-info更改为高级信息类型">3.1.5 Change to Advanced Info（更改为高级信息类型） </h4>
+<ul>
+<li><strong>功能说明</strong>：底盘状态改为0（新增），类型改为2（高级：含重量数据）。</li>
+<li><strong>开始</strong>：点击【Change to Advanced Info】按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的底盘号。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 <code>Chassis number</code> 为空：
+<ul>
+<li>设置 <code>Message</code> = <code>"请输入底盘号"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>在 <code>Chassis number</code> 输入框中录入底盘号。</li>
+<li>点击【Change to Advanced Info】按钮。</li>
+<li>系统调用 <code>UD15ChangetoAdvancedInfo</code> 接口将该 Chassis 的 STATUS 更新为0（新规追加），TYPE 改为2(ADVANCED (with weights))。</li>
+<li>显示操作结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD15SelecthdocsenddatavinplateApi</code> 的 <code>UD15ChangetoAdvancedInfo</code> 方法。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示操作结果。</li>
+<li>失败：显示错误消息，如 <code>"Chassis number XXX not found."</code>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No.</th>
+<th style="text-align:left">检查时机</th>
+<th style="text-align:left">检查对象</th>
+<th style="text-align:left">检查条件</th>
+<th style="text-align:left">错误消息 (Message Content)</th>
+<th style="text-align:left">动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:left">点击按钮时</td>
+<td style="text-align:left"><code>Chassis number</code></td>
+<td style="text-align:left">为空</td>
+<td style="text-align:left">请输入底盘号</td>
+<td style="text-align:left">显示错误消息，焦点返回输入框</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:left">点击按钮时</td>
+<td style="text-align:left"><code>Chassis number</code></td>
+<td style="text-align:left">长度 &gt; 15</td>
+<td style="text-align:left">底盘号长度不能超过15位</td>
+<td style="text-align:left">显示错误消息，焦点返回输入框</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:left">API调用后</td>
+<td style="text-align:left">数据库查询</td>
+<td style="text-align:left">未找到匹配记录</td>
+<td style="text-align:left"><code>Chassis number XXX not found.</code></td>
+<td style="text-align:left">显示错误消息</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
+<h3 id="41-ud15viewinfo">4.1 UD15ViewInfo </h3>
+<ul>
+<li><strong>功能</strong>：获取VIN Plate详细信息。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/vin-plate/viewinfo</code></li>
+</ul>
+<h4 id="request">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"查询成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span>
+    <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span>
+    <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+    <span class="token property">"registerDatetime"</span><span class="token operator">:</span> <span class="token string">"datetime"</span><span class="token punctuation">,</span>
+    <span class="token property">"docReady"</span><span class="token operator">:</span> <span class="token string">"boolean"</span><span class="token punctuation">,</span>
+    <span class="token property">"docSent"</span><span class="token operator">:</span> <span class="token string">"boolean"</span><span class="token punctuation">,</span>
+    <span class="token property">"xmlDoc"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"printItemName"</span><span class="token operator">:</span> <span class="token string">"array"</span><span class="token punctuation">,</span>
+      <span class="token property">"variants"</span><span class="token operator">:</span> <span class="token string">"object"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Chassis number XXX not found."</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="42-ud15setregenerate">4.2 UD15SetRegenerate </h3>
+<ul>
+<li><strong>功能</strong>：将对应底盘状态更新为0（新增）。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/vin-plate/setregenerate</code></li>
+</ul>
+<h4 id="request-1">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-1">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404-1">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Chassis number XXX not found."</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="43-ud15setok">4.3 UD15SetOK </h3>
+<ul>
+<li><strong>功能</strong>：将对应底盘状态更新为1（已生成XML doc文档）。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/vin-plate/setok</code></li>
+</ul>
+<h4 id="request-2">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-2">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404-2">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Chassis number XXX not found."</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="44-ud15changetobasicinfo">4.4 UD15ChangetoBasicInfo </h3>
+<ul>
+<li><strong>功能</strong>：底盘状态改为0（新增），类型改为1（基础）。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/vin-plate/changetobasic</code></li>
+</ul>
+<h4 id="request-3">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-3">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404-3">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Chassis number XXX not found."</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="45-ud15changetoadvancedinfo">4.5 UD15ChangetoAdvancedInfo </h3>
+<ul>
+<li><strong>功能</strong>：底盘状态改为0（新增），类型改为2（高级：含重量数据）。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/vin-plate/changetoadvanced</code></li>
+</ul>
+<h4 id="request-4">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNumber"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-4">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404-4">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Chassis number XXX not found."</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">异常场景</th>
+<th style="text-align:left">处理方式</th>
+<th style="text-align:left">Message 显示内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>底盘号为空</strong></td>
+<td style="text-align:left">阻止操作，显示错误消息</td>
+<td style="text-align:left">请输入底盘号</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>底盘号长度超过15位</strong></td>
+<td style="text-align:left">阻止操作，显示错误消息</td>
+<td style="text-align:left">底盘号长度不能超过15位</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>底盘号不存在</strong></td>
+<td style="text-align:left">显示错误消息</td>
+<td style="text-align:left"><code>Chassis number XXX not found.</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>网络连接失败</strong></td>
+<td style="text-align:left">重试机制，显示网络错误消息</td>
+<td style="text-align:left">网络连接失败，请检查网络设置</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>数据库连接异常</strong></td>
+<td style="text-align:left">记录日志，显示系统错误消息</td>
+<td style="text-align:left">系统暂时不可用，请稍后再试</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
+<ol>
+<li><strong>状态管理</strong>：
+<ul>
+<li>使用 React State 管理 <code>chassisNumber</code>, <code>vinPlateInfo</code>, <code>status</code>, <code>type</code>, <code>error</code>, <code>isLoading</code>。</li>
+<li>实现表单验证状态管理，确保底盘号长度不超过15位。</li>
+<li>在 View Info 操作时更新显示的VIN Plate详细信息。</li>
+<li>在各种状态更新操作后刷新显示状态。</li>
+</ul>
+</li>
+<li><strong>安全性</strong>：
+<ul>
+<li>对底盘号输入进行长度验证，限制最大15位。</li>
+<li>所有 API 请求必须通过 HTTPS 发送。</li>
+<li>不在前端日志中打印敏感数据。</li>
+<li>对于不存在的底盘号，提供明确的错误提示。</li>
+</ul>
+</li>
+<li><strong>UI 细节</strong>：
+<ul>
+<li>View Info、Set Regenerate、Set OK、Change to Basic Info、Change to Advanced Info 按钮在 <code>isLoading</code> 期间应设为 <code>disabled</code>，防止重复提交。</li>
+<li>Chassis number 输入框应限制最大长度为15个字符。</li>
+<li>错误消息（Error Message）Label 仅在出错时显示，建议使用红色文字。</li>
+<li>Error Message 标签应正确显示错误信息。</li>
+<li>各个信息标签（Chassis number、Plate type、Status等）应正确显示从API返回的数据。</li>
+<li>操作按钮应有明确的视觉反馈，区分不同的功能。</li>
+<li>错误消息应以醒目方式显示，建议使用红色文字。</li>
+</ul>
+</li>
+</ol>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

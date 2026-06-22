@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.GenerateDocumentMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="GenerateDocumentDataResultMap" type="com.web.app.domain.GenerateDocumentData">
+        <result property="orderNumber" column="ORDERNUMBER"/>
+        <result property="buildWeek" column="BUILD"/>
+        <result property="specWeek" column="SPEC"/>
+        <result property="market" column="COUNTRY_OF_OPERATION"/>
+        <result property="sNoteNo" column="CUSTOMER_ADAP"/>
+        <result property="loadIndex" column="LOAD_INDEX"/>
+        <result property="adChangeActive" column="ACT"/>
+        <collection property="replacementParams" ofType="com.web.app.domain.GenerateDocumentData$ReplacementParam">
+            <result property="variable" column="VARIABLE"/>
+            <result property="newVal" column="NEWVAL"/>
+        </collection>
+    </resultMap>
+
+    <!-- 根据底盘系列和底盘号查询生成文档数据 -->
+    <select id="selectGenerateDocumentData" resultMap="GenerateDocumentDataResultMap">
+        SELECT 
+            OM.ORDERNUMBER,
+            CAST(OM.BUILD AS CHAR) AS BUILD,
+            CAST(OM.SPEC AS CHAR) AS SPEC,
+            VDAGENERAL.COUNTRY_OF_OPERATION,
+            OM.CUSTOMER_ADAP,
+            MASTER.LOAD_INDEX,
+            ADCACHANGE.ACT,
+            MODIFICATION.VARIABLE,
+            MODIFICATION.NEWVAL
+        FROM
+            HDOC_REC_DATA_VDA_GENERAL VDAGENERAL
+        INNER JOIN
+            HDOC_REC_DATA_OM OM
+        ON
+            OM.SERIE = VDAGENERAL.SERIE
+            AND OM.CHNR = VDAGENERAL.CHNR
+            AND OM.TRANS_TS = VDAGENERAL.TRANS_TS
+        INNER JOIN
+            HDOC_REC_DATA_KOLA_TIRE_MASTER MASTER
+        ON
+            VDAGENERAL.TRANS_TS = MASTER.TRANS_TS
+        INNER JOIN
+            HDOC_ADCA_CHANGE ADCACHANGE
+        ON
+            VDAGENERAL.SERIE = ADCACHANGE.SERIE
+            AND VDAGENERAL.CHNR = ADCACHANGE.CHNR
+        LEFT JOIN
+            HDOC_ADCA_MODIFICATION MODIFICATION
+        ON
+            VDAGENERAL.SERIE = MODIFICATION.SERIE
+            AND VDAGENERAL.CHNR = MODIFICATION.CHNO
+        WHERE
+            VDAGENERAL.SERIE = #{series}
+            AND VDAGENERAL.CHNR = #{no}
+    </select>
+
+</mapper>

@@ -1,0 +1,205 @@
+请根据以下要求生成[Existing HDoc Variables Result List]的详细设计文档：
+
+1. 基本信息
+
+文档编号: DES-ExistingHDocVariablesResultList-011  
+模块名称: Existing HDoc Variables Result List  
+作成日: 2026-06-01 
+
+2. 背景 (Background)
+
+核心功能和目标: 根据上一页面的查询条件，展示对应检索结果，提供数据选择、返回、打印、导出等功能，以及查看用户详情的链接。
+
+面向的用户群体:系统管理员、开发人员、运维人员等需要查看和选择HDoc变量的用户。
+
+用户体验方面的考虑:
+  提供清晰的表格展示，方便用户浏览检索结果
+  支持数据选择功能，便于用户返回上级页面使用数据
+  提供返回功能，允许用户回到查询条件页面
+  提供打印和导出功能，满足数据导出需求
+  提供用户详情链接，便于查看相关信息
+
+安全性或特殊要求:
+  确保数据检索的安全性
+  验证用户选择操作的有效性
+  保护数据的完整性和一致性
+
+3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Variable | DataTable | - | 30 | Output | 半角英数字+記号 | 左 | 空 | - | 来源表:HDOC_VARIABLES, 来源字段:VARIABLE |
+| 2   | Type | DataTable | - | 20 | Output | 半角英数字+記号 | 左 | 空 | - | 来源表:HDOC_VARIABLES, 来源字段:TYPE |
+| 3   | Description | DataTable | - | 100 | Output | 半角英数字+記号 | 左 | 空 | - | 来源表:HDOC_VARIABLES, 来源字段:DESCR |
+| 4   | Created by user | DataTable | - | 16 | Output | 半角英数字+記号 | 左 | 空 | - | 来源表:HDOC_VARIABLES, 来源字段:REGISTER_USER, 可点击链接跳转 |
+| 5   | Date | DataTable | - | - | Output | 日付 | 左 | 空 | - | 来源表:HDOC_VARIABLES, 来源字段:REGISTER_DATETIME |
+| 6   | Count | Label | - | - | Output | - | 左 | 空 | - | 检索結果件数 |
+| 7   | Select | Button | - | - | Action | - | 中 | 空 | 活性 | - |
+| 8   | Down | Button | - | - | Action | - | 中 | 空 | 活性 | 无实际功能 |
+| 9   | Back | Button | - | - | Action | - | 中 | 空 | 活性 | - |
+| 10  | Print | Button | - | - | Action | - | 中 | 空 | 活性 | - |
+| 11  | Excel | Button | - | - | Action | - | 中 | 空 | 活性 | - |
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+ 5.1 处理流程
+
+    5.1.1 初始化显示处理流程 (Initial Load)
+    功能说明：页面加载完成后，根据查询条件获取并展示检索结果。
+      开始：页面加载完成  
+      前置处理：获取Existing HDoc Variables画面传递的查询条件  
+      空值校验等 (Frontend Check)：
+        无特殊校验
+      API调用 (Backend Check)：
+        调用[UD11HdocvariablesApi]的[UD11Search]方法
+      结果处理：
+        成功：显示检索结果到数据表格
+        失败：显示具体错误消息
+
+    5.1.2 选择操作处理流程 (Select)
+    功能说明：勾选数据记录后点击[Select]按钮，返回至上一级现有 HDoc 参数界面（Existing HDoc Variables 画面），并自动回填所选记录的全部内容。
+      开始：点击[Select]按钮  
+      前置处理：获取用户勾选的数据记录  
+      空值校验等 (Frontend Check)：
+        若[未选择任何记录]：
+          设置Message = "未选择任何记录."
+          终止流程
+      操作步骤：
+        1. 用户在数据表格中勾选一条记录。
+        2. 点击[Select]按钮。
+        3. 系统验证是否至少选择了一条记录。
+        4. 返回上一级页面并自动填充所选记录的内容。
+      API调用 (Backend Check)：
+        无API调用
+      结果处理：
+        成功：迁移到Existing HDoc Variables画面，并填充所选数据
+        失败：显示"No key defined for table."错误消息
+
+    5.1.3 返回操作处理流程 (Back)
+    功能说明：点击[Back]按钮，回到现有 HDoc 参数查询条件界面（Existing HDoc Variables 画面），自动恢复此前填写的查询条件。
+      开始：点击[Back]按钮
+      操作步骤：
+        1. 用户点击[Back]按钮。
+        2. 系统导航回到现有 HDoc 参数查询条件界面。
+        3. 自动恢复此前填写的查询条件。
+      结果处理：
+        成功： 返回上级页面并恢复查询条件。
+        失败： 无（纯前端页面跳转操作）。
+
+    5.1.4 打印操作处理流程 (Print)
+    功能说明：点击[Print]按钮，打印当前检索结果。
+      开始：点击[Print]按钮
+      操作步骤：
+        1. 用户点击[Print]按钮。
+        2. 系统打开打印预览窗口。
+        3. 用户执行打印操作。
+      结果处理：
+        成功： 打印预览窗口打开。
+        失败： 无（纯前端操作）。
+
+    5.1.5 下载操作处理流程 (Down)
+    功能说明：点击[Down]按钮。
+      开始：点击[Down]按钮
+      操作步骤：
+        1. 用户点击[Down]按钮。
+        2. 画面无变化。
+      结果处理：
+        成功： 无（当前无实际功能）。
+        失败： 无。
+
+    5.1.6 导出操作处理流程 (Excel Export)
+    功能说明：点击Excel按钮，导出CSV格式文件。
+      开始：点击[Excel]按钮
+      操作步骤：
+        1. 用户点击[Excel]按钮。
+        2. 系统生成CSV格式的导出文件。
+        3. 提供下载选项给用户。
+      结果处理：
+        成功： CSV文件下载。
+        失败： 显示错误消息。
+
+    5.1.7 用户详情跳转处理流程 (Created by user Link)
+    功能说明：点击数据记录中Created by user列的链接，将Created by user作为参数，携带参数跳转至EDB User View画面。
+      开始：点击Created by user列的链接  
+      前置处理：获取被点击行的用户信息  
+      空值校验等 (Frontend Check)：
+        无特殊校验
+      操作步骤：
+        1. 用户点击数据表格中Created by user列的链接。
+        2. 系统携带Created by user参数，跳转至EDB User View画面。
+        3. 显示对应的用户详细信息。
+      结果处理：
+        成功： 跳转至EDB User View画面。
+        失败： 显示具体错误消息。
+
+5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击Select按钮时 | 选择记录 | 未选择任何记录 | No key defined for table. | 显示错误消息，不执行选择操作 |
+| 2 | 页面初始化时 | 查询条件 | 查询条件无效 | 无效的查询条件，请重新输入 | 显示错误消息，不执行查询操作 |
+| 3 | 点击用户链接时 | 用户ID | 用户ID为空 | 无法跳转到用户详情页面 | 显示错误消息，不执行跳转操作 |
+
+5. 接口定义 (API Specification)
+
+ 【UD11HdocvariablesApi】的接口定义如下：
+ 
+  UD11Search
+  功能： 根据查询条件获取HDoc变量信息
+  Method： GET
+  Endpoint： /api/ud11hdocvariables/search
+
+  Request [JSON]
+  {
+  "variable": "string",
+  "type": "string",
+  "description": "string",
+  "createdByUser": "string",
+  "date": "string"
+  }
+
+  Response Success (200)
+  {
+  "code": 200,
+  "msg": "查询成功",
+  "data": {
+    "variables": [
+      {
+        "variable": "VARIABLE1",
+        "type": "VDA",
+        "description": "Sample description",
+        "createdByUser": "admin",
+        "date": "2024-12-19 10:00:00"
+      }
+    ],
+    "count": 1
+   }
+  }
+
+  Response Error (400)
+  {
+  "code": 400,
+  "msg": "无效的查询条件，请重新输入",
+  "data": null
+  }
+
+6. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 未选择任何记录（Select操作） | 阻止选择操作，显示错误消息 | No key defined for table. |
+| 查询条件无效 | 阻止查询操作，显示错误消息 | 无效的查询条件，请重新输入 |
+| 网络连接失败 | 重试机制，显示网络错误消息 | 网络连接失败，请检查网络设置 |
+| 数据库连接异常 | 记录日志，显示系统错误消息 | 系统暂时不可用，请稍后再试 |
+| 数据加载超时 | 显示超时提示，提供重试选项 | 数据加载超时，请稍后重试 |
+
+7.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+8.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

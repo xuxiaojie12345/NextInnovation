@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="HdocVariablesResultMap" type="com.web.app.domain.HdocVariables">
+        <id property="variable" column="VARIABLE"/>
+        <result property="type" column="TYPE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="userid" column="USERID"/>
+        <result property="registerDatetime" column="REGISTER_DATETIME"/>
+        <result property="registerUser" column="REGISTER_USER"/>
+        <result property="registerProcess" column="REGISTER_PROCESS"/>
+        <result property="updateDatetime" column="UPDATE_DATETIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateProcess" column="UPDATE_PROCESS"/>
+    </resultMap>
+
+    <!-- 查询所有HDoc变量 -->
+    <select id="selectAllVariables" resultMap="HdocVariablesResultMap">
+        SELECT
+            VARIABLE,
+            TYPE,
+            DESCRIPTION,
+            USERID,
+            REGISTER_DATETIME,
+            REGISTER_USER,
+            REGISTER_PROCESS,
+            UPDATE_DATETIME,
+            UPDATE_USER,
+            UPDATE_PROCESS
+        FROM HDOC_VARIABLES
+        ORDER BY VARIABLE
+    </select>
+
+    <!-- 动态条件搜索HDOC Variables -->
+    <select id="searchByConditions" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+            VARIABLE,
+            TYPE,
+            DESCRIPTION,
+            REGISTER_USER AS createdByUser,
+            REGISTER_DATETIME AS date
+        FROM HDOC_VARIABLES
+        WHERE 1=1
+        <if test="variable != null and variable != ''">
+            AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+        </if>
+        <if test="type != null and type != ''">
+            AND TYPE LIKE CONCAT('%', #{type}, '%')
+        </if>
+        <if test="description != null and description != ''">
+            AND DESCRIPTION LIKE CONCAT('%', #{description}, '%')
+        </if>
+        ORDER BY VARIABLE
+    </select>
+
+</mapper>

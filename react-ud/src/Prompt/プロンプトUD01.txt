@@ -1,0 +1,99 @@
+请根据以下要求生成[Login]的详细设计文档：
+  
+1.基本信息
+   文档编号:DES-Login-001
+   模块名称:Login
+   作成日:2026-05-21
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：提供用户身份验证入口，点击登录按钮进行用户认证。
+  安全性或特殊要求：密码输入需掩码显示，传输需加密，敏感信息不落地。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | UserID       | TextField   | Y         | 10        | Input | 半角英文数字           | 左              | 空              | 活性              |      |
+| 2   | Password     | TextField   | Y         | 32        | Input | 半角英文数字+记号      | 左              | 空              | 活性              |      |
+| 3   | Message      | Message     | N         | 256       | Output| -                     | 左              | 空              | -                 | 错误/提示信息 |
+| 4   | Login        | Button      | N         | -         | Action| -                      | 中              | -               | 活性              |      |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      开始：用户点击 [Login] 按钮
+      前置处理：获取 UserID 和 Password 输入值，Trim 处理。
+      空值校验等 (Frontend Check)：
+       若 UserID 为空 OR Password 为空：
+        设置Message = [Username and password are required.]
+       若 UserID OR Password 不正确：
+        设置Message = [We didn't recognize the username or password you entered. Please try again.]
+        终止流程
+      4.1.2 API调用 (Backend Check)：
+        调用[AuthenticationApi]，传入 UserID 和 Password。
+   4.2 结果处理：
+       成功：迁移到Menu一览画面。
+       失败：设置 Message = [We didn't recognize the username or password you entered. Please try again.]
+   4.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1   | 点击 Login | UserID | 值为空或仅空白字符 | `"Username and password are required."` | 显示 Message，阻止提交 |
+   | 2   | 点击 Login | Password | 值为空或仅空白字符 | `"Username and password are required."` | 显示 Message，阻止提交 |
+   | 3   | API 返回  | Auth Result | 认证失败 (401/Invalid) | `"We didn't recognize the username or password you entered. Please try again."` | 显示 Message
+
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [AuthenticationApi]
+     功能：[用户情报认证]
+     Method：[GET]
+     Endpoint：/api/authentication/login
+
+     Request [application/json]
+     {
+      "userID": "string",
+      "password": "string"
+     }
+
+     Response Success (200 OK)
+     json:
+     {
+       "code": 200,
+       "message": "Success",
+       "data": {
+          "token": "eyJhbGci...",
+          "userId": 1,
+          "username": "xxx"
+       }
+     }
+
+     Response Error (401 Unauthorized)
+     json:
+     {
+      "code": 401,
+      "message": "Invalid credentials"
+     }
+
+6. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+异常场景	处理方式	Message显示内容
+网络超时/连接失败	捕获异常，重置按钮状态	"Network error. Please check your connection." (建议补充)
+服务器内部错误 (500)	捕获异常，记录日志	"System error. Please try again later." (建议补充)
+输入包含非法字符	前端拦截或后端返回	"Invalid character format." (建议补充)
+
+7.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+8.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

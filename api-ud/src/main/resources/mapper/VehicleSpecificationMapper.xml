@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.VehicleSpecificationMapper">
+
+    <!--
+        查询语句1 - 车辆规格主数据:
+        SELECT
+            OM.MODEL, OM.BUILD, GENERAL.PRODUCT_TYPE, GENERAL.VIN,
+            KOLA.SYMBOL, GENERAL.COUNTRY_OF_OPERATION,
+            VDA.FAMILY_ID, VDA.VARIANT_ID, OM.CUSTOMER_ADAP
+        FROM HDOC_REC_DATA_VDA_GENERAL GENERAL
+        INNER JOIN HDOC_REC_DATA_OM OM
+            ON OM.SERIE = GENERAL.SERIE AND OM.CHNR = GENERAL.CHNR
+        INNER JOIN HDOC_REC_DATA_VDA_VARIANTS VDA
+            ON GENERAL.SERIE = VDA.SERIE AND GENERAL.CHNR = VDA.CHNR
+        INNER JOIN HDOC_REC_DATA_KOLA_VARIANT KOLA
+            ON VDA.FAMILY_ID = KOLA.FAMILY_ID AND VDA.VARIANT_ID = KOLA.VARIANT_ID
+        WHERE GENERAL.SERIE = #{serie} AND GENERAL.CHNR = #{chno}
+    -->
+    <select id="selectVehicleSpecData" resultType="java.util.LinkedHashMap">
+        SELECT
+            OM.MODEL,
+            OM.BUILD,
+            GENERAL.PRODUCT_TYPE,
+            GENERAL.VIN,
+            KOLA.SYMBOL,
+            GENERAL.COUNTRY_OF_OPERATION,
+            VDA.FAMILY_ID,
+            VDA.VARIANT_ID,
+            OM.CUSTOMER_ADAP
+        FROM
+            HDOC_REC_DATA_VDA_GENERAL GENERAL
+        INNER JOIN
+            HDOC_REC_DATA_OM OM
+        ON
+            OM.SERIE = GENERAL.SERIE
+            AND OM.CHNR = GENERAL.CHNR
+        INNER JOIN
+            HDOC_REC_DATA_VDA_VARIANTS VDA
+        ON
+            GENERAL.SERIE = VDA.SERIE
+            AND GENERAL.CHNR = VDA.CHNR
+        INNER JOIN
+            HDOC_REC_DATA_KOLA_VARIANT KOLA
+        ON
+            VDA.FAMILY_ID = KOLA.FAMILY_ID
+            AND VDA.VARIANT_ID = KOLA.VARIANT_ID
+        WHERE
+            GENERAL.SERIE = #{serie}
+            AND GENERAL.CHNR = #{chno}
+    </select>
+
+    <!--
+        查询语句2 - KOLA Variant格式化符号:
+        SELECT
+            LPAD(SUBSTRING(KOLA.SYMBOL, 1, 8), 8, ' ') AS SYMBOL_STR,
+            KOLA.FUNCTION_GROUP,
+            KOLA.DESCRIPTION
+        FROM HDOC_REC_DATA_KOLA_VARIANT KOLA
+        WHERE KOLA.FAMILY_ID = #{familyId} AND KOLA.VARIANT_ID = #{variantId}
+        ORDER BY CONCAT(LPAD(KOLA.FUNCTION_GROUP, 4, ' '), LPAD(KOLA.FAMILY_ID, 3, ' '))
+    -->
+    <select id="selectKolaVariantByFamilyAndVariant" resultType="java.util.LinkedHashMap">
+        SELECT
+            LPAD(SUBSTRING(KOLA.SYMBOL, 1, 8), 8, ' ') AS SYMBOL_STR,
+            KOLA.FUNCTION_GROUP,
+            KOLA.DESCRIPTION
+        FROM
+            HDOC_REC_DATA_KOLA_VARIANT KOLA
+        WHERE
+            KOLA.FAMILY_ID LIKE CONCAT('%', #{familyId}, '%')
+            AND KOLA.VARIANT_ID LIKE CONCAT('%', #{variantId}, '%')
+        ORDER BY
+            CONCAT(LPAD(KOLA.FUNCTION_GROUP, 4, ' '), LPAD(KOLA.FAMILY_ID, 3, ' '))
+    </select>
+
+</mapper>

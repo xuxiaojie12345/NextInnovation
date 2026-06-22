@@ -1,76 +1,96 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
-}
-
-.menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
-  text-align: center;
-}
-
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-.menu-content {
-  padding: 0;
-}
-
-.menu-section {
-  border-bottom: 1px solid #ccc;
-}
-
-.menu-section:last-child {
-  border-bottom: none;
-}
-
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
-}
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu-item {
+/* 整体布局 - 菜单在左，内容在右 */
+.menu-layout {
   display: flex;
-  align-items: center;
-  padding: 6px 15px;
-  cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  min-height: 100vh;
 }
 
-.menu-item:hover {
-  background-color: #d5e3f0;
+/* 菜单容器 - 固定宽度左侧栏 */
+.menu-container {
+  width: 350px;
+  min-width: 350px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background-color: #e0e0e0;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+  font-family: "Microsoft YaHei", sans-serif;
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
-}
-
-.menu-label {
+/* 右侧内容区域 */
+.menu-content-area {
   flex: 1;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+/* 菜单内容区域 */
+.menu-content {
+  padding: 10px 0;
+}
+
+/* 菜单组容器 */
+.menu-group {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #d1d1d1; /* 分组分隔线 */
+  padding-bottom: 10px;
+}
+
+/* 父级菜单标签样式 */
+.menu-parent-label {
+  padding: 5px 15px;
+  font-size: 18px;
+  font-weight: bold;
+  /* 3. 字体颜色设置为深蓝色 */
+  color: #000f60;
+  background-color: #eceaea;
+  cursor: default;
+}
+
+/* 子菜单列表 */
+.submenu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 子菜单链接样式 */
+.submenu-link {
+  display: block;
+  padding: 8px 15px 8px 25px; /* 左侧缩进以体现层级 */
+  font-size: 15px;
+  /* 3. 字体颜色设置为深蓝色 */
+  color: #000f60;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.submenu-link:hover {
+  background-color: #d1d1d1; /* 悬停时稍深的灰色 */
+}
+
+/* 激活状态 */
+.submenu-link.active {
+  background-color: #ffffff; /* 激活项背景设为白色以突出 */
+  color: #003366;
+  border-left: 3px solid #003366; /* 激活项左侧深蓝色竖线 */
+  font-weight: bold;
+}
+
+/* 滚动条样式 */
+.menu-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-container::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+.menu-container::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 3px;
+}
+
+.menu-container::-webkit-scrollbar-thumb:hover {
+  background: #666;
 }

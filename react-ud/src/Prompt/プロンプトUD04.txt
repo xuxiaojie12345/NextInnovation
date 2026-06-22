@@ -1,0 +1,139 @@
+请根据以下要求生成[Generate Document]的详细设计文档：
+
+1.基本信息
+  模块名称：Generate Document
+  文档编号：UD04
+  版本号：v1.0
+  作成日期：2026-05-22
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：本模块用于展示特定底盘号（Chassis No）对应的 VIN Plate 文档生成结果。它在页面加载时触发后台批处理程序生成 .trf 文件，并展示相关的车辆信息、S-Note 警告、轮胎主数据以及文档下载链接。
+  面向的用户群体：内部业务操作人员、技术支持人员。
+  用户体验方面的考虑：
+    清晰展示关键车辆标识信息（Chassis, Order No, Build Week等）。
+    通过颜色（红色）和明确的消息提示用户注意需要修改文档的情况（AD-Change激活）。
+    提供直接下载生成文件和跳转至调试/修改页面的快捷入口。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis no | label | - | 15 | Output | - | 左 | - | - | 数据来源：前画面 "Chassis series" 和 "Chassis no"，中间用'-'隔开， |
+| 2   | Ordernumber | label | - | 16 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.ORDERNUMBER |
+| 3   | Build week | label | - | 10 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.BUILD |
+| 4   | Spec week | label | - | 10 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.SPEC |
+| 5   | Market | label | - | 10 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION；备注：CountryOfOperation(VDA) |
+| 6   | Master Market | label | - | - | Output | - | 左 | - | - | 固定值：'-EU' |
+| 7   | S-Note NO | label | - | 4000 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.CUSTOMER_ADAP |
+| 9   | S-Note Message | label | - | 256 | Output | - | 左 | - | - | 固定文本："The S-Notes above can affect homologation documents." |
+| 10  | Load Index | label | - | 10 | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_TIRE_MASTER.LOAD_INDEX；备注：Tire Master情報 |
+| 11  | Modify Doc Link | link | - | 1 | Output | - | 左 | - | - | 当AD-Chang状态激活时显示红色文字：“After def change detected. Document need to be modified.”；点击跳转至“Modify Document”画面 |
+| 12  | Using template | label | - | 20 | Output | - | 左 | - | - | 固定值：'_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf' |
+| 13  | Replacing parameters | label | - | 40 | Output | - | 左 | - | - | 数据来源：HDOC_ADCA_MODIFICATION表中的"VARIABLE"和"NEWVAL"字段 |
+| 14  | Generated document | link | - | - | Output | - | 左 | - | - |  |
+| 15  | Date | label | - | 20 | Output | - | 左 | - | - | 数据来源：服务器当前时间；默认格式：YYYY-MM-DD HH:mm:ss；示例：2022-12-06 07:30:31 |
+| 16  | HDoc version | label | - | 20 | Output | - | 左 | - | - | 数据来源：程序版本信息；4.2.1|
+| 17  | Error message area | label | - | - | Output | - | 左 | - | - | 用于显示错误信息 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+
+      4.1.1 页面初始化与数据加载 (Initial Load)
+       开始：页面加载（OnLoad），接收到 Chassis series和Chassis No。
+       操作步骤：
+         1. 接收前画面传入的 Chassis series 和 Chassis no。
+         2. 调用 API UD04SelectGeneratedocumentApi 获取详细数据。
+         3. 页面渲染各项 Label 和 Link。
+       结果处理：
+         成功：页面完整显示所有车辆信息、S-Note、轮胎数据、模板信息及下载链接。
+         失败：在 Error message area 显示具体的英文错误消息
+
+      4.1.2 跳转至修改文档页面 (Navigate to Modify Document)
+       功能说明：用户点击 Modify Doc Link 链接，跳转至修改文档页面。
+       操作步骤：
+         1. 系统检查 HDOC_ADCA_CHANGE 表中 ACT 字段是否为'Y'。
+         2. 若是，Modify Doc Link 显示为红色文字："After def change detected. Document need to be modified."。
+         3. 用户点击该链接。
+       结果处理：
+         成功：携带参数 Chassis no、 Market，迁移到 "Modify Document"（修改文档）画面。
+         失败：在 Error message area 显示具体的英文错误消息
+
+      4.1.3 跳转至Chassis详细情报页面 (Navigate to MVDA - Vehicle Specification)
+       功能说明：用户点击 Chassis no 链接，跳转至Chassis详细情报页面。
+       操作步骤：
+         1. 用户点击Chassis no 链接。
+       结果处理：
+         成功：：携带参数 Chassis no，迁移到 "MVDA - Vehicle Specification"（Chassis详细情报）画面。
+         失败：在 Error message area 显示具体的英文错误消息
+
+   4.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+    1	API调用后	API Result	API返回失败状态	API call failed: XXX	在 Error message area 显示错误
+    2	数据查询时	Database Record	对应Chassis数据不存在	No data found for chassis: XXX
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   [UD04SelectGeneratedocumentApi]
+     功能：获取生成文档所需的所有展示数据，包括订单信息、VDA信息、轮胎信息、AD-Change状态及修改参数。
+     Method：GET
+     Endpoint：/api/ud04/generatedocument
+
+     Request [json]
+     {
+       "chassisSeries": "String",
+       "chassisNo": "String"
+     }
+
+     Response Success (200)
+     {
+       "code": 200,
+       "message": "Success",
+       "data": {
+         "orderNumber": "String",
+         "buildWeek": "String",
+         "specWeek": "String",
+         "market": "String",
+         "sNoteNo": "String",
+         "loadIndex": "String",
+         "adChangeActive": boolean, // true if ACT is active
+         "replacementParams": [
+           {
+             "variable": "String",
+             "newVal": "String"
+           }
+          ],
+         "Date": "String", // YYYY-MM-DD HH:mm:ss
+        }
+      }
+
+     Response Error (500/400)
+     {
+       "code": 500,
+       "message": "Batch processing failed: Failed to make the Inplate",
+       "errorReason": "XXX"
+     }
+
+6. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+API执行异常	捕获异常，记录日志，返回错误码	API call failed: [Exception Message]
+数据库连接失败	连接池异常捕获	Database connection error, please try again later.
+查询结果为空	数据查询结果验证	No data found for chassis: [chassis number]
+网络/API超时	前端超时处理	System timeout, please try again later.
+
+7.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（内部設計模板.md）相同的格式结构
+
+8.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

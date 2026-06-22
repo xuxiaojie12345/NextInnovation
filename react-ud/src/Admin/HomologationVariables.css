@@ -1,0 +1,199 @@
+/* Homologation Variables 页面 */
+.hvars-page-wrapper {
+  padding: 20px 30px;
+  font-family: "Microsoft Sans Serif", Arial, sans-serif;
+  background-color: #ffffff;
+  min-height: 100%;
+}
+
+.hvars-container {
+  max-width: 900px;
+}
+
+.hvars-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  text-align: left;
+  margin-bottom: 12px;
+  margin-top: 0;
+  padding-bottom: 4px;
+}
+
+/* 消息 */
+.hvars-message {
+  padding: 8px 12px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  border-radius: 3px;
+}
+
+.hvars-message-success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.hvars-message-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+/* 加载状态 */
+.hvars-loading {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+/* 按钮行 */
+.hvars-button-row {
+  padding: 5px;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+  background-color: #f1f3ff;
+  border-bottom: 3px solid #bbc4f1;
+}
+
+.hvars-btn {
+  padding: 4px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #a4a9c5;
+  border-radius: 2px;
+  background-color: #dee2ff;
+  color: #525392;
+  font-family: inherit;
+  min-width: 50px;
+  box-shadow: none;
+}
+
+.hvars-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.hvars-btn:active {
+  background-color: #d0d0d0;
+}
+
+/* 必填字段星号 */
+.hvars-required {
+  color: #ff0000;
+  font-weight: bold;
+  margin-right: 2px;
+  font-size: 14px;
+}
+
+/* 表单区域 */
+.hvars-form {
+  border: 3px solid #bbc4f1;
+  background-color: #ffffff;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px 0;
+}
+
+.hvars-field {
+  padding: 0px 20px;
+  display: grid;
+  grid-template-columns: 130px 40px 1fr auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.hvars-label {
+  font-weight: bold;
+  color: #000;
+  width: 130px;
+  min-width: 130px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* 运算符下拉框（=） */
+.hvars-operator {
+  width: 40px;
+  height: 26px;
+  padding: 2px 2px;
+  font-size: 14px;
+  border: 1px solid #7f7f7f;
+  box-sizing: border-box;
+  outline: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.hvars-operator:focus {
+  border-color: #000080;
+  outline: 1px solid #000080;
+}
+
+.hvars-input {
+  flex: 1;
+  height: 26px;
+  padding: 2px 6px;
+  font-size: 14px;
+  border: 1px solid #7f7f7f;
+  box-sizing: border-box;
+  outline: none;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+.hvars-input:focus {
+  border-color: #000080;
+  outline: 1px solid #000080;
+}
+
+/* 输入框外部提示文字 */
+.hvars-hint {
+  font-size: 13px;
+  color: #888888;
+  font-style: italic;
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+/* Automatic 输入框样式 */
+.hvars-input-auto {
+  color: #888888;
+  font-style: italic;
+}
+
+.hvars-select {
+  flex: 1;
+  height: 26px;
+  padding: 2px 4px;
+  font-size: 14px;
+  border: 1px solid #7f7f7f;
+  box-sizing: border-box;
+  outline: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+.hvars-select:focus {
+  border-color: #000080;
+  outline: 1px solid #000080;
+}
+
+@media (max-width: 768px) {
+  .hvars-page-wrapper {
+    padding: 15px;
+  }
+
+  .hvars-form {
+    grid-template-columns: 1fr;
+  }
+
+  .hvars-label {
+    min-width: 100px;
+  }
+}

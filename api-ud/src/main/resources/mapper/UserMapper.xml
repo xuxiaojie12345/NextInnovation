@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UserMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="UserInfoResultMap" type="com.web.app.domain.UserInfo">
+        <id property="userid" column="USERID"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="username" column="USERNAME"/>
+        <result property="responsible" column="RESPONSIBLE"/>
+        <result property="userposition" column="USERPOSITION"/>
+        <result property="email" column="EMAIL"/>
+    </resultMap>
+
+    <!-- 根据用户ID和密码查询用户信息 -->
+    <select id="selectByUserIdAndPassword" resultMap="UserInfoResultMap">
+        SELECT USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL 
+        FROM hdoc_user_infor 
+        WHERE USERID = #{userId} 
+          AND PASSWORD = #{password}
+    </select>
+
+    <!-- 搜索用户（关联市场权限） -->
+    <select id="searchUsers" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+        SELECT
+            USERINFO.USERID,
+            USERINFO.USERNAME,
+            MARKETAUTH.MARKET
+        FROM HDOC_USER_INFOR USERINFO
+        INNER JOIN HDOC_MARKET_AUTH MARKETAUTH
+        ON USERINFO.USERID = MARKETAUTH.USERID
+        WHERE 1=1
+        <if test="userid != null and userid != ''">
+            AND USERINFO.USERID = #{userid}
+        </if>
+        <if test="username != null and username != ''">
+            AND USERINFO.USERNAME = #{username}
+        </if>
+        <if test="market != null and market != ''">
+            AND MARKETAUTH.MARKET = #{market}
+        </if>
+        <if test="notSet != null and notSet != ''">
+            AND (MARKETAUTH.MARKET IS NULL OR MARKETAUTH.MARKET = '')
+        </if>
+        <if test="rule != null and rule != ''">
+            AND MARKETAUTH.TYPE = 'Rule Admin'
+        </if>
+        <if test="template != null and template != ''">
+            AND MARKETAUTH.TYPE = 'Template Admin'
+        </if>
+        ORDER BY USERINFO.USERID
+    </select>
+
+</mapper>

@@ -1,0 +1,979 @@
+<!DOCTYPE html><html><head>
+      <title>詳細設計UD08</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\licuiping\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.30\crossnote\dependencies\katex\katex.min.css">
+      
+      
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-details{margin:0;padding:0;border:none}.markdown-preview .md-toc summary.md-toc-link-wrapper{cursor:pointer;list-style-position:outside}.markdown-preview .md-toc summary.md-toc-link-wrapper::marker{font-size:.85em}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='0']{margin-left:12px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='1']{margin-left:28px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='2']{margin-left:44px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='3']{margin-left:60px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='4']{margin-left:76px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='5']{margin-left:80px}.markdown-preview a.tag,.markdown-preview a.tag:active,.markdown-preview a.tag:link,.markdown-preview a.tag:visited,.markdown-preview span.tag:not(.token){display:inline-block;background-color:var(--vscode-badge-background,rgba(127,127,127,.18));color:var(--vscode-badge-foreground,currentColor);border-radius:2em;font-size:.85em;font-weight:500;padding:.05em .55em;line-height:1.5;white-space:nowrap;text-decoration:none;text-shadow:none;box-shadow:none;transition:background-color .12s ease,opacity .12s ease}.markdown-preview a.tag{cursor:pointer}.markdown-preview a.tag:focus,.markdown-preview a.tag:hover{background-color:var(--vscode-badge-background,rgba(127,127,127,.32));color:var(--vscode-badge-foreground,currentColor);opacity:.85;text-decoration:none;outline:0}.markdown-preview .wikilink-embed-content{border-left:3px solid var(--vscode-textBlockQuote-border,rgba(128,128,128,.3));background:var(--vscode-textBlockQuote-background,rgba(128,128,128,.05));margin:.5em 0;padding:.5em .75em;border-radius:0 3px 3px 0}.markdown-preview .wikilink-embed-content.wikilink-embed-error{border-left-color:var(--vscode-errorForeground,#cf222e);color:var(--vscode-errorForeground,#cf222e);font-style:italic;opacity:.8}.markdown-preview .wikilink-embed-content h1:first-child,.markdown-preview .wikilink-embed-content h2:first-child,.markdown-preview .wikilink-embed-content h3:first-child,.markdown-preview .wikilink-embed-content h4:first-child,.markdown-preview .wikilink-embed-content h5:first-child,.markdown-preview .wikilink-embed-content h6:first-child{margin-top:.25em}.markdown-preview .wikilink-embed-content .wikilink-embed-content{margin:.25em 0;padding:.25em .5em}.markdown-preview .block-id{display:none}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));border:4px solid var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));background-clip:content-box}.scrollbar-style::-webkit-scrollbar-thumb:hover{background-color:var(--vscode-scrollbarSlider-hoverBackground,rgba(120,120,120,.66))}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));border:4px solid var(--vscode-scrollbarSlider-background,rgba(150,150,150,.66));background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb:hover{background-color:var(--vscode-scrollbarSlider-hoverBackground,rgba(120,120,120,.66))}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-details{margin:0;padding:0;border:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='0']{padding-left:0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='1']{padding-left:16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='2']{padding-left:32px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='3']{padding-left:48px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='4']{padding-left:64px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='5']{padding-left:80px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. -->
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script>
+    </head>
+    <body for="html-export">
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="homologation-variables-模块-ud08-详细设计说明书">Homologation Variables 模块 (UD08) 详细设计说明书 </h1>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">文档编号</th>
+<th style="text-align:left">DES-HomologationVariables-008</th>
+<th style="text-align:left">版本号</th>
+<th style="text-align:left">v1.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>模块名称</strong></td>
+<td style="text-align:left">Homologation Variables</td>
+<td style="text-align:left"><strong>作成日</strong></td>
+<td style="text-align:left">2026-06-17</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>作成者</strong></td>
+<td style="text-align:left">Deepseek</td>
+<td style="text-align:left"><strong>状态</strong></td>
+<td style="text-align:left">正式稿</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-背景-background">1. 背景 (Background) </h2>
+<p>本模块管理车辆认证相关的用户定义参数规则。用户可以通过此画面查询、添加、更新、删除 RULES 情报。</p>
+<ul>
+<li><strong>面向的用户群体</strong>：系统管理员、数据维护人员。</li>
+<li><strong>用户体验方面的考虑</strong>：
+<ol>
+<li>提供直观的增删改查（CRUD）操作界面。</li>
+<li>清晰的按钮布局，区分搜索、清空、新增、更新、删除等操作。</li>
+<li>对关键操作（新增、更新、删除）提供即时的错误反馈，确保数据准确性。</li>
+<li>在新增时对 Variable 字段进行特殊处理（去除前缀并校验）。</li>
+</ol>
+</li>
+<li><strong>安全性或特殊要求</strong>：对输入数据进行严格校验，防止注入等安全风险。</li>
+</ul>
+<h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
+<h3 id="21-控件属性表">2.1 控件属性表 </h3>
+<table>
+<thead>
+<tr>
+<th>No.</th>
+<th>項目名 (Item)</th>
+<th>種別 (Type)</th>
+<th>必須 (Req)</th>
+<th>MaxLength</th>
+<th>I/O</th>
+<th>許容文字 (Allowed Chars)</th>
+<th>文字配置 (Align)</th>
+<th>初期値 (Default)</th>
+<th>表示制御 (Control)</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Product class</td>
+<td>Pull-downList</td>
+<td>Y</td>
+<td>2</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>Add/Update/Deleteの時、设为必填。数据源: PRODUCT_CLASS_MASTER.PC</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Number</td>
+<td>TextField</td>
+<td>Y</td>
+<td>10</td>
+<td>Input</td>
+<td>半角数字</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>Add/Update/Deleteの時、设为必填</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Market</td>
+<td>Pull-downList</td>
+<td>Y</td>
+<td>3</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>Add/Update/Deleteの時、设为必填。数据源: MARKET_MASTER.MARKET</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Variable</td>
+<td>TextField</td>
+<td>-</td>
+<td>20</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>若输入内容格式为TEMPLATE-XXX，则去除前缀TEMPLATE-，并校验剩余内容是否已存在于HDOC_VARIABLES表中。数据源: HDOC_USER_DEFINED_RULES.VARIABLE</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Value</td>
+<td>TextField</td>
+<td>-</td>
+<td>200</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.VAL</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Variant string.1</td>
+<td>TextField</td>
+<td>-</td>
+<td>100</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.VS</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Variant string.2</td>
+<td>TextField</td>
+<td>-</td>
+<td>100</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.VS2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Comments</td>
+<td>TextField</td>
+<td>-</td>
+<td>100</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.COMMENTS</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Add</td>
+<td>TextField</td>
+<td>-</td>
+<td>6</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.ADD_DATE</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Delete</td>
+<td>TextField</td>
+<td>-</td>
+<td>6</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.DELETE_DATE</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Created by user</td>
+<td>TextField</td>
+<td>-</td>
+<td>16</td>
+<td>Input</td>
+<td>半角英数字+記号</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.UPDATE_USER</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Date</td>
+<td>TextField</td>
+<td>-</td>
+<td>-</td>
+<td>Input</td>
+<td>日付</td>
+<td>左</td>
+<td>空</td>
+<td>活性</td>
+<td>数据源: HDOC_USER_DEFINED_RULES.UPDATE_DATETIME</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Search</td>
+<td>Button</td>
+<td>-</td>
+<td>-</td>
+<td>Action</td>
+<td>-</td>
+<td>中</td>
+<td>-</td>
+<td>活性</td>
+<td>执行查询操作</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Clear</td>
+<td>Button</td>
+<td>-</td>
+<td>-</td>
+<td>Action</td>
+<td>-</td>
+<td>中</td>
+<td>-</td>
+<td>活性</td>
+<td>清空所有输入字段</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Add</td>
+<td>Button</td>
+<td>-</td>
+<td>-</td>
+<td>Action</td>
+<td>-</td>
+<td>中</td>
+<td>-</td>
+<td>活性</td>
+<td>执行新增操作</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Update</td>
+<td>Button</td>
+<td>-</td>
+<td>-</td>
+<td>Action</td>
+<td>-</td>
+<td>中</td>
+<td>-</td>
+<td>活性</td>
+<td>执行更新操作</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Delete</td>
+<td>Button</td>
+<td>-</td>
+<td>-</td>
+<td>Action</td>
+<td>-</td>
+<td>中</td>
+<td>-</td>
+<td>活性</td>
+<td>执行删除操作</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>注</strong>：</p>
+<ul>
+<li>Product class 和 Market 下拉框从主数据表获取选项。</li>
+<li>Variable 字段支持 TEMPLATE-XXX 格式前缀去除处理。</li>
+<li>"Add"（No.9）和 "Delete"（No.10）为 TextField 输入字段，与按钮名称相同但为不同类型的控件。</li>
+</ul>
+</blockquote>
+<h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
+<h3 id="31-处理流程">3.1 处理流程 </h3>
+<h4 id="310-画面初始化-initial-load">3.1.0 画面初始化 (Initial Load) </h4>
+<ul>
+<li><strong>功能说明</strong>：页面加载时，获取并填充下拉框选项。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li><strong>从 Menu 画面迁移的场合</strong>：用户从 Menu 画面点击 "Update user defined variables (rules)" 链接，跳转到本画面。</li>
+<li><strong>从查询结果页返回的场合</strong>：用户从认证参数查询结果页点击【back】按钮，返回到本画面。此时，系统需保存查询结果页返回的 "Product class", "Number", "Market" 的值，并将其他返回值回填到对应字段。</li>
+<li>系统调用 <code>UD08SelectProductclassmaster</code> API，获取 <code>PRODUCT_CLASS_MASTER</code> 表中所有 PC 值，填充到 "Product class" 下拉框。</li>
+<li>系统调用 <code>UD08SelectMarketmaster</code> API，获取 <code>MARKET_MASTER</code> 表中所有 MARKET 值，填充到 "Market" 下拉框。</li>
+<li>下拉框加载完成，其他输入框和按钮处于待命状态。若为从结果页返回，则查询条件字段已预填充。</li>
+</ol>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：页面正确显示下拉框选项，等待用户操作。</li>
+<li>失败：在页面显眼位置显示错误消息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="311-新增操作-add-operation">3.1.1 新增操作 (Add Operation) </h4>
+<ul>
+<li><strong>功能说明</strong>：向数据库中添加一条新的用户定义规则记录。</li>
+<li><strong>开始</strong>：用户点击 "Add" 按钮。</li>
+<li><strong>前置处理</strong>：获取画面所有字段的当前值。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 "Product class", "Number", "Market" 任一为空：
+<ul>
+<li>设置 Message = <code>"Product class, Number, and Market are required for Add operation."</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>存在性检查 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"。</li>
+<li>若 API 返回记录存在：
+<ul>
+<li>设置 Message = <code>"Primary key conflict, Please enter the correct content"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>格式校验 (Frontend Check)</strong>：
+<ul>
+<li>若 "Variable" 字段以 "TEMPLATE-" 开头，则去除前缀。</li>
+</ul>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"，检查记录是否存在。</li>
+<li>调用 <code>UD08SelectHdocvariables</code> API，传入处理后的 "Variable" 值，校验其在 <code>HDOC_VARIABLES</code> 表中是否存在。</li>
+<li>调用 <code>UD08Add</code> API，传入所有字段值，执行新增。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示 "新增成功" 提示，刷新列表。</li>
+<li>失败：显示对应错误消息（"Primary key conflict..." 或 "Variant does not exist..."）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="312-更新操作-update-operation">3.1.2 更新操作 (Update Operation) </h4>
+<ul>
+<li><strong>功能说明</strong>：更新数据库中已有的用户定义规则记录。</li>
+<li><strong>开始</strong>：用户点击 "Update" 按钮。</li>
+<li><strong>前置处理</strong>：获取画面所有字段的当前值。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 "Product class", "Number", "Market" 任一为空：
+<ul>
+<li>设置 Message = <code>"Product class, Number, and Market are required for Update operation."</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>存在性检查 (Backend Check)</strong>：
+<ul>
+<li>从查询结果页返回的场合：
+<ul>
+<li>若 "Product class", "Number", "Market" 的值和本地存储的值不一致：
+<ul>
+<li>设置 Message = <code>"Primary key conflict, Please enter the correct content"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+<li>否则：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"。</li>
+<li>若 API 返回记录不存在：
+<ul>
+<li>设置 Message = <code>"Data does not exist, Please enter the correct content"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>格式校验 (Frontend Check)</strong>：
+<ul>
+<li>若 "Variable" 字段以 "TEMPLATE-" 开头，则去除前缀。</li>
+</ul>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"，检查记录是否存在。</li>
+<li>调用 <code>UD08SelectHdocvariables</code> API，传入处理后的 "Variable" 值，校验其在 <code>HDOC_VARIABLES</code> 表中是否存在。</li>
+<li>调用 <code>UD08Update</code> API，传入所有字段值，执行更新。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示 "更新成功" 提示。</li>
+<li>失败：显示对应错误消息（"Data does not exist..." 或 "Primary key conflict..." 或 "Variant does not exist..."）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="313-删除操作-delete-operation">3.1.3 删除操作 (Delete Operation) </h4>
+<ul>
+<li><strong>功能说明</strong>：从数据库中删除一条用户定义规则记录。</li>
+<li><strong>开始</strong>：用户点击 "Delete" 按钮。</li>
+<li><strong>前置处理</strong>：获取 "Product class", "Number", "Market" 字段的当前值。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若 "Product class", "Number", "Market" 任一为空：
+<ul>
+<li>设置 Message = <code>"Product class, Number, and Market are required for Delete operation."</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>存在性检查 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"。</li>
+<li>若 API 返回记录不存在：
+<ul>
+<li>设置 Message = <code>"Data does not exist, Please enter the correct content"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"，检查记录是否存在。</li>
+<li>调用 <code>UD08Delete</code> API，传入 "Product class", "Number", "Market" 值，执行删除。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示 "删除成功" 提示。</li>
+<li>失败：显示对应错误消息（"Data does not exist..."）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="314-查询操作-search-operation">3.1.4 查询操作 (Search Operation) </h4>
+<ul>
+<li><strong>功能说明</strong>：根据输入的查询条件执行数据检索，并跳转至查询结果页面。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>用户在画面任意字段输入查询条件。</li>
+<li>用户点击 "Search" 按钮。</li>
+<li>系统将输入的查询条件作为参数，携带至认证参数查询结果页。</li>
+<li>系统执行业务逻辑校验（检查主键重复，校验 Variable 是否存在）。</li>
+<li>页面跳转至认证参数查询结果页，并显示符合查询条件的数据。</li>
+</ol>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：跳转到查询结果页并显示数据。</li>
+<li>失败：在画面显眼位置显示错误消息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="315-清空操作-clear-operation">3.1.5 清空操作 (Clear Operation) </h4>
+<ul>
+<li><strong>功能说明</strong>：清空所有输入字段的内容。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>用户点击 "Clear" 按钮。</li>
+<li>系统将所有输入字段（TextField, Pull-downList）的值清空。</li>
+<li>所有输入字段变为空。</li>
+</ol>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：画面所有字段清空。</li>
+<li>失败：无（纯前端操作，不涉及 API 调用）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No.</th>
+<th style="text-align:left">检查时机</th>
+<th style="text-align:left">检查对象</th>
+<th style="text-align:left">检查条件</th>
+<th style="text-align:left">错误消息 (Message Content)</th>
+<th style="text-align:left">动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:left">Add 按钮点击</td>
+<td style="text-align:left">主键组合 (Product class, Number, Market)</td>
+<td style="text-align:left">数据库中已存在相同组合的记录</td>
+<td style="text-align:left"><code>Primary key conflict, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:left">Add 按钮点击</td>
+<td style="text-align:left">Variable 字段</td>
+<td style="text-align:left">Variable 去除前缀后，在 HDOC_VARIABLES 表中不存在</td>
+<td style="text-align:left"><code>Variant does not exist, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:left">Update 按钮点击</td>
+<td style="text-align:left">待更新记录</td>
+<td style="text-align:left">根据 (Product class, Number, Market) 无法查询到现有记录</td>
+<td style="text-align:left"><code>Data does not exist, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:left">从查询结果页返回后，修改主键</td>
+<td style="text-align:left">主键组合 (Product class, Number, Market)</td>
+<td style="text-align:left">用户修改了从结果页带回的主键值，尝试进行 Update 操作时</td>
+<td style="text-align:left"><code>Primary key conflict, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:left">Update 按钮点击</td>
+<td style="text-align:left">Variable 字段</td>
+<td style="text-align:left">Variable 去除前缀后，在 HDOC_VARIABLES 表中不存在</td>
+<td style="text-align:left"><code>Variant does not exist, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left">Delete 按钮点击</td>
+<td style="text-align:left">待删除记录</td>
+<td style="text-align:left">根据 (Product class, Number, Market) 无法查询到现有记录</td>
+<td style="text-align:left"><code>Data does not exist, Please enter the correct content</code></td>
+<td style="text-align:left">显示错误消息，阻止提交</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-结果处理">3.3 结果处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">操作类型</th>
+<th style="text-align:left">成功处理</th>
+<th style="text-align:left">失败处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Search</td>
+<td style="text-align:left">跳转至查询结果页显示数据</td>
+<td style="text-align:left">在画面显眼位置显示具体的错误消息</td>
+</tr>
+<tr>
+<td style="text-align:left">Add</td>
+<td style="text-align:left">显示 "新增成功" 提示，刷新列表</td>
+<td style="text-align:left">在画面显眼位置显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:left">Update</td>
+<td style="text-align:left">显示 "更新成功" 提示</td>
+<td style="text-align:left">在画面显眼位置显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:left">Delete</td>
+<td style="text-align:left">显示 "删除成功" 提示</td>
+<td style="text-align:left">在画面显眼位置显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:left">Clear</td>
+<td style="text-align:left">所有输入字段清空</td>
+<td style="text-align:left">-</td>
+</tr>
+</tbody>
+</table>
+<ol start="14">
+<li>
+<p><strong>结果处理</strong>：</p>
+<ul>
+<li><strong>成功</strong>：显示 "更新成功" 提示。</li>
+<li><strong>失败</strong>：显示对应错误消息（"Data does not exist..." 或 "Primary key conflict..." 或 "Variant does not exist..."）。</li>
+</ul>
+</li>
+<li>
+<p><strong>开始</strong>：用户点击 "Delete" 按钮。</p>
+</li>
+<li>
+<p><strong>前置处理</strong>：获取 "Product class", "Number", "Market" 字段的当前值。</p>
+</li>
+<li>
+<p><strong>空值校验等 (Frontend Check)</strong>：</p>
+<ul>
+<li>若 "Product class", "Number", "Market" 任一为空：
+<ul>
+<li>设置 Message = <code>"Product class, Number, and Market are required for Delete operation."</code></li>
+<li><strong>终止</strong>流程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>存在性检查 (Backend Check)</strong>：</p>
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入 "Product class", "Number", "Market"。</li>
+<li>若 API 返回记录不存在：
+<ul>
+<li>设置 Message = <code>"Data does not exist, Please enter the correct content"</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>API调用 (Backend Check)</strong>：</p>
+<ul>
+<li>调用 <code>UD08SelectUserDefinedRules</code> API，传入"Product class", "Number", "Market"，检查记录是否存在。</li>
+<li>调用 <code>UD08Delete</code> API，传入 "Product class", "Number", "Market" 值，执行删除。</li>
+</ul>
+</li>
+<li>
+<p><strong>结果处理</strong>：</p>
+<ul>
+<li><strong>成功</strong>：显示 "删除成功" 提示。</li>
+<li><strong>失败</strong>：显示对应错误消息（"Data does not exist..."）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="32-校验详细规格表-1">3.2 校验详细规格表 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No.</th>
+<th style="text-align:center">检查时机</th>
+<th style="text-align:center">检查对象</th>
+<th style="text-align:center">检查条件</th>
+<th style="text-align:center">错误消息 (Message Content)</th>
+<th style="text-align:center">动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">Add 按钮点击</td>
+<td style="text-align:center">主键组合 (Product class, Number, Market)</td>
+<td style="text-align:center">数据库中已存在相同组合的记录</td>
+<td style="text-align:center"><code>Primary key conflict, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">Add 按钮点击</td>
+<td style="text-align:center">Variable 字段</td>
+<td style="text-align:center">Variable 去除前缀后，在 HDOC_VARIABLES 表中不存在</td>
+<td style="text-align:center"><code>Variant does not exist, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">Update 按钮点击</td>
+<td style="text-align:center">待更新记录</td>
+<td style="text-align:center">根据 (Product class, Number, Market) 无法查询到现有记录</td>
+<td style="text-align:center"><code>Data does not exist, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">从查询结果页返回后，修改主键</td>
+<td style="text-align:center">主键组合 (Product class, Number, Market)</td>
+<td style="text-align:center">用户修改了从结果页带回的主键值，尝试进行 Update 操作时</td>
+<td style="text-align:center"><code>Primary key conflict, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">Update 按钮点击</td>
+<td style="text-align:center">Variable 字段</td>
+<td style="text-align:center">Variable 去除前缀后，在 HDOC_VARIABLES 表中不存在</td>
+<td style="text-align:center"><code>Variant does not exist, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">Delete 按钮点击</td>
+<td style="text-align:center">待删除记录</td>
+<td style="text-align:center">根据 (Product class, Number, Market) 无法查询到现有记录</td>
+<td style="text-align:center"><code>Data does not exist, Please enter the correct content</code></td>
+<td style="text-align:center">显示错误消息，阻止提交</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
+<h3 id="41-ud08selectproductclassmaster">4.1 UD08SelectProductclassmaster </h3>
+<ul>
+<li><strong>功能</strong>：获取产品类别主数据列表。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/select-productclassmaster</code></li>
+</ul>
+<h4 id="request">Request </h4>
+<p>无参数</p>
+<h4 id="response-success-200">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span> <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"PC01"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"PC02"</span> <span class="token punctuation">}</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"System Error"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="42-ud08selectmarketmaster">4.2 UD08SelectMarketmaster </h3>
+<ul>
+<li><strong>功能</strong>：获取市场主数据列表。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/selectmarketmaster</code></li>
+</ul>
+<h4 id="request-1">Request </h4>
+<p>无参数</p>
+<h4 id="response-success-200-1">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span> <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"DE"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"US"</span> <span class="token punctuation">}</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-1">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"System Error"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="43-ud08selectuserdefinedrules">4.3 UD08SelectUserDefinedRules </h3>
+<ul>
+<li><strong>功能</strong>：根据主键组合查询 HDOC_USER_DEFINED_RULES 表，用于存在性检查。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/selectuserdefinedrules</code></li>
+</ul>
+<h4 id="request-2">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-2">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"count"</span><span class="token operator">:</span> <span class="token number">1</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-2">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"System Error"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="44-ud08selecthdocvariables">4.4 UD08SelectHdocvariables </h3>
+<ul>
+<li><strong>功能</strong>：根据 Variable 值查询 HDOC_VARIABLES 表，用于校验是否存在。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/selecthdocvariables</code></li>
+</ul>
+<h4 id="request-3">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-3">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"count"</span><span class="token operator">:</span> <span class="token number">1</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-3">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"System Error"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="45-ud08add">4.5 UD08Add </h3>
+<ul>
+<li><strong>功能</strong>：新增用户定义规则记录。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/add</code></li>
+</ul>
+<h4 id="request-4">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"val"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"vs"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"vs2"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"comments"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"addDate"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"deleteDate"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"updateUser"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"updateDatetime"</span><span class="token operator">:</span> <span class="token string">"datetime"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-4">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Added successfully"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-4">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Primary key conflict, Please enter the correct content"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="46-ud08update">4.6 UD08Update </h3>
+<ul>
+<li><strong>功能</strong>：更新用户定义规则记录。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/update</code></li>
+</ul>
+<h4 id="request-5">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"val"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"vs"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"vs2"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"comments"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"addDate"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"deleteDate"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"updateUser"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"updateDatetime"</span><span class="token operator">:</span> <span class="token string">"datetime"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-5">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Updated successfully"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-5">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Data does not exist, Please enter the correct content"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="47-ud08delete">4.7 UD08Delete </h3>
+<ul>
+<li><strong>功能</strong>：删除用户定义规则记录。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud08/delete</code></li>
+</ul>
+<h4 id="request-6">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"pc"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-6">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Deleted successfully"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400500-6">Response Error (400/500) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Data does not exist, Please enter the correct content"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">异常场景</th>
+<th style="text-align:left">处理方式</th>
+<th style="text-align:left">Message 显示内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">网络请求失败</td>
+<td style="text-align:left">前端捕获网络错误</td>
+<td style="text-align:left"><code>Network error. Please check your connection.</code></td>
+</tr>
+<tr>
+<td style="text-align:left">服务器内部错误 (500)</td>
+<td style="text-align:left">捕获异常，记录日志</td>
+<td style="text-align:left"><code>System error. Please contact support.</code></td>
+</tr>
+<tr>
+<td style="text-align:left">数据库操作异常 (非业务逻辑)</td>
+<td style="text-align:left">捕获异常</td>
+<td style="text-align:left"><code>Database operation failed. Please try again later.</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
+<ol>
+<li><strong>状态管理</strong>：
+<ul>
+<li>使用 React State 管理所有表单字段的状态，包括 pc, number, market, variable, val, vs, vs2, comments, addDate, deleteDate, updateUser, updateDatetime 等。</li>
+<li>管理下拉框选项状态，分别存储 Product class 和 Market 的选项数据。</li>
+<li>在组件挂载时调用 <code>UD08SelectProductclassmaster</code> 和 <code>UD08SelectMarketmaster</code> API 获取下拉框数据。</li>
+<li>实现本地存储（如 sessionStorage）逻辑，用于在从查询结果页返回时保存和恢复主键值（Product class, Number, Market）。</li>
+<li>从查询结果页返回时，需将返回的 "Product class", "Number", "Market" 值与本地存储的值进行一致性校验后进行 Update 操作。</li>
+</ul>
+</li>
+<li><strong>安全性</strong>：
+<ul>
+<li>对所有输入字段进行严格的正则校验，确保只接受允许的字符类型。</li>
+<li>Variable 字段的 TEMPLATE- 前缀处理逻辑需要在提交前执行。</li>
+<li>所有 API 请求必须通过 HTTPS 发送。</li>
+<li>不在前端日志中打印敏感数据。</li>
+</ul>
+</li>
+<li><strong>UI 细节</strong>：
+<ul>
+<li>Clear 按钮点击后应清空所有输入字段（包括下拉框和文本框）。</li>
+<li>Add、Update、Delete 按钮在提交过程中应设为 disabled 状态，防止重复提交。</li>
+<li>错误消息应以醒目方式显示，建议使用红色文字。</li>
+<li>成功消息应以适当方式提示用户操作结果。</li>
+<li>确保页面布局合理，按钮位置清晰易于操作。</li>
+</ul>
+</li>
+</ol>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
