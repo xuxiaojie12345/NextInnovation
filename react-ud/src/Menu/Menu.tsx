@@ -212,6 +212,13 @@ const Menu: React.FC = () => {
           label: "Privacy",
           type: "link",
         },
+        {
+          // ✅ 带有 Link - HDoc Help
+          id: "doc_hdoc_help",
+          label: "HDoc Help",
+          path: "/hdoc-help",
+          type: "link",
+        },
       ],
     },
   ];

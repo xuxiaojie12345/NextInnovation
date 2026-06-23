@@ -20,6 +20,7 @@ import ADChange from "./ADChange/ADChange";
 import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
 import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
 import SearchUser from "./SearchUser/SearchUser";
+import HDocHelp from "./HDocHelp/HDocHelp";
 
 function App() {
   return (
@@ -98,6 +99,10 @@ function App() {
               <Route
                 path='/search-user'
                 element={<SearchUser />}
+              />
+              <Route
+                path='/hdoc-help'
+                element={<HDocHelp />}
               />
             </Route>
           </Routes>
