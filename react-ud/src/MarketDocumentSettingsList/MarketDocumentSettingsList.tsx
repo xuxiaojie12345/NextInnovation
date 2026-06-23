@@ -32,15 +32,12 @@ const MarketDocumentSettingsList = () => {
 
       const API_BASE_URL = "http://localhost:8081";
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/ud20/getdocumentlist`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error("No data found");
@@ -77,8 +74,8 @@ const MarketDocumentSettingsList = () => {
 
     const selectedDocument = documents[selectedIndex];
 
-    // 将选中记录的数据保存到state，返回到前画面
-    navigate(-1, {
+    // 将选中记录的数据保存到state，返回到MarketDocumentSettings画面
+    navigate("/market-document-settings", {
       state: {
         selectedDocument: {
           documentType: selectedDocument.doctype,
@@ -101,12 +98,14 @@ const MarketDocumentSettingsList = () => {
     window.print();
   };
 
-  // 点击User链接：跳转到EDB User View页面
+  // 点击User链接：跳转到EDB User View页面，传递user值
   const handleUserClick = (username: string) => {
     if (!username || username === "-") {
       return;
     }
-    navigate(`/search-user?userid=${username}`);
+    navigate(`/edb-user-view/${encodeURIComponent(username)}`, {
+      state: { userid: username },
+    });
   };
 
   return (
@@ -186,15 +185,12 @@ const MarketDocumentSettingsList = () => {
                       <td className='mdsl-td'>VBC</td>
                       <td className='mdsl-td mdsl-link'>
                         {item.registerUser && item.registerUser !== "-" ? (
-                          <a
-                            href='#'
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleUserClick(item.registerUser);
-                            }}
+                          <button
+                            className='link-button'
+                            onClick={() => handleUserClick(item.registerUser)}
                           >
                             {item.registerUser}
-                          </a>
+                          </button>
                         ) : (
                           "-"
                         )}

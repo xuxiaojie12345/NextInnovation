@@ -27,7 +27,7 @@ const HDocHelp: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Link to='/HDocMarketDocumentSetting' className='help-link'>
+              <Link to='/market-document-settings-list' className='help-link'>
                 HDoc - Market Document Setting
               </Link>
             </li>
