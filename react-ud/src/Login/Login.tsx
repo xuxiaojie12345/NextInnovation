@@ -26,7 +26,7 @@ const Login: React.FC = () => {
         password: password.trim()
       };
 
-      const response = await fetch('http://localhost:8080/api/v1/hdoc/login', {
+      const response = await fetch('/api/v1/hdoc/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
