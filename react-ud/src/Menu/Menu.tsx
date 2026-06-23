@@ -114,6 +114,13 @@ const Menu: React.FC = () => {
           path: "ad-change",
           type: "link",
         },
+        {
+          // ✅ 带有 Link
+          id: "admin_markets",
+          label: "Markets in HDoc",
+          path: "/markets-in-hdoc",
+          type: "link",
+        },
       ],
     },
     {

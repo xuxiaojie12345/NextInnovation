@@ -1,0 +1,134 @@
+.markets-in-hdoc-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.page-title {
+  color: #000080;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #666666;
+  font-size: 16px;
+}
+
+.table-container {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  overflow-x: auto;
+}
+
+.markets-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.markets-table thead {
+  background-color: #e8e8e8;
+}
+
+.markets-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+  color: #000000;
+  border: 1px solid #999999;
+  background-color: #e8e8e8;
+}
+
+.market-column {
+  width: 120px;
+}
+
+.description-column {
+  width: auto;
+}
+
+.weights-column {
+  width: 160px;
+  text-align: center;
+}
+
+.markets-table td {
+  padding: 10px 15px;
+  text-align: left;
+  font-size: 14px;
+  color: #000000;
+  border: 1px solid #999999;
+  word-wrap: break-word;
+}
+
+.market-cell {
+  font-family: monospace;
+  font-weight: normal;
+}
+
+.description-cell {
+  font-weight: normal;
+}
+
+.weights-cell {
+  text-align: center;
+  font-weight: normal;
+}
+
+.weights-indicator {
+  color: #000000;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.weights-empty {
+  color: #cccccc;
+}
+
+.no-data-cell {
+  text-align: center;
+  padding: 40px;
+  color: #999999;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .markets-in-hdoc-container {
+    padding: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .markets-table th,
+  .markets-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .market-column {
+    width: 100px;
+  }
+
+  .weights-column {
+    width: 130px;
+  }
+}

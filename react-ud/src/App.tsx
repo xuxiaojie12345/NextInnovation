@@ -23,6 +23,7 @@ import SearchUser from "./SearchUser/SearchUser";
 import HDocHelp from "./HDocHelp/HDocHelp";
 import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
+import MarketsInHdoc from "./MarketsInHdoc/MarketsInHdoc";
 
 function App() {
   return (
@@ -38,14 +39,8 @@ function App() {
                 path='/generate-homologation-document'
                 element={<GenerateHomologationDocument />}
               />
-              <Route
-                path='/generate-document'
-                element={<GenerateDocument />}
-              />
-              <Route
-                path='/modify-document'
-                element={<ModifyDocument />}
-              />
+              <Route path='/generate-document' element={<GenerateDocument />} />
+              <Route path='/modify-document' element={<ModifyDocument />} />
               <Route
                 path='/save-modifications'
                 element={<SaveModifications />}
@@ -62,10 +57,7 @@ function App() {
                 path='/homologation-variables-result-list'
                 element={<HomologationVariablesResultList />}
               />
-              <Route
-                path='/hdoc-variables'
-                element={<HdocVariables />}
-              />
+              <Route path='/hdoc-variables' element={<HdocVariables />} />
               <Route
                 path='/hdoc-variables-result-list'
                 element={<HdocVariablesResultList />}
@@ -82,14 +74,8 @@ function App() {
                 path='/list-available-templates'
                 element={<ListAvailableTemplates />}
               />
-              <Route
-                path='/vin-plate'
-                element={<VinPlate />}
-              />
-              <Route
-                path='/ad-change'
-                element={<ADChange />}
-              />
+              <Route path='/vin-plate' element={<VinPlate />} />
+              <Route path='/ad-change' element={<ADChange />} />
               <Route
                 path='/hdoc-user-administration'
                 element={<HDocUserAdministration />}
@@ -98,22 +84,14 @@ function App() {
                 path='/hdoc-user-doc-administration'
                 element={<HDocUserDocAdministration />}
               />
-              <Route
-                path='/search-user'
-                element={<SearchUser />}
-              />
-              <Route
-                path='/hdoc-help'
-                element={<HDocHelp />}
-              />
+              <Route path='/search-user' element={<SearchUser />} />
+              <Route path='/hdoc-help' element={<HDocHelp />} />
               <Route
                 path='/DownloadAndPrintQuickGuides'
                 element={<DownloadAndPrintQuickGuides />}
               />
-              <Route
-                path='/document-types'
-                element={<DocumentTypes />}
-              />
+              <Route path='/document-types' element={<DocumentTypes />} />
+              <Route path='/markets-in-hdoc' element={<MarketsInHdoc />} />
             </Route>
           </Routes>
         </div>
