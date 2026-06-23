@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD06SaveModificationsMapper">
+
+    <!--
+        UD06 保存修改内容查询
+        查询 HDOC_ADCA_MODIFICATION 表中DOCTYP、VERS、VARIABLE、NEWVAL
+    -->
+    <select id="selectHdocAdcaModification" resultType="com.web.app.entity.UD06SaveModificationsVO">
+        SELECT
+            DOCTYPE AS doctype,
+            VERS AS vers,
+            VARIABLE AS variable,
+            NEWVAL AS newVal
+        FROM HDOC_ADCA_MODIFICATION
+        WHERE SERIE = #{chassisSerie}
+          AND CHNO = #{chassisNo}
+        LIMIT 1
+    </select>
+
+</mapper>

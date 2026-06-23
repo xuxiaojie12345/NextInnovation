@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD07VehicleSpecificationMapper">
+
+    <!--
+        UD07 车辆规格主数据查询
+        关联 HDOC_REC_DATA_VDA_GENERAL、HDOC_REC_DATA_OM 和 HDOC_REC_DATA_VDA_VARIANTS
+    -->
+    <select id="selectVehicleSpecification" resultType="com.web.app.entity.UD07VehicleSpecificationVO">
+        SELECT
+            om.MODEL AS model,
+            om.CUSTOMER_ADAP AS customerAdap,
+            vda.BUILD_WEEK AS buildWeek,
+            vda.PRODUCT_TYPE AS productType,
+            vda.VIN AS vin,
+            vda.COUNTRY_OF_OPERATION AS countryOfOperation,
+            variants.FAMILY_ID AS familyId,
+            variants.VARIANT_ID AS variantId
+        FROM HDOC_REC_DATA_VDA_GENERAL vda
+        INNER JOIN HDOC_REC_DATA_OM om
+            ON vda.SERIE = om.SERIE
+           AND vda.CHNR = om.CHNR
+        INNER JOIN HDOC_REC_DATA_VDA_VARIANTS variants
+            ON vda.SERIE = variants.SERIE
+           AND vda.CHNR = variants.CHNR
+        WHERE vda.SERIE = #{serie}
+          AND vda.CHNR = #{chno}
+        LIMIT 1
+    </select>
+
+    <!--
+        UD07 KOLA 变体列表查询
+    -->
+    <select id="selectKolaVariants" resultType="com.web.app.entity.UD07KolaVariantVO">
+        SELECT
+            SYMBOL AS symbol,
+            FUNCTION_GROUP AS functionGroup,
+            DESCRIPTION AS description,
+            FAMILY_ID AS familyId
+        FROM HDOC_REC_DATA_KOLA_VARIANT
+        WHERE FAMILY_ID = #{familyId}
+          AND VARIANT_ID = #{variantId}
+        ORDER BY SYMBOL, FUNCTION_GROUP
+    </select>
+
+</mapper>

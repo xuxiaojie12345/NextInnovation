@@ -62,16 +62,19 @@ const UD05_ModifyDocument: React.FC = () => {
   useEffect(() => {
     // 从路由state获取前画面传来的参数
     const state = location.state as any;
+    const series = state?.chassisSerie || state?.chassisSeries || "";
     if (state) {
-      setChassisSerie(state.chassisSerie || "");
+      setChassisSerie(series);
       setChassisNo(state.chassisNo || "");
       setMarket(state.market || "");
     }
 
     // 调用API获取数据
-    if (state?.chassisSerie && state?.chassisNo) {
-      fetchModifyDocumentData(state.chassisSerie, state.chassisNo);
+    if (series && state?.chassisNo) {
+      console.log("组件加载，获取修改文档数据，参数:", series, state.chassisNo);
+      fetchModifyDocumentData(series, state.chassisNo);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
   // ==================== API调用 ====================
@@ -89,25 +92,27 @@ const UD05_ModifyDocument: React.FC = () => {
     setMessage("");
     
     try {
-      const response = await apiClient.post("/api/ud05/selectmodifydocument", {
-        chassisSerie: chassisSerie,
-        chassisNo: chassisNo
+      const response = await apiClient.get("/api/ud05/selectmodifydocument", {
+        params: {
+          chassisSerie: chassisSerie,
+          chassisNo: chassisNo
+        }
       });
 
       if (response.data.code === 200 && response.data.data) {
-        // 解析返回数据，填充DataTable
-        const data = response.data.data;
-        
-        // 将API返回的数据转换为前端需要的格式
-        const variableList: VariableItem[] = [
-          {
-            variable: data.variable || "",
-            description: data.description || "",
-            currentValue: data.newval || "",
-            modifiedValue: ""
-          }
-        ];
-        
+        console.log("获取修改文档数据成功:", response.data);
+        // 解析返回数据，填充DataTable，支持多条记录
+        const rows = Array.isArray(response.data.data)
+          ? response.data.data
+          : [response.data.data];
+
+        const variableList: VariableItem[] = rows.map((row: any) => ({
+          variable: row?.variable || "",
+          description: row?.description || "",
+          currentValue: row?.newVal || row?.newval || "",
+          modifiedValue: ""
+        }));
+
         setVariables(variableList);
       } else {
         // API返回失败
@@ -139,7 +144,11 @@ const UD05_ModifyDocument: React.FC = () => {
    * @param chassisNo - 底盘编号
    * @param description - 描述
    */
-  const updateModifyDocumentData = async (chassisSerie: string, chassisNo: string, description: string) => {
+  const updateModifyDocumentData = async (
+    chassisSerie: string,
+    chassisNo: string,
+    modifiedItems: Array<{ variable: string; currentValue: string; modifiedValue: string }>
+  ) => {
     setIsLoading(true);
     setMessage("");
     
@@ -147,7 +156,7 @@ const UD05_ModifyDocument: React.FC = () => {
       const response = await apiClient.post("/api/ud05/updatemodifydocument", {
         chassisSerie: chassisSerie,
         chassisNo: chassisNo,
-        description: description
+        modifiedItems: modifiedItems
       });
 
       if (response.data.code === 200) {
@@ -223,9 +232,18 @@ const UD05_ModifyDocument: React.FC = () => {
       return;
     }
 
-    // 调用更新API（这里简化处理，只传递第一个修改项的描述）
-    // 实际项目中可能需要批量更新多个变量
-    updateModifyDocumentData(chassisSerie, chassisNo, modifiedItems[0].description);
+    // 调用更新API，提交所有有修改的行
+    const payloadItems = modifiedItems.map(item => ({
+      variable: item.variable,
+      currentValue: item.currentValue,
+      modifiedValue: item.modifiedValue
+    }));
+
+    updateModifyDocumentData(
+      chassisSerie,
+      chassisNo,
+      payloadItems
+    );
   };
 
   /**
@@ -262,6 +280,7 @@ const UD05_ModifyDocument: React.FC = () => {
     navigate("/UD07", {
       state: {
         chassisSerie: chassisSerie,
+        chassisSeries: chassisSerie,
         chassisNo: chassisNo
       }
     });
@@ -283,9 +302,18 @@ const UD05_ModifyDocument: React.FC = () => {
       {/* 基本信息区域 */}
       <div className="ud05-info-section">
         <div className="ud05-info-item">
-          <label className="ud05-info-label">Chassis no:</label>
-          <span className="ud05-info-value ud05-link" onClick={handleChassisNoClick}>
-            {chassisNo || "-"}
+          <label className="ud05-info-label ud05-label-bold">Chassis no:</label>
+          <span className="ud05-info-value">
+            {chassisSerie ? (
+              <strong className="ud05-info-value-strong">{chassisSerie}</strong>
+            ) : null}
+            {chassisSerie && chassisNo ? " " : ""}
+            <span
+              className={chassisNo ? "ud05-info-value ud05-link" : "ud05-info-value"}
+              onClick={chassisNo ? handleChassisNoClick : undefined}
+            >
+              {chassisNo || "-"}
+            </span>
           </span>
         </div>
         <div className="ud05-info-item">
@@ -304,7 +332,7 @@ const UD05_ModifyDocument: React.FC = () => {
       <div className="ud05-table-section">
         <div className="ud05-button-section">
           <button
-            className="ud05-btn ud05-btn-save"
+            className="ud05-btn"
             onClick={handleSaveClick}
             disabled={isLoading || variables.length === 0}
           >

@@ -5,8 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-
+import java.io.Serializable;import java.util.List;
 /**
  * UD05 修改文档变量更新请求对象
  *
@@ -30,9 +29,22 @@ public class UD05ModifyDocumentUpdateRequest implements Serializable {
     @ApiModelProperty(value = "底盘编号", required = true, example = "1234567890", notes = "必填，最大10字符，半角数字")
     private String chassisNo;
 
-    @ApiModelProperty(value = "当前值", required = true, example = "CurrentValue", notes = "必填，用于定位待更新记录")
-    private String currentValue;
+    @ApiModelProperty(value = "修改项列表", required = true, notes = "包含需要更新的变量、当前值和修改后的值")
+    private List<ModifyItem> modifiedItems;
 
-    @ApiModelProperty(value = "修改后的新值", required = true, example = "ModifiedValue", notes = "必填，要更新到 HDOC_ADCA_MODIFICATION.NEWVAL 字段")
-    private String modifiedValue;
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "UD05修改文档变量更新项", description = "每个要更新的变量行")
+    public static class ModifyItem implements Serializable {
+
+        @ApiModelProperty(value = "变量编码", required = true, example = "VAR001", notes = "用于唯一定位要更新的变量")
+        private String variable;
+
+        @ApiModelProperty(value = "当前值", required = true, example = "CurrentValue", notes = "当前值，用于比较与定位")
+        private String currentValue;
+
+        @ApiModelProperty(value = "修改后的新值", required = true, example = "ModifiedValue", notes = "要更新的新值")
+        private String modifiedValue;
+    }
 }

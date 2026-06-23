@@ -3,13 +3,18 @@ package com.web.app.service.impl;
 import com.web.app.dto.UD05ModifyDocumentRequest;
 import com.web.app.dto.UD05ModifyDocumentResponse;
 import com.web.app.dto.UD05ModifyDocumentUpdateRequest;
+import com.web.app.dto.UD05ModifyDocumentUpdateRequest.ModifyItem;
 import com.web.app.entity.UD05ModifyDocumentVO;
 import com.web.app.mapper.UD05ModifyDocumentMapper;
 import com.web.app.service.UD05ModifyDocumentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * UD05 修改文档变量服务实现类
@@ -38,22 +43,25 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
-            UD05ModifyDocumentVO vo = ud05Mapper.selectVariableModification(request.getChassisSerie(), request.getChassisNo());
-            if (vo == null) {
+            List<UD05ModifyDocumentVO> voList = ud05Mapper.selectVariableModification(request.getChassisSerie(), request.getChassisNo());
+            if (voList == null || voList.isEmpty()) {
                 log.warn("UD05查询未找到记录，chassisSerie: {}, chassisNo: {}", request.getChassisSerie(), request.getChassisNo());
                 return UD05ModifyDocumentResponse.error(404, "Record not found.");
             }
 
-            UD05ModifyDocumentResponse.ModifyDocumentData data = new UD05ModifyDocumentResponse.ModifyDocumentData();
-            data.setChassisSerie(vo.getChassisSerie());
-            data.setChassisNo(vo.getChassisNo());
-            data.setVariable(vo.getVariable());
-            data.setDescription(vo.getDescription());
-            data.setOldVal(vo.getOldVal());
-            data.setNewVal(vo.getNewVal());
-            data.setSta(vo.getSta());
+            List<UD05ModifyDocumentResponse.ModifyDocumentData> dataList = voList.stream().map(vo -> {
+                UD05ModifyDocumentResponse.ModifyDocumentData item = new UD05ModifyDocumentResponse.ModifyDocumentData();
+                item.setChassisSerie(vo.getChassisSerie());
+                item.setChassisNo(vo.getChassisNo());
+                item.setVariable(vo.getVariable());
+                item.setDescription(vo.getDescription());
+                item.setOldVal(vo.getOldVal());
+                item.setNewVal(vo.getNewVal());
+                item.setSta(vo.getSta());
+                return item;
+            }).collect(Collectors.toList());
 
-            return UD05ModifyDocumentResponse.success(data);
+            return UD05ModifyDocumentResponse.success(dataList);
         } catch (Exception e) {
             log.error("UD05查询失败", e);
             return UD05ModifyDocumentResponse.error(500, "System error. Please try again later.");
@@ -61,6 +69,7 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
     }
 
     @Override
+    @Transactional
     public UD05ModifyDocumentResponse UD05UpdateHdocAdcaModification(UD05ModifyDocumentUpdateRequest request) {
         log.info("开始UD05更新，request: {}", request);
 
@@ -71,20 +80,27 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
-            UD05ModifyDocumentVO existing = ud05Mapper.selectVariableModificationByDescription(
-                    request.getChassisSerie(), request.getChassisNo(), request.getDescription());
-            if (existing == null) {
-                log.warn("UD05更新未找到匹配记录，chassisSerie: {}, chassisNo: {}, description: {}",
-                        request.getChassisSerie(), request.getChassisNo(), request.getDescription());
-                return UD05ModifyDocumentResponse.error(404, "Record not found.");
+            int totalUpdated = 0;
+            for (ModifyItem item : request.getModifiedItems()) {
+                if (item == null) {
+                    continue;
+                }
+                String variable = item.getVariable();
+                String currentValue = item.getCurrentValue();
+                String modifiedValue = item.getModifiedValue();
+
+                int updatedRows = ud05Mapper.updateHdocAdcaModificationByVariable(
+                        request.getChassisSerie(), request.getChassisNo(), variable, currentValue, modifiedValue);
+                if (updatedRows <= 0) {
+                    log.warn("UD05更新未修改任何记录，chassisSerie: {}, chassisNo: {}, variable: {}, currentValue: {}",
+                            request.getChassisSerie(), request.getChassisNo(), variable, currentValue);
+                    return UD05ModifyDocumentResponse.error(500, "Update failed.");
+                }
+                totalUpdated += updatedRows;
             }
 
-            int updatedRows = ud05Mapper.updateHdocAdcaModification(
-                    request.getChassisSerie(), request.getChassisNo(), request.getDescription(), request.getNewVal());
-            if (updatedRows <= 0) {
-                log.warn("UD05更新未修改任何记录，chassisSerie: {}, chassisNo: {}, description: {}",
-                        request.getChassisSerie(), request.getChassisNo(), request.getDescription());
-                return UD05ModifyDocumentResponse.error(500, "Update failed.");
+            if (totalUpdated <= 0) {
+                return UD05ModifyDocumentResponse.error(500, "No records were updated.");
             }
 
             return UD05ModifyDocumentResponse.successNoData("Update successful");
@@ -127,17 +143,28 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
         if (baseError != null) {
             return baseError;
         }
-        if (!StringUtils.hasText(request.getDescription())) {
-            return "Description is required.";
+        if (request.getModifiedItems() == null || request.getModifiedItems().isEmpty()) {
+            return "At least one modified item is required.";
         }
-        if (request.getDescription().length() > 100) {
-            return "Description must be at most 100 characters.";
-        }
-        if (!StringUtils.hasText(request.getNewVal())) {
-            return "New value is required.";
-        }
-        if (request.getNewVal().length() > 200) {
-            return "New value must be at most 200 characters.";
+        for (UD05ModifyDocumentUpdateRequest.ModifyItem item : request.getModifiedItems()) {
+            if (item == null) {
+                return "Modified item cannot be null.";
+            }
+            if (!StringUtils.hasText(item.getVariable())) {
+                return "Variable is required for each modified item.";
+            }
+            if (!StringUtils.hasText(item.getCurrentValue())) {
+                return "Current value is required for each modified item.";
+            }
+            if (item.getCurrentValue().length() > 200) {
+                return "Current value must be at most 200 characters.";
+            }
+            if (!StringUtils.hasText(item.getModifiedValue())) {
+                return "Modified value is required for each modified item.";
+            }
+            if (item.getModifiedValue().length() > 200) {
+                return "Modified value must be at most 200 characters.";
+            }
         }
         return null;
     }

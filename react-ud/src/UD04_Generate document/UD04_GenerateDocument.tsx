@@ -132,9 +132,9 @@ const UD04_GenerateDocument: React.FC = () => {
           newval: data.newval || '',
           variable: data.variable || '',
           // 条件处理：根据ACT值决定是否显示Modify Doc Link
-          // 条件处理：根据S-Note数据决定是否显示S-Note Message
-          sNoteNo: data.sNoteNo || '',
-          sNoteMessage: data.sNoteNo ? 'The S-Notes above can affect homologation documents.' : '',
+          // S-Note NO 应该来自数据库字段 CUSTOMER_ADAP
+          sNoteNo: data.customerAdap || '',
+          sNoteMessage: data.customerAdap ? 'The S-Notes above can affect homologation documents.' : '',
           // 设置replacingParameters
           replacingParameters: data.variable ? `AD Change. Modifying:${data.variable}` : '',
           // 设置服务器日期
@@ -231,6 +231,7 @@ const UD04_GenerateDocument: React.FC = () => {
       // 跳转到UD07 VDA - Vehicle Specification画面
       navigate('/UD07', {
         state: {
+          chassisSeries: stateData.chassisSeries,
           chassisNo: stateData.chassisNo,
         },
       });
@@ -261,7 +262,7 @@ const UD04_GenerateDocument: React.FC = () => {
     <div className='ud04-container'>
       <div className='ud04-content'>
         {/* ページタイトル */}
-        <h1 className='page-title'>HDoc - Generate Document</h1>
+        <h1 className='page-title'>Generate Document</h1>
 
         {/* エラーメッセージエリア */}
         {/* 对应设计文档 2.1 控件属性表 No.17 */}
@@ -284,7 +285,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* Chassis no */}
             {/* 对应设计文档 2.1 控件属性表 No.1 */}
             <div className='result-item'>
-              <label className='result-label'>Chassis no:</label>
+              <label className='result-label-chassisNo'>Chassis no:</label>
               <span 
                 className='result-value link-blue'
                 onClick={handleChassisNoClick}
@@ -299,6 +300,11 @@ const UD04_GenerateDocument: React.FC = () => {
             <div className='result-item'>
               <label className='result-label'>Ordernumber:</label>
               <span className='result-value'>{state.ordernumber || '-'}</span>
+            </div>
+
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
             </div>
 
             {/* Build week */}
@@ -329,12 +335,18 @@ const UD04_GenerateDocument: React.FC = () => {
               <span className='result-value'>{state.masterMarket}</span>
             </div>
 
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
+            </div>
+
             {/* S-Note NO */}
             {/* 对应设计文档 2.1 控件属性表 No.7 */}
             {state.sNoteNo && (
               <div className='result-item'>
-                <label className='result-label'>S-Note NO:</label>
-                <span className='result-value'>{state.sNoteNo}</span>
+                {/* <label className='result-label'>S-Note NO:</label> */}
+                <label className='result-value'>{state.sNoteNo}</label>
+                {/* <span className='result-value'>{state.sNoteNo}</span> */}
               </div>
             )}
 
@@ -346,11 +358,21 @@ const UD04_GenerateDocument: React.FC = () => {
               </div>
             )}
 
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
+            </div>
+            
             {/* Load Index */}
             {/* 对应设计文档 2.1 控件属性表 No.9 */}
             <div className='result-item'>
               <label className='result-label'>Load Index:</label>
               <span className='result-value'>{state.loadIndex || '-'}</span>
+            </div>
+
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
             </div>
 
             {/* Analyze Rules */}
@@ -364,6 +386,11 @@ const UD04_GenerateDocument: React.FC = () => {
               >
                 Analyze Rules
               </span>
+            </div>
+
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
             </div>
 
             {/* Modify Doc Link */}
@@ -397,19 +424,37 @@ const UD04_GenerateDocument: React.FC = () => {
               </div>
             )}
 
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
+            </div>
+            
             {/* Generated document */}
             {/* 对应设计文档 2.1 控件属性表 No.14 */}
             <div className='result-item'>
-              <label className='result-label'>Generated document:</label>
-              <span 
+              {/* <label className='result-label'>Generated document:</label> */}
+              <label className='result-value link-blue'
+                onClick={handleGeneratedDocClick}
+                style={{ cursor: 'pointer' }}>Generated document:</label>
+              {/* <span 
                 className='result-value link-blue'
                 onClick={handleGeneratedDocClick}
                 style={{ cursor: 'pointer' }}
               >
                 Download/View Document
-              </span>
+              </span> */}
             </div>
 
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
+            </div>
+            
+            {/* 空白行 */}
+            <div className='result-item'>
+              <label className='result-label'></label>
+            </div>
+            
             {/* Date */}
             {/* 对应设计文档 2.1 控件属性表 No.15 */}
             <div className='result-item'>

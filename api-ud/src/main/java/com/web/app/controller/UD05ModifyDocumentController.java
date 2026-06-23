@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,13 +51,14 @@ public class UD05ModifyDocumentController {
         return response;
     }
 
-    @PutMapping("/updatemodifydocument")
-    @ApiOperation(value = "更新修改文档变量", notes = "根据底盘系列、底盘编号、描述和新值更新文档变量")
+    @PostMapping("/updatemodifydocument")
+    @ApiOperation(value = "更新修改文档变量", notes = "根据底盘系列、底盘编号、批量修改项更新文档变量")
     public UD05ModifyDocumentResponse updateModifyDocument(
             @RequestBody UD05ModifyDocumentUpdateRequest request) {
 
-        log.info("收到UD05更新请求，chassisSerie: {}, chassisNo: {}, currentValue: {}, modifiedValue: {}",
-                request.getChassisSerie(), request.getChassisNo(), request.getCurrentValue(), request.getModifiedValue());
+        int itemCount = request.getModifiedItems() == null ? 0 : request.getModifiedItems().size();
+        log.info("收到UD05更新请求，chassisSerie: {}, chassisNo: {}, modifiedItemsCount: {}",
+                request.getChassisSerie(), request.getChassisNo(), itemCount);
 
         UD05ModifyDocumentResponse response = ud05Service.UD05UpdateHdocAdcaModification(request);
 

@@ -5,21 +5,20 @@
 .ud05-container {
   min-height: 100vh;
   background-color: #ffffff;
-  padding: 20px 30px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* ==================== 标题样式 ==================== */
 .ud05-container .ud05-title {
   color: #003366;
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 30px;
-  text-align: center;
-  letter-spacing: 1px;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  text-align: left;
 }
 
 /* ==================== 错误消息样式 ==================== */
@@ -39,24 +38,21 @@
 .ud05-container .ud05-info-section {
   width: 100%;
   max-width: 1100px;
-  background-color: #ffffff;
-  border-radius: 4px;
-  border: 1px solid #d9e6f6;
-  padding: 14px 18px;
-  margin-bottom: 18px;
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
+  padding: 0;
+  margin-bottom: 22px;
 }
 
 .ud05-container .ud05-info-item {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e8e8e8;
+  margin-bottom: 8px;
 }
 
 .ud05-container .ud05-info-item:last-child {
   margin-bottom: 0;
-  border-bottom: none;
 }
 
 .ud05-container .ud05-info-label {
@@ -67,10 +63,22 @@
   margin-right: 10px;
 }
 
+.ud05-container .ud05-label-bold {
+  font-weight: 700;
+}
+
 .ud05-container .ud05-info-value {
   color: #666666;
   font-size: 15px;
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ud05-container .ud05-info-value-strong {
+  color: #333333;
+  font-weight: 700;
 }
 
 /* 链接样式 */
@@ -89,13 +97,14 @@
 .ud05-container .ud05-table-section {
   width: 100%;
   max-width: 1100px;
-  background-color: #ffffff;
+  background-color: #f9fbff;
   border-radius: 4px;
   border: 1px solid #c8dff2;
-  padding: 12px 12px 20px 12px;
+  padding: 12px 0px 0px 0px;
   margin-bottom: 30px;
   overflow-x: auto;
   position: relative;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
 }
 
 .ud05-container .ud05-table {
@@ -107,20 +116,21 @@
 
 /* 表头样式 */
 .ud05-container .ud05-th {
-  background-color: #eaf4ff;
+  background-color: ghostwhite
+;
   color: #003366;
   padding: 12px 14px;
   text-align: left;
   font-weight: 700;
   font-size: 13px;
-  border-bottom: 1px solid #c8e1ff;
+  border: 1px solid #d9e6f6;
   white-space: nowrap;
 }
 
 /* 表格单元格样式 */
 .ud05-container .ud05-td {
   padding: 10px 12px;
-  border-bottom: 1px solid #e6f0fa;
+  border: 1px solid #d9e6f6;
   font-size: 13px;
   color: #333333;
   vertical-align: middle;
@@ -128,11 +138,19 @@
 
 /* 修改行高亮样式 */
 .ud05-container .ud05-modified-row {
-  background-color: #fbfdff;
+  background-color: #f4f9ff;
 }
 
 .ud05-container .ud05-modified-row:hover {
-  background-color: #f0fbff;
+  background-color: #e9f3ff;
+}
+
+.ud05-container .ud05-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.ud05-container .ud05-table tbody tr:nth-child(even) {
+  background-color: #fbfdff;
 }
 
 /* 空数据提示 */
@@ -176,30 +194,28 @@
   justify-content: flex-start;
   gap: 12px;
   margin-bottom: 8px;
+  
 }
 
 /* Save按钮样式 */
 .ud05-container .ud05-btn {
-  padding: 8px 14px;
-  border: 1px solid #bcdaf7;
-  border-radius: 3px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
   cursor: pointer;
-  transition: all 0.15s ease;
   outline: none;
-  background-color: #ffffff;
+  margin-left: 10px;
+  transition: all 0.15s ease;
+ 
 }
 
-.ud05-container .ud05-btn-save {
-  background-color: #f5f9ff;
-  color: #003366;
-}
 
 .ud05-container .ud05-btn-save:hover:not(:disabled) {
-  background-color: #e9f4ff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 80, 179, 0.12);
+  background-color: #f3f7ff;
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .ud05-container .ud05-btn-save:active:not(:disabled) {

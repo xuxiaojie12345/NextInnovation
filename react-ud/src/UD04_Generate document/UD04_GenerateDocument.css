@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 20px;
+  /* padding: 20px; */
   font-family: Arial, sans-serif;
 }
 
@@ -57,19 +57,25 @@
 }
 
 .ud04-container .result-item {
-  display: flex;
+  /* display: flex; */
   align-items: flex-start;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  /* padding: 10px 0; */
+  /* border-bottom: 1px solid #f0f0f0; */
 }
 
 .ud04-container .result-item:last-child {
   border-bottom: none;
 }
-
-.ud04-container .result-label {
+.ud04-container .result-label-chassisNo {
   flex: 0 0 200px;
   font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  padding-right: 10px;
+}
+.ud04-container .result-label {
+  flex: 0 0 200px;
+  /* font-weight: bold; */
   color: #333;
   font-size: 14px;
   padding-right: 10px;
@@ -95,7 +101,9 @@
 
 .ud04-container .link-red {
   color: #ff4d4f;
-  font-weight: bold;
+  /* font-weight: bold;
+  font-style: normal;
+  font-size: 14px; */
   text-decoration: underline;
   transition: color 0.2s;
 }
@@ -106,15 +114,15 @@
 
 /* ==================== S-Note 消息特殊样式 ==================== */
 .ud04-container .s-note-message {
-  background-color: #fffbe6;
-  border-left: 3px solid #faad14;
-  padding: 10px 15px;
-  margin: 10px 0;
+  background-color: transparent;
+  border-left: none;
+  /* padding: 10px 15px; */
+  margin: 2px 0;
 }
 
 .ud04-container .s-note-message .result-value {
-  color: #d48806;
-  font-style: italic;
+  color: #ff4d4f;
+  font-style: normal;
 }
 
 /* ==================== 页脚支持信息 ==================== */

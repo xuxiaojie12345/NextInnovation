@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class UD05ModifyDocumentResponse implements Serializable {
     private String msg;
 
     @ApiModelProperty(value = "响应数据")
-    private ModifyDocumentData data;
+    private List<ModifyDocumentData> data;
 
     @ApiModelProperty(value = "消息列表")
     private List<MessageItem> messageList;
@@ -77,11 +78,19 @@ public class UD05ModifyDocumentResponse implements Serializable {
         private String message;
     }
 
-    public static UD05ModifyDocumentResponse success(ModifyDocumentData data) {
+    public static UD05ModifyDocumentResponse success(List<ModifyDocumentData> data) {
         UD05ModifyDocumentResponse response = new UD05ModifyDocumentResponse();
         response.setCode(200);
         response.setMsg("查询成功");
         response.setData(data);
+        return response;
+    }
+
+    public static UD05ModifyDocumentResponse success(ModifyDocumentData data) {
+        UD05ModifyDocumentResponse response = new UD05ModifyDocumentResponse();
+        response.setCode(200);
+        response.setMsg("查询成功");
+        response.setData(data == null ? null : Collections.singletonList(data));
         return response;
     }
 

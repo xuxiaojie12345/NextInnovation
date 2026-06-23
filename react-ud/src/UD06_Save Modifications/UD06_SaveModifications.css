@@ -1,0 +1,129 @@
+.ud06-container {
+  min-height: 100vh;
+  /* display: flex; */
+  justify-content: center;
+  align-items: center;
+  background-color: #e9eef6;
+  padding: 24px 12px;
+}
+
+.ud06-card {
+  width: 100%;
+  max-width: 520px;
+  background-color: #ffffff;
+  /* border: 1px solid #2d5fa3; */
+  border-radius: 8px;
+  padding: 28px 26px;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ud06-title {
+  margin: 0 0 20px;
+  color: #1f4c8b;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  /* border-bottom: 1px solid #c7d8f0; */
+  padding-bottom: 12px;
+}
+
+.ud06-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: -5px;
+}
+.ud06-row-empty1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.ud06-row-empty2 { 
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.ud06-label {
+  display: inline-block;
+  /* min-width: 160px; */
+  color: #1e3b67;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.ud06-value {
+  display: inline-block;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+  word-break: break-word;
+  padding-left: 10px;
+}
+
+.ud06-message-box {
+  /* margin-top: 24px;
+  padding: 10px 14px; */
+  border-radius: 4px;
+  background-color: #16a34a;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  width: 170px;
+}
+
+.ud06-error-message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 4px;
+  background-color: #fff1f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ud06-close-button {
+
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  /* min-width: 70px; */
+
+}
+
+.ud06-close-button:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  border-color: #6b7280;
+}
+
+.ud06-close-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .ud06-card {
+    padding: 20px 18px;
+  }
+
+  .ud06-label {
+    min-width: 120px;
+    width: 100%;
+  }
+
+  .ud06-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
