@@ -25,6 +25,8 @@ import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadA
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
 import MarketsInHdoc from "./MarketsInHdoc/MarketsInHdoc";
 import EdbUserView from "./EdbUserView/EdbUserView";
+import MarketDocumentSettings from "./MarketDocumentSettings/MarketDocumentSettings";
+import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocumentSettingsList";
 
 function App() {
   return (
@@ -96,6 +98,14 @@ function App() {
               <Route
                 path='/edb-user-view/:username'
                 element={<EdbUserView />}
+              />
+              <Route
+                path='/market-document-settings'
+                element={<MarketDocumentSettings />}
+              />
+              <Route
+                path='/market-document-settings-list'
+                element={<MarketDocumentSettingsList />}
               />
             </Route>
           </Routes>

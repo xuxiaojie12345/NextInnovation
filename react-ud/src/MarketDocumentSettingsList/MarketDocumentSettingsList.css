@@ -1,0 +1,177 @@
+/* MarketDocumentSettingsList.css - UD20模块 */
+
+.mdsl-container {
+  width: 100%;
+  min-height: 100%;
+  background-color: #ffffff;
+  padding: 10px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* 标题 */
+.mdsl-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000080;
+  margin: 0 0 10px 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 错误消息 */
+.mdsl-error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef5350;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* 边框容器 */
+.mdsl-border-box {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;
+  border: 1px solid #99b4d1;
+  background-color: #ffffff;
+}
+
+/* 按钮区域 */
+.mdsl-button-bar {
+  background-color: #e8eef8;
+  margin-bottom: 0;
+  display: flex;
+  gap: 3px;
+  padding: 5px;
+  justify-content: flex-start;
+  border-bottom: 1px solid #99b4d1;
+}
+
+.mdsl-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #a0a0c0;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #000000;
+  min-width: 60px;
+  height: 24px;
+}
+
+.mdsl-btn:hover:not(:disabled) {
+  background-color: #d0d0e0;
+}
+
+.mdsl-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 表格容器 */
+.mdsl-table-container {
+  overflow-x: auto;
+  padding: 0;
+}
+
+/* 加载状态 */
+.mdsl-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 12px;
+}
+
+/* 数据表格 */
+.mdsl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+}
+
+.mdsl-table thead {
+  background-color: #e8eef8;
+}
+
+.mdsl-th {
+  border: 1px solid #99b4d1;
+  padding: 4px 6px;
+  text-align: left;
+  font-weight: bold;
+  color: #000080;
+  white-space: nowrap;
+  background-color: #e8eef8;
+}
+
+.mdsl-td {
+  border: 1px solid #99b4d1;
+  padding: 3px 6px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* 偶数行背景色（浅蓝色） */
+.mdsl-row-even {
+  background-color: #e8eef8;
+}
+
+/* 奇数行背景色（白色） */
+.mdsl-row-odd {
+  background-color: #ffffff;
+}
+
+/* RadioBox列 */
+.mdsl-radio-col {
+  width: 30px;
+  text-align: center;
+  padding: 3px 6px;
+  border: 1px solid #99b4d1;
+}
+
+.mdsl-radio-col input[type="radio"] {
+  cursor: pointer;
+  margin: 0;
+}
+
+/* 无数据提示 */
+.mdsl-no-data {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* 链接样式 */
+.mdsl-link a {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mdsl-link a:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
+/* 打印样式 */
+@media print {
+  .mdsl-container {
+    padding: 0;
+  }
+
+  .mdsl-button-bar {
+    display: none;
+  }
+
+  .mdsl-table {
+    font-size: 10px;
+  }
+
+  .mdsl-th,
+  .mdsl-td {
+    padding: 3px 4px;
+  }
+}
