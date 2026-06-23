@@ -21,6 +21,7 @@ import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministrat
 import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
 import SearchUser from "./SearchUser/SearchUser";
 import HDocHelp from "./HDocHelp/HDocHelp";
+import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
 
 function App() {
   return (
@@ -103,6 +104,10 @@ function App() {
               <Route
                 path='/hdoc-help'
                 element={<HDocHelp />}
+              />
+              <Route
+                path='/DownloadAndPrintQuickGuides'
+                element={<DownloadAndPrintQuickGuides />}
               />
             </Route>
           </Routes>

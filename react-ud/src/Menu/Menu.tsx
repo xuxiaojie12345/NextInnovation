@@ -185,7 +185,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "doc_user_guide",
           label: "User Guide",
-          path: "/docs/user-guide",
+          path: "/hdoc-help",
           type: "link",
         },
         {
@@ -210,13 +210,6 @@ const Menu: React.FC = () => {
           // 无 Link
           id: "doc_privacy",
           label: "Privacy",
-          type: "link",
-        },
-        {
-          // ✅ 带有 Link - HDoc Help
-          id: "doc_hdoc_help",
-          label: "HDoc Help",
-          path: "/hdoc-help",
           type: "link",
         },
       ],

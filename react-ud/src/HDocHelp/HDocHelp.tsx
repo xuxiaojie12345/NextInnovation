@@ -12,7 +12,7 @@ const HDocHelp: React.FC = () => {
         <div className='help-section'>
           <ul className='manual-links'>
             <li>
-              <Link to='/HDocQuickGuide' className='help-link'>
+              <Link to='/DownloadAndPrintQuickGuides' className='help-link'>
                 HDoc Quick Guide
               </Link>
             </li>
