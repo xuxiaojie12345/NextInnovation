@@ -213,9 +213,11 @@ const HomologationVariablesResultList = () => {
     }
   };
 
-  // 点击Created by user链接：跳转到EDB User View页面
-  const handleUserClick = (username: string) => {
-    navigate(`/edb-user-view/${username}`);
+  // 点击Created by user链接：跳转到EDB User View页面，传递userid
+  const handleUserClick = (userid: string) => {
+    navigate(`/edb-user-view/${encodeURIComponent(userid)}`, {
+      state: { userid },
+    });
   };
 
   return (

@@ -1,0 +1,159 @@
+.euv-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.euv-title {
+  color: #000080;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.euv-error-message {
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.euv-loading {
+  text-align: center;
+  padding: 40px;
+  color: #666666;
+  font-size: 16px;
+}
+
+.euv-border-box {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  padding: 30px;
+}
+
+.euv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.euv-field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.euv-label {
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  text-align: left;
+}
+
+.euv-input {
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #000000;
+  border: 1px solid #999999;
+  background-color: #f9f9f9;
+  border-radius: 2px;
+  outline: none;
+  cursor: default;
+  width: 100%;
+}
+
+.euv-input-short {
+  max-width: 150px;
+}
+
+.euv-input-medium {
+  max-width: 300px;
+}
+
+.euv-input-long {
+  max-width: 500px;
+}
+
+.euv-input:read-only {
+  background-color: #f0f0f0;
+  color: #333333;
+}
+
+.euv-button-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  padding-bottom: 16px;
+}
+
+.euv-btn {
+  min-width: 100px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  background-color: #e8e8e8;
+  border: 1px solid #999999;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.euv-btn:hover:not(:disabled) {
+  background-color: #d0d0d0;
+}
+
+.euv-btn:active:not(:disabled) {
+  background-color: #b8b8b8;
+}
+
+.euv-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .euv-container {
+    padding: 10px;
+  }
+
+  .euv-title {
+    font-size: 20px;
+  }
+
+  .euv-border-box {
+    padding: 20px;
+  }
+
+  .euv-field-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .euv-label {
+    min-width: auto;
+  }
+
+  .euv-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .euv-button-bar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .euv-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}

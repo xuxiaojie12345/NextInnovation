@@ -97,7 +97,7 @@ public class UD10HdocVariablesController {
      */
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<?>> searchVariables(@RequestBody HdocVariables request) {
-        log.info("========== UD10 Controller: Search Variables ==========");
+        log.info("========== UD11 Controller: Search Variables ==========");
         log.info("Search params - variable: {}, type: {}, description: {}",
                 request.getVariable(), request.getType(), request.getDescription());
 
@@ -108,7 +108,7 @@ public class UD10HdocVariablesController {
                 response.getCode(), response.getMsg(),
                 response.getData() instanceof java.util.List ?
                 ((java.util.List<?>) response.getData()).size() : "N/A");
-        log.info("========== UD10 Controller: Search completed ==========");
+        log.info("========== UD11 Controller: Search completed ==========");
 
         return ResponseEntity.ok(response);
     }

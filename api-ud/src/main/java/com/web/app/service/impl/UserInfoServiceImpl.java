@@ -19,4 +19,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         return null;
     }
+
+    @Override
+    public UserInfo getUserById(String userId) {
+        return userInfoMapper.selectUserById(userId);
+    }
 }

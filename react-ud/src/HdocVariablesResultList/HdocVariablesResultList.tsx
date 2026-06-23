@@ -122,6 +122,13 @@ const HdocVariablesResultList = () => {
     });
   };
 
+  // 点击Created by user链接：跳转到EDB User View页面，传递userid
+  const handleUserClick = (userid: string) => {
+    navigate(`/edb-user-view/${encodeURIComponent(userid)}`, {
+      state: { userid },
+    });
+  };
+
   // 点击Print按钮：打印当前页面
   const handlePrint = () => {
     window.print();
@@ -301,8 +308,7 @@ const HdocVariablesResultList = () => {
                           href='#'
                           onClick={(e) => {
                             e.preventDefault();
-                            // TODO: 跳转到用户查看页面
-                            console.log("User clicked:", item.createdByUser);
+                            handleUserClick(item.createdByUser);
                           }}
                         >
                           {item.createdByUser}

@@ -24,6 +24,7 @@ import HDocHelp from "./HDocHelp/HDocHelp";
 import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
 import MarketsInHdoc from "./MarketsInHdoc/MarketsInHdoc";
+import EdbUserView from "./EdbUserView/EdbUserView";
 
 function App() {
   return (
@@ -92,6 +93,10 @@ function App() {
               />
               <Route path='/document-types' element={<DocumentTypes />} />
               <Route path='/markets-in-hdoc' element={<MarketsInHdoc />} />
+              <Route
+                path='/edb-user-view/:username'
+                element={<EdbUserView />}
+              />
             </Route>
           </Routes>
         </div>
