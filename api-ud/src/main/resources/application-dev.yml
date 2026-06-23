@@ -66,3 +66,9 @@ file:
   # file.uploadFolder=d://uploads/
   uploadFolder: d://uploads/
   downloadFolder: d://downloads/
+
+# 模板文件上传路径
+app:
+  template:
+    upload:
+      path: \\172.17.0.63\hdoc\template\upload

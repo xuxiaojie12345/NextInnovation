@@ -8,6 +8,10 @@ import ModifyDocument from "./ModifyDocument/ModifyDocument";
 import SaveModifications from "./SaveModifications/SaveModifications";
 import VehicleSpecification from "./VehicleSpecification/VehicleSpecification";
 import HomologationVariables from "./HomologationVariables/HomologationVariables";
+import HomologationVariablesResult from "./HomologationVariablesResult/HomologationVariablesResult";
+import ExistingHDocVariables from "./ExistingHDocVariables/ExistingHDocVariables";
+import ExistingHDocVariablesResult from "./ExistingHDocVariablesResult/ExistingHDocVariablesResult";
+import UploadDeleteTemplate from "./UploadDeleteTemplate/UploadDeleteTemplate";
 
 function App() {
   return (
@@ -31,6 +35,22 @@ function App() {
             <Route
               path="homologation-variables"
               element={<HomologationVariables />}
+            />
+            <Route
+              path="homologation-variables-result"
+              element={<HomologationVariablesResult />}
+            />
+            <Route
+              path="existing-hdoc-variables"
+              element={<ExistingHDocVariables />}
+            />
+            <Route
+              path="existing-hdoc-variables-result"
+              element={<ExistingHDocVariablesResult />}
+            />
+            <Route
+              path="upload-delete-template"
+              element={<UploadDeleteTemplate />}
             />
           </Route>
 

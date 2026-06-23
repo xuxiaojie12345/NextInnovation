@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -35,8 +34,12 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
         entity.setVariable((String) params.get("variable"));
         entity.setType((String) params.get("type"));
         entity.setDescription((String) params.get("description"));
+        String useridVal = (String) params.get("userid");
+        if (useridVal != null && !useridVal.trim().isEmpty()) {
+            entity.setUserid(useridVal);
+        }
         entity.setRegisterUser((String) params.get("user"));
-        entity.setRegisterDatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        entity.setRegisterDatetime(LocalDateTime.now());
 
         hdocVariablesMapper.insertVariable(entity);
     }
@@ -50,7 +53,7 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
         entity.setType((String) params.get("type"));
         entity.setDescription((String) params.get("description"));
         entity.setUpdateUser((String) params.get("user"));
-        entity.setUpdateDatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        entity.setUpdateDatetime(LocalDateTime.now());
 
         hdocVariablesMapper.updateByVariable(entity);
     }

@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * UD12_UploadDeletetemplat 服务实现类
@@ -62,6 +64,25 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
         } catch (IOException e) {
             logger.error("文件删除失败", e);
             throw new RuntimeException("File delete failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<String> listTemplates(String market) {
+        logger.info("获取模板列表，market: {}", market);
+        try {
+            Path marketDir = Paths.get(uploadPath, market);
+            if (!Files.exists(marketDir)) {
+                return new ArrayList<>();
+            }
+            return Files.list(marketDir)
+                    .filter(Files::isRegularFile)
+                    .map(p -> p.getFileName().toString())
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error("获取模板列表失败", e);
+            return List.of();
         }
     }
 }

@@ -36,9 +36,9 @@
     <!-- 动态条件搜索HDOC Variables -->
     <select id="searchByConditions" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
         SELECT
-            VARIABLE,
-            TYPE,
-            DESCRIPTION,
+            VARIABLE AS variable,
+            TYPE AS type,
+            DESCRIPTION AS description,
             REGISTER_USER AS createdByUser,
             REGISTER_DATETIME AS date
         FROM HDOC_VARIABLES
@@ -54,5 +54,30 @@
         </if>
         ORDER BY VARIABLE
     </select>
+
+    <!-- 新增Variable -->
+    <insert id="insertVariable" parameterType="com.web.app.domain.HdocVariables">
+        INSERT INTO HDOC_VARIABLES (
+            VARIABLE, TYPE, DESCRIPTION,USERID,
+            REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS,
+            UPDATE_USER, UPDATE_DATETIME, UPDATE_PROCESS
+        ) VALUES (
+            #{variable}, #{type}, #{description}, #{userid},
+            #{registerUser}, #{registerDatetime}, 'UD10Add',
+            #{registerUser}, #{registerDatetime}, 'UD10Add'
+        )
+    </insert>
+
+    <!-- 根据Variable更新 -->
+    <update id="updateByVariable" parameterType="com.web.app.domain.HdocVariables">
+        UPDATE HDOC_VARIABLES
+        SET
+            TYPE = #{type},
+            DESCRIPTION = #{description},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_PROCESS = 'UD10Update'
+        WHERE VARIABLE = #{variable}
+    </update>
 
 </mapper>

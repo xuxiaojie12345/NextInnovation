@@ -113,4 +113,23 @@ public class UD12UploadDeletetemplatController {
             return ApiResponse.error(e.getMessage());
         }
     }
+
+    /**
+     * 获取指定市场的模板文件列表
+     *
+     * @param market 市场
+     * @return 模板文件名列表
+     */
+    @GetMapping("/listtemplates")
+    @ApiOperation(value = "获取模板列表", notes = "根据市场获取该目录下的模板文件列表")
+    public ApiResponse<List<String>> listTemplates(@RequestParam("market") String market) {
+        logger.info("接收到获取模板列表请求，market: {}", market);
+        try {
+            List<String> templates = ud12UploadDeletetemplatService.listTemplates(market);
+            return ApiResponse.success("查询成功", templates);
+        } catch (Exception e) {
+            logger.error("获取模板列表失败", e);
+            return ApiResponse.error(e.getMessage());
+        }
+    }
 }

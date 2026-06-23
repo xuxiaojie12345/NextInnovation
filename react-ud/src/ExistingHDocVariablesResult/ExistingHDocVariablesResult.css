@@ -1,0 +1,137 @@
+/* Existing HDoc Variables Result 页面 */
+.hdoc-result-page-wrapper {
+  padding: 20px 30px;
+  font-family: "Microsoft Sans Serif", Arial, sans-serif;
+  background-color: #ffffff;
+  min-height: 100%;
+}
+.hdoc-result-container {
+  max-width: 100%;
+}
+.hdoc-result-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+.hdoc-result-message {
+  padding: 8px 12px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  border-radius: 3px;
+}
+.hdoc-result-message-success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+.hdoc-result-message-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+.hdoc-result-loading {
+  color: #666;
+  font-size: 14px;
+  padding: 20px 0;
+}
+.hdoc-result-button-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+  background-color: #f1f3ff;
+  border: 1px solid #b0bbef;
+  padding: 8px 12px;
+}
+.hdoc-result-btn {
+  padding: 4px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #707070;
+  border-radius: 2px;
+  background-color: #dce1ff;
+  color: #08005f;
+  font-family: inherit;
+  min-width: 50px;
+}
+.hdoc-result-btn:hover {
+  background-color: #e0e0e0;
+}
+.hdoc-result-btn:active {
+  background-color: #d0d0d0;
+}
+.hdoc-result-table-wrapper {
+  border: 2px solid #b0bbef;
+  border-top: none;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+.hdoc-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.hdoc-result-table thead {
+  background-color: transparent;
+}
+.hdoc-result-th {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 1px solid #b0bbef;
+  border-right: 1px solid #b0bbef;
+  font-size: 13px;
+}
+.hdoc-result-th-check {
+  width: 30px;
+  padding: 6px 4px;
+  text-align: center;
+  border-bottom: 1px solid #b0bbef;
+  border-right: 1px solid #b0bbef;
+}
+.hdoc-result-td {
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid #b0bbef;
+  border-right: 1px solid #b0bbef;
+  color: #000;
+}
+.hdoc-result-td-check {
+  width: 30px;
+  padding: 4px;
+  text-align: center;
+  border-bottom: 1px solid #b0bbef;
+  border-right: 1px solid #b0bbef;
+}
+.hdoc-result-row-selected {
+  background-color: #f0f4ff;
+}
+.hdoc-result-table tbody tr:hover {
+  background-color: #e8ecf8;
+}
+.hdoc-result-table tbody tr:nth-child(even) {
+  background-color: #f1f3ff;
+}
+.hdoc-result-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.hdoc-result-link:hover {
+  color: #ff0000;
+}
+.hdoc-result-no-data {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+.hdoc-result-count {
+  font-size: 14px;
+  color: #000;
+  margin-top: 4px;
+}

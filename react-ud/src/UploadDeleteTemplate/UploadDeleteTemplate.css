@@ -1,0 +1,105 @@
+.ud12-page-wrapper {
+  padding: 20px 30px;
+  font-family: "Microsoft Sans Serif", Arial, sans-serif;
+  background-color: #ffffff;
+  min-height: 100%;
+}
+.ud12-container {
+  max-width: 700px;
+}
+.ud12-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+.ud12-message {
+  padding: 8px 12px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  border-radius: 3px;
+}
+.ud12-message-success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+.ud12-message-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+.ud12-section {
+  border: 2px solid #b0bbef;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  background-color: #ffffff;
+}
+.ud12-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.ud12-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ud12-label {
+  font-weight: bold;
+  color: #000;
+  min-width: 110px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.ud12-select {
+  flex: 1;
+  height: 26px;
+  padding: 2px 4px;
+  font-size: 14px;
+  border: 1px solid #7f7f7f;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+.ud12-file-input {
+  flex: 1;
+  font-size: 14px;
+}
+.ud12-btn {
+  padding: 4px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #707070;
+  border-radius: 2px;
+  background-color: #dce1ff;
+  color: #08005f;
+  font-family: inherit;
+  min-width: 50px;
+}
+.ud12-btn:hover {
+  background-color: #e0e0e0;
+}
+.ud12-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ud12-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.ud12-check-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+}
+.ud12-check-link:hover {
+  color: #ff0000;
+}

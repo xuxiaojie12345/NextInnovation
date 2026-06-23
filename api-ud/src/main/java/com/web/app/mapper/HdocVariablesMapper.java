@@ -34,8 +34,6 @@ public interface HdocVariablesMapper {
      * @param entity 实体
      * @return 影响行数
      */
-    @Insert("INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME) " +
-            "VALUES (#{variable}, #{type}, #{description}, #{registerUser}, #{registerDatetime})")
     int insertVariable(HdocVariables entity);
 
     /**
@@ -44,8 +42,6 @@ public interface HdocVariablesMapper {
      * @param entity 实体
      * @return 影响行数
      */
-    @Update("UPDATE HDOC_VARIABLES SET TYPE = #{type}, DESCRIPTION = #{description}, " +
-            "UPDATE_USER = #{updateUser}, UPDATE_DATETIME = #{updateDatetime} WHERE VARIABLE = #{variable}")
     int updateByVariable(HdocVariables entity);
 
     /**

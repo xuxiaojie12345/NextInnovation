@@ -32,4 +32,12 @@ public interface UD12UploadDeletetemplatService {
      * @param template 模板文件名
      */
     void deleteFile(String market, String template);
+
+    /**
+     * 获取指定市场的模板文件列表
+     *
+     * @param market 市场
+     * @return 模板文件名列表
+     */
+    List<String> listTemplates(String market);
 }

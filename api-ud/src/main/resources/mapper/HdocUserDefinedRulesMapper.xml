@@ -5,18 +5,18 @@
     <!-- 动态条件查询 -->
     <select id="selectByConditions" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
         SELECT
-            PC,
-            NUM,
-            MARKET,
-            VARIABLE,
-            VAL,
-            VS,
-            VS2,
-            COMMENTS,
-            ADD_DATE,
-            DELETE_DATE,
-            REGISTER_USER,
-            REGISTER_DATETIME
+            PC AS pc,
+            NUM AS num,
+            MARKET AS market,
+            VARIABLE AS variable,
+            VAL AS val,
+            VS AS vs,
+            VS2 AS vs2,
+            COMMENTS AS comments,
+            ADD_DATE AS add_date,
+            DELETE_DATE AS delete_date,
+            REGISTER_USER AS register_user,
+            REGISTER_DATETIME AS register_datetime
         FROM HDOC_USER_DEFINED_RULES
         WHERE 1=1
         <if test="pc != null and pc != ''">

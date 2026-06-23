@@ -33,7 +33,7 @@ const menuItems: MenuItem[] = [
       {
         id: "existing-hdoc-vars",
         label: ">>  Existing HDoc variables",
-        to: "/admin/existing-hdoc-vars",
+        to: "/menu/existing-hdoc-variables",
       },
       {
         id: "unlock-doc",
@@ -43,7 +43,7 @@ const menuItems: MenuItem[] = [
       {
         id: "upload-delete-template",
         label: ">>  Upload/Delete template",
-        to: "/admin/upload-delete-template",
+        to: "/menu/upload-delete-template",
       },
       {
         id: "list-available-templates",

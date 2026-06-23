@@ -12,7 +12,6 @@ const apiClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// API响应接口
 interface ApiResponse<T = any> {
   code: number;
   msg?: string;
@@ -24,7 +23,6 @@ const HomologationVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 表单字段状态
   const [pc, setPc] = useState("");
   const [number, setNumber] = useState("");
   const [market, setMarket] = useState("");
@@ -38,21 +36,46 @@ const HomologationVariables: React.FC = () => {
   const [updateUser, setUpdateUser] = useState("");
   const [updateDatetime, setUpdateDatetime] = useState("");
 
-  // 下拉框选项
   const [productClassOptions, setProductClassOptions] = useState<string[]>([]);
   const [marketOptions, setMarketOptions] = useState<string[]>([]);
 
-  // 消息状态
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
 
-  // 加载状态
   const [loading, setLoading] = useState(true);
 
-  // 从查询结果页返回时保存的原始主键值
   const [savedPc, setSavedPc] = useState<string | null>(null);
   const [savedNumber, setSavedNumber] = useState<string | null>(null);
   const [savedMarket, setSavedMarket] = useState<string | null>(null);
+
+  // 组件渲染时立即从 sessionStorage 恢复检索条件（Back/Select 返回时）
+  const savedParams = sessionStorage.getItem("hvars_search_params");
+  if (savedParams) {
+    try {
+      const restored = JSON.parse(savedParams);
+      if (restored?.pc) setPc(restored.pc);
+      if (restored?.number) setNumber(restored.number);
+      if (restored?.market) setMarket(restored.market);
+      if (restored?.variable !== undefined) setVariable(restored.variable);
+      if (restored?.val !== undefined) setVal(restored.val);
+      if (restored?.vs !== undefined) setVs(restored.vs);
+      if (restored?.vs2 !== undefined) setVs2(restored.vs2);
+      if (restored?.comments !== undefined) setComments(restored.comments);
+      if (restored?.addDate !== undefined) setAddDate(restored.addDate);
+      if (restored?.deleteDate !== undefined)
+        setDeleteDate(restored.deleteDate);
+      if (restored?.updateUser !== undefined)
+        setUpdateUser(restored.updateUser);
+      if (restored?.updateDatetime !== undefined)
+        setUpdateDatetime(restored.updateDatetime);
+      if (restored?.pc && restored?.number && restored?.market) {
+        setSavedPc(restored.pc);
+        setSavedNumber(restored.number);
+        setSavedMarket(restored.market);
+      }
+    } catch (_) {}
+    sessionStorage.removeItem("hvars_search_params");
+  }
 
   // 显示消息
   const showMessage = (text: string, type: "success" | "error") => {
@@ -85,21 +108,6 @@ const HomologationVariables: React.FC = () => {
             (item) => item.market,
           );
           setMarketOptions(options);
-        }
-
-        // 检查是否从查询结果页返回，恢复查询条件
-        const state = location.state as {
-          pc?: string;
-          number?: string;
-          market?: string;
-        } | null;
-        if (state?.pc && state?.number && state?.market) {
-          setPc(state.pc);
-          setNumber(state.number);
-          setMarket(state.market);
-          setSavedPc(state.pc);
-          setSavedNumber(state.number);
-          setSavedMarket(state.market);
         }
       } catch (error: any) {
         showMessage(
@@ -164,22 +172,23 @@ const HomologationVariables: React.FC = () => {
   // 查询操作
   const handleSearch = async () => {
     clearMessage();
-    navigate("/menu/homologation-variables-result", {
-      state: {
-        pc,
-        number,
-        market,
-        variable,
-        val,
-        vs,
-        vs2,
-        comments,
-        addDate,
-        deleteDate,
-        updateUser,
-        updateDatetime,
-      },
-    });
+    // 保存检索条件到 sessionStorage（确保 Back 返回时能恢复）
+    const searchData = {
+      pc,
+      number,
+      market,
+      variable,
+      val,
+      vs,
+      vs2,
+      comments,
+      addDate,
+      deleteDate,
+      updateUser,
+      updateDatetime,
+    };
+    sessionStorage.setItem("hvars_search_params", JSON.stringify(searchData));
+    navigate("/menu/homologation-variables-result", { state: searchData });
   };
 
   // 新增操作
@@ -469,7 +478,7 @@ const HomologationVariables: React.FC = () => {
             </select>
             <select
               className="hvars-select"
-              style={{ width: "200px" }}
+              style={{ width: "220px" }}
               value={pc}
               onChange={(e) => setPc(e.target.value)}
             >
@@ -493,6 +502,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "70px" }}
               value={number}
               onChange={(e) => {
                 const val = e.target.value.replace(/[^0-9]/g, "");
@@ -512,6 +522,7 @@ const HomologationVariables: React.FC = () => {
             </select>
             <select
               className="hvars-select"
+              style={{ width: "70px" }}
               value={market}
               onChange={(e) => setMarket(e.target.value)}
             >
@@ -533,6 +544,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "120px" }}
               value={variable}
               onChange={(e) => setVariable(e.target.value)}
               maxLength={20}
@@ -592,6 +604,7 @@ const HomologationVariables: React.FC = () => {
             </select>
             <input
               type="text"
+              style={{ width: "500px" }}
               className="hvars-input"
               value={comments}
               onChange={(e) => setComments(e.target.value)}
@@ -608,6 +621,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "70px" }}
               value={addDate}
               onChange={(e) => setAddDate(e.target.value)}
               maxLength={6}
@@ -624,6 +638,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "70px" }}
               value={deleteDate}
               onChange={(e) => setDeleteDate(e.target.value)}
               maxLength={6}
@@ -640,6 +655,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "80px" }}
               value={updateUser}
               onChange={(e) => setUpdateUser(e.target.value)}
               maxLength={16}
@@ -656,6 +672,7 @@ const HomologationVariables: React.FC = () => {
             <input
               type="text"
               className="hvars-input"
+              style={{ width: "100px" }}
               value={updateDatetime}
               onChange={(e) => setUpdateDatetime(e.target.value)}
             />
