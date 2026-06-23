@@ -22,6 +22,7 @@ import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAd
 import SearchUser from "./SearchUser/SearchUser";
 import HDocHelp from "./HDocHelp/HDocHelp";
 import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
+import DocumentTypes from "./DocumentTypes/DocumentTypes";
 
 function App() {
   return (
@@ -108,6 +109,10 @@ function App() {
               <Route
                 path='/DownloadAndPrintQuickGuides'
                 element={<DownloadAndPrintQuickGuides />}
+              />
+              <Route
+                path='/document-types'
+                element={<DocumentTypes />}
               />
             </Route>
           </Routes>

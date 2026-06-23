@@ -17,12 +17,12 @@ const HDocHelp: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Link to='/DocumentTypes' className='help-link'>
+              <Link to='/document-types' className='help-link'>
                 List of document types.
               </Link>
             </li>
             <li>
-              <Link to='/MarketsInHdoc' className='help-link'>
+              <Link to='/markets-in-hdoc' className='help-link'>
                 Markets in Hdoc
               </Link>
             </li>
@@ -62,7 +62,7 @@ const HDocHelp: React.FC = () => {
             HDoc can generate a large number of different document types, for
             example VIN Plate, CEMT, Austria Noise etc.
           </p>
-          <Link to='/DocumentTypes' className='help-link'>
+          <Link to='/document-types' className='help-link'>
             List of document types.
           </Link>
         </div>

@@ -134,4 +134,12 @@ public interface HdocDocumentListMapper {
                                           @Param("username") String username,
                                           @Param("functionCode") String functionCode,
                                           @Param("market") String market);
+
+    // ==================== UD20 文档类型列表 ====================
+
+    /**
+     * 获取所有文档类型列表（含完整字段）
+     * @return 文档类型列表（doctype, description, registerUser, registerDatetime）
+     */
+    List<Map<String, Object>> selectDocumentTypeList();
 }

@@ -199,4 +199,17 @@
         )
     </insert>
 
+    <!-- ==================== UD20 文档类型列表 ==================== -->
+
+    <!-- 获取所有文档类型列表（含完整字段） -->
+    <select id="selectDocumentTypeList" resultType="java.util.Map">
+        SELECT 
+            DOCTYPE       AS doctype,
+            DESCRIPTION   AS description,
+            REGISTER_USER AS registerUser,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_DOCUMENT_LIST
+        ORDER BY DOCTYPE
+    </select>
+
 </mapper>
