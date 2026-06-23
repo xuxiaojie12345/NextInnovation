@@ -24,6 +24,8 @@ import HDocHelp from "./HDocHelp/HDocHelp";
 import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
 import MarketsInHdoc from "./MarketsInHdoc/MarketsInHdoc";
+import MarketDocumentSettings from "./MarketDocumentSettings/MarketDocumentSettings";
+import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocumentSettingsList";
 
 function App() {
   return (
@@ -92,6 +94,14 @@ function App() {
               />
               <Route path='/document-types' element={<DocumentTypes />} />
               <Route path='/markets-in-hdoc' element={<MarketsInHdoc />} />
+              <Route
+                path='/market-document-settings'
+                element={<MarketDocumentSettings />}
+              />
+              <Route
+                path='/market-document-settings-list'
+                element={<MarketDocumentSettingsList />}
+              />
             </Route>
           </Routes>
         </div>
