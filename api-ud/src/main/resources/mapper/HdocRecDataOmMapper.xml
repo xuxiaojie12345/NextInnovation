@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocRecDataOmMapper">
+
+    <!-- UD04: 查询OM信息（关联多表） -->
+    <select id="selectHdocRecDataOm" resultType="com.web.app.dto.SelectGenerateDocumentResponse">
+        SELECT om.ORDERNUMBER AS ordernumber, om.BUILD AS build, om.SPEC AS spec,
+               om.CUSTOMER_ADAP AS customerAdap,
+               vda.COUNTRY_OF_OPERATION AS countryOfOperation,
+               tire.LOAD_INDEX AS loadIndex,
+               cha.ACT AS act, admod.VARIABLE AS variable
+        FROM HDOC_REC_DATA_VDA_GENERAL vda
+        INNER JOIN HDOC_REC_DATA_OM om ON vda.SERIE = om.SERIE AND vda.CHNR = om.CHNR
+        INNER JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER tire ON vda.TRANS_TS = tire.TRANS_TS
+        INNER JOIN HDOC_ADCA_CHANGE cha ON vda.SERIE = cha.SERIE AND vda.CHNR = cha.CHNR
+        INNER JOIN HDOC_ADCA_MODIFICATION admod ON vda.SERIE = admod.SERIE AND vda.CHNR = admod.CHNO
+        WHERE vda.SERIE = #{serie} AND vda.CHNR = #{chnr} AND admod.STA = '0'
+        LIMIT 1
+    </select>
+
+    <!-- UD07: 查询车辆规格(关联多表) -->
+    <select id="selectVehicleSpecification" resultType="com.web.app.dto.VehicleSpecificationResponse">
+        SELECT t1.MODEL AS model, t1.CUSTOMER_ADAP AS customerAdap, t1.BUILD AS build,
+               t2.PRODUCT_TYPE AS productType, t2.VIN AS vin,
+               t2.COUNTRY_OF_OPERATION AS countryOfOperation,
+               t3.FAMILY_ID AS familyId, t3.VARIANT_ID AS variantId
+        FROM HDOC_REC_DATA_OM t1
+        INNER JOIN HDOC_REC_DATA_VDA_GENERAL t2 ON t1.SERIE = t2.SERIE AND t1.CHNR = t2.CHNR
+        INNER JOIN HDOC_REC_DATA_VDA_VARIANTS t3 ON t1.SERIE = t3.SERIE AND t1.CHNR = t3.CHNR
+        WHERE t1.SERIE = #{serie} AND t1.CHNR = #{chnr}
+    </select>
+
+</mapper>

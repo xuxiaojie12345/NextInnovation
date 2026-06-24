@@ -71,12 +71,12 @@ const GeneratedDocument: React.FC = () => {
     
     try {
       // API请求 (对应设计书 5. 接口定义)
-      const response = await axios.post('/api/UD04/ud04/select-hcoc-rec-data-om', {
-        ChassisNo: chassisNoParam,
-        ChassisSeries: chassisSeriesParam
+      const response = await axios.post('http://localhost:8081/api/ud04/selecthdocrecdataom', {
+        chassisNo: chassisNoParam,
+        chassisSeries: chassisSeriesParam
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data;
         
         // 映射返回的数据到状态变量 (对应设计书 4.1 处理流程)
@@ -105,12 +105,12 @@ const GeneratedDocument: React.FC = () => {
         
       } else {
         // API返回失败 (对应设计书 6. 异常处理)
-        setErrorMessage(response.data.message || '情报取得失败');
+        setErrorMessage(response.data.msg || '情报取得失败');
       }
     } catch (error: any) {
       // 捕获网络错误或服务器错误 (对应设计书 6. 异常処理)
       if (error.response) {
-        setErrorMessage(error.response.data?.message || '情报取得失败');
+        setErrorMessage(error.response.data?.msg || '情报取得失败');
       } else if (error.request) {
         setErrorMessage('网络连接失败，请稍后重试');
       } else {
@@ -272,20 +272,21 @@ const GeneratedDocument: React.FC = () => {
             
             {/* Replacing parameters标题 */}
             <div className='replacing-params-title-row'>
-              <span className='replacing-params-title'>Replacing parameters</span>
+              <span className='replacing-params-title'>Replacing parameters:</span>
+              <span className='replacing-params-value'>{replacingParameters}</span>
             </div>
             
             {/* Information parameter行 */}
-            {replacingParameters && (
+            {/* {replacingParameters && (
               <div className='information-parameter-row'>
                 <span className='default-label'>Information parameter:</span>
                 <a href='#' className='info-param-link'>VPGVW_2</a>
                 <span className='default-value'> Market: AUS overrides -EU</span>
               </div>
-            )}
+            )} */}
             
             {/* ERROR行 */}
-            <div className='error-row'>
+            {/* <div className='error-row'>
               <span className='default-label'>ERROR:</span>
               <span className='default-value'>RULE_EPC_4_8.</span>
             </div>
@@ -293,7 +294,7 @@ const GeneratedDocument: React.FC = () => {
             <div className='error-row'>
               <span className='default-label'>ERROR:</span>
               <span className='default-value'>for variable RULE_EPC_4_8ERROR: Can not find RULE_EPC_4_8. No match in user defined rules..</span>
-            </div>
+            </div> */}
             
             {/* Generated document (Link类型) - 与底部Date间距80px */}
             <div className='generated-doc-row'>

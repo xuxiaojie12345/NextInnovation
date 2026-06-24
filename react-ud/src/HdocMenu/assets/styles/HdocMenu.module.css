@@ -14,7 +14,7 @@
 /* Logo 容器：顶部空间压到极限 */
 .logoContainer {
   width: 100%;
-  background-color: #003057;
+  background-color: #023f72;
   padding:4px 30px; /* 顶部/底部只留4px */
   display: flex;
   align-items: center;
@@ -63,7 +63,7 @@
 .categoryTitle {
   padding: 0 !important;
   font-weight: 700 !important;
-  color: #003057 !important;
+  color:  #023f72 !important;
   font-size: 16px !important;
   margin: 0 !important;
   line-height: 1; /* 关键：行高=字号，无额外间距 */
@@ -73,7 +73,7 @@
 .subCategoryTitle {
   padding: 0 0 0 8px !important;
   font-weight: 700 !important;
-  color: #003057 !important;
+  color:  #023f72 !important;
   font-size: 11px !important;
   margin: 0 !important;
   line-height: 1;
@@ -103,7 +103,7 @@
 .menuItemText {
   display: flex;
   font-size: 10px !important;
-  color: #003057;
+  color:  #023f72;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -79,23 +79,24 @@ const HdocGenerateHomologationDocument: React.FC = () => {
       setIsLoading(true);
       
       // API请求 (对应设计书 5.1 UD03SelectHdocdocumentlistApi)
-      const response = await axios.get('/api/UD03/SelectHdocdocumentlistApi');
+      const response = await axios.post('http://localhost:8081/api/ud03/selecthdocdocumentlist');
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         // 映射返回的数据到下拉框选项
-        const options: DocumentTypeOption[] = response.data.data.documentTypes.map((item: any) => ({
+        const list = response.data.data || [];
+        const options: DocumentTypeOption[] = list.map((item: any) => ({
           value: item.doctype,
           label: item.description || item.doctype
         }));
         setDocumentTypeOptions(options);
       } else {
         // API返回失败 (对应设计书 6. 异常处理)
-        setErrorMessage(response.data.message || '获取文档类型失败');
+        setErrorMessage(response.data.msg || '获取文档类型失败');
       }
     } catch (error: any) {
       // 捕获网络错误或服务器错误 (对应设计书 6. 异常处理)
       if (error.response) {
-        setErrorMessage(error.response.data?.message || '获取文档类型失败');
+        setErrorMessage(error.response.data?.msg || '获取文档类型失败');
       } else if (error.request) {
         setErrorMessage('网络连接失败，请稍后重试');
       } else {
@@ -139,7 +140,7 @@ const HdocGenerateHomologationDocument: React.FC = () => {
       localStorage.setItem('documentType', documentType);
 
       // 跳转到GeneratedDocument画面，携带参数 (对应设计书 7. 实现注意事项第3点)
-      navigate('/GeneratedDocument', {
+      navigate('/HdocMenu/GeneratedDocument', {
         state: { 
           userId: getCurrentUserId(), // 当前登录的userId
           chassisSeries, 

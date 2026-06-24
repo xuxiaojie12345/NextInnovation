@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocUserInfoMapper">
+
+    <!--
+        根据登录参数查询用户信息
+        对应SQL文件中的 5.1 - selectUserByLoginParam
+        表名：hdoc_user_infor
+        查询字段：USERID, USERNAME, PASSWORD, RESPONSIBLE, USERPOSITION, EMAIL
+    -->
+    <select id="selectUserByLoginParam" resultType="com.web.app.entity.HdocUserInfo">
+        SELECT
+            USERID AS userId,
+            USERNAME AS username,
+            PASSWORD AS password,
+            RESPONSIBLE AS responsible,
+            USERPOSITION AS userPosition,
+            EMAIL AS email
+        FROM hdoc_user_infor
+        <where>
+            <!-- 参数存在才拼接条件，自动处理and，无需手动判首字符 -->
+            <if test="userId != null and userId != ''">
+                AND USERID = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND USERNAME = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                AND PASSWORD = #{password}
+            </if>
+        </where>
+    </select>
+
+</mapper>

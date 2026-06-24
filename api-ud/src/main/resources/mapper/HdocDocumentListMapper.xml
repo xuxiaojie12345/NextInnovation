@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocDocumentListMapper">
+
+    <!-- UD03: 查询所有文档类型 -->
+    <select id="selectAllDocumentList" resultType="com.web.app.entity.HdocDocumentList">
+        SELECT DOCTYPE, DESCRIPTION FROM HDOC_DOCUMENT_LIST
+    </select>
+
+    <!-- UD20: 根据Doctype查询 -->
+    <select id="selectByDoctype" resultType="com.web.app.entity.HdocDocumentList">
+        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_DOCUMENT_LIST
+        WHERE DOCTYPE = #{doctype}
+    </select>
+
+    <!-- UD20-1: 更新文档列表 -->
+    <update id="updateByDoctype">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET
+            DOCTYPE = #{doctype},
+            REGISTER_USER = #{registerUser},
+            REGISTER_DATETIME = #{registerDatetime},
+            REGISTER_PROCESS = #{registerProcess},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE DOCTYPE = #{doctype}
+    </update>
+
+</mapper>

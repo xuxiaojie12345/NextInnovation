@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 // 这里定义了 UserID 和 passWord 的校验规则
 const loginSchema = z.object({
   userId: z.string()
-    .min(1, { message: "UserID is required" }) // 非空校验
+    .min(1, { message: "Username and password are required." }) // 非空校验
     .max(10, { message: "UserID must be 10 characters or less" }) // 长度校验
     .regex(/^[a-zA-Z0-9]*$/, { message: "UserID must contain only alphanumeric characters" }), // 许容文字校验：只允许半角英数字 [a-zA-Z0-9]
   passWord: z.string()
-    .min(1, { message: "passWord is required" }) // 非空校验
+    .min(1, { message: "Username and password are required." }) // 非空校验
     .max(32, { message: "passWord must be 32 characters or less" }) // 长度校验
     .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, { message: "passWord contains invalid characters" }), // 许容文字校验：半角英数字 + 記号 (Special Chars)
 });
@@ -43,14 +43,13 @@ const loginApi = async (userId: string, passWord: string): Promise<LoginResponse
       body: JSON.stringify({ userId, passWord }),
     });
     
+    const data = await response.json();
 
     if (!response.ok) {
-      // 处理 HTTP 错误（如 400 参数校验失败）
-      const errorData = await response.json();
-      throw new Error(errorData.msg || 'Network response was not ok');
+      // 处理 HTTP 错误（如 400 参数校验失败 / 401 认证失败）
+      throw new Error(data.msg || 'Network response was not ok');
     }
 
-    const data = await response.json();
     return data;
   } catch (error) {
     // 网络错误或服务器错误
@@ -98,11 +97,8 @@ const Login: React.FC = () => {
 
     if (!result.success) {
       // 校验失败，提取第一个错误信息作为 Warning 显示
-      // 这里我们将具体的字段错误合并为一个通用的提示，或者你可以显示具体字段的错误
       const firstError = result.error.errors[0];
-      setWarningMessage('Username and passWord are required.'); 
-      // 如果你想显示更详细的 Zod 错误，可以使用:
-       setWarningMessage(firstError.message);
+      setWarningMessage(firstError.message);
       return;
     }
 
@@ -120,8 +116,9 @@ const Login: React.FC = () => {
         // 3. API 返回认证失败
         setErrorMessage(response.msg || "Login failed.");
       }
-    } catch (error) {
-      setErrorMessage("Network error. Please try again later.");
+    } catch (error: any) {
+      // 显示后端返回的具体错误信息（如账号不存在、密码错误等）
+      setErrorMessage(error.message || "Network error. Please try again later.");
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -131,8 +128,10 @@ const Login: React.FC = () => {
   return (
      <div className="container">
       <div className="backgroundLayer" ></div>
-
+ 
       <div className="card">
+
+       
 
         <form onSubmit={handleSubmit}>
           {/* UserID Input */}
@@ -153,14 +152,14 @@ const Login: React.FC = () => {
           {/* passWord Input */}
           <div className="formGroup">
             <input
-              type="passWord"
-              placeholder="passWord"
+              type="password"
+              placeholder="Password"
               value={passWord}
               onChange={handlepassWordChange}
               maxLength={32}
               disabled={isLoading}
               className="input"
-              aria-label="passWord"
+              aria-label="Password"
             />
           </div>
            <div className="messageContainer">
