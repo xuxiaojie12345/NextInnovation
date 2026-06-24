@@ -194,7 +194,7 @@
 </li>
 <li><strong>API 调用 (Backend Check)</strong>：
 <ul>
-<li>调用 <code>GET /api/saviynt/user/{userid}</code> 获取用户信息。</li>
+<li>调用 <code>POST /api/AuthenticationApi/login</code>（仅传 <code>userid</code>，不传密码）获取用户信息。</li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
@@ -243,40 +243,33 @@
 <h3 id="41-获取用户信息接口">4.1 获取用户信息接口 </h3>
 <ul>
 <li><strong>功能</strong>：获取指定用户的详细信息。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/saviynt/user/{userid}</code></li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/AuthenticationApi/login</code></li>
 </ul>
-<h4 id="request">Request </h4>
-<p>路径参数：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">参数名</th>
-<th style="text-align:left">类型</th>
-<th style="text-align:center">必須</th>
-<th style="text-align:left">説明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">userid</td>
-<td style="text-align:left">String</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:left">用户 ID</td>
-</tr>
-</tbody>
-</table>
+<h4 id="request-body">Request Body </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"t009667"</span>
+<span class="token punctuation">}</span>
+</code></pre><blockquote>
+<p><strong>注</strong>：仅传入 <code>userid</code> 时，系统执行用户信息查询（不验证密码）。<br>
+同时传入 <code>userid</code> 和 <code>password</code> 时，系统执行登录认证。</p>
+</blockquote>
 <h4 id="response-success-200-ok">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"t009667"</span><span class="token punctuation">,</span>
-  <span class="token property">"responsible"</span><span class="token operator">:</span> <span class="token string">"Mats Gustafsson"</span><span class="token punctuation">,</span>
-  <span class="token property">"userPosition"</span><span class="token operator">:</span> <span class="token string">"Senior Solution Leader"</span><span class="token punctuation">,</span>
-  <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"mats.e.gustavsson@volvo.com"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"登录成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"t009667"</span><span class="token punctuation">,</span>
+    <span class="token property">"responsible"</span><span class="token operator">:</span> <span class="token string">"Mats Gustafsson"</span><span class="token punctuation">,</span>
+    <span class="token property">"userPosition"</span><span class="token operator">:</span> <span class="token string">"Senior Solution Leader"</span><span class="token punctuation">,</span>
+    <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"mats.e.gustavsson@volvo.com"</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"User not found in Saviynt"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">404</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"用户不存在"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>

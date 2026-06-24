@@ -22,7 +22,6 @@
   - 删除操作需确认，防止误删
   - “Variable”字段在增改时为必填项
   - 导出文件不包含敏感信息
-  - 权限控制由后端统一管理（如仅允许特定角色执行删除）
 
 3. 画面项目定义 (Screen Parameters)
 
@@ -117,9 +116,9 @@
         终止流程
 
       5.1.2 API调用 (Backend Check)：
-        调用 `POST /HDOC_VARIABLES/add` 添加新记录
-        调用 `PUT /HDOC_VARIABLES/update` 更新记录
-        调用 `DELETE /HDOC_VARIABLES/delete` 删除记录
+        调用 `POST /UD10HdocvariablesApi/UD10Add` 添加新记录
+        调用 `POST /UD10HdocvariablesApi/UD10Update` 更新记录
+        调用 `DELETE /UD10HdocvariablesApi/UD10Delete` 删除记录
         调用 `GET /HDOC_VARIABLES/export` 导出CSV
 
    5.2 结果处理：
@@ -138,10 +137,10 @@
 
 6. 接口定义 (API Specification)
 
-   POST /HDOC_VARIABLES/add
+   UD10HdocvariablesApi
      功能：新增一条认证参数记录
      Method：POST
-     Endpoint：/api/HDOC_VARIABLES/add
+     Endpoint：/api/UD10HdocvariablesApi/UD10Add
 
      Request [请求格式]
      {
@@ -165,10 +164,10 @@
        "message": "Variant already exists. Please enter the correct content"
      }
 
-   PUT /HDOC_VARIABLES/update
+   UD10HdocvariablesApi
      功能：更新现有记录
-     Method：PUT
-     Endpoint：/api/HDOC_VARIABLES/update
+     Method：POST
+     Endpoint：/api/UD10HdocvariablesApi/UD10Update
 
      Request [请求格式]
      {
@@ -190,10 +189,10 @@
        "message": "Variant does not exist. Please enter the correct content"
      }
 
-   DELETE /HDOC_VARIABLES/delete
+   UD10HdocvariablesApi
      功能：删除指定记录
      Method：DELETE
-     Endpoint：/api/HDOC_VARIABLES/delete
+     Endpoint：/api/UD10HdocvariablesApi/UD10Delete
 
      Request [请求格式]
      {
@@ -234,6 +233,5 @@
 | 异常场景 | 处理方式 | Message显示内容 |
 |---------|---------|----------------|
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
-| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
 | 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
 | 文件导出失败 | 返回错误响应 | “导出失败，请联系管理员” |

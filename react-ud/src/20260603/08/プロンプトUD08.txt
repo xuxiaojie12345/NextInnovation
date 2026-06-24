@@ -21,7 +21,7 @@
 - 数据维护人员  
 
  用户体验考虑  
-- 查询条件清晰排列，关键字段带星号标识必填项
+- 查询条件清晰排列，关键字段带星号标识必填项（Product class;Number;Market）
 - 操作按钮集中放置于顶部，便于快速访问
 - 输入框长度合理，避免内容截断
 - 支持实时校验，减少提交错误
@@ -29,8 +29,6 @@
  安全性要求  
 - `Product class`、`Number`、`Market` 组合为主键，禁止重复
 - `Variable` 必须存在于 `HDOC_VARIABLES` 表中
-- 所有写入操作需验证权限（由后端控制）
-- 自动记录 `Created by user` 和 `Date` 字段，不可手动编辑
 
 
 3. 画面项目定义 (Screen Parameters)
@@ -47,8 +45,8 @@
 | 8   | Comments | TextField | - | 100 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 可为空 |
 | 9   | Add | TextField | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 格式：YYYYWW |
 | 10  | Delete | TextField | - | 6 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 格式：YYYYWW |
-| 11  | Created by user | TextField | - | 16 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | 自动填充，不可编辑 |
-| 12  | Date | TextField | - | - | Input/Output | 日付 | 左 | 空 | 活性 | 自动填充，不可编辑 |
+| 11  | Created by user | TextField | - | 16 | Input/Output | 半角英数字+記号 | 左 | 空 | 活性 | - |
+| 12  | Date | TextField | - | - | Input/Output | 日付 | 左 | 空 | 活性 | - |
 | 13  | Search | Button | - | - | Action | - | 中 | - | 活性 | 触发查询跳转 |
 | 14  | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入框 |
 | 15  | Add | Button | - | - | Action | - | 中 | - | 活性 | 新增记录 |
@@ -167,7 +165,7 @@
 6. 接口定义 (API Specification)
 
    UD08HomologationVariablesApi
-     6.1功能：根据条件查询认证参数列表
+     6.1功能：根据条件查询认证参数列表（Product class下拉列表）
      Method：GET
      Endpoint：/api/UD08HomologationVariablesApi/UD08SelectProductclassmaster
 
@@ -189,7 +187,7 @@
        "message": "查询参数格式错误"
      }
 
-     6.2功能：根据条件查询认证参数列表
+     6.2功能：根据条件查询认证参数列表（Market下拉列表）
      Method：GET
      Endpoint：/api/UD08HomologationVariablesApi/UD08SelectMarketmaster
 
@@ -318,17 +316,5 @@
 | 异常场景 | 处理方式 | Message显示内容 |
 |---------|---------|----------------|
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
-| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
 | 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |
 | 主键冲突 | 返回错误响应 | “Primary key conflict, Please enter the correct content” |
-
-8. 语言要求
-  文档使用中文编写
-  所有错误消息和成功消息使用中文
-  技术术语可保留英文
-  保持与参考文档（内部設計模板.md）相同的格式结构
-
-9. 输出要求
-  生成完整的Markdown格式文档
-  文件名格式：认证参数管理页面_詳細設計.md
-  保存到：当前文件夹下的work目录

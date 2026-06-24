@@ -17,17 +17,33 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     @Autowired
     private HdocAdcaChangeMapper hdocAdcaChangeMapper;
 
+    /**
+     * 从 serieChnr 中提取 serie（前4位）和 chnr（剩余部分）
+     */
+    private String extractSerie(String serieChnr) {
+        if (serieChnr == null || serieChnr.trim().length() < 4) return serieChnr;
+        return serieChnr.trim().substring(0, 4);
+    }
+
+    private String extractChnr(String serieChnr) {
+        if (serieChnr == null || serieChnr.trim().length() < 4) return serieChnr;
+        return serieChnr.trim().substring(4).trim();
+    }
+
     @Override
     public UD16ADChangeResponse selectHdocAdcaChange(UD16ADChangeRequest request) {
         UD16ADChangeResponse response = new UD16ADChangeResponse();
 
-        if (request.getSerieChnr() == null || request.getDesc() == null) {
+        if (request.getSerieChnr() == null || request.getSerieChnr().trim().isEmpty()) {
             response.setCode(400);
             response.setMsg("参数不完整");
             return response;
         }
 
-        HdocAdcaChange data = hdocAdcaChangeMapper.selectByCondition(request.getSerieChnr(), request.getDesc());
+        String serie = extractSerie(request.getSerieChnr());
+        String chnr = extractChnr(request.getSerieChnr());
+
+        HdocAdcaChange data = hdocAdcaChangeMapper.selectByCondition(serie, chnr);
 
         response.setCode(200);
         response.setMsg("没有错误");
@@ -39,24 +55,27 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     public UD16ADChangeResponse insertHdocAdcaChange(UD16ADChangeRequest request) {
         UD16ADChangeResponse response = new UD16ADChangeResponse();
 
-        if (request.getSerieChnr() == null || request.getDesc() == null) {
+        if (request.getSerieChnr() == null || request.getSerieChnr().trim().isEmpty()) {
             response.setCode(400);
             response.setMsg("参数不完整");
             return response;
         }
 
+        String serie = extractSerie(request.getSerieChnr());
+        String chnr = extractChnr(request.getSerieChnr());
+
         // 先检查是否存在
-        HdocAdcaChange existing = hdocAdcaChangeMapper.selectByCondition(request.getSerieChnr(), request.getDesc());
+        HdocAdcaChange existing = hdocAdcaChangeMapper.selectByCondition(serie, chnr);
         if (existing != null) {
             response.setCode(400);
-            response.setMsg("记录已存在");
+            response.setMsg("AFTER DEF CHANGE IS NOT ACTIVATED");
             return response;
         }
 
         // 新增
         HdocAdcaChange change = new HdocAdcaChange();
-        change.setSerie(request.getSerieChnr());
-        change.setChnr(request.getDesc());
+        change.setSerie(serie);
+        change.setChnr(chnr);
         change.setAct("Y");
         change.setBu(request.getBu() != null ? request.getBu() : "");
         change.setRegisterUser(request.getUser());
@@ -73,14 +92,17 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     public UD16ADChangeResponse updateHdocAdcaChange(UD16ADChangeRequest request) {
         UD16ADChangeResponse response = new UD16ADChangeResponse();
 
-        if (request.getSerieChnr() == null || request.getDesc() == null) {
+        if (request.getSerieChnr() == null || request.getSerieChnr().trim().isEmpty()) {
             response.setCode(400);
             response.setMsg("参数不完整");
             return response;
         }
 
+        String serie = extractSerie(request.getSerieChnr());
+        String chnr = extractChnr(request.getSerieChnr());
+
         // 先检查是否存在
-        HdocAdcaChange existing = hdocAdcaChangeMapper.selectByCondition(request.getSerieChnr(), request.getDesc());
+        HdocAdcaChange existing = hdocAdcaChangeMapper.selectByCondition(serie, chnr);
         if (existing == null) {
             response.setCode(404);
             response.setMsg("记录不存在");
@@ -88,7 +110,7 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
         }
 
         // 逻辑删除
-        hdocAdcaChangeMapper.updateActToN(request.getSerieChnr(), request.getDesc());
+        hdocAdcaChangeMapper.updateActToN(serie, chnr);
 
         response.setCode(200);
         response.setMsg("删除成功");

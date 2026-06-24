@@ -42,4 +42,10 @@ public class UD12UploadDeletetemplatController {
     public UD12UploadDeletetemplatResponse deleteFile(@RequestBody UD12UploadDeletetemplatRequest request) {
         return ud12UploadDeletetemplatService.deleteFile(request);
     }
+
+    @PostMapping("/UD12ListTemplates")
+    @ApiOperation("根据市场列出模板文件列表")
+    public UD12UploadDeletetemplatResponse listTemplates(@RequestBody UD12UploadDeletetemplatRequest request) {
+        return ud12UploadDeletetemplatService.listTemplates(request.getMarket());
+    }
 }

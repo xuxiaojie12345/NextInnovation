@@ -19,7 +19,6 @@
   - 所有字段均来自数据库或文件系统，确保一致性
 
   安全性或特殊要求：
-  - 仅允许授权用户访问此页面
   - 下载链接需验证权限
   - 不暴露文件路径，防止目录遍历攻击
   - 所有通信使用 HTTPS 加密
@@ -84,12 +83,12 @@
 
 6. 接口定义 (API Specification)
 
-   GET /api/templates/list
+   UD14SearchresultistApi
      功能：获取指定市场的模板文件列表
      Method：GET
-     Endpoint：/api/templates/list
+     Endpoint：/api/UD14SearchresultistApi/UD14SelectMarketmaster
 
-     Request [请求格式]
+     Request [json]
      {
        "market": "AUT"
      }
@@ -118,10 +117,10 @@
        "message": "Market not found"
      }
 
-   GET /api/rules/used
+
      功能：获取已使用的变量信息
-     Method：GET
-     Endpoint：/api/rules/used
+     Method：POST
+     Endpoint：/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules
 
      Request [请求格式]
      {
@@ -144,7 +143,6 @@
 | 异常场景 | 处理方式 | Message显示内容 |
 |---------|---------|----------------|
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
-| 权限不足 | 禁用页面访问 | “您没有权限查看此信息” |
 | 市场不存在 | 返回错误响应 | “市场不存在” |
 | 文件无法访问 | 返回错误响应 | “无法访问文件” |
 | 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

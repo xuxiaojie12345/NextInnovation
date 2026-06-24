@@ -6,8 +6,8 @@
         <id property="variable" column="VARIABLE"/>
         <result property="type" column="TYPE"/>
         <result property="description" column="DESCRIPTION"/>
-        <result property="createdByUser" column="CREATED_BY_USER"/>
-        <result property="createDate" column="CREATE_DATE"/>
+        <result property="createdByUser" column="REGISTER_USER"/>
+        <result property="createDate" column="REGISTER_DATETIME"/>
     </resultMap>
     
     <!-- 根据变量名计数 -->
@@ -18,9 +18,13 @@
     <!-- 插入变量 -->
     <insert id="insert">
         INSERT INTO HDOC_VARIABLES (
-            VARIABLE, TYPE, DESCRIPTION, CREATED_BY_USER, CREATE_DATE
+            VARIABLE, TYPE, DESCRIPTION,
+            REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
         ) VALUES (
-            #{variable}, #{type}, #{description}, #{createdByUser}, SYSDATE
+            #{variable}, #{type}, #{description},
+            #{createdByUser}, SYSDATE(), 'UD10Add',
+            SYSDATE(), #{createdByUser}, 'UD10Add'
         )
     </insert>
     
@@ -29,8 +33,8 @@
         UPDATE HDOC_VARIABLES
         SET TYPE = #{type},
             DESCRIPTION = #{description},
-            CREATED_BY_USER = #{createdByUser},
-            CREATE_DATE = SYSDATE
+            UPDATE_USER = #{createdByUser},
+            UPDATE_DATETIME = SYSDATE()
         WHERE VARIABLE = #{variable}
     </update>
     
@@ -39,6 +43,11 @@
         DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
     </delete>
     
+    <!-- UD08 - 查询所有变量名（仅VARIABLE字段） -->
+    <select id="selectAllVariables" resultMap="HdocVariablesResultMap">
+        SELECT VARIABLE FROM HDOC_VARIABLES
+    </select>
+
     <!-- 搜索变量 -->
     <select id="searchVariables" resultMap="HdocVariablesResultMap">
         SELECT VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME

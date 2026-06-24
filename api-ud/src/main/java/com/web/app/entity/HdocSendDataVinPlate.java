@@ -44,12 +44,12 @@ public class HdocSendDataVinPlate implements Serializable {
     /**
      * 文档就绪
      */
-    private Boolean docReady;
+    private String docReady;
     
     /**
      * 文档已发送
      */
-    private Boolean docSent;
+    private String docSent;
     
     /**
      * XML文档

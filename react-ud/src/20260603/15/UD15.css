@@ -1,0 +1,180 @@
+/* ========================================
+   UD15 - VIN Plate Management
+   ======================================== */
+
+.ud15-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.ud15-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.ud15-card {
+  width: 100%;
+  max-width: 700px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 20px 24px 24px;
+  box-sizing: border-box;
+}
+
+.ud15-page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ---- 消息 ---- */
+.ud15-message {
+  font-size: 13px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.ud15-error {
+  color: #d32f2f;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+}
+
+.ud15-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ---- 输入区域 ---- */
+.ud15-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #b8d4e8;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+.ud15-field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.ud15-label {
+  width: 120px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  text-align: left;
+}
+
+.ud15-input {
+  flex: 1;
+  max-width: 250px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ud15-input:focus {
+  border-color: #003057;
+}
+
+/* ---- 按钮行 ---- */
+.ud15-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid #b8d4e8;
+}
+
+.ud15-btn {
+  min-width: 80px;
+  height: 28px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #7a9eb3;
+  cursor: pointer;
+  text-align: center;
+  background-color: #e8f0f8;
+  color: #003057;
+  transition: background-color 0.15s ease;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.ud15-btn:hover:not(:disabled) {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud15-btn:disabled {
+  background-color: #dce8f0;
+  color: #7a9eb3;
+  border-color: #b0c8d8;
+  cursor: not-allowed;
+}
+
+/* ---- 详情区域 ---- */
+.ud15-detail-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #b8d4e8;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+.ud15-detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.ud15-detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.ud15-detail-label {
+  width: 120px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555555;
+  text-align: left;
+}
+
+.ud15-detail-value {
+  font-size: 12px;
+  color: #333333;
+}
+
+/* ---- 提示文字 ---- */
+.ud15-hint-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+  margin: 0;
+  text-align: left;
+}

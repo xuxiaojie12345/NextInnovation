@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Service
 public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetemplatService {
 
-    @Value("${hdoc.template.upload-path:F:/hdoc/template/upload}")
+    @Value("${hdoc.template.upload-path:\\\\172.17.0.63\\hdoc\\template\\upload}")
     private String uploadPath;
 
     @Autowired
@@ -117,6 +118,45 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
         } catch (Exception e) {
             response.setCode(500);
             response.setMsg("删除失败: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    @Override
+    public UD12UploadDeletetemplatResponse listTemplates(String market) {
+        UD12UploadDeletetemplatResponse response = new UD12UploadDeletetemplatResponse();
+
+        if (market == null || market.trim().isEmpty()) {
+            response.setCode(400);
+            response.setMsg("市场不能为空");
+            return response;
+        }
+
+        try {
+            String marketDir = uploadPath + File.separator + market.trim();
+            File dir = new File(marketDir);
+
+            List<String> fileNames = new ArrayList<>();
+            if (dir.exists() && dir.isDirectory()) {
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        if (f.isFile()) {
+                            fileNames.add(f.getName());
+                        }
+                    }
+                }
+            }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("templates", fileNames);
+            response.setCode(200);
+            response.setMsg("查询成功");
+            response.setData(data);
+        } catch (Exception e) {
+            response.setCode(500);
+            response.setMsg("列出模板失败: " + e.getMessage());
         }
 
         return response;

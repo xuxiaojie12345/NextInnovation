@@ -68,7 +68,7 @@
        无前端校验，直接加载数据
 
       5.1.2 API调用 (Backend Check)：
-        调用 `GET /api/saviynt/user/{userid}` 获取用户信息
+        调用 `GET /api/AuthenticationApi/login` 获取用户信息 
 
    5.2 结果处理：
        成功：正常渲染用户信息
@@ -82,10 +82,10 @@
 
 6. 接口定义 (API Specification)
 
-   GET /api/saviynt/user/{userid}
+   POST /api/AuthenticationApi/login
      功能：获取指定用户的详细信息
-     Method：GET
-     Endpoint：/api/saviynt/user/{userid}
+     Method：POST
+     Endpoint：/api/AuthenticationApi/login
 
      Request [请求格式]
      {

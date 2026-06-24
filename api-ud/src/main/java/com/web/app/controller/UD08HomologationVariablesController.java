@@ -22,7 +22,10 @@ public class UD08HomologationVariablesController {
     @GetMapping("/UD08SelectProductclassmaster")
     @ApiOperation("查询产品类别主数据")
     public UD08HomologationVariablesResponse selectProductclassmaster() {
-        return ud08HomologationVariablesService.selectProductclassmaster();
+        UD08HomologationVariablesResponse response = new UD08HomologationVariablesResponse();
+        response = ud08HomologationVariablesService.selectProductclassmaster();
+        return response;
+
     }
 
     @GetMapping("/UD08SelectMarketmaster")

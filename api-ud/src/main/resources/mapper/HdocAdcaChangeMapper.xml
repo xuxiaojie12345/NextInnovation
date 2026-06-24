@@ -28,8 +28,8 @@
             SERIE, CHNR, ACT, BU, REASON, REGISTER_DATETIME, REGISTER_USER, 
             REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
         ) VALUES (
-            #{serie}, #{chnr}, 'Y', '', #{reason}, SYSDATE, #{registerUser},
-            #{registerUser}, SYSDATE, #{registerUser}, #{registerUser}
+            #{serie}, #{chnr}, 'Y', '', #{reason}, SYSDATE(), #{registerUser},
+            #{registerUser}, SYSDATE(), #{registerUser}, #{registerUser}
         )
     </insert>
     

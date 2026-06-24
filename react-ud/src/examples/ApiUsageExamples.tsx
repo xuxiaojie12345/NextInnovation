@@ -1,44 +1,44 @@
 /**
  * API 使用示例
- * 
+ *
  * 本文件展示如何在 React 组件中使用后端 API
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  authApi, 
-  documentApi, 
-  userApi, 
+import React, { useState, useEffect } from "react";
+import {
+  authApi,
+  documentApi,
+  userApi,
   hdocVariablesApi,
   adcaApi,
   vinPlateApi,
-  marketDocumentApi 
-} from '../services/api';
+  marketDocumentApi,
+} from "../services/api";
 
 // ============================================
 // 示例 1: 用户登录
 // ============================================
 export const LoginExample = () => {
-  const [userid, setUserid] = useState('');
-  const [password, setPassword] = useState('');
+  const [userid, setUserid] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
       const result = await authApi.login(userid, password);
-      
+
       if (result.code === 200) {
-        alert('登录成功！');
+        alert("登录成功！");
         // 保存用户信息
-        localStorage.setItem('currentUser', JSON.stringify(result.data));
+        localStorage.setItem("currentUser", JSON.stringify(result.data));
         // 跳转到首页
-        window.location.href = '/Menu';
+        window.location.href = "/Menu";
       } else {
         alert(`登录失败: ${result.msg}`);
       }
     } catch (error) {
-      alert('网络错误，请检查后端服务是否启动');
+      alert("网络错误，请检查后端服务是否启动");
     } finally {
       setLoading(false);
     }
@@ -46,20 +46,20 @@ export const LoginExample = () => {
 
   return (
     <div>
-      <input 
-        type="text" 
-        value={userid} 
+      <input
+        type="text"
+        value={userid}
         onChange={(e) => setUserid(e.target.value)}
         placeholder="UserID"
       />
-      <input 
-        type="password" 
-        value={password} 
+      <input
+        type="password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
       <button onClick={handleLogin} disabled={loading}>
-        {loading ? '登录中...' : '登录'}
+        {loading ? "登录中..." : "登录"}
       </button>
     </div>
   );
@@ -84,7 +84,7 @@ export const DocumentTypesExample = () => {
         setDocumentTypes(response.data.documentTypes);
       }
     } catch (error) {
-      console.error('加载文档类型失败:', error);
+      console.error("加载文档类型失败:", error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,9 @@ export const DocumentTypesExample = () => {
       ) : (
         <ul>
           {documentTypes.map((doc: any, index: number) => (
-            <li key={index}>{doc.doctype} - {doc.description}</li>
+            <li key={index}>
+              {doc.doctype} - {doc.description}
+            </li>
           ))}
         </ul>
       )}
@@ -111,13 +113,13 @@ export const DocumentTypesExample = () => {
 // 示例 3: 查询用户信息
 // ============================================
 export const UserInfoExample = () => {
-  const [userid, setUserid] = useState('');
+  const [userid, setUserid] = useState("");
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const searchUser = async () => {
     if (!userid) {
-      alert('请输入用户ID');
+      alert("请输入用户ID");
       return;
     }
 
@@ -130,7 +132,7 @@ export const UserInfoExample = () => {
         alert(response.msg);
       }
     } catch (error) {
-      alert('查询失败');
+      alert("查询失败");
     } finally {
       setLoading(false);
     }
@@ -138,16 +140,16 @@ export const UserInfoExample = () => {
 
   return (
     <div>
-      <input 
-        type="text" 
-        value={userid} 
+      <input
+        type="text"
+        value={userid}
         onChange={(e) => setUserid(e.target.value)}
         placeholder="输入用户ID"
       />
       <button onClick={searchUser} disabled={loading}>
-        {loading ? '查询中...' : '查询'}
+        {loading ? "查询中..." : "查询"}
       </button>
-      
+
       {userInfo && (
         <div>
           <h4>用户信息</h4>
@@ -163,9 +165,9 @@ export const UserInfoExample = () => {
 // ============================================
 export const VariablesSearchExample = () => {
   const [searchParams, setSearchParams] = useState({
-    variable: '',
-    type: '',
-    description: ''
+    variable: "",
+    type: "",
+    description: "",
   });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -178,7 +180,7 @@ export const VariablesSearchExample = () => {
         setResults(response.data.variables);
       }
     } catch (error) {
-      console.error('搜索失败:', error);
+      console.error("搜索失败:", error);
     } finally {
       setLoading(false);
     }
@@ -187,20 +189,24 @@ export const VariablesSearchExample = () => {
   return (
     <div>
       <h3>HDoc 变量搜索</h3>
-      <input 
+      <input
         placeholder="变量名"
         value={searchParams.variable}
-        onChange={(e) => setSearchParams({...searchParams, variable: e.target.value})}
+        onChange={(e) =>
+          setSearchParams({ ...searchParams, variable: e.target.value })
+        }
       />
-      <input 
+      <input
         placeholder="类型"
         value={searchParams.type}
-        onChange={(e) => setSearchParams({...searchParams, type: e.target.value})}
+        onChange={(e) =>
+          setSearchParams({ ...searchParams, type: e.target.value })
+        }
       />
       <button onClick={handleSearch} disabled={loading}>
-        {loading ? '搜索中...' : '搜索'}
+        {loading ? "搜索中..." : "搜索"}
       </button>
-      
+
       <table>
         <thead>
           <tr>
@@ -227,7 +233,7 @@ export const VariablesSearchExample = () => {
 // 示例 5: VIN Plate 操作
 // ============================================
 export const VinPlateExample = () => {
-  const [chassisNumber, setChassisNumber] = useState('');
+  const [chassisNumber, setChassisNumber] = useState("");
   const [vinInfo, setVinInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -242,7 +248,7 @@ export const VinPlateExample = () => {
         alert(response.msg);
       }
     } catch (error) {
-      alert('查询失败');
+      alert("查询失败");
     } finally {
       setLoading(false);
     }
@@ -251,29 +257,31 @@ export const VinPlateExample = () => {
   // 设置为完成
   const setOk = async () => {
     if (!chassisNumber) return;
-    
+
     try {
       const response = await vinPlateApi.setOk(chassisNumber);
       if (response.code === 200) {
-        alert('设置成功');
+        alert("设置成功");
         viewInfo(); // 刷新信息
       }
     } catch (error) {
-      alert('操作失败');
+      alert("操作失败");
     }
   };
 
   return (
     <div>
       <h3>VIN Plate 管理</h3>
-      <input 
+      <input
         placeholder="底盘号"
         value={chassisNumber}
         onChange={(e) => setChassisNumber(e.target.value)}
       />
-      <button onClick={viewInfo} disabled={loading}>查看信息</button>
+      <button onClick={viewInfo} disabled={loading}>
+        查看信息
+      </button>
       <button onClick={setOk}>设置为完成</button>
-      
+
       {vinInfo && (
         <div>
           <h4>VIN Plate 信息</h4>
@@ -290,23 +298,23 @@ export const VinPlateExample = () => {
 // 示例 6: ADCA 变更管理
 // ============================================
 export const AdcaChangeExample = () => {
-  const [serieChnr, setSerieChnr] = useState('');
-  const [desc, setDesc] = useState('');
+  const [serieChnr, setSerieChnr] = useState("");
+  const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
 
   // 查询
   const selectAdca = async () => {
     setLoading(true);
     try {
-      const response = await adcaApi.selectAdcaChange(serieChnr, desc);
+      const response = await adcaApi.selectAdcaChange(serieChnr);
       if (response.code === 200) {
-        alert('查询成功');
+        alert("查询成功");
         console.log(response.data);
       } else {
         alert(response.msg);
       }
     } catch (error) {
-      alert('查询失败');
+      alert("查询失败");
     } finally {
       setLoading(false);
     }
@@ -316,20 +324,15 @@ export const AdcaChangeExample = () => {
   const insertAdca = async () => {
     setLoading(true);
     try {
-      const response = await adcaApi.insertAdcaChange({
-        serie_chnr: serieChnr,
-        desc: desc,
-        reason: '测试原因',
-        user: 'admin'
-      });
-      
+      const response = await adcaApi.insertAdcaChange(serieChnr, desc, "admin");
+
       if (response.code === 200) {
-        alert('新增成功');
+        alert("新增成功");
       } else {
         alert(response.msg);
       }
     } catch (error) {
-      alert('新增失败');
+      alert("新增失败");
     } finally {
       setLoading(false);
     }
@@ -338,18 +341,22 @@ export const AdcaChangeExample = () => {
   return (
     <div>
       <h3>ADCA 变更管理</h3>
-      <input 
+      <input
         placeholder="Serie-Chnr"
         value={serieChnr}
         onChange={(e) => setSerieChnr(e.target.value)}
       />
-      <input 
+      <input
         placeholder="描述"
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
       />
-      <button onClick={selectAdca} disabled={loading}>查询</button>
-      <button onClick={insertAdca} disabled={loading}>新增</button>
+      <button onClick={selectAdca} disabled={loading}>
+        查询
+      </button>
+      <button onClick={insertAdca} disabled={loading}>
+        新增
+      </button>
     </div>
   );
 };
@@ -373,7 +380,7 @@ export const MarketDocumentExample = () => {
         setDocuments(response.data.documents);
       }
     } catch (error) {
-      console.error('加载失败:', error);
+      console.error("加载失败:", error);
     } finally {
       setLoading(false);
     }
@@ -389,10 +396,9 @@ export const MarketDocumentExample = () => {
           {documents.map((doc: any, index: number) => (
             <li key={index}>
               {doc.doctype} - {doc.description}
-              <br/>
+              <br />
               <small>
-                用户: {doc.registerUser}, 
-                时间: {doc.registerDatetime}
+                用户: {doc.registerUser}, 时间: {doc.registerDatetime}
               </small>
             </li>
           ))}
@@ -410,5 +416,5 @@ export default {
   VariablesSearchExample,
   VinPlateExample,
   AdcaChangeExample,
-  MarketDocumentExample
+  MarketDocumentExample,
 };

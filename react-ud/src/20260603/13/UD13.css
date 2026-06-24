@@ -1,0 +1,145 @@
+/* ========================================
+   UD13 - HDoc Template Check
+   ======================================== */
+
+.ud13-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.ud13-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.ud13-card {
+  width: 100%;
+  max-width: 600px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 20px 24px 24px;
+  box-sizing: border-box;
+}
+
+.ud13-page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 12px 0;
+}
+
+/* ---- 消息 ---- */
+.ud13-message {
+  font-size: 13px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.ud13-error {
+  color: #d32f2f;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+}
+
+.ud13-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ---- 区块 ---- */
+.ud13-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #b8d4e8;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+/* ---- 字段行 ---- */
+.ud13-field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.ud13-field-row-button {
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid #b8d4e8;
+}
+
+.ud13-field-row-button .ud13-label {
+  display: none;
+}
+
+.ud13-label {
+  width: 100px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  text-align: left;
+}
+
+/* ---- 按钮 ---- */
+.ud13-btn {
+  min-width: 80px;
+  height: 28px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #7a9eb3;
+  cursor: pointer;
+  text-align: center;
+  background-color: #e8f0f8;
+  color: #003057;
+  transition: background-color 0.15s ease;
+  border-radius: 2px;
+}
+
+.ud13-btn:hover:not(:disabled) {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud13-btn:disabled {
+  background-color: #dce8f0;
+  color: #7a9eb3;
+  border-color: #b0c8d8;
+  cursor: not-allowed;
+}
+
+/* ---- 结果 ---- */
+.ud13-result-box {
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+.ud13-result-text {
+  font-size: 13px;
+  color: #333333;
+  margin: 0 0 10px 0;
+}
+
+.ud13-download-link {
+  color: #003057;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ud13-download-link:hover {
+  color: #0055aa;
+}

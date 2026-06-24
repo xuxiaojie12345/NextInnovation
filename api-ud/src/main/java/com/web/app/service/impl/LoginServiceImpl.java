@@ -20,41 +20,45 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public LoginResponse login(LoginRequest request) {
         LoginResponse response = new LoginResponse();
-        
-        // 参数校验
+
+        // 参数校验 - userId必填
         if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
             response.setCode(400);
             response.setMsg("用户ID不能为空");
             return response;
         }
-        
-        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-            response.setCode(400);
-            response.setMsg("密码不能为空");
-            return response;
-        }
-        
-        // 查询用户
-        User user = userMapper.selectByUserId(request.getUserId());
-        
+
+        // 使用动态条件查询：有密码时认证登录，无密码时仅查询用户信息
+        User user = userMapper.selectByCondition(
+                request.getUserId(),
+                request.getPassword()
+        );
+
         if (user == null) {
-            response.setCode(404);
-            response.setMsg("账号不存在");
+            // 区分登录认证和用户查询两种场景的错误消息
+            if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+                // 登录认证场景
+                User userExists = userMapper.selectByUserId(request.getUserId());
+                if (userExists == null) {
+                    response.setCode(404);
+                    response.setMsg("账号不存在");
+                } else {
+                    response.setCode(401);
+                    response.setMsg("密码不正确");
+                }
+            } else {
+                // 用户查询场景（UD25用）
+                response.setCode(404);
+                response.setMsg("用户不存在");
+            }
             return response;
         }
-        
-        // 验证密码（实际项目中应该使用加密比对）
-        if (!user.getPassword().equals(request.getPassword())) {
-            response.setCode(401);
-            response.setMsg("密码不正确");
-            return response;
-        }
-        
-        // 登录成功
+
+        // 成功
         response.setCode(200);
         response.setMsg("登录成功");
         response.setData(user);
-        
+
         return response;
     }
 }

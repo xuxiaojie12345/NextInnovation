@@ -35,4 +35,10 @@ public interface HdocVariablesMapper {
      * 搜索变量
      */
     List<HdocVariables> searchVariables(HdocVariables variables);
+
+    /**
+     * UD08 - 查询所有变量名（仅VARIABLE字段）
+     * SQL: SELECT VARIABLE FROM HDOC_VARIABLES
+     */
+    List<HdocVariables> selectAllVariables();
 }

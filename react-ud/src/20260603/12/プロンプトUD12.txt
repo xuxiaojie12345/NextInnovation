@@ -82,9 +82,9 @@
         终止流程
 
       5.1.2 API调用 (Backend Check)：
-        调用 `POST /api/template/upload` 上传文件
-        调用 `DELETE /api/template/delete` 删除文件
-        调用 `GET /api/template/check` 校验模板
+        调用 `GET /api/UD12UploadDeletetemplatApi/UD12SelectMarket` 初期表示
+        调用 `POST /api/UD12UploadDeletetemplatApi/UD12UploadFlie` 上传文件
+        调用 `DELETE /api/UD12UploadDeletetemplatApi/UD12DeleteFlie` 删除文件
 
    5.2 结果处理：
        成功：显示提示消息“操作成功”
@@ -102,10 +102,27 @@
 
 6. 接口定义 (API Specification)
 
-   POST /api/template/upload
+   UD12UploadDeletetemplatApi
+     功能：跳转至模板校验页面
+     Method：GET
+     Endpoint：/api/UD12UploadDeletetemplatApi/UD12SelectMarket
+
+     Request
+     无参数
+
+     Response Success (200)
+     [重定向至 `/template-check` 页面]
+
+     Response Error (403)
+     {
+       "error": "Forbidden",
+       "message": "You do not have permission to access this page"
+     }
+
+
      功能：上传 VIN plate 模板文件
      Method：POST
-     Endpoint：/api/template/upload
+     Endpoint：/api/UD12UploadDeletetemplatApi/UD12UploadFlie
 
      Request [json]
      {
@@ -125,10 +142,9 @@
        "message": "Only .rtf files are allowed"
      }
 
-   DELETE /api/template/delete
      功能：删除指定模板文件
      Method：DELETE
-     Endpoint：/api/template/delete
+     Endpoint：/api/UD12UploadDeletetemplatApi/UD12DeleteFlie
 
      Request [json]
      {
@@ -148,29 +164,11 @@
        "message": "Template not found"
      }
 
-   GET /api/template/check
-     功能：跳转至模板校验页面
-     Method：GET
-     Endpoint：/api/template/check
-
-     Request
-     无参数
-
-     Response Success (200)
-     [重定向至 `/template-check` 页面]
-
-     Response Error (403)
-     {
-       "error": "Forbidden",
-       "message": "You do not have permission to access this page"
-     }
-
 7. 异常处理 (Exception Handling)
 
 | 异常场景 | 处理方式 | Message显示内容 |
 |---------|---------|----------------|
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
-| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
 | 文件格式错误 | 返回错误响应 | “仅支持 .rtf 文件” |
 | 文件过大 | 返回错误响应 | “文件过大，请压缩后上传” |
 | 模板不存在 | 返回错误响应 | “模板不存在” |

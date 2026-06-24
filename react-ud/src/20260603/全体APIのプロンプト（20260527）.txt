@@ -1126,7 +1126,6 @@
 ----------------------------------------------------------------------------------------------------------------
     【UD04SelectGeneratedocumentApi】
     5.3 - 查询语句: 
-    -- 功能：根据Chassis no、Ordernumber、Market，联合查询全量信息
         select 
          OM.ORDERNUMBER,
          OM.BUILD,
@@ -1151,9 +1150,9 @@
           ON OM.SERIE = MODIFICATION.SERIE
           AND OM.CHNR = MODIFICATION.CHNR
         WHERE
-         OM.CHASSIS_NO = #{chassisNo}
-         AND OM.ORDERNUMBER = #{ordernumber}
-         AND OM.MARKET = #{market}
+         OM.CHASSIS_NO = :Chassis_no
+         AND OM.ORDERNUMBER = :Ordernumber
+         AND OM.MARKET = :Market
 ----------------------------------------------------------------------------------------------------------------
     【UD05ModifyDocumentApi】
     5.4 - 查询语句: 
@@ -1218,10 +1217,9 @@
         - UD08SelectMarketmaster的查询语句: 
     SELECT * FROM MARKET_MASTER
 
-        -  UD08SelectUserDefinedRules的查询语句：
-     SELECT COUNT(1) FROM HDOC_USER_DEFINED_RULES WHERE  PC = {Productclass}  AND NUM = {Number}  AND  MARKET = {Market}
-        - UD08SelectHdocvariables的查询语句:
-         SELECT COUNT(1)  FROM HDOC_VARIABLES WHERE VARIABLE = {Variable}
+        -  UD08SelectHdocvariables的查询语句：
+     SELECT VARIABLE FROM HDOC_VARIABLES
+
         - UD08Add追加语句:
        INSERT INTO HDOC_USER_DEFINED_RULES (
           PC,

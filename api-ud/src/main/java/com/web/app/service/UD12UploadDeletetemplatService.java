@@ -22,4 +22,9 @@ public interface UD12UploadDeletetemplatService {
      * 删除模板文件
      */
     UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request);
+
+    /**
+     * 根据市场列出模板文件列表
+     */
+    UD12UploadDeletetemplatResponse listTemplates(String market);
 }

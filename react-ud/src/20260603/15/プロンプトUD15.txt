@@ -19,7 +19,6 @@
   - 操作逻辑清晰，避免误操作
 
   安全性或特殊要求：
-  - 仅允许授权用户访问此页面
   - 所有状态变更需确认
   - 数据更新由后端统一控制，防止并发冲突
   - 所有通信使用 HTTPS 加密
@@ -47,16 +46,16 @@
       1. 用户在“Chassis number”字段中输入底盘编号（如 JPCT 013945）
       2. 点击“View Info”按钮
       3. 系统校验输入合法性
-      4. 若通过，则调用接口查询 HDOC_SEND_DATA_VIN_PLATE 表
+      4. 若通过，则调用接口查询 HDOC_SEND_DATA_VIN_PLATE 表（UD15SelecthdocsenddatavinplateApi/UD15ViewInfo）
       5. 成功后转移 VIN　Plate詳細画面
       6. 若未找到记录，则显示错误消息：“Chassis number XXX not found.”
 
     4.2 重新生成功能
     功能说明：将指定底盘的状态更新为0（新增），触发重新生成流程。
     操作步骤：
-      1. 用户输入底盘编号
+            1. 用户输入底盘编号
       2. 点击“Set Regenerate”按钮
-      3. 系统调用接口更新数据库
+      3. 系统调用接口更新数据库(UD15SelecthdocsenddatavinplateApi/UD15SetRegenerate)
       4. 将 STATUS 字段设为 0
       5. 成功后提示：“状态已更新为新增”
 
@@ -65,7 +64,7 @@
     操作步骤：
       1. 用户输入底盘编号
       2. 点击“Set OK”按钮
-      3. 系统调用接口更新数据库
+      3. 系统调用接口更新数据库(UD15SelecthdocsenddatavinplateApi/UD15SetOK)
       4. 将 STATUS 字段设为 1
       5. 成功后提示：“状态已更新为XML已生成”
 
@@ -74,7 +73,7 @@
     操作步骤：
       1. 用户输入底盘编号
       2. 点击“Change to Basic Info”按钮
-      3. 系统调用接口更新数据库
+      3. 系统调用接口更新数据库(UD15SelecthdocsenddatavinplateApi/UD15ChangetoBasicInfo)
       4. 将 STATUS 设为 0，TYPE 设为 1
       5. 成功后提示：“已切换为基础信息模式”
 
@@ -83,7 +82,7 @@
     操作步骤：
       1. 用户输入底盘编号
       2. 点击“Change to Advanced Info”按钮
-      3. 系统调用接口更新数据库
+      3. 系统调用接口更新数据库(UD15SelecthdocsenddatavinplateApi/UD15ChangetoAdvancedInfo)
       4. 将 STATUS 设为 0，TYPE 设为 2
       5. 成功后提示：“已切换为高级信息模式”
 
@@ -99,11 +98,6 @@
         设置Message = “Please enter a chassis number.”
         终止流程
 
-      5.1.2 API调用 (Backend Check)：
-        调用 `GET /api/vinplate/UD15ViewInfo` 获取详情
-        调用 `PUT /api/vinplate/status` 更新状态
-        调用 `PUT /api/vinplate/type` 更新类型
-
    5.2 结果处理：
        成功：显示提示消息“操作成功”
        失败：显示错误消息“操作失败，请稍后重试”
@@ -118,7 +112,7 @@
 
 6. 接口定义 (API Specification)
 
-   GET /api/vinplate/{chassisNo}
+   UD15SelecthdocsenddatavinplateApi
      功能：获取指定底盘的车辆铭牌信息
      Method：GET
      Endpoint：/api/UD15SelecthdocsenddatavinplateApi/UD15ViewInfo
@@ -126,7 +120,7 @@
      Request [json]
      {
         "chassisNumber": "JPCT 013945"
-}
+           }
 
      Response Success (200)
      {
@@ -149,10 +143,10 @@
        "message": "Chassis number XXX not found."
      }
 
-   PUT /api/vinplate/status
+   UD15SelecthdocsenddatavinplateApi
      功能：更新车辆铭牌状态
      Method：PUT
-     Endpoint：/api/vinplate/status
+     Endpoint：/api/UD15SelecthdocsenddatavinplateApi/UD15SetRegenerate
 
      Request [json]
      {
@@ -172,10 +166,10 @@
        "message": "您没有权限执行此操作"
      }
 
-   PUT /api/vinplate/type
+   UD15SelecthdocsenddatavinplateApi
      功能：更新车辆铭牌类型
-     Method：PUT
-     Endpoint：/api/vinplate/type
+     Method：POST
+     Endpoint：/api/UD15SelecthdocsenddatavinplateApi/UD15SetOK
 
      Request [json]
      {
@@ -196,11 +190,56 @@
        "message": "类型必须为1或2"
      }
 
+   UD15SelecthdocsenddatavinplateApi
+ 
+     Method：POST
+     Endpoint：/api/UD15SelecthdocsenddatavinplateApi/UD15ChangetoBasicInfo
+
+     Request [json]
+     {
+            "chassisNumber": "JPCT-013945"
+           }
+
+           {
+             "code": 200,
+             "msg": "切换到基础信息成功",
+             "data": {
+               "serie": "xxx",
+               "chnr": "xxx"
+             }
+           }
+
+
+           #### 6.1.5 changeToAdvancedInfo
+
+           - **功能**：changeToAdvancedInfo
+           - **Method**: POST
+           - **Endpoint**: `/api/UD15SelecthdocsenddatavinplateApi/UD15ChangetoAdvancedInfo
+
+           ##### Request
+
+           ```json
+           {
+             "chassisNumber": "JPCT-013945"
+           }
+           ```
+
+            Response Success (200)
+
+           ```json
+           {
+             "code": 200,
+             "msg": "切换到高级信息成功",
+             "data": {
+               "serie": "xxx",
+               "chnr": "xxx"
+             }
+           }
+
 7. 异常处理 (Exception Handling)
 
 | 异常场景 | 处理方式 | Message显示内容 |
 |---------|---------|----------------|
 | 网络超时 | 重试一次，若仍失败则提示 | “网络连接失败，请检查网络设置” |
-| 权限不足 | 禁用相关按钮 | “您没有权限执行此操作” |
 | 底盘编号不存在 | 返回错误响应 | “Chassis number XXX not found.” |
 | 数据库异常 | 回滚事务，记录日志 | “系统繁忙，请稍后再试” |

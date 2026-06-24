@@ -171,22 +171,25 @@ export const hdocVariablesApi = {
  * ADCA 变更 API
  */
 export const adcaApi = {
-  // 查询 ADCA 变更
-  selectAdcaChange: (serie_chnr: string, desc: string) =>
+  // 查询 ADCA 变更 (CHECK)
+  selectAdcaChange: (serieChnr: string) =>
     apiRequest("/api/UD16ADChangeApi/UD16SelectHdocAdcaChange", "POST", {
-      serie_chnr,
-      desc,
+      serieChnr,
     }),
 
-  // 新增 ADCA 变更
-  insertAdcaChange: (params: any) =>
-    apiRequest("/api/UD16ADChangeApi/UD16InsertHdocAdcaChange", "POST", params),
-
-  // 删除 ADCA 变更
-  updateAdcaChange: (serie_chnr: string, desc: string) =>
-    apiRequest("/api/UD16ADChangeApi/UD16UpdateHdocAdcaChange", "POST", {
-      serie_chnr,
+  // 新增 ADCA 变更 (ADD)
+  insertAdcaChange: (serieChnr: string, desc: string, user: string) =>
+    apiRequest("/api/UD16ADChangeApi/UD16InsertHdocAdcaChange", "POST", {
+      serieChnr,
       desc,
+      user,
+    }),
+
+  // 删除 ADCA 变更 (DELETE)
+  deleteAdcaChange: (serieChnr: string, user: string) =>
+    apiRequest("/api/UD16ADChangeApi/UD16UpdateHdocAdcaChange", "POST", {
+      serieChnr,
+      user,
     }),
 };
 
@@ -280,13 +283,96 @@ export const homologationVariablesApi = {
 
   // 更新记录
   update: (params: any) =>
-    apiRequest("/api/UD08HomologationVariablesApi/UD08Update", "PUT", params),
+    apiRequest("/api/UD08HomologationVariablesApi/UD08Update", "POST", params),
 
   // 删除记录
   delete: (params: any) =>
+    apiRequest("/api/UD08HomologationVariablesApi/UD08Delete", "POST", params),
+
+  // UD09 - 搜索认证参数列表
+  searchList: (params: any) =>
     apiRequest(
-      "/api/UD08HomologationVariablesApi/UD08Delete",
-      "DELETE",
+      "/api/UD09DeleteHdocuserdefinedrulesApi/UD09Seach",
+      "POST",
       params,
     ),
+
+  // UD09 - 批量删除选中的记录
+  deleteSelected: (params: any) =>
+    apiRequest(
+      "/api/UD09DeleteHdocuserdefinedrulesApi/UD09DeleteSelected",
+      "POST",
+      params,
+    ),
+};
+
+/**
+ * UD12 - 模板上传/删除 API
+ */
+export const templateApi = {
+  // 获取市场列表
+  selectMarket: () =>
+    apiRequest("/api/UD12UploadDeletetemplatApi/UD12SelectMarket", "POST"),
+
+  // 上传文件（使用 FormData）
+  uploadFile: (file: File, market: string) => {
+    const url = `${API_BASE_URL}/api/UD12UploadDeletetemplatApi/UD12UploadFlie`;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("market", market);
+    return fetch(url, { method: "POST", body: formData }).then((res) =>
+      res.json(),
+    );
+  },
+
+  // 删除文件
+  deleteFile: (market: string, templateName: string) =>
+    apiRequest("/api/UD12UploadDeletetemplatApi/UD12DeleteFlie", "POST", {
+      market,
+      templateName,
+    }),
+
+  // 根据市场列出模板文件列表
+  listTemplates: (market: string) =>
+    apiRequest("/api/UD12UploadDeletetemplatApi/UD12ListTemplates", "POST", {
+      market,
+    }),
+};
+
+/**
+ * UD14 - 模板文件列表 API
+ */
+export const templateListApi = {
+  // 获取市场列表
+  selectMarket: () =>
+    apiRequest("/api/UD14SearchresultistApi/UD14SelectMarketmaster", "POST"),
+
+  // 获取指定市场的模板文件列表
+  selectTemplateFiles: (market: string) =>
+    apiRequest(
+      "/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
+      "POST",
+      { market },
+    ),
+
+  // 获取指定市场的规则变量列表
+  selectHdocuserdefinedrules: (market: string) =>
+    apiRequest(
+      "/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
+      "POST",
+      { market },
+    ),
+
+  // 下载模板文件
+  downloadFile: (market: string, filename: string) =>
+    `${API_BASE_URL}/api/UD14SearchresultistApi/UD14DownloadFile?market=${encodeURIComponent(market)}&filename=${encodeURIComponent(filename)}`,
+};
+
+/**
+ * UD25 - EDB 用户信息 API
+ */
+export const edbUserApi = {
+  // 获取用户信息（调用 AuthenticationApi/login，仅传userId不传密码）
+  getUserInfo: (userid: string) =>
+    apiRequest("/api/AuthenticationApi/login", "POST", { userId: userid }),
 };

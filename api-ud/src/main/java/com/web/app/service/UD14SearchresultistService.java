@@ -17,4 +17,14 @@ public interface UD14SearchresultistService {
      * 根据市场查询用户定义规则
      */
     UD14SearchresultistResponse selectHdocuserdefinedrules(UD14SearchresultistRequest request);
+
+    /**
+     * 根据市场获取模板文件列表
+     */
+    UD14SearchresultistResponse selectTemplateFiles(UD14SearchresultistRequest request);
+
+    /**
+     * 下载模板文件
+     */
+    org.springframework.core.io.Resource downloadFile(String market, String filename);
 }

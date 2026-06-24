@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { homologationVariablesApi } from "../../services/api";
 import "./UD08.css";
 
@@ -26,7 +26,8 @@ interface HomoVarRecord {
   createdByUser: string;
   date: string;
 }
-
+/** sessionStorage 键名 - 保存检索条件 */
+const STORAGE_KEY_UD08_FORM = "ud08_search_criteria";
 /** 检索条件 */
 interface SearchParams {
   productClass: string;
@@ -71,6 +72,7 @@ const getCurrentUser = (): {
 
 const UD08 = React.memo(() => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // ===== 状态管理 =====
 
@@ -83,6 +85,10 @@ const UD08 = React.memo(() => {
   const [opVariantString1, setOpVariantString1] = useState<string>("=");
   const [opVariantString2, setOpVariantString2] = useState<string>("=");
   const [opComments, setOpComments] = useState<string>("=");
+  const [opAdd, setOpAdd] = useState<string>("=");
+  const [opDelete, setOpDelete] = useState<string>("=");
+  const [opCreatedBy, setOpCreatedBy] = useState<string>("=");
+  const [opDate, setOpDate] = useState<string>("=");
 
   // 表单输入
   const [productClass, setProductClass] = useState<string>("");
@@ -94,11 +100,11 @@ const UD08 = React.memo(() => {
   const [variantString2, setVariantString2] = useState<string>("");
   const [comments, setComments] = useState<string>("");
 
-  // 输出字段（系统自动填充）
-  const [addLabel, setAddLabel] = useState<string>("YYYYWW");
-  const [deleteLabel, setDeleteLabel] = useState<string>("YYYYWW");
-  const [createdByUser, setCreatedByUser] = useState<string>("Automatic");
-  const [dateLabel, setDateLabel] = useState<string>("Automatic");
+  // 系统自动填充字段（TextField / Input/Output / 活性）
+  const [addVal, setAddVal] = useState<string>("");
+  const [deleteVal, setDeleteVal] = useState<string>("");
+  const [createdByVal, setCreatedByVal] = useState<string>("");
+  const [dateVal, setDateVal] = useState<string>("");
 
   // 下拉列表数据
   const [productClassOptions, setProductClassOptions] = useState<
@@ -143,30 +149,106 @@ const UD08 = React.memo(() => {
           homologationVariablesApi.getHdocVariables(),
         ]);
 
-        // 处理 Product Class 下拉
-        if (productRes && productRes.data && Array.isArray(productRes.data)) {
-          setProductClassOptions(productRes.data);
-        } else {
-          setProductClassOptions([]);
-        }
+        // デバッグ: 実際のレスポンス構造を確認
+        console.log("UD08 ProductClass response:", productRes);
+        console.log("UD08 Market response:", marketRes);
+        console.log("UD08 Variable response:", variableRes);
 
-        // 处理 Market 下拉
-        if (marketRes && marketRes.data && Array.isArray(marketRes.data)) {
-          setMarketOptions(marketRes.data);
-        } else {
-          setMarketOptions([]);
-        }
+        // 处理下拉列表数据
+        // 返回格式: { code: 200, data: { productClasses: [{pc, description}, ...] } }
+        const extractArray = (
+          res: any,
+          labelName: string = "",
+        ): SelectOption[] => {
+          if (!res || !res.data) return [];
+          const dataObj = res.data;
+          // 遍历 data 内的所有属性，找到第一个数组
+          for (const key of Object.keys(dataObj)) {
+            if (Array.isArray(dataObj[key])) {
+              const result = dataObj[key].map((item: any) => {
+                if (typeof item === "string") {
+                  return { value: item, label: item };
+                }
+                if (typeof item === "object" && item !== null) {
+                  // 尝试各种可能的字段名
+                  const possibleValueKeys = [
+                    "pc",
+                    "value",
+                    "code",
+                    "key",
+                    "id",
+                    "market",
+                    "mk",
+                    "productClass",
+                    "variable",
+                  ];
+                  const possibleLabelKeys = [
+                    "description",
+                    "label",
+                    "name",
+                    "desc",
+                    "text",
+                    "marketDescription",
+                    "marketName",
+                  ];
+                  let val = "";
+                  let lbl = "";
+                  for (const k of possibleValueKeys) {
+                    if (item[k] !== undefined) {
+                      val = String(item[k]);
+                      break;
+                    }
+                  }
+                  for (const k of possibleLabelKeys) {
+                    if (item[k] !== undefined) {
+                      lbl = String(item[k]);
+                      break;
+                    }
+                  }
+                  if (!val) val = labelName || `item_${Math.random()}`;
+                  if (!lbl) lbl = val;
+                  return { value: val, label: lbl };
+                }
+                return { value: String(item), label: String(item) };
+              });
+              // 调试日志
+              console.log(`UD08 extractArray (${key}):`, result.slice(0, 3));
+              return result;
+            }
+          }
+          return [];
+        };
 
-        // 处理 Variable 下拉（用于输入提示）
-        if (
-          variableRes &&
-          variableRes.data &&
-          Array.isArray(variableRes.data)
-        ) {
-          setVariableOptions(variableRes.data);
-        } else {
-          setVariableOptions([]);
-        }
+        setProductClassOptions(extractArray(productRes));
+        setMarketOptions(extractArray(marketRes));
+        setVariableOptions(extractArray(variableRes));
+        // 从 sessionStorage 恢复上次检索条件（从UD09返回时）
+        try {
+          const saved = sessionStorage.getItem(STORAGE_KEY_UD08_FORM);
+          if (saved) {
+            const formState = JSON.parse(saved);
+            setProductClass(formState.productClass || "");
+            setNumber(formState.number || "");
+            setMarket(formState.market || "");
+            setVariable(formState.variable || "");
+            setValue(formState.value || "");
+            setVariantString1(formState.variantString1 || "");
+            setVariantString2(formState.variantString2 || "");
+            setComments(formState.comments || "");
+            setOpProductClass(formState.opProductClass || "=");
+            setOpNumber(formState.opNumber || "=");
+            setOpMarket(formState.opMarket || "=");
+            setOpVariable(formState.opVariable || "=");
+            setOpValue(formState.opValue || "=");
+            setOpVariantString1(formState.opVariantString1 || "=");
+            setOpVariantString2(formState.opVariantString2 || "=");
+            setOpComments(formState.opComments || "=");
+            setAddVal(formState.addVal || "");
+            setDeleteVal(formState.deleteVal || "");
+            setCreatedByVal(formState.createdByVal || "");
+            setDateVal(formState.dateVal || "");
+          }
+        } catch {}
       } catch {
         setErrorMessage("无法加载下拉列表数据，请刷新页面重试");
       } finally {
@@ -176,6 +258,31 @@ const UD08 = React.memo(() => {
 
     initPage();
   }, [navigate]);
+
+  // ===== 接收从UD09返回的选择记录 =====
+  useEffect(() => {
+    const stateData = location.state as { selectedRecords?: any[] } | null;
+    if (
+      stateData &&
+      stateData.selectedRecords &&
+      stateData.selectedRecords.length > 0
+    ) {
+      const record = stateData.selectedRecords[0];
+      setProductClass(record.productClass || "");
+      setNumber(String(record.number || ""));
+      setMarket(record.market || "");
+      setVariable(record.variable || "");
+      setValue(record.value || "");
+      setVariantString1(record.variantString || "");
+      setVariantString2("");
+      setComments(record.comments || "");
+      setAddVal(record.addDate || record.add || "");
+      setDeleteVal(record.deleteDate || record.delete || "");
+      setCreatedByVal(record.createdByUser || "");
+      setDateVal(record.date || "");
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // ===== 运算符处理 =====
 
@@ -324,6 +431,68 @@ const UD08 = React.memo(() => {
     [],
   );
 
+  // ---- Add / Delete / Created by user / Date 入力処理 ----
+
+  const handleAddChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAddVal(e.target.value);
+      if (errorMessage) setErrorMessage("");
+    },
+    [errorMessage],
+  );
+
+  const handleAddOpChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setOpAdd(e.target.value);
+    },
+    [],
+  );
+
+  const handleDeleteChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDeleteVal(e.target.value);
+      if (errorMessage) setErrorMessage("");
+    },
+    [errorMessage],
+  );
+
+  const handleDeleteOpChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setOpDelete(e.target.value);
+    },
+    [],
+  );
+
+  const handleCreatedByChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCreatedByVal(e.target.value);
+      if (errorMessage) setErrorMessage("");
+    },
+    [errorMessage],
+  );
+
+  const handleCreatedByOpChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setOpCreatedBy(e.target.value);
+    },
+    [],
+  );
+
+  const handleDateChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDateVal(e.target.value);
+      if (errorMessage) setErrorMessage("");
+    },
+    [errorMessage],
+  );
+
+  const handleDateOpChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setOpDate(e.target.value);
+    },
+    [],
+  );
+
   // ===== 业务逻辑 =====
 
   /**
@@ -346,51 +515,76 @@ const UD08 = React.memo(() => {
     setOpVariantString1("=");
     setOpVariantString2("=");
     setOpComments("=");
-    setAddLabel("YYYYWW");
-    setDeleteLabel("YYYYWW");
-    setCreatedByUser("Automatic");
-    setDateLabel("Automatic");
+    setOpAdd("=");
+    setOpDelete("=");
+    setOpCreatedBy("=");
+    setOpDate("=");
+    setAddVal("");
+    setDeleteVal("");
+    setCreatedByVal("");
+    setDateVal("");
     setSelectedRecord(null);
     setErrorMessage("");
+    // 清除保存的检索条件
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_UD08_FORM);
+    } catch {}
   }, []);
 
   /**
-   * Search - 查询认证参数记录
+   * Search - 跳转至UD09查询结果页
    */
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(() => {
     setIsSearching(true);
     setErrorMessage("");
-    setSelectedRecord(null);
 
+    // 将检索条件保存到 sessionStorage，以便从UD09返回时恢复
+    const formState = {
+      productClass: productClass.trim(),
+      number: number.trim(),
+      market: market.trim(),
+      variable: variable.trim(),
+      value: value.trim(),
+      variantString1: variantString1.trim(),
+      variantString2: variantString2.trim(),
+      comments: comments.trim(),
+      opProductClass,
+      opNumber,
+      opMarket,
+      opVariable,
+      opValue,
+      opVariantString1,
+      opVariantString2,
+      opComments,
+      addVal,
+      deleteVal,
+      createdByVal,
+      dateVal,
+    };
     try {
-      const params: SearchParams = {
-        productClass: productClass.trim(),
-        number: number.trim(),
-        market: market.trim(),
-        variable: variable.trim(),
-        value: value.trim(),
-        variantString1: variantString1.trim(),
-        variantString2: variantString2.trim(),
-        comments: comments.trim(),
-      };
+      sessionStorage.setItem(STORAGE_KEY_UD08_FORM, JSON.stringify(formState));
+    } catch {}
 
-      const result = await homologationVariablesApi.getProductClassMaster();
+    const params = {
+      productClass: formState.productClass,
+      number: formState.number,
+      market: formState.market,
+      variable: formState.variable,
+      value: formState.value,
+      variantString1: formState.variantString1,
+      variantString2: formState.variantString2,
+      comments: formState.comments,
+      opProductClass,
+      opNumber,
+      opMarket,
+      opVariable,
+      opValue,
+      opVariantString1,
+      opVariantString2,
+      opComments,
+    };
 
-      if (result && result.data && Array.isArray(result.data)) {
-        setSearchResults(result.data);
-        if (result.data.length === 0) {
-          setErrorMessage("未找到符合条件的记录");
-        }
-      } else {
-        setSearchResults([]);
-        setErrorMessage("未找到符合条件的记录");
-      }
-    } catch {
-      setErrorMessage("查询失败，请稍后重试");
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
+    navigate("/UD09", { state: params });
   }, [
     productClass,
     number,
@@ -400,6 +594,19 @@ const UD08 = React.memo(() => {
     variantString1,
     variantString2,
     comments,
+    opProductClass,
+    opNumber,
+    opMarket,
+    opVariable,
+    opValue,
+    opVariantString1,
+    opVariantString2,
+    opComments,
+    addVal,
+    deleteVal,
+    createdByVal,
+    dateVal,
+    navigate,
   ]);
 
   /**
@@ -415,10 +622,10 @@ const UD08 = React.memo(() => {
     setVariantString1(record.variantString1);
     setVariantString2(record.variantString2);
     setComments(record.comments);
-    setAddLabel(record.add || "YYYYWW");
-    setDeleteLabel(record.delete || "YYYYWW");
-    setCreatedByUser(record.createdByUser || "Automatic");
-    setDateLabel(record.date || "Automatic");
+    setAddVal(record.add || "");
+    setDeleteVal(record.delete || "");
+    setCreatedByVal(record.createdByUser || "");
+    setDateVal(record.date || "");
     // 运算符重置为 "="
     setOpProductClass("=");
     setOpNumber("=");
@@ -428,6 +635,10 @@ const UD08 = React.memo(() => {
     setOpVariantString1("=");
     setOpVariantString2("=");
     setOpComments("=");
+    setOpAdd("=");
+    setOpDelete("=");
+    setOpCreatedBy("=");
+    setOpDate("=");
     setErrorMessage("");
   }, []);
 
@@ -451,10 +662,29 @@ const UD08 = React.memo(() => {
   }, [productClass, number, market]);
 
   /**
+   * Variable存在校验
+   */
+  const validateVariable = useCallback((): boolean => {
+    const trimmedVar = variable.trim();
+    if (!trimmedVar) return true; // Variable 可为空，为空时不校验
+    const exists = variableOptions.some(
+      (opt) => opt.value.toLowerCase() === trimmedVar.toLowerCase(),
+    );
+    if (!exists) {
+      setErrorMessage(
+        "Variant does not exist, Please enter the correct content",
+      );
+      return false;
+    }
+    return true;
+  }, [variable, variableOptions]);
+
+  /**
    * Add - 新增记录
    */
   const handleAdd = useCallback(async () => {
     if (!validateRequired()) return;
+    if (!validateVariable()) return;
 
     setIsSubmitting(true);
     setErrorMessage("");
@@ -466,19 +696,18 @@ const UD08 = React.memo(() => {
         market: market.trim(),
         variable: variable.trim(),
         value: value.trim(),
-        variantString1: variantString1.trim(),
-        variantString2: variantString2.trim(),
+        string1: variantString1.trim() || null,
+        string2: variantString2.trim() || null,
         comments: comments.trim(),
       };
 
       const result = await homologationVariablesApi.add(params);
 
-      if (result && result.success) {
-        // 新增成功后，清空表单并刷新列表
+      if (result && result.code === 200) {
         handleClear();
         alert("添加成功");
       } else {
-        setErrorMessage(result?.message || "添加失败，请确认输入内容");
+        setErrorMessage(result?.msg || "添加失败，请确认输入内容");
       }
     } catch (err: any) {
       if (err.message?.includes("409") || err.message?.includes("Conflict")) {
@@ -509,10 +738,7 @@ const UD08 = React.memo(() => {
    */
   const handleUpdate = useCallback(async () => {
     if (!validateRequired()) return;
-    if (!selectedRecord) {
-      setErrorMessage("请先从搜索结果中选择要更新的记录");
-      return;
-    }
+    if (!validateVariable()) return;
 
     setIsSubmitting(true);
     setErrorMessage("");
@@ -524,18 +750,18 @@ const UD08 = React.memo(() => {
         market: market.trim(),
         variable: variable.trim(),
         value: value.trim(),
-        variantString1: variantString1.trim(),
-        variantString2: variantString2.trim(),
+        string1: variantString1.trim() || null,
+        string2: variantString2.trim() || null,
         comments: comments.trim(),
       };
 
       const result = await homologationVariablesApi.update(params);
 
-      if (result && result.success) {
+      if (result && result.code === 200) {
         handleClear();
         alert("更新成功");
       } else {
-        setErrorMessage(result?.message || "更新失败");
+        setErrorMessage(result?.msg || "更新失败");
       }
     } catch (err: any) {
       if (err.message?.includes("404") || err.message?.includes("Not Found")) {
@@ -566,10 +792,7 @@ const UD08 = React.memo(() => {
    * Delete - 删除记录
    */
   const handleDelete = useCallback(async () => {
-    if (!selectedRecord) {
-      setErrorMessage("请选择要删除的记录");
-      return;
-    }
+    if (!validateRequired()) return;
 
     if (!window.confirm("确定要删除该记录吗？")) return;
 
@@ -578,18 +801,18 @@ const UD08 = React.memo(() => {
 
     try {
       const params = {
-        productClass: selectedRecord.productClass,
-        number: selectedRecord.number,
-        market: selectedRecord.market,
+        productClass: productClass.trim(),
+        number: parseInt(number.trim(), 10),
+        market: market.trim(),
       };
 
       const result = await homologationVariablesApi.delete(params);
 
-      if (result && result.success) {
+      if (result && result.code === 200) {
         handleClear();
         alert("删除成功");
       } else {
-        setErrorMessage(result?.message || "删除失败");
+        setErrorMessage(result?.msg || "删除失败");
       }
     } catch (err: any) {
       if (err.message?.includes("404") || err.message?.includes("Not Found")) {
@@ -602,7 +825,7 @@ const UD08 = React.memo(() => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedRecord, handleClear]);
+  }, [productClass, number, market, validateRequired, handleClear]);
 
   // ===== 加载状态 =====
 
@@ -664,7 +887,7 @@ const UD08 = React.memo(() => {
             <button
               className="ud08-btn"
               onClick={handleDelete}
-              disabled={isSubmitting || !selectedRecord}
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Deleting..." : "Delete"}
             </button>
@@ -853,83 +1076,78 @@ const UD08 = React.memo(() => {
               </div>
             </div>
 
-            {/* 系统输出字段（无运算符） */}
+            {/* Add - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
               <label className="ud08-label">Add</label>
-              <div className="ud08-field-control ud08-field-control-full">
-                <span className="ud08-output-text">{addLabel}</span>
+              {renderOperatorSelect(opAdd, handleAddOpChange)}
+              <div className="ud08-field-control-short">
+                <input
+                  className="ud08-input"
+                  type="text"
+                  value={addVal}
+                  onChange={handleAddChange}
+                  maxLength={6}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
               </div>
+              <span className="ud08-auto-value">{addVal || "YYYYWW"}</span>
             </div>
+            {/* Delete - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
               <label className="ud08-label">Delete</label>
-              <div className="ud08-field-control ud08-field-control-full">
-                <span className="ud08-output-text">{deleteLabel}</span>
+              {renderOperatorSelect(opDelete, handleDeleteOpChange)}
+              <div className="ud08-field-control-short">
+                <input
+                  className="ud08-input"
+                  type="text"
+                  value={deleteVal}
+                  onChange={handleDeleteChange}
+                  maxLength={6}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
               </div>
+              <span className="ud08-auto-value">{deleteVal || "YYYYWW"}</span>
             </div>
+            {/* Created by user - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
               <label className="ud08-label">Created by user</label>
-              <div className="ud08-field-control ud08-field-control-full">
-                <span className="ud08-output-text">{createdByUser}</span>
+              {renderOperatorSelect(opCreatedBy, handleCreatedByOpChange)}
+              <div className="ud08-field-control-short">
+                <input
+                  className="ud08-input"
+                  type="text"
+                  value={createdByVal}
+                  onChange={handleCreatedByChange}
+                  maxLength={16}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
               </div>
+              <span className="ud08-auto-value">
+                {createdByVal || "Automatic"}
+              </span>
             </div>
+            {/* Date - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
               <label className="ud08-label">Date</label>
-              <div className="ud08-field-control ud08-field-control-full">
-                <span className="ud08-output-text">{dateLabel}</span>
+              {renderOperatorSelect(opDate, handleDateOpChange)}
+              <div className="ud08-field-control-short">
+                <input
+                  className="ud08-input"
+                  type="text"
+                  value={dateVal}
+                  onChange={handleDateChange}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
               </div>
+              <span className="ud08-auto-value">{dateVal || "Automatic"}</span>
             </div>
           </div>
 
-          {/* 搜索结果表格 */}
-          {searchResults.length > 0 && (
-            <div className="ud08-results-section">
-              <h2 className="ud08-results-title">Search Results</h2>
-              <div className="ud08-results-table-wrapper">
-                <table className="ud08-results-table">
-                  <thead>
-                    <tr>
-                      <th>Product class</th>
-                      <th>Number</th>
-                      <th>Market</th>
-                      <th>Variable</th>
-                      <th>Value</th>
-                      <th>Variant string.1</th>
-                      <th>Variant string.2</th>
-                      <th>Comments</th>
-                      <th>Add</th>
-                      <th>Created by</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchResults.map((record, index) => (
-                      <tr
-                        key={index}
-                        className={`ud08-table-row ${
-                          selectedRecord === record
-                            ? "ud08-table-row-selected"
-                            : ""
-                        }`}
-                        onClick={() => handleSelectRecord(record)}
-                      >
-                        <td>{record.productClass}</td>
-                        <td>{record.number}</td>
-                        <td>{record.market}</td>
-                        <td>{record.variable}</td>
-                        <td>{record.value}</td>
-                        <td>{record.variantString1}</td>
-                        <td>{record.variantString2}</td>
-                        <td>{record.comments}</td>
-                        <td>{record.add}</td>
-                        <td>{record.createdByUser}</td>
-                        <td>{record.date}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+          {/* 搜索结果表格（已移至UD09） */}
 
           {/* 用户信息 */}
           {user && (

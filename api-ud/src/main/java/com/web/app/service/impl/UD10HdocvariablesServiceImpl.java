@@ -8,6 +8,8 @@ import com.web.app.service.UD10HdocvariablesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * UD10 - HDoc变量操作服务实现类
  */
@@ -36,12 +38,18 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
             return response;
         }
 
-        // 新增
+        // 新增（NOT NULL 字段自动采番）
         HdocVariables variables = new HdocVariables();
         variables.setVariable(request.getVariable());
         variables.setType(request.getType());
         variables.setDescription(request.getDescription());
-        variables.setCreatedByUser(request.getCreatedByUser());
+
+        // REGISTER_USER: 前台未传值时自动生成
+        String user = request.getCreatedByUser();
+        if (user == null || user.trim().isEmpty()) {
+            user = "AUTO_" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6);
+        }
+        variables.setCreatedByUser(user);
 
         hdocVariablesMapper.insert(variables);
 

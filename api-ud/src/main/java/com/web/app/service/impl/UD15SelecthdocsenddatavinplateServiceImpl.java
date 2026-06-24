@@ -20,6 +20,19 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     @Autowired
     private HdocSendDataVinPlateMapper hdocSendDataVinPlateMapper;
 
+    /**
+     * 从 chassisNumber 中提取 serie（前4位）和 chnr（剩余部分）
+     */
+    private String extractSerie(String chassisNumber) {
+        if (chassisNumber == null || chassisNumber.trim().length() < 4) return chassisNumber;
+        return chassisNumber.trim().substring(0, 4);
+    }
+
+    private String extractChnr(String chassisNumber) {
+        if (chassisNumber == null || chassisNumber.trim().length() < 4) return chassisNumber;
+        return chassisNumber.trim().substring(4).trim();
+    }
+
     @Override
     public UD15SelecthdocsenddatavinplateResponse viewInfo(UD15SelecthdocsenddatavinplateRequest request) {
         UD15SelecthdocsenddatavinplateResponse response = new UD15SelecthdocsenddatavinplateResponse();
@@ -30,8 +43,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
             return response;
         }
 
-        HdocSendDataVinPlate data = hdocSendDataVinPlateMapper.selectByCondition(
-                request.getSerie(), request.getChassisNumber());
+        String serie = request.getSerie() != null && !request.getSerie().isEmpty()
+                ? request.getSerie() : extractSerie(request.getChassisNumber());
+        String chnr = extractChnr(request.getChassisNumber());
+
+        HdocSendDataVinPlate data = hdocSendDataVinPlateMapper.selectByCondition(serie, chnr);
 
         if (data == null) {
             response.setCode(404);
@@ -49,8 +65,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     public UD15SelecthdocsenddatavinplateResponse setRegenerate(UD15SelecthdocsenddatavinplateRequest request) {
         UD15SelecthdocsenddatavinplateResponse response = new UD15SelecthdocsenddatavinplateResponse();
 
-        int result = hdocSendDataVinPlateMapper.updateStatusToRegenerate(
-                request.getSerie(), request.getChassisNumber());
+        String serie = request.getSerie() != null && !request.getSerie().isEmpty()
+                ? request.getSerie() : extractSerie(request.getChassisNumber());
+        String chnr = extractChnr(request.getChassisNumber());
+
+        int result = hdocSendDataVinPlateMapper.updateStatusToRegenerate(serie, chnr);
         if (result <= 0) {
             response.setCode(404);
             response.setMsg("Chassis number " + request.getChassisNumber() + " not found.");
@@ -66,8 +85,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     public UD15SelecthdocsenddatavinplateResponse setOk(UD15SelecthdocsenddatavinplateRequest request) {
         UD15SelecthdocsenddatavinplateResponse response = new UD15SelecthdocsenddatavinplateResponse();
 
-        int result = hdocSendDataVinPlateMapper.updateStatusToOk(
-                request.getSerie(), request.getChassisNumber());
+        String serie = request.getSerie() != null && !request.getSerie().isEmpty()
+                ? request.getSerie() : extractSerie(request.getChassisNumber());
+        String chnr = extractChnr(request.getChassisNumber());
+
+        int result = hdocSendDataVinPlateMapper.updateStatusToOk(serie, chnr);
         if (result <= 0) {
             response.setCode(404);
             response.setMsg("Chassis number " + request.getChassisNumber() + " not found.");
@@ -83,8 +105,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     public UD15SelecthdocsenddatavinplateResponse changeToBasicInfo(UD15SelecthdocsenddatavinplateRequest request) {
         UD15SelecthdocsenddatavinplateResponse response = new UD15SelecthdocsenddatavinplateResponse();
 
-        int result = hdocSendDataVinPlateMapper.updateToBasicInfo(
-                request.getSerie(), request.getChassisNumber());
+        String serie = request.getSerie() != null && !request.getSerie().isEmpty()
+                ? request.getSerie() : extractSerie(request.getChassisNumber());
+        String chnr = extractChnr(request.getChassisNumber());
+
+        int result = hdocSendDataVinPlateMapper.updateToBasicInfo(serie, chnr);
         if (result <= 0) {
             response.setCode(404);
             response.setMsg("Chassis number " + request.getChassisNumber() + " not found.");
@@ -100,8 +125,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     public UD15SelecthdocsenddatavinplateResponse changeToAdvancedInfo(UD15SelecthdocsenddatavinplateRequest request) {
         UD15SelecthdocsenddatavinplateResponse response = new UD15SelecthdocsenddatavinplateResponse();
 
-        int result = hdocSendDataVinPlateMapper.updateToAdvancedInfo(
-                request.getSerie(), request.getChassisNumber());
+        String serie = request.getSerie() != null && !request.getSerie().isEmpty()
+                ? request.getSerie() : extractSerie(request.getChassisNumber());
+        String chnr = extractChnr(request.getChassisNumber());
+
+        int result = hdocSendDataVinPlateMapper.updateToAdvancedInfo(serie, chnr);
         if (result <= 0) {
             response.setCode(404);
             response.setMsg("Chassis number " + request.getChassisNumber() + " not found.");

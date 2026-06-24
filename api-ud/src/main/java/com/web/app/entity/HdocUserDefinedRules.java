@@ -10,64 +10,58 @@ import java.io.Serializable;
 @Data
 public class HdocUserDefinedRules implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    /**
-     * 产品类别
-     */
+
+    /** 产品类别 (PK) */
     private String pc;
-    
-    /**
-     * 编号
-     */
+
+    /** 序号 (PK) */
     private String num;
-    
-    /**
-     * 市场
-     */
+
+    /** 市场 (PK) */
     private String market;
-    
-    /**
-     * 变量
-     */
-    private String variable;
-    
-    /**
-     * 值
-     */
-    private String val;
-    
-    /**
-     * 字符串1
-     */
+
+    /** VS - 不可为空 */
     private String vs;
-    
-    /**
-     * 字符串2
-     */
+
+    /** VS2 */
     private String vs2;
-    
-    /**
-     * 注释
-     */
+
+    /** 变量 - 不可为空 */
+    private String variable;
+
+    /** 值 - 不可为空 */
+    private String val;
+
+    /** 用户ID */
+    private String userId;
+
+    /** 更新日期 */
+    private String upDate;
+
+    /** 备注 */
     private String comments;
-    
-    /**
-     * 添加日期
-     */
+
+    /** 添加日期 YYYYWW */
     private String addDate;
-    
-    /**
-     * 删除日期
-     */
+
+    /** 删除日期 YYYYWW */
     private String deleteDate;
-    
-    /**
-     * 注册用户
-     */
-    private String registerUser;
-    
-    /**
-     * 注册时间
-     */
+
+    /** 注册时间 - 不可为空 */
     private String registerDatetime;
+
+    /** 注册用户 - 不可为空 */
+    private String registerUser;
+
+    /** 注册程序 - 不可为空 */
+    private String registerProcess;
+
+    /** 更新时间 - 不可为空 */
+    private String updateDatetime;
+
+    /** 更新用户 - 不可为空 */
+    private String updateUser;
+
+    /** 更新程序 - 不可为空 */
+    private String updateProcess;
 }

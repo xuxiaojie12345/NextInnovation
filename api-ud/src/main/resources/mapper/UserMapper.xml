@@ -6,13 +6,30 @@
         <id property="userid" column="USERID"/>
         <result property="username" column="USERNAME"/>
         <result property="password" column="PASSWORD"/>
+        <result property="responsible" column="RESPONSIBLE"/>
+        <result property="userPosition" column="USER_POSITION"/>
+        <result property="email" column="EMAIL"/>
     </resultMap>
     
-    <!-- 根据用户ID查询用户 -->
+    <!-- 根据用户ID查询用户（用于登录认证） -->
     <select id="selectByUserId" resultMap="UserResultMap">
-        SELECT USERID, PASSWORD, USERNAME 
-        FROM hdoc_user_infor 
+        SELECT USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL
+        FROM hdoc_user_infor
         WHERE USERID = #{userId}
+    </select>
+
+    <!-- 动态查询用户 - 仅当参数不为空时才作为条件 -->
+    <select id="selectByCondition" resultMap="UserResultMap">
+        SELECT USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL
+        FROM hdoc_user_infor
+        <where>
+            <if test="userId != null and userId != ''">
+                AND USERID = #{userId}
+            </if>
+            <if test="password != null and password != ''">
+                AND PASSWORD = #{password}
+            </if>
+        </where>
     </select>
     
 </mapper>

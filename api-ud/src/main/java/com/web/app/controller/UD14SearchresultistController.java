@@ -6,6 +6,10 @@ import com.web.app.service.UD14SearchresultistService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -29,5 +33,26 @@ public class UD14SearchresultistController {
     @ApiOperation("根据市场查询用户定义规则")
     public UD14SearchresultistResponse selectHdocuserdefinedrules(@RequestBody UD14SearchresultistRequest request) {
         return ud14SearchresultistService.selectHdocuserdefinedrules(request);
+    }
+
+    @PostMapping("/UD14SelectMarketmasterFileList")
+    @ApiOperation("根据市场获取模板文件列表")
+    public UD14SearchresultistResponse selectTemplateFiles(@RequestBody UD14SearchresultistRequest request) {
+        return ud14SearchresultistService.selectTemplateFiles(request);
+    }
+
+    @GetMapping("/UD14DownloadFile")
+    @ApiOperation("下载模板文件")
+    public ResponseEntity<Resource> downloadFile(
+            @RequestParam("market") String market,
+            @RequestParam("filename") String filename) {
+        Resource resource = ud14SearchresultistService.downloadFile(market, filename);
+        if (resource == null || !resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(resource);
     }
 }
