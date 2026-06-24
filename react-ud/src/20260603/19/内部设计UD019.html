@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部設計UD21</title>
+      <title>内部设计UD019</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="markets-in-hdoc详细设计说明书">Markets in Hdoc详细设计说明书 </h1>
+<h1 id="search-user详细设计说明书">Search User详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD21</th>
+<th style="text-align:left">DES-SearchHDocUser-019</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,49 +40,46 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">HDoc系统市场列表页面 (Market List Page)</td>
+<td style="text-align:left">Search HDoc User</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-29</td>
+<td style="text-align:left">2026-06-17</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Lingma Assistant</td>
+<td style="text-align:left">Deepseek</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块的核心功能是展示 HDoc 系统中所有市场的基础信息列表，包括市场代码、描述以及是否支持重量数据（Weights from Hdoc）。该页面用于提供市场配置的概览，支持用户快速查阅各市场的属性。</p>
+<p>本模块用于查询用户信息及其市场权限，支持多种查询方式（Userid、用户名、未配置、规则、模板），提供用户市场权限的全面检索功能。</p>
 <ul>
-<li><strong>目标</strong>：以只读表格形式呈现市场主数据，便于用户快速浏览和检索市场信息。</li>
-<li><strong>面向的用户群体</strong>：
+<li><strong>核心功能和目标</strong>：
 <ul>
-<li>系统管理员</li>
-<li>生产工程师</li>
-<li>认证管理人员</li>
+<li>查询用户信息及其市场权限。</li>
+<li>支持多种查询方式（Userid、用户名、未配置、规则、模板）。</li>
+<li>提供用户市场权限的全面检索功能。</li>
 </ul>
 </li>
-<li><strong>用户体验</strong>：
+<li><strong>面向的用户群体</strong>：系统管理员、权限管理人员、用户信息查询人员。</li>
+<li><strong>用户体验方面的考虑</strong>：
 <ul>
-<li>表格布局清晰，便于浏览</li>
-<li>支持排序与筛选（如按市场代码）</li>
-<li>所有字段均来自数据库，确保一致性</li>
-<li>不提供编辑功能，仅为只读展示</li>
+<li>提供灵活的查询条件。</li>
+<li>支持多种筛选方式。</li>
+<li>显示完整的用户市场权限信息。</li>
 </ul>
 </li>
-<li><strong>安全性</strong>：
+<li><strong>安全性或特殊要求</strong>：
 <ul>
-<li>仅允许授权用户访问此页面</li>
-<li>所有通信使用 HTTPS 加密</li>
-<li>不暴露敏感信息</li>
-<li>数据来源为 <code>MARKET_MASTER</code> 表，确保准确性</li>
+<li>确保用户信息查询的安全性。</li>
+<li>防止未授权的用户信息访问。</li>
 </ul>
 </li>
 </ul>
 <h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
 <h3 id="21-控件属性表">2.1 控件属性表 </h3>
-<p>根据需求，各显示项的详细定义如下：</p>
+<p>根据需求，各输入输出项的详细定义如下：</p>
 <table>
 <thead>
 <tr>
@@ -100,127 +97,379 @@
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left"><strong>Userid</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>User</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Market</strong></td>
+<td style="text-align:left">Pull-downList</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Not set</strong></td>
+<td style="text-align:left">Radiobox</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Rule</strong></td>
+<td style="text-align:left">Radiobox</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Template</strong></td>
+<td style="text-align:left">Radiobox</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">检索条件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Search</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Userid</strong></td>
+<td style="text-align:left">DataTable</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">检索结果</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>User</strong></td>
+<td style="text-align:left">DataTable</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">检索结果</td>
+</tr>
+<tr>
 <td style="text-align:left"><strong>Market</strong></td>
 <td style="text-align:left">DataTable</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">3</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">市场代码，如 AUT, BEL</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Description</strong></td>
+<td style="text-align:left"><strong>COUNT</strong></td>
 <td style="text-align:left">DataTable</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">市场描述，如 Austria</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Weights from Hdoc</strong></td>
-<td style="text-align:left">DataTable</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">是否支持重量数据</td>
+<td style="text-align:left">检索结果的记录数显示</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>DataTable</strong>：数据来源于后端 API 返回的列表数据，渲染为表格列。</li>
-<li>所有字段均为只读显示，不提供编辑功能。</li>
+<li>Userid 最大长度10位，只允许半角英数字。</li>
+<li>User 最大长度32位，只允许半角英数字。</li>
+<li>Market 从市场主数据获取选项。</li>
+<li>支持多种查询方式：Userid、User、Not set、Rule、Template，但仅能选择一种。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有逻辑均在页面加载时自动执行。</p>
+<p>所有用户查询逻辑均在用户点击 Search 按钮时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
+<h4 id="311-userid-查询功能">3.1.1 Userid 查询功能 </h4>
+<ul>
+<li><strong>功能说明</strong>：输入 Userid 后点击【Search】，从 Saviynt 获取用户名，再从用户市场权限表带出用户绑定的市场信息。</li>
+<li><strong>开始</strong>：点击 Search 按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的查询条件。</li>
+<li><strong>操作步骤</strong>：
 <ol>
-<li><strong>开始</strong>：初期表示。</li>
-<li><strong>前置处理</strong>：无前端校验，直接加载数据。</li>
-<li><strong>空值校验 (Frontend Check)</strong>：
-<ul>
-<li>无</li>
-</ul>
+<li>输入 Userid。</li>
+<li>点击 Search 按钮。</li>
+<li>系统从 Saviynt 获取用户名。</li>
+<li>从用户市场权限表获取用户绑定的市场信息。</li>
+<li>显示查询结果。</li>
+</ol>
 </li>
-<li><strong>API 调用 (Backend Check)</strong>：
+<li><strong>API调用 (Backend Check)</strong>：
 <ul>
-<li>调用 <code>GET /api/market/list</code> 获取市场列表。</li>
+<li>调用 <code>UD19SearchResultListApi</code>。</li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>成功</strong>：正常渲染表格，显示 Market、Description、Weights from Hdoc 字段。</li>
-<li><strong>失败</strong>：显示错误消息：「无法加载市场列表，请稍后重试」。</li>
+<li>成功：显示查询结果。</li>
+<li>失败：显示错误消息。</li>
 </ul>
 </li>
+</ul>
+<h4 id="312-用户名查询功能">3.1.2 用户名查询功能 </h4>
+<ul>
+<li><strong>功能说明</strong>：输入用户名后点击【Search】，先从 Saviynt 反查用户ID，再依据用户ID从用户市场权限表获取所属市场。</li>
+<li><strong>开始</strong>：点击 Search 按钮。</li>
+<li><strong>前置处理</strong>：获取用户输入的查询条件。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>输入用户名。</li>
+<li>点击 Search 按钮。</li>
+<li>系统从 Saviynt 反查用户ID。</li>
+<li>依据用户ID从用户市场权限表获取所属市场。</li>
+<li>显示查询结果。</li>
 </ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD19SearchResultListApi</code>。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示查询结果。</li>
+<li>失败：显示错误消息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="313-未配置筛选功能">3.1.3 未配置筛选功能 </h4>
+<ul>
+<li><strong>功能说明</strong>：勾选未配置(Not set)选项并点击【Search】，检索全部用户。</li>
+<li><strong>开始</strong>：点击 Search 按钮。</li>
+<li><strong>前置处理</strong>：勾选 Not set 选项。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>勾选 Not set 选项。</li>
+<li>点击 Search 按钮。</li>
+<li>检索全部用户。</li>
+<li>显示查询结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD19SearchResultListApi</code>。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示查询结果。</li>
+<li>失败：显示错误消息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="314-规则筛选功能">3.1.4 规则筛选功能 </h4>
+<ul>
+<li><strong>功能说明</strong>：勾选规则(Rule)选项并点击【Search】，筛选拥有规则管理员权限的用户。</li>
+<li><strong>开始</strong>：点击 Search 按钮。</li>
+<li><strong>前置处理</strong>：勾选 Rule 选项。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>勾选 Rule 选项。</li>
+<li>点击 Search 按钮。</li>
+<li>筛选拥有规则管理员权限的用户。</li>
+<li>显示查询结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD19SearchResultListApi</code>。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示查询结果。</li>
+<li>失败：显示错误消息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="315-模板筛选功能">3.1.5 模板筛选功能 </h4>
+<ul>
+<li><strong>功能说明</strong>：勾选模板(Template)选项并点击【Search】，筛选拥有模板管理员权限的用户。</li>
+<li><strong>开始</strong>：点击 Search 按钮。</li>
+<li><strong>前置处理</strong>：勾选 Template 选项。</li>
+<li><strong>操作步骤</strong>：
+<ol>
+<li>勾选 Template 选项。</li>
+<li>点击 Search 按钮。</li>
+<li>筛选拥有模板管理员权限的用户。</li>
+<li>显示查询结果。</li>
+</ol>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用 <code>UD19SearchResultListApi</code>。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li>成功：显示查询结果。</li>
+<li>失败：显示错误消息。</li>
+</ul>
+</li>
+</ul>
 <h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
 <table>
 <thead>
 <tr>
 <th style="text-align:center">No.</th>
-<th style="text-align:center">检查时机</th>
-<th style="text-align:center">检查对象</th>
-<th style="text-align:center">检查条件</th>
-<th style="text-align:center">错误消息 (Message Content)</th>
-<th style="text-align:center">动作</th>
+<th style="text-align:left">检查时机</th>
+<th style="text-align:left">检查对象</th>
+<th style="text-align:left">检查条件</th>
+<th style="text-align:left">错误消息 (Message Content)</th>
+<th style="text-align:left">动作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">页面加载时</td>
-<td style="text-align:center">MARKET_MASTER</td>
-<td style="text-align:center">数据库连接失败</td>
-<td style="text-align:center">「无法加载市场列表，请稍后重试」</td>
-<td style="text-align:center">显示错误信息</td>
+<td style="text-align:left">点击按钮时</td>
+<td style="text-align:left">查询条件</td>
+<td style="text-align:left">多个条件同时存在</td>
+<td style="text-align:left">请只选择一种查询方式</td>
+<td style="text-align:left">显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:left">查询时</td>
+<td style="text-align:left">数据库查询</td>
+<td style="text-align:left">查询失败</td>
+<td style="text-align:left">查询失败，请稍后再试</td>
+<td style="text-align:left">显示错误消息</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取市场列表接口">4.1 获取市场列表接口 </h3>
+<h3 id="41-ud19selectmarketmaster">4.1 UD19SelectMarketMaster </h3>
 <ul>
-<li><strong>功能</strong>：获取所有市场列表。</li>
+<li><strong>功能</strong>：根据传入的参数 Userid 或者 User 名称，获取用户名称或反查用户ID，再获取用户 market 权限。</li>
 <li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/market/list</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud19searchresultlistapi/ud19selectmarketmaster</code></li>
 </ul>
 <h4 id="request">Request </h4>
-<p>无参数。</p>
-<h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"AUT"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Austria"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"BEL"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Belgium"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"CHE"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Switzerland"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
-</code></pre><h4 id="response-error-500-internal-server-error">Response Error (500 Internal Server Error) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Internal Server Error"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Failed to load market list"</span>
+  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"查询成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"users"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+        <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+        <span class="token property">"markets"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"string"</span><span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"count"</span><span class="token operator">:</span> <span class="token number">0</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400">Response Error (400) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"查询失败"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="42-ud19searchhdoc">4.2 UD19SearchHdoc </h3>
+<ul>
+<li><strong>功能</strong>：根据传入的参数 Userid 或者 User 名称，获取用户名称或反查用户ID，再获取用户 market 权限。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud19searchresultlistapi/ud19searchhdoc</code></li>
+</ul>
+<h4 id="request-1">Request </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"searchType"</span><span class="token operator">:</span> <span class="token string">"NOT_SET"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-success-200-1">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"count"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    <span class="token property">"users"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"SWE"</span><span class="token punctuation">,</span>
+        <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"Kurt Bjork"</span><span class="token punctuation">,</span>
+        <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU,1AD,1CZ"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"e2090ru"</span><span class="token punctuation">,</span>
+        <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"Ivanova Anna"</span><span class="token punctuation">,</span>
+        <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU,1RU"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400-1">Response Error (400) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"查询失败"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
@@ -233,19 +482,19 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>网络超时</strong></td>
-<td style="text-align:left">重试一次，若仍失败则提示</td>
-<td style="text-align:left">「网络连接失败，请检查网络设置」</td>
+<td style="text-align:left"><strong>查询条件冲突</strong></td>
+<td style="text-align:left">显示错误消息</td>
+<td style="text-align:left">请只选择一种查询方式</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>数据库异常</strong></td>
-<td style="text-align:left">回滚事务，记录日志</td>
-<td style="text-align:left">「系统繁忙，请稍后再试」</td>
+<td style="text-align:left"><strong>数据库连接失败</strong></td>
+<td style="text-align:left">显示系统错误消息</td>
+<td style="text-align:left">系统暂时不可用，请稍后再试</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>服务器内部错误 (500)</strong></td>
-<td style="text-align:left">捕获 Server Error</td>
-<td style="text-align:left">「无法加载市场列表，请稍后重试」</td>
+<td style="text-align:left"><strong>网络请求超时</strong></td>
+<td style="text-align:left">显示超时提示</td>
+<td style="text-align:left">请求超时，请检查网络连接</td>
 </tr>
 </tbody>
 </table>
@@ -253,33 +502,33 @@
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理 <code>marketList</code>（市场列表数据）、<code>isLoading</code>（加载状态）、<code>errorMessage</code>（错误消息）。</li>
-<li>页面初始化时自动触发数据加载。</li>
+<li>使用 React State 管理 <code>userid</code>, <code>user</code>, <code>market</code>, <code>notSet</code>, <code>rule</code>, <code>template</code>, <code>searchResults</code>, <code>count</code>, <code>isLoading</code>。</li>
+<li>实现查询条件互斥逻辑，确保只能选择一种查询方式。</li>
+<li>管理查询结果数据表格的显示状态。</li>
+<li>实现表单验证状态管理，确保 userid 长度不超过10位，user 长度不超过32位。</li>
+<li>在 Search 操作后更新查询结果和计数显示。</li>
 </ul>
 </li>
-<li><strong>加载状态</strong>：
+<li><strong>安全性</strong>：
 <ul>
-<li>数据加载期间应显示 Loading 指示器（如 Spin 或 Skeleton），提升用户体验。</li>
-</ul>
-</li>
-<li><strong>错误处理</strong>：
-<ul>
-<li>API 调用失败时，页面中央显示错误消息，并提供重试按钮或提示用户刷新页面。</li>
+<li>对输入字段进行适当的格式验证，userid 和 user 只允许半角英数字。</li>
+<li>所有 API 请求必须通过 HTTPS 发送。</li>
+<li>不在前端日志中打印敏感数据。</li>
+<li>实现用户信息访问的安全验证机制，确保只有授权用户才能执行查询操作。</li>
 </ul>
 </li>
 <li><strong>UI 细节</strong>：
 <ul>
-<li>表格建议支持按 Market 列排序，便于用户快速查找特定市场。</li>
-<li><code>Weights from Hdoc</code> 列建议使用图标（如 ✓/✗）或 Badge 形式展示布尔值，提升可读性。</li>
-</ul>
-</li>
-<li><strong>性能</strong>：
-<ul>
-<li>若市场数据量较大，建议后端支持分页查询，前端表格配合分页控件。</li>
+<li>Search 按钮在 <code>isLoading</code> 期间应设为 <code>disabled</code>，防止重复提交。</li>
+<li>userid 和 user 输入框应限制最大长度并验证格式。</li>
+<li>Radiobox 选项应正确实现互斥选择逻辑。</li>
+<li>DataTable 应正确显示查询结果，包括 userid、user、market 等信息。</li>
+<li>COUNT 字段应正确显示检索结果的记录数。</li>
+<li>当多个查询条件同时选择时，应显示错误消息"请只选择一种查询方式"。</li>
+<li>错误消息（Message）Label 仅在出错时显示，建议使用红色文字。</li>
 </ul>
 </li>
 </ol>
-<hr>
 
       </div>
       

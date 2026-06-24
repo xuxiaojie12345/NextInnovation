@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部設計UD21</title>
+      <title>内部设计UD16</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,62 +27,45 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="markets-in-hdoc详细设计说明书">Markets in Hdoc详细设计说明书 </h1>
+<h1 id="ad-change详细设计说明书">AD Change详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD21</th>
+<th style="text-align:left">UD16</th>
 <th style="text-align:left">版本号</th>
-<th style="text-align:left">v1.0</th>
+<th style="text-align:left">v1.1</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">HDoc系统市场列表页面 (Market List Page)</td>
+<td style="text-align:left">AD Change管理 (AD Change Mgmt)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-29</td>
+<td style="text-align:left">2026-06-23</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Lingma Assistant</td>
+<td style="text-align:left">AI Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块的核心功能是展示 HDoc 系统中所有市场的基础信息列表，包括市场代码、描述以及是否支持重量数据（Weights from Hdoc）。该页面用于提供市场配置的概览，支持用户快速查阅各市场的属性。</p>
+<p>本模块的核心功能是对 <code>HDOC_ADCA_CHANGE</code> 表中的数据进行新增、删除和校验操作。用户可通过输入 Serie-Chnr（底盘系列+编号）组合，执行相应的操作。</p>
 <ul>
-<li><strong>目标</strong>：以只读表格形式呈现市场主数据，便于用户快速浏览和检索市场信息。</li>
-<li><strong>面向的用户群体</strong>：
-<ul>
-<li>系统管理员</li>
-<li>生产工程师</li>
-<li>认证管理人员</li>
-</ul>
-</li>
+<li><strong>目标</strong>：提供便捷的 AD/CA 变更管理入口，确保变更记录的准确性，并提供激活状态的快速校验。</li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>表格布局清晰，便于浏览</li>
-<li>支持排序与筛选（如按市场代码）</li>
-<li>所有字段均来自数据库，确保一致性</li>
-<li>不提供编辑功能，仅为只读展示</li>
-</ul>
-</li>
-<li><strong>安全性</strong>：
-<ul>
-<li>仅允许授权用户访问此页面</li>
-<li>所有通信使用 HTTPS 加密</li>
-<li>不暴露敏感信息</li>
-<li>数据来源为 <code>MARKET_MASTER</code> 表，确保准确性</li>
+<li>界面简洁，仅包含必要控件（输入框、三个操作按钮）。</li>
+<li>所有操作均有明确的成功/失败反馈提示。</li>
+<li>校验结果以警告形式展示（如未激活提示）。</li>
 </ul>
 </li>
 </ul>
 <h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
 <h3 id="21-控件属性表">2.1 控件属性表 </h3>
-<p>根据需求，各显示项的详细定义如下：</p>
 <table>
 <thead>
 <tr>
@@ -100,70 +83,113 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Market</strong></td>
-<td style="text-align:left">DataTable</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">-</td>
+<td style="text-align:left"><strong>Serie-Chnr</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">空 (Empty)</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">市场代码，如 AUT, BEL</td>
+<td style="text-align:left">示例：JPCT013945</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Description</strong></td>
-<td style="text-align:left">DataTable</td>
+<td style="text-align:left"><strong>Desc</strong></td>
+<td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">-</td>
+<td style="text-align:center">4000</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字+記号</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">空 (Empty)</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">市场描述，如 Austria</td>
+<td style="text-align:left">描述信息，可选</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Weights from Hdoc</strong></td>
-<td style="text-align:left">DataTable</td>
+<td style="text-align:left"><strong>ADD</strong></td>
+<td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">新增记录</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>DELETE</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">删除记录</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>CHECK</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">校验激活状态</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Message</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">256</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">是否支持重量数据</td>
+<td style="text-align:center">动态显示 (Dynamic)</td>
+<td style="text-align:left">显示成功/错误/警告信息</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong>注</strong>：</p>
-<ul>
-<li><strong>DataTable</strong>：数据来源于后端 API 返回的列表数据，渲染为表格列。</li>
-<li>所有字段均为只读显示，不提供编辑功能。</li>
-</ul>
-</blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有逻辑均在页面加载时自动执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <ol>
-<li><strong>开始</strong>：初期表示。</li>
-<li><strong>前置处理</strong>：无前端校验，直接加载数据。</li>
-<li><strong>空值校验 (Frontend Check)</strong>：
+<li><strong>开始</strong>：用户点击操作按钮。</li>
+<li><strong>前置处理</strong>：获取 <code>Serie-Chnr</code> 和 <code>Desc</code> 输入值。</li>
+<li><strong>空值校验</strong>：
 <ul>
-<li>无</li>
+<li>若点击任意按钮且 <code>Serie-Chnr</code> 为空：设置 <code>Message</code> = <code>Serie-Chnr 是必填项</code>，<strong>终止</strong>流程。</li>
 </ul>
 </li>
-<li><strong>API 调用 (Backend Check)</strong>：
+<li><strong>机能处理</strong>：
 <ul>
-<li>调用 <code>GET /api/market/list</code> 获取市场列表。</li>
+<li>点击ADD按钮，调用/api/ud16adchangeapi/ud16inserthdocadcachange</li>
+<li>点击DELETE按钮，调用/api/ud16adchangeapi/ud16updatehdocadcachange</li>
+<li>点击CHECK按钮，调用/api/ud16adchangeapi/ud16selecthdocadcachange</li>
+</ul>
+</li>
+<li><strong>二次确认 (Delete Only)</strong>：
+<ul>
+<li>若点击 DELETE：弹出确认对话框，用户取消则<strong>终止</strong>。</li>
+</ul>
+</li>
+<li><strong>API 调用</strong>：
+<ul>
+<li><strong>ADD</strong>: <code>POST /api/ud16adchangeapi/ud16inserthdocadcachange</code></li>
+<li><strong>DELETE</strong>: <code>POST /api/ud16adchangeapi/ud16updatehdocadcachange</code></li>
+<li><strong>CHECK</strong>: <code>POST /api/ud16adchangeapi/ud16selecthdocadcachange</code></li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>成功</strong>：正常渲染表格，显示 Market、Description、Weights from Hdoc 字段。</li>
-<li><strong>失败</strong>：显示错误消息：「无法加载市场列表，请稍后重试」。</li>
+<li>成功：显示绿色成功消息。</li>
+<li>失败：显示红色错误消息。</li>
+<li>CHECK 未激活：显示橙色警告消息。</li>
 </ul>
 </li>
 </ol>
@@ -182,47 +208,64 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">页面加载时</td>
-<td style="text-align:center">MARKET_MASTER</td>
-<td style="text-align:center">数据库连接失败</td>
-<td style="text-align:center">「无法加载市场列表，请稍后重试」</td>
-<td style="text-align:center">显示错误信息</td>
+<td style="text-align:center">Click Any</td>
+<td style="text-align:center">Serie-Chnr</td>
+<td style="text-align:center"><code>Value == null</code> OR <code>Trim(Value) == ""</code></td>
+<td style="text-align:center"><code>Serie-Chnr 是必填项</code></td>
+<td style="text-align:center">显示 Message，焦点停留</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">API Response</td>
+<td style="text-align:center">Record Existence</td>
+<td style="text-align:center"><code>Status == 409</code> (Add)</td>
+<td style="text-align:center"><code>Record already exists</code></td>
+<td style="text-align:center">显示 Message</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">API Response</td>
+<td style="text-align:center">Record Existence</td>
+<td style="text-align:center"><code>Status == 404</code> (Delete)</td>
+<td style="text-align:center"><code>Record not found</code></td>
+<td style="text-align:center">显示 Message</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">API Response</td>
+<td style="text-align:center">Activation Status</td>
+<td style="text-align:center"><code>activated == false</code> (Check)</td>
+<td style="text-align:center"><code>AFTER DEF CHANGE IS NOT ACTIVATED</code></td>
+<td style="text-align:center">显示 Warning Message</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取市场列表接口">4.1 获取市场列表接口 </h3>
+<h3 id="41-insert-新增">4.1 Insert (新增) </h3>
 <ul>
-<li><strong>功能</strong>：获取所有市场列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/market/list</code></li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud16adchangeapi/ud16inserthdocadcachange</code></li>
+<li><strong>Request</strong>: <code>{ "serieChnr": "JPCT013945", "desc": "description" }</code></li>
+<li><strong>Response Success</strong>: <code>{ "code": 200, "msg": "新增成功" }</code></li>
+<li><strong>Response Error</strong>: <code>{ "code": 409, "msg": "Record already exists" }</code></li>
 </ul>
-<h4 id="request">Request </h4>
-<p>无参数。</p>
-<h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"AUT"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Austria"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"BEL"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Belgium"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"CHE"</span><span class="token punctuation">,</span>
-    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Switzerland"</span><span class="token punctuation">,</span>
-    <span class="token property">"weightsFromHdoc"</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
-</code></pre><h4 id="response-error-500-internal-server-error">Response Error (500 Internal Server Error) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Internal Server Error"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Failed to load market list"</span>
-<span class="token punctuation">}</span>
-</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<h3 id="42-delete-删除">4.2 Delete (删除) </h3>
+<ul>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud16adchangeapi/ud16updatehdocadcachange</code></li>
+<li><strong>Request</strong>: <code>{ "serieChnr": "JPCT013945" }</code></li>
+<li><strong>Response Success</strong>: <code>{ "code": 200, "msg": "删除成功" }</code></li>
+<li><strong>Response Error</strong>: <code>{ "code": 404, "msg": "Record not found" }</code></li>
+</ul>
+<h3 id="43-select-校验">4.3 Select (校验) </h3>
+<ul>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud16adchangeapi/ud16selecthdocadcachange</code></li>
+<li><strong>Request</strong>: <code>{ "serieChnr": "JPCT013945" }</code></li>
+<li><strong>Response Success</strong>: <code>{ "code": 200, "msg": "AFTER DEF CHANGE IS ACTIVATED" }</code></li>
+<li><strong>Response Warning</strong>: <code>{ "code": 400, "msg": "AFTER DEF CHANGE IS NOT ACTIVATED" }</code></li>
+</ul>
+<h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
 <thead>
 <tr>
@@ -233,53 +276,39 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>网络超时</strong></td>
-<td style="text-align:left">重试一次，若仍失败则提示</td>
-<td style="text-align:left">「网络连接失败，请检查网络设置」</td>
+<td style="text-align:left"><strong>Serie-Chnr 为空</strong></td>
+<td style="text-align:left">前端校验</td>
+<td style="text-align:left"><code>Serie-Chnr 是必填项</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>数据库异常</strong></td>
-<td style="text-align:left">回滚事务，记录日志</td>
-<td style="text-align:left">「系统繁忙，请稍后再试」</td>
+<td style="text-align:left"><strong>网络断开/超时</strong></td>
+<td style="text-align:left">捕获 Network Error</td>
+<td style="text-align:left"><code>网络连接失败，请检查网络设置</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>服务器内部错误 (500)</strong></td>
-<td style="text-align:left">捕获 Server Error</td>
-<td style="text-align:left">「无法加载市场列表，请稍后重试」</td>
+<td style="text-align:left"><strong>记录已存在</strong></td>
+<td style="text-align:left">API 返回 409</td>
+<td style="text-align:left"><code>Record already exists</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>记录不存在</strong></td>
+<td style="text-align:left">API 返回 404</td>
+<td style="text-align:left"><code>Record not found</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>未激活状态</strong></td>
+<td style="text-align:left">API 返回 400</td>
+<td style="text-align:left"><code>AFTER DEF CHANGE IS NOT ACTIVATED</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
 <ol>
-<li><strong>状态管理</strong>：
-<ul>
-<li>使用 React State 管理 <code>marketList</code>（市场列表数据）、<code>isLoading</code>（加载状态）、<code>errorMessage</code>（错误消息）。</li>
-<li>页面初始化时自动触发数据加载。</li>
-</ul>
-</li>
-<li><strong>加载状态</strong>：
-<ul>
-<li>数据加载期间应显示 Loading 指示器（如 Spin 或 Skeleton），提升用户体验。</li>
-</ul>
-</li>
-<li><strong>错误处理</strong>：
-<ul>
-<li>API 调用失败时，页面中央显示错误消息，并提供重试按钮或提示用户刷新页面。</li>
-</ul>
-</li>
-<li><strong>UI 细节</strong>：
-<ul>
-<li>表格建议支持按 Market 列排序，便于用户快速查找特定市场。</li>
-<li><code>Weights from Hdoc</code> 列建议使用图标（如 ✓/✗）或 Badge 形式展示布尔值，提升可读性。</li>
-</ul>
-</li>
-<li><strong>性能</strong>：
-<ul>
-<li>若市场数据量较大，建议后端支持分页查询，前端表格配合分页控件。</li>
-</ul>
-</li>
+<li><strong>状态管理</strong>：使用 React State 管理 <code>serieChnr</code>, <code>desc</code>, <code>message</code>, <code>messageType</code>, <code>isLoading</code>。</li>
+<li><strong>消息类型</strong>：success=绿色, error=红色, warning=橙色。</li>
+<li><strong>Desc 清空</strong>：ADD 成功后清空 Desc 输入框。</li>
+<li><strong>DELETE 确认</strong>：点击 DELETE 前弹出 confirm 对话框。</li>
 </ol>
-<hr>
 
       </div>
       
