@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD10HdocvariablesMapper">
+
+    <!--
+        UD10 检查变量是否已存在
+    -->
+    <select id="countByVariable" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM HDOC_VARIABLES
+        WHERE VARIABLE = #{variable}
+    </select>
+
+    <!--
+        UD10 插入新变量
+    -->
+    <insert id="insertVariable">
+        INSERT INTO HDOC_VARIABLES (
+            VARIABLE, TYPE, DESCRIPTION, USERID,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        ) VALUES (
+            #{variable}, #{type}, #{description}, #{userid},
+            NOW(), #{registerUser}, 'UD10',
+            NOW(), #{updateUser}, 'UD10'
+        )
+    </insert>
+
+    <!--
+        UD10 更新变量
+    -->
+    <update id="updateVariable">
+        UPDATE HDOC_VARIABLES
+        SET TYPE = #{type},
+            DESCRIPTION = #{description},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_PROCESS = 'UD10'
+        WHERE VARIABLE = #{variable}
+    </update>
+
+    <!--
+        UD10 删除变量
+    -->
+    <delete id="deleteVariable">
+        DELETE FROM HDOC_VARIABLES
+        WHERE VARIABLE = #{variable}
+    </delete>
+
+</mapper>

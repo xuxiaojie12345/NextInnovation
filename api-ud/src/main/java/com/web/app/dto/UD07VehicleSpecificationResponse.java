@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Collections;
+// import java.util.Collections;
 import java.util.List;
 
 /**
@@ -117,7 +117,8 @@ public class UD07VehicleSpecificationResponse implements Serializable {
         return response;
     }
 
-    public static UD07VehicleSpecificationResponse errorWithMessages(Integer code, String msg, List<MessageItem> messageList) {
+    public static UD07VehicleSpecificationResponse errorWithMessages(Integer code, String msg,
+            List<MessageItem> messageList) {
         UD07VehicleSpecificationResponse response = new UD07VehicleSpecificationResponse();
         response.setCode(code);
         response.setMsg(msg);

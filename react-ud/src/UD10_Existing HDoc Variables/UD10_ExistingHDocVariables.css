@@ -1,0 +1,243 @@
+/* ===================================================
+   UD10_ExistingHDocVariables.css
+   Existing HDoc Variables 变量管理画面样式
+   =================================================== */
+
+/* ---------- 页面主容器 ---------- */
+.ud10-container {
+  padding: 20px 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------- 页面标题 ---------- */
+.ud10-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  /* margin-bottom: 20px; */
+  padding-bottom: 10px;
+  /* border-bottom: 2px solid #003366; */
+}
+
+/* ---------- 消息显示区域 ---------- */
+.ud10-message {
+  padding: 10px 15px;
+  /* margin-bottom: 15px; */
+  border-radius: 4px;
+  font-size: 14px;
+  min-height: 20px;
+  border: 1px solid transparent;
+}
+
+.ud10-message--success {
+  background-color: #f6ffed;
+  border-color: #b7eb8f;
+  color: #52c41a;
+}
+
+.ud10-message--error {
+  background-color: #fff2f0;
+  border-color: #ffccc7;
+  color: #ff4d4f;
+}
+
+.ud10-message--info {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+  color: #1890ff;
+}
+
+/* ---------- 主内容区域（白色卡片） ---------- */
+.ud10-content {
+  background: #ffffff;
+  border: 1px solid #9999cc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-width: 650px;
+}
+
+/* ---------- 检索行 ---------- */
+.ud10-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-left: 15px;
+}
+
+.ud10-row .ud10-label {
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-align: left;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+/* 输入框 */
+.ud10-row .ud10-input {
+  flex: 1;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+  max-width: 320px;
+}
+
+.ud10-row .ud10-input:focus {
+  border-color: #003366;
+}
+
+.ud10-row .ud10-input:disabled {
+  background-color: #f5f5f5;
+  color: #888;
+}
+
+/* 下拉选择框 */
+.ud10-row .ud10-select {
+  flex: 1;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  outline: none;
+  cursor: pointer;
+  max-width: 320px;
+}
+
+.ud10-row .ud10-select:focus {
+  border-color: #003366;
+}
+
+/* ---------- 按钮行 ---------- */
+.ud10-button-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  border-bottom: 1px solid #9999cc; /* 与form-section相同的边框 */
+  border-top: none; /* 去掉上边框，与form-section连接 */
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 通用按钮样式 ---------- */
+.ud10-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.ud10-btn:hover {
+  opacity: 0.85;
+}
+
+.ud10-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Search - 深蓝色 */
+/* .ud10-btn--search {
+  background-color: #1a3a6b;
+  border-color: #1a3a6b;
+  color: #ffffff;
+} */
+
+/* Clear - 浅灰色 */
+/* .ud10-btn--clear {
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
+  color: #333;
+} */
+
+/* Back - 灰色 */
+/* .ud10-btn--back {
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
+  color: #333;
+} */
+
+/* Add - 绿色 */
+/* .ud10-btn--add {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: #ffffff;
+} */
+
+/* Update - 橙色 */
+/* .ud10-btn--update {
+  background-color: #ff9800;
+  border-color: #ff9800;
+  color: #ffffff;
+} */
+
+/* Delete - 红色 */
+/* .ud10-btn--delete {
+  background-color: #f44336;
+  border-color: #f44336;
+  color: #ffffff;
+} */
+
+/* Excel - 紫色 */
+/* .ud10-btn--excel {
+  background-color: #9c27b0;
+  border-color: #9c27b0;
+  color: #ffffff;
+} */
+
+/* ---------- 信息标签行 ---------- */
+.ud10-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ud10-info-row .ud10-info-label {
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  text-align: left;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+.ud10-info-row .ud10-info-value {
+  font-size: 14px;
+  color: #333;
+}
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 768px) {
+  .ud10-container {
+    padding: 12px 16px;
+  }
+  .ud10-content {
+    padding: 16px;
+  }
+  .ud10-row {
+    flex-wrap: wrap;
+  }
+  .ud10-row .ud10-label {
+    min-width: 100px;
+    font-size: 13px;
+  }
+  .ud10-button-row {
+    flex-wrap: wrap;
+  }
+}

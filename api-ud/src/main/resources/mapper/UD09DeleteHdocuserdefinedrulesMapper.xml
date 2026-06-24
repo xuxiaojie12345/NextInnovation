@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD09DeleteHdocuserdefinedrulesMapper">
+
+    <!--
+        UD09 动态条件搜索用户定义规则
+    -->
+    <select id="searchUserDefinedRules"
+            resultType="com.web.app.entity.HdocUserDefinedRules"
+            parameterType="com.web.app.dto.UD09DeleteHdocuserdefinedrulesRequest">
+        SELECT
+            PC AS pc,
+            NUM AS num,
+            MARKET AS market,
+            VARIABLE AS variable,
+            VAL AS val,
+            VS AS vs,
+            VS2 AS vs2,
+            COMMENTS AS comments,
+            ADD_DATE AS addDate,
+            DELETE_DATE AS deleteDate,
+            REGISTER_USER AS registerUser,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_USER_DEFINED_RULES
+        <where>
+            <if test="productClass != null and productClass != ''">
+                AND PC = #{productClass}
+            </if>
+            <if test="number != null">
+                AND NUM = #{number}
+            </if>
+            <if test="market != null and market != ''">
+                AND MARKET = #{market}
+            </if>
+            <if test="variable != null and variable != ''">
+                AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+            </if>
+            <if test="value != null and value != ''">
+                AND VAL LIKE CONCAT('%', #{value}, '%')
+            </if>
+            <if test="variantString1 != null and variantString1 != ''">
+                AND VS LIKE CONCAT('%', #{variantString1}, '%')
+            </if>
+            <if test="variantString2 != null and variantString2 != ''">
+                AND VS2 LIKE CONCAT('%', #{variantString2}, '%')
+            </if>
+            <if test="comments != null and comments != ''">
+                AND COMMENTS LIKE CONCAT('%', #{comments}, '%')
+            </if>
+        </where>
+        ORDER BY PC, NUM, MARKET
+    </select>
+
+    <!--
+        UD09 根据PC+NUM+MARKET查询规则数量
+    -->
+    <select id="countUserDefinedRule" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc}
+          AND NUM = #{num}
+          AND MARKET = #{market}
+    </select>
+
+    <!--
+        UD09 根据PC+NUM+MARKET删除规则
+    -->
+    <delete id="deleteUserDefinedRule">
+        DELETE FROM HDOC_USER_DEFINED_RULES
+        WHERE PC = #{pc}
+          AND NUM = #{num}
+          AND MARKET = #{market}
+    </delete>
+
+</mapper>

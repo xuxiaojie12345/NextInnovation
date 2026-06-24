@@ -1,0 +1,268 @@
+/* ===================================================
+   UD08_HomologationVariables.css
+   Homologation Variables 认证变量规则管理画面样式
+   =================================================== */
+
+/* ---------- 页面主容器 ---------- */
+.ud08-container {
+  padding: 20px 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------- 页面标题 ---------- */
+.ud08-title {
+  max-width: 900px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  /* margin-bottom: 20px; */
+  padding-bottom: 10px;
+  /* border-bottom: 2px solid #003366; */
+}
+
+/* ---------- 消息显示区域 ---------- */
+.ud08-message {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  min-height: 20px;
+  border: 1px solid transparent;
+}
+
+.ud08-message--success {
+  background-color: #f6ffed;
+  border-color: #b7eb8f;
+  color: #52c41a;
+}
+
+.ud08-message--error {
+  background-color: #fff2f0;
+  border-color: #ffccc7;
+  color: #ff4d4f;
+}
+
+.ud08-message--info {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+  color: #1890ff;
+}
+
+/* ---------- 主内容区域（白色卡片） ---------- */
+.ud08-content {
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #9999cc; /* 与form-section相同的边框 */
+  /* border: 1px solid #d9d9d9; */
+  /* border-radius: 4px; */
+  /* padding: 20px; */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- 检索行（每个字段一行） ---------- */
+.ud08-search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: nowrap;
+}
+
+/* 字段标签（固定宽度，左对齐） */
+.ud08-search-row .ud08-label {
+  min-width: 140px;
+  font-size: 13px;
+  font-weight: bolder;
+  color: #333;
+  text-align: left;
+  padding-right: 10px;
+  white-space: nowrap;
+  margin-left: 15px;
+}
+
+/* 必填字段标签中*号标记为红色 */
+/* .ud08-label--required {
+  color: #e60000;
+} */
+
+/* 运算符下拉框 */
+.ud08-search-row .ud08-operator {
+  width: 65px;
+  height: 25px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  margin-right: 8px;
+  cursor: pointer;
+  outline: none;
+}
+
+.ud08-search-row .ud08-operator:focus {
+  border-color: #003366;
+}
+
+/* 输入框 / 下拉选择框 */
+.ud08-search-row .ud08-input {
+  flex: 1;
+  height: 25px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  padding: 0 8px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+  max-width: 280px;
+}
+
+.ud08-search-row .ud08-input:focus {
+  border-color: #003366;
+}
+
+.ud08-search-row .ud08-input::placeholder {
+  color: #bfbfbf;
+}
+
+/* 下拉选择框 Picklist 样式 */
+.ud08-search-row .ud08-select {
+  flex: 1;
+  height: 25px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  padding: 0 8px;
+  font-size: 13px;
+  color: #333;
+  background-color: #fff;
+  outline: none;
+  cursor: pointer;
+  max-width: 280px;
+}
+
+.ud08-search-row .ud08-select:focus {
+  border-color: #003366;
+}
+
+/* ---------- 按钮行（所有5个按钮在一行） ---------- */
+.ud08-button-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  padding: 10px;
+  border-bottom: 1px solid #9999cc; 
+}
+
+/* 通用按钮基础样式 */
+.ud08-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.ud08-btn:hover {
+  opacity: 0.85;
+}
+
+.ud08-btn:active {
+  opacity: 0.7;
+}
+
+.ud08-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Search - 深蓝色 */
+/* .ud08-btn--search {
+  background-color: #1a3a6b;
+  border-color: #1a3a6b;
+  color: #ffffff;
+} */
+
+/* .ud08-btn--search:hover {
+  background-color: #254e8a;
+} */
+
+/* Clear - 浅灰色 */
+/* .ud08-btn--clear {
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
+  color: #333;
+} */
+
+/* .ud08-btn--clear:hover {
+  background-color: #d0d0d0;
+} */
+
+/* Add - 绿色 */
+/* .ud08-btn--add {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: #ffffff;
+} */
+
+/* .ud08-btn--add:hover {
+  background-color: #66bb6a;
+} */
+
+/* Update - 橙色 */
+/* .ud08-btn--update {
+  background-color: #ff9800;
+  border-color: #ff9800;
+  color: #ffffff;
+} */
+
+/* .ud08-btn--update:hover {
+  background-color: #ffb74d;
+} */
+
+/* Delete - 红色 */
+/* .ud08-btn--delete {
+  background-color: #f44336;
+  border-color: #f44336;
+  color: #ffffff;
+}
+
+/* .ud08-btn--delete:hover {
+  background-color: #ef5350;
+} */
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 768px) {
+  .ud08-container {
+    padding: 12px 16px;
+  }
+
+  .ud08-search-row {
+    flex-wrap: wrap;
+  }
+
+  .ud08-search-row .ud08-label {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .ud08-search-row .ud08-operator {
+    width: 60px;
+  }
+
+  .ud08-search-row .ud08-input,
+  .ud08-search-row .ud08-select {
+    max-width: 100%;
+  }
+
+  .ud08-button-row,
+  .ud08-action-row {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD11HdocvariablesMapper">
+
+    <!--
+        UD11 动态条件搜索HDOC变量
+        结果映射到 UD11HdocvariablesResponse.VariableData
+    -->
+    <select id="searchVariables"
+            resultType="com.web.app.dto.UD11HdocvariablesResponse$VariableData"
+            parameterType="com.web.app.dto.UD11HdocvariablesRequest">
+        SELECT
+            VARIABLE AS variable,
+            TYPE AS type,
+            DESCRIPTION AS description,
+            REGISTER_USER AS registerUser,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_VARIABLES
+        <where>
+            <if test="variable != null and variable != ''">
+                AND VARIABLE = #{variable}
+            </if>
+            <if test="type != null and type != ''">
+                AND TYPE = #{type}
+            </if>
+            <if test="description != null and description != ''">
+                AND DESCRIPTION = #{description}
+            </if>
+            <if test="createdByUser != null and createdByUser != ''">
+                AND REGISTER_USER = #{createdByUser}
+            </if>
+            <if test="date != null">
+                AND REGISTER_DATETIME = #{date}
+            </if>
+        </where>
+        ORDER BY VARIABLE
+    </select>
+
+</mapper>

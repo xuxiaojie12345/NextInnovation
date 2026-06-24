@@ -1,0 +1,370 @@
+/* ===================================================
+   UD09_HomologationVariablesResultList.css
+   Homologation Variables Result List 检索结果画面样式
+   =================================================== */
+
+/* ---------- 页面主容器 ---------- */
+.ud09-container {
+  padding: 20px 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------- 页面标题 ---------- */
+.ud09-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  /* margin-bottom: 20px; */
+  padding-bottom: 10px;
+  /* border-bottom: 2px solid #003366; */
+}
+
+/* ---------- 消息显示区域 ---------- */
+.ud09-message {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  min-height: 20px;
+  border: 1px solid transparent;
+}
+
+.ud09-message--success {
+  background-color: #f6ffed;
+  border-color: #b7eb8f;
+  color: #52c41a;
+}
+
+.ud09-message--error {
+  background-color: #fff2f0;
+  border-color: #ffccc7;
+  color: #ff4d4f;
+}
+
+.ud09-message--info {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+  color: #1890ff;
+}
+
+/* ---------- 主内容区域（白色卡片） ---------- */
+.ud09-content {
+  background: #ffffff;
+  border: 1px solid #9999cc; 
+  /* border: 1px solid #d9d9d9; */
+  /* border-radius: 4px; */
+  /* padding: 16px 18px; */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- 记录件数显示 ---------- */
+.ud09-count {
+  font-size: 13px;
+  font-weight: normal;
+  color: #555;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+}
+
+/* ---------- 表格容器 ---------- */
+.ud09-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+  padding: 0px 10px;
+  /* border: 1px solid #e8e8e8; */
+  /* border-radius: 4px; */
+}
+
+/* ---------- 数据表格 ---------- */
+.ud09-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+  border-color: inherit;
+}
+
+.ud09-table th {
+  background-color: #ffffff;
+  color: #333;
+  font-weight: 700;
+  padding: 8px 10px;
+  text-align: left;
+  border: 1px solid #d9d9d9;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.ud09-table th.ud09-th--center {
+  text-align: center;
+}
+
+.ud09-table td {
+  padding: 6px 10px;
+  border: 1px solid #e8e8e8;
+  color: #333;
+  text-align: left;
+}
+
+.ud09-table td.ud09-td--center {
+  text-align: center;
+}
+
+/* 表格行交替背景色 */
+.ud09-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* 表格行悬停效果 */
+.ud09-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+/* 选中行高亮 */
+.ud09-table tbody tr.ud09-row--selected {
+  background-color: #bae7ff;
+}
+
+/* ---------- Radio 列 ---------- */
+.ud09-radio {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #003366;
+}
+
+/* ---------- Created by user 链接样式 ---------- */
+.ud09-user-link {
+  color: #1890ff;
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px dashed #1890ff;
+}
+
+.ud09-user-link:hover {
+  color: #40a9ff;
+  border-bottom-style: solid;
+}
+
+/* ---------- 按钮区域 ---------- */
+.ud09-button-row {
+ 
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  padding: 10px;
+  border-bottom: 1px solid #9999cc; 
+}
+
+/* ---------- 通用按钮样式 ---------- */
+.ud09-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.ud09-btn:hover {
+  opacity: 0.85;
+}
+
+.ud09-btn:active {
+  opacity: 0.7;
+}
+
+.ud09-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* .ud09-btn--primary {
+  background-color: #003366;
+  border-color: #003366;
+  color: #ffffff;
+}
+
+.ud09-btn--primary:hover {
+  background-color: #004d99;
+  border-color: #004d99;
+}
+
+.ud09-btn--default {
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  color: #333;
+}
+
+.ud09-btn--default:hover {
+  border-color: #003366;
+  color: #003366;
+}
+
+.ud09-btn--danger {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+  color: #ffffff;
+}
+
+.ud09-btn--danger:hover {
+  background-color: #ff7875;
+  border-color: #ff7875;
+} */
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 768px) {
+  .ud09-container {
+    padding: 12px 16px;
+  }
+
+  .ud09-table {
+    font-size: 12px;
+  }
+
+  .ud09-table th,
+  .ud09-table td {
+    padding: 6px 8px;
+  }
+
+  .ud09-button-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===================================================
+   打印样式 - 仅显示表格数据
+   =================================================== */
+@media print {
+  /* 设置页面为横向，边距最小化 */
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  /* 隐藏左侧菜单 */
+  .menu-sidebar {
+    display: none !important;
+  }
+
+  /* 隐藏页面标题 */
+  .ud09-title {
+    display: none !important;
+  }
+
+  /* 隐藏消息区域 */
+  .ud09-message {
+    display: none !important;
+  }
+
+  /* 隐藏按钮区域 */
+  .ud09-button-row {
+    display: none !important;
+  }
+
+  /* 隐藏件数显示 */
+  .ud09-count {
+    display: none !important;
+  }
+
+  /* 调整内容区域边距 */
+  .content-area {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 移除内容区域背景和边框 */
+  .ud09-content {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+
+  /* 移除容器背景和内边距 */
+  .ud09-container {
+    padding: 0 !important;
+    background: none !important;
+    min-height: auto !important;
+  }
+
+  /* 表格容器 - 无边框 */
+  .ud09-table-wrapper {
+    border: none !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 表格样式优化 */
+  .ud09-table {
+    border-collapse: collapse  !important;
+    width: 100% !important;
+    font-size: 11px !important;
+    
+  }
+
+  .ud09-table th {
+    background-color: #f0f0f0 !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border: 1px solid #999 !important;
+    padding: 6px 8px !important;
+  }
+
+  .ud09-table td {
+    border: 1px solid #999 !important;
+    padding: 4px 8px !important;
+    color: #000 !important;
+  }
+
+  /* 确保表头在每页重复显示 */
+  .ud09-table thead {
+    display: table-header-group !important;
+  }
+
+  .ud09-table tbody {
+    display: table-row-group !important;
+  }
+
+  /* 隐藏Checkbox列 */
+  .ud09-table th:first-child,
+  .ud09-table td:first-child {
+    display: none !important;
+  }
+
+  /* 选中行不高亮 */
+  .ud09-table tbody tr.ud09-row--selected {
+    background-color: transparent !important;
+  }
+
+  /* 表格行交替色简化 */
+  .ud09-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9 !important;
+  }
+
+  .ud09-table tbody tr:nth-child(odd) {
+    background-color: #ffffff !important;
+  }
+
+  /* 用户链接显示为纯文本 */
+  .ud09-user-link {
+    color: #000 !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+  }
+
+  /* 分页防止表格被切断 */
+  .ud09-table-wrapper {
+    page-break-inside: auto !important;
+  }
+
+  .ud09-table tr {
+    page-break-inside: avoid !important;
+  }
+}

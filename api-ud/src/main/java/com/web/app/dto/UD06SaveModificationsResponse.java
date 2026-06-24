@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Collections;
+// import java.util.Collections;
 import java.util.List;
 
 /**
@@ -94,7 +94,8 @@ public class UD06SaveModificationsResponse implements Serializable {
         return response;
     }
 
-    public static UD06SaveModificationsResponse errorWithMessages(Integer code, String msg, List<MessageItem> messageList) {
+    public static UD06SaveModificationsResponse errorWithMessages(Integer code, String msg,
+            List<MessageItem> messageList) {
         UD06SaveModificationsResponse response = new UD06SaveModificationsResponse();
         response.setCode(code);
         response.setMsg(msg);

@@ -7,7 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
+// import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,13 +18,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/ud01")
 @Api(tags = "用户认证管理")
 public class AuthenticationController {
-    
+
     @Autowired
     private AuthenticationService authenticationService;
-    
+
     /**
      * 用户认证接口
-     * @param userId 用户ID
+     * 
+     * @param userId   用户ID
      * @param password 密码
      * @return 认证响应
      */
@@ -34,12 +35,12 @@ public class AuthenticationController {
             @RequestParam String userId,
             @RequestParam(required = false) String password) {
         log.info("收到登录请求: userId={}", userId);
-        
+
         // 构建请求对象
         AuthenticationRequest request = new AuthenticationRequest();
         request.setUserId(userId);
         request.setPassword(password);
-        
+
         return authenticationService.authentication(request);
     }
 }
