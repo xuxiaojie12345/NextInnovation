@@ -1,17 +1,17 @@
 # 登录模块 (Login Module) 详细设计说明书
 
-| 文档编号     | DES-LOGIN-001         | 版本号     | v1.0       |
+| 文档编号     | DES-LOGIN-UD01         | 版本号     | v1.0       |
 | :----------- | :-------------------- | :--------- | :--------- |
-| **模块名称** | 用户登录 (User Login) | **作成日** | 2023-10-XX |
-| **作成者**   | Lingma Assistant      | **状态**   | 正式稿     |
+| **模块名称** | 登录画面 (Login Screen) | **作成日** | 2022-11-18 |
+| **作成者**   | UD 刘                 | **状态**   | 正式稿     |
 
 ## 1. 背景 (Background)
 
-本模块是系统的入口，负责验证用户身份。用户通过输入 UserID 和 Password，经由前端校验后调用后端 `AuthenticationApi` 进行认证。
+本模块是HDoc系统的入口，负责验证用户身份。用户通过输入UserID和Password，点击登录按钮后执行ISAM认证。
 
 - **目标**：确保只有授权用户能进入系统，并提供清晰的错误反馈。
 - **安全性**：密码字段需掩码显示，所有敏感数据传输需加密。
-- **用户体验**：采用 Label 形式在页面内显示错误信息，避免频繁弹窗打断操作流。
+- **用户体验**：采用Label形式在页面内显示错误信息，避免频繁弹窗打断操作流。
 
 ## 2. 画面参数定义 (Screen Parameters)
 
@@ -27,7 +27,6 @@
 | **Login**     | Button      |     -      |     -     | Action | -                                 |   中 (Center)    |        -         |   活性 (Enabled)   | 点击触发校验与 API 调用 |
 
 > **注**：
->
 > - **半角英数字**：正则表达式 `[a-zA-Z0-9]`
 > - **記号**：指 ASCII 范围内的可见符号（如 `!@#$%` 等），具体范围以后端安全策略为准。
 
@@ -42,33 +41,35 @@
 3.  **空值校验 (Frontend Check)**：
     - 若 `UserID` 为空 **或** `Password` 为空：
       - 设置 `Message` = `Username and password are required.`
+      - Message级别 = Warning
       - **终止**流程，不调用 API。
 4.  **API 调用 (Backend Check)**：
-    - 若校验通过，调用 `AuthenticationApi(userID, password)`。
+    - 若校验通过，调用 `AuthenticationApi(userID, password)` 执行ISAM认证。
 5.  **结果处理**：
-    - **认证成功**：清空 Message，保存 Token，跳转首页。
-    - **认证失败**：设置 `Message` = `We didn't recognize the username or password you entered. Please try again.`
+    - **认证成功**：清空 Message，保存 Token/UserID，跳转至菜单页面。
+    - **认证失败**：设置 `Message` = `We didn't recognize the username or password you entered. Please try again.`，Message级别 = Error。
 
 ### 3.2 校验详细规格表
 
-| No. |   检查时机   |     检查对象      |                检查条件                |                          错误消息 (Message Content)                           |                 动作                 |
-| :-: | :----------: | :---------------: | :------------------------------------: | :---------------------------------------------------------------------------: | :----------------------------------: |
-|  1  | Click Login  | UserID / Password | `Value == null` OR `Trim(Value) == ""` |                     `Username and password are required.`                     | 显示 Message，焦点停留在第一个空字段 |
-|  2  | API Response |    Auth Result    |  `Status != Success` OR `Code == 401`  | `We didn't recognize the username or password you entered. Please try again.` | 显示 Message，建议清空 Password 字段 |
+| No. |   检查时机   |     检查对象      |                检查条件                |                          错误消息 (Message Content)                           |    错误级别    |                 动作                 |
+| :-: | :----------: | :---------------: | :------------------------------------: | :---------------------------------------------------------------------------: | :------------: | :----------------------------------: |
+|  1  | Click Login  |      UserID       | `Value == null` OR `Trim(Value) == ""` |                     `Username and password are required.`                     |    Warning     | 显示 Message，焦点停留在 UserID 字段 |
+|  2  | Click Login  |     Password      | `Value == null` OR `Trim(Value) == ""` |                     `Username and password are required.`                     |    Warning     | 显示 Message，焦点停留在 Password 字段 |
+|  3  | API Response |    Auth Result    |  `Status != Success` OR `Code == 401`  | `We didn't recognize the username or password you entered. Please try again.` |     Error      | 显示 Message，建议清空 Password 字段 |
 
 ## 4. 接口定义 (API Specification)
 
 ### 4.1 AuthenticationApi
 
-- **功能**：验证用户凭证并返回认证结果。
+- **功能**：通过ISAM验证用户凭证并返回认证结果。
 - **Method**: `POST`
-- **Endpoint**: `/api/auth/login` (示例路径)
+- **Endpoint**: `/api/login`
 
 #### Request Body
 
 ```json
 {
-  "userID": "string (Max 10, Alphanumeric)",
+  "userId": "string (Max 10, Alphanumeric)",
   "password": "string (Max 32, Alphanumeric + Symbols)"
 }
 ```
@@ -77,12 +78,11 @@
 
 ```json
 {
-  "code": 200,
+  "success": true,
+  "message": "Login successful",
   "data": {
-    "token": "eyJhbGciOi...",
-    "userInfo": { ... }
-  },
-  "message": "success"
+    "userId": "user001"
+  }
 }
 ```
 
@@ -90,9 +90,9 @@
 
 ```json
 {
-  "code": 401,
-  "data": null,
-  "message": "Invalid credentials"
+  "success": false,
+  "message": "We didn't recognize the username or password you entered. Please try again.",
+  "data": null
 }
 ```
 
@@ -100,7 +100,7 @@
 
 | 异常场景                 | 处理方式           | Message 显示内容                               |
 | :----------------------- | :----------------- | :--------------------------------------------- |
-| **网络断开/超时**        | 捕获 Network Error | `Network error. Please check your connection.` |
+| **网络断开/超时**        | 捕获 Network Error | `Network error or server unavailable. Please try again later.` |
 | **服务器内部错误 (500)** | 捕获 Server Error  | `System error. Please contact administrator.`  |
 | **输入非法字符**         | 前端实时拦截       | 不允许输入非定义范围内的字符                   |
 
@@ -109,11 +109,15 @@
 1.  **状态管理**：
     - 使用 React State 管理 `userID`, `password`, `message`, `isLoading`。
     - `Message` Label 默认隐藏（内容为空时不占位或高度为0）。
+    - 认证成功后将 userID 保存到 localStorage，便于后续页面使用。
 2.  **安全性**：
     - 严禁在前端日志中打印明文密码。
     - API 请求必须通过 HTTPS 发送。
+    - 密码输入框 type 必须设置为 `password` 以掩码显示。
 3.  **UI 细节**：
-    - [Login](file://f:\★王建徳\lingmagongcheng\my-app\src\Login\Login.tsx#L3-L82) 按钮在 `isLoading` 期间应设为 `disabled`，防止重复提交。
-    - `Message` 文字颜色建议使用红色 (`#ff4d4f`) 以起到警示作用。
+    - [Login](file://f:\git\NextInnovation\react-ud\src\Login\Login.tsx#L3-L216) 按钮在 `isLoading` 期间应设为 `disabled`，防止重复提交。
+    - `Message` 文字颜色建议使用红色 (`#ff4d4f` 或 `#c62828`) 以起到警示作用。
+    - UserID 和 Password 输入框应添加适当的 placeholder 提示文本。
+    - 错误消息应显示在表单下方或输入框附近，确保用户能够清晰看到。
 
 ---

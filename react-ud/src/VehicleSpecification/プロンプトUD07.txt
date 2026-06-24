@@ -1,0 +1,62 @@
+================================================================================
+                        UD HDoc & VBI(UDBI) 替换项目
+                                画面功能设计书
+                              车辆规格（Vehicle Specification）
+================================================================================
+
+【修订历史】
+版本   变更位置           变更内容                    变更理由           创建/变更日期       创建/变更者   备注
+----------------------------------------------------------------------------------------------------------------
+1.0                       新建                      新建               2022-11-21         UD 刘
+1.1     画面布局与项目定义  删除 S-Note 说明显示       规格调整           2022-12-21         UD 李
+
+================================================================================
+【画面布局】
+
+项目名称: UD HDoc & VBI(UDBI) 替换项目
+业务名称: HDOC
+系统名称: HDOC
+画面ID: Vehicle Specification
+画面名称: Vehicle Specification
+创建日期: 2022-11-21
+创建者: UD 刘
+
+概要处理:
+1. 初始显示
+   １. VDA - 车辆规格画面
+   显示所选底盘（Chassis）的详细信息。
+   (1) 将光标悬停在变体（Variant）对象上时，将出现工具提示并显示说明（DESCRIPTION）。
+
+================================================================================
+【项目定义书】 - 项目定义_VDA - 车辆规格
+
+编号   项目名称               类型     必须  最大长度  数据源表                                               数据源项目                             I/O     允许字符  文字对齐  初始值  显示控制  备注
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1     Chassis no（底盘号）    label    -        -     前画面                                                 =F9（由前画面传递）                   Output    -        左        -      -         -
+2     Model（型号）           label    -        -     HDOC_REC_DATA_OM                                      MODEL                                 Output    -        左        -      -         -
+3     Built week（制造周）    label    -        -     HDOC_REC_DATA_OM                                      BUILD                                 Output    -        左        -      -         -
+4     Product type（产品类型） label    -        -     HDOC_REC_DATA_VDA_GENERAL                             PRODUCT_TYPE                          Output    -        左        -      -         -
+5     VIN（车架号）           label    -        -     HDOC_REC_DATA_VDA_GENERAL                             VIN                                   Output    -        左        -      -         -
+6     Engine no（发动机号）   label    -        -     HDOC_REC_DATA_VDA_VARIANTS<br>+<br>HDOC_REC_DATA_KOLA_VARIANT | SYMBOL                               Output    -        左        -      -         【数据检索】<br>① 检索 HDOC_REC_DATA_VDA_VARIANTS<br>   条件：Chassis no，Family ID Like 'DPX%'<br>   取得：FAMILY_ID, VARIANT_ID<br>② 检索 HDOC_REC_DATA_KOLA_VARIANT<br>   条件：上一步取得的 FAMILY_ID, VARIANT_ID<br>   取得：Symbol
+7     Country of Operation（运营国家） label   -        -     HDOC_REC_DATA_VDA_GENERAL                             COUNTRY_OF_OPERATION                  Output    -        左        -      -         -
+8     SYMBOL_STR（符号串）    label    -        -     HDOC_REC_DATA_VDA_VARIANTS<br>+<br>HDOC_REC_DATA_KOLA_VARIANT | SYMBOL, FUNCTION_GROUP               Output    -        左        -      -         【数据检索】<br>① 检索 HDOC_REC_DATA_VDA_VARIANTS<br>   条件：Chassis no<br>   取得：FAMILY_ID, VARIANT_ID<br>② 检索 HDOC_REC_DATA_KOLA_VARIANT<br>   条件：上一步取得的 FAMILY_ID, VARIANT_ID<br>【结果显示】<br>取得 Symbol 的前8位（不足8位时左侧补半角空格）<br>【排序规则】<br>将 FUNCTION_GROUP 左对齐补足4位半角空格，再连接 FAMILY_ID（3位）
+9     DESCRIPTION（说明）    tooltip  -        -     HDOC_REC_DATA_KOLA_VARIANT                             DESCRIPTION                           Output    -        左        -      -         -
+10    S-Note NO（S-Note编号） label    -        -     HDOC_REC_DATA_OM                                      CUSTOMER_ADAP                         Output    -        左        -      -         -
+11    S-Note Desc（S-Note描述） label   -        -     HDOC_REC_DATA_KAP_SNOTE                              DESCRIPTION                           Output    -        左        -      -         -
+
+================================================================================
+【输入输出表一览】
+
+编号   表/视图                        物理名                          操作CRUD   备注
+-------------------------------------------------------------------------------------------------------
+1     OM(RP500) 接收数据              HDOC_REC_DATA_OM                R         取得 OM(RP500) 接收数据
+2     VDA 接收数据（通用信息）         HDOC_REC_DATA_VDA_GENERAL       R         取得 VDA 接收数据（通用信息）
+3     VDA 接收数据（变体信息）         HDOC_REC_DATA_VDA_VARIANTS      R         取得 VDA 接收数据（变体信息）
+4     KOLA 接收数据（变体）            HDOC_REC_DATA_KOLA_VARIANT      R         取得 KOLA 接收数据（变体）
+5     KAP 接收数据（S-Note）           HDOC_REC_DATA_KAP_SNOTE         R         取得 KAP 信息
+
+================================================================================
+【检查规格】
+（本画面无检查规格条目）
+
+================================================================================
