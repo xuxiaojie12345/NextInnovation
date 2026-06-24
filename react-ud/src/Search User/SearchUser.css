@@ -1,0 +1,312 @@
+/**
+ * SearchUser组件样式文件
+ * 
+ * @description 严格按照UD19.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局、间距等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.ud19-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   内容区域 - 包含所有内容的边框
+   ============================================ */
+.ud19-content-area {
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #ccccff;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* ============================================
+   页面标题区域
+   ============================================ */
+   .ud19-page-title-area {
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    padding: 15px;
+}
+
+/* ============================================
+   页面标题 - Search HDoc User
+   ============================================ */
+.ud19-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  padding: 0;
+}
+
+/* ============================================
+   错误消息区域
+   ============================================ */
+.ud19-error-message-area {
+  margin-bottom: 20px;
+  padding: 5px 0;
+  min-height: 20px;
+}
+
+.ud19-error-text {
+  color: #ff0000;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ============================================
+   搜索条件区域
+   ============================================ */
+.ud19-search-section {
+  margin-bottom: 20px;
+}
+
+.ud19-input-row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* Market和radio button在同一行的特殊布局 */
+.ud19-market-radio-row {
+  align-items: flex-start;
+}
+
+.ud19-label {
+  font-weight: normal;
+  color: #000000;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.ud19-input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  width: 250px;
+}
+
+.ud19-input:focus {
+  outline: none;
+  border-color: #6666ff;
+  box-shadow: 0 0 3px rgba(102, 102, 255, 0.3);
+}
+
+.ud19-select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  width: 120px;
+}
+
+.ud19-select:focus {
+  outline: none;
+  border-color: #6666ff;
+  box-shadow: 0 0 3px rgba(102, 102, 255, 0.3);
+}
+
+/* ============================================
+   单选框组 - 竖行排列
+   ============================================ */
+.ud19-radio-group-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.ud19-radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #000000;
+}
+
+.ud19-radio {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+/* ============================================
+   按钮区域 - 左对齐
+   ============================================ */
+.ud19-button-area {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.ud19-button {
+  padding: 6px 20px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  border-radius: 3px;
+  background-color: #e0e0ff;
+  color: #000066;
+  cursor: pointer;
+}
+
+.ud19-button:hover {
+  background-color: #d0d0ff;
+  border-color: #666699;
+}
+
+.ud19-search-button {
+  margin-left: 0; /* 与上面的输入框左对齐 */
+}
+
+/* ============================================
+   搜索结果区域
+   ============================================ */
+.ud19-result-section {
+  margin-top: 20px;
+}
+
+.ud19-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #cccccc;
+}
+
+.ud19-data-table thead {
+  background-color: #f0f0f0;
+}
+
+.ud19-data-table th {
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  color: #000000;
+  border-bottom: 2px solid #cccccc;
+}
+
+.ud19-data-table td {
+  padding: 8px 10px;
+  text-align: left;
+  color: #000000;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.ud19-data-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.ud19-col-userid {
+  width: 30%;
+}
+
+.ud19-col-user {
+  width: 40%;
+}
+
+.ud19-col-market {
+  width: 30%;
+}
+
+/* ============================================
+   COUNT显示
+   ============================================ */
+.ud19-count-display {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  text-align: right;
+}
+
+/* ============================================
+   加载消息
+   ============================================ */
+.ud19-loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .ud19-container {
+    padding: 15px;
+  }
+
+  .ud19-content-area {
+    padding: 15px;
+  }
+
+  .ud19-page-title {
+    font-size: 20px;
+  }
+
+  .ud19-input,
+  .ud19-select {
+    width: 220px;
+  }
+
+  .ud19-radio-group {
+    flex-wrap: wrap;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .ud19-container {
+    padding: 10px;
+  }
+
+  .ud19-content-area {
+    padding: 10px;
+  }
+
+  .ud19-page-title {
+    font-size: 18px;
+  }
+
+  .ud19-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .ud19-input,
+  .ud19-select {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .ud19-radio-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ud19-search-button {
+    margin-left: 0;
+  }
+
+  .ud19-data-table {
+    font-size: 12px;
+  }
+
+  .ud19-data-table th,
+  .ud19-data-table td {
+    padding: 6px 8px;
+  }
+}

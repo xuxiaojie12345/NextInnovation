@@ -1,0 +1,272 @@
+/**
+ * GenerateHomologationDocument组件样式文件
+ * 
+ * @description 严格按照UD03.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.ud03-generate-hdoc-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   页面标题 - HDoc - Generate Homologation Document
+   ============================================ */
+.ud03-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  margin: 0 0 10px 0;
+  padding: 0;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* ============================================
+   错误消息区域 - エラーメッセージエリア
+   ============================================ */
+.ud03-error-message-area {
+  margin-bottom: 20px;
+  padding: 5px 0;
+  min-height: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.ud03-error-text {
+  color: #ff0000;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ============================================
+   表单区域 - 白色背景，浅蓝色边框
+   ============================================ */
+.ud03-form-container {
+  background-color: #ffffff;
+  border: 1px solid #ccccff;
+  padding: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* ============================================
+   表单项组
+   ============================================ */
+.ud03-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.ud03-form-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #000000;
+  width: 150px;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.ud03-form-input,
+.ud03-form-select {
+  flex: 1;
+  max-width: 300px;
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  background-color: #ffffff;
+}
+
+.ud03-form-input:focus,
+.ud03-form-select:focus {
+  outline: none;
+  border-color: #003366;
+  box-shadow: 0 0 3px rgba(0, 51, 102, 0.3);
+}
+
+.ud03-form-input::placeholder {
+  color: #999999;
+}
+
+/* Document type下拉列表未选择时的样式 */
+.ud03-form-select option[value=""] {
+  color: #999999;
+}
+
+.ud03-select-placeholder {
+  color: #999999;
+}
+
+/* ============================================
+   底部按钮区域 - 浅蓝色背景条
+   ============================================ */
+.ud03-button-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 0 0;
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ud03-submit-button,
+.ud03-reset-button,
+.ud03-help-button {
+  padding: 6px 15px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ud03-submit-button {
+  background-color: #d0d0f0;
+  color: #000000;
+}
+
+.ud03-submit-button:hover:not(:disabled) {
+  background-color: #b0b0e0;
+}
+
+.ud03-reset-button {
+  background-color: #d0d0f0;
+  color: #000000;
+}
+
+.ud03-reset-button:hover:not(:disabled) {
+  background-color: #b0b0e0;
+}
+
+.ud03-help-button {
+  background-color: #d0d0f0;
+  color: #000000;
+  margin-left: 100px;
+}
+
+.ud03-help-button:hover:not(:disabled) {
+  background-color: #b0b0e0;
+}
+
+.ud03-submit-button:disabled,
+.ud03-reset-button:disabled,
+.ud03-help-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Support情報
+   ============================================ */
+.ud03-support-info {
+  /* margin-top: 20px; */
+  padding: 10px 40px 0 0;
+  font-size: 14px;
+  color: #000000;
+  font-weight: normal;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* ============================================
+   响应式設計 - 平板デバイス (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .ud03-generate-hdoc-container {
+    padding: 15px;
+  }
+
+  .ud03-page-title {
+    font-size: 20px;
+  }
+
+  .ud03-form-label {
+    width: 130px;
+    font-size: 13px;
+  }
+
+  .ud03-form-input,
+  .ud03-form-select {
+    max-width: 250px;
+    font-size: 13px;
+  }
+
+  .ud03-submit-button,
+  .ud03-reset-button,
+  .ud03-help-button {
+    font-size: 13px;
+    padding: 5px 12px;
+  }
+}
+
+/* ============================================
+   响应式設計 - スマートフォンデバイス (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .ud03-generate-hdoc-container {
+    padding: 10px;
+  }
+
+  .ud03-page-title {
+    font-size: 18px;
+  }
+
+  .ud03-error-text {
+    font-size: 12px;
+  }
+
+  .ud03-form-container {
+    padding: 15px;
+  }
+
+  .ud03-form-group {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .ud03-form-label {
+    width: 100%;
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+
+  .ud03-form-input,
+  .ud03-form-select {
+    width: 100%;
+    max-width: none;
+    font-size: 12px;
+  }
+
+  .ud03-button-area {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ud03-submit-button,
+  .ud03-reset-button,
+  .ud03-help-button {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .ud03-help-button {
+    margin-left: 0;
+  }
+
+  .ud03-support-info {
+    font-size: 12px;
+  }
+}

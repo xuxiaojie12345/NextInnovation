@@ -133,6 +133,26 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+        <!-- 添加 Java Validation API -->
+       <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+       </dependency>
+
+       <!-- 推荐同时添加 Hibernate Validator，它是 Validation API 的参考实现 -->
+      <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.5.Final</version>
+      </dependency>
+
+      <!-- 如果需要使用 EL 表达式（通常需要），也加上这个 -->
+      <dependency>
+           <groupId>org.glassfish</groupId>
+           <artifactId>javax.el</artifactId>
+           <version>3.0.0</version>
+      </dependency>
     </dependencies>
 
     <build>
@@ -141,11 +161,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <!-- <version>3.8.1</version> -->
+                <version>3.11.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    
+                    <!-- <source>1.8</source>
+                    <target>1.8</target> -->
+                    <!-- <source>11</source>
+                    <target>11</target> -->
+                    <release>11</release>  <!-- 替换掉 source 和 target -->
+                    <annotationProcessorPaths>
+                       <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.40</version>
+                       </path>
+                    </annotationProcessorPaths>                    
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

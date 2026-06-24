@@ -1,0 +1,309 @@
+/**
+ * ModifyDocument组件样式文件
+ * 
+ * @description 严格按照UD05.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局、间距等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.ud05-modify-document-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   内容区域 - 包含所有内容的边框
+   ============================================ */
+.ud05-content-area {
+  width: 100%;
+  max-width: 1200px;
+  border: 1px solid #ccccff;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* ============================================
+   页面标题 - Modify Document
+   ============================================ */
+.ud05-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+/* ============================================
+   错误消息区域
+   ============================================ */
+.ud05-error-message-area {
+  margin-bottom: 20px;
+  padding: 5px 0;
+  min-height: 20px;
+}
+
+.ud05-error-text {
+  color: #ff0000;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ============================================
+   信息项
+   ============================================ */
+.ud05-info-item {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.ud05-info-item-empty {
+  height: 8px;
+}
+
+.ud05-label {
+  font-weight: normal;
+  color: #000000;
+}
+
+.ud05-label-bold {
+  font-weight: bold;
+  color: #000000;
+}
+
+.ud05-value {
+  color: #000000;
+}
+
+.ud05-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ud05-link:hover {
+  color: #0000cc;
+  text-decoration: underline;
+}
+
+/* ============================================
+   按钮区域 - 左对齐
+   ============================================ */
+.ud05-button-area {
+  padding: 10px 0 20px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.ud05-save-button {
+  padding: 6px 15px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  border-radius: 3px;
+  background-color: #e0e0ff;
+  color: #000066;
+  cursor: pointer;
+}
+
+.ud05-save-button:hover {
+  background-color: #d0d0ff;
+  border-color: #666699;
+}
+
+/* ============================================
+   表格容器
+   ============================================ */
+.ud05-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ============================================
+   DataTable表格
+   ============================================ */
+.ud05-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ud05-data-table thead {
+  background-color: #f0f0ff;
+}
+
+.ud05-data-table th {
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: bold;
+  color: #000000;
+  border: 1px solid #ccccff;
+}
+
+.ud05-data-table td {
+  padding: 8px;
+  border: 1px solid #ccccff;
+  vertical-align: middle;
+}
+
+.ud05-data-table tbody tr:nth-child(even) {
+  background-color: #f8f8ff;
+}
+
+.ud05-data-table tbody tr:hover {
+  background-color: #f0f0ff;
+}
+
+/* ============================================
+   列宽定义
+   ============================================ */
+.ud05-col-variable {
+  width: 15%;
+  min-width: 120px;
+}
+
+.ud05-col-description {
+  width: 35%;
+  min-width: 250px;
+}
+
+.ud05-col-current {
+  width: 20%;
+  min-width: 150px;
+}
+
+.ud05-col-modified {
+  width: 30%;
+  min-width: 200px;
+}
+
+/* ============================================
+   Modified value输入框
+   ============================================ */
+.ud05-modified-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+}
+
+.ud05-modified-input:focus {
+  outline: none;
+  border-color: #6666ff;
+  box-shadow: 0 0 3px rgba(102, 102, 255, 0.3);
+}
+
+/* ============================================
+   加载消息
+   ============================================ */
+.ud05-loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .ud05-modify-document-container {
+    padding: 15px;
+  }
+
+  .ud05-content-area {
+    padding: 15px;
+  }
+
+  .ud05-page-title {
+    font-size: 20px;
+  }
+
+  .ud05-info-item {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .ud05-data-table {
+    font-size: 13px;
+  }
+
+  .ud05-data-table th,
+  .ud05-data-table td {
+    padding: 6px 5px;
+  }
+
+  .ud05-save-button {
+    font-size: 13px;
+    padding: 5px 12px;
+  }
+
+  .ud05-modified-input {
+    font-size: 13px;
+    padding: 3px 5px;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .ud05-modify-document-container {
+    padding: 10px;
+  }
+
+  .ud05-content-area {
+    padding: 10px;
+  }
+
+  .ud05-page-title {
+    font-size: 18px;
+  }
+
+  .ud05-info-item {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  .ud05-data-table {
+    font-size: 12px;
+  }
+
+  .ud05-data-table th,
+  .ud05-data-table td {
+    padding: 5px 4px;
+  }
+
+  .ud05-col-variable {
+    min-width: 80px;
+  }
+
+  .ud05-col-description {
+    min-width: 150px;
+  }
+
+  .ud05-col-current {
+    min-width: 100px;
+  }
+
+  .ud05-col-modified {
+    min-width: 120px;
+  }
+
+  .ud05-save-button {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .ud05-modified-input {
+    font-size: 12px;
+    padding: 3px 4px;
+  }
+}

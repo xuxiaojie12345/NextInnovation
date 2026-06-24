@@ -1,0 +1,400 @@
+/**
+ * DownloadPrintQuickGuides组件样式文件
+ * 
+ * @description 定义Download and Print Quick Guides页面的样式，包括标题、链接列表等元素的样式
+ *              严格按照UD23.png图片中的布局、字体、颜色、间距进行设计
+ */
+
+/* ==================== 容器样式 ==================== */
+
+/**
+ * 主容器
+ * - 使用flex布局，垂直排列
+ * - 最小高度100vh，确保占满整个视口
+ */
+.download-print-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* ==================== 主内容区域 ==================== */
+
+/**
+ * 主内容区域
+ * - 占据剩余空间
+ * - 居中显示内容
+ */
+.download-print-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/**
+ * 内容容器
+ * - 限制最大宽度，保持内容可读性
+ * - 白色背景，圆角边框
+ */
+.download-print-content {
+  width: 100%;
+  max-width: 1500px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+/* ==================== 侧边栏样式 ==================== */
+
+/**
+ * 左侧内容区域
+ * - 左对齐显示所有元素
+ */
+.download-print-sidebar {
+  text-align: left;
+  width: 100%;
+}
+
+/* ==================== Header行样式（Back按钮和标题） ==================== */
+
+/**
+ * Header行容器
+ * - 使用flex布局，水平排列
+ * - Back按钮和标题在同一行
+ */
+.header-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 20px;
+}
+
+/**
+ * Back按钮
+ * - 蓝色链接样式
+ * - 鼠标悬停时显示下划线
+ * - 移除默认按钮样式
+ * - 添加手型光标
+ */
+.back-button {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+
+/**
+ * Back按钮悬停效果
+ * - 颜色加深
+ */
+.back-button:hover {
+  color: #0052a3;
+}
+
+/* ==================== 标题样式 ==================== */
+
+/**
+ * 页面标题 "Download and Print Quick Guides"
+ * - 红色文字（根据图片）
+ * - 加粗字体
+ * - 较大的字号
+ * - 无底部留白（与Back按钮同行）
+ */
+.page-title {
+  color: #cc0000;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * 章节标题 "Deep 3P Quick Guides" - 红色
+ * - 红色文字
+ * - 加粗字体
+ * - 中等字号
+ * - 上下留白
+ */
+.section-title-red {
+  color: #cc0000;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+/* ==================== HDoc系统快速指南网格布局 ==================== */
+
+/**
+ * HDoc系统快速指南部分容器
+ * - 底部留白
+ */
+.hdoc-guides-section {
+  margin-bottom: 30px;
+}
+
+/**
+ * 快速指南网格容器
+ * - 使用grid布局，横向排列
+ * - 自动适应列数
+ * - 列间距和行间距
+ */
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+/**
+ * 单个快速指南项
+ * - 居中对齐
+ * - 包含图片和链接
+ */
+.guide-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/**
+ * 快速指南图片
+ * - 固定宽度和高度，确保所有图片尺寸一致
+ * - 使用object-fit保持图片比例
+ * - 底部留白
+ */
+.guide-image {
+  width: 120px;
+  height: 160px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+/**
+ * 快速指南链接按钮
+ * - 左对齐文本
+ * - 蓝色链接样式
+ * - 鼠标悬停时显示下划线
+ * - 移除默认按钮样式
+ * - 添加手型光标
+ */
+.quick-guide-link {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+/**
+ * 快速指南链接按钮悬停效果
+ * - 显示下划线
+ * - 颜色加深
+ */
+.quick-guide-link:hover {
+  text-decoration: underline;
+  color: #0052a3;
+}
+
+/**
+ * 快速指南链接按钮激活效果
+ * - 点击时的视觉反馈
+ */
+.quick-guide-link:active {
+  color: #003d7a;
+}
+
+/* ==================== Deep 3P系统快速指南列表样式 ==================== */
+
+/**
+ * Deep 3P系统快速指南部分容器
+ * - 底部留白
+ */
+.deep-guides-section {
+  margin-bottom: 20px;
+}
+
+/**
+ * Deep 3P快速指南列表
+ * - 使用默认列表样式（黑点）
+ * - 缩进显示
+ */
+.deep-guide-list {
+  list-style-type: disc;
+  padding-left: 30px;
+  margin: 0;
+}
+
+/**
+ * Deep 3P快速指南项
+ * - 底部留白，分隔各个链接
+ */
+.deep-guide-item {
+  margin-bottom: 10px;
+}
+
+/**
+ * Deep 3P快速指南链接按钮
+ * - 左对齐文本
+ * - 蓝色链接样式
+ * - 鼠标悬停时显示下划线
+ * - 移除默认按钮样式
+ * - 添加手型光标
+ */
+.deep-guide-link {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+/**
+ * Deep 3P快速指南链接按钮悬停效果
+ * - 显示下划线
+ * - 颜色加深
+ */
+.deep-guide-link:hover {
+  text-decoration: underline;
+  color: #0052a3;
+}
+
+/**
+ * Deep 3P快速指南链接按钮激活效果
+ * - 点击时的视觉反馈
+ */
+.deep-guide-link:active {
+  color: #003d7a;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/**
+ * 平板设备（768px及以下）
+ */
+@media (max-width: 768px) {
+  .download-print-main {
+    padding: 15px;
+  }
+
+  .download-print-content {
+    padding: 20px;
+  }
+
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .section-title-red {
+    font-size: 16px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+  }
+
+  .guides-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+  }
+
+  .guide-image {
+    width: 100px;
+    height: 133px;
+    object-fit: contain;
+  }
+
+  .quick-guide-link {
+    font-size: 12px;
+  }
+
+  .deep-guide-link {
+    font-size: 14px;
+  }
+
+  .back-button {
+    font-size: 14px;
+  }
+}
+
+/**
+ * 手机设备（480px及以下）
+ */
+@media (max-width: 480px) {
+  .download-print-main {
+    padding: 10px;
+  }
+
+  .download-print-content {
+    padding: 15px;
+  }
+
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .section-title-red {
+    font-size: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .guides-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  .guide-image {
+    width: 80px;
+    height: 107px;
+    object-fit: contain;
+  }
+
+  .quick-guide-link {
+    font-size: 11px;
+  }
+
+  .deep-guide-link {
+    font-size: 13px;
+  }
+
+  .back-button {
+    font-size: 13px;
+  }
+
+  .deep-guide-list {
+    padding-left: 20px;
+  }
+}

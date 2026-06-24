@@ -1,0 +1,217 @@
+/**
+ * GenerateDocument组件样式文件
+ * 
+ * @description 严格按照UD04.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局、间距等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.generate-document-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   页面标题 - Generate document
+   ============================================ */
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  margin: 0 0 10px 0;
+  padding: 0;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* ============================================
+   错误消息区域
+   ============================================ */
+.error-message-area {
+  margin-bottom: 20px;
+  padding: 5px 0;
+  min-height: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.error-text {
+  color: #ff0000;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.error-placeholder {
+  color: #ff0000;
+  font-size: 14px;
+  font-style: normal;
+}
+
+/* ============================================
+   内容区域
+   ============================================ */
+.content-area {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px 0;
+}
+
+/* ============================================
+   信息项
+   ============================================ */
+.info-item {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.info-item-empty {
+  height: 8px;
+}
+
+.label {
+  font-weight: normal;
+  color: #000000;
+}
+
+.label-bold {
+  font-weight: bold;
+  color: #000000;
+}
+
+.value {
+  color: #000000;
+}
+
+.link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: #0000cc;
+  text-decoration: underline;
+}
+
+/* ============================================
+   S-Note Message - 红色文字
+   ============================================ */
+.s-note-message {
+  color: #ff0000;
+  font-style: normal;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+/* ============================================
+   Modify Doc Link - 红色文字
+   ============================================ */
+.modify-doc-link {
+  color: #ff0000;
+  font-weight: normal;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+/* ============================================
+   参数列表
+   ============================================ */
+.parameters-list {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+.parameter-item {
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+/* ============================================
+   Generated document - 蓝色链接
+   ============================================ */
+.generated-document {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.generated-document .link {
+  color: #0000ff;
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+/* ============================================
+   加载消息
+   ============================================ */
+.loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .generate-document-container {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .info-item {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .error-text,
+  .error-placeholder {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .generate-document-container {
+    padding: 10px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .content-area {
+    padding: 15px 0;
+  }
+
+  .info-item {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  .error-text,
+  .error-placeholder {
+    font-size: 12px;
+  }
+
+  .parameters-list {
+    margin-left: 15px;
+  }
+
+  .parameter-item {
+    font-size: 12px;
+  }
+}

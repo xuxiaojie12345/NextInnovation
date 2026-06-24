@@ -16,8 +16,18 @@ public class SimpleCORSFilter implements Filter {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, HEAD");
     response.setHeader("Access-Control-Max-Age", "3600");
-    response.setHeader("Access-Control-Allow-Headers", "access-control-allow-origin, " +
-        "authority, content-type, version-info, X-Requested-With");
+    // 允许前端发送 Authorization 等常用头，避免预检失败
+    response.setHeader("Access-Control-Allow-Headers",
+        "Origin, Accept, X-Requested-With, Content-Type, Authorization, Version-Info");
+    // 如需暴露特定响应头可在此添加
+    response.setHeader("Access-Control-Expose-Headers", "Authorization");
+
+    // 如果是预检请求直接返回 200，不再继续后续过滤链
+    if ("OPTIONS".equalsIgnoreCase(((javax.servlet.http.HttpServletRequest) req).getMethod())) {
+      response.setStatus(javax.servlet.http.HttpServletResponse.SC_OK);
+      return;
+    }
+
     chain.doFilter(req, res);
   }
 

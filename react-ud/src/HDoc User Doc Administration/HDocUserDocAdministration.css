@@ -1,0 +1,250 @@
+/**
+ * HDocUserDocAdministration组件样式文件
+ * 
+ * @description 严格按照UD18.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局、间距等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.ud18-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   内容区域 - 包含所有内容的边框
+   ============================================ */
+.ud18-content-area {
+  width: 100%;
+  max-width: 900px;
+  border: 1px solid #ccccff;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* ============================================
+   页面标题 - HDoc Document Authorization
+   ============================================ */
+.ud18-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+/* ============================================
+   错误消息区域
+   ============================================ */
+.ud18-error-message-area {
+  margin-bottom: 20px;
+  padding: 5px 0;
+  min-height: 20px;
+}
+
+.ud18-error-text {
+  color: #ff0000;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ============================================
+   输入行
+   ============================================ */
+.ud18-input-row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.ud18-info-row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: baseline;
+}
+
+.ud18-label {
+  font-weight: normal;
+  color: #000000;
+  font-size: 14px;
+  min-width: 50px;
+}
+
+.ud18-input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  width: 200px;
+}
+
+.ud18-input:focus {
+  outline: none;
+  border-color: #6666ff;
+  box-shadow: 0 0 3px rgba(102, 102, 255, 0.3);
+}
+
+.ud18-value {
+  color: #000000;
+  font-size: 14px;
+  padding-left: 30px;
+}
+
+/* ============================================
+   下拉列表样式
+   ============================================ */
+.ud18-select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  width: 400px;
+  height: 250px;
+  overflow-y: auto;
+  margin-left: 80px;
+}
+
+.ud18-select:focus {
+  outline: none;
+  border-color: #6666ff;
+  box-shadow: 0 0 3px rgba(102, 102, 255, 0.3);
+}
+
+.ud18-option-highlighted {
+  font-weight: bold;
+  color: #0066cc;
+  background-color: #ffffcc;
+}
+
+/* ============================================
+   按钮样式
+   ============================================ */
+.ud18-button {
+  padding: 6px 20px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  border-radius: 3px;
+  background-color: #e0e0ff;
+  color: #000066;
+  cursor: pointer;
+}
+
+.ud18-button:hover {
+  background-color: #d0d0ff;
+  border-color: #666699;
+}
+
+.ud18-user-info-button {
+  margin-left: 10px;
+}
+
+.ud18-update-button {
+  margin-top: 0;
+}
+
+/* ============================================
+   按钮区域 - 左对齐
+   ============================================ */
+.ud18-button-area-left {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+  padding-left: 80px; /* 与label对齐 */
+}
+
+/* ============================================
+   按钮区域
+   ============================================ */
+.ud18-button-area {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+/* ============================================
+   加载消息
+   ============================================ */
+.ud18-loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .ud18-container {
+    padding: 15px;
+  }
+
+  .ud18-content-area {
+    padding: 15px;
+  }
+
+  .ud18-page-title {
+    font-size: 20px;
+  }
+
+  .ud18-input-row {
+    flex-wrap: wrap;
+  }
+
+  .ud18-input {
+    width: 180px;
+  }
+
+  .ud18-document-list {
+    max-height: 350px;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .ud18-container {
+    padding: 10px;
+  }
+
+  .ud18-content-area {
+    padding: 10px;
+  }
+
+  .ud18-page-title {
+    font-size: 18px;
+  }
+
+  .ud18-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ud18-input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .ud18-user-info-button {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .ud18-document-list {
+    max-height: 300px;
+  }
+
+  .ud18-document-label {
+    font-size: 13px;
+  }
+}

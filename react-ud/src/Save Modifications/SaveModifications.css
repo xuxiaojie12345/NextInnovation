@@ -1,0 +1,163 @@
+/**
+ * SaveModifications组件样式文件
+ * 
+ * @description 严格按照UD06.png图片实现布局和样式，保持式样、布局与图片一致
+ *              包括颜色、字体、位置布局、间距等细节
+ */
+
+/* ============================================
+   页面容器 - 整体居中
+   ============================================ */
+.save-modifications-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================
+   内容区域 - 包含标题、内容和按钮的边框
+   ============================================ */
+.save-modifications-content-area {
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #ccccff;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* ============================================
+   页面标题 - Save Modifications（在边框内）
+   ============================================ */
+.save-modifications-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003366;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+/* ============================================
+   信息项
+   ============================================ */
+.save-modifications-info-item {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.save-modifications-info-item-empty {
+  height: 8px;
+}
+
+.save-modifications-label {
+  font-weight: normal;
+  color: #000000;
+}
+
+.save-modifications-value {
+  color: #000000;
+}
+
+/* ============================================
+   Message高亮显示 - 绿色背景
+   ============================================ */
+.save-modifications-message-highlight {
+  background-color: #00aa00;
+  color: #000000;
+  padding: 5px 10px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* ============================================
+   按钮区域 - 左对齐
+   ============================================ */
+.save-modifications-button-area {
+  padding: 20px 0 0 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.save-modifications-close-button {
+  padding: 6px 15px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  border-radius: 3px;
+  background-color: #e0e0ff;
+  color: #000066;
+  cursor: pointer;
+}
+
+.save-modifications-close-button:hover {
+  background-color: #d0d0ff;
+  border-color: #666699;
+}
+
+/* ============================================
+   加载消息
+   ============================================ */
+.save-modifications-loading-message {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #666666;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .save-modifications-container {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .save-modifications-content-area {
+    padding: 15px;
+  }
+
+  .save-modifications-info-item {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .close-button {
+    font-size: 13px;
+    padding: 5px 12px;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .save-modifications-container {
+    padding: 10px;
+  }
+
+  .save-modifications-page-title {
+    font-size: 18px;
+  }
+
+  .save-modifications-content-area {
+    padding: 10px;
+  }
+
+  .save-modifications-info-item {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  .close-button {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}

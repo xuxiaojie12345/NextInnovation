@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.GeneratedDocumentMapper">
+
+  <resultMap id="GeneratedDocumentResultMap" type="com.web.app.dto.GeneratedDocumentDto">
+    <result property="chassisNo" column="CHNR" />
+    <result property="ordernumber" column="ORDERNUMBER" />
+    <result property="buildWeek" column="BUILD" />
+    <result property="specWeek" column="SPEC" />
+    <result property="market" column="COUNTRY_OF_OPERATION" />
+    <result property="masterMarket" column="MASTER_MARKET" />
+    <result property="sNoteNo" column="CUSTOMER_ADAP" />
+    <result property="loadIndex" column="LOAD_INDEX" />
+    <result property="modifyDocAct" column="ACT" />
+    <result property="usingTemplate" column="USING_TEMPLATE" />
+    <result property="date" column="DATE" />
+    <result property="hdocVersion" column="HDOC_VERSION" />
+  </resultMap>
+
+  <select id="selectGeneratedDocument" resultMap="GeneratedDocumentResultMap" parameterType="map">
+    SELECT
+      om.CHNR,
+      om.ORDERNUMBER,
+      om.BUILD,
+      om.SPEC,
+      vda.COUNTRY_OF_OPERATION,
+      '-EU' AS MASTER_MARKET,
+      om.CUSTOMER_ADAP,
+      tire.LOAD_INDEX,
+      cha.ACT,
+      '_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf' AS USING_TEMPLATE,
+      CURRENT_TIMESTAMP() AS DATE,
+      '4.2.1' AS HDOC_VERSION
+    FROM HDOC_REC_DATA_VDA_GENERAL vda
+    INNER JOIN HDOC_REC_DATA_OM om
+      ON vda.SERIE = om.SERIE
+      AND vda.CHNR = om.CHNR
+    INNER JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER tire
+      ON vda.TRANS_TS = tire.TRANS_TS
+    INNER JOIN HDOC_ADCA_CHANGE cha
+      ON vda.SERIE = cha.SERIE
+      AND vda.CHNR = cha.CHNR
+    INNER JOIN HDOC_ADCA_MODIFICATION admod
+      ON vda.SERIE = admod.SERIE
+      AND vda.CHNR = admod.CHNO
+    WHERE
+      vda.SERIE = #{chassisSeries}
+      AND vda.CHNR = #{chassisNo}
+      AND admod.STA = '0'
+    LIMIT 1
+  </select>
+
+  <select id="selectReplacingParameters" resultType="com.web.app.dto.ReplacingParameterDto" parameterType="map">
+    SELECT
+      VARIABLE
+    FROM HDOC_ADCA_MODIFICATION
+    WHERE
+      SERIE = #{chassisSeries}
+      AND CHNO = #{chassisNo}
+      AND STA = '0'
+  </select>
+
+</mapper>

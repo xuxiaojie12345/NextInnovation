@@ -1,76 +1,245 @@
+/**
+ * Menu组件样式文件
+ * 
+ * @description 菜单页面的样式定义，严格按照menu.png图片实现布局和样式
+ *              保持式样、布局与图片一致，包括颜色、字体、位置布局
+ * 
+ * @features
+ * - PC端居左显示
+ * - 响应式设计（PC、平板、手机三个断点）
+ * - Volvo品牌色 (#003366)
+ * - 清晰的视觉层次和交互状态
+ * - 所有项目在画面左侧显示
+ */
+
+/* ============================================
+   菜单页面容器 - 全屏显示
+   ============================================ */
 .menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #dbe1ee;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 0;
 }
 
-.menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
-  text-align: center;
+/* ============================================
+   主内容区域
+   ============================================ */
+.menu-main {
+  width: 100%;
+  max-width: 1400px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  padding: 0 18px 20px;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-.menu-content {
+.menu-sidebar {
+  background-color: #f0f2f8;
+  border: 1px solid #c8cbd3;
+  border-radius: 8px;
   padding: 0;
 }
 
-.menu-section {
-  border-bottom: 1px solid #ccc;
+/* ============================================
+   左侧菜单栏 - 所有项目居左显示
+   ============================================ */
+.menu-sidebar {
+  width: 100%;
 }
 
-.menu-section:last-child {
-  border-bottom: none;
-}
-
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
+/* ============================================
+   主标题 - 项番1: Generate Document
+   ============================================ */
+.menu-main-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 18px 16px;
+  background-color: #003366;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.02em;
 }
 
+/* ============================================
+   菜单分组
+   ============================================ */
+.menu-section {
+  margin-bottom: 30px;
+  padding-left: 0;
+}
+
+.menu-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #002a5c;
+  margin: 0;
+  padding: 10px 14px;
+  background-color: #e8eaef;
+  font-family: Arial, sans-serif;
+  border-bottom: 1px solid #d1d5dd;
+}
+
+/* ============================================
+   菜单列表
+   ============================================ */
 .menu-list {
   list-style: none;
-  padding: 0;
+  padding: 12px 18px 18px 24px;
   margin: 0;
 }
 
 .menu-item {
-  display: flex;
-  align-items: center;
-  padding: 6px 15px;
+  margin: 6px 0;
+}
+
+.menu-link {
+  display: block;
+  padding: 6px 0;
+  color: #0c2b5d;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  text-align: left;
+  width: 100%;
 }
 
-.menu-item:hover {
-  background-color: #d5e3f0;
+.menu-link:hover {
+  background-color: #e7eef9;
+  color: #00214b;
+  text-decoration: underline;
+  padding-left: 24px;
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
+.menu-link:active {
+  background-color: #cfdcf0;
 }
 
-.menu-label {
+/* ============================================
+   右侧预览区域
+   ============================================ */
+.menu-right-panel {
+  background-color: #ffffff;
+  border: 1px solid #d1d5dc;
+  border-radius: 8px;
+  padding: 0;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-right-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: #002b55;
+  background-color: #f5f7fb;
+  border-bottom: 1px solid #d1d5dc;
+  padding: 16px 18px;
+}
+
+.menu-right-panel-body {
   flex: 1;
+  padding: 18px;
+  font-family: Arial, sans-serif;
+  color: #2f3b50;
+}
+
+.menu-right-panel-body h3 {
+  margin-top: 0;
+  color: #002b55;
+}
+
+.menu-right-placeholder {
+  color: #5b6475;
+}
+
+.menu-right-placeholder p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.menu-right-content h3 {
+  margin-top: 0;
+  color: #002b55;
+}
+
+.menu-right-content p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   响应式设计 - 平板设备 (768px - 1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .menu-main {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-sidebar,
+  .menu-right-panel {
+    width: 100%;
+  }
+
+  .menu-main-title {
+    font-size: 18px;
+    padding: 10px 14px;
+  }
+
+  .menu-section-title {
+    font-size: 15px;
+    padding: 8px 12px;
+  }
+
+  .menu-link {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+
+/* ============================================
+   响应式设计 - 手机设备 (< 768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .menu-main {
+    grid-template-columns: 1fr;
+    padding: 0 10px;
+  }
+
+  .menu-container {
+    padding: 10px 0;
+  }
+
+  .menu-main-title {
+    font-size: 16px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+  }
+
+  .menu-section {
+    margin-bottom: 18px;
+  }
+
+  .menu-section-title {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .menu-list {
+    padding-left: 12px;
+  }
+
+  .menu-link {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.DocumentListMapper">
+
+  <resultMap id="DocumentTypeResultMap" type="com.web.app.dto.DocumentTypeDto">
+    <result property="doctype" column="DOCTYPE" />
+    <result property="description" column="DESCRIPTION" />
+  </resultMap>
+
+  <select id="selectDocumentTypes" resultMap="DocumentTypeResultMap">
+    SELECT DOCTYPE, DESCRIPTION
+    FROM HDOC_DOCUMENT_LIST
+  </select>
+
+</mapper>
