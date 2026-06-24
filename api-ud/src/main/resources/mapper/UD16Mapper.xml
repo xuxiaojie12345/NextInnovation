@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD16Mapper">
+
+    <select id="selectHdocAdcaChange" resultType="java.util.LinkedHashMap">
+        SELECT SERIE, CHNR, REASON, ACT FROM HDOC_ADCA_CHANGE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <insert id="insertHdocAdcaChange">
+        INSERT INTO HDOC_ADCA_CHANGE (SERIE, CHNR, REASON, ACT, BU,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{serie}, #{chnr}, #{reason}, 'Y', '',
+            NOW(), 'SYSTEM', 'UD16',
+            NOW(), 'SYSTEM', 'UD16')
+    </insert>
+
+    <update id="logicalDeleteHdocAdcaChange">
+        UPDATE HDOC_ADCA_CHANGE
+        SET ACT = 'N', UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{user}, UPDATE_PROCESS = #{process}
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+
+</mapper>

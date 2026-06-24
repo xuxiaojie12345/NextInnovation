@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD12Mapper">
+
+    <!-- MARKET_MASTER 结果映射 -->
+    <resultMap id="MarketMasterMap" type="com.web.app.domain.entity.MarketMaster">
+        <id column="MARKET" property="market"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="REGISTER_DATETIME" property="registerDatetime"/>
+        <result column="REGISTER_USER" property="registerUser"/>
+        <result column="REGISTER_PROCESS" property="registerProcess"/>
+        <result column="UPDATE_DATETIME" property="updateDatetime"/>
+        <result column="UPDATE_USER" property="updateUser"/>
+        <result column="UPDATE_PROCESS" property="updateProcess"/>
+    </resultMap>
+
+    <!-- UD12SelectMarket: 查询所有市场信息
+         对应全体APIのプロンプト.txt 5.1 查询语句 -->
+    <select id="selectAllMarketMaster" resultMap="MarketMasterMap">
+        SELECT MARKET, DESCRIPTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+               UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        FROM MARKET_MASTER
+        ORDER BY MARKET
+    </select>
+
+</mapper>

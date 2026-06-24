@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD17Mapper">
+
+    <select id="selectAllMarkets" resultType="java.util.LinkedHashMap">
+        SELECT MARKET, DESCRIPTION FROM MARKET_MASTER ORDER BY MARKET
+    </select>
+
+    <select id="selectUsername" resultType="string">
+        SELECT USERNAME FROM HDOC_USER_INFOR WHERE USERID = #{userid}
+    </select>
+
+    <select id="selectFunctionAuth" resultType="java.util.LinkedHashMap">
+        SELECT FUNCTION, USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+    </select>
+
+    <select id="selectMarketAuth" resultType="java.util.LinkedHashMap">
+        SELECT USERID, MARKET, TYPE, BU FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
+    </select>
+
+    <update id="updateMarketAuth">
+        UPDATE HDOC_MARKET_AUTH
+        SET USERID = #{userid}, MARKET = #{market}, TYPE = #{type}, BU = #{bu},
+            UPDATE_DATETIME = NOW(), UPDATE_USER = #{updateUser}, UPDATE_PROCESS = #{updateProcess}
+        WHERE USERID = #{userid} AND MARKET = #{market} AND TYPE = #{type} AND BU = #{bu}
+    </update>
+
+    <update id="updateFunctionAuth">
+        UPDATE HDOC_FUNCTION_AUTH
+        SET FUNCTION = #{function}, USERID = #{userid},
+            UPDATE_DATETIME = NOW(), UPDATE_USER = #{updateUser}, UPDATE_PROCESS = #{updateProcess}
+        WHERE FUNCTION = #{function} AND USERID = #{userid}
+    </update>
+
+    <delete id="deleteMarketAuth">
+        DELETE FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid} AND MARKET = #{market} AND TYPE = #{type} AND BU = #{bu}
+    </delete>
+
+    <delete id="deleteFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE FUNCTION = #{function} AND USERID = #{userid}
+    </delete>
+
+</mapper>

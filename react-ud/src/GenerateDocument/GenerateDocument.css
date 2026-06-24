@@ -96,6 +96,18 @@
   color: #333;
 }
 
+/* Chassis no链接样式 - 对应详细设计 3.1.3 Chassis no Link押下时处理 */
+.chassis-link {
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.chassis-link:hover {
+  color: #1890ff;
+  text-decoration: underline;
+}
+
 /* S-Noteセクション */
 .s-note-section {
   margin-bottom: 20px;

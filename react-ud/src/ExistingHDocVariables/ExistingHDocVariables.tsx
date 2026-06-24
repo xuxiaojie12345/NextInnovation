@@ -104,12 +104,49 @@ const ExistingHDocVariables: React.FC = () => {
   const [hasError, setHasError] = useState<boolean>(false);
 
   /**
-   * 初始化：从 location.state 中获取前画面传递的 Variable 值
+   * 初始化：从 location.state 中获取前画面传递的值
+   * 包括从UD11 Back返回时的搜索条件，以及从Search画面Select返回时的选中记录
    * 对应详细设计 3.1.1 页面初始化流程
    */
   useEffect(() => {
     const state = location.state as Record<string, any> | null;
-    if (state?.variable) {
+    if (!state) return;
+
+    // 从UD11 Back返回时，恢复所有搜索条件
+    if (state.searchConditions) {
+      const cond = state.searchConditions;
+      setFormData(prev => ({
+        ...prev,
+        variable: cond.variable || '',
+        type: cond.type || '',
+        description: cond.description || '',
+        userid: cond.userid || '',
+        registerDatetime: cond.registerDatetime || ''
+      }));
+      if (cond.variableOp) setOps(prev => ({ ...prev, variable: cond.variableOp }));
+      if (cond.typeOp) setOps(prev => ({ ...prev, type: cond.typeOp }));
+      if (cond.descriptionOp) setOps(prev => ({ ...prev, description: cond.descriptionOp }));
+      if (cond.useridOp) setOps(prev => ({ ...prev, userid: cond.useridOp }));
+      if (cond.registerDatetimeOp) setCompareOps(prev => ({ ...prev, registerDatetime: cond.registerDatetimeOp }));
+      return;
+    }
+
+    // 从UD11 Select返回时，自动填充选中记录的内容
+    if (state.selectedRecord) {
+      const rec = state.selectedRecord;
+      setFormData(prev => ({
+        ...prev,
+        variable: rec.variable || '',
+        type: rec.type || '',
+        description: rec.description || '',
+        userid: rec.userid || '',
+        registerDatetime: rec.registerDatetime || ''
+      }));
+      return;
+    }
+
+    // 兼容旧逻辑：只传递了variable
+    if (state.variable) {
       setFormData(prev => ({ ...prev, variable: state.variable }));
     }
   }, [location.state]);
@@ -418,7 +455,7 @@ const ExistingHDocVariables: React.FC = () => {
         <button type='button' className='existing-hdoc-btn' onClick={handleSearch} disabled={disabled}>Search</button>
         <button type='button' className='existing-hdoc-btn' onClick={handleClear} disabled={disabled}>Clear</button>
         <button type='button' className='existing-hdoc-btn' onClick={handleBack} disabled={disabled}>Back</button>
-        <button type='button' className='existing-hdoc-btn primary' onClick={handleAdd} disabled={disabled}>Add</button>
+        <button type='button' className='existing-hdoc-btn' onClick={handleAdd} disabled={disabled}>Add</button>
         <button type='button' className='existing-hdoc-btn' onClick={handleUpdate} disabled={disabled}>Update</button>
         <button type='button' className='existing-hdoc-btn' onClick={handleDelete} disabled={disabled}>Delete</button>
         <button type='button' className='existing-hdoc-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>

@@ -105,6 +105,20 @@ const GenerateDocument: React.FC = () => {
 
   // Generated document 静态显示，link不实装具体功能
 
+  /**
+   * 点击Chassis no链接 - 跳转到Vehicle Specification页面（UD07）
+   * 对应详细设计 3.1.3 Chassis no Link押下时处理
+   * 传递参数：chassisNo（serie + 半角空格 + chassisNo 的拼接值）
+   */
+  const handleChassisNoClick = useCallback(() => {
+    const fullChassisNo = `${currentChassisSeries} ${currentChassisNo}`.trim();
+    if (fullChassisNo) {
+      navigate('/Menu/VehicleSpecification', {
+        state: { chassisNo: fullChassisNo }
+      });
+    }
+  }, [currentChassisSeries, currentChassisNo, navigate]);
+
   // 点击 Analyze Rules
   const handleAnalyzeRulesClick = useCallback(() => {
     alert('Analyze Rules: This feature is under development.');
@@ -141,8 +155,20 @@ const GenerateDocument: React.FC = () => {
         <div className='info-item info-item-chassis'>
           <span className='chassis-label'>Chassis no:</span>
           <span className='chassis-value'>
-            <strong className='chassis-series'>{currentChassisSeries || documentData?.serie || '-'}</strong>{' '}
-            <u className='chassis-number'>{currentChassisNo || '-'}</u>
+            <strong
+              className='chassis-series chassis-link'
+              onClick={handleChassisNoClick}
+              title='点击查看车辆规格'
+            >
+              {currentChassisSeries || documentData?.serie || '-'}
+            </strong>{' '}
+            <u
+              className='chassis-number chassis-link'
+              onClick={handleChassisNoClick}
+              title='点击查看车辆规格'
+            >
+              {currentChassisNo || '-'}
+            </u>
           </span>
         </div>
         <div className='info-item'>

@@ -1,0 +1,174 @@
+/**
+ * VinPlate 组件样式 - VIN Plate页面（UD15）
+ * 参照 Homologation Variables 页面风格
+ * 对应详细设计：详细设计/詳細設計UD15.md
+ */
+
+/* 容器 */
+.ud15-container {
+  padding: 20px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 页面标题 */
+.ud15-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+
+/* 加载状态 */
+.ud15-loading {
+  padding: 12px 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+/* 消息区域 */
+.ud15-message {
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-bottom: 12px;
+  text-align: left;
+  display: inline-block;
+  max-width: fit-content;
+}
+
+.ud15-message.error {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.ud15-message.success {
+  background-color: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+/* 按钮组 */
+.ud15-btn-group {
+  display: flex;
+  gap: 5px;
+  margin: 0 -20px 15px -20px;
+  padding: 8px 20px;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+  flex-wrap: wrap;
+}
+
+/* 操作按钮 */
+.ud15-btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: normal;
+  color: #333333;
+  background-color: #d0ddf0;
+  border: 1px solid #8da0c0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ud15-btn:hover {
+  background-color: #c0d0e5;
+}
+
+.ud15-btn:active {
+  background-color: #b0c0d5;
+}
+
+.ud15-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 表单容器 */
+.ud15-form {
+  border: 1px solid #b0c4de;
+  padding: 0 20px 15px 20px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* 表单行 */
+.ud15-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+/* 字段标签 */
+.ud15-label {
+  width: 140px;
+  text-align: left;
+  font-size: 14px;
+  color: #000000;
+  flex-shrink: 0;
+}
+
+/* 文本输入框 */
+.ud15-input {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+  outline: none;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+  height: 26px;
+}
+
+.ud15-input:focus {
+  border-color: #666666;
+}
+
+/* 信息展示区域 */
+.ud15-info-section {
+  margin-top: 20px;
+  max-width: 800px;
+  border: 1px solid #b0c4de;
+}
+
+.ud15-info-title {
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  padding: 10px 16px;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+}
+
+/* 信息表格 */
+.ud15-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ud15-info-table td {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ud15-info-label {
+  width: 200px;
+  color: #555555;
+  font-weight: 500;
+  background-color: #fafafa;
+}
+
+.ud15-info-value {
+  color: #333333;
+}

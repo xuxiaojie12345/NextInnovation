@@ -111,17 +111,6 @@
   color: #bbbbbb;
 }
 
-.existing-hdoc-btn.primary {
-  background-color: #1890ff;
-  border-color: #1890ff;
-  color: #ffffff;
-}
-
-.existing-hdoc-btn.primary:hover {
-  background-color: #40a9ff;
-  border-color: #40a9ff;
-}
-
 /* 表单区域 */
 .existing-hdoc-form {
   display: flex;

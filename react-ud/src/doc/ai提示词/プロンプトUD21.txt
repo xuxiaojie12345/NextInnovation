@@ -48,7 +48,7 @@
 
 **操作步骤**:
 1. 页面加载触发初始化事件
-2. 调用后端API `UD21GetMarketApi`，从MARKET_MASTER表获取所有市场列表
+2. 调用后端API `UD19SearchResultListApi`的`UD19SelectMarketMaster`方法（operation=GET_MARKET_LIST），从MARKET_MASTER表获取所有市场列表
 3. API返回市场列表数据，包括：
    - Market（市场代码，如AUT、BEL、CHE等）
    - Description（市场描述，如Austria、Belgium、Switzerland等）
@@ -75,7 +75,7 @@
 - 无
 
 **API调用 (Backend Check)**:
-- 调用`UD21GetMarketApi`
+- 调用`UD19SearchResultListApi`的`UD19SelectMarketMaster`方法（operation=GET_MARKET_LIST）
 - API内部逻辑：
   1. 查询MARKET_MASTER表，获取所有市场记录
   2. 提取Market、Description字段
@@ -95,27 +95,42 @@
   - 若无数据：显示"No data found"提示消息
   - 若其他错误：显示具体错误消息
 
-### 5.2 校验详细规格表
-
-| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
-|-----|---------|---------|---------|--------------------------|------|
-| 1 | 页面初始化 | MARKET_MASTER表 | 至少存在一条记录 | "No data found" | 显示提示消息，DataTable为空 |
-
 ---
 
 ## 6. 接口定义 (API Specification)
 
-### 6.1 UD21GetMarketApi
+### 6.1 UD19SearchResultListApi - UD19SelectMarketMaster
 
-**功能**: 获取HDoc系统中的市场列表
+**功能**: 获取市场列表（复用UD19的市场列表查询接口）
 
-**Method**: GET
+**Method**: POST
 
-**Endpoint**: `/api/ud21/getmarket`
+**Endpoint**: `/api/ud19/UD19SearchResultListApi`
 
-**Request**: 无
+**Request**:
+```json
+{
+  "operation": "GET_MARKET_LIST"
+}
+```
 
 **Response Success (200)**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "market": "AUT",
+      "description": "Austria"
+    },
+    {
+      "market": "BEL",
+      "description": "Belgium"
+    }
+  ]
+}
 ```json
 {
   "code": 200,

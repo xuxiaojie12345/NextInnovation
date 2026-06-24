@@ -48,14 +48,10 @@
         设置Message = "无法获取文档类型信息"
         终止流程
       5.1.2 API调用 (Backend Check)：
-        调用`UD22GetDocumentTypesApi`的`getDocumentTypes`方法（operation=GET_DOCUMENT_TYPES），从HDOC_DOCUMENT_LIST表获取文档类型信息（DOCTYPE, Description）
+        调用`UD20GetDocumentListApi`的`UD20SelectHdocDocumentList`方法（operation=SELECT_HDOC_DOCUMENT_LIST），从HDOC_DOCUMENT_LIST表获取文档类型信息（DOCTYPE, Description）
    5.2 结果处理：
        成功：正常显示文档类型列表信息
        失败：显示相应错误消息并保持在当前页面
-   5.3 校验详细规格表
-   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
-   |-----|---------|---------|---------|--------------------------|------|
-   | 1 | 进入画面时 | 文档类型数据获取 | 无法获取文档类型数据 | 无法获取文档类型信息 | 显示错误消息 |
 
 6. 接口定义 (API Specification)
 请为每个API提供(TODO：API的具体内容参照API提示词)：

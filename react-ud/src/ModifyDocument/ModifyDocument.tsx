@@ -234,7 +234,7 @@ const ModifyDocument: React.FC = () => {
       <div className='vehicle-info-section'>
         <div className='info-item'>
           <label>chassis no:</label>
-          <span>{chassisNo || '-'}</span>
+          <span>{serie ? `${serie} ${chassisNo}` : (chassisNo || '-')}</span>
         </div>
         <div className='info-item'>
           <label>Market:</label>

@@ -1,346 +1,283 @@
+/**
+ * UploadDeleteTemplate 组件 - 模板上传删除页面（UD12）
+ * 功能：管理HDoc模板文件的上传和删除操作
+ * 对应详细设计：详细设计/詳細設計UD12.md
+ */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./UploadDeleteTemplate.css";
 
-// 定义市场接口
+/**
+ * 市场数据类型
+ * 对应详细设计 4.1 Response Success
+ */
 interface Market {
   marketCode: string;
   marketName: string;
 }
 
-// 定义模板文件接口
+/**
+ * 模板文件数据类型
+ * 对应详细设计 4.1 场景2 Response Success
+ */
 interface TemplateFile {
   fileName: string;
   filePath: string;
 }
 
+/** 后端API基础地址 */
+const API_BASE_URL = "http://localhost:8081";
+
+/**
+ * UploadDeleteTemplate 组件
+ * 提供模板文件上传和删除管理功能
+ * 包含HDoc Template Upload和HDoc Template Delete两个区域
+ */
 const UploadDeleteTemplate: React.FC = () => {
-  // 路由导航
   const navigate = useNavigate();
 
-  // 状态管理
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
-  
-  // Upload区域状态
+  // 市场列表状态
   const [uploadMarketList, setUploadMarketList] = useState<Market[]>([]);
+  const [deleteMarketList, setDeleteMarketList] = useState<Market[]>([]);
+
+  // Upload区域状态
   const [selectedUploadMarket, setSelectedUploadMarket] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
+
   // Delete区域状态
-  const [deleteMarketList, setDeleteMarketList] = useState<Market[]>([]);
   const [selectedDeleteMarket, setSelectedDeleteMarket] = useState<string>("");
   const [templatesList, setTemplatesList] = useState<TemplateFile[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
-  // 页面初始化 - 获取市场列表
+  // 通用状态
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  /**
+   * 页面初始化 - 调用UD12SelectMarket获取可用市场列表
+   * 对应详细设计 3.1.1 页面初始化流程
+   * API: GET /api/ud12/selectmarket
+   */
   useEffect(() => {
     const initializePage = async () => {
+      setLoading(true);
+      setError("");
+      setSuccessMessage("");
       try {
-        setLoading(true);
-        setError("");
-        setSuccessMessage("");
-
-        // 调用API获取市场列表
-        const response = await fetch("/api/ud12/selectmarket", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load markets");
-        }
-
-        const jsonResponse = await response.json();
-        const data: Market[] = jsonResponse.data || [];
-        
-        // 填充两个Market下拉列表
+        const response = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket`);
+        const data: Market[] = response.data.data || [];
+        // 填充Upload和Delete两个区域的Market下拉列表
         setUploadMarketList(data);
         setDeleteMarketList(data);
-        
         // Templates下拉列表初始化为空
         setTemplatesList([]);
       } catch (err) {
-        console.error("Failed to load markets:", err);
         setError("System error. Please contact administrator.");
       } finally {
         setLoading(false);
       }
     };
-
     initializePage();
   }, []);
 
-  // Upload区域 - Market选择处理
+  /**
+   * Upload区域Market选择处理
+   */
   const handleUploadMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedUploadMarket(e.target.value);
-    // 清除错误和成功消息
     setError("");
     setSuccessMessage("");
   };
 
-  // Delete区域 - Market选择处理（联动加载模板列表）
+  /**
+   * Delete区域Market选择处理 - 联动加载模板列表
+   * 对应详细设计 3.1.4 市场选择联动流程
+   * API: GET /api/ud12/selectmarket/{marketCode}
+   */
   const handleDeleteMarketChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const marketCode = e.target.value;
     setSelectedDeleteMarket(marketCode);
-    setSelectedTemplate(""); // 清空选中的模板
-    
-    // 清除错误和成功消息
+    setSelectedTemplate("");
     setError("");
     setSuccessMessage("");
 
-    // 如果选择了市场，加载该市场下的模板文件列表
     if (marketCode) {
+      setLoading(true);
       try {
-        setLoading(true);
-        
-        // 调用API获取模板文件列表
-        const response = await fetch(`/api/ud12/selectmarket/${marketCode}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load templates");
-        }
-
-        const jsonResponse = await response.json();
-        const data: TemplateFile[] = jsonResponse.data || [];
+        const response = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket/${marketCode}`);
+        const data: TemplateFile[] = response.data.data || [];
         setTemplatesList(data);
       } catch (err) {
-        console.error("Failed to load templates:", err);
         setError("System error. Please contact administrator.");
         setTemplatesList([]);
       } finally {
         setLoading(false);
       }
     } else {
-      // 未选择市场时，清空模板列表
       setTemplatesList([]);
     }
   };
 
-  // File Input选择处理
+  /**
+   * 文件选择处理
+   */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
-      // 清除错误和成功消息
       setError("");
       setSuccessMessage("");
     }
   };
 
-  // Templates下拉列表选择处理
+  /**
+   * Templates下拉列表选择处理
+   */
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTemplate(e.target.value);
-    // 清除错误和成功消息
     setError("");
     setSuccessMessage("");
   };
 
-  // Upload file按钮点击处理
+  /**
+   * Upload file按钮点击处理 - 文件上传
+   * 对应详细设计 3.1.2 文件上传流程
+   * API: POST /api/ud12/upload (multipart/form-data)
+   */
   const handleUploadClick = async () => {
-    // 清除旧消息
     setError("");
     setSuccessMessage("");
 
-    // 前端校验：检查是否选择了文件
+    // 校验：是否选择了文件（对应详细设计 3.2 No.1）
     if (!selectedFile) {
       setError("NO FILE UPLOADED");
       return;
     }
 
-    // 前端校验：检查文件大小是否超过10MB
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    // 校验：文件大小是否超过10MB（对应详细设计 3.2 No.2）
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError("File size exceeds the 10MB limit.");
       return;
     }
 
-    // 前端校验：检查是否选择了市场
-    if (!selectedUploadMarket) {
-      setError("Please select a market.");
-      return;
-    }
-
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // 构建FormData对象
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("market", selectedUploadMarket);
 
-      // 调用文件上传API
-      const response = await fetch("/api/ud12/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/ud12/upload`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-      const result = await response.json();
-
-      if (result.code !== 200) {
-        // 根据返回码显示不同的错误消息
-        if (result.code === 400) {
-          setError(result.message || "Invalid file type or size");
-        } else {
-          setError("System error. Please contact administrator.");
-        }
-        return;
-      }
-
-      // 上传成功
-      setSuccessMessage(`TEMPLATE ${selectedFile.name} WAS SUCESSFULLY UPLOADED TO MARKET ${selectedUploadMarket}`);
-      // 清空文件选择框
-      setSelectedFile(null);
-      // 重置文件输入框
-      const fileInput = document.getElementById("templateFileInput") as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = "";
+      if (response.data.code === 200) {
+        const result = response.data.data;
+        setSuccessMessage(
+          `TEMPLATE ${result.fileName} WAS SUCESSFULLY UPLOADED TO MARKET ${result.market}`
+        );
+        setSelectedFile(null);
+        const fileInput = document.getElementById("templateFileInput") as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+      } else if (response.data.code === 400) {
+        setError(response.data.message || "Invalid file type or size (Max 10MB)");
+      } else {
+        setError("System error. Please contact administrator.");
       }
     } catch (err) {
-      console.error("Upload error:", err);
       setError("System error. Please contact administrator.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete按钮点击处理
+  /**
+   * Delete按钮点击处理 - 模板文件删除
+   * 对应详细设计 3.1.3 模板删除流程
+   * API: POST /api/ud12/delete
+   */
   const handleDeleteClick = async () => {
-    // 清除旧消息
     setError("");
     setSuccessMessage("");
 
-    // 前端校验：检查是否选择了市场和模板
+    // 校验：是否选择了市场和模板（对应详细设计 3.2 No.3）
     if (!selectedDeleteMarket || !selectedTemplate) {
       setError("Please select market and template.");
       return;
     }
 
-    // 显示确认对话框
-    const confirmed = window.confirm("Do you really want to delete template?");
-    if (!confirmed) {
-      // 用户取消，终止流程
-      return;
-    }
+    // 确认对话框（对应详细设计 3.1.3 步骤3）
+    if (!window.confirm("Do you really want to delete template?")) return;
 
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // 构建请求参数
-      const requestBody = {
+      const response = await axios.post(`${API_BASE_URL}/api/ud12/delete`, {
         market: selectedDeleteMarket,
-        fileName: selectedTemplate,
-      };
-
-      // 调用文件删除API
-      const response = await fetch("/api/ud12/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+        fileName: selectedTemplate
       });
 
-      const result = await response.json();
-
-      if (result.code !== 200) {
-        // 根据返回码显示不同的错误消息
-        if (result.code === 404) {
-          setError(result.message || "File not found");
-        } else {
-          setError("System error. Please contact administrator.");
-        }
-        return;
-      }
-
-      // 删除成功
-      setSuccessMessage(`TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${selectedDeleteMarket}`);
-      
-      // 刷新Templates下拉列表
-      const marketResponse = await fetch(`/api/ud12/selectmarket/${selectedDeleteMarket}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (marketResponse.ok) {
-        const marketJson = await marketResponse.json();
-        const templatesData: TemplateFile[] = marketJson.data || [];
-        setTemplatesList(templatesData);
-        setSelectedTemplate(""); // 清空选中的模板
+      if (response.data.code === 200) {
+        setSuccessMessage(
+          `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${selectedDeleteMarket}`
+        );
+        // 刷新模板列表
+        const marketRes = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket/${selectedDeleteMarket}`);
+        setTemplatesList(marketRes.data.data || []);
+        setSelectedTemplate("");
+      } else if (response.data.code === 404) {
+        setError(response.data.message || "File not found");
+      } else {
+        setError("System error. Please contact administrator.");
       }
     } catch (err) {
-      console.error("Delete error:", err);
       setError("System error. Please contact administrator.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Check Template链接点击处理
-  const handleCheckTemplateClick = () => {
-    // 跳转到HDoc Template Check页面
-    navigate("/HDocTemplateCheck");
+  /**
+   * Check Template链接点击处理
+   * 对应详细设计 3.1.5 模板检查链接跳转
+   */
+  const handleCheckTemplateClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigate("/Menu/HDocTemplateCheck");
   };
 
   return (
-    <div className="upload-delete-template-container">
-      {/* 页面标题 */}
-      <h1 className="page-title">EDB Engineering Database - Upload Delete Template</h1>
+    <div className="ud12-container">
+      <h1 className="ud12-title">EDB Engineering Database - Upload Delete Template</h1>
 
-      {/* 错误消息区域 */}
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {loading && <div className="ud12-loading">Loading...</div>}
 
-      {/* 成功消息区域 */}
-      {successMessage && (
-        <div className="success-message">
-          {successMessage}
-        </div>
-      )}
+      {error && !loading && <div className="ud12-error">{error}</div>}
 
-      {/* 加载状态 */}
-      {loading && (
-        <div className="loading-indicator">
-          Loading...
-        </div>
-      )}
+      {successMessage && !loading && <div className="ud12-success">{successMessage}</div>}
 
       {/* HDoc Template Upload区域 */}
-      <div className="section-container">
-        <h2 className="section-title">HDoc Template Upload</h2>
-        
-        <div className="form-group">
-          <label htmlFor="templateFileInput" className="form-label">
-            Template File
-          </label>
+      <div className="ud12-section">
+        <h2 className="ud12-section-title">HDoc Template Upload</h2>
+
+        <div className="ud12-form-group">
+          <label className="ud12-label" htmlFor="templateFileInput">Template File</label>
           <input
             type="file"
             id="templateFileInput"
-            className="form-control"
+            className="ud12-file-input"
             onChange={handleFileChange}
             accept=".rtf,.docx,.doc"
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="uploadMarketSelect" className="form-label">
-            Market
-          </label>
+        <div className="ud12-form-group">
+          <label className="ud12-label" htmlFor="uploadMarketSelect">Market</label>
           <select
             id="uploadMarketSelect"
-            className="form-control"
+            className="ud12-select"
             value={selectedUploadMarket}
             onChange={handleUploadMarketChange}
           >
@@ -353,29 +290,23 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className="button-group">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleUploadClick}
-            disabled={loading}
-          >
+        <div className="ud12-btn-group">
+          <button type="button" className="ud12-btn ud12-btn-primary"
+            onClick={handleUploadClick} disabled={loading}>
             Upload file
           </button>
         </div>
       </div>
 
       {/* HDoc Template Delete区域 */}
-      <div className="section-container">
-        <h2 className="section-title">HDoc Template Delete</h2>
-        
-        <div className="form-group">
-          <label htmlFor="deleteMarketSelect" className="form-label">
-            Market
-          </label>
+      <div className="ud12-section">
+        <h2 className="ud12-section-title">HDoc Template Delete</h2>
+
+        <div className="ud12-form-group">
+          <label className="ud12-label" htmlFor="deleteMarketSelect">Market</label>
           <select
             id="deleteMarketSelect"
-            className="form-control"
+            className="ud12-select"
             value={selectedDeleteMarket}
             onChange={handleDeleteMarketChange}
           >
@@ -388,54 +319,38 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="templateSelect" className="form-label">
-            Templates
-          </label>
+        <div className="ud12-form-group">
+          <label className="ud12-label" htmlFor="templateSelect">Templates</label>
           <select
             id="templateSelect"
-            className="form-control"
+            className="ud12-select"
             value={selectedTemplate}
             onChange={handleTemplateChange}
-            disabled={!selectedDeleteMarket || templatesList.length === 0}
+            disabled={!selectedDeleteMarket}
           >
             <option value="">-- Select Template --</option>
             {templatesList.length > 0 ? (
-              templatesList.map((template) => (
-                <option key={template.fileName} value={template.fileName}>
-                  {template.fileName}
-                </option>
+              templatesList.map((t) => (
+                <option key={t.fileName} value={t.fileName}>{t.fileName}</option>
               ))
             ) : (
-              <option value="" disabled>
-                No templates available
-              </option>
+              <option value="" disabled>No templates available</option>
             )}
           </select>
         </div>
 
-        <div className="button-group">
-          <button
-            type="button"
-            className="btn btn-danger"
+        <div className="ud12-btn-group">
+          <button type="button" className="ud12-btn ud12-btn-danger"
             onClick={handleDeleteClick}
-            disabled={loading || !selectedDeleteMarket || !selectedTemplate}
-          >
+            disabled={loading || !selectedDeleteMarket || !selectedTemplate}>
             Delete
           </button>
         </div>
       </div>
 
-      {/* 底部链接 */}
-      <div className="link-section">
-        <a
-          href="#"
-          className="check-template-link"
-          onClick={(e) => {
-            e.preventDefault();
-            handleCheckTemplateClick();
-          }}
-        >
+      {/* 底部链接 - 对应详细设计 2.1 其他控件 */}
+      <div className="ud12-link-section">
+        <a href="#" className="ud12-link" onClick={handleCheckTemplateClick}>
           Check Template (Only for rtf files)
         </a>
       </div>

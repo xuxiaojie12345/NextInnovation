@@ -44,15 +44,15 @@
 
 | No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
 |-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
-| 1   | Document type | TextField | - | 20 | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.DOCTYPE获取 |
-| 2   | Bussines unit | TextField | - | - | Output | - | - | BU | - | 固定显示'BU' |
+| 1   | Document type | TextField | - | 20 | Output | - | 左 | - | - | 从HDOC_DOCUMENT_LIST.DOCTYPE获取 |
+| 2   | Bussines unit | TextField | - | - | Output | - | 左 | BU | - | 固定显示'BU' |
 | 3   | User | TextField | - | 16 | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.REGISTER_USER获取，带链接 |
 | 4   | Date | TextField | - | - | Output | - | - | - | - | 从HDOC_DOCUMENT_LIST.REGISTER_DATETIME获取 |
-| 5   | Select | Button | - | - | Action | - | 中 | - | 活性 | 选择记录并返回前画面 |
-| 6   | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回前画面 |
-| 7   | Print | Button | - | - | Action | - | 中 | - | 活性 | 打印文档列表 |
+| 5   | Select | Button | - | - | Action | - | - | - | 活性 | 选择记录并返回前画面 |
+| 6   | Back | Button | - | - | Action | - | - | - | 活性 | 返回前画面 |
+| 7   | Print | Button | - | - | Action | - | - | - | 活性 | 打印文档列表 |
 
----
+----
 
 ## 4. 功能描述 (Functional Description)
 

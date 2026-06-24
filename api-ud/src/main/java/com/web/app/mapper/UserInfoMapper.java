@@ -16,4 +16,14 @@ public interface UserInfoMapper {
      * @return 用户信息,如果不存在返回null
      */
     UserInfo findByUserIdAndPassword(@Param("userid") String userid, @Param("password") String password);
+
+    /**
+     * 根据用户ID查询用户详细信息（UD25EduUserViewApi使用）
+     * 对应SQL：SELECT Userid, Responsible, `User Position`, `E-mail`
+     *         FROM HDOC_USER_INFOR WHERE Userid = #{userid}
+     *
+     * @param userid 用户ID
+     * @return 用户信息,如果不存在返回null
+     */
+    UserInfo findByUserId(@Param("userid") String userid);
 }

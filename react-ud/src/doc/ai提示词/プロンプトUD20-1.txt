@@ -17,13 +17,15 @@
   No		项目名				类别			必须		MaxLength			数据源_表				数据源_项目				I/O		允许文字					字符配置			初始值			显示控制			备注						
   1		title				lable			-		-			-				-				Output		-					左			-			-			固定表示：HDoc - Market Document Settings
   2		Document type				textfield			-		20			HDOC_DOCUMENT_LIST				DOCTYPE				Input		-					左			-			-			Update Mode时必须
-  3		Bussines unit				textfield			-		-			-				-				Input		-					左			-			-			固定表示：BU
-  4		User			textfield			-		16			HDOC_DOCUMENT_LIST				REGISTER_USER				Input		-					左			空			活性				
-  5		Date				textfield			-		-			HDOC_DOCUMENT_LIST				REGISTER_DATETIME				Input		-					左			空			活性			
-  6		Search				button			-		-			-				-				-		-					-			-			活性			
-  7		Clear				button			-		-			-				-				-		-					-			-			活性			
-  8		Back				button			-		-			-				-				-		-					-			-			活性			
-  9		Update Mode				button			-		-			-				-				-		-					-			-			活性			
+  3		Market				textfield			-		-			-				-				Input		-					左			空			活性			市场信息
+  4		Setting				pull-down list			-		-			-				-				Input		-					左			-			活性			设置选项，以下拉列表形式选择
+  5		Bussines unit				textfield			-		-			-				-				Input		-					左			-			-			固定表示：BU
+  6		User			textfield			-		16			HDOC_DOCUMENT_LIST				REGISTER_USER				Input		-					左			空			活性				
+  7		Date				textfield			-		-			HDOC_DOCUMENT_LIST				REGISTER_DATETIME				Input		-					左			空			活性			
+  8		Search				button			-		-			-				-				-		-					-			-			活性			
+  9		Clear				button			-		-			-				-				-		-					-			-			活性			
+  10		Back				button			-		-			-				-				-		-					-			-			活性			
+  11		Update Mode				button			-		-			-				-				-		-					-			-			活性			
 
 4. 功能描述 (Functional Description)
   4.1 初期表示
@@ -101,7 +103,7 @@
       空值校验等 (Frontend Check)：Document type非空检验，数据唯一性检验
 
       API调用 (Backend Check)：
-        调用API更新对应的HDOC_DOCUMENT_LIST表数据
+        调用`UD20MarketDocumentSettingsApi`的`UD20-1UpdateHdocDocumentList`方法（operation=UPDATE_HDOC_DOCUMENT_LIST），传递参数doctype、user、date、market、setting，更新HDOC_DOCUMENT_LIST表数据
       结果处理：
        成功：成功显示提示“更新成功”
        失败：显示错误消息“更新失败”
@@ -113,33 +115,36 @@
    | 2 | Update Mode按钮点击 | Document type | Document type在表中不存在 | "Document type does not exists. Please enter the correct content." | 显示错误消息，终止流程  |
 
 6. 接口定义 (API Specification)
-  6.1 UD20-1UpdateHdocDocumentList
-     功能：获取市场文档设置列表信息
-     Method：GET
+  6.1 UD20MarketDocumentSettingsApi - UD20-1UpdateHdocDocumentList
+     功能：更新HDOC_DOCUMENT_LIST表中的市场文档信息
+     Method：POST
      Endpoint：/api/ud20-1/UpdateHdocDocumentList
 
      Request [请求格式]
      {
-      "doctype":string,
-      "user":string,
-      "date":string
+       "operation": "UPDATE_HDOC_DOCUMENT_LIST",
+       "doctype": "string (文档类型，Update Mode时必须)",
+       "user": "string (注册用户)",
+       "date": "string (注册日期)",
+       "market": "string (市场)",
+       "setting": "string (设置)"
      }
 
      Response Success (200)
      {
-       "status": "success",
+       "code": 200,
        "message": "更新成功"
      }
 
      Response Error (404)
      {
-       "status": "error",
+       "code": 404,
        "message": "Document type does not exists. Please enter the correct content."
      }
 
      Response Error (500)
      {
-       "status": "error",
+       "code": 500,
        "message": "更新失败"
      }
 

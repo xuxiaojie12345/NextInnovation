@@ -37,5 +37,25 @@
         WHERE USERID = #{userid}
           AND PASSWORD = #{password}
     </select>
+
+    <!-- 根据用户ID查询用户详细信息（UD25EduUserViewApi使用）
+         对应全体APIのプロンプト.txt 5.1 查询语句 -->
+    <select id="findByUserId" resultMap="UserInfoResultMap">
+        SELECT 
+            USERID,
+            PASSWORD,
+            USERNAME,
+            RESPONSIBLE,
+            USERPOSITION,
+            EMAIL,
+            REGISTER_DATETIME,
+            REGISTER_USER,
+            REGISTER_PROCESS,
+            UPDATE_DATETIME,
+            UPDATE_USER,
+            UPDATE_PROCESS
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid}
+    </select>
     
 </mapper>

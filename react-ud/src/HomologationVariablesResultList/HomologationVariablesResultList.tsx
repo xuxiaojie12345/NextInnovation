@@ -143,14 +143,12 @@ const HomologationVariablesResultList: React.FC = () => {
    * 获取选中记录的完整数据（用于 Select 操作）
    * 选中记录只能有一条
    */
-  const getSelectedRecord = (): SearchResultItem | null => {
+  const getSelectedRecord = useCallback((): SearchResultItem | null => {
     if (selectedKeys.size === 0) return null;
     const firstKey = Array.from(selectedKeys)[0];
-    const [pc, num, market] = firstKey.split('|');
-    return dataList.find(
-      item => item.pc === pc && item.num === num && item.market === market
-    ) || null;
-  };
+    // 直接从 dataList 中根据唯一键查找匹配的记录
+    return dataList.find(item => `${item.pc}|${item.num}|${item.market}` === firstKey) || null;
+  }, [selectedKeys, dataList]);
 
   /**
    * 获取选中记录的主键列表（用于 Delete selected 操作）
@@ -419,9 +417,8 @@ const HomologationVariablesResultList: React.FC = () => {
                         className='user-link'
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Created by user 显示为蓝色可点击链接，点击跳转到 EDB User View 页面
-                          // 目前跳转到用户管理页面（后续可替换为具体的 User View 路由）
-                          navigate('/Menu/SearchUser', { state: { userId: item.updateUser } });
+                          // Created by user 显示为蓝色可点击链接，点击跳转到 EDB User View 页面（UD25）
+                          navigate('/Menu/EDBUserView', { state: { userId: item.updateUser } });
                         }}
                       >
                         {item.updateUser}

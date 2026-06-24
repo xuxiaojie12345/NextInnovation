@@ -11,6 +11,12 @@ import HomologationVariablesResultList from "./HomologationVariablesResultList/H
 import ModifyDocument from "./ModifyDocument/ModifyDocument";
 import ExistingHDocVariables from "./ExistingHDocVariables/ExistingHDocVariables";
 import ExistingHDocVariablesResultList from "./ExistingHDocVariablesResultList/ExistingHDocVariablesResultList";
+import VehicleSpecification from "./VehicleSpecification/VehicleSpecification";
+import EDBUserView from "./EDBUserView/EDBUserView";
+import HDocTemplateCheck from "./HDocTemplateCheck/HDocTemplateCheck";
+import ListTemplates from "./ListTemplates/ListTemplates";
+import VinPlate from "./VinPlate/VinPlate";
+import ADChange from "./ADChange/ADChange";
 
 function App() {
   return (
@@ -30,6 +36,13 @@ function App() {
               <Route path='SaveModifications' element={<SaveModifications />} />
               <Route path='ExistingHDocVariables' element={<ExistingHDocVariables />} />
               <Route path='ExistingHDocVariables/Search' element={<ExistingHDocVariablesResultList />} />
+              <Route path='UploadDeleteTemplate' element={<UploadDeleteTemplate />} />
+              <Route path='VehicleSpecification' element={<VehicleSpecification />} />
+              <Route path='EDBUserView' element={<EDBUserView />} />
+              <Route path='HDocTemplateCheck' element={<HDocTemplateCheck />} />
+              <Route path='ListTemplates' element={<ListTemplates />} />
+              <Route path='VinPlate' element={<VinPlate />} />
+              <Route path='ADCAChange' element={<ADChange />} />
             </Route>
           </Routes>
         </div>

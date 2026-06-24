@@ -28,14 +28,14 @@
                UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
         FROM HDOC_VARIABLES
         WHERE 1=1
-        <!-- Variable: 等值匹配（= 或 !=） -->
+        <!-- Variable: 模糊匹配（LIKE 或 NOT LIKE） -->
         <if test="request.variable != null and request.variable != ''">
             <choose>
                 <when test="request.variableOp == '!='">
-                    AND VARIABLE != #{request.variable}
+                    AND VARIABLE NOT LIKE CONCAT('%', #{request.variable}, '%')
                 </when>
                 <otherwise>
-                    AND VARIABLE = #{request.variable}
+                    AND VARIABLE LIKE CONCAT('%', #{request.variable}, '%')
                 </otherwise>
             </choose>
         </if>

@@ -67,6 +67,7 @@
         <if test="chassisSeries != null and chassisSeries != ''">
             AND vda.SERIE = #{chassisSeries}
         </if>
+        AND admod.STA = '0' 
         GROUP BY
     om.SERIE,
     om.ORDERNUMBER,

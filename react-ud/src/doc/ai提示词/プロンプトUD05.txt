@@ -18,7 +18,7 @@
 
 | No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
 |-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
-| 1   | chassis no | Link | - | - | Output | - | 左 | 从前一画面传递 | 活性 (Enabled) | 底盘编号，来自前一页面。点击跳转到Vehicle Specification页面（UD07），查看底盘详细信息 |
+| 1   | chassis no | Link | - | - | Output | - | 左 | 从前一画面传递 | 活性 (Enabled) | 底盘系列号（serie）和底盘编号（chassisNo）合并显示，格式：**serie** **chassisNo**。点击跳转到Vehicle Specification页面（UD07），传递参数chassisNo（serie + 半角空格 + chassisNo） |
 | 2   | Market | Label | - | - | Output | - | 左 | 从前一画面传递 | - | 市场信息，来自前一页面 |
 | 3   | Template文件 | Link | - | - | Output | - | 左 | 模板文件名 | - | 点击可下载.trf格式的模板文件(不含填充值)，如"Template: aus/UD_TEST.odt" |
 | 4   | Variable | DataTable | - | - | Output | - | 左 | - | - | 变量名列表，来自Template文件的Template项目 |

@@ -101,6 +101,7 @@ const getUserPermissions = (): string[] => {
       "GenerateDoc", "GenerateBatch", "RegdataArchive", "RegdataBatch",
       "UpdateRules", "UpdateUnicodeRules", "ExistingVariables", "UnlockDocument",
       "HDocNumberSeries", "UploadDeleteTemplate", "ListTemplates", "VPPSVinPlate", "ADCAChange",
+      "HDocTemplateCheck",
       "HDocUserAdmin", "HDocUserDocAdmin", "SearchUser", "ChangePassword", "UserPosition",
       "ArchiveSearch", "UploadDocument",
       "UserGuide", "ADCAChangeGuide", "VinPlateGuide", "ArchiveGuide", "Privacy",

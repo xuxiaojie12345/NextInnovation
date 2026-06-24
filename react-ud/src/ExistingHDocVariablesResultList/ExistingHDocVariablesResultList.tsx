@@ -154,26 +154,11 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   }, [navigate, searchState]);
 
   /**
-   * Down 按钮处理：将选中记录的Variable作为参数跳转到 Homologation Variables 页面
-   * 对应详细设计 3.1.4 Down操作流程
+   * Down 按钮（暂不实装具体功能）
    */
   const handleDown = useCallback(() => {
-    if (selectedIndex < 0) {
-      setMessage('No key defined for table.');
-      setMessageType('warning');
-      return;
-    }
-    const record = getSelectedRecord();
-    if (!record) {
-      setMessage('No key defined for table.');
-      setMessageType('warning');
-      return;
-    }
-    // 将选中记录的Variable传递到 Homologation Variables 页面
-    navigate('/Menu/HomologationVariables', {
-      state: { variable: record.variable }
-    });
-  }, [selectedIndex, dataList, navigate]);
+    // 暂不实装
+  }, []);
 
   /**
    * Print 按钮处理：打印搜索结果列表
@@ -300,8 +285,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                       className='ud11-user-link'
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Created by user 显示为可点击链接，跳转到 EDB User View 页面
-                        navigate('/Menu/SearchUser', { state: { userId: item.userid } });
+                        // Created by user 显示为可点击链接，跳转到 EDB User View 页面（UD25）
+                        navigate('/Menu/EDBUserView', { state: { userId: item.userid } });
                       }}
                     >
                       {item.userid}

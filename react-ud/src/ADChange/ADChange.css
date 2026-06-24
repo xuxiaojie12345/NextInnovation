@@ -1,0 +1,227 @@
+/**
+ * ADChange 组件样式 - AD Change页面（UD16）
+ * 参照 Homologation Variables 页面风格
+ * 对应详细设计：详细设计/詳細設計UD16.md
+ */
+
+.ud16-container {
+  padding: 20px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.ud16-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+
+.ud16-loading {
+  padding: 12px 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.ud16-message {
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-top: 12px;
+  margin-bottom: 0px;
+  text-align: left;
+  display: inline-block;
+  max-width: fit-content;
+}
+
+.ud16-message.error {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.ud16-message.success {
+  background-color: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+.ud16-btn-group {
+  display: flex;
+  gap: 5px;
+  margin: 12px -20px 0 -20px;
+  padding: 8px 20px;
+  background-color: #e8f0fe;
+  border-top: 1px solid #b0c4de;
+}
+
+.ud16-btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: normal;
+  color: #333333;
+  background-color: #d0ddf0;
+  border: 1px solid #8da0c0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ud16-btn:hover {
+  background-color: #c0d0e5;
+}
+
+.ud16-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ud16-form {
+  border: 1px solid #b0c4de;
+  padding: 0 20px 0 20px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ud16-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.ud16-label {
+  width: 140px;
+  text-align: left;
+  font-size: 14px;
+  color: #000000;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.ud16-input {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+  outline: none;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+  height: 26px;
+}
+
+.ud16-input:focus {
+  border-color: #666666;
+}
+
+.ud16-textarea {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+  outline: none;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.ud16-textarea:focus {
+  border-color: #666666;
+}
+
+/* 弹窗遮罩 */
+.ud16-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 弹窗 */
+.ud16-modal {
+  background: #ffffff;
+  border: 1px solid #b0c4de;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ud16-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+}
+
+.ud16-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.ud16-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 0 4px;
+}
+
+.ud16-modal-body {
+  padding: 16px;
+}
+
+.ud16-modal-footer {
+  padding: 10px 16px;
+  border-top: 1px solid #e8e8e8;
+  text-align: right;
+}
+
+/* CHECK结果表格 */
+.ud16-check-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ud16-check-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ud16-check-label {
+  width: 120px;
+  color: #555555;
+  font-weight: 500;
+  background-color: #fafafa;
+}
+
+.ud16-check-value {
+  color: #333333;
+}
+
+.ud16-check-not-found {
+  text-align: center;
+  color: #c33;
+  font-size: 14px;
+  padding: 20px 0;
+  margin: 0;
+}
