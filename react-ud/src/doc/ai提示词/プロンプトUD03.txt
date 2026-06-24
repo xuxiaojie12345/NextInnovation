@@ -41,8 +41,6 @@
    5.1 处理流程
       ① 开始：页面初始化
       前置处理：调用 `UD03SelectHdocdocumentlistApi` 获取文档类型列表
-      5.1.1 API调用 (Backend Check)：
-        调用[UD03SelectHdocdocumentlistApi]
       ② 开始：点击 [Submit] 按钮，无error的情况下，迁移至“Generate document”画面
       前置处理：输入Chassis series、Chassis no、选择Document type
       空值校验(Frontend Check)：

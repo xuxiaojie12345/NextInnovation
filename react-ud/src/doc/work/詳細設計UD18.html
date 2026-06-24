@@ -107,7 +107,7 @@
 <td style="text-align:left">multi-select list</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Input/Output</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
@@ -119,7 +119,7 @@
 <td style="text-align:left">button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
@@ -131,7 +131,7 @@
 <td style="text-align:left">button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
@@ -158,37 +158,40 @@
 </ol>
 <ul>
 <li>初始化所有输入框为空。</li>
-<li>Document多选列表初始化为空。</li>
-<li>从HDOC_DOCUMENT_LIST获取所有文档列表。</li>
+<li>调用UD18HDocUserDocAdministrationApi，向后端服务获取文档列表信息(/api/ud18HDocUserDocAdministration/getDocumentList),显示在Document项目上。</li>
 </ul>
 <ol start="3">
 <li><strong>结果处理</strong>：</li>
 </ol>
 <ul>
-<li><strong>成功</strong>：UserID输入框为空，User标签为空，Document多选列表为空或不显示任何选项，所有操作按钮处于可用状态。</li>
+<li><strong>成功</strong>：UserID输入框为空，User标签为空，Document多选列表显示所有的文档列表信息，所有操作按钮处于可用状态。</li>
 </ul>
 <h4 id="312-用户信息查询处理流程user-info">3.1.2 用户信息查询处理流程（User Info） </h4>
 <ol>
-<li><strong>开始</strong>：用户点击User Info按钮。</li>
-<li><strong>前置处理</strong>：</li>
-</ol>
+<li>
+<p><strong>开始</strong>：用户点击User Info按钮。</p>
+</li>
+<li>
+<p><strong>前置处理</strong>：</p>
 <ul>
 <li>校验UserID是否为空。</li>
 <li>若为空：设置Message = "请输入UserID"；终止流程。</li>
 </ul>
-<ol start="3">
-<li><strong>处理步骤</strong>：</li>
+</li>
+<li>
+<p><strong>处理步骤</strong>：</p>
+</li>
 </ol>
 <ul>
 <li>调用API检查该UserID是否存在于HDOC_FUNCTION_AUTH表中。</li>
 <li>若HDOC_FUNCTION_AUTH表中未找到该UserID：设置Message = "We didn't recognize the userid you entered. Please try again."；终止流程。</li>
-<li>若找到该UserID：调用AuthenticationApi从Saviynt系统获取用户名；在"User"标签中显示用户名（如Jenna Wang）；从HDOC_USER_DOC表查询该用户已授权的文档列表；在Document多选列表中展示所有文档，并自动勾选已授权的文档。</li>
+<li>若找到该UserID：调用AuthenticationApi获取用户名；在"User"标签中显示用户名（如Jenna Wang）；从HDOC_USER_DOC表查询该用户已授权的文档列表；在Document多选列表中展示所有文档，并自动选中已授权的文档。</li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>
 </ol>
 <ul>
-<li><strong>成功</strong>：显示查询到的用户名，在Document多选列表中展示所有文档，并自动勾选已授权的文档。</li>
+<li><strong>成功</strong>：显示查询到的用户名，在Document多选列表中展示所有文档，并自动选中已授权的文档。</li>
 <li><strong>失败</strong>：显示错误消息："We didn't recognize the userid you entered. Please try again."。</li>
 </ul>
 <h4 id="313-文档权限更新处理流程update">3.1.3 文档权限更新处理流程（Update） </h4>
@@ -206,7 +209,7 @@
 <ul>
 <li>系统校验UserID是否存在于HDOC_FUNCTION_AUTH表中。</li>
 <li>若不存在：设置Message = "We didn't recognize the userid you entered. Please try again."。</li>
-<li>若存在：调用API保存文档权限配置到HDOC_USER_DOC表。</li>
+<li>若存在：调用UD18HDocUserDocAdministrationApi(/api/ud18HDocUserDocAdministration/updateUserDocuments)将当前画面已选的文档权限更新到HDOC_USER_DOC表(先删除原来的再登录新选择的)。</li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>
@@ -298,30 +301,28 @@
 <ul>
 <li><strong>功能</strong>：向后端服务获取文档列表信息。</li>
 <li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud18HDocUserDocAdministration/getDocumentList</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud18/getdocumentList</code></li>
 </ul>
 <h5 id="request">Request </h5>
 <p>无需参数</p>
 <h5 id="response-success-200">Response Success (200) </h5>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-            <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
-            <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取文档列表成功"</span><span class="token punctuation">,</span>
-            <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                <span class="token punctuation">{</span>
-                    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-
-#### <span class="token number">4.2</span>.<span class="token number">3</span> 查询用户文档权限接口
-- **功能**：提供HDoc用户文档权限管理的查询接口。
-- **Method**<span class="token operator">:</span> `POST`
-- **Endpoint**<span class="token operator">:</span> `/api/ud18HDocUserDocAdministration/getUserFunctionsAndDocuments`
-
-##### Request
-
-```json
-<span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取文档列表成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="423-查询用户文档权限接口">4.2.3 查询用户文档权限接口 </h4>
+<ul>
+<li><strong>功能</strong>：提供HDoc用户文档权限管理的查询接口。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud18/getuserfunctionsanddocuments</code></li>
+</ul>
+<h5 id="request-1">Request </h5>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"action"</span><span class="token operator">:</span> <span class="token string">"query"</span><span class="token punctuation">,</span>
   <span class="token property">"userId"</span><span class="token operator">:</span> <span class="token string">"a420064"</span>
 <span class="token punctuation">}</span>
@@ -346,9 +347,9 @@
 <ul>
 <li><strong>功能</strong>：提供HDoc用户文档权限管理的更新接口。</li>
 <li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud18HDocUserDocAdministration/updateUserDocuments</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud18/updateuserdocuments</code></li>
 </ul>
-<h5 id="request-1">Request </h5>
+<h5 id="request-2">Request </h5>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"action"</span><span class="token operator">:</span> <span class="token string">"update"</span><span class="token punctuation">,</span>
   <span class="token property">"userId"</span><span class="token operator">:</span> <span class="token string">"a420064"</span><span class="token punctuation">,</span>

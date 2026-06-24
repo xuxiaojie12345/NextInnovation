@@ -35,6 +35,7 @@
    -
 
 6. 接口定义 (API Specification)
+　　无
  -
 7. 异常处理 (Exception Handling)（TODO：共同化可能）
    异常场景	处理方式	Message 显示内容
