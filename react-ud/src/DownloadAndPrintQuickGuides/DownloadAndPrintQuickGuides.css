@@ -9,6 +9,14 @@
   padding: 10px 20px;
   display: flex;
   align-items: center;
+  width: 100%;
+}
+
+.volvo-header h1 {
+  color: #ffffff;
+  font-weight: bold;
+  margin: 0;
+  font-size: 20px;
 }
 
 .volvo-logo {

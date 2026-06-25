@@ -236,22 +236,20 @@
 <ul>
 <li><strong>功能</strong>：获取完整的市场实体列表。</li>
 <li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud14Searchresultist/getmarkets</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud14/getmarkets</code></li>
 </ul>
 <h4 id="request">Request </h4>
 <p>无需参数</p>
-<pre data-role="codeBlock" data-info="" class="language-text"><code>#### Response Success (200)
-
-```json
-{
-            "code": 200,
-            "msg": "获取市场列表成功",
-            "data": [
-                {
-                    "market": "xx"
-                }
-            ]
-        }
+<h4 id="response-success-200">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取市场列表成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"xx"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </code></pre><h4 id="response-error-400">Response Error (400) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Invalid input"</span><span class="token punctuation">,</span>
@@ -266,13 +264,13 @@
 <ul>
 <li><strong>功能</strong>：获取完整的市场实体列表。</li>
 <li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud14Searchresultist/getvariablesbymarket</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud14/getvariablesbymarket</code></li>
 </ul>
 <h4 id="request-1">Request </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"Market"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
 <span class="token punctuation">}</span>
-</code></pre><h4 id="response-success-200">Response Success (200) </h4>
+</code></pre><h4 id="response-success-200-1">Response Success (200) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
   <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"根据市场获取变量列表成功"</span><span class="token punctuation">,</span>

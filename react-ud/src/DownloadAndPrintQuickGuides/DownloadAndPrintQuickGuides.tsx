@@ -80,7 +80,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
     <div className='download-quick-guides-container'>
       {/* VOLVO Header */}
       <div className='volvo-header'>
-        <img src='/image/volvo-logo.png' alt='VOLVO' className='volvo-logo' />
+        <h1>VOLVO</h1>
       </div>
 
       {/* Main Content */}
@@ -91,6 +91,9 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             Back
           </button>
           <h2 className='page-title'>Download and Print Quick Guides</h2>
+        </div>
+        <div className='volvo-3p-section'>
+          <h3 className='volvo-3p-title'>Download and Print Quick Guides</h3>
         </div>
 
         {/* Quick Guides Grid */}
