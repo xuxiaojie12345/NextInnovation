@@ -7,14 +7,6 @@ interface MarketItem {
   description: string;
 }
 
-interface UserInfo {
-  userid: string;
-  username: string;
-  responsible: string;
-  userposition: string;
-  email: string;
-}
-
 interface PermissionData {
   functions: Array<any>;
   markets: Array<any>;
@@ -264,8 +256,8 @@ const HDocUserAdministration = () => {
             const marketType = toCode(market.TYPE || market.type || "");
             switch (marketType) {
               case "U":
-                if (!updatedFormData.standardUserMarkets.includes(marketCode)) {
-                  updatedFormData.standardUserMarkets.push(marketCode);
+                if (!updatedFormData.standardUserMarkets.includes("-EU")) {
+                  updatedFormData.standardUserMarkets = ["-EU"];
                 }
                 break;
               case "R":
@@ -288,10 +280,8 @@ const HDocUserAdministration = () => {
                 }
                 break;
               case "DOCMOD":
-                if (
-                  !updatedFormData.adaptationUserMarkets.includes(marketCode)
-                ) {
-                  updatedFormData.adaptationUserMarkets.push(marketCode);
+                if (!updatedFormData.adaptationUserMarkets.includes("-EU")) {
+                  updatedFormData.adaptationUserMarkets = ["-EU"];
                 }
                 break;
               case "MCSU":
@@ -323,7 +313,23 @@ const HDocUserAdministration = () => {
 
   // 处理角色复选框变化
   const handleRoleCheckboxChange = (role: keyof FormData, checked: boolean) => {
-    setFormData({ ...formData, [role]: checked });
+    // Standard User / Adaptation use 勾选时自动设置 "-EU"
+    const isStandardOrAdapt =
+      role === "standardUserChecked" || role === "adaptationUserChecked";
+    const marketsKey =
+      role === "standardUserChecked"
+        ? "standardUserMarkets"
+        : "adaptationUserMarkets";
+
+    setFormData({
+      ...formData,
+      [role]: checked,
+      ...(isStandardOrAdapt && checked
+        ? { [marketsKey]: ["-EU"] }
+        : isStandardOrAdapt && !checked
+          ? { [marketsKey]: [] }
+          : {}),
+    });
   };
 
   // 处理Market多选下拉框变化
@@ -671,7 +677,7 @@ const HDocUserAdministration = () => {
             </div>
             <select
               multiple
-              className='hvua-select-multiple'
+              className='hvua-select-single'
               value={formData.standardUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -684,13 +690,7 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.standardUserChecked}
             >
-              {getSortedMarketList(formData.standardUserMarkets).map(
-                (market) => (
-                  <option key={market.market} value={market.market}>
-                    {market.market}
-                  </option>
-                ),
-              )}
+              <option value='-EU'>-EU</option>
             </select>
           </div>
 
@@ -855,7 +855,7 @@ const HDocUserAdministration = () => {
             </div>
             <select
               multiple
-              className='hvua-select-multiple'
+              className='hvua-select-single'
               value={formData.adaptationUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -868,13 +868,7 @@ const HDocUserAdministration = () => {
               }}
               disabled={!formData.adaptationUserChecked}
             >
-              {getSortedMarketList(formData.adaptationUserMarkets).map(
-                (market) => (
-                  <option key={market.market} value={market.market}>
-                    {market.market}
-                  </option>
-                ),
-              )}
+              <option value='-EU'>-EU</option>
             </select>
           </div>
         </div>

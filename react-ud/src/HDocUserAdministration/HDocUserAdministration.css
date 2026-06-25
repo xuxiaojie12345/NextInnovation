@@ -142,6 +142,27 @@
   box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
 }
 
+/* 单选下拉框（Standard User / Adaptation use 固定显示-EU） */
+.hvua-select-single {
+  width: 60px;
+  height: 150px;
+  border: 1px solid #a0a0a0;
+  padding: 5px;
+  font-size: 13px;
+  background-color: #ffffff;
+}
+
+.hvua-select-single:disabled {
+  background-color: #f5f5f5;
+  opacity: 0.6;
+}
+
+.hvua-select-single:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
+}
+
 /* 按钮区域 */
 .hvua-button-bar {
   background-color: #e8eef8;
