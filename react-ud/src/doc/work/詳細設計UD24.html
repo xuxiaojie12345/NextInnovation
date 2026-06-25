@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>詳細設計UD22</title>
+      <title>詳細設計UD24</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="document-types详细设计说明书">Document Types详细设计说明书 </h1>
+<h1 id="hdoc帮助页面-hdoc-help-详细设计说明书">HDoc帮助页面 (HDoc Help) 详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">DES-Document Types-001</th>
+<th style="text-align:left">DES-HDocHelp-024</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,24 +40,25 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Document Types</td>
+<td style="text-align:left">HDoc帮助 (HDoc Help)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-26</td>
+<td style="text-align:left">2026-05-20</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Qoder</td>
+<td style="text-align:left">AI Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块用于显示HDoc系统中可用的文档类型列表，包括文档类型的键值和描述。</p>
+<p>本模块用于说明系统相关信息，提供系统功能导航链接，为用户提供系统使用指导。</p>
 <ul>
-<li><strong>目标</strong>：向需要了解文档类型的业务人员和系统管理员提供文档类型列表展示功能。</li>
-<li><strong>安全性</strong>：需验证用户权限，确保只能访问授权的文档类型信息。</li>
-<li><strong>用户体验</strong>：提供清晰的文档类型列表展示，便于用户识别和选择合适的文档类型。</li>
+<li><strong>目标</strong>：提供系统功能的导航入口和帮助信息。</li>
+<li><strong>面向用户</strong>：系统用户、需要系统帮助信息的工作人员、系统管理员。</li>
+<li><strong>用户体验</strong>：提供直观的导航链接、清晰的系统功能说明、便捷的页面跳转方式。</li>
+<li><strong>安全性</strong>：确保页面访问的安全性、防止未授权的系统信息访问。</li>
 </ul>
 <h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
 <h3 id="21-控件属性表">2.1 控件属性表 </h3>
@@ -79,20 +80,68 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Key</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>HDoc Quick Guide</strong></td>
+<td style="text-align:left">Link</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.DOCTYPE</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">跳转至Download and Print Quick Guides页面</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Description</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>List of document types.</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">跳转至Document Types页面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Markets in HDoc</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">跳转至Markets in HDoc页面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>HDoc - Market Document Setting</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">跳转至HDoc - Market Document Settings页面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Describation</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">活性 (Enabled)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Other Information</strong></td>
+<td style="text-align:left">Checkbox</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
@@ -100,125 +149,58 @@
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.Description</td>
+<td style="text-align:left">-</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>控件类型说明</strong>：</p>
+<p><strong>注</strong>：</p>
 <ul>
-<li>Output控件：TextField（Key、Description）</li>
+<li>本页面无后端API调用，所有功能为页面间的导航跳转</li>
+<li>Link控件点击后通过React Router跳转到对应路由</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在页面加载时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <h4 id="311-页面初始化流程">3.1.1 页面初始化流程 </h4>
 <ol>
-<li><strong>开始</strong>：用户进入Document Types画面。</li>
-<li><strong>前置处理</strong>：无</li>
-<li><strong>API 调用 (Backend Check)</strong>：</li>
-</ol>
+<li><strong>开始</strong>：页面加载。</li>
+<li><strong>前置处理</strong>：准备页面元素，显示所有导航链接。</li>
+<li><strong>结果处理</strong>：
 <ul>
-<li>调用<a href="..\..\..\..\api\ud20\getdocumentlist">UD20MarketDocumentSettingsApi</a></li>
+<li><strong>成功</strong>：显示页面和导航链接。</li>
+<li><strong>失败</strong>：显示"HDoc Help页面加载失败，请稍后再试"。</li>
 </ul>
-<ol start="4">
-<li><strong>结果处理</strong>：</li>
+</li>
 </ol>
-<ul>
-<li><strong>成功</strong>：正常显示文档类型列表信息。</li>
-<li><strong>失败</strong>：显示相应错误消息并保持在当前页面。</li>
-</ul>
-<h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No.</th>
-<th style="text-align:center">检查时机</th>
-<th style="text-align:center">检查对象</th>
-<th style="text-align:center">检查条件</th>
-<th style="text-align:center">错误消息 (Message Content)</th>
-<th style="text-align:center">动作</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">1</td>
-<td style="text-align:center">进入画面时</td>
-<td style="text-align:center">文档类型数据获取</td>
-<td style="text-align:center">无法获取文档类型数据</td>
-<td style="text-align:center"><code>无法获取文档类型信息</code></td>
-<td style="text-align:center">显示错误消息</td>
-</tr>
-</tbody>
-</table>
+<h4 id="312-hdoc快速指南跳转流程">3.1.2 HDoc快速指南跳转流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"HDoc Quick Guide"链接。</li>
+<li>系统通过React Router跳转至Download and Print Quick Guides页面（路由：<code>/DownloadAndPrintQuickGuides</code>）。</li>
+<li><strong>成功</strong>：跳转到目标页面。</li>
+<li><strong>失败</strong>：显示"目标页面不可用，请联系管理员"。</li>
+</ol>
+<h4 id="313-文档类型列表跳转流程">3.1.3 文档类型列表跳转流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"List of document types."链接。</li>
+<li>系统跳转至Document Types页面（路由：<code>/DocumentTypes</code>）。</li>
+<li><strong>结果处理</strong>：同HDoc快速指南跳转。</li>
+</ol>
+<h4 id="314-市场信息跳转流程">3.1.4 市场信息跳转流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"Markets in HDoc"链接。</li>
+<li>系统跳转至Markets in HDoc页面（路由：<code>/MarketsInHDoc</code>）。</li>
+<li><strong>结果处理</strong>：同HDoc快速指南跳转。</li>
+</ol>
+<h4 id="315-市场文档设置跳转流程">3.1.5 市场文档设置跳转流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"HDoc - Market Document Settings"链接。</li>
+<li>系统跳转至HDoc - Market Document Settings页面（路由：<code>/MarketDocumentSettings</code>）。</li>
+<li><strong>结果处理</strong>：同HDoc快速指南跳转。</li>
+</ol>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-ud20marketdocumentsettingsapi">4.1 UD20MarketDocumentSettingsApi </h3>
-<ul>
-<li><strong>功能</strong>：获取市场文档设置列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud20/getdocumentlist</code></li>
-</ul>
-<h4 id="request">Request </h4>
-<p>无</p>
-<h4 id="response-success-200">Response Success (200) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-            <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
-            <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取文档列表成功"</span><span class="token punctuation">,</span>
-            <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                <span class="token punctuation">{</span>
-                    <span class="token property">"doctype"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                    <span class="token property">"registerUser"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"registerDatetime"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-</code></pre><h5 id="响应字段说明">响应字段说明 </h5>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">字段名</th>
-<th style="text-align:left">类型</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">documentType</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">文档类型，来自HDOC_DOCUMENT_LIST.DOCTYPE，最大20字符</td>
-</tr>
-<tr>
-<td style="text-align:left">bussinesUnit</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">业务单元，固定显示'BU'或实际业务单元代码</td>
-</tr>
-<tr>
-<td style="text-align:left">user</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册用户，来自HDOC_DOCUMENT_LIST.REGISTER_USER，最大16字符，若为空显示'-'</td>
-</tr>
-<tr>
-<td style="text-align:left">date</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册日期时间，来自HDOC_DOCUMENT_LIST.REGISTER_DATETIME，格式：YYYY-MM-DD HH:mm:ss</td>
-</tr>
-</tbody>
-</table>
-<h4 id="response-error-400500">Response Error (400/500) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"No data found"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
-<span class="token punctuation">}</span>
-</code></pre><p>或</p>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"系统错误，请稍后重试"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
-<span class="token punctuation">}</span>
-</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<p>本模块无API接口定义。页面间跳转通过前端路由（React Router）实现。</p>
+<h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
 <thead>
 <tr>
@@ -229,37 +211,41 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>无法获取文档类型数据</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
-<td style="text-align:left"><code>无法获取文档类型信息</code></td>
+<td style="text-align:left"><strong>页面加载失败</strong></td>
+<td style="text-align:left">显示系统错误消息</td>
+<td style="text-align:left"><code>HDoc Help页面加载失败，请稍后再试</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>API调用失败</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
-<td style="text-align:left"><code>系统错误，请稍后重试</code></td>
+<td style="text-align:left"><strong>链接跳转失败</strong></td>
+<td style="text-align:left">显示错误消息</td>
+<td style="text-align:left"><code>目标页面不可用，请联系管理员</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>路由不存在</strong></td>
+<td style="text-align:left">React Router捕获</td>
+<td style="text-align:left"><code>目标页面不可用，请联系管理员</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
 <ol>
-<li><strong>状态管理</strong>：
+<li><strong>导航链接</strong>：所有Link控件通过React Router的<code>&lt;Link&gt;</code>或<code>useNavigate</code>实现页面跳转。</li>
+<li><strong>目标页面路由映射</strong>：
 <ul>
-<li>使用 React State 管理 documentTypes, errorMessage, <code>isLoading</code>。</li>
-<li>确保DataTable按Key（DOCTYPE）字母顺序显示。</li>
+<li>HDoc Quick Guide → <code>/DownloadAndPrintQuickGuides</code></li>
+<li>List of document types → <code>/DocumentTypes</code></li>
+<li>Markets in HDoc → <code>/MarketsInHDoc</code></li>
+<li>HDoc - Market Document Setting → <code>/MarketDocumentSettings</code></li>
 </ul>
 </li>
-<li><strong>安全性</strong>：
+<li><strong>UI细节</strong>：
 <ul>
-<li>API 请求必须通过 HTTPS 发送。</li>
-<li>需要用户登录认证后才能访问。</li>
+<li>链接以蓝色可点击文字显示。</li>
+<li>建议使用列表或分组方式清晰排列各导航链接。</li>
+<li>Other Information区域可通过Checkbox控制显示/隐藏。</li>
 </ul>
 </li>
-<li><strong>UI 细节</strong>：
-<ul>
-<li>DataTable 为只读展示，不提供任何编辑功能。</li>
-<li>Message 文字颜色建议使用红色 (<code>#ff4d4f</code>) 以起到警示作用。</li>
-</ul>
-</li>
+<li><strong>无API调用</strong>：本模块不涉及后端API，所有功能为前端页面导航。</li>
 </ol>
 <hr>
 

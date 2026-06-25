@@ -168,6 +168,7 @@
 <li><strong>前置处理</strong>：</li>
 </ol>
 <ul>
+<li>接收前画面(ud09,ud11,ud20)传的参数userid，并将userid传到AuthenticationApi</li>
 <li>页面加载时自动调用AuthenticationApi获取当前登录用户信息。</li>
 <li>将获取到的信息填充到对应字段。</li>
 </ul>
@@ -239,8 +240,7 @@
 </ul>
 <h4 id="request-body">Request Body </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"userID"</span><span class="token operator">:</span> <span class="token string">"string (Max 10, Alphanumeric)"</span><span class="token punctuation">,</span>
-  <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"string (Max 32, Alphanumeric + Symbols)"</span>
+  <span class="token property">"userID"</span><span class="token operator">:</span> <span class="token string">"string (Max 10, Alphanumeric)"</span>
 <span class="token punctuation">}</span>
 </code></pre><h4 id="response-success-200-ok">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>

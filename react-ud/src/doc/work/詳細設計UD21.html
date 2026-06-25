@@ -131,22 +131,7 @@
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>API内部逻辑：
-<ol>
-<li>查询MARKET_MASTER表，获取所有市场记录</li>
-<li>提取Market、Description字段</li>
-<li>根据业务逻辑确定Weights from Hdoc字段的值：
-<ul>
-<li>若该市场启用了HDoc权重功能，显示"X"</li>
-<li>若该市场启用了带特殊条件的HDoc权重功能，显示"X(*)"</li>
-<li>若该市场未启用HDoc权重功能，显示为空</li>
-</ul>
-</li>
-<li>按Market代码字母顺序升序排序</li>
-<li>返回市场列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\getmarketlist">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>

@@ -217,7 +217,7 @@
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <h4 id="311-页面初始化流程">3.1.1 页面初始化流程 </h4>
 <ol>
-<li><strong>开始</strong>：页面加载事件触发。</li>
+<li><strong>开始</strong>：画面初始化。</li>
 <li><strong>前置处理</strong>：</li>
 </ol>
 <ul>
@@ -227,20 +227,13 @@
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>API内部逻辑：
-<ol>
-<li>查询MARKET_MASTER表，获取所有Market列表。</li>
-<li>按Market代码排序。</li>
-<li>返回Market列表。</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\getmarketlist">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>
 </ol>
 <ul>
-<li><strong>成功</strong>：将Market列表填充到下拉列表；设置默认值为'-EU'。</li>
+<li><strong>成功</strong>：将Market列表填充到下拉列表。</li>
 <li><strong>失败</strong>：显示错误消息"获取Market列表失败"。</li>
 </ul>
 <h4 id="312-userid搜索流程">3.1.2 Userid搜索流程 </h4>
@@ -250,67 +243,12 @@
 </ol>
 <ul>
 <li>获取Userid、Market、权限类型参数。</li>
-<li>去除Userid首尾空格，转换为大写。</li>
-</ul>
-<ol start="3">
-<li><strong>空值校验 (Frontend Check)</strong>：</li>
-</ol>
-<ul>
-<li>若Userid为空或仅包含空格：
-<ul>
-<li>设置Message = "Userid不能为空"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若Userid包含非半角英数字字符：
-<ul>
-<li>设置Message = "Userid只能包含半角英数字"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若Userid长度超过10字符：
-<ul>
-<li>设置Message = "Userid长度不能超过10字符"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
 </ul>
 <ol start="4">
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>请求参数：<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"SWE"</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-  <span class="token property">"permissionType"</span><span class="token operator">:</span> <span class="token string">"NOT_SET"</span>
-<span class="token punctuation">}</span>
-</code></pre>
-</li>
-<li>API内部逻辑：
-<ol>
-<li>调用AuthenticationApi从Saviynt系统获取User信息
-<ul>
-<li>若Userid不存在于Saviynt系统，返回错误</li>
-</ul>
-</li>
-<li>从HDOC_FUNCTION_AUTH表查询该Userid的功能权限</li>
-<li>从HDOC_MARKET_AUTH表查询该Userid的Market权限</li>
-<li>根据permissionType过滤：
-<ul>
-<li>NOT_SET：不过滤</li>
-<li>RULE：仅保留FUNCTION_TYPE='Rule Admin'的记录</li>
-<li>TEMPLATE：仅保留FUNCTION_TYPE='Template Admin'的记录</li>
-</ul>
-</li>
-<li>根据market过滤（若market不为空）：
-<ul>
-<li>仅保留包含指定Market的记录</li>
-</ul>
-</li>
-<li>组装结果列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\searchhdoc">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="5">
 <li><strong>结果处理</strong>：</li>
@@ -328,54 +266,11 @@
 <li>获取User、Market、权限类型参数。</li>
 <li>去除User首尾空格。</li>
 </ul>
-<ol start="3">
-<li><strong>空值校验 (Frontend Check)</strong>：</li>
-</ol>
-<ul>
-<li>若User为空或仅包含空格：
-<ul>
-<li>设置Message = "User不能为空"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若User包含非半角英数字字符：
-<ul>
-<li>设置Message = "User只能包含半角英数字"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若User长度超过32字符：
-<ul>
-<li>设置Message = "User长度不能超过32字符"。</li>
-<li><strong>终止</strong>流程。</li>
-</ul>
-</li>
-</ul>
 <ol start="4">
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>请求参数：<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"Kurt Bjork"</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-  <span class="token property">"permissionType"</span><span class="token operator">:</span> <span class="token string">"NOT_SET"</span>
-<span class="token punctuation">}</span>
-</code></pre>
-</li>
-<li>API内部逻辑：
-<ol>
-<li>调用AuthenticationApi从Saviynt系统获取Userid
-<ul>
-<li>若User不存在于Saviynt系统，返回错误</li>
-</ul>
-</li>
-<li>根据Userid从HDOC_MARKET_AUTH表查询Market权限</li>
-<li>从HDOC_FUNCTION_AUTH表查询功能权限</li>
-<li>根据permissionType和market过滤（同Userid搜索）</li>
-<li>组装结果列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\searchhdoc">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="5">
 <li><strong>结果处理</strong>：</li>
@@ -396,25 +291,7 @@
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>请求参数：<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
-<span class="token punctuation">}</span>
-</code></pre>
-</li>
-<li>API内部逻辑：
-<ol>
-<li>从Saviynt系统获取所有用户列表</li>
-<li>对每个用户：
-<ul>
-<li>从HDOC_MARKET_AUTH表查询Market权限</li>
-<li>从HDOC_FUNCTION_AUTH表查询功能权限</li>
-</ul>
-</li>
-<li>根据market过滤（若market不为空）</li>
-<li>组装结果列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\searchhdoc">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>
@@ -435,26 +312,7 @@
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>请求参数：<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
-<span class="token punctuation">}</span>
-</code></pre>
-</li>
-<li>API内部逻辑：
-<ol>
-<li>从HDOC_FUNCTION_AUTH表筛选FUNCTION_TYPE='Rule Admin'的记录</li>
-<li>获取Userid列表</li>
-<li>对每个Userid：
-<ul>
-<li>调用AuthenticationApi从Saviynt系统获取User信息</li>
-<li>从HDOC_MARKET_AUTH表查询Market权限</li>
-</ul>
-</li>
-<li>根据market过滤</li>
-<li>组装结果列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\searchhdoc">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>
@@ -475,26 +333,7 @@
 <li><strong>API 调用 (Backend Check)</strong>：</li>
 </ol>
 <ul>
-<li>调用[UD19SearchResultListApi]</li>
-<li>请求参数：<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
-<span class="token punctuation">}</span>
-</code></pre>
-</li>
-<li>API内部逻辑：
-<ol>
-<li>从HDOC_FUNCTION_AUTH表筛选FUNCTION_TYPE='Template Admin'的记录</li>
-<li>获取Userid列表</li>
-<li>对每个Userid：
-<ul>
-<li>调用AuthenticationApi从Saviynt系统获取User信息</li>
-<li>从HDOC_MARKET_AUTH表查询Market权限</li>
-</ul>
-</li>
-<li>根据market过滤</li>
-<li>组装结果列表</li>
-</ol>
-</li>
+<li>调用<a href="..\..\..\..\api\ud19\searchhdoc">UD19SearchResultListApi</a></li>
 </ul>
 <ol start="4">
 <li><strong>结果处理</strong>：</li>

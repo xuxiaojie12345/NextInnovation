@@ -1,9 +1,9 @@
 <!DOCTYPE html><html><head>
-      <title>詳細設計UD22</title>
+      <title>詳細設計UD20-1</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
-      <link rel="stylesheet" href="file:///c:\Users\yanwenjing\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.30\crossnote\dependencies\katex\katex.min.css">
+      <link rel="stylesheet" href="file:///c:\Users\wangqun\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.30\crossnote\dependencies\katex\katex.min.css">
       
       
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="document-types详细设计说明书">Document Types详细设计说明书 </h1>
+<h1 id="市场文档设置页面-marketdocumentsettingspage-详细设计说明书">市场文档设置页面 (MarketDocumentSettingsPage) 详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">DES-Document Types-001</th>
+<th style="text-align:left">DES-UD20-1-001</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,24 +40,25 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Document Types</td>
+<td style="text-align:left">市场文档设置 (Market Document Settings)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-26</td>
+<td style="text-align:left">2026-06-03</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Qoder</td>
+<td style="text-align:left">AI Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块用于显示HDoc系统中可用的文档类型列表，包括文档类型的键值和描述。</p>
+<p>本模块用于实现市场文档设置功能，用户可以通过检索功能跳转到Market Document Settings List画面，选择一条记录并返回。还可以清空输入的信息、返回上级画面，以及更新现有的市场文档信息。</p>
 <ul>
-<li><strong>目标</strong>：向需要了解文档类型的业务人员和系统管理员提供文档类型列表展示功能。</li>
-<li><strong>安全性</strong>：需验证用户权限，确保只能访问授权的文档类型信息。</li>
-<li><strong>用户体验</strong>：提供清晰的文档类型列表展示，便于用户识别和选择合适的文档类型。</li>
+<li><strong>目标</strong>：提供市场文档的检索、更新和维护功能。</li>
+<li><strong>面向用户</strong>：HDoc系统用户、需要管理市场文档配置的业务人员、系统管理员。</li>
+<li><strong>用户体验</strong>：提供简洁直观的搜索界面，支持从前画面跳转到后画面并能携带查询条件，同时提供清空和返回功能，确保用户操作便捷。</li>
+<li><strong>安全性</strong>：用户需要具备相应的文档管理权限才能进行更新操作。</li>
 </ul>
 <h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
 <h3 id="21-控件属性表">2.1 控件属性表 </h3>
@@ -79,8 +80,8 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Key</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>title</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
@@ -88,47 +89,205 @@
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.DOCTYPE</td>
+<td style="text-align:left">固定表示：HDoc - Market Document Settings</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Description</strong></td>
+<td style="text-align:left"><strong>Document type</strong></td>
 <td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.Description</td>
+<td style="text-align:left">从HDOC_DOCUMENT_LIST.DOCTYPE获取，Update Mode时必须</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Market</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">市场信息</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Setting</strong></td>
+<td style="text-align:left">Pull-down List</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">设置选项，以下拉列表形式选择</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Bussines unit</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">固定表示：BU</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>User</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">从HDOC_DOCUMENT_LIST.REGISTER_USER获取</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Date</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">从HDOC_DOCUMENT_LIST.REGISTER_DATETIME获取</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Search</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">携带检索条件跳转到Market Document Settings List画面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Clear</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">清空输入内容</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Back</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">返回前画面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Update Mode</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Action</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">更新市场文档信息</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong>控件类型说明</strong>：</p>
-<ul>
-<li>Output控件：TextField（Key、Description）</li>
-</ul>
-</blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在页面加载时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
-<h4 id="311-页面初始化流程">3.1.1 页面初始化流程 </h4>
+<h4 id="311-初期表示流程">3.1.1 初期表示流程 </h4>
 <ol>
-<li><strong>开始</strong>：用户进入Document Types画面。</li>
-<li><strong>前置处理</strong>：无</li>
-<li><strong>API 调用 (Backend Check)</strong>：</li>
-</ol>
+<li><strong>开始</strong>：画面加载，显示页面标题"HDoc - Market Document Settings"。</li>
+<li><strong>前置处理</strong>：判断初期化场合和后画面返回的场合：
 <ul>
-<li>调用<a href="..\..\..\..\api\ud20\getdocumentlist">UD20MarketDocumentSettingsApi</a></li>
-</ul>
-<ol start="4">
-<li><strong>结果处理</strong>：</li>
-</ol>
+<li><strong>初期化场合</strong>：显示初始画面，所有输入字段为空。</li>
+<li><strong>后画面（Market Document Settings List）返回的场合</strong>：需要判断是后画面的Select按钮按下返回还是Back按钮按下返回。
 <ul>
-<li><strong>成功</strong>：正常显示文档类型列表信息。</li>
-<li><strong>失败</strong>：显示相应错误消息并保持在当前页面。</li>
+<li><strong>Select返回</strong>：接收后画面传回的数据（Document type、Bussines unit、User、Date），填充到对应输入框中。</li>
+<li><strong>Back返回</strong>：画面保持原有状态，不更新任何字段。</li>
 </ul>
+</li>
+</ul>
+</li>
+<li><strong>API调用</strong>：无。</li>
+<li><strong>结果处理</strong>：渲染画面。</li>
+</ol>
+<h4 id="312-search处理流程">3.1.2 Search处理流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击Search按钮。</li>
+<li><strong>前置处理</strong>：获取画面中的检索条件（Document type、User、Date），可以为空。</li>
+<li><strong>空值校验</strong>：无。</li>
+<li><strong>API调用</strong>：无。</li>
+<li><strong>结果处理</strong>：携带检索条件参数跳转到Market Document Settings List画面。</li>
+</ol>
+<h4 id="313-back处理流程">3.1.3 Back处理流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击Back按钮。</li>
+<li><strong>前置处理</strong>：无。</li>
+<li><strong>空值校验</strong>：无。</li>
+<li><strong>API调用</strong>：无。</li>
+<li><strong>结果处理</strong>：返回前页面，不携带任何数据。</li>
+</ol>
+<h4 id="314-clear处理流程">3.1.4 Clear处理流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击Clear按钮。</li>
+<li><strong>前置处理</strong>：无。</li>
+<li><strong>空值校验</strong>：无。</li>
+<li><strong>API调用</strong>：无。</li>
+<li><strong>结果处理</strong>：清空所有输入字段（Document type、Bussines unit、User、Date）。</li>
+</ol>
+<h4 id="315-update-mode处理流程">3.1.5 Update Mode处理流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击Update Mode按钮。</li>
+<li><strong>前置处理</strong>：获取输入的内容数据（Document type、User、Date）。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
+<ul>
+<li>若Document type为空：
+<ul>
+<li>设置错误消息 = <code>Document type不能为空</code></li>
+<li><strong>终止</strong>流程，不调用API。</li>
+</ul>
+</li>
+<li>若Document type在表中不存在（API校验）：
+<ul>
+<li>设置错误消息 = <code>Document type does not exists. Please enter the correct content.</code></li>
+<li><strong>终止</strong>流程。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>API调用 (Backend Check)</strong>：
+<ul>
+<li>调用<code>UD20MarketDocumentSettingsApi</code>的<code>UD20-1UpdateHdocDocumentList</code>方法，传递参数doctype、user、date、market、setting，更新HDOC_DOCUMENT_LIST表数据。</li>
+</ul>
+</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：显示成功提示<code>更新成功</code>。</li>
+<li><strong>失败</strong>：显示错误消息<code>更新失败</code>。</li>
+</ul>
+</li>
+</ol>
 <h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
 <table>
 <thead>
@@ -136,87 +295,60 @@
 <th style="text-align:center">No.</th>
 <th style="text-align:center">检查时机</th>
 <th style="text-align:center">检查对象</th>
-<th style="text-align:center">检查条件</th>
-<th style="text-align:center">错误消息 (Message Content)</th>
+<th style="text-align:left">检查条件</th>
+<th style="text-align:left">错误消息 (Message Content)</th>
 <th style="text-align:center">动作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">进入画面时</td>
-<td style="text-align:center">文档类型数据获取</td>
-<td style="text-align:center">无法获取文档类型数据</td>
-<td style="text-align:center"><code>无法获取文档类型信息</code></td>
-<td style="text-align:center">显示错误消息</td>
+<td style="text-align:center">Update Mode按钮点击</td>
+<td style="text-align:center">Document type</td>
+<td style="text-align:left">Document type未选择</td>
+<td style="text-align:left"><code>Document type不能为空</code></td>
+<td style="text-align:center">显示错误消息，终止流程</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">Update Mode按钮点击</td>
+<td style="text-align:center">Document type</td>
+<td style="text-align:left">Document type在表中不存在</td>
+<td style="text-align:left"><code>Document type does not exists. Please enter the correct content.</code></td>
+<td style="text-align:center">显示错误消息，终止流程</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-ud20marketdocumentsettingsapi">4.1 UD20MarketDocumentSettingsApi </h3>
+<h3 id="41-ud20marketdocumentsettingsapi---ud20-1updatehdocdocumentlist">4.1 UD20MarketDocumentSettingsApi - UD20-1UpdateHdocDocumentList </h3>
+<p><strong>功能</strong>：更新HDOC_DOCUMENT_LIST表中的市场文档信息</p>
 <ul>
-<li><strong>功能</strong>：获取市场文档设置列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud20/getdocumentlist</code></li>
+<li><strong>Method</strong>：<code>POST</code></li>
+<li><strong>Endpoint</strong>：<code>/api/ud20-1/UpdateHdocDocumentList</code></li>
 </ul>
 <h4 id="request">Request </h4>
-<p>无</p>
-<h4 id="response-success-200">Response Success (200) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-            <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
-            <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取文档列表成功"</span><span class="token punctuation">,</span>
-            <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                <span class="token punctuation">{</span>
-                    <span class="token property">"doctype"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                    <span class="token property">"registerUser"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"registerDatetime"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-</code></pre><h5 id="响应字段说明">响应字段说明 </h5>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">字段名</th>
-<th style="text-align:left">类型</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">documentType</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">文档类型，来自HDOC_DOCUMENT_LIST.DOCTYPE，最大20字符</td>
-</tr>
-<tr>
-<td style="text-align:left">bussinesUnit</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">业务单元，固定显示'BU'或实际业务单元代码</td>
-</tr>
-<tr>
-<td style="text-align:left">user</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册用户，来自HDOC_DOCUMENT_LIST.REGISTER_USER，最大16字符，若为空显示'-'</td>
-</tr>
-<tr>
-<td style="text-align:left">date</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册日期时间，来自HDOC_DOCUMENT_LIST.REGISTER_DATETIME，格式：YYYY-MM-DD HH:mm:ss</td>
-</tr>
-</tbody>
-</table>
-<h4 id="response-error-400500">Response Error (400/500) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"No data found"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+  <span class="token property">"operation"</span><span class="token operator">:</span> <span class="token string">"UPDATE_HDOC_DOCUMENT_LIST"</span><span class="token punctuation">,</span>
+  <span class="token property">"doctype"</span><span class="token operator">:</span> <span class="token string">"string (文档类型，Update Mode时必须)"</span><span class="token punctuation">,</span>
+  <span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"string (注册用户)"</span><span class="token punctuation">,</span>
+  <span class="token property">"date"</span><span class="token operator">:</span> <span class="token string">"string (注册日期)"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"string (市场)"</span><span class="token punctuation">,</span>
+  <span class="token property">"setting"</span><span class="token operator">:</span> <span class="token string">"string (设置)"</span>
 <span class="token punctuation">}</span>
-</code></pre><p>或</p>
+</code></pre><h4 id="response-success-200">Response Success (200) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404">Response Error (404) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">404</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Document type does not exists. Please enter the correct content."</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-500">Response Error (500) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"系统错误，请稍后重试"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新失败"</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
@@ -229,39 +361,41 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>无法获取文档类型数据</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
-<td style="text-align:left"><code>无法获取文档类型信息</code></td>
+<td style="text-align:left"><strong>数据库连接失败</strong></td>
+<td style="text-align:left">记录错误日志，显示友好提示</td>
+<td style="text-align:left"><code>系统暂时不可用，请联系管理员</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>API调用失败</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
+<td style="text-align:left"><strong>API更新数据失败</strong></td>
+<td style="text-align:left">显示空状态提示</td>
+<td style="text-align:left"><code>文件类型不存在，请输入正确的内容</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>更新操作失败</strong></td>
+<td style="text-align:left">显示错误提示</td>
+<td style="text-align:left"><code>更新失败</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>网络断开/超时</strong></td>
+<td style="text-align:left">捕获网络异常，显示通用错误消息</td>
 <td style="text-align:left"><code>系统错误，请稍后重试</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
 <ol>
-<li><strong>状态管理</strong>：
+<li><strong>画面状态判断</strong>：页面加载时需要区分初期化场合和从Market Document Settings List返回的场合。</li>
+<li><strong>后画面返回处理</strong>：
 <ul>
-<li>使用 React State 管理 documentTypes, errorMessage, <code>isLoading</code>。</li>
-<li>确保DataTable按Key（DOCTYPE）字母顺序显示。</li>
+<li>Select按钮返回：接收数据并填充到表单。</li>
+<li>Back按钮返回：保持原有状态。</li>
 </ul>
 </li>
-<li><strong>安全性</strong>：
-<ul>
-<li>API 请求必须通过 HTTPS 发送。</li>
-<li>需要用户登录认证后才能访问。</li>
-</ul>
-</li>
-<li><strong>UI 细节</strong>：
-<ul>
-<li>DataTable 为只读展示，不提供任何编辑功能。</li>
-<li>Message 文字颜色建议使用红色 (<code>#ff4d4f</code>) 以起到警示作用。</li>
-</ul>
-</li>
+<li><strong>Search跳转</strong>：携带检索条件（可为空）跳转到Market Document Settings List画面。</li>
+<li><strong>Update Mode校验</strong>：Document type为必须输入项，且需要在表中存在。</li>
+<li><strong>Bussines unit固定值</strong>：该字段固定显示为'BU'。</li>
+<li><strong>Loading状态</strong>：Update Mode API调用期间建议显示加载提示，防止重复提交。</li>
 </ol>
-<hr>
 
       </div>
       

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>詳細設計UD22</title>
+      <title>詳細設計UD23</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="document-types详细设计说明书">Document Types详细设计说明书 </h1>
+<h1 id="下载打印快速指南页面-download-and-print-quick-guides-详细设计说明书">下载打印快速指南页面 (Download and Print Quick Guides) 详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">DES-Document Types-001</th>
+<th style="text-align:left">DES-DownloadAndPrintQuickGuides-023</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,24 +40,25 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Document Types</td>
+<td style="text-align:left">下载打印快速指南 (Download and Print Quick Guides)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-26</td>
+<td style="text-align:left">2026-05-20</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Qoder</td>
+<td style="text-align:left">AI Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块用于显示HDoc系统中可用的文档类型列表，包括文档类型的键值和描述。</p>
+<p>本模块提供快速指南（Quick Guides）文件的下载功能，文件内说明快速指南的打印方式与折页方法，为用户提供便捷的文档打印和折叠指导。</p>
 <ul>
-<li><strong>目标</strong>：向需要了解文档类型的业务人员和系统管理员提供文档类型列表展示功能。</li>
-<li><strong>安全性</strong>：需验证用户权限，确保只能访问授权的文档类型信息。</li>
-<li><strong>用户体验</strong>：提供清晰的文档类型列表展示，便于用户识别和选择合适的文档类型。</li>
+<li><strong>目标</strong>：提供快速指南文件的下载，以及打印和折叠操作指导。</li>
+<li><strong>面向用户</strong>：系统用户、需要打印快速指南的工作人员、操作人员。</li>
+<li><strong>用户体验</strong>：提供直观的下载链接、清晰的打印和折叠指导说明、便捷的操作方式。</li>
+<li><strong>安全性</strong>：确保文件下载的安全性、防止未授权的文件访问。</li>
 </ul>
 <h2 id="2-画面参数定义-screen-parameters">2. 画面参数定义 (Screen Parameters) </h2>
 <h3 id="21-控件属性表">2.1 控件属性表 </h3>
@@ -79,56 +80,98 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Key</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>Download and Print Quick Guides</strong></td>
+<td style="text-align:left">Link</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.DOCTYPE</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">下载快速指南链接</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Description</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>Volvo 3P Quick Guides</strong></td>
+<td style="text-align:left">Link</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Output</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">Volvo 3P快速指南链接</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>To print do the following</strong></td>
+<td style="text-align:left">Checkbox</td>
 <td style="text-align:center">-</td>
-<td style="text-align:left">数据源：HDOC_DOCUMENT_LIST.Description</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">打印操作说明复选框</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>To fold do the following</strong></td>
+<td style="text-align:left">Checkbox</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">折叠操作说明复选框</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>控件类型说明</strong>：</p>
+<p><strong>注</strong>：</p>
 <ul>
-<li>Output控件：TextField（Key、Description）</li>
+<li>本页面无后端API调用，所有功能在前端实现</li>
+<li>Link控件点击后触发文件下载，Checkbox控件用于显示操作说明</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在页面加载时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <h4 id="311-页面初始化流程">3.1.1 页面初始化流程 </h4>
 <ol>
-<li><strong>开始</strong>：用户进入Document Types画面。</li>
-<li><strong>前置处理</strong>：无</li>
-<li><strong>API 调用 (Backend Check)</strong>：</li>
-</ol>
+<li><strong>开始</strong>：页面加载。</li>
+<li><strong>前置处理</strong>：准备页面元素，显示下载链接和操作说明复选框。</li>
+<li><strong>结果处理</strong>：
 <ul>
-<li>调用<a href="..\..\..\..\api\ud20\getdocumentlist">UD20MarketDocumentSettingsApi</a></li>
+<li><strong>成功</strong>：显示下载链接和操作说明。</li>
+<li><strong>失败（文件不存在）</strong>：显示错误消息"快速指南文件不可用"。</li>
 </ul>
-<ol start="4">
-<li><strong>结果处理</strong>：</li>
+</li>
 </ol>
-<ul>
-<li><strong>成功</strong>：正常显示文档类型列表信息。</li>
-<li><strong>失败</strong>：显示相应错误消息并保持在当前页面。</li>
-</ul>
+<h4 id="312-快速指南下载流程">3.1.2 快速指南下载流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"Download and Print Quick Guides"链接。</li>
+<li>系统提供快速指南文件下载，文件包含打印方式与折页方法说明。</li>
+<li><strong>成功</strong>：浏览器下载文件。</li>
+<li><strong>失败</strong>：显示"文件下载失败，请稍后再试"。</li>
+</ol>
+<h4 id="313-volvo-3p快速指南下载流程">3.1.3 Volvo 3P快速指南下载流程 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击"Volvo 3P Quick Guides"链接。</li>
+<li>系统提供Volvo 3P快速指南文件下载。</li>
+<li><strong>结果处理</strong>：同快速指南下载。</li>
+</ol>
+<h4 id="314-打印指导功能">3.1.4 打印指导功能 </h4>
+<ol>
+<li><strong>开始</strong>：用户勾选"To print do the following"复选框。</li>
+<li>显示打印操作的详细说明。</li>
+</ol>
+<h4 id="315-折叠指导功能">3.1.5 折叠指导功能 </h4>
+<ol>
+<li><strong>开始</strong>：用户勾选"To fold do the following"复选框。</li>
+<li>显示折叠操作的详细说明。</li>
+</ol>
 <h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
 <table>
 <thead>
@@ -136,89 +179,33 @@
 <th style="text-align:center">No.</th>
 <th style="text-align:center">检查时机</th>
 <th style="text-align:center">检查对象</th>
-<th style="text-align:center">检查条件</th>
-<th style="text-align:center">错误消息 (Message Content)</th>
+<th style="text-align:left">检查条件</th>
+<th style="text-align:left">错误消息 (Message Content)</th>
 <th style="text-align:center">动作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">进入画面时</td>
-<td style="text-align:center">文档类型数据获取</td>
-<td style="text-align:center">无法获取文档类型数据</td>
-<td style="text-align:center"><code>无法获取文档类型信息</code></td>
+<td style="text-align:center">页面加载时</td>
+<td style="text-align:center">文件资源</td>
+<td style="text-align:left">文件不存在</td>
+<td style="text-align:left"><code>快速指南文件不可用</code></td>
+<td style="text-align:center">显示错误消息</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">文件下载时</td>
+<td style="text-align:center">文件访问</td>
+<td style="text-align:left">下载失败</td>
+<td style="text-align:left"><code>文件下载失败，请稍后再试</code></td>
 <td style="text-align:center">显示错误消息</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-ud20marketdocumentsettingsapi">4.1 UD20MarketDocumentSettingsApi </h3>
-<ul>
-<li><strong>功能</strong>：获取市场文档设置列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud20/getdocumentlist</code></li>
-</ul>
-<h4 id="request">Request </h4>
-<p>无</p>
-<h4 id="response-success-200">Response Success (200) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-            <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
-            <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"获取文档列表成功"</span><span class="token punctuation">,</span>
-            <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                <span class="token punctuation">{</span>
-                    <span class="token property">"doctype"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                    <span class="token property">"registerUser"</span><span class="token operator">:</span> <span class="token string">"xxx"</span><span class="token punctuation">,</span>
-                    <span class="token property">"registerDatetime"</span><span class="token operator">:</span> <span class="token string">"xxx"</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-</code></pre><h5 id="响应字段说明">响应字段说明 </h5>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">字段名</th>
-<th style="text-align:left">类型</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">documentType</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">文档类型，来自HDOC_DOCUMENT_LIST.DOCTYPE，最大20字符</td>
-</tr>
-<tr>
-<td style="text-align:left">bussinesUnit</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">业务单元，固定显示'BU'或实际业务单元代码</td>
-</tr>
-<tr>
-<td style="text-align:left">user</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册用户，来自HDOC_DOCUMENT_LIST.REGISTER_USER，最大16字符，若为空显示'-'</td>
-</tr>
-<tr>
-<td style="text-align:left">date</td>
-<td style="text-align:left">String</td>
-<td style="text-align:left">注册日期时间，来自HDOC_DOCUMENT_LIST.REGISTER_DATETIME，格式：YYYY-MM-DD HH:mm:ss</td>
-</tr>
-</tbody>
-</table>
-<h4 id="response-error-400500">Response Error (400/500) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"No data found"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
-<span class="token punctuation">}</span>
-</code></pre><p>或</p>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"系统错误，请稍后重试"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
-<span class="token punctuation">}</span>
-</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<p>本模块无API接口定义。文件下载通过前端直接访问静态文件资源实现。</p>
+<h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
 <thead>
 <tr>
@@ -229,37 +216,33 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>无法获取文档类型数据</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
-<td style="text-align:left"><code>无法获取文档类型信息</code></td>
+<td style="text-align:left"><strong>文件下载失败</strong></td>
+<td style="text-align:left">显示系统错误消息</td>
+<td style="text-align:left"><code>文件下载失败，请稍后再试</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>API调用失败</strong></td>
-<td style="text-align:left">显示错误消息，保持当前页面</td>
-<td style="text-align:left"><code>系统错误，请稍后重试</code></td>
+<td style="text-align:left"><strong>文件不存在</strong></td>
+<td style="text-align:left">显示错误消息</td>
+<td style="text-align:left"><code>快速指南文件不可用</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>网络断开</strong></td>
+<td style="text-align:left">捕获网络异常</td>
+<td style="text-align:left"><code>文件下载失败，请稍后再试</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
 <ol>
-<li><strong>状态管理</strong>：
+<li><strong>文件下载</strong>：链接指向静态文件资源，点击后直接触发浏览器下载。</li>
+<li><strong>Checkbox控件</strong>：勾选后展开显示对应的操作说明文本，取消勾选则隐藏。</li>
+<li><strong>UI细节</strong>：
 <ul>
-<li>使用 React State 管理 documentTypes, errorMessage, <code>isLoading</code>。</li>
-<li>确保DataTable按Key（DOCTYPE）字母顺序显示。</li>
+<li>链接以蓝色可点击文字显示。</li>
+<li>Checkbox勾选后显示对应的说明内容，可通过条件渲染实现展开/折叠效果。</li>
 </ul>
 </li>
-<li><strong>安全性</strong>：
-<ul>
-<li>API 请求必须通过 HTTPS 发送。</li>
-<li>需要用户登录认证后才能访问。</li>
-</ul>
-</li>
-<li><strong>UI 细节</strong>：
-<ul>
-<li>DataTable 为只读展示，不提供任何编辑功能。</li>
-<li>Message 文字颜色建议使用红色 (<code>#ff4d4f</code>) 以起到警示作用。</li>
-</ul>
-</li>
+<li><strong>无API调用</strong>：本模块不涉及后端API，所有资源为静态文件。</li>
 </ol>
 <hr>
 
