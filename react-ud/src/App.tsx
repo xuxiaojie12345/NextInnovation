@@ -17,6 +17,15 @@ import HDocTemplateCheck from "./HDocTemplateCheck/HDocTemplateCheck";
 import ListTemplates from "./ListTemplates/ListTemplates";
 import VinPlate from "./VinPlate/VinPlate";
 import ADChange from "./ADChange/ADChange";
+import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
+import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
+import SearchUser from "./SearchUser/SearchUser";
+import MarketDocumentSettings from "./MarketDocumentSettings/MarketDocumentSettings";
+import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocumentSettingsList";
+import HDocHelp from "./HDocHelp/HDocHelp";
+import MarketsInHDoc from "./MarketsInHDoc/MarketsInHDoc";
+import DocumentTypes from "./DocumentTypes/DocumentTypes";
+import DownloadPrintQuickGuides from "./DownloadPrintQuickGuides/DownloadPrintQuickGuides";
 
 function App() {
   return (
@@ -43,6 +52,15 @@ function App() {
               <Route path='ListTemplates' element={<ListTemplates />} />
               <Route path='VinPlate' element={<VinPlate />} />
               <Route path='ADCAChange' element={<ADChange />} />
+              <Route path='HDocUserAdministration' element={<HDocUserAdministration />} />
+              <Route path='HDocUserDocAdministration' element={<HDocUserDocAdministration />} />
+              <Route path='SearchUser' element={<SearchUser />} />
+              <Route path='MarketDocumentSettings' element={<MarketDocumentSettings />} />
+              <Route path='MarketDocumentSettingsList' element={<MarketDocumentSettingsList />} />
+              <Route path='UserGuide' element={<HDocHelp />} />
+              <Route path='MarketsInHDoc' element={<MarketsInHDoc />} />
+              <Route path='DocumentTypes' element={<DocumentTypes />} />
+              <Route path='DownloadAndPrintQuickGuides' element={<DownloadPrintQuickGuides />} />
             </Route>
           </Routes>
         </div>

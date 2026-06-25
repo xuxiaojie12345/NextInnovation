@@ -11,7 +11,7 @@
     </select>
 
     <select id="selectFunctionAuth" resultType="java.util.LinkedHashMap">
-        SELECT FUNCTION, USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+        SELECT `FUNCTION`, USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
     </select>
 
     <select id="selectMarketAuth" resultType="java.util.LinkedHashMap">
@@ -19,27 +19,30 @@
         WHERE USERID = #{userid}
     </select>
 
-    <update id="updateMarketAuth">
-        UPDATE HDOC_MARKET_AUTH
-        SET USERID = #{userid}, MARKET = #{market}, TYPE = #{type}, BU = #{bu},
-            UPDATE_DATETIME = NOW(), UPDATE_USER = #{updateUser}, UPDATE_PROCESS = #{updateProcess}
-        WHERE USERID = #{userid} AND MARKET = #{market} AND TYPE = #{type} AND BU = #{bu}
-    </update>
-
-    <update id="updateFunctionAuth">
-        UPDATE HDOC_FUNCTION_AUTH
-        SET FUNCTION = #{function}, USERID = #{userid},
-            UPDATE_DATETIME = NOW(), UPDATE_USER = #{updateUser}, UPDATE_PROCESS = #{updateProcess}
-        WHERE FUNCTION = #{function} AND USERID = #{userid}
-    </update>
-
-    <delete id="deleteMarketAuth">
-        DELETE FROM HDOC_MARKET_AUTH
-        WHERE USERID = #{userid} AND MARKET = #{market} AND TYPE = #{type} AND BU = #{bu}
+    <delete id="deleteAllFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
     </delete>
 
-    <delete id="deleteFunctionAuth">
-        DELETE FROM HDOC_FUNCTION_AUTH WHERE FUNCTION = #{function} AND USERID = #{userid}
+    <delete id="deleteAllMarketAuth">
+        DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userid}
     </delete>
+
+    <insert id="insertFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH (`FUNCTION`, USERID,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{function}, #{userid},
+            NOW(), #{registerUser}, #{registerProcess},
+            NOW(), #{registerUser}, #{registerProcess})
+    </insert>
+
+    <insert id="insertMarketAuth">
+        INSERT INTO HDOC_MARKET_AUTH (USERID, MARKET, `TYPE`, BU,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{market}, #{type}, #{bu},
+            NOW(), #{registerUser}, #{registerProcess},
+            NOW(), #{registerUser}, #{registerProcess})
+    </insert>
 
 </mapper>

@@ -23,17 +23,21 @@
     <select id="searchByRule" resultType="java.util.LinkedHashMap">
         SELECT u.USERID, u.USERNAME, a.MARKET
         FROM HDOC_USER_INFOR u
+        INNER JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID AND f.`FUNCTION` = 'Rule Admin'
         LEFT JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
-        WHERE u.RESPONSIBLE = 'Rule'
-        <if test="market != null and market != ''"> AND a.MARKET = #{market}</if>
+        <where>
+            <if test="market != null and market != ''">a.MARKET = #{market}</if>
+        </where>
     </select>
 
     <select id="searchByTemplate" resultType="java.util.LinkedHashMap">
         SELECT u.USERID, u.USERNAME, a.MARKET
         FROM HDOC_USER_INFOR u
+        INNER JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID AND f.`FUNCTION` = 'Template Admin'
         LEFT JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
-        WHERE u.RESPONSIBLE = 'Template'
-        <if test="market != null and market != ''"> AND a.MARKET = #{market}</if>
+        <where>
+            <if test="market != null and market != ''">a.MARKET = #{market}</if>
+        </where>
     </select>
 
     <select id="searchAllUsers" resultType="java.util.LinkedHashMap">

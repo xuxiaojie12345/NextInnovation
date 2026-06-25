@@ -32,12 +32,16 @@ public class UD17ServiceImpl implements UD17Service {
             case "updateRole":
                 return handleUpdateRole(userid, request);
             case "deleteRole":
-                return handleDeleteRole(userid, request);
+                return handleDeleteRole(userid);
             default:
                 throw new IllegalArgumentException("Unknown operation: " + request.getOperation());
         }
     }
 
+    /**
+     * User Info处理
+     * 查询用户名（HDOC_USER_INFOR），以及功能权限（HDOC_FUNCTION_AUTH）和市场权限（DOC_MARKET_AUTH）
+     */
     private Map<String, Object> handleUserInfo(String userid) {
         Map<String, Object> result = new LinkedHashMap<>();
         // 查询用户名
@@ -55,6 +59,10 @@ public class UD17ServiceImpl implements UD17Service {
         return result;
     }
 
+    /**
+     * Update Role处理
+     * 先删除既存数据，后追加新的数据（DELETE + INSERT）
+     */
     private Map<String, Object> handleUpdateRole(String userid, UD17Request request) {
         Map<String, Object> result = new LinkedHashMap<>();
         // 检查用户是否存在
@@ -65,18 +73,23 @@ public class UD17ServiceImpl implements UD17Service {
             return result;
         }
 
-        // 更新市场权限
-        if (request.getMarkets() != null) {
-            for (Map<String, String> market : request.getMarkets()) {
-                ud17Mapper.updateMarketAuth(userid, market.get("market"), market.get("type"),
-                        market.get("bu"), request.getUpdateUser(), request.getUpdateProcess());
+        // 1. 先删除该用户的全部既有权限
+        ud17Mapper.deleteAllFunctionAuth(userid);
+        ud17Mapper.deleteAllMarketAuth(userid);
+
+        // 2. 再追加新的功能权限记录
+        if (request.getFunctions() != null) {
+            for (String func : request.getFunctions()) {
+                ud17Mapper.insertFunctionAuth(func, userid,
+                        request.getUpdateUser(), request.getUpdateProcess());
             }
         }
 
-        // 更新功能权限
-        if (request.getFunctions() != null) {
-            for (String func : request.getFunctions()) {
-                ud17Mapper.updateFunctionAuth(func, userid, request.getUpdateUser(), request.getUpdateProcess());
+        // 3. 再追加新的市场权限记录
+        if (request.getMarkets() != null) {
+            for (Map<String, String> market : request.getMarkets()) {
+                ud17Mapper.insertMarketAuth(userid, market.get("market"), market.get("type"),
+                        market.get("bu"), request.getUpdateUser(), request.getUpdateProcess());
             }
         }
 
@@ -85,19 +98,15 @@ public class UD17ServiceImpl implements UD17Service {
         return result;
     }
 
-    private Map<String, Object> handleDeleteRole(String userid, UD17Request request) {
-        // 删除市场权限
-        if (request.getMarkets() != null) {
-            for (Map<String, String> market : request.getMarkets()) {
-                ud17Mapper.deleteMarketAuth(userid, market.get("market"), market.get("type"), market.get("bu"));
-            }
-        }
-        // 删除功能权限
-        if (request.getFunctions() != null) {
-            for (String func : request.getFunctions()) {
-                ud17Mapper.deleteFunctionAuth(func, userid);
-            }
-        }
+    /**
+     * Delete Role处理
+     * 根据userid删除该用户的所有权限（DOC_MARKET_AUTH, HDOC_FUNCTION_AUTH）
+     */
+    private Map<String, Object> handleDeleteRole(String userid) {
+        // 删除该用户的所有市场权限
+        ud17Mapper.deleteAllMarketAuth(userid);
+        // 删除该用户的所有功能权限
+        ud17Mapper.deleteAllFunctionAuth(userid);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("success", true);

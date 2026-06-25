@@ -1,0 +1,203 @@
+/**
+ * HDocUserDocAdministration 组件样式 - HDoc用户文档管理页面（UD18）
+ * 对应详细设计：详细设计/詳細設計UD18.md
+ * 风格参照 UD17 经典样式
+ */
+
+/* 页面容器 - 经典白底全宽布局 */
+.ud18-container {
+  padding: 20px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 页面标题 - 蓝色下边框 */
+.ud18-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+
+/* 加载提示 */
+.ud18-loading {
+  padding: 12px 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+/* 消息提示 */
+.ud18-message {
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-bottom: 12px;
+  text-align: left;
+  display: inline-block;
+  max-width: fit-content;
+}
+
+.ud18-message.error {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.ud18-message.success {
+  background-color: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+/* 按钮栏 - 浅蓝背景工具栏 */
+.ud18-btn-group {
+  display: flex;
+  gap: 5px;
+  padding: 8px 20px;
+  margin: 0 0 15px 0;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+}
+
+/* 通用按钮样式 */
+.ud18-btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: normal;
+  color: #333333;
+  background-color: #d0ddf0;
+  border: 1px solid #8da0c0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ud18-btn:hover {
+  background-color: #c0d0e5;
+}
+
+.ud18-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 表单容器 - 带边框 */
+.ud18-form {
+  border: 1px solid #b0c4de;
+  padding: 0 20px 15px 20px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* 表单字段行 */
+.ud18-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.ud18-label {
+  width: 140px;
+  text-align: left;
+  font-size: 14px;
+  color: #000000;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.ud18-input {
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid #cccccc;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+/* UserID 输入框缩短 */
+.ud18-input-short {
+  width: 160px;
+  flex: none;
+}
+
+/* 行内按钮（与输入框同行） */
+.ud18-btn-inline {
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* 底部按钮容器（居中） */
+.ud18-btn-bottom {
+  padding-top: 12px;
+  text-align: center;
+}
+
+.ud18-input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* 用户名显示 */
+.ud18-user-label {
+  padding: 10px 0 4px 0;
+  font-size: 14px;
+  color: #333333;
+}
+
+.ud18-user-label strong {
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Document 多选下拉列表 - 原生多选样式 */
+.ud18-multiselect {
+  flex: 1;
+  height: 120px;
+  padding: 4px;
+  border: 1px solid #cccccc;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.ud18-multiselect:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.ud18-multiselect option {
+  padding: 3px 6px;
+}
+
+.ud18-multiselect option:checked {
+  background-color: #d0ddf0;
+  color: #000000;
+}
+
+
+
+/* 响应式适配 */
+@media (max-width: 600px) {
+  .ud18-field {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ud18-label {
+    width: auto;
+  }
+
+  .ud18-multiselect {
+    height: 100px;
+  }
+}

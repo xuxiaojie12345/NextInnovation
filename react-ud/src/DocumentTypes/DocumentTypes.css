@@ -1,0 +1,113 @@
+/**
+ * DocumentTypes 组件样式 - 文档类型列表页面（UD22）
+ * 对应详细设计：详细设计/詳細設計UD22.md
+ * 风格与 HomologationVariables 保持一致
+ */
+
+/* 页面容器 */
+.ud22-container {
+  padding: 20px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* 页面标题 */
+.ud22-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+
+/* 消息提示 */
+.ud22-message {
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-bottom: 12px;
+  text-align: left;
+  display: inline-block;
+  max-width: fit-content;
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+/* 加载提示 */
+.ud22-loading {
+  padding: 12px 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+/* 表格容器 */
+.ud22-table-wrapper {
+  width: 100%;
+  max-width: 700px;
+  overflow-x: auto;
+  border: 1px solid #b0c4de;
+}
+
+/* 数据表格 */
+.ud22-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ud22-table thead th {
+  padding: 8px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333333;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+  white-space: nowrap;
+}
+
+.ud22-table tbody td {
+  padding: 8px 16px;
+  color: #333333;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.ud22-table tbody tr:hover {
+  background-color: #f0f4ff;
+}
+
+.ud22-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 空数据行 */
+.ud22-empty-row {
+  text-align: center;
+  padding: 24px 12px !important;
+  color: #999999;
+}
+
+/* ========== 响应式适配 ========== */
+
+@media (max-width: 768px) {
+  .ud22-container {
+    padding: 12px;
+  }
+
+  .ud22-table-wrapper {
+    max-width: 100%;
+  }
+
+  .ud22-table thead th,
+  .ud22-table tbody td {
+    padding: 6px 10px;
+  }
+}

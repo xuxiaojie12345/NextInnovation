@@ -1,0 +1,214 @@
+/**
+ * HDocHelp 组件样式 - HDoc帮助页面（UD24）
+ * 对应详细设计：详细设计/詳細設計UD24.md
+ * 风格参照 Login 经典样式 + 页面设计描述.txt 通用风格
+ */
+
+/* 页面容器 - 白色卡片居中 */
+.ud24-container {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 30px 36px 36px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* 页面标题 - 居中 */
+.ud24-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #1890ff;
+}
+
+/* 错误消息提示 */
+.ud24-message {
+  padding: 7px 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+}
+
+/* 内容区块 */
+.ud24-section {
+  margin-bottom: 24px;
+}
+
+/* 区块标题 */
+.ud24-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 导航链接列表 */
+.ud24-link-list {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 导航链接项 */
+.ud24-link-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ud24-link-item:last-child {
+  border-bottom: none;
+}
+
+.ud24-link-item:hover {
+  background-color: #e6f7ff;
+}
+
+/* 导航链接文字（蓝色可点击） */
+.ud24-link-text {
+  color: #1890ff;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.ud24-link-item:hover .ud24-link-text {
+  color: #40a9ff;
+}
+
+/* 导航箭头 */
+.ud24-link-arrow {
+  color: #999999;
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+
+.ud24-link-item:hover .ud24-link-arrow {
+  transform: translateX(4px);
+}
+
+/* Checkbox 行 */
+.ud24-checkbox-row {
+  margin-bottom: 8px;
+}
+
+/* Checkbox 标签 */
+.ud24-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333333;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Checkbox 控件 */
+.ud24-checkbox {
+  margin: 0;
+  cursor: pointer;
+  accent-color: #1890ff;
+}
+
+/* Other Information 内容区域 */
+.ud24-other-info {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #fafafa;
+  animation: ud24-fadeIn 0.3s ease;
+}
+
+/* 信息内容 */
+.ud24-info-content {
+  font-size: 13px;
+  color: #666666;
+  line-height: 1.8;
+}
+
+.ud24-info-content p {
+  margin: 0;
+}
+
+.ud24-info-content strong {
+  color: #333333;
+}
+
+/* 底部固定信息区域 */
+.ud24-footer {
+  margin-top: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.ud24-footer-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ud24-footer-label {
+  width: 120px;
+  color: #888888;
+  flex-shrink: 0;
+}
+
+.ud24-footer-value {
+  color: #333333;
+}
+
+.ud24-footer-copyright {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e8e8e8;
+  font-size: 12px;
+  color: #999999;
+  text-align: center;
+}
+
+/* 淡入动画 */
+@keyframes ud24-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== 响应式适配 ========== */
+
+@media (max-width: 768px) {
+  .ud24-container {
+    margin: 20px 12px;
+    padding: 20px 16px 24px;
+  }
+
+  .ud24-link-item {
+    padding: 10px 12px;
+  }
+
+  .ud24-link-text {
+    font-size: 13px;
+  }
+}

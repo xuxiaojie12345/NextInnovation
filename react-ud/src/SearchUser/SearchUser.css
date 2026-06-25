@@ -1,0 +1,336 @@
+/**
+ * SearchUser 组件样式 - 多条件用户搜索页面（UD19）
+ * 对应详细设计：详细设计/詳細設計UD19.md
+ * 风格参照 Login 经典样式 + 页面设计描述.txt 通用风格
+ */
+
+/* 页面容器 - 浅灰背景居中 */
+.ud19-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px 36px 36px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* 页面标题 - 居中，下边框分割线 */
+.ud19-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 支持信息区域 */
+.ud19-support-info {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.ud19-support-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #666666;
+  line-height: 1.6;
+}
+
+/* 消息提示 */
+.ud19-message {
+  padding: 7px 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+}
+
+/* 表单区域 */
+.ud19-form {
+  border: 1px solid #e8e8e8;
+  padding: 20px 20px 24px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+/* 表单字段行 */
+.ud19-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* 字段标签 */
+.ud19-label {
+  width: 100px;
+  text-align: left;
+  font-size: 13px;
+  color: #666666;
+  flex-shrink: 0;
+}
+
+/* 文本输入框 */
+.ud19-input {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333333;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.ud19-input:focus {
+  border-color: #1890ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ud19-input::placeholder {
+  color: #bfbfbf;
+}
+
+.ud19-input:disabled {
+  background-color: #f5f5f5;
+  color: #bbbbbb;
+  cursor: not-allowed;
+}
+
+/* 下拉选择框 */
+.ud19-select {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.ud19-select:focus {
+  border-color: #1890ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ud19-select:disabled {
+  background-color: #f5f5f5;
+  color: #bbbbbb;
+  cursor: not-allowed;
+}
+
+/* 单选按钮组容器 */
+.ud19-radio-group {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* 单选按钮标签 */
+.ud19-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #333333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ud19-radio-label:hover {
+  color: #1890ff;
+}
+
+/* 单选按钮 */
+.ud19-radio {
+  margin: 0;
+  cursor: pointer;
+  accent-color: #1890ff;
+}
+
+.ud19-radio:disabled {
+  cursor: not-allowed;
+}
+
+/* 按钮行 - 居中 */
+.ud19-btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 通用按钮样式 */
+.ud19-btn {
+  height: 34px;
+  padding: 0 24px;
+  min-width: 80px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.ud19-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 主按钮 - 蓝色 */
+.ud19-btn-primary {
+  color: #ffffff;
+  background-color: #1890ff;
+  border: 1px solid #1890ff;
+}
+
+.ud19-btn-primary:hover:not(:disabled) {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ud19-btn-primary:active:not(:disabled) {
+  background-color: #096dd9;
+  border-color: #096dd9;
+}
+
+/* 默认按钮 - 白色灰边框 */
+.ud19-btn-default {
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+}
+
+.ud19-btn-default:hover:not(:disabled) {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ud19-btn-default:active:not(:disabled) {
+  color: #096dd9;
+  border-color: #096dd9;
+}
+
+/* ========== 搜索结果区域 ========== */
+
+.ud19-result-section {
+  margin-top: 20px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 结果头部 - 显示COUNT */
+.ud19-result-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ud19-count-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+}
+
+/* 表格容器 - 支持横向滚动 */
+.ud19-table-wrapper {
+  overflow-x: auto;
+}
+
+/* 搜索结果表格 */
+.ud19-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ud19-table thead th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333333;
+  background-color: #fafafa;
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.ud19-table tbody td {
+  padding: 8px 12px;
+  color: #333333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ud19-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+.ud19-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 空结果提示 */
+.ud19-empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #999999;
+}
+
+/* ========== 响应式适配 ========== */
+
+@media (max-width: 768px) {
+  .ud19-container {
+    margin: 20px 12px;
+    padding: 20px 16px 24px;
+  }
+
+  .ud19-form {
+    padding: 16px 12px 20px;
+  }
+
+  .ud19-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .ud19-label {
+    width: auto;
+  }
+
+  .ud19-radio-group {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ud19-btn-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ud19-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}

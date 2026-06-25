@@ -17,15 +17,14 @@ public interface UD17Mapper {
 
     List<Map<String, Object>> selectMarketAuth(@Param("userid") String userid);
 
-    int updateMarketAuth(@Param("userid") String userid, @Param("market") String market,
+    int deleteAllFunctionAuth(@Param("userid") String userid);
+
+    int deleteAllMarketAuth(@Param("userid") String userid);
+
+    int insertFunctionAuth(@Param("function") String function, @Param("userid") String userid,
+                           @Param("registerUser") String registerUser, @Param("registerProcess") String registerProcess);
+
+    int insertMarketAuth(@Param("userid") String userid, @Param("market") String market,
                          @Param("type") String type, @Param("bu") String bu,
-                         @Param("updateUser") String updateUser, @Param("updateProcess") String updateProcess);
-
-    int updateFunctionAuth(@Param("function") String function, @Param("userid") String userid,
-                           @Param("updateUser") String updateUser, @Param("updateProcess") String updateProcess);
-
-    int deleteMarketAuth(@Param("userid") String userid, @Param("market") String market,
-                         @Param("type") String type, @Param("bu") String bu);
-
-    int deleteFunctionAuth(@Param("function") String function, @Param("userid") String userid);
+                         @Param("registerUser") String registerUser, @Param("registerProcess") String registerProcess);
 }
