@@ -145,8 +145,11 @@ const HomologationVariablesResultList: React.FC = () => {
         })),
       });
       if (res.code === 200) {
+        // 从本地结果中移除已删除的记录
+        const remaining = results.filter((_, i) => !selectedIds.has(i));
+        setResults(remaining);
         setSelectedIds(new Set());
-        alert('Records deleted successfully.');
+        setErrorMessage('');
       } else {
         setErrorMessage(res.message || 'Failed to delete records.');
       }

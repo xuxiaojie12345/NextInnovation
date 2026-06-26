@@ -10,7 +10,7 @@ interface UserRecord {
   market: string;
 }
 
-type PermissionFilter = '' | 'Rule Admin' | 'Template Admin';
+type PermissionFilter = '' | 'R' | 'T';
 
 const SearchUser: React.FC = () => {
   const location = useLocation();
@@ -114,53 +114,55 @@ const SearchUser: React.FC = () => {
             disabled={isLoading}
           />
         </div>
-        <div className="su-row">
-          <span className="su-label">Market</span>
-          <select
-            className="su-input su-select"
-            value={market}
-            onChange={(e) => setMarket(e.target.value)}
-            disabled={isLoading}
-          >
-            <option value="">-- Select --</option>
-            {markets.map((m) => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-        </div>
-        <div className="su-row">
-          <span className="su-label">Permission</span>
-          <div className="su-radio-group">
-            <label className="su-radio-label">
-              <input
-                type="radio"
-                name="permission"
-                checked={permissionFilter === ''}
-                onChange={() => setPermissionFilter('')}
-                disabled={isLoading}
-              />
-              <span>Not set</span>
-            </label>
-            <label className="su-radio-label">
-              <input
-                type="radio"
-                name="permission"
-                checked={permissionFilter === 'Rule Admin'}
-                onChange={() => setPermissionFilter('Rule Admin')}
-                disabled={isLoading}
-              />
-              <span>Rule</span>
-            </label>
-            <label className="su-radio-label">
-              <input
-                type="radio"
-                name="permission"
-                checked={permissionFilter === 'Template Admin'}
-                onChange={() => setPermissionFilter('Template Admin')}
-                disabled={isLoading}
-              />
-              <span>Template</span>
-            </label>
+        <div className="su-row su-row-market-perm">
+          <div className="su-market-section">
+            <span className="su-label">Market</span>
+            <select
+              className="su-market-listbox"
+              size={Math.max(markets.length, 3)}
+              value={market}
+              onChange={(e) => setMarket(e.target.value)}
+              disabled={isLoading}
+            >
+              {markets.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+          <div className="su-perm-section">
+            {/* <span className="su-label">Permission</span> */}
+            <div className="su-perm-group">
+              <label className="su-radio-label">
+                <input
+                  type="radio"
+                  name="permission"
+                  checked={permissionFilter === ''}
+                  onChange={() => setPermissionFilter('')}
+                  disabled={isLoading}
+                />
+                <span>Not set</span>
+              </label>
+              <label className="su-radio-label">
+                <input
+                  type="radio"
+                  name="permission"
+                  checked={permissionFilter === 'R'}
+                  onChange={() => setPermissionFilter('R')}
+                  disabled={isLoading}
+                />
+                <span>Rule</span>
+              </label>
+              <label className="su-radio-label">
+                <input
+                  type="radio"
+                  name="permission"
+                  checked={permissionFilter === 'T'}
+                  onChange={() => setPermissionFilter('T')}
+                  disabled={isLoading}
+                />
+                <span>Template</span>
+              </label>
+            </div>
           </div>
         </div>
         <div className="su-btn-row">

@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .su-container {
-  width: 80%;
+  width: 70%;
   padding: 0;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #acb7ee;
@@ -33,6 +33,10 @@
 
 .su-form {
   padding: 8px 10px;
+  border: 1.5px solid #acb7ee;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  width: 500px;
 }
 
 .su-row {
@@ -79,17 +83,65 @@
   min-width: 200px;
 }
 
-.su-radio-group {
+/* ── Market 与 Permission 并排 ── */
+.su-row-market-perm {
   display: flex;
-  gap: 16px;
-  align-items: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 6px 0;
+}
+
+.su-market-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.su-market-listbox {
+  padding: 2px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  min-width: 80px;
+  width: 65px;
+  height: auto;
+}
+
+.su-market-listbox:focus {
+  outline: none;
+  border-color: #002060;
+}
+
+.su-market-listbox:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.su-market-listbox option {
+  padding: 2px 4px;
+}
+
+.su-perm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 100px;
+}
+
+.su-perm-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .su-radio-label {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 14px;
   color: #333;
   cursor: pointer;
 }
@@ -97,10 +149,19 @@
 .su-radio-label input[type="radio"] {
   margin: 0;
   cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 
 .su-btn-row {
-  padding: 8px 0;
+  background-color: #f1f3ff;
+  /* border: 2px solid #acb7ee; */
+  border-left: none;
+  border-right: none;
+  padding: 8px 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  text-align: left;
 }
 
 .su-table-section {
@@ -114,13 +175,49 @@
 }
 
 .su-table th {
-  background-color: #002060;
-  color: #ffffff;
-  padding: 5px 8px;
+  padding: 6px 8px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 12px;
-  border: 1px solid #9fb6d4;
+  color: #00006d;
+  border: none;
+}
+
+.su-table td {
+  padding: 4px 8px;
+  color: #333;
+  font-size: 12px;
+  text-align: left;
+  vertical-align: middle;
+  border: 1px solid #a7b2ec;
+}
+
+.su-table tbody tr:first-child td {
+  border-top: none;
+}
+
+.su-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.su-table tbody td:first-child {
+  border-left: none;
+}
+
+.su-table tbody td:last-child {
+  border-right: none;
+}
+
+.su-table tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+.su-table tbody tr:nth-child(even) td {
+  background-color: #f1f3ff;
+}
+
+.su-table tbody tr:hover td {
+  background-color: #e0e8ff;
 }
 
 .su-table td {

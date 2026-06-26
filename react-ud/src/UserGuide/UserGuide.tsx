@@ -11,7 +11,7 @@ interface HelpLink {
 }
 
 const HELP_LINKS: HelpLink[] = [
-  { label: 'HDoc Quick Guide', path: '/menu/guide-user/quick-guide' },
+  { label: 'HDoc Quick Guide', path: '/menu/quick-guides' },
   { label: 'List of document types.', path: '/menu/document-types' },
   { label: 'Markets in Hdoc', path: '/menu/markets-in-hdoc' },
   { label: 'HDoc - Market Document Setting', path: '/menu/market-document-setting' },

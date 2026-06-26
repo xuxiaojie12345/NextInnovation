@@ -118,6 +118,16 @@
   font-size: 16px;
 }
 
+/* ── 印刷時：メニューを非表示 ── */
+@media print {
+  .menu-sidebar {
+    display: none !important;
+  }
+  .sidebar-footer {
+    display: none !important;
+  }
+}
+
 .user-name {
   font-size: 13px;
   color: #333;

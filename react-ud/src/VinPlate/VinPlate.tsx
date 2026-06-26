@@ -65,37 +65,60 @@ const VinPlate: React.FC = () => {
     return { serie: trimmed, chnr: '' };
   };
 
-  // ── 解析 XML_DOC（简单XML解析） ──
-  const parseXmlDoc = (xmlStr: string) => {
+  // ── 解析 XML_DOC（JSON / XML 両対応） ──
+  const parseXmlDoc = (rawStr: string) => {
     const items: PrintItem[] = [];
     const vpDataItems: VpDataItem[] = [];
 
     try {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlStr, 'text/xml');
+      // First try JSON parse (data is stored as JSON)
+      const json = JSON.parse(rawStr);
 
-      // Parse PrintItemName elements
-      const printItemElements = xmlDoc.getElementsByTagName('PrintItemName');
-      for (let i = 0; i < printItemElements.length; i++) {
-        const el = printItemElements[i];
-        items.push({
-          name: el.textContent || '',
-          value: el.getAttribute('value') || '',
+      // Parse "Print items" array
+      if (json['Print items'] && Array.isArray(json['Print items'])) {
+        json['Print items'].forEach((pi: any) => {
+          items.push({
+            name: pi.PrintItemName || '',
+            value: pi.value || '',
+          });
         });
       }
 
-      // Parse Variant elements
-      const variantElements = xmlDoc.getElementsByTagName('Variant');
-      for (let i = 0; i < variantElements.length; i++) {
-        const el = variantElements[i];
-        vpDataItems.push({
-          variantName: el.getAttribute('name') || '',
-          value: el.textContent || '',
+      // Parse "VP Data" object
+      if (json['VP Data']) {
+        Object.entries(json['VP Data']).forEach(([key, val]) => {
+          vpDataItems.push({
+            variantName: key,
+            value: String(val ?? ''),
+          });
         });
       }
     } catch {
-      // If XML parsing fails, show raw text
-      items.push({ name: 'Raw XML', value: xmlStr });
+      // Fallback: try XML parse
+      try {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(rawStr, 'text/xml');
+
+        const printItemElements = xmlDoc.getElementsByTagName('PrintItemName');
+        for (let i = 0; i < printItemElements.length; i++) {
+          const el = printItemElements[i];
+          items.push({
+            name: el.textContent || '',
+            value: el.getAttribute('value') || '',
+          });
+        }
+
+        const variantElements = xmlDoc.getElementsByTagName('Variant');
+        for (let i = 0; i < variantElements.length; i++) {
+          const el = variantElements[i];
+          vpDataItems.push({
+            variantName: el.getAttribute('name') || '',
+            value: el.textContent || '',
+          });
+        }
+      } catch {
+        items.push({ name: 'Raw Data', value: rawStr });
+      }
     }
 
     setPrintItems(items);
@@ -268,22 +291,14 @@ const VinPlate: React.FC = () => {
           {printItems.length > 0 && (
             <div className="vp-xml-section">
               <h3 className="vp-xml-title">Print items</h3>
-              <table className="vp-xml-table">
-                <thead>
-                  <tr>
-                    <th>Item Name</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {printItems.map((item, idx) => (
-                    <tr key={idx}>
-                      <td>{item.name}</td>
-                      <td>{item.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="vp-xml-list">
+                {printItems.map((item, idx) => (
+                  <div className="vp-xml-item" key={idx}>
+                    <span className="vp-xml-item-name">{item.name}</span>
+                    <span className="vp-xml-item-value">{item.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -291,22 +306,14 @@ const VinPlate: React.FC = () => {
           {vpData.length > 0 && (
             <div className="vp-xml-section">
               <h3 className="vp-xml-title">VP Data</h3>
-              <table className="vp-xml-table">
-                <thead>
-                  <tr>
-                    <th>Variant Name</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vpData.map((item, idx) => (
-                    <tr key={idx}>
-                      <td>{item.variantName}</td>
-                      <td>{item.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="vp-xml-list">
+                {vpData.map((item, idx) => (
+                  <div className="vp-xml-item" key={idx}>
+                    <span className="vp-xml-item-name">{item.variantName}</span>
+                    <span className="vp-xml-item-value">{item.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

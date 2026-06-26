@@ -247,31 +247,27 @@ const ExistingHDocVariables: React.FC = () => {
     navigate('/menu');
   };
 
-  // ── Excel 导出 ──
-  const handleExcel = async () => {
+  // ── CSV 导出（纯前端） ──
+  const handleExcel = () => {
     clearMessages();
-    try {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const fileName = `HDoc_Variables_${today}.csv`;
-      const token = localStorage.getItem('token') || '';
-      const response = await fetch(
-        'http://localhost:8080/api/v1/hdoc/variables/export',
-        { method: 'GET', headers: { Authorization: token } },
-      );
-      if (!response.ok) throw new Error('Export failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      setSuccessMessage('CSV文件导出成功');
-    } catch {
-      setMessage('CSV导出失败，请联系管理员');
-    }
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fileName = `HDoc_Variables_${today}.csv`;
+
+    const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
+    const row = [variable, type, description, createdByUser, date];
+    const csvContent = [headers.join(','), row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')].join('\n');
+
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    setSuccessMessage('CSV文件导出成功');
   };
 
   // ── JSX ──

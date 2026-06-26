@@ -4,83 +4,72 @@ import { api } from '../services/api';
 import '../common/css/common.css';
 import './SaveModifications.css';
 
-interface Modification {
-  variable: string;
-  newVal: string;
-}
-
-interface SaveModData {
+interface SaveModMeta {
   doctype: string;
   version: string;
-  modifications: Modification[];
   hasUnreleasedVersion: boolean;
 }
 
 const SaveModifications: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { serie: string; chnr: string } | null;
+  const state = location.state as {
+    serie: string;
+    chnr: string;
+    market?: string;
+    modifications?: { variable: string; val: string }[];
+  } | null;
 
-  const [data, setData] = useState<SaveModData | null>(null);
+  const serie = state?.serie || '';
+  const chnr = state?.chnr || '';
+  const market = state?.market || '';
+  const modifications = state?.modifications || [];
+
+  const [meta, setMeta] = useState<SaveModMeta | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!state || !state.serie || !state.chnr) {
+    if (!serie || !chnr) {
       setErrorMessage('Invalid chassis information.');
       setIsLoading(false);
       return;
     }
-
-    const fetchData = async () => {
+    const fetchMeta = async () => {
       try {
-        const [serie, chnr] = state.chnr.includes('-')
-          ? state.chnr.split('-')
-          : [state.serie, state.chnr];
-
-        const res = await api.post<SaveModData>('/adcamodification', { serie, chno: chnr });
-
+        const [s, c] = chnr.includes('-') ? chnr.split('-') : [serie, chnr];
+        const res = await api.post<SaveModMeta>('/adcamodification', { serie: s, chno: c });
         if (res.code === 200 && res.data) {
-          setData(res.data);
-        } else {
-          setErrorMessage(res.message || 'No modifications found.');
+          setMeta(res.data);
         }
       } catch {
-        setErrorMessage('System error. Please contact administrator.');
+        // metadata fetch failure is non-critical
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchData();
-  }, [state]);
+    fetchMeta();
+  }, [serie, chnr]);
 
   const handleClose = () => {
-    navigate('/menu/generate-doc');
+    navigate('/menu/modify-document', {
+      state: { serie, chnr, market },
+    });
   };
+
+  if (!serie || !chnr) {
+    return (
+      <div className="save-mod-container">
+        <div className="save-mod-error">Invalid chassis information.</div>
+        <button className="btn btn-secondary" onClick={handleClose}>Close</button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <div className="save-mod-container">
         <div className="save-mod-loading">Loading...</div>
-      </div>
-    );
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="save-mod-container">
-        <div className="save-mod-error">{errorMessage}</div>
-        <button className="btn btn-secondary" onClick={handleClose}>Close</button>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="save-mod-container">
-        <div className="save-mod-error">Invalid chassis information.</div>
-        <button className="btn btn-secondary" onClick={handleClose}>Close</button>
       </div>
     );
   }
@@ -92,35 +81,39 @@ const SaveModifications: React.FC = () => {
       <div className="save-mod-info">
         <div className="save-mod-info-row">
           <span className="info-label">Chassis serie:</span>
-          <span className="info-value">{state?.serie}</span>
+          <span className="info-value">{serie}</span>
         </div>
         <div className="save-mod-info-row">
           <span className="info-label">Chassis number:</span>
-          <span className="info-value">{state?.chnr}</span>
+          <span className="info-value">{chnr}</span>
         </div>
-        <div className="save-mod-info-row">
-          <span className="info-label">Doctype:</span>
-          <span className="info-value">{data.doctype}</span>
-        </div>
-      </div>
-
-      <div className="save-mod-version-row">
-        <span className="info-label">Version:</span>
-        <span className="info-value">{data.version}</span>
+        {meta && (
+          <>
+            <div className="save-mod-info-row">
+              <span className="info-label">Doctype:</span>
+              <span className="info-value">{meta.doctype}</span>
+            </div>
+            <div className="save-mod-info-row" style={{ marginTop: '30px' }}>
+              <span className="info-label">Version:</span>
+              <span className="info-value">{meta.version}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="save-mod-version-row">
         <span className="info-label">Storing:</span>
         <span className="info-value">
-          {data.modifications.map((mod, idx) => (
-            <span key={idx}>{mod.variable} {mod.newVal}{idx < data.modifications.length - 1 ? ', ' : ''}</span>
+          {modifications.map((mod, idx) => (
+            <span key={idx}>{mod.variable} {mod.val}{idx < modifications.length - 1 ? ', ' : ''}</span>
           ))}
         </span>
       </div>
 
-      {data.hasUnreleasedVersion && (
-        <div className="save-mod-unreleased">FOUND UNRELEASED VERSION</div>
-      )}
+      <div className="save-mod-info-row">
+        <span className="info-label">FOUND UNRELEASED VERSION:</span>
+        <span className="info-value">{meta?.version || ''}</span>
+      </div>
 
       <div className="save-mod-message">VERSION IS RELEASED</div>
 

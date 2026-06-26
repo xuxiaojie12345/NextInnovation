@@ -1,5 +1,5 @@
 // api.ts
-const API_BASE_URL = '/api/v1/hdoc';
+export const API_BASE_URL = '/api/v1/hdoc';
 
 interface ApiResponse<T> {
   code: number;

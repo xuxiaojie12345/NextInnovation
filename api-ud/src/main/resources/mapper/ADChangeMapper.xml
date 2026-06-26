@@ -2,8 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.ADChangeMapper">
 
-    <select id="countBySerieAndChnr" resultType="int">
-        SELECT COUNT(*) FROM HDOC_ADCA_CHANGE
+    <select id="findBySerieAndChnr" resultType="com.web.app.entity.HdocAdcaChange">
+        SELECT SERIE, CHNR, ACT, BU, REASON,
+               REGISTER_DATETIME AS registerDatetime,
+               REGISTER_USER AS registerUser,
+               REGISTER_PROCESS AS registerProcess,
+               UPDATE_DATETIME AS updateDatetime,
+               UPDATE_USER AS updateUser,
+               UPDATE_PROCESS AS updateProcess
+        FROM HDOC_ADCA_CHANGE
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </select>
 
@@ -16,12 +23,21 @@
             NOW(), #{currentUser}, 'UD16ADChangeApi')
     </insert>
 
-    <update id="updateAllActToZero">
+    <update id="updateAllActToN">
         UPDATE HDOC_ADCA_CHANGE
-        SET ACT = '0',
+        SET ACT = 'N',
             UPDATE_DATETIME = NOW(),
             UPDATE_USER = 'SYSTEM',
             UPDATE_PROCESS = 'UD16UpdateHdocAdcaChange'
+    </update>
+
+    <update id="reactivateBySerieAndChnr">
+        UPDATE HDOC_ADCA_CHANGE
+        SET ACT = 'Y',
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{currentUser},
+            UPDATE_PROCESS = 'UD16ReactivateHdocAdcaChange'
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
 
 </mapper>

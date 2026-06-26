@@ -3,7 +3,14 @@
 <mapper namespace="com.web.app.mapper.HDocSendDataVinPlateMapper">
 
     <select id="selectVinPlateInfo" resultType="map">
-        SELECT TYPE, STATUS, MSG, REGISTER_DATETIME, DOC_READY, DOC_SENT, XML_DOC
+        SELECT
+            TYPE AS `type`,
+            STATUS AS `status`,
+            MSG AS `msg`,
+            REGISTER_DATETIME AS `registerDatetime`,
+            DOC_READY AS `docReady`,
+            DOC_SENT AS `docSent`,
+            XML_DOC AS `xmlDoc`
         FROM HDOC_SEND_DATA_VIN_PLATE
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </select>

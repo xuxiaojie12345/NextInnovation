@@ -1,7 +1,10 @@
 package com.web.app.service;
 
+import com.web.app.entity.HdocAdcaChange;
+
 public interface ADChangeService {
-    int selectCount(String serie, String chnr);
+    HdocAdcaChange findBySerieAndChnr(String serie, String chnr);
     int insert(String serie, String chnr, String act, String bu, String reason);
-    int updateAllActToZero();
+    int updateAllActToN();
+    int reactivate(String serie, String chnr);
 }

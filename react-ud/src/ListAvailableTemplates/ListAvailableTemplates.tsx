@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { api, API_BASE_URL } from '../services/api';
 import '../common/css/common.css';
 import './ListAvailableTemplates.css';
 
@@ -137,8 +137,7 @@ const ListAvailableTemplates: React.FC = () => {
     try {
       // Use POST to download endpoint (backend returns file as blob in response)
       const token = localStorage.getItem('token') || '';
-      const baseUrl = 'http://localhost:8080/api/v1/hdoc';
-      const url = `${baseUrl}/template/download`;
+      const url = `${API_BASE_URL}/template/download`;
 
       const response = await fetch(url, {
         method: 'POST',

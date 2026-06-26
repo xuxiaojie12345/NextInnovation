@@ -9,6 +9,8 @@ const MarketDocumentSettingsList: React.FC = () => {
   const state = location.state as { doctype?: string; registerUser?: string; registerDatetime?: string } | null;
 
   const [documentType, setDocumentType] = useState(state?.doctype || '');
+  const [market, setMarket] = useState('-EU');
+  const [setting, setSetting] = useState('');
   const [businessUnit, setBusinessUnit] = useState('BU');
   const [user, setUser] = useState(state?.registerUser || '');
   const [date, setDate] = useState(state?.registerDatetime || '');
@@ -29,6 +31,8 @@ const MarketDocumentSettingsList: React.FC = () => {
 
   const handleClear = () => {
     setDocumentType('');
+    setMarket('-EU');
+    setSetting('');
     setBusinessUnit('BU');
     setUser('');
     setDate('');
@@ -39,7 +43,7 @@ const MarketDocumentSettingsList: React.FC = () => {
     navigate('/menu/guide-user');
   };
 
-  const handleUpdateRole = () => {
+  const handleUpdateMode = () => {
     // 机能暂时不实装
     return;
   };
@@ -62,6 +66,26 @@ const MarketDocumentSettingsList: React.FC = () => {
             onChange={(e) => setDocumentType(e.target.value)}
             maxLength={20}
           />
+        </div>
+        <div className="mdsl-row">
+          <span className="mdsl-label">Market</span>
+          <input
+            type="text"
+            className="mdsl-input"
+            value={market}
+            onChange={(e) => setMarket(e.target.value)}
+          />
+        </div>
+        <div className="mdsl-row">
+          <span className="mdsl-label">Setting</span>
+          <select
+            className="mdsl-input mdsl-select"
+            value={setting}
+            onChange={(e) => setSetting(e.target.value)}
+          >
+            <option value="">-- Select --</option>
+            <option value="NO_VDA_CACHE">NO_VDA_CACHE</option>
+          </select>
         </div>
         <div className="mdsl-row">
           <span className="mdsl-label">Business unit</span>
@@ -96,7 +120,7 @@ const MarketDocumentSettingsList: React.FC = () => {
           <button className="btn" onClick={handleSearch}>Search</button>
           <button className="btn" onClick={handleClear}>Clear</button>
           <button className="btn" onClick={handleBack}>Back</button>
-          <button className="btn" onClick={handleUpdateRole}>Update role</button>
+          <button className="btn" onClick={handleUpdateMode}>Update Mode</button>
         </div>
       </div>
     </div>

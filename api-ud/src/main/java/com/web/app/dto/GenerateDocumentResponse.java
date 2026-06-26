@@ -19,8 +19,9 @@ public class GenerateDocumentResponse {
 
     /**
      * MyBatis 用: ACT(VARCHAR) → Boolean 変換
+     * ACT='Y'（活性/有効）→ true, ACT='N'（非活性/無効）→ false
      */
     public void setAct(String act) {
-        this.modifyDocLink = "1".equals(act);
+        this.modifyDocLink = "Y".equals(act);
     }
 }

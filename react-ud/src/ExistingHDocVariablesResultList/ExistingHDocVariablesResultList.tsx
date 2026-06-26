@@ -146,39 +146,31 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   };
 
   /**
-   * Excel 导出：调用后端 export API 生成 CSV 文件并触发下载
+   * CSV 导出（纯前端）：将查询结果导出为 CSV 文件
    */
-  const handleExcel = async () => {
+  const handleExcel = () => {
     setErrorMessage('');
-    try {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const fileName = `HDoc_Variables_${today}.csv`;
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fileName = `HDoc_Variables_${today}.csv`;
 
-      const token = localStorage.getItem('token') || '';
-      const response = await fetch(
-        'http://localhost:8080/api/v1/hdoc/variables/export',
-        {
-          method: 'GET',
-          headers: { Authorization: token },
-        },
-      );
+    const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
+    const csvRows = results.map(r =>
+      [r.variable, r.type, r.description, r.registerUser, r.registerDatetime]
+        .map(cell => `"${(cell || '').replace(/"/g, '""')}"`)
+        .join(',')
+    );
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
 
-      if (!response.ok) {
-        throw new Error('Export failed');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch {
-      setErrorMessage('CSV导出失败，请联系管理员');
-    }
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   };
 
   const handleUserViewClick = (userid: string) => {

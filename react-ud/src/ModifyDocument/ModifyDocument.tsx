@@ -47,10 +47,10 @@ const ModifyDocument: React.FC = () => {
         });
         if (res.code === 200 && res.data) {
           setVariables(res.data);
-          // Initialize modified values with current values
+          // Initialize modified values as empty
           const initial: Record<string, string> = {};
           res.data.forEach((v) => {
-            initial[v.variable] = v.newVal || '';
+            initial[v.variable] = '';
           });
           setModifiedValues(initial);
         } else {
@@ -71,18 +71,15 @@ const ModifyDocument: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // Check for empty values
-    const emptyVars = variables.filter((v) => !modifiedValues[v.variable]?.trim());
-    if (emptyVars.length > 0) {
-      setErrorMessage('Value is required.');
-      return;
-    }
+    // Collect only rows where the user actually entered a value
+    const modifications = variables
+      .filter((v) => modifiedValues[v.variable]?.trim())
+      .map((v) => ({
+        variable: v.variable,
+        val: modifiedValues[v.variable],
+      }));
 
-    // Check if any value actually changed
-    const hasChanges = variables.some(
-      (v) => modifiedValues[v.variable] !== (v.newVal || '')
-    );
-    if (!hasChanges) {
+    if (modifications.length === 0) {
       setErrorMessage('NO UNRELEASED VERSION EXISTS!');
       return;
     }
@@ -91,12 +88,6 @@ const ModifyDocument: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const modifications = variables
-        .filter((v) => modifiedValues[v.variable] !== (v.newVal || ''))
-        .map((v) => ({
-          variable: v.variable,
-          val: modifiedValues[v.variable],
-        }));
 
       const res = await api.post('/modifydocument/update', {
         serie,
@@ -109,6 +100,8 @@ const ModifyDocument: React.FC = () => {
           state: {
             serie,
             chnr,
+            market,
+            modifications,
           },
         });
       } else {
@@ -159,7 +152,7 @@ const ModifyDocument: React.FC = () => {
         </span>
       </div>
 
-      {errorMessage && <div className="modify-doc-error">{errorMessage}</div>}
+      <div className="modify-doc-error">{errorMessage}</div>
 
       {variables.length > 0 ? (
         <>
@@ -185,7 +178,7 @@ const ModifyDocument: React.FC = () => {
               <tbody>
                 {variables.map((v) => (
                   <tr key={v.variable}>
-                    <td className="td-var">{v.variable}</td>
+                    <td className="td-desc">{v.variable}</td>
                     <td className="td-desc">{v.description}</td>
                     <td className="td-current">{v.newVal || '-'}</td>
                     <td className="td-modified">

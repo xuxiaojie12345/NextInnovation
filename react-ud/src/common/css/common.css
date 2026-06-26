@@ -44,14 +44,12 @@
    エラーメッセージボックス
    ═══════════════════════════════════════════ */
 .message-error {
-  padding: 10px 14px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
+  min-height: 18px;
+  padding: 2px 4px;
   color: #e53935;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .message-success {

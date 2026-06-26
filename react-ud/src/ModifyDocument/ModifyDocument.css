@@ -38,7 +38,7 @@
 }
 
 .modify-doc-info-item .info-label {
-  font-weight: 600;
+  font-weight: 700;
   color: #555;
   font-size: 13px;
 }
@@ -46,6 +46,7 @@
 .modify-doc-info-item .info-value {
   font-size: 13px;
   color: #333;
+  text-decoration: underline;
 }
 
 /* ── Template ファイルリンク ── */
@@ -66,13 +67,11 @@
 }
 
 .modify-doc-error {
-  padding: 10px 14px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
+  min-height: 18px;
+  padding: 2px 4px;
   color: #e53935;
-  font-size: 13px;
-  margin-bottom: 12px;
+  font-size: 12px;
+  margin-bottom: 0;
 }
 
 /* ── 大枠テーブル ── */
@@ -103,14 +102,15 @@
   color: #333;
   padding: 10px 12px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
   border: 2px solid #a1aeeb;
 }
 
 .modify-doc-table td {
-  padding: 8px 12px;
+  padding: 2px 12px;
   vertical-align: middle;
+  text-align: left;
   border: 2px solid #a1aeeb;
 }
 
@@ -128,8 +128,8 @@
 }
 
 .td-var { font-weight: 500; color: #002182; }
-.td-desc { color: #555; }
-.td-current { color: #333; }
+.td-desc { font-weight: 500 }
+.td-current { font-weight: 500 }
 
 .modify-input {
   width: 100%;

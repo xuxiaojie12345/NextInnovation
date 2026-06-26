@@ -106,21 +106,24 @@
 }
 
 .vp-info-table td {
-  padding: 4px 8px;
-  border: 1px solid #d0d0d0;
+  padding: 2px 8px;
+  border: none;
   font-size: 12px;
 }
 
 .vp-info-label {
-  font-weight: 700;
-  color: #333;
-  background-color: #f1f3ff;
+  font-weight: 500;
+  color: #555;
   width: 180px;
   white-space: nowrap;
+  background: none;
+  text-align: left;
 }
 
 .vp-info-value {
   color: #333;
+  text-align: left;
+  font-weight: 500;
 }
 
 /* ── XML 数据展示 ── */
@@ -131,37 +134,37 @@
 .vp-xml-title {
   font-size: 13px;
   font-weight: 700;
-  color: #1c2771;
+  /* color: #1c2771; */
   margin: 0 0 8px 0;
   padding: 4px 0;
-  border-bottom: 1px solid #acb7ee;
-}
-
-.vp-xml-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 12px;
-}
-
-.vp-xml-table th {
-  background-color: #002060;
-  color: #ffffff;
-  padding: 5px 8px;
   text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  border: 1px solid #9fb6d4;
 }
 
-.vp-xml-table td {
-  padding: 4px 8px;
-  border: 1px solid #d0d0d0;
+.vp-xml-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vp-xml-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   font-size: 12px;
+  line-height: 1.6;
+}
+
+.vp-xml-item-name {
+  color: #555;
+  min-width: 120px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.vp-xml-item-value {
   color: #333;
-}
-
-.vp-xml-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+  text-align: left;
+  font-weight: 500;
 }
 
 /* ── 无数据 ── */
