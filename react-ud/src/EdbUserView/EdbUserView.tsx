@@ -117,6 +117,11 @@ const EdbUserView: React.FC = () => {
             </div>
             <div className='euv-field-row'>
               <label className='euv-label'>Userid</label>
+              <select className='euv-operator-select'>
+                <option value='='>=</option>
+                <option value='<'>&lt;</option>
+                <option value='>'>&gt;</option>
+              </select>
               <input
                 type='text'
                 className='euv-input euv-input-short'
@@ -126,6 +131,11 @@ const EdbUserView: React.FC = () => {
             </div>
             <div className='euv-field-row'>
               <label className='euv-label'>Responsible</label>
+              <select className='euv-operator-select'>
+                <option value='='>=</option>
+                <option value='<'>&lt;</option>
+                <option value='>'>&gt;</option>
+              </select>
               <input
                 type='text'
                 className='euv-input euv-input-medium'
@@ -135,6 +145,11 @@ const EdbUserView: React.FC = () => {
             </div>
             <div className='euv-field-row'>
               <label className='euv-label'>User Position</label>
+              <select className='euv-operator-select'>
+                <option value='='>=</option>
+                <option value='<'>&lt;</option>
+                <option value='>'>&gt;</option>
+              </select>
               <input
                 type='text'
                 className='euv-input euv-input-medium'
@@ -144,6 +159,11 @@ const EdbUserView: React.FC = () => {
             </div>
             <div className='euv-field-row'>
               <label className='euv-label'>E-mail</label>
+              <select className='euv-operator-select'>
+                <option value='='>=</option>
+                <option value='<'>&lt;</option>
+                <option value='>'>&gt;</option>
+              </select>
               <input
                 type='text'
                 className='euv-input euv-input-long'

@@ -45,7 +45,7 @@
 .euv-field-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
 }
 
 .euv-label {
@@ -54,6 +54,24 @@
   font-weight: bold;
   color: #000000;
   text-align: left;
+}
+
+.euv-operator-select {
+  width: 50px;
+  height: 34px;
+  padding: 6px 4px;
+  font-size: 14px;
+  border: 1px solid #999999;
+  background-color: #f0f0f0;
+  color: #000000;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.euv-operator-select:focus {
+  border-color: #66a3ff;
+  box-shadow: 0 0 3px rgba(102, 163, 255, 0.5);
 }
 
 .euv-input {

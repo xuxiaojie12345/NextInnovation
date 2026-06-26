@@ -142,6 +142,11 @@ const MarketDocumentSettings = () => {
         <div className='mds-form-section'>
           <div className='mds-form-row'>
             <label className='mds-label'>Document type:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <input
               type='text'
               value={formData.documentType}
@@ -155,6 +160,11 @@ const MarketDocumentSettings = () => {
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>Market:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <input
               type='text'
               value={formData.market}
@@ -166,6 +176,11 @@ const MarketDocumentSettings = () => {
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>Setting:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <select
               value={formData.setting}
               onChange={(e) => handleInputChange("setting", e.target.value)}
@@ -179,6 +194,11 @@ const MarketDocumentSettings = () => {
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>Bussines unit:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <input
               type='text'
               value={formData.bussinesUnit}
@@ -192,6 +212,11 @@ const MarketDocumentSettings = () => {
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>User:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <input
               type='text'
               value={formData.user}
@@ -202,6 +227,11 @@ const MarketDocumentSettings = () => {
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>Date:</label>
+            <select className='mds-operator-select'>
+              <option value='='>=</option>
+              <option value='<'>&lt;</option>
+              <option value='>'>&gt;</option>
+            </select>
             <input
               type='text'
               value={formData.date}
