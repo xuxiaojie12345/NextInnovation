@@ -47,7 +47,7 @@ const ListAvailableTemplates: React.FC = () => {
     
     try {
       // API请求 - 获取Market下拉列表数据
-      const response = await axios.post('/api/UD08/select-marketmaster');
+      const response = await axios.post('http://localhost:8081/api/ud14/selectmarketmaster');
       
       if (response.data.success) {
         const markets = response.data.data.map((item: any) => item.market || item);
@@ -75,12 +75,12 @@ const ListAvailableTemplates: React.FC = () => {
       // 并行调用两个API
       const [fileResponse, usedResponse] = await Promise.all([
         // API请求 - 获取该市场文件夹下的文件列表 (对应设计书 5.2 UD14SelectMarketFileApi)
-        axios.get('/api/UD14/select-market-file', {
+        axios.get('http://localhost:8081/api/ud14/select-market-file', {
           params: { market }
         }),
         
         // API请求 - 获取HDOC_USER_DEFINED_RULES表中的VARIABLE列表 (对应设计书 5.3 UD14SelectHdocUserDefinedUsedApi)
-        axios.get('/api/UD14/select-hdoc-user-defined-used', {
+        axios.get('http://localhost:8081/api/ud14/selecthdocuserdefinedused', {
           params: { market }
         })
       ]);

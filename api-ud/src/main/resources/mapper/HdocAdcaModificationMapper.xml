@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaModificationMapper">
+
+    <!-- UD05: 查询Modification信息 -->
+    <select id="selectBySerieAndChno" resultType="com.web.app.dto.ModifyDocumentResponse">
+        SELECT a.VARIABLE, b.DESCRIPTION AS description, a.NEWVAL
+        FROM HDOC_ADCA_MODIFICATION a
+        LEFT JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE
+        WHERE a.SERIE = #{serie} AND a.CHNO = #{chno}
+    </select>
+
+    <!-- UD05: 更新Modification -->
+    <update id="updateBySerieAndChno">
+        UPDATE HDOC_ADCA_MODIFICATION a
+        INNER JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE
+        SET a.NEWVAL = #{newval},
+            a.UPDATE_DATETIME = NOW(),
+            a.UPDATE_USER = #{updateUser},
+            a.UPDATE_PROCESS = #{updateProcess}
+        WHERE a.CHNO = #{chno}
+          AND a.SERIE = #{serie}
+          AND b.DESCRIPTION = #{description}
+    </update>
+
+    <!-- UD06: 查询Modification(不同字段) -->
+    <select id="selectSaveModifications" resultType="com.web.app.dto.SaveModificationsResponse">
+        SELECT DOCTYPE, VERS, VARIABLE, NEWVAL
+        FROM HDOC_ADCA_MODIFICATION
+        WHERE SERIE = #{serie} AND CHNO = #{chno}
+    </select>
+
+</mapper>

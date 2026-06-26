@@ -28,6 +28,17 @@ const HomologationVariables: React.FC = () => {
   const [date, setDate] = useState<string>('');
   const [productClassList, setProductClassList] = useState<string[]>([]);
   const [marketList, setMarketList] = useState<string[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => {
+    setMessage('');
+  };
 
   /**
    * 画面初期表示 - 加载下拉列表数据并处理从前画面传递的参数
@@ -37,11 +48,39 @@ const HomologationVariables: React.FC = () => {
     // 调用API获取下拉列表数据 (对应设计书 4.1.1 画面初期没有数据情况)
     fetchDropdownData();
     
-    // 检查是否从前画面传递了variable参数 (对应设计书 4.1.3 从ExistingHdocVariablesResultList画面跳转)
+    // 检查是否从前画面传递了参数
     const state = location.state as any;
-    if (state && state.variable) {
-      fetchVariableData(state.variable);
+    if (state) {
+      if (state.pc) {
+        // 从HomologationVariablesResultList通过Select返回时，直接用选中行数据填充所有字段
+        setProductClass(state.pc || '');
+        setNumber(state.num ? String(state.num) : '');
+        setMarket(state.market || '');
+        setVariable(state.variable || '');
+        setValue(state.val || '');
+        setVariantString1(state.vs || '');
+        setVariantString2(state.vs2 || '');
+        setComments(state.comments || '');
+        setAddDate(state.addDate || '');
+        setDeleteDate(state.deleteDate || '');
+        setCreatedByUser(state.updateUser || '');
+        setDate(state.updateDatetime || '');
+      } else if (state.productClass !== undefined) {
+        // 从HomologationVariablesResultList通过Back返回时，用原来的检索条件填充（不调API）
+        setProductClass(state.productClass || '');
+        setNumber(state.number || '');
+        setMarket(state.market || '');
+        setVariable(state.variable || '');
+        setValue(state.value || '');
+        setVariantString1(state.variantString1 || '');
+        setVariantString2(state.variantString2 || '');
+        setComments(state.comments || '');
+      } else if (state.variable) {
+        // 从ExistingHdocVariablesResultList画面跳转时，根据variable查询数据
+        fetchVariableData(state.variable);
+      }
     }
+    // 初始加载（从HdocMenu点link进入）: state为null，所有字段保持空白
   }, [location.state]);
 
   /**
@@ -52,23 +91,21 @@ const HomologationVariables: React.FC = () => {
     try {
       // 并行调用两个API获取下拉列表数据
       const [productClassResponse, marketResponse] = await Promise.all([
-        axios.post('/api/UD08/select-productclassmaster'),
-        axios.post('/api/UD08/select-marketmaster')
+        axios.post('http://localhost:8081/api/ud08/selectproductclassmaster'),
+        axios.post('http://localhost:8081/api/ud08/selectmarketmaster')
       ]);
       
-      if (productClassResponse.data.success) {
-        // 假设返回的是数组格式
+      if (productClassResponse.data.code === 200) {
         const pcList = productClassResponse.data.data.map((item: any) => item.pc || item);
         setProductClassList(pcList);
       }
       
-      if (marketResponse.data.success) {
-        // 假设返回的是数组格式
+      if (marketResponse.data.code === 200) {
         const marketData = marketResponse.data.data.map((item: any) => item.market || item);
         setMarketList(marketData);
       }
     } catch (error: any) {
-      console.error('获取下拉列表数据失败:', error);
+      showMessage('获取下拉列表数据失败', 'error');
     }
   };
 
@@ -80,11 +117,11 @@ const HomologationVariables: React.FC = () => {
    */
   const fetchVariableData = async (variableParam: string) => {
     try {
-      const response = await axios.post('/api/UD08/select-hdoc-variables', {
+      const response = await axios.post('http://localhost:8081/api/ud08/selecthdocvariables', {
         variable: variableParam
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data;
         
         // 填充画面数据
@@ -102,7 +139,7 @@ const HomologationVariables: React.FC = () => {
         setDate(data.updateDatetime || '');
       }
     } catch (error: any) {
-      console.error('获取variable数据失败:', error);
+      showMessage('获取variable数据失败', 'error');
     }
   };
 
@@ -111,8 +148,24 @@ const HomologationVariables: React.FC = () => {
    * 对应设计书 3.2 Search按钮押下
    */
   const handleSearchClick = () => {
+    // 校验：Product class, Number, Market必须入力
+    if (!productClass) {
+      showMessage('productClass 是必须入力项目', 'error');
+      return;
+    }
+    if (!number) {
+      showMessage('number 是必须入力项目', 'error');
+      return;
+    }
+    if (!market) {
+      showMessage('market 是必须入力项目', 'error');
+      return;
+    }
+    
+    clearMessage();
+    
     // 获取当前登录用户ID（从localStorage或context中获取）
-    const userId = localStorage.getItem('userId') || '';
+    const userId = sessionStorage.getItem('userId') || '';
     
     // 准备检索条件参数
     const searchParams = {
@@ -128,7 +181,7 @@ const HomologationVariables: React.FC = () => {
     };
     
     // 跳转到结果列表画面 (对应设计书 7. 实现注意事项)
-    navigate('/HomologationVariablesResultList', { state: searchParams });
+    navigate('/HdocMenu/HomologationVariablesResultList', { state: searchParams });
   };
 
   /**
@@ -157,17 +210,19 @@ const HomologationVariables: React.FC = () => {
   const handleAddClick = async () => {
     // 校验1：Product class, Number, Market必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!productClass) {
-      alert('Product class 是必须入力项目');
+      showMessage('productClass 是必须入力项目', 'error');
       return;
     }
     if (!number) {
-      alert('Number 是必须入力项目');
+      showMessage('number 是必须入力项目', 'error');
       return;
     }
     if (!market) {
-      alert('Market 是必须入力项目');
+      showMessage('market 是必须入力项目', 'error');
       return;
     }
+    
+    clearMessage();
     
     // 处理Variable：若以'TEMPLATE-'开头，去除前缀 (对应设计书 2.1 控件属性表 备注)
     let processedVariable = variable;
@@ -177,29 +232,29 @@ const HomologationVariables: React.FC = () => {
     
     // 校验2：检查Variable是否在HDOC_VARIABLES表中存在 (对应设计书 4.1.2.3 Add操作校验 校验2)
     try {
-      const varResponse = await axios.post('/api/UD08/select-hdoc-variables', {
+      const varResponse = await axios.post('http://localhost:8081/api/ud08/selecthdocvariables', {
         variable: processedVariable
       });
       
-      if (!varResponse.data.success || !varResponse.data.data) {
-        alert('Variant does not exist, Please enter the correct content');
+      if (varResponse.data.code !== 200 || !varResponse.data.data) {
+        showMessage('Variant does not exist, Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
-      alert('Variant does not exist, Please enter the correct content');
+      showMessage('Variant does not exist, Please enter the correct content', 'error');
       return;
     }
     
     // 校验3：检查是否已存在相同数据 (对应设计书 4.1.2.3 Add操作校验 校验3)
     try {
-      const existResponse = await axios.post('/api/UD08/select-hdoc-user-defined-rules', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud09/search', {
         pc: productClass,
         num: parseInt(number),
         market: market
       });
       
-      if (existResponse.data.success && existResponse.data.data) {
-        alert('数据已存在，无法重复添加');
+      if (existResponse.data.code === 200 && existResponse.data.data && Array.isArray(existResponse.data.data) && existResponse.data.data.length > 0) {
+        showMessage('数据已存在，无法重复添加', 'error');
         return;
       }
     } catch (error: any) {
@@ -208,10 +263,10 @@ const HomologationVariables: React.FC = () => {
     
     // 执行新增操作 (对应设计书 5.6 UD08AddHdocUserDefinedRulesApi)
     try {
-      const currentUserId = localStorage.getItem('userId') || '';
+      const currentUserId = sessionStorage.getItem('userId') || '';
       const currentDateTime = new Date().toISOString();
       
-      const addResponse = await axios.post('/api/UD08/add-hdoc-user-defined-rules', {
+      const addResponse = await axios.post('http://localhost:8081/api/ud08/add', {
         pc: productClass,
         num: parseInt(number),
         market: market,
@@ -221,23 +276,23 @@ const HomologationVariables: React.FC = () => {
         vs2: variantString2,
         comments: comments,
         addDate: addDate,
-        updateUser: currentUserId,
+        deleteDate: deleteDate,
+        updateUser: createdByUser,
         updateDatetime: currentDateTime,
-        UpdateProcess: 'HomologationVariables',
-        RegisterUser: currentUserId,
-        RegisterDateTime: currentDateTime,
-        RegisterProcess: 'HomologationVariables'
+        updateProcess: 'UD08HomologationVariables',
+        registerUser: currentUserId,
+        registerDatetime: currentDateTime,
+        registerProcess: 'UD08HomologationVariables'
       });
       
-      if (addResponse.data.success) {
-        alert('情报登录成功');
+      if (addResponse.data.code === 200) {
+        showMessage('情报登录成功', 'success');
         // 可选：清空表单或刷新数据
       } else {
-        alert(addResponse.data.message || '情报登录失败');
+        showMessage(addResponse.data.message || '情报登录失败', 'error');
       }
     } catch (error: any) {
-      console.error('新增失败:', error);
-      alert(error.response?.data?.message || '情报登录失败');
+      showMessage(error.response?.data?.message || '情报登录失败', 'error');
     }
   };
 
@@ -248,32 +303,34 @@ const HomologationVariables: React.FC = () => {
   const handleUpdateClick = async () => {
     // 校验1：Product class, Number, Market必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!productClass) {
-      alert('Product class 是必须入力项目');
+      showMessage('productClass 是必须入力项目', 'error');
       return;
     }
     if (!number) {
-      alert('Number 是必须入力项目');
+      showMessage('number 是必须入力项目', 'error');
       return;
     }
     if (!market) {
-      alert('Market 是必须入力项目');
+      showMessage('market 是必须入力项目', 'error');
       return;
     }
     
+    clearMessage();
+    
     // 校验2：检查数据是否存在 (对应设计书 4.1.2.1 Update操作校验 校验2)
     try {
-      const existResponse = await axios.post('/api/UD08/select-hdoc-user-defined-rules', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud09/search', {
         pc: productClass,
         num: parseInt(number),
         market: market
       });
       
-      if (!existResponse.data.success || !existResponse.data.data) {
-        alert('Data does not exist, Please enter the correct content');
+      if (existResponse.data.code !== 200 || !existResponse.data.data || (Array.isArray(existResponse.data.data) && existResponse.data.data.length === 0)) {
+        showMessage('Data does not exist, Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
-      alert('Data does not exist, Please enter the correct content');
+      showMessage('Data does not exist, Please enter the correct content', 'error');
       return;
     }
     
@@ -286,26 +343,26 @@ const HomologationVariables: React.FC = () => {
     // 校验3：如果Variable有值，检查是否在HDOC_VARIABLES表中存在 (对应设计书 4.1.2.1 Update操作校验 校验3)
     if (processedVariable) {
       try {
-        const varResponse = await axios.post('/api/UD08/select-hdoc-variables', {
+        const varResponse = await axios.post('http://localhost:8081/api/ud08/selecthdocvariables', {
           variable: processedVariable
         });
         
-        if (!varResponse.data.success || !varResponse.data.data) {
-          alert('Variant does not exist, Please enter the correct content');
+        if (varResponse.data.code !== 200 || !varResponse.data.data) {
+          showMessage('Variant does not exist, Please enter the correct content', 'error');
           return;
         }
       } catch (error: any) {
-        alert('Variant does not exist, Please enter the correct content');
+        showMessage('Variant does not exist, Please enter the correct content', 'error');
         return;
       }
     }
     
     // 执行更新操作 (对应设计书 5.5 UD08UpdateHdocUserDefinedRulesApi)
     try {
-      const currentUserId = localStorage.getItem('userId') || '';
+      const currentUserId = sessionStorage.getItem('userId') || '';
       const currentDateTime = new Date().toISOString();
       
-      const updateResponse = await axios.put('/api/UD08/update-hdoc-user-defined-rules', {
+      const updateResponse = await axios.post('http://localhost:8081/api/ud08/update', {
         pc: productClass,
         num: parseInt(number),
         market: market,
@@ -318,17 +375,16 @@ const HomologationVariables: React.FC = () => {
         deleteDate: deleteDate,
         updateUser: currentUserId,
         updateDatetime: currentDateTime,
-        updateProcess: 'HomologationVariables'
+        updateProcess: 'UD08HomologationVariables'
       });
       
-      if (updateResponse.data.success) {
-        alert('情报更新成功');
+      if (updateResponse.data.code === 200) {
+        showMessage('情报更新成功', 'success');
       } else {
-        alert(updateResponse.data.message || '情报更新失败');
+        showMessage(updateResponse.data.message || '情报更新失败', 'error');
       }
     } catch (error: any) {
-      console.error('更新失败:', error);
-      alert(error.response?.data?.message || '情报更新失败');
+      showMessage(error.response?.data?.message || '情报更新失败', 'error');
     }
   };
 
@@ -339,55 +395,54 @@ const HomologationVariables: React.FC = () => {
   const handleDeleteClick = async () => {
     // 校验1：Product class, Number, Market必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!productClass) {
-      alert('Product class 是必须入力项目');
+      showMessage('productClass 是必须入力项目', 'error');
       return;
     }
     if (!number) {
-      alert('Number 是必须入力项目');
+      showMessage('number 是必须入力项目', 'error');
       return;
     }
     if (!market) {
-      alert('Market 是必须入力项目');
+      showMessage('market 是必须入力项目', 'error');
       return;
     }
     
+    clearMessage();
+    
     // 校验2：检查数据是否存在 (对应设计书 4.1.2.2 Delete操作校验 校验2)
     try {
-      const existResponse = await axios.post('/api/UD08/select-hdoc-user-defined-rules', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud09/search', {
         pc: productClass,
         num: parseInt(number),
         market: market
       });
       
-      if (!existResponse.data.success || !existResponse.data.data) {
-        alert('Data does not exist, Please enter the correct conten');
+      if (existResponse.data.code !== 200 || !existResponse.data.data || (Array.isArray(existResponse.data.data) && existResponse.data.data.length === 0)) {
+        showMessage('Data does not exist, Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
-      alert('Data does not exist, Please enter the correct conten');
+      showMessage('Data does not exist, Please enter the correct content', 'error');
       return;
     }
     
     // 执行删除操作 (对应设计书 5.7 UD08DeleteHdocUserDefinedRulesApi)
     try {
-      const deleteResponse = await axios.delete('/api/UD08/delete-hdoc-user-defined-rules', {
-        data: {
-          pc: productClass,
-          num: parseInt(number),
-          market: market
-        }
+      const deleteResponse = await axios.post('http://localhost:8081/api/ud08/delete', {
+        pc: productClass,
+        num: parseInt(number),
+        market: market
       });
       
-      if (deleteResponse.data.success) {
-        alert('情报删除成功');
+      if (deleteResponse.data.code === 200) {
+        showMessage('情报删除成功', 'success');
         // 可选：清空表单
         handleClearClick();
       } else {
-        alert(deleteResponse.data.message || '情报删除失败');
+        showMessage(deleteResponse.data.message || '情报删除失败', 'error');
       }
     } catch (error: any) {
-      console.error('删除失败:', error);
-      alert(error.response?.data?.message || '情报删除失败');
+      showMessage(error.response?.data?.message || '情报删除失败', 'error');
     }
   };
 
@@ -405,6 +460,13 @@ const HomologationVariables: React.FC = () => {
           <button className='action-button' onClick={handleUpdateClick}>Update</button>
           <button className='action-button' onClick={handleDeleteClick}>Delete</button>
         </div>
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
+          </div>
+        )}
         
         {/* 表单区域 */}
         <div className='form-container'>

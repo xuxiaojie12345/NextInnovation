@@ -167,8 +167,8 @@ const HdocGenerateHomologationDocument: React.FC = () => {
    * TODO: 实际项目中需要从认证上下文或API获取
    */
   const getCurrentUserId = (): string => {
-    // 临时使用mock数据，实际项目中应从session或context获取
-    return 'test_user_id';
+    // 从sessionStorage获取当前登录用户的userId
+    return sessionStorage.getItem('userId') || '';
   };
 
   /**

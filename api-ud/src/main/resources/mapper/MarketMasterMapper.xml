@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.MarketMasterMapper">
+
+    <!-- UD08/UD12: 查询所有Market -->
+    <select id="selectAllMarket" resultType="com.web.app.entity.MarketMaster">
+        SELECT MARKET FROM MARKET_MASTER
+    </select>
+
+    <!-- UD19: 查询Market和Description -->
+    <select id="selectMarketWithDescription" resultType="com.web.app.entity.MarketMaster">
+        SELECT MARKET, DESCRIPTION FROM MARKET_MASTER
+    </select>
+
+</mapper>

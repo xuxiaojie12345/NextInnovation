@@ -19,7 +19,18 @@ const ExistingHdocVariables: React.FC = () => {
   const [description, setDescription] = useState<string>('');
   const [createdByUser, setCreatedByUser] = useState<string>('');
   const [date, setDate] = useState<string>('');
-  const typeList = ['VDA', 'User Defined']; // Type下拉列表固定值 (对应设计书 2.1 控件属性表 备注)
+  const typeList = ['VDA', 'User Defined'];
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => {
+    setMessage('');
+  };
 
   /**
    * 画面初期表示 - 从路由state获取检索条件并显示
@@ -44,11 +55,13 @@ const ExistingHdocVariables: React.FC = () => {
   const handleSearchClick = () => {
     // 校验：Variable必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!variable) {
-      alert('[项目:Variable] 是必须入力项目');
+      showMessage('[项目:Variable] 是必须入力项目', 'error');
       return;
     }
     
-    const userId = localStorage.getItem('userId') || '';
+    clearMessage();
+    
+    const userId = sessionStorage.getItem('userId') || '';
     
     const searchParams = {
       variable,
@@ -59,8 +72,7 @@ const ExistingHdocVariables: React.FC = () => {
       userId
     };
     
-    // 跳转到结果列表画面
-    navigate('/ExistingHdocVariableResultList', { state: searchParams });
+    navigate('/HdocMenu/ExistingHdocVariablesResultList', { state: searchParams });
   };
 
   /**
@@ -80,7 +92,11 @@ const ExistingHdocVariables: React.FC = () => {
    * 对应设计书 3.4 Back按钮押下
    */
   const handleBackClick = () => {
-    navigate(-1);
+    navigate('/HdocMenu/ExistingHdocVariables', { 
+      state: { 
+        variable, type, description, createdByUser, date 
+      } 
+    });
   };
 
   /**
@@ -88,53 +104,50 @@ const ExistingHdocVariables: React.FC = () => {
    * 对应设计书 3.5 Add按钮押下 和 4.1.2.4 Add操作校验
    */
   const handleAddClick = async () => {
-    // 校验1：Variable必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!variable) {
-      alert('[项目:Variable] 是必须入力项目');
+      showMessage('[项目:Variable] 是必须入力项目', 'error');
       return;
     }
     
+    clearMessage();
+    
     try {
-      // 校验2：检查Variable是否已存在 (对应设计书 4.1.2.4 Add操作校验 校验2)
-      const existResponse = await axios.post('/api/UD10/select-hdoc-variables', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud11/search', {
         variable: variable
       });
       
-      if (existResponse.data.success && existResponse.data.data) {
-        alert('Variant already exists. Please enter the correct content');
+      if (existResponse.data.code === 200 && existResponse.data.data && Array.isArray(existResponse.data.data) && existResponse.data.data.length > 0) {
+        showMessage('Variant already exists. Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
       // 如果查询失败，继续执行新增
     }
     
-    // 执行新增操作 (对应设计书 4.1.2.4 Add操作校验 执行新增)
     try {
-      const currentUserId = localStorage.getItem('userId') || '';
+      const currentUserId = sessionStorage.getItem('userId') || '';
       const currentDateTime = new Date().toISOString();
       
-      const addResponse = await axios.post('/api/UD10/add-hdoc-variables', {
+      const addResponse = await axios.post('http://localhost:8081/api/ud10/add', {
         variable: variable,
         type: type,
-        descr: description,
+        description: description,
         registerUser: currentUserId,
         registerDatetime: currentDateTime,
         registerProcess: 'ExistingHdocVariables',
-        UpdateUser: currentUserId,
-        UpdateDatetime: currentDateTime,
-        UpdateProcess: 'ExistingHdocVariables'
+        updateUser: currentUserId,
+        updateDatetime: currentDateTime,
+        updateProcess: 'ExistingHdocVariables'
       });
       
-      if (addResponse.data.success) {
-        alert('情报登录成功');
-        // 清空表单
+      if (addResponse.data.code === 200) {
+        showMessage('情报登录成功', 'success');
         handleClearClick();
       } else {
-        alert(addResponse.data.message || '情报登录失败');
+        showMessage(addResponse.data.msg || '情报登录失败', 'error');
       }
     } catch (error: any) {
-      console.error('新增失败:', error);
-      alert(error.response?.data?.message || '情报登录失败');
+      showMessage(error.response?.data?.msg || '情报登录失败', 'error');
     }
   };
 
@@ -143,49 +156,50 @@ const ExistingHdocVariables: React.FC = () => {
    * 对应设计书 3.6 Update按钮押下 和 4.1.2.2 Update操作校验
    */
   const handleUpdateClick = async () => {
-    // 校验1：Variable必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!variable) {
-      alert('[项目:Variable] 是必须入力项目');
+      showMessage('[项目:Variable] 是必须入力项目', 'error');
       return;
     }
     
+    clearMessage();
+    
     try {
-      // 校验2：检查数据是否存在 (对应设计书 4.1.2.2 Update操作校验 校验2)
-      const existResponse = await axios.post('/api/UD10/select-hdoc-variables', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud11/search', {
         variable: variable
       });
       
-      if (!existResponse.data.success || !existResponse.data.data) {
-        alert('Variant already exists. Please enter the correct content');
+      if (existResponse.data.code !== 200 || !existResponse.data.data || (Array.isArray(existResponse.data.data) && existResponse.data.data.length === 0)) {
+        showMessage('Variant does not exist. Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
-      alert('Variant already exists. Please enter the correct content');
+      showMessage('Variant does not exist. Please enter the correct content', 'error');
       return;
     }
     
-    // 执行更新操作 (对应设计书 4.1.2.2 Update操作校验 执行更新)
     try {
-      const currentUserId = localStorage.getItem('userId') || '';
+      const currentUserId = sessionStorage.getItem('userId') || '';
       const currentDateTime = new Date().toISOString();
       
-      const updateResponse = await axios.put('/api/UD10/update-hdoc-variables', {
+      const updateResponse = await axios.post('http://localhost:8081/api/ud10/update', {
         variable: variable,
         type: type,
-        descr: description,
-        registerUser: currentUserId,
+        description: description,
+        registerUser: createdByUser,
         registerDatetime: currentDateTime,
-        registerProcess: 'ExistingHdocVariables'
+        registerProcess: 'ExistingHdocVariables',
+        updateUser: currentUserId,
+        updateDatetime: currentDateTime,
+        updateProcess: 'ExistingHdocVariables'
       });
       
-      if (updateResponse.data.success) {
-        alert('情报更新成功');
+      if (updateResponse.data.code === 200) {
+        showMessage('情报更新成功', 'success');
       } else {
-        alert(updateResponse.data.message || '情报更新失败');
+        showMessage(updateResponse.data.msg || '情报更新失败', 'error');
       }
     } catch (error: any) {
-      console.error('更新失败:', error);
-      alert(error.response?.data?.message || '情报更新失败');
+      showMessage(error.response?.data?.msg || '情报更新失败', 'error');
     }
   };
 
@@ -194,45 +208,40 @@ const ExistingHdocVariables: React.FC = () => {
    * 对应设计书 3.7 Delete按钮押下 和 4.1.2.3 Delete操作校验
    */
   const handleDeleteClick = async () => {
-    // 校验1：Variable必须入力 (对应设计书 4.2 校验详细规格表 No.1)
     if (!variable) {
-      alert('[项目:Variable] 是必须入力项目');
+      showMessage('[项目:Variable] 是必须入力项目', 'error');
       return;
     }
     
+    clearMessage();
+    
     try {
-      // 校验2：检查数据是否存在 (对应设计书 4.1.2.3 Delete操作校验 校验2)
-      const existResponse = await axios.post('/api/UD10/select-hdoc-variables', {
+      const existResponse = await axios.post('http://localhost:8081/api/ud11/search', {
         variable: variable
       });
       
-      if (!existResponse.data.success || !existResponse.data.data) {
-        alert('Variant does not exists. Please enter the correct content');
+      if (existResponse.data.code !== 200 || !existResponse.data.data || (Array.isArray(existResponse.data.data) && existResponse.data.data.length === 0)) {
+        showMessage('Variant does not exist. Please enter the correct content', 'error');
         return;
       }
     } catch (error: any) {
-      alert('Variant does not exists. Please enter the correct content');
+      showMessage('Variant does not exist. Please enter the correct content', 'error');
       return;
     }
     
-    // 执行删除操作 (对应设计书 4.1.2.3 Delete操作校验 执行删除)
     try {
-      const deleteResponse = await axios.delete('/api/UD10/delete-hdoc-variables', {
-        data: {
-          variable: variable
-        }
+      const deleteResponse = await axios.post('http://localhost:8081/api/ud10/delete', {
+        variable: variable
       });
       
-      if (deleteResponse.data.success) {
-        alert('情报删除成功');
-        // 清空表单
+      if (deleteResponse.data.code === 200) {
+        showMessage('情报删除成功', 'success');
         handleClearClick();
       } else {
-        alert(deleteResponse.data.message || '情报删除失败');
+        showMessage(deleteResponse.data.msg || '情报删除失败', 'error');
       }
     } catch (error: any) {
-      console.error('删除失败:', error);
-      alert(error.response?.data?.message || '情报删除失败');
+      showMessage(error.response?.data?.msg || '情报删除失败', 'error');
     }
   };
 
@@ -240,32 +249,25 @@ const ExistingHdocVariables: React.FC = () => {
    * Excel按钮点击处理 - 导出CSV文件
    * 对应设计书 3.8 Excel按钮押下
    */
-  const handleExcelClick = async () => {
-    try {
-      // 调用后端接口生成CSV文件
-      const response = await axios.post('/api/UD10/export-csv', {
-        variable: variable,
-        type: type,
-        description: description,
-        createdByUser: createdByUser,
-        date: date
-      }, {
-        responseType: 'blob' // 设置响应类型为blob以处理文件下载
-      });
-      
-      // 创建下载链接
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'hdoc_variables.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error: any) {
-      console.error('导出CSV失败:', error);
-      alert(error.response?.data?.message || '导出CSV失败');
-    }
+  const handleExcelClick = () => {
+    // 纯前台生成CSV，不调API
+    const csvData = [
+      ['Variable', 'Type', 'Description', 'Created by user', 'Date'],
+      [variable, type, description, createdByUser, date]
+    ];
+    const csvContent = csvData.map(row => 
+      row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'hdoc_variables.csv');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -284,6 +286,13 @@ const ExistingHdocVariables: React.FC = () => {
           <button className='action-button' onClick={handleDeleteClick}>Delete</button>
           <button className='action-button' onClick={handleExcelClick}>Excel</button>
         </div>
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
+          </div>
+        )}
         
         {/* 表单区域 */}
         <div className='form-container'>

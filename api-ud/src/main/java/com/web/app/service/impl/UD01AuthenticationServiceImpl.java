@@ -47,11 +47,6 @@ public class UD01AuthenticationServiceImpl implements UD01AuthenticationService 
             throw new IllegalArgumentException("用户ID不能为空");
         }
         
-        // password非空校验
-        if (loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("密码不能为空");
-        }
-        
         // ===== 4.5 查询用户信息 =====
         // 通过HdocUserInfoMapper数据访问层，根据请求参数查询数据库中的用户信息
         HdocUserInfo userInfo = hdocUserInfoMapper.selectUserByLoginParam(
@@ -60,15 +55,17 @@ public class UD01AuthenticationServiceImpl implements UD01AuthenticationService 
             loginRequest.getPassword()
         );
         
-        // ===== 4.6 登录核心验证逻辑 =====
         // 判断用户是否存在
         if (userInfo == null) {
-            throw new RuntimeException("We didn't recognize the username or password you entered. Please try again.");
+            throw new RuntimeException("用户信息不存在");
         }
         
-        // 比对前端传递密码与数据库密码是否一致
-        if (!loginRequest.getPassword().equals(userInfo.getPassword())) {
-            throw new RuntimeException("We didn't recognize the username or password you entered. Please try again.");
+        // ===== 4.6 密码验证（仅Login画面传入密码时执行）=====
+        if (loginRequest.getPassword() != null && !loginRequest.getPassword().trim().isEmpty()) {
+            // 比对前端传递密码与数据库密码是否一致
+            if (!loginRequest.getPassword().equals(userInfo.getPassword())) {
+                throw new RuntimeException("We didn't recognize the username or password you entered. Please try again.");
+            }
         }
         
         // ===== 4.7 构建登录成功响应 =====

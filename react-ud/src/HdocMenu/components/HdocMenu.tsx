@@ -53,21 +53,21 @@ const FULL_MENU_DATA: MenuCategory[] = [
   {
     categoryName: 'Admin',
     items: [
-      { id: 'menu-admin-update-rules', name: 'Update user defined variables (rules)', routePath: '/HomologationVariables' },
+      { id: 'menu-admin-update-rules', name: 'Update user defined variables (rules)', routePath: '/HdocMenu/HomologationVariables' },
       { id: 'menu-admin-update-unicode', name: 'Update user defined variables (UNICODE rules)', routePath: '/admin/update-unicode' },
       { 
         id: 'menu-admin-existing-variables', 
         name: 'Existing HDoc variables', 
-        routePath: '/admin/variables'
+        routePath: '/HdocMenu/ExistingHdocVariables'
       },
       { id: 'menu-admin-unlock-document', name: 'Unlock Document', routePath: '/admin/unlock' },
       { id: 'menu-admin-number-series', name: 'HDoc Number Series', routePath: '/admin/number-series' },
       { 
         id: 'menu-admin-upload-template', 
         name: 'Upload/Delete template', 
-        routePath: '/admin/template'
+        routePath: '/HdocMenu/UploadDeleteTemplate'
       },
-      { id: 'menu-admin-list-templates', name: 'List available templates', routePath: '/admin/list-templates' },
+      { id: 'menu-admin-list-templates', name: 'List available templates', routePath: '/HdocMenu/ListAvailableTemplates' },
       { id: 'menu-admin-vpps-vin', name: 'VPPS Vin plate', routePath: '/admin/vpps-vin' },
       { id: 'menu-admin-ad-ca-change', name: 'AD/CA Change', routePath: '/HdocMenu/AdChange' }
     ]

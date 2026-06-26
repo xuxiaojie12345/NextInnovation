@@ -126,8 +126,9 @@ const GeneratedDocument: React.FC = () => {
    * 对应设计书 3.2 Chassis no Link押下
    */
   const handleChassisNoClick = () => {
-    // 跳转到VdaVehicle Specification画面，传递userId参数
-    navigate('/VehicleSpecification', { state: { userId } });
+    // 合并chassisSeries和chassisNo传递（如 "wang123"），VehicleSpecification会自行拆分
+    const combinedChassisNo = chassisSeries + chassisNo;
+    navigate('/HdocMenu/VehicleSpecification', { state: { userId, chassisNo: combinedChassisNo } });
   };
 
   /**
@@ -135,8 +136,10 @@ const GeneratedDocument: React.FC = () => {
    * 对应設計書 3.3 Modify Doc Link押下
    */
   const handleModifyDocClick = () => {
-    // 跳转到ModifyDocument画面，传递userId、chassisNo、market参数
-    navigate('/ModifyDocument', { state: { userId, chassisNo, market } });
+    // 将chassisSeries和chassisNo合并为一个字符串传递（如 "JPCT028321"），
+    // ModifyDocument画面会将其拆分为Serie和ChNo作为API参数
+    const combinedChassisNo = chassisSeries + chassisNo;
+    navigate('/HdocMenu/ModifyDocument', { state: { userId, chassisNo: combinedChassisNo, market } });
   };
 
   /**
@@ -180,7 +183,7 @@ const GeneratedDocument: React.FC = () => {
             {/* Chassis no (Link类型) - 与Ordernumber间距4px */}
             <div className='chassis-no-row'>
               <span className='chassis-no-label'>Chassis no:</span>
-              <a href='/VehicleSpecification' className='chassis-no-link' onClick={handleChassisNoClick}>
+              <a href='#' className='chassis-no-link' onClick={(e) => { e.preventDefault(); handleChassisNoClick(); }}>
                 {chassisSeries} {chassisNo}
               </a>
             </div>
@@ -258,7 +261,7 @@ const GeneratedDocument: React.FC = () => {
             {/* Modify Doc Link (条件显示) - 红色警告信息 */}
             {modifyDocLinkActive && (
               <div className='modify-warning-row'>
-                <a href='/react-ud/src/ModifyDocument/ModifyDocument.tsx' className='modify-warning-link' onClick={handleModifyDocClick}>
+                <a href='#' className='modify-warning-link' onClick={(e) => { e.preventDefault(); handleModifyDocClick(); }}>
                   After def change detected. Document need to be modified.
                 </a>
               </div>
@@ -272,7 +275,7 @@ const GeneratedDocument: React.FC = () => {
             
             {/* Replacing parameters标题 */}
             <div className='replacing-params-title-row'>
-              <span className='replacing-params-title'>Replacing parameters:</span>
+              <span className='replacing-params-title'>Replacing parameters:</span><br/>
               <span className='replacing-params-value'>{replacingParameters}</span>
             </div>
             

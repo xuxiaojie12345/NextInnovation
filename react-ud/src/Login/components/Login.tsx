@@ -109,7 +109,11 @@ const Login: React.FC = () => {
       
       if (response.code === 200) {
         console.log('Login Success:', response.data);
-        // TODO: 保存用户信息（如Token、用户信息等）
+        // 保存用户信息到sessionStorage
+        if (response.data) {
+          sessionStorage.setItem('userId', response.data.userId);
+          sessionStorage.setItem('username', response.data.username);
+        }
         Navigate('/HdocMenu');
        
       } else {

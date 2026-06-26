@@ -38,15 +38,16 @@ function App() {
             <Route path='/HdocMenu' element={<HdocMenu />}>
               {/* HdocMenu的直接子路由 */}
               <Route path='HdocGenerateHomologationDocument' element={<HdocGenerateHomologationDocument />} ></Route>
-                <Route path='GeneratedDocument' element={<GeneratedDocument />} />
-             
-              <Route path='ModifyDocument' element={<ModifyDocument />} />
-              <Route path='SaveModifications' element={<SaveModifications />} />
-              <Route path='VehicleSpecification' element={<VehicleSpecification />} />
-              <Route path='HomologationVariables' element={<HomologationVariables />} />
-              <Route path='HomologationVariablesResultList' element={<HomologationVariablesResultList />} />
-              <Route path='ExistingHdocVariables' element={<ExistingHdocVariables />} />
-              <Route path='ExistingHdocVariablesResultList' element={<ExistingHdocVariablesResultList />} />
+                <Route path='GeneratedDocument' element={<GeneratedDocument />} ></Route>
+                  <Route path='ModifyDocument' element={<ModifyDocument />} ></Route>
+                    <Route path='SaveModifications' element={<SaveModifications />} />
+                    <Route path='VehicleSpecification' element={<VehicleSpecification />} />
+              
+              <Route path='HomologationVariables' element={<HomologationVariables />} ></Route>
+                <Route path='HomologationVariablesResultList' element={<HomologationVariablesResultList />} />
+                  <Route path='EdbUserView' element={<EdbUserView />} />
+              <Route path='ExistingHdocVariables' element={<ExistingHdocVariables />} ></Route>
+                <Route path='ExistingHdocVariablesResultList' element={<ExistingHdocVariablesResultList />} />
               <Route path='UploadDeleteTemplate' element={<UploadDeleteTemplate />} />
               <Route path='HdocTemplateCheck' element={<HdocTemplateCheck />} />
               <Route path='ListAvailableTemplates' element={<ListAvailableTemplates />} />
@@ -66,7 +67,7 @@ function App() {
               <Route path='MarketDocumentSettingsList' element={<MarketDocumentSettingsList />} />
               <Route path='MarketsInHdoc' element={<MarketsInHdoc />} />
               <Route path='DocumentTypes' element={<DocumentTypes />} /> 
-              <Route path='EdbUserView' element={<EdbUserView />} />
+              
             </Route>
           </Routes>
         </div>

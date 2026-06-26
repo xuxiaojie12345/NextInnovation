@@ -47,7 +47,7 @@ public class UD01AuthenticationController {
         
         return ResponseEntity.ok(response);
     }
-    
+
     /**
      * 处理业务异常（如账号不存在、密码错误等）
      */

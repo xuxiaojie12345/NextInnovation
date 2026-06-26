@@ -173,6 +173,34 @@
   margin-bottom: 15px;
 }
 
+/* 消息显示区域 */
+.message-display {
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid;
+}
+
+.message-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.message-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.message-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .existing-hdoc-variables-content {

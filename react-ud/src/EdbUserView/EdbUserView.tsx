@@ -48,25 +48,23 @@ const EdbUserView: React.FC = () => {
     setErrorMessage('');
     
     try {
-      // API请求 - 获取用户信息 (对应设计书 5.1)
-      const response = await axios.post('/api/UD01/login', {
-        userId: userId,
-        userName: '' // 可选参数
+      // API请求 - 获取用户信息
+      const response = await axios.post('http://localhost:8081/api/ud01/login', {
+        userId: userId
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data || {};
-        // 将用户信息显示在对应的TextField中 (对应设计书 2.1 控件属性表)
-        setUserId(data.userid || '');
+        setUserId(data.userId || '');
         setResponsible(data.responsible || '');
         setUserPosition(data.userPosition || '');
         setEmail(data.email || '');
       } else {
-        setErrorMessage(response.data.message || '用户信息获取失败');
+        setErrorMessage(response.data.msg || '用户信息获取失败');
       }
     } catch (error: any) {
       console.error('获取用户信息失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      setErrorMessage(error.response?.data?.msg || '网络连接失败，请稍后重试');
     } finally {
       setIsLoading(false);
     }

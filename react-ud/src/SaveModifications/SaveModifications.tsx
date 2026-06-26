@@ -29,12 +29,17 @@ const SaveModifications: React.FC = () => {
   useEffect(() => {
     // 从路由state中获取参数
     const state = location.state as any;
-    if (state && state.chassisSerie && state.chassisNumber) {
+    if (state && state.chassisSerie && state.chassisNo) {
       setChassisSerie(state.chassisSerie);
-      setChassisNumber(state.chassisNumber);
-      
+      setChassisNumber(state.chassisNo);
+
+      // 与ModifyDocument一样，从合并字符串中提取数字部分作为CHNO
+      const combinedNo = state.chassisNo as string;
+      const serie = state.chassisSerie as string;
+      const chNo = combinedNo.replace(/[^0-9]/g, '');
+
       // 调用API获取数据
-      fetchModificationData(state.chassisSerie, state.chassisNumber);
+      fetchModificationData(serie, chNo);
     } else {
       // 缺少必要参数，直接结束loading状态
       setIsLoading(false);
@@ -53,24 +58,26 @@ const SaveModifications: React.FC = () => {
     
     try {
       // API请求 (对应设计书 5.1 UD06SelectHdocAdcaModificationApi)
-      const response = await axios.post('/api/UD06/SelectHdocAdcaModification', {
+      const response = await axios.post('http://localhost:8081/api/ud06/selecthdocadcamodification', {
         serie: serieParam,
         chno: chnoParam
       });
       
-      if (response.data.success) {
-        const data = response.data.data;
-        
+      if (response.data.code === 200) {
+        const list = response.data.data;
+        // 取第一条数据展示
+        const data = Array.isArray(list) && list.length > 0 ? list[0] : list;
+
         // 映射返回的数据到对应的Label控件 (对应设计书 4.1.1 步骤1)
         setDoctype(data.doctype || '');
-        setVersion(data.vers || '');
-        
+        setVersion(data.vers != null ? String(data.vers) : '');
+
         // Storing: 将variable和newval组合显示 (对应设计书 7. 实现注意事项)
         const storingText = `${data.variable || ''} ${data.newval || ''}`;
         setStoring(storingText.trim());
-        
+
         // FOUND UNRELEASED VERSION: 从VERS字段获取
-        setFoundUnreleasedVersion(data.vers || '');
+        setFoundUnreleasedVersion(data.vers != null ? String(data.vers) : '');
       }
       // Message区域固定显示"VERSION IS RELEASED"，无论API成功或失败都显示此文本
     } catch (error: any) {

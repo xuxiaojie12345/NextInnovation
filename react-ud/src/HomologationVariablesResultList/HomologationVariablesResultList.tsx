@@ -48,39 +48,37 @@ const HomologationVariablesResultList: React.FC = () => {
     
     try {
       // 并行调用两个API
+      const searchBody = {
+        pc: params.productClass || '',
+        num: params.number || '',
+        market: params.market || '',
+        variable: params.variable || '',
+        val: params.value || '',
+        vs: params.variantString1 || '',
+        vs2: params.variantString2 || '',
+        comments: params.comments || ''
+      };
+
       const [dataResponse, countResponse] = await Promise.all([
-        // API请求 - 获取检索结果数据 (对应设计书 5.1)
-        axios.post('/api/UD08/select-hdoc-user-defined-rules', {
-          pc: params.productClass || '',
-          num: params.number ? parseInt(params.number) : null,
-          market: params.market || ''
-        }),
-        
-        // API请求 - 获取检索结果总条数 (对应设计书 5.3)
-        axios.post('/api/UD08/select-hdoc-user-defined-rules-count', {
-          pc: params.productClass || '',
-          num: params.number ? parseInt(params.number) : null,
-          market: params.market || ''
-        })
+        axios.post('http://localhost:8081/api/ud09/search', searchBody),
+        axios.post('http://localhost:8081/api/ud09/selecthdocuserdefinedrulescount', searchBody)
       ]);
       
-      if (dataResponse.data.success) {
-        // 假设返回的是数组格式
+      if (dataResponse.data.code === 200) {
         const dataList = Array.isArray(dataResponse.data.data) 
           ? dataResponse.data.data 
           : [dataResponse.data.data];
         
-        // 按 Product Class, Market, Number 排序 (对应设计书 2.1 控件属性表 备注)
         const sortedData = dataList.sort((a: any, b: any) => {
-          if (a.pc !== b.pc) return a.pc.localeCompare(b.pc);
-          if (a.market !== b.market) return a.market.localeCompare(b.market);
+          if (a.pc !== b.pc) return (a.pc || '').localeCompare(b.pc || '');
+          if (a.market !== b.market) return (a.market || '').localeCompare(b.market || '');
           return (a.num || 0) - (b.num || 0);
         });
         
         setDataTableList(sortedData);
       }
       
-      if (countResponse.data.success) {
+      if (countResponse.data.code === 200) {
         setTotalCount(countResponse.data.data.count || 0);
       }
     } catch (error: any) {
@@ -102,7 +100,7 @@ const HomologationVariablesResultList: React.FC = () => {
     }
     
     // 返回HomologationVariables画面，携带选中的数据
-    navigate('/HomologationVariables', { 
+    navigate('/HdocMenu/HomologationVariables', { 
       state: { 
         variable: selectedRow.variable,
         ...selectedRow
@@ -115,7 +113,10 @@ const HomologationVariablesResultList: React.FC = () => {
    * 对应設計書 3.3 Back按钮押下
    */
   const handleBackClick = () => {
-    navigate(-1);
+    // 返回HomologationVariables画面，携带原来的检索条件参数
+    navigate('/HdocMenu/HomologationVariables', { 
+      state: searchParams 
+    });
   };
 
   /**
@@ -139,15 +140,13 @@ const HomologationVariablesResultList: React.FC = () => {
     
     try {
       // API请求 - 删除选中的数据 (对应設計書 5.2 UD08DeleteHdocUserDefinedRulesApi)
-      const deleteResponse = await axios.delete('/api/UD08/delete-hdoc-user-defined-rules', {
-        data: {
-          pc: selectedRow.pc,
-          num: selectedRow.num,
-          market: selectedRow.market
-        }
+      const deleteResponse = await axios.post('http://localhost:8081/api/ud09/deleteselected', {
+        pc: selectedRow.pc,
+        num: selectedRow.num,
+        market: selectedRow.market
       });
       
-      if (deleteResponse.data.success) {
+      if (deleteResponse.data.code === 200) {
         alert('情报删除成功');
         
         // 重新加载数据
@@ -176,7 +175,7 @@ const HomologationVariablesResultList: React.FC = () => {
     }
     
     // 跳转到EdbUserView画面，携带userId参数
-    navigate('/edb-user-view', { 
+    navigate('/HdocMenu/EdbUserView', { 
       state: { userId: registerUser } 
     });
   };

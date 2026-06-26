@@ -34,11 +34,10 @@ public class LoginRequest {
     private String username;
     
     /**
-     * 密码（必填）
+     * 密码（Login画面必填，EdbUserView画面可选）
      * 许容文字：半角英数字 + 記号
      * MaxLength: 32
      */
-    @NotBlank(message = "密码不能为空")
     @Size(max = 32, message = "密码长度不能超过32")
     @JsonProperty("passWord")
     private String password;

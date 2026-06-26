@@ -46,12 +46,12 @@ const VehicleSpecification: React.FC = () => {
    */
   const fetchVehicleData = async (chassisNoParam: string) => {
     try {
-      // API请求 - 第一步：获取OM基础数据和variantId、functionId (对应设计书 4.1.1 步骤1)
-      const response = await axios.post('/api/UD07/select-hdoc-rec-data-om', {
+      // API请求 - 调用UD07车辆规格接口（后端已合并两个查询）
+      const response = await axios.post('http://localhost:8081/api/ud07/vehiclespecification', {
         chassisNo: chassisNoParam
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data;
         
         // 映射返回的基础数据到状态变量
@@ -63,9 +63,14 @@ const VehicleSpecification: React.FC = () => {
         setCountryOfOperation(data.countryOfOperation || '');
         setSNoteNo(data.customerAdap || '');
         
-        // 如果存在variantId和functionId，继续调用第二个API获取SYMBOL_STR列表
-        if (data.variantId && data.functionId) {
-          await fetchVariantData(data.variantId, data.functionId);
+        // 后端已合并KOLA Variant数据到symbol/description字段
+        if (data.symbol || data.description) {
+          const formattedSymbol = (data.symbol || '').substring(0, 8).padStart(8, ' ');
+          setSymbolStrList([{
+            symbol: formattedSymbol,
+            functionGroup: '',
+            description: data.description || ''
+          }]);
         }
       }
     } catch (error: any) {
@@ -73,41 +78,7 @@ const VehicleSpecification: React.FC = () => {
     }
   };
 
-  /**
-   * 调用UD07SelectHdocRecDataVdaAndKolaVariantsApi获取SYMBOL_STR列表
-   * 对应设计书 5.2 UD07SelectHdocRecDataVdaAndKolaVariantsApi
-   * 
-   * @param variantId 变体ID
-   * @param functionId 功能ID
-   */
-  const fetchVariantData = async (variantId: string, functionId: string) => {
-    try {
-      // API请求 - 第二步：获取VDA和KOLA变体数据 (对应设计书 4.1.2 步骤2)
-      const response = await axios.post('/api/UD07/select-hdoc-rec-data-vda-and-kola-variants', {
-        variantId: variantId,
-        functionId: functionId
-      });
-      
-      if (response.data.success) {
-        const data = response.data.data;
-        
-        // 格式化SYMBOL_STR：截取前8个字符，不足8位时左侧补半角空格 (对应设计书 7. 实现注意事项)
-        const formattedSymbol = (data.symbol || '').substring(0, 8).padStart(8, ' ');
-        
-        // 设置SYMBOL_STR列表（可能有多条记录）
-        setSymbolStrList([{
-          symbol: formattedSymbol,
-          functionGroup: data.functionGroup || '',
-          description: data.description || ''
-        }]);
-      } else {
-        // 未找到对应的车辆变体数据
-        console.warn('未找到对应的车辆变体数据');
-      }
-    } catch (error: any) {
-      console.error('获取变体数据失败:', error);
-    }
-  };
+  // 已移除 fetchVariantData，后端UD07Controller已合并两个查询
 
   return (
     <div className='vehicle-specification-container'>
@@ -169,7 +140,7 @@ const VehicleSpecification: React.FC = () => {
         {/* S-Note NO (条件显示) */}
         {sNoteNo && (
           <div className='info-row-single'>
-            <span className='label'>S-Note NO:</span>
+            {/* <span className='label'>S-Note NO:</span> */}
             <span className='value'>{sNoteNo}</span>
           </div>
         )}

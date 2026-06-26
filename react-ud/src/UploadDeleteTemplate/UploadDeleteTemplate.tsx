@@ -21,6 +21,15 @@ const UploadDeleteTemplate: React.FC = () => {
   const [filteredTemplates, setFilteredTemplates] = useState<any[]>([]);
   const [marketList, setMarketList] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
 
   /**
    * 画面初期表示 - 调用API获取Market下拉列表数据和Templates模板列表数据
@@ -55,27 +64,24 @@ const UploadDeleteTemplate: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // 并行调用两个API
       const [marketResponse, templatesResponse] = await Promise.all([
-        // API请求 - 获取Market下拉列表数据
-        axios.post('/api/UD08/select-marketmaster'),
-        
-        // API请求 - 获取所有模板列表数据
-        axios.post('/api/UD12/get-templates')
+        axios.post('http://localhost:8081/api/ud12/selectmarket'),
+        axios.post('http://localhost:8081/api/ud12/gettemplates')
       ]);
       
-      if (marketResponse.data.success) {
+      if (marketResponse.data.code === 200) {
         const markets = marketResponse.data.data.map((item: any) => item.market || item);
         setMarketList(markets);
       }
       
-      if (templatesResponse.data.success) {
-        const templates = templatesResponse.data.data.templateFiles || [];
+      if (templatesResponse.data.code === 200) {
+        const templateData = templatesResponse.data.data;
+        const templates = templateData?.templateFiles || [];
         setAllTemplates(templates);
         setFilteredTemplates(templates);
       }
     } catch (error: any) {
-      console.error('获取初始数据失败:', error);
+      showMessage('获取初始数据失败', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -96,50 +102,45 @@ const UploadDeleteTemplate: React.FC = () => {
    * 对应设计书 3.2 Upload file按钮押下 和 4.1.2 模板上传操作
    */
   const handleUploadClick = async () => {
-    // 校验1：Template File未选择文件 (对应设计书 4.2 校验详细规格表 No.1)
     if (!templateFile) {
-      alert('NO FILE UPLOADED');
+      showMessage('NO FILE UPLOADED', 'error');
       return;
     }
     
-    // 校验2：Market未选择
     if (!uploadMarket) {
-      alert('请选择目标市场');
+      showMessage('MARKET是必须入力项目', 'error');
       return;
     }
+    
+    // 校验文件大小不超过10MB
+    const maxSize = 10 * 1024 * 1024;
+    if (templateFile.size > maxSize) {
+      showMessage('文件大小上限10MB，请压缩文件后再上传', 'error');
+      return;
+    }
+    
+    clearMessage();
     
     try {
-      // 使用FormData封装文件和参数
       const formData = new FormData();
       formData.append('templateFile', templateFile);
       formData.append('market', uploadMarket);
       
-      // API请求 - 上传模板文件 (对应设计书 5.3 UD12UploadTemplateApi)
-      const response = await axios.post('/api/UD12/upload-template', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      const response = await axios.post('http://localhost:8081/api/ud12/uploadtemplate', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      if (response.data.success) {
-        // 弹出Information提示 (对应设计书 4.1.2 执行上传)
-        alert(`TEMPLATE ${templateFile.name} WAS SUCESSFULLY UPLOADED TO MARKET ${uploadMarket}`);
-        
-        // 刷新Templates下拉列表
+      if (response.data.code === 200) {
+        showMessage(`TEMPLATE ${templateFile.name} WAS SUCESSFULLY UPLOADED TO MARKET ${uploadMarket}`, 'success');
         await fetchInitialData();
-        
-        // 清空文件选择
         setTemplateFile(null);
         const fileInput = document.getElementById('template-file-input') as HTMLInputElement;
-        if (fileInput) {
-          fileInput.value = '';
-        }
+        if (fileInput) fileInput.value = '';
       } else {
-        alert(response.data.message || '文档上传失败');
+        showMessage(response.data.msg || '文档上传失败', 'error');
       }
     } catch (error: any) {
-      console.error('上传失败:', error);
-      alert(error.response?.data?.message || '文档上传失败');
+      showMessage(error.response?.data?.msg || '文档上传失败', 'error');
     }
   };
 
@@ -148,42 +149,31 @@ const UploadDeleteTemplate: React.FC = () => {
    * 对应设计书 3.3 Delete按钮押下 和 4.1.3 模板删除操作
    */
   const handleDeleteClick = async () => {
-    // 校验1：Market或Templates未选择 (对应设计书 4.2 校验详细规格表 No.3)
     if (!deleteMarket || !selectedTemplate) {
-      alert('请选择要删除的模板');
+      showMessage('请选择要删除的模板', 'error');
       return;
     }
     
-    // 确认对话框 (对应设计书 4.1.3 确认对话框)
     const confirmed = window.confirm('Do you really want to delete template?');
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
+    
+    clearMessage();
     
     try {
-      // API请求 - 删除模板文件 (对应设计书 5.4 UD12DeleteTemplateApi)
-      const response = await axios.delete('/api/UD12/delete-template', {
-        data: {
-          templateName: selectedTemplate,
-          market: deleteMarket
-        }
+      const response = await axios.post('http://localhost:8081/api/ud12/deletetemplate', {
+        templateName: selectedTemplate,
+        market: deleteMarket
       });
       
-      if (response.data.success) {
-        // 弹出Information提示 (对应设计书 4.1.3 执行删除)
-        alert(`TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${deleteMarket}`);
-        
-        // 刷新Templates下拉列表
+      if (response.data.code === 200) {
+        showMessage(`TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${deleteMarket}`, 'success');
         await fetchInitialData();
-        
-        // 清空选中项
         setSelectedTemplate('');
       } else {
-        alert(response.data.message || '文档删除失败');
+        showMessage(response.data.msg || '文档删除失败', 'error');
       }
     } catch (error: any) {
-      console.error('删除失败:', error);
-      alert(error.response?.data?.message || '文档删除失败');
+      showMessage(error.response?.data?.msg || '文档删除失败', 'error');
     }
   };
 
@@ -191,16 +181,8 @@ const UploadDeleteTemplate: React.FC = () => {
    * Archive按钮点击处理 - 归档模板文件
    * 注意：内部设计书中未明确Archive功能，此处预留接口
    */
-  const handleArchiveClick = () => {
-    alert('Archive功能暂未实现');
-  };
-
-  /**
-   * Check Template链接点击处理 - 跳转到HdocTemplateCheck画面进行模板校验
-   * 对应设计书 3.4 Check Template链接押下
-   */
   const handleCheckTemplateClick = () => {
-    navigate('/HdocTemplateCheck');
+    navigate('/HdocMenu/HdocTemplateCheck');
   };
 
   return (
@@ -287,10 +269,16 @@ const UploadDeleteTemplate: React.FC = () => {
 
           <div className='udt-button-row'>
             <button className='udt-action-button' onClick={handleDeleteClick}>Delete</button>
-            <button className='udt-action-button' onClick={handleArchiveClick}>Archive</button>
           </div>
           </div>
         </div>
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
+          </div>
+        )}
         
         {/* Check your rtf template区域 */}
         <div className='udt-check-section'>

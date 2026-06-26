@@ -1,6 +1,6 @@
-/* ModifyDocument页面样式 */
+/* ModifyDocument页面样式 - 所有类名以 md- 开头 */
 
-.modify-document-container {
+.md-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -9,7 +9,7 @@
   padding: 20px;
 }
 
-.modify-document-content {
+.md-content {
   width: 100%;
   max-width: 1200px;
   background: white;
@@ -18,7 +18,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.page-title {
+.md-page-title {
   font-size: 24px;
   font-weight: bold;
   color: #003f87;
@@ -27,7 +27,7 @@
   text-align: left;
 }
 
-.error-message-area {
+.md-error {
   color: #ff4d4f;
   background-color: #fff1f0;
   border: 1px solid #ffa39e;
@@ -39,14 +39,14 @@
   word-break: break-word;
 }
 
-.loading-message {
+.md-loading {
   text-align: center;
   padding: 40px;
   color: #666;
   font-size: 16px;
 }
 
-.info-row {
+.md-info-row {
   margin-bottom: 15px;
   text-align: left;
   line-height: 1.6;
@@ -54,120 +54,147 @@
   color: #333;
 }
 
-.label {
+.md-label {
   font-weight: 500;
   color: #333;
   margin-right: 8px;
 }
 
-.value {
+.md-value {
   color: #333;
   word-break: break-all;
 }
 
-.link-text {
+.md-link {
   color: #1890ff;
   text-decoration: underline;
   cursor: pointer;
   font-weight: 500;
 }
 
-.link-text:hover {
+.md-link:hover {
   color: #40a9ff;
   text-decoration: underline;
 }
 
-/* DataTable container (corresponding to design document section 7) */
-.data-table-container {
-  margin-top: 20px;
+/* DataTable容器 - 包含Save按钮和表格的带边框容器 */
+.md-table-container {
+  margin-top: 50px;
   margin-bottom: 30px;
+  border: 1px solid #c0c0d8;
+  border-radius: 4px;
+  padding: 20px 0 0 0;
+  background-color: #f5f5fa;
+}
+
+/* 表格外层容器-处理横向滚动 */
+.md-table-wrapper {
   overflow-x: auto;
 }
 
-/* Save button at top-left of DataTable */
-.button-container-top {
-  text-align: left; /* Left align */
-  margin-top: 25px;
-  margin-bottom: 15px;
+/* Save按钮 */
+.md-btn-container {
+  text-align: left;
+  padding-left: 20px;
+  margin-bottom: 5px;
+  margin-top: -15px;
 }
 
-.save-button {
-  padding: 8px 20px; /* Adjust button size to match design */
-  background-color: #bcc4f0; /* Light gray background like design */
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 2px;
+.md-save-btn {
+  padding: 8px 28px;
+  background-color: #c6cdf0;
+  color: #2c2c2c;
+  border: 1px solid #9ca4d0;
+  border-radius: 1px;
   font-size: 14px;
-  font-weight: normal;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.save-button:hover:not(:disabled) {
-  background-color: #d9d9d9;
+.md-save-btn:hover:not(:disabled) {
+  background-color: #b6bff3;
 }
 
-.save-button:disabled {
-  background-color: #f5f5f5;
+.md-save-btn:disabled {
+  background-color: #d9d9e8;
+  border-color: #c8c8d8;
   cursor: not-allowed;
 }
 
-/* DataTable样式 (对应设计书 7. 实现注意事项) */
-.data-table {
+/* 分割线：Save按钮与表格标题之间 */
+/* .data-table-container::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background-color: #c0c0d8;
+  margin: 16px 0 0 0;
+} */
+
+/* DataTable样式 */
+.md-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid #e8e8e8;
   font-size: 14px;
 }
 
-.data-table thead {
-  background-color: #f5f5f5;
+.md-table thead {
+  background-color: #ffffff;
 }
 
-.data-table th {
+.md-table th {
   padding: 12px 10px;
   text-align: left;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e8e8e8;
+  font-weight: 700;
+  color: #1a1a1a;
+  border: 1px solid #c0c0d8;
   white-space: nowrap;
+  background-color: #ffffff;
 }
 
-.data-table td {
+.md-table td {
   padding: 10px;
-  border-bottom: 1px solid #e8e8e8;
+  border: 1px solid #d0d0e4;
   vertical-align: middle;
   word-break: break-word;
 }
 
-.data-table tbody tr:hover {
-  background-color: #fafafa;
+/* 交替行背景色（斑马纹） */
+.md-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.md-table tbody tr:nth-child(even) {
+  background-color: #e8eaf5;
+}
+
+.md-table tbody tr:hover {
+  background-color: #dce0f2;
 }
 
 /* 列宽设置 */
-.col-variable {
+.md-col-variable {
   width: 15%;
   min-width: 120px;
 }
 
-.col-description {
+.md-col-description {
   width: 35%;
   min-width: 200px;
 }
 
-.col-current {
+.md-col-current {
   width: 25%;
   min-width: 150px;
 }
 
-.col-modified {
+.md-col-modified {
   width: 25%;
   min-width: 150px;
 }
 
 /* Modified value输入框样式 */
-.modified-input {
-  width: 100%;
+.md-input {
   padding: 8px 10px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
@@ -176,70 +203,23 @@
   transition: all 0.3s;
 }
 
-.modified-input:focus {
+.md-input:focus {
   border-color: #1890ff;
   outline: none;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
-.modified-input:disabled {
+.md-input:disabled {
   background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-/* Save按钮样式 */
-.button-container {
-  text-align: right; /* 修改为右对齐，与设计图一致 */
-  margin-top: 30px;
-}
-
-.save-button {
-  padding: 10px 30px; /* 调整按钮大小，更接近设计图 */
-  background-color:  #bcc4f0;
-  color: #3851df;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px; /* 调整字体大小 */
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.save-button:hover:not(:disabled) {
-  background-color: #40a9ff;
-}
-
-.save-button:disabled {
-  background-color: #ccc;
   cursor: not-allowed;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .modify-document-content {
-    padding: 20px;
-  }
-  
-  .page-title {
-    font-size: 20px;
-  }
-  
-  .data-table {
-    font-size: 13px;
-  }
-  
-  .data-table th,
-  .data-table td {
-    padding: 8px 6px;
-  }
-  
-  .modified-input {
-    padding: 6px 8px;
-    font-size: 13px;
-  }
-  
-  .save-button {
-    padding: 6px 16px;
-    font-size: 13px;
-  }
+  .md-content { padding: 20px; }
+  .md-page-title { font-size: 20px; }
+  .md-table { font-size: 13px; }
+  .md-table th, .md-table td { padding: 8px 6px; }
+  .md-input { padding: 6px 8px; font-size: 13px; }
+  .md-save-btn { padding: 6px 16px; font-size: 13px; }
 }

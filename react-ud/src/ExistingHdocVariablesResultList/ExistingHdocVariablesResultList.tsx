@@ -19,6 +19,17 @@ const ExistingHdocVariablesResultList: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => {
+    setMessage('');
+  };
 
   /**
    * 画面初期表示 - 从路由state获取检索条件并调用API获取数据
@@ -50,18 +61,17 @@ const ExistingHdocVariablesResultList: React.FC = () => {
       // 并行调用两个API
       const [dataResponse, countResponse] = await Promise.all([
         // API请求 - 获取检索结果数据 (对应设计书 5.1)
-        axios.post('/api/UD10/select-hdoc-variables', {
+        axios.post('http://localhost:8081/api/ud11/search', {
           variable: params.variable || ''
         }),
         
         // API请求 - 获取检索结果总条数 (对应设计书 5.2)
-        axios.post('/api/UD10/select-hdoc-variables-count', {
+        axios.post('http://localhost:8081/api/ud11/selecthdocvariablescount', {
           variable: params.variable || ''
         })
       ]);
       
-      if (dataResponse.data.success) {
-        // 假设返回的是数组格式
+      if (dataResponse.data.code === 200) {
         const dataList = Array.isArray(dataResponse.data.data) 
           ? dataResponse.data.data 
           : [dataResponse.data.data];
@@ -69,11 +79,11 @@ const ExistingHdocVariablesResultList: React.FC = () => {
         setDataTableList(dataList);
       }
       
-      if (countResponse.data.success) {
+      if (countResponse.data.code === 200) {
         setTotalCount(countResponse.data.data.count || 0);
       }
     } catch (error: any) {
-      console.error('获取数据失败:', error);
+      showMessage('获取数据失败', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -86,16 +96,16 @@ const ExistingHdocVariablesResultList: React.FC = () => {
   const handleSelectClick = () => {
     // 校验：检查是否选中了数据
     if (!selectedRow) {
-      alert('请先选中一条数据');
+      showMessage('请先选中一条数据', 'error');
       return;
     }
     
     // 返回ExistingHdocVariables画面，携带选中的数据
-    navigate('/ExistingHdocVariables', { 
+    navigate('/HdocMenu/ExistingHdocVariables', { 
       state: { 
         variable: selectedRow.variable,
         type: selectedRow.type,
-        description: selectedRow.descr,
+        description: selectedRow.description,
         createdByUser: selectedRow.registerUser,
         date: selectedRow.registerDatetime
       } 
@@ -107,7 +117,9 @@ const ExistingHdocVariablesResultList: React.FC = () => {
    * 对应设计书 3.3 Back按钮押下
    */
   const handleBackClick = () => {
-    navigate(-1);
+    navigate('/HdocMenu/ExistingHdocVariables', { 
+      state: searchParams 
+    });
   };
 
   /**
@@ -125,12 +137,12 @@ const ExistingHdocVariablesResultList: React.FC = () => {
   const handleDownClick = () => {
     // 校验：检查是否选中了数据 (对应设计书 4.2 校验详细规格表 No.1)
     if (!selectedRow) {
-      alert('No key defined for table.');
+      showMessage('No key defined for table.', 'error');
       return;
     }
     
     // 跳转到HomologationVariables画面，携带variable参数
-    navigate('/homologation-variables', { 
+    navigate('/HdocMenu/HomologationVariables', { 
       state: { 
         variable: selectedRow.variable 
       } 
@@ -149,7 +161,7 @@ const ExistingHdocVariablesResultList: React.FC = () => {
     }
     
     // 跳转到EdbUserView画面，携带userId参数
-    navigate('/EdbUserView', { 
+    navigate('/HdocMenu/EdbUserView', { 
       state: { userId: registerUser } 
     });
   };
@@ -158,32 +170,32 @@ const ExistingHdocVariablesResultList: React.FC = () => {
    * Excel按钮点击处理 - 导出CSV文件
    * 对应设计书 3.7 Excel按钮押下
    */
-  const handleExcelClick = async () => {
-    try {
-      // 调用后端接口生成CSV文件
-      const response = await axios.post('/api/UD10/export-csv', {
-        variable: searchParams.variable,
-        type: searchParams.type,
-        description: searchParams.description,
-        createdByUser: searchParams.createdByUser,
-        date: searchParams.date
-      }, {
-        responseType: 'blob' // 设置响应类型为blob以处理文件下载
-      });
-      
-      // 创建下载链接
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'hdoc_variables.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error: any) {
-      console.error('导出CSV失败:', error);
-      alert(error.response?.data?.message || '导出CSV失败');
-    }
+  const handleExcelClick = () => {
+    // 纯前台生成CSV，不调API
+    const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
+    const csvRows = [headers];
+    dataTableList.forEach(row => {
+      csvRows.push([
+        row.variable || '',
+        row.type || '',
+        row.description || '',
+        row.registerUser || '',
+        row.registerDatetime || ''
+      ]);
+    });
+    const csvContent = csvRows.map(row => 
+      row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'hdoc_variables.csv');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   /**
@@ -209,6 +221,13 @@ const ExistingHdocVariablesResultList: React.FC = () => {
           <button className='action-button' onClick={handlePrintClick}>Print</button>
           <button className='action-button' onClick={handleExcelClick}>Excel</button>
         </div>
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
+          </div>
+        )}
         
         {/* DataTable区域 */}
         <div className='table-container'>
@@ -240,7 +259,7 @@ const ExistingHdocVariablesResultList: React.FC = () => {
                   </td>
                   <td>{row.variable}</td>
                   <td>{row.type}</td>
-                  <td>{row.descr}</td>
+                  <td>{row.description}</td>
                   <td>
                     {row.registerUser && (
                       <span 
