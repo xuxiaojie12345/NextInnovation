@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD17HDocUserAdministrationMapper">
+
+    <!--
+        UD17 根据用户ID查询机能权限
+    -->
+    <select id="selectFunctionAuthByUserid" resultType="com.web.app.entity.HdocFunctionAuth">
+        SELECT
+            USERID AS userid,
+            `FUNCTION` AS function
+        FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = #{userid}
+    </select>
+
+    <!--
+        UD17 根据用户ID查询市场权限
+    -->
+    <select id="selectMarketAuthByUserid" resultType="com.web.app.entity.HdocMarketAuth">
+        SELECT
+            USERID AS userid,
+            MARKET AS market,
+            TYPE AS type
+        FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
+    </select>
+
+    <!--
+        UD17 更新用户机能权限
+    -->
+    <update id="updateFunctionAuth">
+        UPDATE HDOC_FUNCTION_AUTH
+        SET `FUNCTION` = #{function},
+            UPDATE_DATETIME = NOW()
+        WHERE USERID = #{userid}
+    </update>
+
+    <!--
+        UD17 更新用户市场权限
+    -->
+    <update id="updateMarketAuth">
+        UPDATE HDOC_MARKET_AUTH
+        SET MARKET = #{market},
+            TYPE = #{type},
+            UPDATE_DATETIME = NOW()
+        WHERE USERID = #{userid}
+    </update>
+
+    <!--
+        UD17 删除用户的机能权限和市场权限（关联删除）
+    -->
+    <delete id="deleteUserAuth">
+        DELETE T1, T2
+        FROM HDOC_FUNCTION_AUTH T1
+        INNER JOIN HDOC_MARKET_AUTH T2 ON T1.USERID = T2.USERID
+        WHERE T1.USERID = #{userid}
+    </delete>
+
+</mapper>

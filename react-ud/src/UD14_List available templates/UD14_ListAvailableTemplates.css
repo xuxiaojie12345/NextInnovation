@@ -1,0 +1,246 @@
+/* =========================================================
+   UD14_ListAvailableTemplates.css
+   List Available Templates 模板一覧表示画面样式
+   ========================================================= */
+
+/* ---------- 页面主容器 ---------- */
+.ud14-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.ud14-container .ud14-content {
+  width: 100%;
+  max-width: 100%;
+  background-color: #ffffff;
+}
+
+/* ---------- 页面标题 ---------- */
+.ud14-container .ud14-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 15px;
+  text-align: left;
+  border: none;
+  padding: 0;
+}
+
+/* ---------- 错误消息显示区域 ---------- */
+.ud14-container .ud14-message {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  min-height: 20px;
+  border: 1px solid transparent;
+}
+
+.ud14-container .ud14-message--error {
+  background-color: #fff2f0;
+  border-color: #ffccc7;
+  color: #ff4d4f;
+}
+
+/* ---------- 加载状态提示 ---------- */
+.ud14-container .ud14-loading {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+/* ---------- 查询条件区域 ---------- */
+.ud14-container .ud14-search-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #9999cc;
+  padding: 15px 20px;
+  background-color: #ffffff;
+  margin-bottom: 15px;
+}
+
+/* ---------- 表单组 ---------- */
+.ud14-container .ud14-form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ud14-container .ud14-form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* 必填标记 */
+.ud14-container .ud14-required {
+  color: #ff0000;
+  margin-left: 2px;
+}
+
+/* ---------- 下拉框样式 ---------- */
+.ud14-container .ud14-select {
+  width: 200px;
+  padding: 4px 6px;
+  font-size: 13px;
+  border: 1px solid #808080;
+  outline: none;
+  text-align: left;
+  background-color: #ffffff;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.ud14-container .ud14-select:focus {
+  border-color: #000080;
+}
+
+.ud14-container .ud14-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------- 按钮样式 ---------- */
+.ud14-container .ud14-btn {
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.ud14-container .ud14-btn:hover:not(:disabled) {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud14-container .ud14-btn:active:not(:disabled) {
+  background-color: #b0b0d0;
+}
+
+.ud14-container .ud14-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 確認按钮 */
+.ud14-container .ud14-btn-confirm {
+  background-color: #d0d0f0;
+}
+
+/* ---------- 表格容器 ---------- */
+.ud14-container .ud14-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #9999cc;
+}
+
+/* ---------- 数据表格 ---------- */
+.ud14-container .ud14-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.ud14-container .ud14-table th {
+  background-color: #ffffff;
+  color: #333;
+  font-weight: 700;
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid #d9d9d9;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.ud14-container .ud14-table td {
+  padding: 6px 12px;
+  border: 1px solid #e8e8e8;
+  color: #333;
+  text-align: left;
+}
+
+/* 表格行交替背景色 */
+.ud14-container .ud14-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* 表格行悬停效果 */
+.ud14-container .ud14-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+/* ---------- 文件链接样式 ---------- */
+.ud14-container .ud14-file-link {
+  color: #1890ff;
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+
+.ud14-container .ud14-file-link:hover {
+  color: #40a9ff;
+  border-bottom: 1px solid #40a9ff;
+}
+
+/* ---------- 空数据单元格 ---------- */
+.ud14-container .ud14-empty-cell {
+  text-align: center !important;
+  color: #999;
+  padding: 30px 12px !important;
+  font-size: 14px;
+}
+
+/* ---------- 响应式设计 ---------- */
+
+/* 平板设备 */
+@media (max-width: 768px) {
+  .ud14-container {
+    padding: 15px;
+  }
+
+  .ud14-container .ud14-title {
+    font-size: 18px;
+  }
+
+  .ud14-container .ud14-search-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ud14-container .ud14-select {
+    width: 100%;
+  }
+}
+
+/* 手机设备 */
+@media (max-width: 480px) {
+  .ud14-container {
+    padding: 10px;
+  }
+
+  .ud14-container .ud14-title {
+    font-size: 16px;
+  }
+
+  .ud14-container .ud14-table {
+    font-size: 12px;
+  }
+
+  .ud14-container .ud14-table th,
+  .ud14-container .ud14-table td {
+    padding: 5px 8px;
+  }
+}

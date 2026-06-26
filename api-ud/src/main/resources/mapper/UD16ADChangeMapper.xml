@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD16ADChangeMapper">
+
+    <!--
+        UD16 根据系列和底盘号查询AD/CA变更记录
+    -->
+    <select id="selectAdcaChange" resultType="com.web.app.entity.HdocAdcaChange">
+        SELECT *
+        FROM HDOC_ADCA_CHANGE
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </select>
+
+    <!--
+        UD16 插入AD/CA变更记录
+    -->
+    <insert id="insertAdcaChange" parameterType="com.web.app.entity.HdocAdcaChange">
+        INSERT INTO HDOC_ADCA_CHANGE (
+            SERIE, CHNR, ACT, BU, REASON,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+        ) VALUES (
+            #{serie}, #{chnr}, #{act}, #{bu}, #{reason},
+            NOW(), #{registerUser}, #{registerProcess},
+            NOW(), #{updateUser}, #{updateProcess}
+        )
+    </insert>
+
+    <!--
+        UD16 ADD: 更新AD/CA变更记录（ACT = 'Y'）
+    -->
+    <update id="updateAdcaChangeActY">
+        UPDATE HDOC_ADCA_CHANGE
+        SET ACT = 'Y'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+    <!--
+        UD16 DELETE: 更新AD/CA变更记录（ACT = 'U'）
+    -->
+    <update id="updateAdcaChangeActU">
+        UPDATE HDOC_ADCA_CHANGE
+        SET ACT = 'U'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD19SearchResultListMapper">
+
+    <!--
+        UD19 市场列表查询
+    -->
+    <select id="selectAllMarket" resultType="com.web.app.entity.MarketMaster">
+        SELECT
+            MARKET AS market,
+            DESCRIPTION AS description
+        FROM MARKET_MASTER
+        ORDER BY MARKET
+    </select>
+
+    <!--
+        UD19 动态条件搜索用户
+    -->
+    <select id="searchUsers" resultType="com.web.app.dto.UD19SearchResultListResponse$UserData">
+        SELECT
+            T1.USERID AS userId,
+            T1.USERNAME AS username,
+            T2.MARKET AS market
+        FROM HDOC_USER_INFOR T1
+        INNER JOIN HDOC_MARKET_AUTH T2 ON T1.USERID = T2.USERID
+        <where>
+            <if test="userId != null and userId != ''">
+                AND T1.USERID = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND T1.USERNAME = #{username}
+            </if>
+            <if test="market != null and market != ''">
+                AND T2.MARKET = #{market}
+            </if>
+            <if test="type != null and type != ''">
+                AND T2.TYPE = #{type}
+            </if>
+        </where>
+        ORDER BY T1.USERID, T2.MARKET
+    </select>
+
+</mapper>

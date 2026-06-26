@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD15SelecthdocsenddatavinplateMapper">
+
+    <!--
+        UD15 根据底盘系列和底盘编号查询VIN Plate信息
+    -->
+    <select id="selectVinPlateInfo" resultType="com.web.app.entity.HdocSendDataVinPlate">
+        SELECT
+            DOC_READY AS docReady,
+            DOC_SENT AS docSent,
+            STATUS AS status,
+            XML_DOC AS xmlDoc,
+            MSG AS msg,
+            TYPE AS type,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_SEND_DATA_VIN_PLATE
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </select>
+
+    <!--
+        UD15 Set Regenerate: 更新VIN Plate状态为'0'
+    -->
+    <update id="updateStatusRegenerate">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET STATUS = '0'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+    <!--
+        UD15 Set OK: 更新VIN Plate状态为'1'
+    -->
+    <update id="updateStatusSetOk">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET STATUS = '1'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+    <!--
+        UD15 Change to Basic Info: 更新VIN Plate状态为'0', TYPE为'1'
+    -->
+    <update id="updateStatusChangeBasic">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET STATUS = '0',
+            TYPE = '1'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+    <!--
+        UD15 Change to Advanced Info: 更新VIN Plate状态为'0', TYPE为'2'
+    -->
+    <update id="updateStatusChangeAdvanced">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE
+        SET STATUS = '0',
+            TYPE = '2'
+        WHERE SERIE = #{serie}
+          AND CHNR = #{chnr}
+    </update>
+
+</mapper>

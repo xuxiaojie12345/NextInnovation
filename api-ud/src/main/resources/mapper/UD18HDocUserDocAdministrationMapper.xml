@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD18HDocUserDocAdministrationMapper">
+
+    <!--
+        UD18 检查用户是否在机能权限表中存在
+    -->
+    <select id="countFunctionAuthByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = #{userId}
+    </select>
+
+    <!--
+        UD18 根据用户ID查询用户基本信息
+    -->
+    <select id="selectUserInfor" resultType="com.web.app.entity.HdocUserInfor">
+        SELECT
+            USERID AS userid,
+            USERNAME AS username,
+            RESPONSIBLE AS responsible,
+            USERPOSITION AS userposition,
+            EMAIL AS email
+        FROM HDOC_USER_INFOR
+        WHERE USERID = #{userId}
+    </select>
+
+    <!--
+        UD18 根据用户ID查询用户文档类型
+    -->
+    <select id="selectUserDocByUserId" resultType="com.web.app.entity.HdocUserDoc">
+        SELECT
+            USERID AS userid,
+            DOCTYPE AS doctype
+        FROM HDOC_USER_DOC
+        WHERE USERID = #{userId}
+    </select>
+
+    <!--
+        UD18 更新用户文档类型
+    -->
+    <update id="updateUserDoc">
+        UPDATE HDOC_USER_DOC
+        SET DOCTYPE = #{doctype},
+            UPDATE_DATETIME = NOW()
+        WHERE USERID = #{userId}
+    </update>
+
+</mapper>

@@ -1,0 +1,315 @@
+/* ==========================================================================
+   UD13_HDocTemplateCheck 样式文件
+   对应设计书：HDoc Template Check 模块详细设计说明书
+   ========================================================================== */
+
+/* ===== 页面整体容器 ===== */
+.ud13-container {
+  /* max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh; */
+
+  /* max-width: 1100px; */
+  /* margin: 0 auto; */
+  /* padding: 24px 20px; */
+  font-family:  Arial, sans-serif;
+  background-color: #ffffff;
+  /* min-height: 100vh; */
+  box-sizing: border-box;
+  width: 800px;
+  border: 1px solid #96bfeb;
+}
+
+/* ===== 页面标题 ===== */
+.ud13-page-title {
+  font-size: 25px;
+  font-weight: 600;
+  color: #1a3a5c;
+  padding: 10px;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* ===== 内容区域 ===== */
+.ud13-content-wrapper {
+  margin-bottom: 20px;
+}
+
+/* ===== 主区域样式 ===== */
+.ud13-main-section {
+  background: #ffffff;
+  /* border: 1px solid #96bfeb; */
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin:10px;
+}
+
+/* ===== 区域标题栏 ===== */
+.ud13-section-header {
+  background-color: #d9e5f0;
+  padding: 10px 16px;
+  border-bottom: 1px solid #c0cbd8;
+}
+
+.ud13-section-title {
+  color: #1a3a5c;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ===== 表单主体 ===== */
+.ud13-form-body {
+  padding: 10px 16px;
+  flex: 1;
+  border: 1px solid #96bfeb;
+}
+
+/* ===== 表单组（标签和输入框同行显示） ===== */
+.ud13-form-group {
+  display: flex;
+  align-items: center;
+  /* margin-bottom: 12px; */
+}
+
+/* ===== 标签 ===== */
+.ud13-label {
+  width: 110px;
+  min-width: 110px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+  padding-right: 10px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* ===== 蓝色边框盒子 ===== */
+.ud13-blue-border-box {
+  /* border: 1px solid #4a90d9; */
+  border-radius: 0;
+  /* padding: 2px; */
+  background-color: #ffffff;
+  flex: 1;
+  max-width: 400px;
+}
+
+.ud13-btn-box {
+  display: inline-block;
+  flex: none;
+  max-width: none;
+}
+
+/* ===== 文件选择框 ===== */
+.ud13-file-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ud13-file-input:focus {
+  outline: none;
+}
+
+.ud13-file-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ===== 表单外部按钮容器 ===== */
+.ud13-btn-outer {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: 1px solid #96bfeb;
+  border-top: none;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+}
+
+.ud13-btn-outer .ud13-blue-border-box {
+  max-width: none;
+  flex: none;
+}
+
+/* ===== 通用按钮样式 ===== */
+.ud13-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+/* .ud13-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} */
+
+/* ===== Check 按钮 ===== */
+.ud13-btn-check {
+  /* background-color: #1890ff; */
+  color: #000000;
+}
+
+/* .ud13-btn-check:hover:not(:disabled) {
+  background-color: #f8f3f3;
+} */
+
+/* .ud13-btn-check:active:not(:disabled) {
+  background-color: #096dd9;
+} */
+
+/* ===== Back 按钮 ===== */
+.ud13-btn-back {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #d0d5dd;
+  border-radius: 0;
+}
+
+.ud13-btn-back:hover:not(:disabled) {
+  background-color: #f5f5f5;
+  border-color: #b3b8c2;
+}
+
+/* ===== 检查结果区域 ===== */
+.ud13-result-section {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 0;
+}
+
+.ud13-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.ud13-result-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.ud13-result-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #52c41a;
+}
+
+/* ===== Download 区域 ===== */
+.ud13-download-section {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  /* border: 1px solid #e8ecf1; */
+  /* background-color: #fafbfc; */
+}
+
+/* ===== Download 链接 ===== */
+.ud13-download-link {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  padding: 4px 0;
+  transition: color 0.2s;
+  cursor: pointer;
+  color: #000000;
+}
+
+.ud13-download-active {
+  color: #000000;
+}
+
+.ud13-download-active:hover {
+  color: #333333;
+}
+
+.ud13-download-disabled {
+  color: #3f65a3;
+  cursor: not-allowed !important;
+  text-decoration: none;
+}
+
+.ud13-download-hint {
+  font-size: 12px;
+  color: #999999;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+/* ===== 消息显示区域 ===== */
+.ud13-message {
+  padding: 10px 16px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+  animation: ud13FadeIn 0.3s ease-in-out;
+}
+
+/* 消息级别：成功（绿色） */
+.ud13-message-success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+/* 消息级别：错误（红色） */
+.ud13-message-error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+/* ===== 返回按钮区域 ===== */
+.ud13-back-section {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  /* border-top: 1px solid #e8ecf1; */
+}
+
+/* ===== 动画 ===== */
+@keyframes ud13FadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  .ud13-container {
+    padding: 20px 15px;
+  }
+
+  .ud13-page-title {
+    font-size: 20px;
+  }
+
+  .ud13-btn {
+    width: 100%;
+  }
+}

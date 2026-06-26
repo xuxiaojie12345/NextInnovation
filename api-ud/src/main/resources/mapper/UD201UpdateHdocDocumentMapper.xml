@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD201UpdateHdocDocumentMapper">
+
+    <!--
+        UD20-1 根据文档类型更新文档列表
+    -->
+    <update id="updateDocumentList">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET REGISTER_USER = #{registerUser},
+            REGISTER_DATETIME = #{registerDatetime}
+        WHERE DOCTYPE = #{doctype}
+    </update>
+
+</mapper>

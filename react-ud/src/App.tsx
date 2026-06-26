@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login/Login";
 import TestMain from "./Test/Test";
@@ -13,6 +14,11 @@ import UD09_HomologationVariablesResultList from './UD09_Homologation Variables 
 import UD25_EDBUserView from './UD25_EDB User View/UD25_EDBUserView';
 import UD10_ExistingHDocVariables from './UD10_Existing HDoc Variables/UD10_ExistingHDocVariables';
 import UD11_ExistingHDocVariablesResultList from './UD11_Existing HDoc Variables Result List/UD11_ExistingHDocVariablesResultList';
+import UD12_UploadDeleteTemplate from './UD12_UploadDeleteTemplate/UD12_UploadDeleteTemplate';
+import UD13_HDocTemplateCheck from './UD13_HDocTemplateCheck/UD13_HDocTemplateCheck';
+import UD14_ListAvailableTemplates from './UD14_List available templates/UD14_ListAvailableTemplates';
+import UD15_VinPlate from './UD15_Vin Plate/UD15_VinPlate';
+import UD16_ADChange from './UD16_AD Change/UD16_ADChange';
 
 function App() {
   return (
@@ -56,6 +62,21 @@ function App() {
             
             {/* UD11 Existing HDoc Variables Result List */}
             <Route path='/UD11' element={<UD11_ExistingHDocVariablesResultList />} />
+
+            {/* UD12 上传删除模板 */}
+            <Route path='/UD12' element={<UD12_UploadDeleteTemplate />} />
+
+            {/* UD13 HDoc模板检查 */}
+            <Route path='/UD13' element={<UD13_HDocTemplateCheck />} />
+
+            {/* UD14 可用模板列表 */}
+            <Route path='/UD14' element={<UD14_ListAvailableTemplates />} />
+
+            {/* UD15 VIN Plate */}
+            <Route path='/UD15' element={<UD15_VinPlate />} />
+
+            {/* UD16 AD Change */}
+            <Route path='/UD16' element={<UD16_ADChange />} />
             
             {/* UD24 用户指南 */}
             <Route path='/UD24' element={<UD24_UDHDoc />} />

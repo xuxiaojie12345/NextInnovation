@@ -1,0 +1,449 @@
+/* ==========================================================================
+   UD12_UploadDeleteTemplate 样式文件
+   对应设计书：Upload & Delete Template 模块详细设计说明书
+   ========================================================================== */
+
+/* ===== 页面整体容器 ===== */
+.ud12-container {
+  /* max-width: 1100px; */
+  /* margin: 0 auto; */
+  /* padding: 24px 20px; */
+  font-family:  Arial, sans-serif;
+  background-color: #ffffff;
+  /* min-height: 100vh; */
+  box-sizing: border-box;
+  max-width: 800px;
+}
+
+
+/* ===== 内容区域（Upload + Delete 上下排列） ===== */
+.ud12-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #d0d5dd;
+}
+
+/* ===== Upload区域和Delete区域公用样式 ===== */
+.ud12-upload-section,
+.ud12-delete-section {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 600px;
+}
+
+
+/* ===== 区域标题栏 ===== */
+.ud12-section-header {
+  padding: 10px 16px;
+}
+
+.ud12-section-title {
+  font-size: 25px;
+  font-weight: 600;
+  color: #1a3a5c;
+  padding: 0;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* ===== 表单主体 ===== */
+.ud12-form-body {
+  padding: 10px 10px;
+  flex: 1;
+  border: 1px solid #a4c5ee;
+  margin-left: 10px;
+}
+
+/* ===== 表单组（标签和输入框同行显示） ===== */
+.ud12-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* ===== 标签（固定宽度，右对齐） ===== */
+.ud12-label {
+  width: 110px;
+  min-width: 110px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333333;
+  padding-right: 10px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* ===== 蓝色边框盒子（输入框/下拉框/按钮容器） ===== */
+.ud12-blue-border-box {
+  /* border: 1px solid #4a90d9; */
+  border-radius: 0;
+  /* padding: 2px; */
+  background-color: #ffffff;
+  flex: 1;
+  max-width: 400px;
+}
+
+.ud12-btn-box {
+  display: inline-block;
+  flex: none;
+  max-width: none;
+}
+
+/* ===== 蓝色边框盒子 ===== */
+/* .ud12-blue-border-box {
+  border: 1px solid #4a90d9;
+  border-radius: 0;
+  padding: 2px;
+  background-color: #ffffff;
+} */
+
+.ud12-btn-box {
+  display: inline-block;
+}
+
+/* ===== 文件选择框 ===== */
+.ud12-file-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ud12-file-input:focus {
+  outline: none;
+}
+
+.ud12-file-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ===== 下拉选择框 ===== */
+.ud12-select {
+  width: 50%;
+  padding: 6px 8px;
+  border: 1px solid;
+  border-radius: 0;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  cursor: pointer;
+  appearance: auto;
+  font-family: inherit;
+}
+
+.ud12-select:focus {
+  outline: none;
+}
+
+.ud12-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ===== 加载提示 ===== */
+.ud12-loading-hint {
+  font-size: 12px;
+  color: #2a5a8c;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ===== 按钮组 ===== */
+.ud12-button-group {
+  margin-top: 4px;
+}
+
+/* ===== 表单外部按钮容器 ===== */
+.ud12-btn-outer {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #a4c5ee;
+  border-top: none;
+  margin-left: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+}
+
+.ud12-btn-outer .ud12-blue-border-box {
+  max-width: none;
+  flex: none;
+}
+
+/* ===== 通用按钮样式 ===== */
+.ud12-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+
+  /* padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 100px;
+  text-align: center;
+  font-family: inherit; */
+}
+
+/* .ud12-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} */
+
+/* ===== Upload按钮 ===== */
+/* .ud12-btn-upload {
+  background-color: #1890ff;
+  color: #ffffff;
+} */
+
+.ud12-btn-upload:hover:not(:disabled) {
+  background-color:#f8f3f3;
+}
+
+/* .ud12-btn-upload:active:not(:disabled) {
+  background-color: #096dd9;
+} */
+
+/* ===== Delete按钮 ===== */
+/* .ud12-btn-delete {
+  background-color: #ff4d4f;
+  color: #ffffff;
+} */
+
+.ud12-btn-delete:hover:not(:disabled) {
+  background-color: #f8f3f3;
+}
+
+/* .ud12-btn-delete:active:not(:disabled) {
+  background-color: #f0ebeb;
+} */
+
+/* ===== 取消按钮（模态框用） ===== */
+.ud12-btn-cancel {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #d0d5dd;
+}
+
+.ud12-btn-cancel:hover:not(:disabled) {
+  background-color: #f5f5f5;
+  border-color: #b3b8c2;
+}
+
+/* ===== 确认按钮（模态框用） ===== */
+.ud12-btn-confirm {
+  background-color: #ff4d4f;
+  color: #ffffff;
+}
+
+.ud12-btn-confirm:hover:not(:disabled) {
+  background-color: #ff7875;
+}
+
+/* ===== 底部提示文字 ===== */
+.ud12-footnote {
+  padding: 10px 16px;
+  /* background-color: #fafafa; */
+  /* border-top: 1px solid #e8ecf1; */
+  font-size: 15px;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* ===== Check Template 底部区域 ===== */
+.ud12-check-section {
+  /* border: 1px solid #e8ecf1; */
+  padding: 10px 10px;
+  margin-bottom: 16px;
+  /* background-color: #fafbfc; */
+}
+
+.ud12-check-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: #cc0000;
+  margin: 0 0 8px 0;
+}
+
+.ud12-check-description {
+  font-size: 15px;
+  color: #666666;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.ud12-check-link {
+  color: #1890ff;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.ud12-check-link:hover {
+  color: #40a9ff;
+}
+
+/* ===== 消息显示区域 ===== */
+.ud12-message {
+  padding: 10px 16px;
+  border-radius: 0;
+  font-size: 13px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+  animation: ud12FadeIn 0.3s ease-in-out;
+}
+
+/* 消息级别：成功（绿色） */
+.ud12-message-success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+/* 消息级别：错误（红色） */
+.ud12-message-error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+/* 消息级别：警告（橙色） */
+.ud12-message-warning {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #faad14;
+}
+
+/* ===== 模态框覆盖层 ===== */
+.ud12-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: ud12FadeIn 0.2s ease-in-out;
+}
+
+/* ===== 模态框 ===== */
+.ud12-modal {
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.ud12-modal-header {
+  background: #1a3a5c;
+  padding: 15px 20px;
+}
+
+.ud12-modal-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ud12-modal-body {
+  padding: 25px 20px;
+  text-align: center;
+}
+
+.ud12-modal-body p {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #333333;
+  line-height: 1.6;
+}
+
+.ud12-modal-file-info {
+  font-size: 13px !important;
+  color: #888888 !important;
+  background-color: #f8f9fb;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #e8ecf1;
+}
+
+.ud12-modal-footer {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ===== 动画 ===== */
+@keyframes ud12FadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ud12SlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  .ud12-container {
+    padding: 20px 15px;
+  }
+
+  .ud12-page-title {
+    font-size: 22px;
+  }
+
+  .ud12-section-title {
+    font-size: 16px;
+  }
+
+  .ud12-btn {
+    width: 100%;
+  }
+}

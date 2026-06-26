@@ -1,0 +1,242 @@
+/* =========================================================
+   UD16_ADChange.css
+   AD Change 管理页面样式
+   ========================================================= */
+
+/* ---------- 页面主容器 ---------- */
+.ud16-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.ud16-container .ud16-content {
+  width: 100%;
+  max-width: 100%;
+  background-color: #ffffff;
+}
+
+/* ---------- 页面标题 ---------- */
+.ud16-container .ud16-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 15px;
+  text-align: left;
+  border: none;
+  padding: 0;
+}
+
+/* ---------- 错误消息显示区域 ---------- */
+/* 对应设计书 2.1 控件属性表 No.3 error message */
+.ud16-container .ud16-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+/* ---------- 加载状态提示 ---------- */
+.ud16-container .ud16-loading {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+/* ---------- 表单区域 ---------- */
+.ud16-container .ud16-form-section {
+  border: 1px solid #9999cc;
+  padding: 20px;
+  background-color: #ffffff;
+  margin-bottom: 0;
+}
+
+/* ---------- 表单组 ---------- */
+.ud16-container .ud16-form-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.ud16-container .ud16-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.ud16-container .ud16-form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  text-align: left;
+  min-width: 100px;
+  padding-top: 4px;
+  white-space: nowrap;
+}
+
+/* ---------- 输入框样式 ---------- */
+.ud16-container .ud16-input {
+  width: 250px;
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid #808080;
+  outline: none;
+  text-align: left;
+  border-radius: 0;
+}
+
+.ud16-container .ud16-input:focus {
+  border-color: #000080;
+}
+
+.ud16-container .ud16-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ud16-container .ud16-input::placeholder {
+  color: #bfbfbf;
+}
+
+/* ---------- 文本域样式 ---------- */
+.ud16-container .ud16-textarea {
+  width: 100%;
+  max-width: 600px;
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid #808080;
+  outline: none;
+  text-align: left;
+  border-radius: 0;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.ud16-container .ud16-textarea:focus {
+  border-color: #000080;
+}
+
+.ud16-container .ud16-textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ud16-container .ud16-textarea::placeholder {
+  color: #bfbfbf;
+}
+
+/* ---------- Desc文本域所在行：label顶部对齐 ---------- */
+.ud16-container .ud16-form-group-desc label {
+  padding-top: 4px;
+}
+
+/* ---------- 按钮区域 ---------- */
+/* 对应设计书 2.1 控件属性表 No.4~No.6 */
+.ud16-container .ud16-button-section {
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px;
+  background-color: #e8e8ff;
+  border: 1px solid #9999cc;
+  border-top: none;
+}
+
+/* ---------- 通用按钮样式 ---------- */
+.ud16-container .ud16-btn {
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud16-container .ud16-btn:hover:not(:disabled) {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud16-container .ud16-btn:active:not(:disabled) {
+  background-color: #b0b0d0;
+}
+
+.ud16-container .ud16-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ADD 按钮 */
+.ud16-container .ud16-btn-add {
+  background-color: #d0d0f0;
+}
+
+/* DELETE 按钮 */
+.ud16-container .ud16-btn-delete {
+  background-color: #d0d0f0;
+}
+
+/* CHECK 按钮 */
+.ud16-container .ud16-btn-check {
+  background-color: #d0d0f0;
+}
+
+/* ---------- 响应式设计 ---------- */
+
+/* 平板设备 */
+@media (max-width: 768px) {
+  .ud16-container {
+    padding: 15px;
+  }
+
+  .ud16-container .ud16-title {
+    font-size: 18px;
+  }
+
+  .ud16-container .ud16-form-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ud16-container .ud16-input {
+    width: 100%;
+  }
+
+  .ud16-container .ud16-textarea {
+    max-width: 100%;
+  }
+
+  .ud16-container .ud16-button-section {
+    flex-wrap: wrap;
+  }
+}
+
+/* 手机设备 */
+@media (max-width: 480px) {
+  .ud16-container {
+    padding: 10px;
+  }
+
+  .ud16-container .ud16-title {
+    font-size: 16px;
+  }
+
+  .ud16-container .ud16-form-section {
+    padding: 15px;
+  }
+
+  .ud16-container .ud16-btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD20MarketDocumentSettingsMapper">
+
+    <!--
+        UD20 动态条件查询文档列表
+    -->
+    <select id="selectDocumentList" resultType="com.web.app.entity.HdocDocumentList">
+        SELECT
+            ID AS id,
+            DOCTYPE AS doctype,
+            DESCRIPTION AS description,
+            REGISTER_USER AS registerUser,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_DOCUMENT_LIST
+        <where>
+            <if test="doctype != null and doctype != ''">
+                AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
+            </if>
+            <if test="registerUser != null and registerUser != ''">
+                AND REGISTER_USER = #{registerUser}
+            </if>
+            <if test="registerDatetime != null and registerDatetime != ''">
+                AND REGISTER_DATETIME &gt;= #{registerDatetime}
+            </if>
+        </where>
+        ORDER BY DOCTYPE
+    </select>
+
+</mapper>
