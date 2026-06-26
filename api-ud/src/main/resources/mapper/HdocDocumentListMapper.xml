@@ -212,4 +212,42 @@
         ORDER BY DOCTYPE
     </select>
 
+    <!-- ==================== UD20-1 文档类型更新 ==================== -->
+
+    <!-- 根据doctype统计记录数 -->
+    <select id="countByDoctype" resultType="int">
+        SELECT COUNT(*)
+        FROM HDOC_DOCUMENT_LIST
+        WHERE DOCTYPE = #{doctype}
+    </select>
+
+    <!-- 删除HDOC_DOCUMENT_LIST表记录 -->
+    <delete id="deleteHdocDocumentList">
+        DELETE FROM HDOC_DOCUMENT_LIST
+        WHERE DOCTYPE = #{doctype}
+    </delete>
+
+    <!-- 插入HDOC_DOCUMENT_LIST表记录 -->
+    <insert id="insertHdocDocumentList">
+        INSERT INTO HDOC_DOCUMENT_LIST (
+            DOCTYPE,
+            DESCRIPTION,
+            REGISTER_USER,
+            REGISTER_DATETIME,
+            REGISTER_PROCESS,
+            UPDATE_USER,
+            UPDATE_PROCESS,
+            UPDATE_DATETIME
+        ) VALUES (
+            #{doctype},
+            #{doctype},
+            #{registerUser},
+            #{registerDatetime},
+            #{updateProcess},
+            #{updateUser},
+            #{updateProcess},
+            NOW()
+        )
+    </insert>
+
 </mapper>

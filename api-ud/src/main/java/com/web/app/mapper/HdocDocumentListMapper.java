@@ -142,4 +142,35 @@ public interface HdocDocumentListMapper {
      * @return 文档类型列表（doctype, description, registerUser, registerDatetime）
      */
     List<Map<String, Object>> selectDocumentTypeList();
+
+    // ==================== UD20-1 文档类型更新 ====================
+
+    /**
+     * 根据doctype统计记录数（判断是否存在）
+     * @param doctype 文档类型
+     * @return 记录数
+     */
+    int countByDoctype(@Param("doctype") String doctype);
+
+    /**
+     * 删除HDOC_DOCUMENT_LIST表记录
+     * @param doctype 文档类型
+     * @return 影响行数
+     */
+    int deleteHdocDocumentList(@Param("doctype") String doctype);
+
+    /**
+     * 插入HDOC_DOCUMENT_LIST表记录
+     * @param doctype 文档类型
+     * @param registerUser 注册用户
+     * @param registerDatetime 注册日期
+     * @param updateUser 更新用户
+     * @param updateProcess 更新进程
+     * @return 影响行数
+     */
+    int insertHdocDocumentList(@Param("doctype") String doctype,
+                               @Param("registerUser") String registerUser,
+                               @Param("registerDatetime") String registerDatetime,
+                               @Param("updateUser") String updateUser,
+                               @Param("updateProcess") String updateProcess);
 }

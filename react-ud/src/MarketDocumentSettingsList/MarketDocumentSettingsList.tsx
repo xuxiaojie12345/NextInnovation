@@ -88,9 +88,9 @@ const MarketDocumentSettingsList = () => {
     });
   };
 
-  // 点击Back按钮：返回前画面
+  // 点击Back按钮：返回到MarketDocumentSettings画面
   const handleBack = () => {
-    navigate(-1);
+    navigate("/market-document-settings");
   };
 
   // 点击Print按钮：打印当前页面

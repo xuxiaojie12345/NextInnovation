@@ -25,6 +25,8 @@ const MarketDocumentSettings = () => {
     date: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // 页面初始化：获取当前用户信息和日期
   useEffect(() => {
@@ -75,6 +77,7 @@ const MarketDocumentSettings = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (value.trim()) {
       setErrorMessage("");
+      setSuccessMessage("");
     }
   };
 
@@ -112,6 +115,63 @@ const MarketDocumentSettings = () => {
     navigate(-1);
   };
 
+  // Update Mode处理：更新HDOC_DOCUMENT_LIST表
+  const handleUpdateMode = async () => {
+    // 空值校验：Document type不能为空
+    if (!formData.documentType.trim()) {
+      setErrorMessage("Document type不能为空");
+      setSuccessMessage("");
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const API_BASE_URL = "http://localhost:8081";
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/ud20-1/updatehdocdocumentlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            operation: "UPDATE_HDOC_DOCUMENT_LIST",
+            doctype: formData.documentType.trim(),
+            user: formData.user,
+            date: formData.date,
+            market: formData.market,
+            setting: formData.setting,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("更新失败");
+      }
+
+      const result = await response.json();
+
+      if (result.code === 200) {
+        setSuccessMessage("更新成功");
+      } else if (result.code === 404) {
+        setErrorMessage(
+          "Document type does not exists. Please enter the correct content.",
+        );
+      } else {
+        setErrorMessage(result.msg || "更新失败");
+      }
+    } catch (error) {
+      console.error("Update Mode error:", error);
+      setErrorMessage("更新失败");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className='mds-container'>
       {/* 标题 */}
@@ -119,6 +179,11 @@ const MarketDocumentSettings = () => {
 
       {/* 错误消息 */}
       {errorMessage && <div className='mds-error-message'>{errorMessage}</div>}
+
+      {/* 成功消息 */}
+      {successMessage && (
+        <div className='mds-success-message'>{successMessage}</div>
+      )}
 
       {/* 边框容器 */}
       <div className='mds-border-box'>
@@ -133,7 +198,11 @@ const MarketDocumentSettings = () => {
           <button className='mds-btn' onClick={handleBack}>
             Back
           </button>
-          <button className='mds-btn' onClick={() => {}}>
+          <button
+            className='mds-btn'
+            onClick={handleUpdateMode}
+            disabled={isLoading}
+          >
             Update Mode
           </button>
         </div>
