@@ -5,11 +5,13 @@
 
 /* ---------- 页面主容器 ---------- */
 .ud15-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #ffffff;
-  padding: 20px;
+  padding: 5px 10px;
   font-family: Arial, sans-serif;
   box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 700px;
 }
 
 .ud15-container .ud15-content {
@@ -22,11 +24,12 @@
 .ud15-container .ud15-title {
   font-size: 20px;
   font-weight: bold;
-  color: #000080;
-  margin-bottom: 15px;
+  color: #003366;
+  margin-bottom: 10px;
   text-align: left;
   border: none;
   padding: 0;
+
 }
 
 /* ---------- 消息显示区域 ---------- */
@@ -79,6 +82,17 @@
   border: 1px solid #9999cc;
   padding: 15px 20px;
   background-color: #ffffff;
+}
+
+/* ---------- 按钮组区域（参照UD03） ---------- */
+.ud15-container .ud15-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff;
+  border: 1px solid #9999cc;
+  border-top: none;
   margin-bottom: 15px;
 }
 
@@ -95,6 +109,7 @@
   color: #000000;
   text-align: left;
   white-space: nowrap;
+  margin-right: 20px;
 }
 
 /* 必填标记 */
@@ -105,7 +120,7 @@
 
 /* ---------- 输入框样式 ---------- */
 .ud15-container .ud15-input {
-  width: 220px;
+  width: 150px;
   padding: 4px 8px;
   font-size: 13px;
   border: 1px solid #808080;
@@ -128,16 +143,16 @@
   color: #bfbfbf;
 }
 
-/* ---------- 通用按钮样式 ---------- */
+/* ---------- 通用按钮样式（参照UD03） ---------- */
 .ud15-container .ud15-btn {
-  padding: 4px 16px;
+  padding: 4px 12px;
   font-size: 12px;
   font-weight: normal;
   border: 1px solid #808080;
   background-color: #d0d0f0;
   cursor: pointer;
   outline: none;
-  min-width: 80px;
+  min-width: 70px;
 }
 
 .ud15-container .ud15-btn:hover:not(:disabled) {
@@ -154,156 +169,96 @@
   opacity: 0.6;
 }
 
-/* View Info 按钮 */
-.ud15-container .ud15-btn-view {
-  background-color: #d0d0f0;
-}
-
-/* 操作按钮 */
-.ud15-container .ud15-btn-action {
-  background-color: #d0d0f0;
-  min-width: 150px;
-}
-
-/* ---------- 占位提示（未检索时显示） ---------- */
-.ud15-container .ud15-placeholder {
-  border: 1px solid #9999cc;
-  padding: 40px 20px;
-  text-align: center;
-  font-size: 16px;
-  color: #999;
-  background-color: #fafafa;
-}
-
 /* ---------- VIN Plate信息面板 ---------- */
 .ud15-container .ud15-info-panel {
-  border: 1px solid #9999cc;
+  /* border: 1px solid #9999cc; */
   background-color: #ffffff;
 }
 
-/* ---------- 信息网格区域 ---------- */
-.ud15-container .ud15-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border-bottom: 1px solid #d9d9d9;
-}
-
-.ud15-container .ud15-info-item {
+/* ---------- 信息列表区域（单列布局） ---------- */
+.ud15-container .ud15-info-list {
   display: flex;
-  border-bottom: 1px solid #e8e8e8;
-  border-right: 1px solid #e8e8e8;
+  flex-direction: column;
 }
 
-.ud15-container .ud15-info-item:nth-child(even) {
-  border-right: none;
+.ud15-container .ud15-info-row {
+  display: flex;
+  /* border-bottom: 1px solid #d9d9d9; */
 }
 
-.ud15-container .ud15-info-item:nth-last-child(-n+2) {
+.ud15-container .ud15-info-row:last-child {
   border-bottom: none;
 }
 
 .ud15-container .ud15-info-label {
-  flex: 0 0 180px;
-  padding: 8px 12px;
+  flex: 0 0 200px;
+  /* padding: 6px 12px; */
   font-size: 13px;
-  font-weight: bold;
+  /* font-weight: bold; */
   color: #333;
-  background-color: #f5f5f5;
-  border-right: 1px solid #e8e8e8;
+  /* background-color: #f0f0f0; */
+  /* border-right: 1px solid #d9d9d9; */
 }
 
 .ud15-container .ud15-info-value {
   flex: 1;
-  padding: 8px 12px;
+  padding: 6px 12px;
   font-size: 13px;
   color: #333;
 }
 
-/* ---------- 区域块（Print items / VP Data） ---------- */
-.ud15-container .ud15-section-block {
-  padding: 15px 20px;
-  border-bottom: 1px solid #d9d9d9;
-}
-
-.ud15-container .ud15-section-block:last-of-type {
-  border-bottom: none;
-}
+/* ---------- VP Data 区域 ---------- */
+/* .ud15-container .ud15-vp-section {
+  border-top: 1px solid #9999cc;
+} */
 
 .ud15-container .ud15-section-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #000080;
-  margin: 0 0 10px 0;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-/* ---------- Print items 列表 ---------- */
-.ud15-container .ud15-print-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.ud15-container .ud15-print-item {
-  padding: 4px 0;
   font-size: 13px;
-  color: #333;
+  font-weight: bold;
+  /* color: #000080; */
+  margin: 0;
+  padding: 8px 0px;
+  /* background-color: #f0f0f0; */
+  /* border-bottom: 1px solid #d9d9d9; */
 }
 
-.ud15-container .ud15-print-item::before {
-  content: '•';
-  color: #000080;
-  margin-right: 8px;
-}
-
-/* ---------- VP Data 表格 ---------- */
+/* ---------- VP Data 表格（无thead，直接label-value对） ---------- */
 .ud15-container .ud15-vp-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.ud15-container .ud15-vp-table th {
-  background-color: #f5f5f5;
-  color: #333;
-  font-weight: 700;
-  padding: 6px 12px;
-  text-align: left;
-  border: 1px solid #d9d9d9;
-}
-
 .ud15-container .ud15-vp-table td {
-  padding: 6px 12px;
-  border: 1px solid #e8e8e8;
+  /* padding: 5px 12px; */
+  /* border-bottom: 1px solid #e8e8e8; */
   color: #333;
   text-align: left;
 }
 
-.ud15-container .ud15-vp-table tbody tr:nth-child(even) {
-  background-color: #fafafa;
+.ud15-container .ud15-vp-label {
+  width: 200px;
+  /* font-weight: bold; */
+  color: #333;
 }
 
-.ud15-container .ud15-vp-table tbody tr:hover {
-  background-color: #e6f7ff;
+.ud15-container .ud15-vp-value {
+  color: #333;
+}
+
+.ud15-container .ud15-vp-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* ---------- 空数据文本 ---------- */
 .ud15-container .ud15-empty-text {
   font-size: 13px;
   color: #999;
+  padding: 8px 12px;
+  display: inline-block;
 }
 
-/* ---------- 操作按钮区域 ---------- */
-.ud15-container .ud15-action-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 15px 20px;
-  background-color: #e8e8ff;
-  border-top: 1px solid #9999cc;
-}
+
 
 /* ---------- 响应式设计 ---------- */
 
@@ -324,22 +279,6 @@
 
   .ud15-container .ud15-input {
     width: 100%;
-  }
-
-  .ud15-container .ud15-info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ud15-container .ud15-info-item:nth-child(even) {
-    border-right: 1px solid #e8e8e8;
-  }
-
-  .ud15-container .ud15-info-item:nth-last-child(-n+2) {
-    border-bottom: 1px solid #e8e8e8;
-  }
-
-  .ud15-container .ud15-info-item:last-child {
-    border-bottom: none;
   }
 
   .ud15-container .ud15-info-label {

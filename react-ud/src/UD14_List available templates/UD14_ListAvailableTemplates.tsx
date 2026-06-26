@@ -262,23 +262,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
     fetchFileList(market);
   };
 
-  /**
-   * 点击 確認 按钮触发文件列表查询
-   * 对应设计书 3.1.2 Market选择与文件列表显示流程
-   */
-  const handleConfirm = () => {
-    // 空值校验：若未选择Market，DataTable保持为空
-    // 对应设计书 3.2 校验详细规格表 No.2
-    if (!selectedMarket) {
-      setMessage('请先选择Market');
-      setFileList([]);
-      return;
-    }
-
-    // 获取文件列表
-    fetchFileList(selectedMarket);
-  };
-
   // ==================== 渲染 UI ====================
   return (
     <div className='ud14-container'>
@@ -295,48 +278,41 @@ const UD14_ListAvailableTemplates: React.FC = () => {
           </div>
         )}
 
-        {/* 查询条件区域 */}
-        <div className='ud14-search-section'>
-          {/* SelectMarKet 下拉框 */}
-          {/* 对应设计书 2.1 控件属性表 No.1 SelectMarKet */}
-          <div className='ud14-form-group'>
-            <label htmlFor='selectMarket'>
-              SelectMarKet<span className='ud14-required'>*</span>
-            </label>
-            <select
-              id='selectMarket'
-              className='ud14-select'
-              value={selectedMarket}
-              onChange={handleMarketChange}
-              disabled={isLoading}
-            >
-              <option value=''>-- 请选择Market --</option>
-              {marketOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+        {/* 查询条件 + 数据表格 - 合并到一个容器 */}
+        <div className='ud14-content-box'>
+          {/* 查询条件区域 */}
+          <div className='ud14-search-section'>
+            {/* SelectMarKet 下拉框 */}
+            {/* 对应设计书 2.1 控件属性表 No.1 SelectMarKet */}
+            <div className='ud14-form-group'>
+              <label htmlFor='selectMarket'>
+                Select Market:
+              </label>
+              <select
+                id='selectMarket'
+                className='ud14-select'
+                value={selectedMarket}
+                onChange={handleMarketChange}
+                disabled={isLoading}
+              >
+                <option value=''>-- 请选择Market --</option>
+                {marketOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* 確認 按钮 */}
-          {/* <button
-            className='ud14-btn ud14-btn-confirm'
-            onClick={handleConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? '処理中...' : '確認'}
-          </button> */}
-        </div>
+          {/* 加载状态提示 */}
+          {isLoading && (
+            <div className='ud14-loading'>加载中...</div>
+          )}
 
-        {/* 加载状态提示 */}
-        {isLoading && (
-          <div className='ud14-loading'>加载中...</div>
-        )}
-
-        {/* 数据表格 - 文件列表 */}
-        {/* 对应设计书 2.1 控件属性表 No.2~No.5 DataTable */}
-        <div className='ud14-table-wrapper'>
+          {/* 数据表格 - 文件列表 */}
+          {/* 对应设计书 2.1 控件属性表 No.2~No.5 DataTable */}
+          <div className='ud14-table-wrapper'>
           <table className='ud14-table'>
             <thead>
               <tr>
@@ -385,6 +361,7 @@ const UD14_ListAvailableTemplates: React.FC = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

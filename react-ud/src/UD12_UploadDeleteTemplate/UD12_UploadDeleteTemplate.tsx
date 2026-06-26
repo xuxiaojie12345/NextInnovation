@@ -203,7 +203,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
    */
   const handleUploadFile = async () => {
     // 1. 前置处理：获取选中的文件和Market值
-
+    
     // 2. 空值校验（前端校验）
     // 对应设计书 3.2 校验详细规格表 No.1
     if (!selectedFile) {
@@ -230,11 +230,8 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
       // 调用文件上传API
       // Method: POST, Endpoint: /api/ud12/uploadflie
-      const response = await apiClient.post("/api/ud12/uploadflie", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // 注意：上传FormData时不能手动设置Content-Type，必须由浏览器自动生成带boundary的multipart头
+      const response = await apiClient.post("/api/ud12/uploadflie", formData);
 
       if (response.data.code === 200) {
         // 4. 结果处理 - 成功
@@ -311,8 +308,9 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     try {
       // 调用文件删除API
       // 对应设计书 4.3 UD12DeleteFlie - 文件删除
-      // Method: POST, Endpoint: /api/ud12/deleteflie
-      const response = await apiClient.post("/api/ud12/deleteflie", {
+      // Method: DELETE, Endpoint: /api/ud12/deleteflie
+      // 后端使用@DeleteMapping且参数为@RequestParam，需以params形式传递
+      const response = await apiClient.delete("/api/ud12/deleteflie", {
         params: {
           market: deleteMarket,
           template: selectedTemplate,

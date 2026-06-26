@@ -320,6 +320,10 @@ const UD05_ModifyDocument: React.FC = () => {
           <label className="ud05-info-label">Market:</label>
           <span className="ud05-info-value">{market || "-"}</span>
         </div>
+
+        <div className="ud05-item-space">
+        </div>
+
         <div className="ud05-info-item">
           <label className="ud05-info-label">Templateファイル:</label>
           <span className="ud05-info-value ud05-link" onClick={handleTemplateClick}>

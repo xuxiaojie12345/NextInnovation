@@ -91,16 +91,14 @@ const UD07_VehicleSpecification: React.FC = () => {
         console.log('UD07车辆规格数据:', data);
 
         const kolaVariants = data.kolaVariants || [];
+        // SYMBOL_STR：取SQL中取得的symbol，保留8字符填充格式，不拼接functionGroup
         const symbolStr = kolaVariants
           .map((item: any) => {
             const rawSymbol = String(item.symbol || '');
-            const symbolPart = rawSymbol.length >= 8
+            // 不足8字符右侧补空格，超过8字符截取前8位
+            return rawSymbol.length >= 8
               ? rawSymbol.substring(0, 8)
               : rawSymbol.padEnd(8, ' ');
-            const functionGroup = String(item.functionGroup || '');
-            return functionGroup
-              ? `${symbolPart} ${functionGroup}`
-              : symbolPart;
           })
           .filter((line: string) => line.trim().length > 0)
           .join('\n');
@@ -191,16 +189,17 @@ const UD07_VehicleSpecification: React.FC = () => {
         </div>
 
         <div className='ud07-block'>
-          <div className='ud07-block-label'>SYMBOL_STR</div>
+          {/* <div className='ud07-block-label'>SYMBOL_STR</div> */}
           <pre className='ud07-symbol'>{state.symbolStr || '-'}</pre>
+          <pre className='ud07-symbol'>{state.description}</pre>
         </div>
 
-        <div className='ud07-description'>
-          {/* <span className='ud07-block-label'>DESCRIPTION</span> */}
+        {/* <div className='ud07-description'>
+          <span className='ud07-block-label'>DESCRIPTION</span>
           <span className='ud07-tooltip' title={state.description || 'No description available'}>
             {state.description ? 'Hover to view description' : 'No description available'}
           </span>
-        </div>
+        </div> */}
 
         <div className='ud07-snote'>{state.sNoteNo || '-'}</div>
 

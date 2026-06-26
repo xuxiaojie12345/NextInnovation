@@ -1,20 +1,22 @@
 .ud07-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   /* display: flex; */
   justify-content: center;
   align-items: center;
-  padding: 32px 16px;
-  background-color: #f6f8fc;
+  padding: 5px 16px;
+  background-color: #ffffff;
+  border: 1px solid #d0d5dd;
+  max-width: 700px;
 }
 
 .ud07-card {
   width: 100%;
-  max-width: 700px;
-  background-color: #ffffff;
-  border: 1px solid #2d5fa3;
-  border-radius: 10px;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
-  padding: 28px 30px;
+  
+  /* background-color: #ffffff; */
+  /* border: 1px solid #2d5fa3; */
+  /* border-radius: 10px; */
+  /* box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08); */
+  /* padding: 28px 30px; */
   box-sizing: border-box;
   position: relative;
 }
@@ -52,15 +54,15 @@
 
 .ud07-label {
   min-width: 160px;
-  color: #1f467a;
-  font-size: 14px;
+  color: #000000;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .ud07-value {
   color: #112130;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 100;
   word-break: break-word;
 }
 
@@ -71,8 +73,8 @@
 .ud07-block-label {
   display: inline-block;
   margin-bottom: 10px;
-  color: #1b3e72;
-  font-size: 14px;
+  color: #000000;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -81,9 +83,9 @@
   min-height: auto;
   margin: 0;
   padding: 18px;
-  background-color: #f5f7ff;
-  border: 1px solid #d9e2f5;
-  border-radius: 8px;
+  /* background-color: #f5f7ff; */
+  /* border: 1px solid #d9e2f5; */
+  /* border-radius: 8px; */
   color: #0f172a;
   font-size: 13px;
   line-height: 1.55;
@@ -117,9 +119,9 @@
 
 .ud07-snote {
   margin-bottom: 18px;
-  color: #1f427a;
-  font-size: 14px;
-  font-weight: 700;
+  color: #2c61f1;
+  font-size: 13px;
+  /* font-weight: 700; */
   text-align: left;
   white-space: pre-wrap;
   word-break: break-word;

@@ -3,9 +3,10 @@
 
 /* ==================== 容器样式 ==================== */
 .ud05-container {
-  min-height: 100vh;
+  border: 1px solid #d0d5dd;
+  /* min-height: 100vh; */
   background-color: #ffffff;
-  padding: 24px 28px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -14,6 +15,7 @@
 
 /* ==================== 标题样式 ==================== */
 .ud05-container .ud05-title {
+  margin-top: 0px;
   color: #003366;
   font-size: 26px;
   font-weight: 700;
@@ -49,6 +51,10 @@
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.ud05-container .ud05-item-space{
+  margin-top: 50px;
 }
 
 .ud05-container .ud05-info-item:last-child {
@@ -99,12 +105,13 @@
   max-width: 1100px;
   background-color: #f9fbff;
   border-radius: 4px;
-  border: 1px solid #c8dff2;
+  border-top: 1px solid #c8dff2;
   padding: 12px 0px 0px 0px;
   margin-bottom: 30px;
   overflow-x: auto;
   position: relative;
   background-color: #e8e8ff; /* 浅蓝色背景 */
+  margin-top: 25px;
 }
 
 .ud05-container .ud05-table {

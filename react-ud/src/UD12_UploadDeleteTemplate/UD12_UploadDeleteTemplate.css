@@ -46,7 +46,7 @@
 .ud12-section-title {
   font-size: 25px;
   font-weight: 600;
-  color: #1a3a5c;
+  color: #003366;;
   padding: 0;
   font-weight: 800;
   margin: 0;
@@ -194,42 +194,11 @@
   outline: none;
   min-width: 70px;
 
-  /* padding: 6px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  min-width: 100px;
-  text-align: center;
-  font-family: inherit; */
 }
-
-/* .ud12-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-} */
-
-/* ===== Upload按钮 ===== */
-/* .ud12-btn-upload {
-  background-color: #1890ff;
-  color: #ffffff;
-} */
 
 .ud12-btn-upload:hover:not(:disabled) {
   background-color:#f8f3f3;
 }
-
-/* .ud12-btn-upload:active:not(:disabled) {
-  background-color: #096dd9;
-} */
-
-/* ===== Delete按钮 ===== */
-/* .ud12-btn-delete {
-  background-color: #ff4d4f;
-  color: #ffffff;
-} */
 
 .ud12-btn-delete:hover:not(:disabled) {
   background-color: #f8f3f3;

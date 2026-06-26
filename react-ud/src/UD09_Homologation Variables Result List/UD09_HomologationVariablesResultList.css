@@ -7,9 +7,10 @@
 .ud09-container {
   padding: 20px 30px;
   font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  min-height: 100vh;
+  background-color: white;
+  /* min-height: 100vh; */
   box-sizing: border-box;
+  border: 1px solid #d0d5dd;
 }
 
 /* ---------- 页面标题 ---------- */

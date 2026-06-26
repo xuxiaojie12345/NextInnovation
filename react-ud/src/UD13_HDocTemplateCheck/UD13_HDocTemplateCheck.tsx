@@ -20,6 +20,7 @@ const UD13_HDocTemplateCheck: React.FC = () => {
   // 对应设计书 6.1 状态管理
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 选择的文件
   const [isChecked, setIsChecked] = useState<boolean>(false);         // 是否已执行检查
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState<boolean>(false);         // 加载状态
   const [message, setMessage] = useState<string>("");                 // 消息文本
   const [messageType, setMessageType] = useState<"success" | "error" | "">(""); // 消息级别

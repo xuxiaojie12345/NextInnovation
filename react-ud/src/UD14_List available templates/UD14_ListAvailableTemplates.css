@@ -5,11 +5,12 @@
 
 /* ---------- 页面主容器 ---------- */
 .ud14-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #ffffff;
-  padding: 20px;
+  padding: 5px 10px;
   font-family: Arial, sans-serif;
   box-sizing: border-box;
+  border: 1px solid #d0d5dd;
 }
 
 .ud14-container .ud14-content {
@@ -22,11 +23,12 @@
 .ud14-container .ud14-title {
   font-size: 20px;
   font-weight: bold;
-  color: #000080;
+  color: #003366;;
   margin-bottom: 15px;
   text-align: left;
   border: none;
   padding: 0;
+    
 }
 
 /* ---------- 错误消息显示区域 ---------- */
@@ -53,43 +55,41 @@
   padding: 6px 0;
 }
 
+/* ---------- 内容容器（查询条件 + 表格合并） ---------- */
+.ud14-container .ud14-content-box {
+  border: 1px solid #9999cc;
+}
+
 /* ---------- 查询条件区域 ---------- */
 .ud14-container .ud14-search-section {
   display: flex;
   align-items: center;
   gap: 15px;
-  border: 1px solid #9999cc;
-  padding: 15px 20px;
+  padding: 10px 15px;
   background-color: #ffffff;
-  margin-bottom: 15px;
+  border-bottom: 1px solid #d9d9d9;
 }
 
 /* ---------- 表单组 ---------- */
 .ud14-container .ud14-form-group {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ud14-container .ud14-form-group label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   color: #000000;
   text-align: left;
   white-space: nowrap;
 }
 
-/* 必填标记 */
-.ud14-container .ud14-required {
-  color: #ff0000;
-  margin-left: 2px;
-}
-
 /* ---------- 下拉框样式 ---------- */
 .ud14-container .ud14-select {
-  width: 200px;
-  padding: 4px 6px;
-  font-size: 13px;
+  width: 120px;
+  padding: 3px 5px;
+  font-size: 12px;
   border: 1px solid #808080;
   outline: none;
   text-align: left;
@@ -108,41 +108,9 @@
   opacity: 0.6;
 }
 
-/* ---------- 按钮样式 ---------- */
-.ud14-container .ud14-btn {
-  padding: 4px 16px;
-  font-size: 12px;
-  font-weight: normal;
-  border: 1px solid #808080;
-  background-color: #d0d0f0;
-  cursor: pointer;
-  outline: none;
-  min-width: 70px;
-}
-
-.ud14-container .ud14-btn:hover:not(:disabled) {
-  background-color: #c0c0e0;
-  border-color: #000080;
-}
-
-.ud14-container .ud14-btn:active:not(:disabled) {
-  background-color: #b0b0d0;
-}
-
-.ud14-container .ud14-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* 確認按钮 */
-.ud14-container .ud14-btn-confirm {
-  background-color: #d0d0f0;
-}
-
 /* ---------- 表格容器 ---------- */
 .ud14-container .ud14-table-wrapper {
   overflow-x: auto;
-  border: 1px solid #9999cc;
 }
 
 /* ---------- 数据表格 ---------- */

@@ -3,9 +3,11 @@
 
 /* ==================== 容器布局 ==================== */
 .ud03-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #ffffff;
-  padding: 20px;
+  padding: 0px 10px 10px;
+  width: 600px;
+  border: 1px solid #d0d5dd;
 }
 
 .ud03-container .ud03-content {
@@ -42,7 +44,7 @@
   border: 1px solid #9999cc; /* 浅蓝色边框 */
   padding: 20px 20px 0 20px; /* 底部padding改为0，让按钮紧贴边框 */
   background-color: #ffffff;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 /* ==================== 表单组（水平布局）==================== */
