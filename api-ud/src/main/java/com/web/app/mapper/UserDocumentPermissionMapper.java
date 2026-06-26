@@ -11,6 +11,16 @@ import java.util.Map;
  */
 @Mapper
 public interface UserDocumentPermissionMapper {
+
+    /**
+     * 查询HDOC_FUNCTION_AUTH中是否存在该用户（去重）
+     */
+    String selectUserIdFromFunctionAuth(@Param("userid") String userid);
+    
+    /**
+     * 查询用户文档权限（仅返回DOCTYPE）
+     */
+    List<String> selectUserDocDoctypes(@Param("userid") String userid);
     
     /**
      * 查询用户文档权限

@@ -1,0 +1,212 @@
+/* ========================================
+   UD10 - Existing HDoc Variables
+   ======================================== */
+
+.ud10-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.ud10-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 16px;
+  color: #555555;
+}
+
+.ud10-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.ud10-card {
+  width: 100%;
+  max-width: 650px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 20px 24px 24px;
+  box-sizing: border-box;
+}
+
+.ud10-page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ud10-error-message {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  text-align: left;
+  font-weight: 500;
+}
+
+.ud10-button-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.ud10-btn {
+  min-width: 70px;
+  height: 28px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #7a9eb3;
+  cursor: pointer;
+  text-align: center;
+  background-color: #e8f0f8;
+  color: #003057;
+  transition: background-color 0.15s ease;
+  border-radius: 2px;
+}
+
+.ud10-btn:hover:not(:disabled) {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud10-btn:disabled {
+  background-color: #dce8f0;
+  color: #7a9eb3;
+  border-color: #b0c8d8;
+  cursor: not-allowed;
+}
+
+.ud10-btn-danger {
+  background-color: #d32f2f;
+  color: #ffffff;
+  border-color: #b0b0b0;
+}
+
+.ud10-btn-danger:hover:not(:disabled) {
+  background-color: #b71c1c;
+}
+
+.ud10-form-area {
+  margin-bottom: 4px;
+}
+
+.ud10-field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.ud10-label {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.ud10-field-control {
+  flex: 1;
+  min-width: 0;
+}
+
+.ud10-required {
+  color: #d32f2f;
+  margin-left: 1px;
+}
+
+.ud10-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ud10-input:focus {
+  border-color: #003057;
+}
+
+.ud10-input:disabled {
+  background-color: #f0f0f0;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+.ud10-select {
+  width: 100%;
+  height: 28px;
+  padding: 0 20px 0 6px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.ud10-select:focus {
+  border-color: #003057;
+}
+
+/* ---- 运算符下拉框 ---- */
+.ud10-operator {
+  width: 55px;
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 2px 0 4px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.ud10-operator:focus {
+  border-color: #003057;
+}
+
+/* ---- 短入力框 ---- */
+.ud10-field-control-short {
+  width: 15%;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+/* ---- 自动值文本 ---- */
+.ud10-auto-value {
+  display: inline-block;
+  font-size: 12px;
+  color: #666666;
+  line-height: 28px;
+  margin-left: auto;
+  padding-right: 4px;
+  white-space: nowrap;
+  font-style: italic;
+}

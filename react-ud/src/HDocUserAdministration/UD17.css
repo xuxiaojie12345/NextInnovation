@@ -1,0 +1,267 @@
+/* ===== UD17 HDoc User Admin ===== */
+
+.ud17-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud17-main {
+  flex: 1;
+}
+
+.ud17-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.ud17-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Message ===== */
+.ud17-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ud17-success {
+  background: #e6f7ed;
+  color: #1a7f42;
+  border: 1px solid #b7ebc8;
+}
+.ud17-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Section / Row ===== */
+.ud17-sec {
+  margin-bottom: 4px;
+  padding: 6px 0;
+}
+.ud17-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ud17-row + .ud17-row {
+  margin-top: 10px;
+}
+
+/* ===== Hint text ===== */
+.ud17-hint {
+  font-size: 12px;
+  color: #000;
+  white-space: nowrap;
+}
+
+/* ===== Roles Section ===== */
+.ud17-roles-section {
+  display: flex;
+  gap: 12px;
+}
+.ud17-roles-label {
+  min-width: 70px;
+  padding-top: 8px;
+}
+.ud17-roles-content {
+  flex: 1;
+}
+.ud17-mvl-chk {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+  align-self: center;
+}
+/* Manage Variable List row: center label and checkbox vertically */
+.ud17-roles-section + .ud17-roles-section {
+  align-items: center;
+}
+.ud17-roles-section + .ud17-roles-section .ud17-roles-label {
+  padding-top: 0;
+}
+
+/* ===== Label ===== */
+.ud17-lbl {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* ===== Checkbox Label ===== */
+.ud17-chk-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  min-width: 160px;
+}
+.ud17-chk-lbl input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+}
+
+/* ===== Input ===== */
+.ud17-inp {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ud17-inp:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+.ud17-ro {
+  background: #f5f5f5;
+  color: #555;
+  cursor: default;
+  flex: 1;
+  max-width: 300px;
+}
+
+/* ===== Select ===== */
+.ud17-sel {
+  height: auto;
+  min-height: 32px;
+  padding: 2px 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  min-width: 70px;
+  width: auto;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ud17-sel:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+
+/* ===== Buttons ===== */
+.ud17-btn {
+  height: 32px;
+  padding: 0 18px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.ud17-btn:hover:not(:disabled) {
+  background: #003057;
+  color: #fff;
+}
+.ud17-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ud17-btn-d {
+  background: #fef2f2;
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+.ud17-btn-d:hover:not(:disabled) {
+  background: #b91c1c;
+  color: #fff;
+}
+
+/* ===== Button group ===== */
+.ud17-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* ===== Role Grid (Horizontal) ===== */
+.ud17-role-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+.ud17-role-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid #dce8f0;
+  border-radius: 4px;
+  background: #fafafa;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.ud17-role-item .ud17-chk-lbl {
+  min-width: 0;
+  white-space: nowrap;
+}
+.ud17-role-market {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ud17-role-market .ud17-lbl {
+  width: auto;
+  min-width: 44px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .ud17-container {
+    padding: 12px;
+  }
+  .ud17-card {
+    padding: 16px;
+  }
+  .ud17-row {
+    gap: 6px;
+  }
+  .ud17-chk-lbl {
+    min-width: 100%;
+  }
+}

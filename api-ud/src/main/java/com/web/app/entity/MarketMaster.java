@@ -20,4 +20,9 @@ public class MarketMaster implements Serializable {
      * 描述
      */
     private String description;
+
+    /**
+     * 是否支持重量数据
+     */
+    private String weightsFromHdoc;
 }

@@ -24,4 +24,10 @@ public class UD19SearchResultListController {
     public UD19SearchResultListResponse search(@RequestBody UD19SearchResultListRequest request) {
         return ud19SearchResultListService.searchHdoc(request);
     }
+
+    @PostMapping("/UD19SelectMarketMaster")
+    @ApiOperation("获取市场列表")
+    public UD19SearchResultListResponse selectMarketMaster() {
+        return ud19SearchResultListService.selectMarketMaster();
+    }
 }

@@ -1,0 +1,151 @@
+/* ===== UD20-1 Market Document Settings ===== */
+
+.ud20-1-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud20-1-main {
+  flex: 1;
+}
+
+.ud20-1-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ud20-1-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Message ===== */
+.ud20-1-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.ud20-1-success {
+  background: #e6f7ed;
+  color: #1a7f42;
+  border: 1px solid #b7ebc8;
+}
+.ud20-1-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Row ===== */
+.ud20-1-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.ud20-1-lbl {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.ud20-1-op {
+  font-size: 13px;
+  color: #333;
+  min-width: 20px;
+  text-align: center;
+}
+
+.ud20-1-inp {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  flex: 1;
+  max-width: 300px;
+}
+.ud20-1-inp:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+
+.ud20-1-sel {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* ===== Buttons ===== */
+.ud20-1-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.ud20-1-btn {
+  height: 32px;
+  padding: 0 18px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.ud20-1-btn:hover:not(:disabled) {
+  background: #003057;
+  color: #fff;
+}
+.ud20-1-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .ud20-1-container {
+    padding: 12px;
+  }
+  .ud20-1-card {
+    padding: 16px;
+  }
+}

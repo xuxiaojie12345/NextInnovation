@@ -5,6 +5,7 @@
     <resultMap id="MarketMasterResultMap" type="com.web.app.entity.MarketMaster">
         <id property="market" column="MARKET"/>
         <result property="description" column="DESCRIPTION"/>
+        <result property="weightsFromHdoc" column="WEIGHTS_FROM_HDOC"/>
     </resultMap>
     
     <!-- 查询所有市场 -->

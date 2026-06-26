@@ -1,0 +1,96 @@
+/* ===== UD22 Document Types ===== */
+
+.ud22-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud22-main {
+  flex: 1;
+}
+
+.ud22-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ud22-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Message ===== */
+.ud22-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.ud22-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Table ===== */
+.ud22-table-wrap {
+  overflow-x: auto;
+}
+.ud22-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ud22-table th {
+  background: #dce8f0;
+  color: #003057;
+  font-weight: 600;
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #c0d0e0;
+  white-space: nowrap;
+}
+.ud22-table td {
+  padding: 8px 14px;
+  border: 1px solid #e0e0e0;
+  color: #333;
+  vertical-align: top;
+}
+.ud22-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+.ud22-table tr:hover {
+  background: #eef3f8;
+}
+
+/* ===== Loading ===== */
+.ud22-loading {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .ud22-container {
+    padding: 12px;
+  }
+  .ud22-card {
+    padding: 16px;
+  }
+}

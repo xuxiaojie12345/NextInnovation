@@ -4,26 +4,33 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./Login/Login";
 import TestMain from "./Test/Test";
-import Menu from "./Menu/Menu";
-import UD01 from "./20260603/01/UD01";
-import UD03 from "./20260603/03/UD03";
-import UD04 from "./20260603/04/UD04";
-import UD05 from "./20260603/05/UD05";
-import UD06 from "./20260603/06/UD06";
-import UD07 from "./20260603/07/UD07";
-import UD08 from "./20260603/08/UD08";
-import UD09 from "./20260603/09/UD09";
-import UD10 from "./20260603/10/UD10";
-import UD11 from "./20260603/11/UD11";
-import UD12 from "./20260603/12/UD12";
-import UD13 from "./20260603/13/UD13";
-import UD14 from "./20260603/14/UD14";
-import UD15 from "./20260603/15/UD15";
-import UD16 from "./20260603/16/UD16";
-import UD25 from "./20260603/25/UD25";
-import SidebarLayout from "./20260603/SidebarLayout";
+import UD01 from "./Login/UD01";
+import UD03 from "./GenerateHomologationDocument​/UD03";
+import UD04 from "./GenerateDocument/UD04";
+import UD05 from "./ModifyDocument/UD05";
+import UD06 from "./SaveModifications/UD06";
+import UD07 from "./VehicleSpecification/UD07";
+import UD08 from "./HomologationVariables/UD08";
+import UD09 from "./HomologationVariablesResultList/UD09";
+import UD10 from "./ExistingHDocVariables/UD10";
+import UD11 from "./ExistingHDocVariablesResult List/UD11";
+import UD12 from "./Upload&DeleteTemplate/UD12";
+import UD13 from "./HDocTemplateCheck/UD13";
+import UD14 from "./ListAvailableTemplates/UD14";
+import UD15 from "./VinPlate/UD15";
+import UD16 from "./ADChange/UD16";
+import UD17 from "./HDocUserAdministration/UD17";
+import UD18 from "./HDocUserDocAdministration/UD18";
+import UD19 from "./SearchUser/UD19";
+import UD20 from "./MarketDocumentSettingsList/UD20";
+import UD20_1 from "./MarketDocumentSettingsList/UD20_1";
+import UD21 from "./MarketsInHdoc/UD21";
+import UD22 from "./DocumentTypes/UD22";
+import UD23 from "./DownloadandPrintQuickGuides/UD23";
+import UD24 from "./UserGuide/UD24";
+import UD25 from "./EDBUserView/UD25";
+import SidebarLayout from "./SidebarLayout";
 
 function App() {
   return (
@@ -80,6 +87,33 @@ function App() {
             </Route>
             <Route path="/UD16" element={<SidebarLayout />}>
               <Route index element={<UD16 />} />
+            </Route>
+            <Route path="/UD17" element={<SidebarLayout />}>
+              <Route index element={<UD17 />} />
+            </Route>
+            <Route path="/UD18" element={<SidebarLayout />}>
+              <Route index element={<UD18 />} />
+            </Route>
+            <Route path="/UD19" element={<SidebarLayout />}>
+              <Route index element={<UD19 />} />
+            </Route>
+            <Route path="/UD20" element={<SidebarLayout />}>
+              <Route index element={<UD20 />} />
+            </Route>
+            <Route path="/UD20-1" element={<SidebarLayout />}>
+              <Route index element={<UD20_1 />} />
+            </Route>
+            <Route path="/UD21" element={<SidebarLayout />}>
+              <Route index element={<UD21 />} />
+            </Route>
+            <Route path="/UD22" element={<SidebarLayout />}>
+              <Route index element={<UD22 />} />
+            </Route>
+            <Route path="/UD23" element={<SidebarLayout />}>
+              <Route index element={<UD23 />} />
+            </Route>
+            <Route path="/UD24" element={<SidebarLayout />}>
+              <Route index element={<UD24 />} />
             </Route>
             <Route path="/UD25" element={<SidebarLayout />}>
               <Route index element={<UD25 />} />

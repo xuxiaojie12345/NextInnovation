@@ -1,0 +1,173 @@
+/* ========================================
+   UD07 - VDA Vehicle Specification
+   ======================================== */
+
+.ud07-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Courier New", "Consolas", monospace;
+  background-color: #ffffff;
+}
+
+.ud07-header {
+  background-color: #003057;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.ud07-header-logo {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.ud07-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.ud07-content-box {
+  width: 100%;
+  max-width: 900px;
+  background-color: #ffffff;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+.ud07-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 16px;
+  color: #888888;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.ud07-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 12px 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.ud07-error {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  font-weight: 500;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ---- 基本信息（2列网格布局） ---- */
+.ud07-info-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 10px;
+}
+
+.ud07-info-row {
+  display: flex;
+  align-items: baseline;
+  line-height: 1.7;
+}
+
+.ud07-info-row:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.ud07-info-label {
+  width: 140px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.ud07-info-value {
+  font-size: 13px;
+  color: #000000;
+}
+
+/* ---- Symbols（仅显示SYMBOL_STR，hover显示Tooltip） ---- */
+.ud07-symbols-block {
+  margin-bottom: 16px;
+  font-family: "Courier New", "Consolas", monospace;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #000000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+/* 单个Symbol项（带Tooltip） */
+.ud07-symbol-item {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  white-space: pre;
+  padding: 0 2px;
+}
+
+/* Tooltip 弹出框 */
+.ud07-symbol-item:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333333;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip 箭头 */
+.ud07-symbol-item:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333333;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* ---- S-Notes ---- */
+.ud07-snotes-section {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #333333;
+}
+
+.ud07-snote-item {
+  line-height: 1.6;
+  padding-left: 4px;
+}

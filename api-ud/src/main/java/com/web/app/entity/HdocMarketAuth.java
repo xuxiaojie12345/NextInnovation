@@ -25,4 +25,9 @@ public class HdocMarketAuth implements Serializable {
      * 市场
      */
     private String market;
+
+    /**
+     * BU
+     */
+    private String bu;
 }

@@ -133,7 +133,10 @@ export const userApi = {
     }),
 
   // 更新用户角色
-  updateUserRole: (userid: string, permissions: string) =>
+  updateUserRole: (
+    userid: string,
+    permissions: Array<{ role: string; markets: string[] }>,
+  ) =>
     apiRequest("/api/UD17HDocUserAdministrationApi/UD17UpdateRole", "POST", {
       userid,
       permissions,
@@ -375,4 +378,80 @@ export const edbUserApi = {
   // 获取用户信息（调用 AuthenticationApi/login，仅传userId不传密码）
   getUserInfo: (userid: string) =>
     apiRequest("/api/AuthenticationApi/login", "POST", { userId: userid }),
+};
+
+/**
+ * UD18 - HDoc User Doc Administration API
+ */
+export const userDocApi = {
+  // 获取全部文档列表
+  getDocumentList: () =>
+    apiRequest("/api/UD18HDocUserDocAdministrationApi/document-list", "GET"),
+
+  // 获取用户已有文档权限
+  getUserDoc: (userid: string) =>
+    apiRequest(
+      "/api/UD18HDocUserDocAdministrationApi/select-user-doc",
+      "POST",
+      {
+        userid,
+      },
+    ),
+
+  // 更新用户文档权限（先删后插）
+  updateUserDoc: (userid: string, documents: Array<{ doctype: string }>) =>
+    apiRequest(
+      "/api/UD18HDocUserDocAdministrationApi/update-user-doc",
+      "POST",
+      {
+        userid,
+        documents,
+      },
+    ),
+};
+
+/**
+ * UD19 - Search HDoc User API
+ */
+export const userSearchApi = {
+  // 获取市场列表
+  getMarkets: () =>
+    apiRequest("/api/UD19SearchResultListApi/UD19SelectMarketMaster", "POST"),
+
+  // 检索用户
+  searchUser: (params: {
+    userid?: string;
+    user?: string;
+    searchType?: string;
+  }) => apiRequest("/api/UD19SearchResultListApi/search", "POST", params),
+};
+
+/**
+ * UD20-1 - Market Document Settings API
+ */
+export const marketDocSettingsApi = {
+  // 更新文档设置
+  updateDocSetting: (params: {
+    documentType: string;
+    businessUnit: string;
+    user: string;
+    date: string;
+  }) => apiRequest("/api/market-document-settings/update", "POST", params),
+};
+
+/**
+ * UD21 - Markets in Hdoc API
+ */
+export const marketsApi = {
+  // 获取市场列表
+  getMarkets: () => apiRequest("/api/UD21MarketsInHdocApi/markets", "GET"),
+};
+
+/**
+ * UD22 - Document Types API
+ */
+export const documentTypesApi = {
+  // 获取文档类型列表
+  getDocumentTypes: () =>
+    apiRequest("/api/UD22DocumentTypesApi/document-types", "GET"),
 };

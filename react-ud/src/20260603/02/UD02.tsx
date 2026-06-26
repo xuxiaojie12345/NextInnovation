@@ -76,8 +76,8 @@ const MENU_STRUCTURE: MenuGroup[] = [
     id: "user-administration",
     title: "User Administration",
     items: [
-      { label: "HDoc User Administration", path: "/user/hdoc-admin" },
-      { label: "HDoc User Doc Administration", path: "/user/hdoc-doc-admin" },
+      { label: "HDoc User Administration", path: "/UD17" },
+      { label: "HDoc User Doc Administration", path: "/UD18" },
       { label: "Search User", path: "/user/search" },
     ],
   },

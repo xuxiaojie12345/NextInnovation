@@ -69,7 +69,7 @@
     3.12.[UD14SearchresultistApi]: List available templates画面信息检索
     3.13.[UD15SelecthdocsenddatavinplateApi]: Vin Plate画面的检索，更新
     3.14.[UD16ADChangeApi]: AD Change画面的检索，追加，删除
-    3.15.[UD16ADChangeApi]: HDoc User Administration画面的检索，更新，删除
+    3.15.[UD17HDocUserAdministration​​Api]: HDoc User Administration画面的检索，更新，删除
     3.16.[UD18HDocUserDocAdministrationApi]: HDoc User Doc Administration画面的更新，登录
     3.17.[UD19SearchResultListApi]: Search HDoc User画面的检索
     3.18.[UD20MarketDocumentSettingsApi]: HDoc - Market Document Setting検索結果画面
@@ -1324,8 +1324,8 @@
             VARIABLE,        -- 変数コード (必須)
             TYPE,            -- タイプ
             DESCRIPTION,     -- 説明
-            CREATED_BY_USER, -- 作成ユーザー
-            CREATE_DATE      -- 作成日付
+            REGISTER_USER, -- 作成ユーザー
+            REGISTER_DATETIME      -- 作成日付
         ) VALUES (
             Variable,   
             Type,   
@@ -1460,38 +1460,79 @@
 
 ----------------------------------------------------------------------------------------------------------------
   【UD17HDocUserAdministration​​Api】
-   5.15
-  - 查询语句:
-    SELECT COUNT(1) FROM hdoc_user_infor WHERE USERID = {userid}
+   UD17Userinfo方法：
+        ①getMarketList() 方法使用的 SQL
+        SELECT 
+            MARKET,
+            DESCRIPTION
+        FROM MARKET_MASTER;
 
-    SELECT
-     FUNCTIONAUTH.FUNCTION,
-     MARKETAUTH.MARKET
-    FROM HDOC_FUNCTION_AUTH FUNCTIONAUTH
-    LEFT JOIN
-     HDOC_MARKET_AUTH MARKETAUTH
-   ON  FUNCTIONAUTH.USERID = MARKETAUTH.USERID
-   AND FUNCTIONAUTH.FUNCTION = MARKETAUTH.TYPE
-   WHERE FUNCTIONAUTH.USERID = {userid}
+        ②getUserInfo() 方法使用的 SQL
+        SELECT 
+            USERID,
+            USERNAME,
+            RESPONSIBLE,
+            USERPOSITION,
+            `E-MMAIL` AS EMAIL
+        FROM hdoc_user_infor
+        WHERE USERID = :userid OR USERNAME = :username;
+        ③getUserPermissions() 方法使用的 SQL
+        -- 查询用户功能权限
+        SELECT 
+            `FUNCTION`,
+            USERID
+        FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = :userid;
 
-  - 更新语句: 
-    UPDATE  HDOC_FUNCTION_AUTH
-    SET FUNCTION = {permissions}
-    WHERE USERID = {userid}
+        -- 查询用户市场权限
+        SELECT 
+            USERID,
+            MARKET,
+            `TYPE`,
+            BU
+        FROM HDOC_MARKET_AUTH
+        WHERE USERID = :userid AND `TYPE` IN (
+            SELECT `FUNCTION` 
+            FROM HDOC_FUNCTION_AUTH 
+            WHERE USERID = :userid
+        );
 
-    UPDATE  HDOC_MARKET_AUTH
-    SET MARKET = {market}
-    WHERE USERID = {userid}
-    AND   TYPE = {permissions}
 
-  - 删除语句:
-    UPDATE  HDOC_FUNCTION_AUTH
-    SET FUNCTION = ''
-    WHERE USERID = {userid}
+    UD17UpdateRole方法
+        -- 更新HDOC_MARKET_AUTH表
+        UPDATE HDOC_MARKET_AUTH 
+        SET 
+            USERID = :userid,
+            MARKET = :market,
+            `TYPE` = :type,
+            BU = :bu,
+            UPDATE_DATETIME = SYSDATE,
+            UPDATE_USER = :updateUser,
+            UPDATE_PROCESS = :updateProcess
+        WHERE 
+            USERID = :userid AND MARKET = :market AND `TYPE` = :type AND BU = :bu;
 
-    UPDATE  HDOC_MARKET_AUTH
-    SET MARKET = ''
-    WHERE USERID = {userid}
+        -- 更新HDOC_FUNCTION_AUTH表
+        UPDATE HDOC_FUNCTION_AUTH 
+        SET 
+            `FUNCTION` = :function,
+            USERID = :userid,
+            UPDATE_DATETIME = SYSDATE,
+            UPDATE_USER = :updateUser,
+            UPDATE_PROCESS = :updateProcess
+        WHERE 
+            `FUNCTION` = :function AND USERID = :userid;
+
+    UD17DeleteRole方法
+        -- 删除HDOC_MARKET_AUTH表记录
+        DELETE FROM HDOC_MARKET_AUTH 
+        WHERE 
+            USERID = :userid AND MARKET = :market AND `TYPE` = :type AND BU = :bu;
+
+        -- 删除HDOC_FUNCTION_AUTH表记录
+        DELETE FROM HDOC_FUNCTION_AUTH 
+        WHERE 
+            `FUNCTION` = :function AND USERID = :userid;
 
 ----------------------------------------------------------------------------------------------------------------
   【UD18HDocUserDocAdministrationApi】

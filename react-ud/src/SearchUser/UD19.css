@@ -1,0 +1,236 @@
+/* ===== UD19 Search HDoc User ===== */
+
+.ud19-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud19-main {
+  flex: 1;
+}
+
+.ud19-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ud19-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Message ===== */
+.ud19-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ud19-success {
+  background: #e6f7ed;
+  color: #1a7f42;
+  border: 1px solid #b7ebc8;
+}
+.ud19-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Row ===== */
+.ud19-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* ===== Label ===== */
+.ud19-lbl {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* ===== Input ===== */
+.ud19-inp {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ud19-inp:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+
+/* ===== Bottom section (Radio + Market) ===== */
+.ud19-bottom-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 4px;
+}
+.ud19-market-list {
+  width: 180px;
+}
+.ud19-market-list select {
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+  padding: 4px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+}
+.ud19-market-list select:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+.ud19-market-list select option {
+  padding: 3px 6px;
+}
+
+/* ===== Radio group ===== */
+.ud19-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+.ud19-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+}
+.ud19-radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+}
+
+/* ===== Market section (label left, list right) ===== */
+.ud19-market-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ud19-market-title {
+  min-width: 50px;
+}
+
+/* ===== Search button row ===== */
+.ud19-search-btn-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 16px;
+}
+
+/* ===== Button ===== */
+.ud19-btn {
+  height: 32px;
+  padding: 0 24px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  align-self: flex-end;
+}
+.ud19-btn:hover:not(:disabled) {
+  background: #003057;
+  color: #fff;
+}
+.ud19-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== Table ===== */
+.ud19-table-wrap {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+.ud19-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ud19-table th {
+  background: #dce8f0;
+  color: #003057;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid #c0d0e0;
+  white-space: nowrap;
+}
+.ud19-table td {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  color: #333;
+}
+.ud19-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+.ud19-table tr:hover {
+  background: #eef3f8;
+}
+
+/* ===== Count ===== */
+.ud19-count {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #555;
+  text-align: right;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 700px) {
+  .ud19-bottom-row {
+    flex-direction: column;
+  }
+  .ud19-container {
+    padding: 12px;
+  }
+  .ud19-card {
+    padding: 16px;
+  }
+}

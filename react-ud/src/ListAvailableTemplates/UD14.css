@@ -1,0 +1,169 @@
+/* ========================================
+   UD14 - Template File List
+   ======================================== */
+
+.ud14-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.ud14-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 16px;
+  color: #555555;
+}
+
+.ud14-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.ud14-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 20px 24px 24px;
+  box-sizing: border-box;
+}
+
+.ud14-page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ---- 消息 ---- */
+.ud14-message {
+  font-size: 13px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.ud14-error {
+  color: #d32f2f;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+}
+
+/* ---- 筛选行 ---- */
+.ud14-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ud14-filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.ud14-select {
+  width: 120px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.ud14-select:focus {
+  border-color: #003057;
+}
+
+/* ---- 表格 ---- */
+.ud14-table-wrapper {
+  overflow-x: auto;
+}
+
+.ud14-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ud14-table th {
+  background-color: #dce8f0;
+  color: #003057;
+  font-weight: 600;
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid #b8d4e8;
+  white-space: nowrap;
+}
+
+.ud14-table td {
+  padding: 5px 10px;
+  border: 1px solid #d0d0d0;
+  color: #333333;
+}
+
+.ud14-table tbody tr:hover {
+  background-color: #f0f6fa;
+}
+
+.ud14-table-empty {
+  text-align: center;
+  color: #999999;
+  padding: 20px 10px !important;
+}
+
+.ud14-col-center {
+  text-align: left;
+}
+
+.ud14-col-right {
+  text-align: right;
+}
+
+.ud14-col-icon {
+  width: 28px;
+  text-align: center;
+}
+
+.ud14-file-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ---- 文件链接 ---- */
+.ud14-file-link {
+  color: #003057;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ud14-file-link:hover {
+  color: #0055aa;
+}
+
+/* ---- Used 列 ---- */
+.ud14-used-yes {
+  color: #333333;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.ud14-used-no {
+  color: #bbbbbb;
+}

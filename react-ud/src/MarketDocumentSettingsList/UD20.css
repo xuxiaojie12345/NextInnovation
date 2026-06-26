@@ -1,0 +1,137 @@
+/* ===== UD20 Market Document Settings List ===== */
+
+.ud20-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud20-main {
+  flex: 1;
+}
+
+.ud20-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ud20-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+.ud20-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.ud20-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.ud20-table-wrap {
+  overflow-x: auto;
+}
+.ud20-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ud20-table th {
+  background: #dce8f0;
+  color: #003057;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid #c0d0e0;
+  white-space: nowrap;
+}
+.ud20-table td {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  color: #333;
+}
+.ud20-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+.ud20-table tr:hover {
+  background: #eef3f8;
+}
+
+.ud20-user-link {
+  color: #003057;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+}
+.ud20-user-link:hover {
+  color: #1a6db5;
+}
+
+.ud20-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ud20-btn {
+  height: 32px;
+  padding: 0 18px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.ud20-btn:hover:not(:disabled) {
+  background: #003057;
+  color: #fff;
+}
+.ud20-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ud20-loading {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+@media (max-width: 600px) {
+  .ud20-container {
+    padding: 12px;
+  }
+  .ud20-card {
+    padding: 16px;
+  }
+}

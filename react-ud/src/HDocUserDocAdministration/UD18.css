@@ -1,0 +1,182 @@
+/* ===== UD18 HDoc User Doc Administration ===== */
+
+.ud18-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud18-main {
+  flex: 1;
+}
+
+.ud18-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ud18-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Message ===== */
+.ud18-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ud18-success {
+  background: #e6f7ed;
+  color: #1a7f42;
+  border: 1px solid #b7ebc8;
+}
+.ud18-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Row ===== */
+.ud18-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.ud18-row + .ud18-row {
+  margin-top: 6px;
+}
+
+/* ===== Label ===== */
+.ud18-lbl {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* ===== Input ===== */
+.ud18-inp {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ud18-inp:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+.ud18-ro {
+  background: #f5f5f5;
+  color: #555;
+  cursor: default;
+  flex: 1;
+  max-width: 300px;
+}
+
+/* ===== Button ===== */
+.ud18-btn {
+  height: 32px;
+  padding: 0 18px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.ud18-btn:hover:not(:disabled) {
+  background: #003057;
+  color: #fff;
+}
+.ud18-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== Document list ===== */
+.ud18-doc-list {
+  margin: 16px 0 20px;
+  border: 1px solid #dce8f0;
+  border-radius: 4px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+.ud18-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid #eaeef2;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ud18-doc-item:last-child {
+  border-bottom: none;
+}
+.ud18-doc-item:hover {
+  background: #eef3f8;
+}
+.ud18-doc-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ud18-doc-lbl {
+  font-size: 13px;
+  color: #333;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* ===== Button group ===== */
+.ud18-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .ud18-container {
+    padding: 12px;
+  }
+  .ud18-card {
+    padding: 16px;
+  }
+}

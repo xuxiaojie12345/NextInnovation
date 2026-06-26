@@ -1,13 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.UserPermissionMapper">
+
+    <resultMap id="FunctionAuthResultMap" type="com.web.app.entity.HdocFunctionAuth">
+        <result property="userid" column="USERID"/>
+        <result property="function" column="FUNCTION"/>
+    </resultMap>
+
+    <resultMap id="MarketAuthResultMap" type="com.web.app.entity.HdocMarketAuth">
+        <result property="userid" column="USERID"/>
+        <result property="market" column="MARKET"/>
+        <result property="type" column="TYPE"/>
+        <result property="bu" column="BU"/>
+    </resultMap>
+
+    <resultMap id="UserResultMap" type="com.web.app.entity.User">
+        <id property="userid" column="USERID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="responsible" column="RESPONSIBLE"/>
+        <result property="userPosition" column="USERPOSITION"/>
+        <result property="email" column="EMAIL"/>
+    </resultMap>
+
+    <resultMap id="MarketMasterResultMap" type="com.web.app.entity.MarketMaster">
+        <result property="market" column="MARKET"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
     
     <!-- 检查用户是否存在 -->
     <select id="countByUserId" resultType="int">
         SELECT COUNT(1) FROM hdoc_user_infor WHERE USERID = #{userid}
     </select>
-    
-    <!-- 查询用户功能权限和市场权限 -->
+
+    <!-- 查询用户信息 -->
+    <select id="selectUserInfo" resultMap="UserResultMap">
+        SELECT USERID, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid}
+    </select>
+
+    <!-- 查询市场列表 -->
+    <select id="selectMarketList" resultMap="MarketMasterResultMap">
+        SELECT MARKET, DESCRIPTION FROM MARKET_MASTER
+    </select>
+
+    <!-- 查询用户功能权限 -->
+    <select id="selectFunctionAuthByUserId" resultMap="FunctionAuthResultMap">
+        SELECT `FUNCTION`, USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+    </select>
+
+    <!-- 查询用户市场权限 -->
+    <select id="selectMarketAuthByUserId" resultMap="MarketAuthResultMap">
+        SELECT USERID, MARKET, `TYPE`, BU
+        FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
+        AND `TYPE` IN (
+            SELECT `FUNCTION` FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+        )
+    </select>
+
+    <!-- 查询用户功能权限和市场权限（原有兼容方法） -->
     <select id="selectUserPermissions" resultType="map">
         SELECT FUNCTIONAUTH.FUNCTION, MARKETAUTH.MARKET
         FROM HDOC_FUNCTION_AUTH FUNCTIONAUTH
@@ -16,6 +68,48 @@
             AND FUNCTIONAUTH.FUNCTION = MARKETAUTH.TYPE
         WHERE FUNCTIONAUTH.USERID = #{userid}
     </select>
+
+    <!-- UD19搜索：根据条件查询用户及市场信息 -->
+    <select id="searchHdocUsers" resultType="map">
+        SELECT DISTINCT u.USERID, u.USERNAME AS `user`,
+            (SELECT GROUP_CONCAT(DISTINCT ma.MARKET ORDER BY ma.MARKET SEPARATOR ',')
+             FROM HDOC_MARKET_AUTH ma WHERE ma.USERID = u.USERID) AS market
+        FROM hdoc_user_infor u
+        INNER JOIN HDOC_FUNCTION_AUTH fa ON u.USERID = fa.USERID
+        WHERE 1=1
+        <if test="userid != null and userid != ''">
+            AND u.USERID = #{userid}
+        </if>
+        <if test="user != null and user != ''">
+            AND u.USERNAME LIKE CONCAT('%', #{user}, '%')
+        </if>
+        <if test="function != null and function != ''">
+            AND fa.FUNCTION = #{function}
+        </if>
+        ORDER BY u.USERID
+    </select>
+    
+    <!-- 删除用户功能权限 -->
+    <delete id="deleteFunctionAuthByUser">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
+    </delete>
+
+    <!-- 删除用户市场权限 -->
+    <delete id="deleteMarketAuthByUser">
+        DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userid}
+    </delete>
+
+    <!-- 插入功能权限 -->
+    <insert id="insertFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH (USERID, FUNCTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{function}, NOW(), #{updateUser}, 'UD17UpdateRole', NOW(), #{updateUser}, 'UD17UpdateRole')
+    </insert>
+
+    <!-- 插入市场权限 -->
+    <insert id="insertMarketAuth">
+        INSERT INTO HDOC_MARKET_AUTH (USERID, MARKET, TYPE, BU, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{userid}, #{market}, #{type}, 'UD', NOW(), #{updateUser}, 'UD17UpdateRole', NOW(), #{updateUser}, 'UD17UpdateRole')
+    </insert>
     
     <!-- 更新用户功能权限 -->
     <update id="updateFunctionAuth">

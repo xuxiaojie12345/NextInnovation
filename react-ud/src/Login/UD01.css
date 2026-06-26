@@ -1,0 +1,159 @@
+/* UD01.css */
+
+/* 全局重置，确保全屏显示 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* 背景图片设置：请替换为实际图片路径 */
+  background-image: url("./login-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 左侧品牌区域 */
+.login-brand-section {
+  flex: 1;
+  /* 关键：透明背景，直接显示底层背景图 */
+  background-color: transparent;
+  color: white; /* 白色文字 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 增加文字阴影以确保在复杂背景图上可读 */
+}
+
+.brand-title {
+  font-size: 56px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.brand-title2 {
+  font-size: 56px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.brand-subtitle {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.brand-support {
+  font-size: 16px;
+  text-align: left;
+
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* 右侧登录表单区域 */
+.login-form-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #333;
+  font-size: 20px;
+}
+
+/* 错误消息：红色，位于 Password 下方、Login 上方 */
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: left;
+  min-height: 20px;
+  font-weight: 500;
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 10px;
+  height: 40px;
+  font-size: 16px;
+}
+
+/* 底部备用链接提示区域 */
+.fallback-login-info {
+  margin-top: 30px;
+  font-size: 12px;
+  text-align: center;
+  max-width: 400px;
+  /* 关键：所有文字红色，无背景色 */
+  color: #ff4d4f;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); /* 黑色阴影增强红色在背景图上的可读性 */
+}
+
+.fallback-link {
+  color: #ff4d4f;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.fallback-link:hover {
+  color: #ff7875;
+}
+
+.fallback-note {
+  color: #ff4d4f;
+  margin-top: 5px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-brand-section {
+    padding: 20px;
+    min-height: 150px;
+    justify-content: flex-start;
+  }
+
+  .brand-support {
+    margin-top: 20px;
+  }
+
+  .login-form-section {
+    background-color: transparent;
+    backdrop-filter: none;
+  }
+}

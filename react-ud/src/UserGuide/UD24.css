@@ -1,0 +1,172 @@
+/* ===== UD24 User Guide ===== */
+
+.ud24-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud24-main {
+  flex: 1;
+}
+
+.ud24-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ud24-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+/* ===== Links ===== */
+.ud24-links {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+}
+.ud24-links li {
+  margin-bottom: 6px;
+}
+.ud24-link {
+  color: #003057;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.ud24-link:hover {
+  color: #1a6db5;
+}
+
+/* ===== Section ===== */
+.ud24-section {
+  margin-bottom: 22px;
+}
+.ud24-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 8px;
+}
+.ud24-section p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 8px;
+  color: #333;
+}
+
+/* ===== Numbered list ===== */
+.ud24-ol {
+  margin: 6px 0 0;
+  padding-left: 22px;
+}
+.ud24-ol li {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* ===== Checkbox section ===== */
+.ud24-chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #333;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.ud24-chk input {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .ud24-container {
+    padding: 12px;
+  }
+  .ud24-card {
+    padding: 16px;
+  }
+}
+
+.ud24-modal {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  width: 400px;
+  max-width: 90%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.ud24-header {
+  background-color: #003057;
+  padding: 12px 20px;
+}
+
+.ud24-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ud24-body {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.ud24-message {
+  font-size: 16px;
+  color: #333333;
+  margin: 0;
+}
+
+.ud24-footer {
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ud24-close-btn {
+  min-width: 100px;
+  height: 32px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #7a9eb3;
+  background-color: #e8f0f8;
+  color: #003057;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ud24-close-btn:hover {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud24-close-btn:active {
+  background-color: #c0d8e8;
+}

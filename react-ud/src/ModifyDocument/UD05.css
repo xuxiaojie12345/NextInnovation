@@ -1,0 +1,194 @@
+/* ========================================
+   UD05 - Modify Document
+   ======================================== */
+
+.ud05-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.ud05-header {
+  background-color: #003057;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.ud05-header-logo {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.ud05-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px 20px;
+}
+
+.ud05-content-box {
+  width: 100%;
+  max-width: 900px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 20px 20px;
+  box-sizing: border-box;
+}
+
+.ud05-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 16px;
+  color: #888888;
+}
+
+.ud05-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ud05-error-message {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  text-align: left;
+  font-weight: 500;
+}
+
+/* ---- 信息行（竖向排列） ---- */
+.ud05-info-section {
+  margin-bottom: 10px;
+}
+
+.ud05-info-row {
+  display: flex;
+  align-items: baseline;
+  line-height: 1.8;
+}
+
+.ud05-info-label {
+  width: 110px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.ud05-info-value {
+  font-size: 13px;
+  color: #333333;
+}
+
+.ud05-link {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #003057;
+}
+
+.ud05-link:hover {
+  color: #002244;
+}
+
+/* ---- 按钮（在表格上方，左对齐） ---- */
+.ud05-button-row {
+  text-align: left;
+  margin: 10px 0 8px 0;
+}
+
+.ud05-btn {
+  min-width: 80px;
+  height: 28px;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #8ab8d4;
+  background-color: #b0d0e8;
+  color: #003057;
+  cursor: pointer;
+}
+
+.ud05-btn:hover:not(:disabled) {
+  background-color: #9cc0dc;
+  border-color: #7aaac8;
+}
+
+.ud05-btn:disabled {
+  background-color: #d0dce8;
+  color: #7a8a9a;
+  border-color: #c0ccd8;
+  cursor: not-allowed;
+}
+
+/* ---- 表格 ---- */
+.ud05-table-wrapper {
+  overflow-x: auto;
+}
+
+.ud05-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 1px solid #999999;
+}
+
+.ud05-th {
+  background-color: #d9e6f2;
+  color: #003057;
+  font-weight: 600;
+  text-align: center;
+  padding: 5px 8px;
+  border: 1px solid #999999;
+  white-space: nowrap;
+}
+
+.ud05-td {
+  padding: 4px 8px;
+  border: 1px solid #999999;
+  color: #333333;
+  vertical-align: middle;
+}
+
+.ud05-row-changed {
+  background-color: #fffbe6;
+}
+
+/* ---- 输入框 ---- */
+.ud05-input {
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 12px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ud05-input:focus {
+  border-color: #003057;
+}
+
+.ud05-input:disabled {
+  background-color: #f0f0f0;
+  color: #888888;
+  cursor: not-allowed;
+}

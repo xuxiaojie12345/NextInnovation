@@ -1,0 +1,91 @@
+/* ===== UD21 Markets in Hdoc ===== */
+
+.ud21-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
+}
+
+.ud21-main {
+  flex: 1;
+}
+
+.ud21-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ud21-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
+}
+
+.ud21-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.ud21-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.ud21-table-wrap {
+  overflow-x: auto;
+}
+.ud21-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ud21-table th {
+  background: #dce8f0;
+  color: #003057;
+  font-weight: 600;
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #c0d0e0;
+  white-space: nowrap;
+}
+.ud21-table td {
+  padding: 8px 14px;
+  border: 1px solid #e0e0e0;
+  color: #333;
+}
+.ud21-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+.ud21-table tr:hover {
+  background: #eef3f8;
+}
+
+.ud21-loading {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+@media (max-width: 600px) {
+  .ud21-container {
+    padding: 12px;
+  }
+  .ud21-card {
+    padding: 16px;
+  }
+}
