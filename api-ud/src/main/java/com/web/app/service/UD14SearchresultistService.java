@@ -28,4 +28,13 @@ public interface UD14SearchresultistService {
      * @return 响应对象
      */
     UD14SearchresultistResponse selectUserDefinedRules(UD14SearchresultistRequest request);
+
+    /**
+     * 获取指定Market文件夹下的文件列表
+     * 读取market文件夹下的文件，并检查每个文件是否在HDOC_USER_DEFINED_RULES中已使用
+     *
+     * @param request 请求对象（包含market）
+     * @return 响应对象（包含文件列表）
+     */
+    UD14SearchresultistResponse getMarketFiles(UD14SearchresultistRequest request);
 }

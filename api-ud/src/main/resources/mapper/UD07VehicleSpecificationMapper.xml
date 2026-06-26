@@ -40,7 +40,7 @@
         FROM HDOC_REC_DATA_KOLA_VARIANT
         WHERE FAMILY_ID = #{familyId}
           AND VARIANT_ID = #{variantId}
-        ORDER BY SYMBOL, FUNCTION_GROUP
+        ORDER BY  FUNCTION_GROUP
     </select>
 
 </mapper>

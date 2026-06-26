@@ -45,6 +45,14 @@ public class UD12UploadDeletetemplatController {
         return ud12Service.uploadFile(file, market);
     }
 
+    @GetMapping("/template/list")
+    @ApiOperation(value = "获取模板文件列表", notes = "根据市场获取该Market文件夹下的所有模板文件名")
+    public UD12UploadDeletetemplatResponse getTemplateList(
+            @ApiParam(value = "市场", required = true, example = "AF") @RequestParam("market") String market) {
+        log.info("收到UD12查询模板文件列表请求, market: {}", market);
+        return ud12Service.getTemplateList(market);
+    }
+
     @DeleteMapping("/deleteflie")
     @ApiOperation(value = "删除模板文件", notes = "从服务器删除指定市场的模板文件")
     public UD12UploadDeletetemplatResponse deleteFile(

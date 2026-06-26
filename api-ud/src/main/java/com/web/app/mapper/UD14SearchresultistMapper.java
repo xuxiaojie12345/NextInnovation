@@ -32,4 +32,14 @@ public interface UD14SearchresultistMapper {
      * @return 变量列表
      */
     List<String> selectVariableByMarket(@Param("market") String market);
+
+    /**
+     * 根据市场和文件名查询用户定义规则中的变量
+     * SQL条件：MARKET = #{market} AND VAL = #{market}/{fileName}
+     *
+     * @param market   市场
+     * @param fileName 文件名
+     * @return VARIABLE值（未找到时返回null）
+     */
+    String selectVariableByMarketAndFile(@Param("market") String market, @Param("fileName") String fileName);
 }

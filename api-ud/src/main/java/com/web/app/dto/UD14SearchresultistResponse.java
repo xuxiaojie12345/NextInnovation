@@ -99,4 +99,22 @@ public class UD14SearchresultistResponse implements Serializable {
         @ApiModelProperty(value = "变量名", example = "VAR001")
         private String variable;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "文件数据", description = "Market文件夹下的文件信息")
+    public static class FileData implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @ApiModelProperty(value = "文件名", example = "af_file.rtf")
+        private String filename;
+        @ApiModelProperty(value = "是否已使用", example = "true")
+        private Boolean isUsed;
+        @ApiModelProperty(value = "VARIABLE值（已使用时）", example = "VAR001")
+        private String variable;
+        @ApiModelProperty(value = "最后修改时间", example = "2026-06-24 10:30:00")
+        private String lastMod;
+        @ApiModelProperty(value = "文件大小", example = "12.5 KB")
+        private String size;
+    }
 }

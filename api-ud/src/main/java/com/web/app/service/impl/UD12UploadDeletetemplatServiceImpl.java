@@ -17,7 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * UD12 上传删除模板服务实现类
@@ -35,7 +37,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     @Autowired
     private UD12UploadDeletetemplatMapper ud12Mapper;
 
-    @Value("${file.uploadFolder:https://172.17.0.63/F:/hdoc/template/upload}")
+    @Value("${file.marketFolder}")
     private String uploadFolder;
 
     @Override
@@ -148,6 +150,43 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             return UD12UploadDeletetemplatResponse.success(msg, deleteData);
         } catch (Exception e) {
             log.error("UD12删除文件失败", e);
+            return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
+        }
+    }
+
+    @Override
+    public UD12UploadDeletetemplatResponse getTemplateList(String market) {
+        log.info("开始UD12查询模板文件列表, market: {}", market);
+        try {
+            if (market == null || market.trim().isEmpty()) {
+                return UD12UploadDeletetemplatResponse.error(400, "市场参数不能为空");
+            }
+
+            // 构建market文件夹路径
+            String marketDirPath = uploadFolder + File.separator + market.trim();
+            File marketDir = new File(marketDirPath);
+
+            // 检查文件夹是否存在
+            if (!marketDir.exists() || !marketDir.isDirectory()) {
+                log.warn("UD12市场文件夹不存在: {}", marketDirPath);
+                return UD12UploadDeletetemplatResponse.success("查询成功", new ArrayList<>());
+            }
+
+            // 获取文件夹下的所有文件名
+            File[] files = marketDir.listFiles();
+            List<String> fileNames = new ArrayList<>();
+            if (files != null) {
+                fileNames = Arrays.stream(files)
+                        .filter(File::isFile)
+                        .map(File::getName)
+                        .sorted()
+                        .collect(Collectors.toList());
+            }
+
+            log.info("UD12查询模板文件列表成功，共 {} 个文件", fileNames.size());
+            return UD12UploadDeletetemplatResponse.success("查询成功", fileNames);
+        } catch (Exception e) {
+            log.error("UD12查询模板文件列表失败", e);
             return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

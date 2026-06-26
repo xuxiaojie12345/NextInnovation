@@ -66,3 +66,5 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: d://uploads/
     downloadFolder: d://downloads/
+    # Market模板文件存放路径（对应react前端项目的market文件夹）
+    marketFolder: E:\NextInnovation - コピー\react-ud\src\market\

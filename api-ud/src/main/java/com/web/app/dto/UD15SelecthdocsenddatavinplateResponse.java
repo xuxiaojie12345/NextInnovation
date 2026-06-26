@@ -77,9 +77,22 @@ public class UD15SelecthdocsenddatavinplateResponse implements Serializable {
         @ApiModelProperty(value = "文档发送", example = "N")
         private String docSent;
         @ApiModelProperty(value = "打印项列表")
-        private List<String> printItems;
+        private List<PrintItemData> printItems;
         @ApiModelProperty(value = "VP数据列表")
         private List<VpDataItem> vpData;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "打印项数据", description = "PrintItemName及其值")
+    public static class PrintItemData implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @ApiModelProperty(value = "打印项名称", example = "PrintItemName1")
+        private String name;
+        @ApiModelProperty(value = "打印项值", example = "Value1")
+        private String value;
     }
 
     @Data

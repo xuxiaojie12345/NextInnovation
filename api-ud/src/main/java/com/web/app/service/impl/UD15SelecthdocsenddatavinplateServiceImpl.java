@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.web.app.dto.UD15SelecthdocsenddatavinplateResponse.PrintItemData;
+import static com.web.app.dto.UD15SelecthdocsenddatavinplateResponse.VpDataItem;
 
 /**
  * UD15 VIN Plate数据服务实现类
@@ -57,15 +59,41 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
             data.setDocReady(vinPlate.getDocReady());
             data.setDocSent(vinPlate.getDocSent());
 
-            // 模拟打印项和VP数据（可根据实际业务逻辑扩展）
-            List<String> printItems = new ArrayList<>();
-            printItems.add("Item1");
-            printItems.add("Item2");
-            printItems.add("Item3");
-            data.setPrintItems(printItems);
+            // 从XML_DOC字段解析PrintItemName和VP Data
+            // 注意：XML_DOC字段实际存储的是纯文本格式，不是XML
+            // 格式示例: "PrintItemName 82644192 product type"
+            // 按连续空格分割后，每两个一组作为name-value对
+            List<PrintItemData> printItems = new ArrayList<>();
+            List<VpDataItem> vpData = new ArrayList<>();
 
-            List<UD15SelecthdocsenddatavinplateResponse.VpDataItem> vpData = new ArrayList<>();
-            vpData.add(new UD15SelecthdocsenddatavinplateResponse.VpDataItem("VAR1", "Value1"));
+            String xmlDoc = vinPlate.getXmlDoc();
+            if (xmlDoc != null && !xmlDoc.trim().isEmpty()) {
+                // 按连续空格或换行分割
+                String[] tokens = xmlDoc.trim().split("\\s+");
+
+                // 用两个指针遍历：偶数位为name，奇数位为value
+                // 前两个token作为PrintItemName的name/value
+                if (tokens.length >= 2) {
+                    printItems.add(new PrintItemData(tokens[0], tokens[1]));
+                }
+
+                // 剩余token每两个一组作为VP Data的variantName/value
+                for (int i = 2; i + 1 < tokens.length; i += 2) {
+                    vpData.add(new VpDataItem(tokens[i], tokens[i + 1]));
+                }
+                // 如果剩余奇数个token，最后一个单独作为value（name为空）
+                if (tokens.length > 2 && (tokens.length - 2) % 2 == 1) {
+                    // 最后一个token追加到最后一个vpData的value中
+                    int lastIdx = vpData.size() - 1;
+                    if (lastIdx >= 0) {
+                        VpDataItem last = vpData.get(lastIdx);
+                        vpData.set(lastIdx, new VpDataItem(last.getVariantName(),
+                                last.getValue() + " " + tokens[tokens.length - 1]));
+                    }
+                }
+            }
+
+            data.setPrintItems(printItems);
             data.setVpData(vpData);
 
             log.info("UD15查询VIN Plate信息成功");
@@ -118,8 +146,11 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
             }
 
-            // Integer result = ud15Mapper.updateStatusSetOk(
-            // request.getChassisSerie().trim(), request.getChassisNo().trim());
+            Integer result = ud15Mapper.updateStatusSetOk(
+                    request.getChassisSerie().trim(), request.getChassisNo().trim());
+            if (result == null || result == 0) {
+                return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
+            }
 
             log.info("UD15设置OK成功");
             return UD15SelecthdocsenddatavinplateResponse.success("状态已更新为OK", null);
@@ -139,11 +170,14 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
             }
 
-            // Integer result = ud15Mapper.updateStatusChangeBasic(
-            // request.getChassisSerie().trim(), request.getChassisNo().trim());
+            Integer result = ud15Mapper.updateStatusChangeBasic(
+                    request.getChassisSerie().trim(), request.getChassisNo().trim());
+            if (result == null || result == 0) {
+                return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
+            }
 
             log.info("UD15切换为基础信息成功");
-            return UD15SelecthdocsenddatavinplateResponse.success("状态已更新为OK", null);
+            return UD15SelecthdocsenddatavinplateResponse.success("已切换到基本信息", null);
         } catch (Exception e) {
             log.error("UD15切换为基础信息失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
@@ -160,11 +194,14 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
             }
 
-            // Integer result = ud15Mapper.updateStatusChangeAdvanced(
-            // request.getChassisSerie().trim(), request.getChassisNo().trim());
+            Integer result = ud15Mapper.updateStatusChangeAdvanced(
+                    request.getChassisSerie().trim(), request.getChassisNo().trim());
+            if (result == null || result == 0) {
+                return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
+            }
 
             log.info("UD15切换为高级信息成功");
-            return UD15SelecthdocsenddatavinplateResponse.success("状态已更新为OK", null);
+            return UD15SelecthdocsenddatavinplateResponse.success("已切换到高级信息", null);
         } catch (Exception e) {
             log.error("UD15切换为高级信息失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");

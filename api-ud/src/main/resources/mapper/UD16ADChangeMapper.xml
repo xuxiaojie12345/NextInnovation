@@ -18,12 +18,14 @@
     <insert id="insertAdcaChange" parameterType="com.web.app.entity.HdocAdcaChange">
         INSERT INTO HDOC_ADCA_CHANGE (
             SERIE, CHNR, ACT, BU, REASON,
-            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
-            UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS
+            REGISTER_USER, REGISTER_PROCESS,
+            UPDATE_USER, UPDATE_PROCESS,
+            REGISTER_DATETIME, UPDATE_DATETIME
         ) VALUES (
-            #{serie}, #{chnr}, #{act}, #{bu}, #{reason},
-            NOW(), #{registerUser}, #{registerProcess},
-            NOW(), #{updateUser}, #{updateProcess}
+            #{serie}, #{chnr}, 'Y', 'UD', #{reason},
+            'SYSTEM', 'UD',
+            'SYSTEM', 'UD',
+            NOW(), NOW()
         )
     </insert>
 

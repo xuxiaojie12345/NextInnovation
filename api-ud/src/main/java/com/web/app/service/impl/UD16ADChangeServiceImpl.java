@@ -42,13 +42,26 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                     request.getSerie().trim(), request.getChnr().trim());
 
             if (existing != null) {
-                // 存在则更新 ACT = 'Y'
-                Integer result = ud16Mapper.updateAdcaChangeActY(
-                        request.getSerie().trim(), request.getChnr().trim());
-                if (result == null || result == 0) {
-                    return UD16ADChangeResponse.error(500, "更新失败");
+                // 对应设计书 3.2 校验详细规格表 No.4
+                // 记录已存在时检查ACT字段
+                if ("U".equals(existing.getAct())) {
+                    // force=true时跳过检查，直接更新ACT='Y'
+                    if (Boolean.TRUE.equals(request.getForce())) {
+                        Integer result = ud16Mapper.updateAdcaChangeActY(
+                                request.getSerie().trim(), request.getChnr().trim());
+                        if (result == null || result == 0) {
+                            return UD16ADChangeResponse.error(500, "更新失败");
+                        }
+                        log.info("UD16添加AD/CA变更成功（force激活已存在记录）");
+                        return UD16ADChangeResponse.success("添加成功", null);
+                    }
+                    // ACT='U'（未激活）-> 返回409，前端弹框确认后重试
+                    log.warn("UD16添加AD/CA变更 - 记录存在但ACT未激活(U)");
+                    return UD16ADChangeResponse.error(409, "AFTER DEF CHANGE IS NOT ACTIVATED");
                 }
-                log.info("UD16更新AD/CA变更成功（已存在记录）");
+                // ACT='Y'（已激活）-> 直接返回成功
+                log.info("UD16添加AD/CA变更 - 记录已存在且已激活(Y)");
+                return UD16ADChangeResponse.success("添加成功", null);
             } else {
                 // 不存在则插入新记录
                 HdocAdcaChange adcaChange = new HdocAdcaChange();
@@ -123,7 +136,11 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
             }
 
             log.info("UD16检查AD/CA变更成功 - 记录存在");
-            return UD16ADChangeResponse.success("对应的数据存在", null);
+            // 返回exists和act字段，前端需要根据data.exists做判断
+            java.util.Map<String, Object> resultData = new java.util.HashMap<>();
+            resultData.put("exists", true);
+            resultData.put("act", existing.getAct());
+            return UD16ADChangeResponse.success("对应的数据存在", resultData);
         } catch (Exception e) {
             log.error("UD16检查AD/CA变更失败", e);
             return UD16ADChangeResponse.error(500, "系统繁忙，请稍后重试");
