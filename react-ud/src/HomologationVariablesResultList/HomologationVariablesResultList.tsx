@@ -88,7 +88,7 @@ const HomologationVariablesResultList: React.FC = () => {
         if (res.code === 200 && res.data) {
           setResults(res.data.ruleList || []);
         } else {
-          setErrorMessage(res.msg || 'Failed to fetch results.');
+          setErrorMessage(res.message || 'Failed to fetch results.');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');
@@ -148,7 +148,7 @@ const HomologationVariablesResultList: React.FC = () => {
         setSelectedIds(new Set());
         alert('Records deleted successfully.');
       } else {
-        setErrorMessage(res.msg || 'Failed to delete records.');
+        setErrorMessage(res.message || 'Failed to delete records.');
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');

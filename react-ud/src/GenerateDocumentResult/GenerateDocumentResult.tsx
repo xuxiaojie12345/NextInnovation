@@ -56,7 +56,7 @@ const GenerateDocumentResult: React.FC = () => {
         if (res.code === 200 && res.data) {
           setData(res.data);
         } else {
-          setErrorMessage(res.msg || 'Vehicle data not found.');
+          setErrorMessage(res.message || 'Chassis no is not exists');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');
@@ -102,7 +102,6 @@ const GenerateDocumentResult: React.FC = () => {
       state: {
         serie,
         chnr,
-        market: data?.market || '',
       },
     });
   };
@@ -113,6 +112,7 @@ const GenerateDocumentResult: React.FC = () => {
         serie,
         chnr,
         market: data?.market || '',
+        userId: localStorage.getItem('userId'),
       },
     });
   };

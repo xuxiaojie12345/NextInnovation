@@ -164,7 +164,7 @@ const VinPlate: React.FC = () => {
         // Refresh info after action
         await handleViewInfo();
       } else {
-        setMessage(res.msg || 'Operation failed.');
+        setMessage(res.message || 'Operation failed.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -174,9 +174,9 @@ const VinPlate: React.FC = () => {
   };
 
   const handleSetRegenerate = () => executeAction('/ud15/setRegenerate', 'Status updated to regenerate.');
-  const handleSetOk = () => executeAction('/ud15/setOk', 'Status updated to OK.');
-  const handleChangeToBasic = () => executeAction('/ud15/changeToBasic', 'Type changed to Basic Info.');
-  const handleChangeToAdvanced = () => executeAction('/ud15/changeToAdvanced', 'Type changed to Advanced Info.');
+  const handleSetOk = () => executeAction('/ud15/setOK', 'Status updated to OK.');
+  const handleChangeToBasic = () => executeAction('/ud15/changeToBasicInfo', 'Type changed to Basic Info.');
+  const handleChangeToAdvanced = () => executeAction('/ud15/changeToAdvancedInfo', 'Type changed to Advanced Info.');
 
   // ── 状态/类型映射 ──
   const getStatusText = (status: string): string => {

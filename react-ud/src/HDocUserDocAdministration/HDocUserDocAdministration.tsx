@@ -51,7 +51,7 @@ const HDocUserDocAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage("We didn't recognize the userid you entered. Please try again.");
+      setMessage('UserID is required');
       return;
     }
 
@@ -66,7 +66,7 @@ const HDocUserDocAdministration: React.FC = () => {
       });
 
       if (authRes.code !== 200) {
-        setMessage("We didn't recognize the userid you entered. Please try again.");
+        setMessage('UserID is required');
         setIsLoading(false);
         return;
       }
@@ -95,7 +95,7 @@ const HDocUserDocAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage("We didn't recognize the userid you entered. Please try again.");
+      setMessage('UserID is required');
       return;
     }
 
@@ -109,7 +109,7 @@ const HDocUserDocAdministration: React.FC = () => {
       if (res.code === 200) {
         setSuccessMessage('用户文档权限更新成功');
       } else {
-        setMessage(res.msg || 'Failed to update document permissions.');
+        setMessage(res.message || 'Failed to update document permissions.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');

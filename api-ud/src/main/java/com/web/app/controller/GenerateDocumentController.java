@@ -33,7 +33,7 @@ public class GenerateDocumentController {
                 return ResponseEntity.ok(ApiResponse.success(data));
             } else {
                 return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, "Vehicle data not found."));
+                    .body(ApiResponse.error(404, "Chassis no is not exists"));
             }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()

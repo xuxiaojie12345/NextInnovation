@@ -54,7 +54,7 @@ const App: React.FC = () => {
           <Route path="markets-in-hdoc" element={<MarketsInHDoc />} />
           <Route path="market-document-setting" element={<MarketDocumentSettingsList />} />
           <Route path="market-document-setting/result" element={<MarketDocumentSettingsResultList />} />
-          <Route path="download-print-quick-guides" element={<DownloadAndPrintQuickGuides />} />
+          <Route path="quick-guides" element={<DownloadAndPrintQuickGuides />} />
           <Route path="search-user" element={<SearchUser />} />
           <Route path="hdoc-user-admin" element={<HDocUserAdministration />} />
           <Route path="hdoc-user-doc-admin" element={<HDocUserDocAdministration />} />

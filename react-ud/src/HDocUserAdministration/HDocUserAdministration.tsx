@@ -146,7 +146,7 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage("We didn't recognize the userid you entered. Please try again.");
+      setMessage('Userid are required.');
       return;
     }
 
@@ -161,7 +161,7 @@ const HDocUserAdministration: React.FC = () => {
         applyAuthList(res.data.authList || []);
         setSuccessMessage('User info loaded successfully.');
       } else {
-        setMessage(res?.msg || "We didn't recognize the userid you entered. Please try again.");
+        setMessage(res?.message || 'Userid are required.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -176,7 +176,7 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage("We didn't recognize the userid you entered. Please try again.");
+      setMessage('Userid are required.');
       return;
     }
 
@@ -196,7 +196,7 @@ const HDocUserAdministration: React.FC = () => {
       if (res.code === 200) {
         setSuccessMessage('权限更新成功');
       } else {
-        setMessage(res.msg || 'Failed to update role.');
+        setMessage(res.message || 'Failed to update role.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -211,7 +211,7 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage("We didn't recognize the userid you entered. Please try again.");
+      setMessage('Userid are required.');
       return;
     }
 
@@ -229,7 +229,7 @@ const HDocUserAdministration: React.FC = () => {
         setSuccessMessage('用户权限已全部删除');
         resetForm();
       } else {
-        setMessage(res.msg || 'Failed to delete role.');
+        setMessage(res.message || 'Failed to delete role.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');

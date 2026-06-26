@@ -174,7 +174,7 @@ const ExistingHDocVariables: React.FC = () => {
         setSuccessMessage('变量添加成功');
         clearForm(true);
       } else {
-        setMessage(res.msg || 'Variant already exists. Please enter the correct content');
+        setMessage(res.message || 'Variant already exists. Please enter the correct content');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -202,7 +202,7 @@ const ExistingHDocVariables: React.FC = () => {
       if (res.code === 200) {
         setSuccessMessage('变量更新成功');
       } else {
-        setMessage(res.msg || 'Variant does not exists. Please enter the correct content');
+        setMessage(res.message || 'Variant does not exists. Please enter the correct content');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -233,7 +233,7 @@ const ExistingHDocVariables: React.FC = () => {
         setSuccessMessage('变量删除成功');
         clearForm(true);
       } else {
-        setMessage(res.msg || 'Variant does not exists. Please enter the correct content');
+        setMessage(res.message || 'Variant does not exists. Please enter the correct content');
       }
     } catch {
       setMessage('System error. Please contact administrator.');

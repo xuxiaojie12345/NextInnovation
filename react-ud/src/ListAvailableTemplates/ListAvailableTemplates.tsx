@@ -161,7 +161,7 @@ const ListAvailableTemplates: React.FC = () => {
       if (contentType.includes('application/json')) {
         const json = await response.json();
         if (json.code !== 200) {
-          setMessage(json.msg || 'File not found.');
+          setMessage(json.message || 'File not found.');
           return;
         }
       }

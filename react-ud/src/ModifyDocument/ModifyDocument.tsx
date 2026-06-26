@@ -54,7 +54,7 @@ const ModifyDocument: React.FC = () => {
           });
           setModifiedValues(initial);
         } else {
-          setErrorMessage(res.msg || 'Vehicle data not found.');
+          setErrorMessage(res.message || 'Vehicle data not found.');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');
@@ -109,14 +109,10 @@ const ModifyDocument: React.FC = () => {
           state: {
             serie,
             chnr,
-            doctype: 'VIN_PLATE',
-            version: '1.0',
-            modifications,
-            hasUnreleased: true,
           },
         });
       } else {
-        setErrorMessage(res.msg || 'Failed to save modifications.');
+        setErrorMessage(res.message || 'Failed to save modifications.');
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');

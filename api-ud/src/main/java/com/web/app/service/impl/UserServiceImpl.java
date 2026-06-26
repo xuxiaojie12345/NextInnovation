@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
         if (user != null) {
             LoginResponse.LoginData loginData = new LoginResponse.LoginData();
             loginData.setToken("mock-token-" + System.currentTimeMillis());
-            loginData.setUserId(user.getUserid());
+            loginData.setUserid(user.getUserid());
             loginData.setUsername(user.getUsername());
             return loginData;
         }

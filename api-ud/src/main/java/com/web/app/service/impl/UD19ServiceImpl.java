@@ -22,8 +22,8 @@ public class UD19ServiceImpl implements UD19Service {
     }
 
     @Override
-    public List<Map<String, Object>> searchHdoc(String userid, String username, String market, String type) {
-        List<Map<String, Object>> rawList = ud19Mapper.searchHdoc(userid, username, market, type);
+    public List<Map<String, Object>> searchHdoc(String userid, String user, String market, String check) {
+        List<Map<String, Object>> rawList = ud19Mapper.searchHdoc(userid, user, market, check);
         List<Map<String, Object>> result = new ArrayList<>();
         for (Map<String, Object> row : rawList) {
             Map<String, Object> camelRow = new LinkedHashMap<>();

@@ -265,11 +265,11 @@ const HomologationVariables: React.FC = () => {
 
     const processedVar = processVariable(varVal);
     if (varVal && !processedVar) {
-      setErrorMessage('Variable does not exist, Please enter the correct content.');
+      setErrorMessage('Variant does not exist, Please enter the correct content.');
       return;
     }
     if (processedVar && !(await checkVariableExists(processedVar))) {
-      setErrorMessage('Variable does not exist, Please enter the correct content.');
+      setErrorMessage('Variant does not exist, Please enter the correct content.');
       return;
     }
 
@@ -277,10 +277,10 @@ const HomologationVariables: React.FC = () => {
     try {
       const res = await api.post('/ud08/add', {
         pc, num, market: mkt, variable: processedVar, val: valVal,
-        vs: variantCond.value1, comments: cmt, addDate: addDt, deleteDate: delDt,
+        vs: variantCond.value1, vs2: variantCond.value2, comments: cmt, addDate: addDt, deleteDate: delDt,
       });
       if (res.code === 200) { setSuccessMessage('Rule added successfully.'); clearForm(true); }
-      else setErrorMessage(res.msg || 'Failed to add rule.');
+      else setErrorMessage(res.message || 'Failed to add rule.');
     } catch { setErrorMessage('System error. Please contact administrator.'); }
     finally { setIsLoading(false); }
   };
@@ -308,7 +308,7 @@ const HomologationVariables: React.FC = () => {
 
     const processedVar = processVariable(varVal);
     if (processedVar && !(await checkVariableExists(processedVar))) {
-      setErrorMessage('Variable does not exist, Please enter the correct content.');
+      setErrorMessage('Variant does not exist, Please enter the correct content.');
       return;
     }
 
@@ -316,10 +316,10 @@ const HomologationVariables: React.FC = () => {
     try {
       const res = await api.post('/ud08/update', {
         pc, num, market: mkt, variable: processedVar, val: valVal,
-        vs: variantCond.value1, comments: cmt, addDate: addDt, deleteDate: delDt,
+        vs: variantCond.value1, vs2: variantCond.value2, comments: cmt, addDate: addDt, deleteDate: delDt,
       });
       if (res.code === 200) { setSuccessMessage('Rule updated successfully.'); clearForm(true); }
-      else setErrorMessage(res.msg || 'Failed to update rule.');
+      else setErrorMessage(res.message || 'Failed to update rule.');
     } catch { setErrorMessage('System error. Please contact administrator.'); }
     finally { setIsLoading(false); }
   };
@@ -344,7 +344,7 @@ const HomologationVariables: React.FC = () => {
     try {
       const res = await api.post('/ud08/delete', { pc, num, market: mkt });
       if (res.code === 200) { setSuccessMessage('Rule deleted successfully.'); clearForm(true); }
-      else setErrorMessage(res.msg || 'Failed to delete rule.');
+      else setErrorMessage(res.message || 'Failed to delete rule.');
     } catch { setErrorMessage('System error. Please contact administrator.'); }
     finally { setIsLoading(false); }
   };

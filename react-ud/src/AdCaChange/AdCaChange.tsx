@@ -81,7 +81,7 @@ const AdCaChange: React.FC = () => {
         setSerieChnr('');
         setDesc('');
       } else {
-        setMessage(res.msg || 'Failed to add record.');
+        setMessage(res.message || 'Failed to add record.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -114,7 +114,7 @@ const AdCaChange: React.FC = () => {
         setSuccessMessage('Record updated/deleted successfully.');
         setSerieChnr('');
       } else {
-        setMessage(res.msg || 'Failed to delete record.');
+        setMessage(res.message || 'Failed to delete record.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');

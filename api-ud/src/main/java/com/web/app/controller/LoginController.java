@@ -31,7 +31,9 @@ public class LoginController {
             LoginResponse.LoginData loginData = userService.authenticate(request);
             
             if (loginData != null) {
-                return ResponseEntity.ok(ApiResponse.success(loginData));
+                ApiResponse<LoginResponse.LoginData> response = ApiResponse.success(loginData);
+                response.setMessage("登录成功");
+                return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(401, "We didn't recognize the username or password you entered. Please try again."));

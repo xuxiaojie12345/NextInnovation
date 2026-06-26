@@ -5,5 +5,5 @@ import java.util.Map;
 
 public interface UD19Service {
     List<String> selectAllMarkets();
-    List<Map<String, Object>> searchHdoc(String userid, String username, String market, String type);
+    List<Map<String, Object>> searchHdoc(String userid, String user, String market, String check);
 }

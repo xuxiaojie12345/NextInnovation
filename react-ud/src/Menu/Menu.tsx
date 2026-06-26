@@ -57,6 +57,10 @@ const MENU_CATEGORIES: MenuCategory[] = [
     title: 'Documentation',
     items: [
       { label: 'User Guide', path: '/menu/guide-user' },
+      { label: 'Document Types', path: '/menu/document-types' },
+      { label: 'Markets in HDoc', path: '/menu/markets-in-hdoc' },
+      { label: 'Market Document Settings', path: '/menu/market-document-setting' },
+      { label: 'Download and Print Quick Guides', path: '/menu/quick-guides' },
       { label: 'AD/CA Change Guide', path: '/menu/guide-ad-ca' },
       { label: 'Vin plate Guide FM/FH', path: '/menu/guide-vin-plate' },
       { label: 'Archive Guide', path: '/menu/guide-archive' },

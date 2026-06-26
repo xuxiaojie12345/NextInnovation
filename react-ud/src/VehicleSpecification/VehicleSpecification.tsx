@@ -52,7 +52,7 @@ const VehicleSpecification: React.FC = () => {
         if (res.code === 200 && res.data) {
           setData(res.data);
         } else {
-          setErrorMessage(res.msg || 'No vehicle data found for the given chassis number.');
+          setErrorMessage(res.message || 'No vehicle data found for the given chassis number.');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');
@@ -115,13 +115,13 @@ const VehicleSpecification: React.FC = () => {
             <td className="info-label"><strong>VIN:</strong></td>
             <td className="info-value">{data.vin || '-'}</td>
             <td className="info-label"><strong>Engine no:</strong></td>
-            <td className="info-value">{'engine'}</td>
+            <td className="info-value">{data.kolaList && data.kolaList.length > 0 ? data.kolaList[0].symbol : '-'}</td>
           </tr>
           <tr>
             <td className="info-label"><strong>Country of Operation:</strong></td>
             <td className="info-value">{data.countryOfOperation || '-'}</td>
-            <td></td>
-            <td></td>
+            <td className="info-label"><strong>Symbol:</strong></td>
+            <td className="info-value">{data.symbolStr || '-'}</td>
           </tr>
         </tbody>
       </table>
@@ -152,6 +152,7 @@ const VehicleSpecification: React.FC = () => {
       {/* 画面底部：S-Note NO */}
       <div style={{ height: '30px'}}/>
       <div className="vs-footer">
+        <strong>S-Note NO: </strong>
         <span className="vs-link-text" onClick={() => {}}>{data.customerAdap || '-'}</span>
       </div>
 

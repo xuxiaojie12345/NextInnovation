@@ -4,6 +4,12 @@ import { api } from '../services/api';
 import '../common/css/common.css';
 import './UploadDeleteTemplate.css';
 
+interface TemplateFile {
+  filename: string;
+  size: string;
+  lastMod: string;
+}
+
 const UploadDeleteTemplate: React.FC = () => {
   const navigate = useNavigate();
 
@@ -13,7 +19,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
   // ── Delete 区域状态 ──
   const [deleteMarket, setDeleteMarket] = useState('');
-  const [templates, setTemplates] = useState<string[]>([]);
+  const [templates, setTemplates] = useState<TemplateFile[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
 
   // ── 共用状态 ──
@@ -52,7 +58,7 @@ const UploadDeleteTemplate: React.FC = () => {
     }
     (async () => {
       try {
-        const res = await api.post<{ templateList: string[] }>('/template/listTemplates', {
+        const res = await api.post<{ templateList: TemplateFile[] }>('/template/listTemplates', {
           market: deleteMarket,
         });
         if (res.code === 200 && res.data) {
@@ -82,7 +88,7 @@ const UploadDeleteTemplate: React.FC = () => {
       return;
     }
     if (!uploadMarket) {
-      setMessage('Please select a market.');
+      setMessage('NO Market UPLOADED');
       return;
     }
 
@@ -101,7 +107,7 @@ const UploadDeleteTemplate: React.FC = () => {
         const fileInput = document.getElementById('templateFile') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
       } else {
-        setMessage(res.msg || 'File upload failed. Please try again.');
+        setMessage(res.message || 'File upload failed. Please try again.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -133,14 +139,14 @@ const UploadDeleteTemplate: React.FC = () => {
         setSuccessMessage(`TEMPLATE ${selectedTemplate} WAS SUCCESSFULLY DELETED FROM MARKET ${deleteMarket}`);
         setSelectedTemplate('');
         // 刷新模板列表
-        const listRes = await api.post<{ templateList: string[] }>('/template/listTemplates', {
+        const listRes = await api.post<{ templateList: TemplateFile[] }>('/template/listTemplates', {
           market: deleteMarket,
         });
         if (listRes.code === 200 && listRes.data) {
           setTemplates(listRes.data.templateList || []);
         }
       } else {
-        setMessage(res.msg || 'File deletion failed. Please try again.');
+        setMessage(res.message || 'File deletion failed. Please try again.');
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -238,7 +244,7 @@ const UploadDeleteTemplate: React.FC = () => {
                 >
                   <option value="">-- Select --</option>
                   {templates.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t.filename} value={t.filename}>{t.filename}</option>
                   ))}
                 </select>
               </td>

@@ -34,13 +34,13 @@ public class UD19Controller {
             @RequestBody Map<String, String> request) {
         try {
             String userid = request.get("userid");
-            String username = request.get("username");
+            String user = request.get("user");
+            String check = request.get("check");
             String market = request.get("market");
-            String type = request.get("type");
 
-            List<Map<String, Object>> resultList = ud19Service.searchHdoc(userid, username, market, type);
+            List<Map<String, Object>> hdocList = ud19Service.searchHdoc(userid, user, market, check);
             Map<String, Object> data = new HashMap<>();
-            data.put("resultList", resultList != null ? resultList : new ArrayList<>());
+            data.put("hdocList", hdocList != null ? hdocList : new ArrayList<>());
             return ResponseEntity.ok(ApiResponse.success(data));
         } catch (Exception e) {
             return ResponseEntity.status(500)

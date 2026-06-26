@@ -3,7 +3,7 @@ const API_BASE_URL = '/api/v1/hdoc';
 
 interface ApiResponse<T> {
   code: number;
-  msg: string;
+  message: string;
   data: T | null;
 }
 

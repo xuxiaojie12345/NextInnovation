@@ -96,7 +96,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           const mapped = (res.data.list || []).map(toCamelCase);
           setResults(mapped);
         } else {
-          setErrorMessage(res.msg || 'Failed to fetch results.');
+          setErrorMessage(res.message || 'Failed to fetch results.');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');

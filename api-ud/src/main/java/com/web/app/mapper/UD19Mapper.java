@@ -12,7 +12,7 @@ public interface UD19Mapper {
     List<String> selectAllMarketCodes();
 
     List<Map<String, Object>> searchHdoc(@Param("userid") String userid,
-                                         @Param("username") String username,
+                                         @Param("user") String user,
                                          @Param("market") String market,
-                                         @Param("type") String type);
+                                         @Param("check") String check);
 }

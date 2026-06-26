@@ -25,13 +25,13 @@ const MarketDocumentSettingsResultList: React.FC = () => {
     (async () => {
       setIsLoading(true);
       try {
-        const res = await api.post<{ documents: DocumentRecord[] }>('/ud20/getDocumentList', {
+        const res = await api.post<{ documentList: DocumentRecord[] }>('/ud20/getDocumentList', {
           doctype: state?.doctype || '',
           registerUser: state?.registerUser || '',
           registerDatetime: state?.registerDatetime || '',
         });
         if (res.code === 200 && res.data) {
-          const docs = (res.data.documents || []).map((d) => ({
+          const docs = (res.data.documentList || []).map((d) => ({
             ...d,
             businessUnit: 'BU',
           }));

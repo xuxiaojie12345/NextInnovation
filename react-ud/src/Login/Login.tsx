@@ -55,12 +55,12 @@ const Login: React.FC = () => {
       if (response.ok && result && result.code === 200 && result.data) {
         // 登录成功，保存token并跳转
         localStorage.setItem('token', result.data.token);
-        localStorage.setItem('userId', result.data.userId);
+        localStorage.setItem('userId', result.data.userid);
         localStorage.setItem('username', result.data.username);
         window.location.href = '/menu';
       } else {
         // 登录失败 — prefer server message when available
-        const serverMsg = result && result.msg ? result.msg : `Login failed: ${response.status} ${response.statusText}`;
+        const serverMsg = result && result.message ? result.message : `Login failed: ${response.status} ${response.statusText}`;
         console.warn('Login failed response:', response.status, serverMsg, result);
         setMessage(serverMsg || 'Login failed. Please try again.');
       }

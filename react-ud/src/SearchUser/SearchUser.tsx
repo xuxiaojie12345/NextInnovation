@@ -59,15 +59,15 @@ const SearchUser: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ resultList: UserRecord[] }>('/ud19/searchHdoc', {
+      const res = await api.post<{ hdocList: UserRecord[] }>('/ud19/searchHdoc', {
         userid: userid.trim(),
-        username: username.trim(),
+        user: username.trim(),
+        check: permissionFilter,
         market: market,
-        type: permissionFilter,
       });
 
       if (res.code === 200 && res.data) {
-        const list = res.data.resultList || [];
+        const list = res.data.hdocList || [];
         setResults(list);
         if (list.length === 0) {
           setMessage('没有找到匹配的用户');

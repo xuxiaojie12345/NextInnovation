@@ -51,9 +51,8 @@ const GenerateHomologationDoc: React.FC = () => {
         const res = await api.get<DocumentType[]>('/document/types');
         if (res.code === 200 && res.data) {
           if (res.data.length === 0) {
-            // 检索结果为空时
             setDocumentTypes([]);
-            setErrorMessage('Chassis no is not exists');
+            setErrorMessage('Failed to load document types. Please try again.');
           } else {
             setDocumentTypes(res.data);
           }
@@ -126,7 +125,7 @@ const GenerateHomologationDoc: React.FC = () => {
           },
         });
       } else {
-        setErrorMessage(res.msg || 'System error. Please contact administrator.');
+        setErrorMessage(res.message || 'System error. Please contact administrator.');
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');

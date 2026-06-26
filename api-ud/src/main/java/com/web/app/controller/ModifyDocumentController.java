@@ -60,7 +60,9 @@ public class ModifyDocumentController {
             int count = modifyDocumentService.updateModifications(serie, chnr, modifications);
             Map<String, Object> data = new HashMap<>();
             data.put("updateCount", count);
-            return ResponseEntity.ok(ApiResponse.success(data));
+            ApiResponse<Map<String, Object>> response = ApiResponse.success(data);
+            response.setMessage("Variables updated successfully.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(500)
                 .body(ApiResponse.error(500, "System error. Please contact administrator."));
