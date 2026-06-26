@@ -53,26 +53,46 @@ const AdCaChange: React.FC = () => {
     setIsLoading(true);
     try {
       // Step 1: Check existence
-      const checkRes = await api.post<{ serie: string; chnr: string; count: string }>('/adca/select', {
+      const checkRes = await api.post<{ serie: string; chnr: string; count: string; act: string }>('/adca/select', {
         serie,
         chnr,
       });
 
       if (checkRes.code === 200 && checkRes.data) {
         const count = parseInt(checkRes.data.count, 10);
-        if (count > 0) {
+        const act = checkRes.data.act;
+        if (count > 0 && act === 'Y') {
+          // 已存在且为活性状态 → 不允许新增
           setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+          setIsLoading(false);
+          return;
+        }
+        if (count > 0 && act === 'N') {
+          // 已存在但为非活性状态 → 执行 reactivate（主键冲突不可 insert）
+          const updateUser = localStorage.getItem('userId') || '';
+          const reactivateRes = await api.post('/adca/reactivate', {
+            serie,
+            chnr,
+          });
+          if (reactivateRes.code === 200) {
+            setSuccessMessage('Record added successfully.');
+            setSerieChnr('');
+            setDesc('');
+          } else {
+            setMessage(reactivateRes.message || 'Failed to reactivate record.');
+          }
           setIsLoading(false);
           return;
         }
       }
 
-      // Step 2: Insert
+      // Step 2: Insert (BU fixed as "UD", ACT = 'Y' for active)
       const updateUser = localStorage.getItem('userId') || '';
       const res = await api.post('/adca/insert', {
         serie,
         chnr,
-        act: '1',
+        act: 'Y',
+        bu: 'UD',
         updateUser,
       });
 
@@ -137,16 +157,20 @@ const AdCaChange: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ serie: string; chnr: string; count: string }>('/adca/select', {
+      const res = await api.post<{ serie: string; chnr: string; count: string; act: string }>('/adca/select', {
         serie,
         chnr,
       });
 
       if (res.code === 200 && res.data) {
         const count = parseInt(res.data.count, 10);
+        const act = res.data.act;
         if (count > 0) {
-          // Check if ACT field indicates activation status
-          setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+          if (act === 'Y') {
+            setMessage('Record found and activated.');
+          } else {
+            setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+          }
         } else {
           setMessage('Record not found.');
         }

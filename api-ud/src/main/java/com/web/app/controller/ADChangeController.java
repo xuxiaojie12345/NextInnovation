@@ -1,6 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.dto.ApiResponse;
+import com.web.app.entity.HdocAdcaChange;
 import com.web.app.service.ADChangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,19 @@ public class ADChangeController {
                     .body(ApiResponse.error(400, "Serie and CHNR are required."));
             }
 
-            int count = adChangeService.selectCount(serie, chnr);
+            HdocAdcaChange record = adChangeService.findBySerieAndChnr(serie, chnr);
             Map<String, Object> data = new HashMap<>();
             data.put("serie", serie);
             data.put("chnr", chnr);
-            data.put("count", String.valueOf(count));
+            if (record != null) {
+                data.put("count", "1");
+                data.put("act", record.getAct());
+                data.put("bu", record.getBu());
+            } else {
+                data.put("count", "0");
+                data.put("act", null);
+                data.put("bu", null);
+            }
             return ResponseEntity.ok(ApiResponse.success(data));
         } catch (Exception e) {
             return ResponseEntity.status(500)
@@ -72,13 +81,42 @@ public class ADChangeController {
         }
     }
 
+    @PostMapping("/reactivate")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> reactivateHdocAdcaChange(
+            @RequestBody Map<String, String> request) {
+        try {
+            String serie = request.get("serie");
+            String chnr = request.get("chnr");
+
+            if (serie == null || chnr == null) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "Serie and CHNR are required."));
+            }
+
+            int result = adChangeService.reactivate(serie, chnr);
+            if (result > 0) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serie", serie);
+                data.put("chnr", chnr);
+                data.put("act", "Y");
+                return ResponseEntity.ok(ApiResponse.success(data));
+            } else {
+                return ResponseEntity.status(404)
+                    .body(ApiResponse.error(404, "Record not found for reactivation."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+        }
+    }
+
     @PostMapping("/update")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateHdocAdcaChange() {
         try {
-            int updateCount = adChangeService.updateAllActToZero();
+            int updateCount = adChangeService.updateAllActToN();
             Map<String, Object> data = new HashMap<>();
             data.put("updateCount", String.valueOf(updateCount));
-            data.put("updateContent", "ACT status has been set to 0 for all records.");
+            data.put("updateContent", "ACT status has been set to N for all records.");
             return ResponseEntity.ok(ApiResponse.success(data));
         } catch (Exception e) {
             return ResponseEntity.status(500)

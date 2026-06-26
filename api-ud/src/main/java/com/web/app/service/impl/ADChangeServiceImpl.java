@@ -1,5 +1,6 @@
 package com.web.app.service.impl;
 
+import com.web.app.entity.HdocAdcaChange;
 import com.web.app.mapper.ADChangeMapper;
 import com.web.app.service.ADChangeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,8 @@ public class ADChangeServiceImpl implements ADChangeService {
     private ADChangeMapper adChangeMapper;
 
     @Override
-    public int selectCount(String serie, String chnr) {
-        return adChangeMapper.countBySerieAndChnr(serie, chnr);
+    public HdocAdcaChange findBySerieAndChnr(String serie, String chnr) {
+        return adChangeMapper.findBySerieAndChnr(serie, chnr);
     }
 
     @Override
@@ -23,7 +24,13 @@ public class ADChangeServiceImpl implements ADChangeService {
     }
 
     @Override
-    public int updateAllActToZero() {
-        return adChangeMapper.updateAllActToZero();
+    public int updateAllActToN() {
+        return adChangeMapper.updateAllActToN();
+    }
+
+    @Override
+    public int reactivate(String serie, String chnr) {
+        String currentUser = "SYSTEM";
+        return adChangeMapper.reactivateBySerieAndChnr(serie, chnr, currentUser);
     }
 }
