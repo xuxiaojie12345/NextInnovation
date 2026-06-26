@@ -5,6 +5,7 @@ import "./MarketDocumentSettings.css";
 
 interface FormData {
   documentType: string;
+  documentTypeOperator: string;
   market: string;
   setting: string;
   bussinesUnit: string;
@@ -18,6 +19,7 @@ const MarketDocumentSettings = () => {
 
   const [formData, setFormData] = useState<FormData>({
     documentType: "",
+    documentTypeOperator: "=",
     market: "",
     setting: "",
     bussinesUnit: "BU",
@@ -92,6 +94,7 @@ const MarketDocumentSettings = () => {
       state: {
         searchCriteria: {
           documentType: formData.documentType.trim(),
+          operator: formData.documentTypeOperator,
         },
       },
     });
@@ -101,6 +104,7 @@ const MarketDocumentSettings = () => {
   const handleClear = () => {
     setFormData((prev) => ({
       documentType: "",
+      documentTypeOperator: "=",
       market: "",
       setting: "",
       bussinesUnit: "BU",
@@ -211,7 +215,13 @@ const MarketDocumentSettings = () => {
         <div className='mds-form-section'>
           <div className='mds-form-row'>
             <label className='mds-label'>Document type:</label>
-            <select className='mds-operator-select'>
+            <select
+              className='mds-operator-select'
+              value={formData.documentTypeOperator}
+              onChange={(e) =>
+                handleInputChange("documentTypeOperator", e.target.value)
+              }
+            >
               <option value='='>=</option>
               <option value='<'>&lt;</option>
               <option value='>'>&gt;</option>

@@ -143,6 +143,15 @@ public interface HdocDocumentListMapper {
      */
     List<Map<String, Object>> selectDocumentTypeList();
 
+    /**
+     * 根据条件搜索文档类型列表
+     * @param documentType 文档类型
+     * @param operator 操作符（= 或 !=）
+     * @return 文档类型列表
+     */
+    List<Map<String, Object>> searchDocumentTypeList(@Param("documentType") String documentType,
+                                                      @Param("operator") String operator);
+
     // ==================== UD20-1 文档类型更新 ====================
 
     /**

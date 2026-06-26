@@ -26,10 +26,8 @@ public class UD20ServiceImpl implements UD20Service {
         log.info("========== UD20 Service: Get Document List ==========");
 
         try {
-            // 4.5 数据访问层查询HDOC_DOCUMENT_LIST表的所有文档信息
             List<Map<String, Object>> documentList = hdocDocumentListMapper.selectDocumentTypeList();
 
-            // 4.6 验证查询结果是否为空
             if (documentList == null || documentList.isEmpty()) {
                 log.warn("Document list is empty");
                 return ApiResponse.error(404, "文档列表为空");
@@ -37,11 +35,33 @@ public class UD20ServiceImpl implements UD20Service {
 
             log.info("Document list size: {}", documentList.size());
 
-            // 4.7 构建成功响应体，包含文档列表数据
             return ApiResponse.success("获取文档列表成功", documentList);
 
         } catch (Exception e) {
             log.error("Error getting document list", e);
+            return ApiResponse.error(500, "系统内部错误，请联系管理员");
+        }
+    }
+
+    @Override
+    public ApiResponse<?> searchDocumentList(String documentType, String operator) {
+        log.info("========== UD20 Service: Search Document List ==========");
+        log.info("documentType: {}, operator: {}", documentType, operator);
+
+        try {
+            List<Map<String, Object>> documentList = hdocDocumentListMapper.searchDocumentTypeList(documentType, operator);
+
+            if (documentList == null || documentList.isEmpty()) {
+                log.warn("No documents found for search criteria");
+                return ApiResponse.error(404, "No data found");
+            }
+
+            log.info("Search result size: {}", documentList.size());
+
+            return ApiResponse.success("获取文档列表成功", documentList);
+
+        } catch (Exception e) {
+            log.error("Error searching document list", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

@@ -1,6 +1,6 @@
 // MarketDocumentSettingsList.tsx - UD20模块
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./MarketDocumentSettingsList.css";
 
 interface DocumentItem {
@@ -12,6 +12,10 @@ interface DocumentItem {
 
 const MarketDocumentSettingsList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 从state中获取前画面传递的搜索条件
+  const searchCriteria = (location.state as any)?.searchCriteria || {};
 
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -33,10 +37,14 @@ const MarketDocumentSettingsList = () => {
       const API_BASE_URL = "http://localhost:8081";
 
       const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          documentType: searchCriteria.documentType || "",
+          operator: searchCriteria.operator || "=",
+        }),
       });
 
       if (!response.ok) {

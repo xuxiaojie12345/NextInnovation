@@ -212,6 +212,29 @@
         ORDER BY DOCTYPE
     </select>
 
+    <!-- 根据条件搜索文档类型列表 -->
+    <select id="searchDocumentTypeList" resultType="java.util.Map">
+        SELECT 
+            DOCTYPE       AS doctype,
+            DESCRIPTION   AS description,
+            REGISTER_USER AS registerUser,
+            REGISTER_DATETIME AS registerDatetime
+        FROM HDOC_DOCUMENT_LIST
+        <where>
+            <if test="documentType != null and documentType != ''">
+                <choose>
+                    <when test='operator == "="'>
+                        DOCTYPE = #{documentType}
+                    </when>
+                    <otherwise>
+                        DOCTYPE != #{documentType}
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY DOCTYPE
+    </select>
+
     <!-- ==================== UD20-1 文档类型更新 ==================== -->
 
     <!-- 根据doctype统计记录数 -->
@@ -240,7 +263,7 @@
             UPDATE_DATETIME
         ) VALUES (
             #{doctype},
-            #{doctype},
+            LOWER(#{doctype}),
             #{registerUser},
             #{registerDatetime},
             #{updateProcess},

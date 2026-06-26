@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * UD20 Controller
  * 提供文档类型列表的API接口
@@ -25,23 +27,31 @@ public class UD20Controller {
     private UD20Service ud20Service;
 
     /**
-     * 获取文档类型列表
-     * GET /api/ud20/getdocumentlist
+     * 搜索文档类型列表
+     * POST /api/ud20/getdocumentlist
      *
-     * 4.1 客户端通过GET请求访问接口 /api/ud20/getdocumentlist，无需请求参数
-     * 4.2 后端接收前端请求，调用HdocDocumentService接口中的 getDocumentList() 方法
+     * Request Body:
+     * {
+     *   "documentType": "xxx",
+     *   "operator": "="
+     * }
+     * operator = "="   → 等于检索
+     * operator = ">" 或 "<" → 不等于检索
      */
-    @GetMapping("/getdocumentlist")
-    public ResponseEntity<ApiResponse<?>> getDocumentList() {
+    @PostMapping("/getdocumentlist")
+    public ResponseEntity<ApiResponse<?>> getDocumentList(@RequestBody Map<String, String> request) {
         log.info("========== UD20 Controller: Get Document List ==========");
 
-        // 4.2-4.3 控制器层调用Service接口中的 getDocumentList() 方法
-        ApiResponse<?> response = ud20Service.getDocumentList();
+        String documentType = request.getOrDefault("documentType", "");
+        String operator = request.getOrDefault("operator", "=");
+
+        log.info("Search params - documentType: {}, operator: {}", documentType, operator);
+
+        ApiResponse<?> response = ud20Service.searchDocumentList(documentType, operator);
 
         log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
         log.info("========== UD20 Controller: Get Document List completed ==========");
 
-        // 4.8 封装响应对象，统一返回标准格式
         return ResponseEntity.ok(response);
     }
 }
