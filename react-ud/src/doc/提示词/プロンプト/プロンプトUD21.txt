@@ -1,0 +1,122 @@
+请根据以下要求生成Markets in HDoc的详细设计文档：
+
+1.基本信息
+   文档编号:DES-MarketsinHDoc-001
+   模块名称:Markets in HDoc
+   作成日:2026-05-20
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标：显示HDoc系统中可用的市场信息列表
+  面向的用户群体：需要查看和了解市场信息的业务人员
+  用户体验方面的考虑：提供清晰的市场列表展示，便于用户查看市场及描述信息
+  安全性或特殊要求（如有）：需验证用户权限，确保只能访问授权的市场数据
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Market | TextField | - | - | Output | - | 左 | - | - | 数据源：MARKET_MASTER.Market |
+| 2   | Description | TextField | - | - | Output | - | 左 | - | - | 数据源：MARKET_MASTER.Description |
+| 3   | Weights from Hdoc | TextField | - | - | Output | - | 左 | - | - | 来源于HDoc的权重信息 |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 Markets in HDoc画面
+    功能说明：显示市场信息列表。
+    操作步骤：
+      1. 从MARKET_MASTER表获取市场信息(Market, Description)
+      2. 显示市场列表信息
+      3. 展示相关的权重信息(Weights from Hdoc)
+      4. 完成信息展示并提供可读的界面
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      开始：用户进入Markets in HDoc画面
+      前置处理：准备调用API获取MARKET_MASTER表数据
+      空值校验等 (Frontend Check)：
+       若获取不到市场数据：
+        设置Message = "无法获取市场信息"
+        终止流程
+      5.1.2 API调用 (Backend Check)：
+        调用相关API获取MARKET_MASTER表数据
+   5.2 结果处理：
+       成功：正常显示市场列表信息
+       失败：显示相应错误消息并保持在当前页面
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 进入画面时 | 市场数据获取 | 无法获取市场数据 | 无法获取市场信息 | 显示错误消息 |
+
+6. 接口定义 (API Specification)
+
+UD19SearchResultListApi
+
+6.1 UD19SelectMarketMaster
+
+功能：获取Market列表
+
+Method：POST
+
+Endpoint：/api/v1/hdoc/ud19/selectMarketMaster
+
+Request Body：
+```json
+{}
+```
+
+Response Success (200 OK)：
+```json
+{
+    "code": 200,
+    "message": "查询成功",
+    "data": {
+        "marketList": [
+              {
+                "market": "MARKET-A",
+                "description": "A市场说明文本"
+              },
+              {
+                "market": "MARKET-B",
+                "description": "B市场说明文本"
+              }
+            ]
+    }
+}
+```
+
+Response Error (400 Bad Request)：
+```json
+{
+  "code": 400,
+  "data": null,
+  "message": "Invalid request parameters"
+}
+```
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 无法获取市场数据 | 显示错误消息，保持当前页面 | 无法获取市场信息 |
+| API调用失败 | 显示错误消息，保持当前页面 | 系统错误，请稍后重试 |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：MarketsinHDoc_詳細設計.md
+  保存到：当前文件夹下的work目录

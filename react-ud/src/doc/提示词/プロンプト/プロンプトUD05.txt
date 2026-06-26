@@ -1,0 +1,243 @@
+请根据以下要求生成[Modify Document]的详细设计文档：
+
+ 1. 基本信息
+
+   文档编号:DES-ModifyDocument​-001
+   模块名称:Modify Document
+   作成日:2026-05-20
+
+
+ 2. 背景 (Background)
+
+核心功能和目标：
+本模块提供Homologation Document修改功能，用户可以查看Template中的Variable列表，修改对应的值，并保存修改内容。
+支持从HDOC_ADCA_MODIFICATION 和 HDOC_REC_DATA_KOLA_VARIANT表获取当前值。
+
+面向的用户群体：
+- 系统工程人员
+- 文档管理人员
+- 需要修改Homologation文档参数的用户
+
+用户体验方面的考虑：
+- 清晰的Variable列表展示
+- 直观的当前值和修改值对比
+- 明确的保存操作反馈
+- Template文件下载功能
+
+安全性或特殊要求：
+- 输入数据校验
+- 防止SQL注入
+- 修改记录追踪
+
+3. 画面项目定义 (Screen Parameters)
+
+ No. | 项目名 | 类型 | 必填 | MaxLength | I/O | 允许文字 | 文字配置 | 初始值 | 显示控制 | 备注 
+-----|--------|------|------|-----------|-----|---------|---------|--------|---------|------
+ 1 | chassis no | label | - | - | Output | - | 左 | - | - | 从前页面传入，数据源：前页面.chassis no
+ 2 | Market | label | - | - | Output | - | 左 | - | - | 从前页面传入，数据源：前页面.Market
+ 3 | Template文件 | link | - | - | Output | - | 左 | - | - | Template文件下载链接，数据源：Template文件.Template名
+ 4 | Variable | DataTable | - | - | Output | - | 左 | - | - | Variable列表，数据源：Template文件.Template项目
+ 5 | Description | DataTable | - | - | Output | - | 左 | - | - | Variable描述，数据源：HDOC_VARIABLES.DESCRIPTION
+ 6 | Current value | DataTable | - | - | Output | - | 左 | 如果Modify中不存在，从HDOC_REC_DATA_KOLA_VARIANT获取数据 | - | 当前值，数据源：HDOC_ADCA_MODIFICATION.NEWVAL, HDOC_REC_DATA_KOLA_VARIANT.SYMBOL
+ 7 | Modified value | DataTable | - | 500 | Input | - | 左 | 如果Modify中不存在，为空 | 激活 | 修改后的值，数据源：HDOC_ADCA_MODIFICATION.NEWVAL
+ 8 | Save | button | - | - | - | - | 中 | - | 激活 | 保存按钮 
+
+ 画面布局说明
+
+ 整体布局
+- 参考图片：`react-ud\src\doc\image\Modify Document_1.png`
+- 顶部显示Chassis no和Market信息
+- 中部显示Template文件链接
+- 主体部分为DataTable，显示Variable、Description、Current value、Modified value
+- 主体部分上方为Save按钮
+
+4. 功能描述 (Functional Description)
+
+4.1 页面初始化
+功能说明： 页面加载时显示可修改的Variable列表
+
+操作步骤：
+1. 从前页面接收Chassis no和Market参数
+2. 调用UD05ModifyDocumentApi的 UD05SelectVariableModification 获取Variable列表
+3. 显示Variable、Description、Current value
+4. Modified value初始为空或已有修改值
+
+4.2 修改Variable值
+功能说明： 用户在Modified value列输入修改后的值
+
+操作步骤：
+1. 用户在Modified value输入框中输入新值
+2. 前端进行基本校验（长度不超过500）
+3. 可以修改多个Variable的值
+
+4.3 保存修改
+功能说明： 点击Save按钮保存所有修改
+
+操作步骤：
+1. 用户点击Save按钮
+2. 前端校验：检查是否有任何项目被输入
+3. 如果没有输入，显示错误消息"NO UNRELEASED VERSION EXISTS!"
+4. 如果有输入，调用UD05ModifyDocumentApi的 UD05UpdateHdocAdcaModification保存
+5. 跳转到「Save Modifications」页面，显示修改内容
+
+4.4 Template文件下载
+功能说明： 点击Template文件链接下载文件
+
+操作步骤：
+1. 只显示不实装具体功能
+
+4.5 查看Chassis详细信息
+功能说明： 点击Chassis no查看详细信息
+
+操作步骤：
+1. 用户点击'Chassis no'链接
+2. 显示该Chassis的详细信息
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+5.1 处理流程
+
+开始： 从前页面接收Chassis no和Market参数
+
+前置处理：
+- 验证参数有效性
+- 调用UD05ModifyDocumentApi 的 UD05SelectVariableModification获取Variable列表
+
+数据显示：
+- 遍历Variable列表
+- 对于每个Variable，从HDOC_ADCA_MODIFICATION获取NEWVAL（如果存在）
+- 如果不存在，从HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL作为Current value
+- Modified value初始为空或已有修改值
+
+用户修改：
+- 用户在Modified value列输入新值
+- 前端实时校验输入长度（最大500字符）
+
+保存操作：
+- 用户点击Save按钮
+- 检查是否有任何Modified value被修改
+- 如果没有修改：显示错误消息"NO UNRELEASED VERSION EXISTS!"
+- 如果有修改：调用UD05ModifyDocumentApi 的 UD05UpdateHdocAdcaModification批量更新
+- 跳转到「Save Modifications」页面
+
+结果处理：
+- 成功：跳转页面，显示修改内容
+- 失败：显示错误消息
+
+5.2 校验详细规格表
+
+ No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 | 动作 
+-----|---------|---------|---------|---------|------
+ 1 | Save按钮点击 | Modified value | 没有任何项目被修改 | NO UNRELEASED VERSION EXISTS! | 显示错误消息，不提交 
+ 2 | 输入时 | Modified value | 输入长度超过500字符 | Input exceeds maximum length of 500 characters. | 截断或显示警告 
+ 3 | API调用 | 数据更新 | 数据库更新失败 | Failed to save modifications. Please try again. | 显示错误消息 
+
+6. 接口定义 (API Specification)
+
+### 6.1 UD05SelectVariableModification
+
+- **功能**：获取Modify Document页面所需的变量列表数据。
+- **所属 API**：UD05ModifyDocumentApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/modifydocument/select`
+
+#### Request Body
+
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "variable": "VIN",
+      "val": "12345678901234567"
+    },
+    {
+      "variable": "ENGINE_NO",
+      "val": "ENG123456"
+    }
+  ]
+}
+```
+
+#### Response Error (404 Not Found)
+
+```json
+{
+  "code": 404,
+  "message": "Vehicle data not found.",
+  "data": null
+}
+```
+
+### 6.2 UD05UpdateHdocAdcaModification
+
+- **功能**：更新Modify Document的变量值。
+- **所属 API**：UD05ModifyDocumentApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/modifydocument/update`
+
+#### Request Body
+
+```json
+{
+  "serie": "string",
+  "chnr": "string",
+  "modifications": [
+    {
+      "variable": "VIN",
+      "val": "NEW_VIN_VALUE"
+    }
+  ]
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "Modifications saved successfully.",
+  "data": null
+}
+```
+
+#### Response Error (400 Bad Request)
+
+```json
+{
+  "code": 400,
+  "message": "Value is required.",
+  "data": null
+}
+```
+
+7. 异常处理 (Exception Handling)
+
+ 异常场景 | 处理方式 | Message显示内容 
+---------|---------|----------------
+ 没有任何修改就点击Save | 前端校验拦截 | NO UNRELEASED VERSION EXISTS! 
+ 输入长度超过500字符 | 前端校验拦截 | Input exceeds maximum length of 500 characters. 
+ 数据库更新失败 | API返回错误 | Failed to save modifications. Please try again. 
+ API调用失败 | 捕获异常，返回500错误 | System error. Please contact administrator. 
+ 网络超时 | 捕获超时异常 | Network timeout. Please try again. 
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

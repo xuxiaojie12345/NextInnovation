@@ -1,0 +1,166 @@
+请根据以下要求生成[Vehicle Specification]的详细设计文档：
+
+1. 基本信息
+
+   文档编号:DES-VehicleSpecification-001
+   模块名称:Vehicle Specification
+   作成日:2026-05-22
+
+
+2. 背景 (Background)
+
+核心功能和目标:
+本模块提供车辆规格信息的查看功能，是Homologation（认证）流程中的重要环节。
+通过Vehicle Specification页面，用户可以查看特定车辆的完整规格信息，包括车型、生产周次、产品类型、VIN、发动机号、适用国家等关键数据。
+
+面向的用户群体:
+- 系统注册用户
+- 需要进行车辆认证的工程人员
+- 文档管理人员
+
+用户体验方面的考虑:
+- 清晰的标签式布局，易于阅读
+- 重要信息突出显示
+- 鼠标悬停时显示详细描述信息（SYMBOL的tooltip）
+- 响应式布局，适配不同屏幕尺寸
+
+安全性或特殊要求:
+- 需要校验车辆数据的存在性
+- 确保数据显示的数据一致性
+- 支持从前画面传递Chassis no参数
+
+
+3. 画面项目定义 (Screen Parameters)
+
+No. | 项目名 | 类型 | 必填 | MaxLength | I/O | 允许文字 | 文字配置 | 初始值 | 显示控制 | 备注
+---|---|---|---|---|---|---|---|---|---|---
+1 | Chassis no | Label | - | - | Output | - | 左 | 前画面传入 | - | 认证编号，数据源：前画面.CHNR
+2 | Model | Label | - | - | Output | - | 左 | - | - | 车型，数据源：HDOC_REC_DATA_OM.MODEL
+3 | Built week | Label | - | - | Output | - | 左 | - | - | 生产周次，数据源：HDOC_REC_DATA_OM.BUILD
+4 | Product type | Label | - | - | Output | - | 左 | - | - | 产品类型，数据源：HDOC_REC_DATA_VDA_GENERAL.PRODUCT_TYPE
+5 | VIN | Label | - | - | Output | - | 左 | - | - | 车辆识别号，数据源：HDOC_REC_DATA_VDA_GENERAL.VIN
+6 | Engine no | Label | - | - | Output | - | 左 | - | - | 发动机号，数据源：HDOC_REC_DATA_VDA_VARIANTS/HDOC_REC_DATA_KOLA_VARIANT.SYMBOL
+7 | Country of Operation | Label | - | - | Output | - | 左 | - | - | 适用国家，数据源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION
+8 | SYMBOL_STR | Label | - | - | Output | - | 左 | - | - | 符号字符串，数据源：HDOC_REC_DATA_VDA_VARIANTS/HDOC_REC_DATA_KOLA_VARIANT.SYMBOL/FUNCTION_GROUP
+9 | DESCRIPTION | Tooltip | - | - | Output | - | 左 | - | - | 符号描述（鼠标悬停显示），数据源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION
+10 | S-Note NO | Label | - | - | Output | - | 左 | - | - | 客户备注编号，数据源：HDOC_REC_DATA_OM.CUSTOMER_ADAP
+
+画面布局说明:
+
+整体布局:
+- 单列标签式布局，所有项目垂直排列
+- 每个项目包含标签名和对应的值
+- 部分项目支持鼠标悬停显示tooltip
+
+左侧菜单区:
+保持不变，与其他画面共享Menu组件
+
+右侧内容区:
+- VDA - Vehicle Specification页面内容
+- 按照标签顺序依次显示各项车辆规格信息
+
+
+4. 功能描述 (Functional Description)
+
+4.1 页面初始化
+功能说明：页面加载时从API获取车辆规格数据并展示
+
+操作步骤：
+1. 从前页面获取Chassis no (CHNR)参数
+2. 校验Chassis no是否为空
+3. 调用UD07VehicleSpecificationApi（Endpoint: `/api/v1/hdoc/vehiclespecification`）
+4. 将返回的数据填充到画面项目中
+
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+5.1 处理流程
+
+开始：从前页面获取Chassis no (CHNR)参数
+
+前置处理：
+- 校验Chassis no是否为空
+- 如果为空，显示错误提示
+
+数据获取：
+- 调用UD07VehicleSpecificationApi（Endpoint: `/api/v1/hdoc/vehiclespecification`）
+
+数据展示：
+- 将UD07VehicleSpecificationApi返回的数据填充到画面项目中
+
+结果处理：
+- 成功：页面正常显示所有车辆规格信息
+- 失败：显示错误提示信息
+
+5.2 校验详细规格表
+
+No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 | 动作
+---|---|---|---|---|---
+1 | 页面加载 | Chassis no | Chassis no为空 | Chassis no is required. Please return to the previous page. | 显示错误提示
+2 | API调用失败 | 任意API | 接口调用超时或失败 | System error. Please contact administrator. | 显示错误提示，提供重试按钮
+3 | 网络异常 | 网络请求 | 网络连接失败 | Network timeout. Please try again. | 显示错误提示，提供重试按钮
+
+
+6. 接口定义 (API Specification)
+
+### 6.1 UD07VehicleSpecificationApi
+
+- **功能**：获取车辆规格信息（Model、Built week、Product type、VIN、Country of Operation、S-Note NO、SYMBOL_STR、DESCRIPTION等）。
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/vehiclespecification`
+
+#### Request Body
+
+```json
+{
+  "serie": "string",
+  "chno": "string"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "model": "xxxx",
+    "build": "xxxx",
+    "productType": "xxxx",
+    "vin": "xxxx",
+    "symbolStr": "xxxx",
+    "countryOfOperation": "xxxx",
+    "customerAdap": "xxxx",
+    "familyId": "xxx",
+    "variantId": "xxx",
+    "kolaList": [
+      {
+        "symbol": "xxx",
+        "description": "xxx"
+      }
+    ]
+  }
+}
+```
+
+
+7. 异常处理 (Exception Handling)
+
+异常场景 | 处理方式 | Message显示内容
+---|---|---
+Chassis no为空 | 前端参数校验 | Chassis no is required. Please return to the previous page.
+API调用失败 | 捕获异常，显示错误提示 | System error. Please contact administrator.
+网络超时 | 捕获超时异常 | Network timeout. Please try again.
+数据格式错误 | 前端数据解析异常 | Invalid data format. Please contact administrator.
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

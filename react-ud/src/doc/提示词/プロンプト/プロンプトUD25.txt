@@ -1,0 +1,116 @@
+请根据以下要求生成EDB User View的详细设计文档：
+
+1.基本信息
+   文档编号:DES-EDBUserView-001
+   模块名称:EDB User View
+   作成日:2026-05-20
+  
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  面向的用户群体
+  用户体验方面的考虑
+  安全性或特殊要求（如有）
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Userid | TextField | - | - | Output | - | 左 | - | 活性 | 数据源：Saviynt.Userid |
+| 2   | Responsible | TextField | - | - | Output | - | 左 | - | 活性 | 数据源：Saviynt.Responsible |
+| 3   | User Position | TextField | - | - | Output | - | 左 | - | 活性 | 数据源：Saviynt.User Position |
+| 4   | E-mail | TextField | - | - | Output | - | 左 | - | 活性 | 数据源：Saviynt.E-mail |
+| 5   | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清除按钮 |
+| 6   | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回按钮 |
+
+
+必须包含的控件类型：
+- Input控件（如TextField、File Input、Pull-down List等）
+- Output控件（如Label、Message等）
+- Action控件（如Button等）
+
+4. 功能描述 (Functional Description)
+请描述每个主要功能：（PS：画面迁移等信息可以记述在这里）
+
+    4.1 EDB User View画面
+    功能说明：显示用户的详细信息。
+    操作步骤：
+      1. 调用AuthenticationApi获取用户信息
+      2. 在界面上显示Userid、Responsible、User Position、E-mail等信息
+      3. 提供Clear和Back按钮功能
+      4. 完成用户信息展示
+      
+   4.2 Clear功能
+    功能说明：清空当前输入内容
+    操作步骤：
+      1. 用户点击Clear按钮
+      2. 清除所有输入字段的内容
+      3. 重置界面到初始状态
+      4. 显示清空成功消息
+
+   4.3 Back功能
+    功能说明：返回前画面
+    操作步骤：
+      1. 用户点击Back按钮
+      2. 返回到调用此画面的前一个画面
+      3. 保持前画面的状态
+      4. 完成画面跳转
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   5.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      开始：进入EDB User View画面
+      前置处理：调用AuthenticationApi获取用户信息
+      空值校验等 (Frontend Check)：
+       若获取不到用户信息：
+        设置Message = "无法获取用户信息"
+        终止流程
+      5.1.2 API调用 (Backend Check)：
+        调用AuthenticationApi从Saviynt表获取用户信息
+   5.2 结果处理：
+       成功：显示用户详细信息
+       失败：显示相应错误消息并保持在当前页面
+   5.3 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 进入画面时 | 用户信息获取 | 无法获取用户信息 | 无法获取用户信息 | 显示错误消息 |
+
+6. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   Authentication2Api
+     功能：从HDOC_USER_INFOR表获取用户认证信息
+     Method：GET/POST
+     Endpoint：/api/v1/hdoc/login
+
+     
+     Response Success ([状态码])
+     [成功响应示例]
+     {
+       "Userid": "用户ID",
+       "Responsible": "负责人",
+       "UserPosition": "用户职位",
+       "Email": "邮箱地址"
+     }
+
+     Response Error ([状态码])
+     [错误响应示例]
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 无法获取用户信息 | 显示错误消息，保持当前页面 | 无法获取用户信息 |
+| API调用失败 | 显示错误消息，保持当前页面 | [具体错误信息] |
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：EDBUserView_詳細設計.md
+  保存到：当前文件夹下的work目录

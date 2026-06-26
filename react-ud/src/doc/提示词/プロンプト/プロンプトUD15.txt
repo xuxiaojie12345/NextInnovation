@@ -1,0 +1,411 @@
+请根据以下要求生成[Vin Plate]的详细设计文档：
+
+ 1. 基本信息
+
+   文档编号:DES-VinPlate-001
+   模块名称:Vin Plate
+   作成日:2026-05-20
+
+ 2. 背景 (Background)
+
+ 核心功能和目标：
+本模块提供Vin Plate信息管理功能，用户输入Chassis number后，可以查看VIN Plate的详细信息，包括状态、类型、错误消息、发送数据状态等。
+支持多种操作：View Info、Set Regenerate、Set OK、Change to Basic Info、Change to Advanced Info，用于更新Chassis的状态和类型。
+
+ 面向的用户群体：
+- 系统工程人员
+- 需要管理VIN Plate数据的用户
+
+ 用户体验方面的考虑：
+- 清晰的Chassis信息展示
+- 直观的操作按钮
+- 明确的状态和错误消息显示
+- XML数据解析展示（Print Items和VP Data）
+
+ 安全性或特殊要求：
+- Chassis number格式校验
+- 状态更新权限控制
+- XML数据安全解析
+
+ 3. 画面项目定义 (Screen Parameters)
+
+ No. | 项目名 | 类型 | 必填 | MaxLength | I/O | 允许文字 | 文字配置 | 初始值 | 显示控制 | 备注 
+-----|--------|------|------|-----------|-----|---------|---------|--------|---------|------
+ 1 | Chassis number | textfield | - | 15 | Input | - | 左 | - | 激活 | Chassis number输入框 
+ 2 | View Info | button | - | - | - | - | 中 | - | 激活 | 查看信息按钮 
+ 3 | Set Regenerate | button | - | - | - | - | 中 | - | 激活 | 设置为再生状态 
+ 4 | Set OK | button | - | - | - | - | 中 | - | 激活 | 设置为OK状态 
+ 5 | Change to Basic Info | button | - | - | - | - | 中 | - | 激活 | 更改为Basic Info 
+ 6 | Change to Advanced Info | button | - | - | - | - | 中 | - | 激活 | 更改为Advanced Info 
+ 7 | Chassis number | label | - | - | Output | - | 左 | - | - | 显示的Chassis number，数据源：画面设置内容.Chassis number
+ 8 | Plate type | label | - | - | Output | - | 左 | - | - | Plate类型，数据源：HDOC_SEND_DATA_VIN_PLATE.TYPE
+ 9 | Status | label | - | - | Output | - | 左 | - | - | 状态，数据源：HDOC_SEND_DATA_VIN_PLATE.STATUS
+ 10 | Error Message | label | - | - | Output | - | 左 | - | - | 错误消息，数据源：HDOC_SEND_DATA_VIN_PLATE.MSG
+ 11 | Def. | label | - | - | Output | - | 左 | - | - | 定义日期，数据源：HDOC_SEND_DATA_VIN_PLATE.REGISTER_DATETIME
+ 12 | Data ready | label | - | - | Output | - | 左 | - | - | 数据就绪状态，数据源：HDOC_SEND_DATA_VIN_PLATE.DOC_READY
+ 13 | Sent to CAB factory | label | - | - | Output | - | 左 | - | - | 发送到CAB工厂状态，数据源：HDOC_SEND_DATA_VIN_PLATE.DOC_SENT
+ 14 | Print items | label | - | - | Output | - | 左 | - | - | 获取XML_DOC中的PrintItemName项目值，数据源：HDOC_SEND_DATA_VIN_PLATE.XML_DOC
+ 15 | VP Data | label | - | - | Output | - | 左 | - | - | 获取XML_DOC中的各Variant名称和Value，数据源：HDOC_SEND_DATA_VIN_PLATE.XML_DOC
+
+ 画面布局说明
+
+ 整体布局
+- 参考图片：`react-ud\src\doc\image\Vin Plate_1.png`（Vin Plate页面）
+- 参考图片：`react-ud\src\doc\image\Vin Plate_2.png`（Vin Plate详细页面）
+- 顶部为Chassis number输入区和操作按钮区
+- 中部显示Chassis基本信息（Chassis number、Plate type、Status等）
+- 底部显示XML数据解析结果（Print items、VP Data）
+
+ 4. 功能描述 (Functional Description)
+
+ 4.1 查看VIN Plate信息
+功能说明： 输入Chassis number，点击View Info按钮查看VIN Plate详细信息
+
+操作步骤：
+1. 用户输入Chassis number（最多15字符）
+2. 点击View Info按钮
+3. 调用UD15ViewInfo方法
+4. 检索结果为0件时，显示错误消息"Chassis number XXX not found."。
+4. 从HDOC_SEND_DATA_VIN_PLATE表获取该Chassis的信息
+5. 显示Plate type、Status、Error Message、Def.、Data ready、Sent to CAB factory等信息
+6. 解析XML_DOC，提取PrintItemName并显示在Print items列
+7. 解析XML_DOC，提取各Variant名称和Value并显示在VP Data列
+
+ 4.2 设置为再生状态
+功能说明： 输入Chassis number，点击Set Regenerate按钮将状态更新为'0'（新增）
+
+操作步骤：
+1. 用户输入Chassis number
+2. 点击Set Regenerate按钮
+3. 调用UD15SetRegenerate方法
+4. 将该Chassis的STATUS更新为'0'（新增）
+5. 刷新页面显示最新状态
+
+ 4.3 设置为OK状态
+功能说明： 输入Chassis number，点击Set OK按钮将状态更新为'1'（xml doc已创建）
+
+操作步骤：
+1. 用户输入Chassis number
+2. 点击Set OK按钮
+3. 调用UD15SetOK方法
+4. 将该Chassis的STATUS更新为'1'（xml doc已创建）
+5. 刷新页面显示最新状态
+
+ 4.4 更改为Basic Info
+功能说明： 输入Chassis number，点击Change to Basic Info按钮将状态更新为'0'，TYPE更新为'1'（basic）
+
+操作步骤：
+1. 用户输入Chassis number
+2. 点击Change to Basic Info按钮
+3. 调用UD15ChangetoBasicInfo方法
+4. 将该Chassis的STATUS更新为'0'（新增），TYPE更新为'1'（basic）
+5. 刷新页面显示最新状态
+
+ 4.5 更改为Advanced Info
+功能说明： 输入Chassis number，点击Change to Advanced Info按钮将状态更新为'0'，TYPE更新为'2'（ADVANCED (with weights)）
+
+操作步骤：
+1. 用户输入Chassis number
+2. 点击Change to Advanced Info按钮
+3. 调用UD15ChangetoAdvancedInfo方法
+4. 将该Chassis的STATUS更新为'0'（新增），TYPE更新为'2'（ADVANCED (with weights)）
+5. 刷新页面显示最新状态
+
+ 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+ 5.1 处理流程
+
+开始： 用户输入Chassis number并执行操作
+
+前置处理： 
+- 获取Chassis number输入值
+- 去除首尾空格
+- 校验Chassis number格式（最多15字符）
+
+View Info操作：
+- 调用UD15ViewInfo方法
+- 从HDOC_SEND_DATA_VIN_PLATE表查询该Chassis的记录
+- 如果记录不存在，显示错误消息
+- 如果记录存在，显示所有字段信息
+- 解析XML_DOC字段：
+  - 提取PrintItemName项目值，显示在Print items列
+  - 提取各Variant名称和Value，显示在VP Data列
+
+Set Regenerate操作：
+- 调用UD15SetRegenerate方法
+- 更新HDOC_SEND_DATA_VIN_PLATE表，设置STATUS='0'
+- 刷新页面显示最新状态
+
+Set OK操作：
+- 调用UD15SetOK方法
+- 更新HDOC_SEND_DATA_VIN_PLATE表，设置STATUS='1'
+- 刷新页面显示最新状态
+
+Change to Basic Info操作：
+- 调用UD15ChangetoBasicInfo方法
+- 更新HDOC_SEND_DATA_VIN_PLATE表，设置STATUS='0'，TYPE='1'
+- 刷新页面显示最新状态
+
+Change to Advanced Info操作：
+- 调用UD15ChangetoAdvancedInfo方法
+- 更新HDOC_SEND_DATA_VIN_PLATE表，设置STATUS='0'，TYPE='2'
+- 刷新页面显示最新状态
+
+结果处理：
+- 成功：显示更新后的信息
+- 失败：显示错误消息
+
+ 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 | 动作 |
+|-----|---------|---------|---------|---------|------|
+| 1 | 所有操作 | Chassis number | Chassis number为空 | Chassis number is required. | 显示错误消息 |
+| 2 | 所有操作 | Chassis记录 | Chassis记录不存在 | Chassis record not found. | 显示错误消息 |
+
+ 6. 接口定义 (API Specification)
+
+ UD15SelecthdocsenddatavinplateApi
+
+ 1. UD15ViewInfo
+
+功能： 查看VIN Plate信息
+
+Method： POST
+
+Endpoint： `/api/v1/hdoc/ud15/viewInfo`
+
+Request Body：
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+Response Success (200 OK)：
+```json
+{
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "type": "xxx",
+    "status": "xxx",
+    "msg": "xxx",
+    "registerDatetime": "xxx",
+    "docReady": "xxx",
+    "docSent": "xxx",
+    "xmlDoc": "CLOB形式的XML文本数据"
+  }
+}
+```
+
+Response Error (404 Not Found)：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+Response Error (500 Internal Server Error)：
+```json
+{
+  "code": 500,
+  "message": "System error. Please contact administrator.",
+  "data": null
+}
+```
+
+ 2. UD15SetRegenerate
+
+功能： 设置为再生状态
+
+Method： POST
+
+Endpoint： `/api/v1/hdoc/ud15/setRegenerate`
+
+Request Body：
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+Response Success (200 OK)：
+```json
+{
+  "code": 200,
+  "message": "Status updated to regenerate.",
+  "data": null
+}
+```
+
+Response Error (404 Not Found)：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+Response Error (500 Internal Server Error)：
+```json
+{
+  "code": 500,
+  "message": "System error. Please contact administrator.",
+  "data": null
+}
+```
+
+ 3. UD15SetOk
+
+功能： 设置为OK状态
+
+Method： POST
+
+Endpoint： `/api/v1/hdoc/ud15/setOk`
+
+Request Body：
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+Response Success (200 OK)：
+```json
+{
+  "code": 200,
+  "message": "Status updated to OK.",
+  "data": null
+}
+```
+
+Response Error (404 Not Found)：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+Response Error (500 Internal Server Error)：
+```json
+{
+  "code": 500,
+  "message": "System error. Please contact administrator.",
+  "data": null
+}
+```
+
+ 4. UD15ChangetoBasicInfo
+
+功能： 更改为Basic Info
+
+Method： POST
+
+Endpoint： `/api/v1/hdoc/ud15/changeToBasicInfo`
+
+Request Body：
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+Response Success (200 OK)：
+```json
+{
+  "code": 200,
+  "message": "Type changed to Basic Info.",
+  "data": null
+}
+```
+
+Response Error (404 Not Found)：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+Response Error (500 Internal Server Error)：
+```json
+{
+  "code": 500,
+  "message": "System error. Please contact administrator.",
+  "data": null
+}
+```
+
+ 5. UD15ChangetoAdvancedInfo
+
+功能： 更改为Advanced Info
+
+Method： POST
+
+Endpoint： `/api/v1/hdoc/ud15/changeToAdvancedInfo`
+
+Request Body：
+```json
+{
+  "serie": "string",
+  "chnr": "string"
+}
+```
+
+Response Success (200 OK)：
+```json
+{
+  "code": 200,
+  "message": "Type changed to Advanced Info.",
+  "data": null
+}
+```
+
+Response Error (404 Not Found)：
+```json
+{
+  "code": 404,
+  "message": "Chassis number XXX not found.",
+  "data": null
+}
+```
+
+Response Error (500 Internal Server Error)：
+```json
+{
+  "code": 500,
+  "message": "System error. Please contact administrator.",
+  "data": null
+}
+```
+
+ 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| Chassis number为空 | 前端校验拦截 | Chassis number is required. |
+| Chassis记录不存在 | API返回404错误 | Chassis record not found. |
+| XML解析失败 | 捕获异常 | XML parsing failed. |
+| API调用失败 | 捕获异常，返回500错误 | System error. Please contact administrator. |
+| 网络超时 | 捕获超时异常 | Network timeout. Please try again. |
+
+ 8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+ 9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：[模块功能名]_詳細設計.md
+  保存到：当前文件夹下的work目录

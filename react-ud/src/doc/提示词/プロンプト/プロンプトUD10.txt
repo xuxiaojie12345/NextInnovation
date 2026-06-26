@@ -1,0 +1,418 @@
+# Existing HDoc Variables 详细设计文档
+
+## 1. 基本信息
+
+| 文档编号     | DES-EXISTINGHDOCVARIABLES-001 | 版本号     | v1.0       |
+| :----------- | :---------------------------- | :--------- | :--------- |
+| 模块名称     | 现有HDoc变量管理 (Existing HDoc Variables) | 作成日     | 2026-05-20 |
+| 作成者       | Lingma Assistant              | 状态       | 正式稿     |
+
+## 2. 背景 (Background)
+
+### 核心功能和目标
+本模块用于管理Homologation文档系统中现有的变量（Variables），提供变量的查询、新增、更新、删除和导出功能。用户可以查看系统中已存在的所有变量，包括VDA标准变量和用户自定义变量，并对其进行维护操作。
+
+### 面向的用户群体
+- 系统管理员：负责维护和管理系统中的变量配置
+- 业务用户：需要查看和使用现有变量信息的用户
+
+### 用户体验方面的考虑
+- 提供清晰的搜索功能，方便用户快速定位特定变量
+- 支持批量导出为CSV格式，便于数据分析和备份
+- 操作按钮布局合理，Add/Update/Delete功能明确区分
+- 提供Clear功能，方便用户重置搜索条件
+
+### 安全性或特殊要求
+- 所有输入字段仅允许半角英数字和记号，防止注入攻击
+- 变量操作前需进行存在性校验，避免重复添加或删除不存在的记录
+- 删除操作需谨慎处理，确保不会误删重要数据
+
+## 3. 画面项目定义 (Screen Parameters)
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Variable | TextField | Y | 30 | Input | 半角英数字+记号 | 左 | 空 | 激活 | 点击Add/Update/Delete按钮时必填 |
+| 2   | Type | Pull-downList | - | 20 | Input | 半角英数字+记号 | 左 | 空 | 激活 | 固定选项：VDA, User Defined |
+| 3   | Description | TextField | - | 100 | Input | 半角英数字+记号 | 左 | 空 | 激活 | 变量描述信息 |
+| 4   | Created by user | TextField | - | 16 | Input | 半角英数字+记号 | 左 | 空 | 激活 | 创建用户信息 |
+| 5   | Date | TextField | - | - | Input | 日期格式 | 左 | 空 | 激活 | 创建日期 |
+| 6   | Search | Button | - | - | Action | - | 中 | - | 激活 | 执行变量搜索 |
+| 7   | Clear | Button | - | - | Action | - | 中 | - | 激活 | 清空输入条件 |
+| 8   | Back | Button | - | - | Action | - | 中 | - | 激活 | 返回来源页面 |
+| 9   | Add | Button | - | - | Action | - | 中 | - | 激活 | 新增变量记录 |
+| 10  | Update | Button | - | - | Action | - | 中 | - | 激活 | 更新变量记录 |
+| 11  | Delete | Button | - | - | Action | - | 中 | - | 激活 | 删除变量记录 |
+| 12  | Excel | Button | - | - | Action | - | 中 | - | 激活 | 导出CSV文件 |
+
+## 4. 功能描述 (Functional Description)
+
+### 4.1 初期表示
+**功能说明：** 画面加载时的初始状态展示
+
+**操作步骤：**
+1. 用户进入Existing HDoc Variables画面
+2. Type下拉列表显示固定选项：VDA、User Defined，默认未选择
+3. 其他输入字段（Variable、Description、Created by user、Date）均为空
+4. 所有按钮均处于激活状态，Message标签默认隐藏
+
+### 4.2 Search按钮压下
+**功能说明：** 根据输入的Variable名称搜索匹配的变量记录
+
+**操作步骤：**
+1. 用户在Variable输入框中输入搜索条件（半角英数字+记号，最大30字符）
+2. 可选择在Type下拉列表中选择变量类型（VDA或User Defined）
+3. 可输入Description、Created by user、Date等其他筛选条件
+4. 点击[Search]按钮
+5. 携带检索条件 跳转到 ExistingHdocVariablesResultList 画面
+
+### 4.3 Clear按钮压下
+**功能说明：** 清除所有已输入的搜索条件，恢复初始状态
+
+**操作步骤：**
+1. 用户点击[Clear]按钮
+2. 系统清空所有输入字段
+
+### 4.4 Back按钮压下
+**功能说明：** 从当前页面返回到调用此页面的前一个页面
+
+**操作步骤：**
+1. 用户点击[Back]按钮
+2. 系统返回到来源页面
+
+### 4.5 Add按钮压下
+**功能说明：** 向系统中添加新的变量记录
+
+**操作步骤：**
+1. 用户在Variable输入框中输入变量名称（必填，最大30字符）
+2. 在Type下拉列表中选择变量类型（VDA或User Defined）
+3. 可选填写Description（最大100字符）
+4. 点击[Add]按钮
+5. 系统校验变量是否已存在
+6. 若不存在，则创建新记录并显示成功消息
+7. 若已存在，则显示错误消息
+
+### 4.6 Update按钮压下
+**功能说明：** 修改现有变量的信息
+
+**操作步骤：**
+1. 用户在Variable输入框中输入要更新的变量名称（必填）
+2. 修改Type、Description等字段内容
+3. 点击[Update]按钮
+4. 系统校验变量是否存在
+5. 若存在，则更新记录并显示成功消息
+6. 若不存在，则显示错误消息
+
+### 4.7 Delete按钮压下
+**功能说明：** 从系统中删除指定的变量记录
+
+**操作步骤：**
+1. 用户在Variable输入框中输入要删除的变量名称（必填）
+2. 点击[Delete]按钮
+3. 系统弹出确认对话框
+4. 用户确认后，系统校验变量是否存在
+5. 若存在，则删除记录并显示成功消息
+6. 若不存在，则显示错误消息
+
+### 4.8 Excel按钮压下
+**功能说明：** 将当前显示的变量列表导出为CSV格式文件
+
+**操作步骤：**
+1. 用户点击[Excel]按钮
+2. 系统生成包含所有变量数据的CSV文件
+3. 浏览器自动下载CSV文件到本地
+4. 文件包含字段：Variable、Type、Description、Created by user、Date
+
+## 5. 业务逻辑与校验规则 (Business Logic & Checks)
+
+### 5.1 处理流程
+
+#### 5.1.1 初期表示
+1. 用户进入Existing HDoc Variables画面
+2. Type下拉列表显示固定选项：VDA、User Defined，默认未选择
+3. 其他输入字段（Variable、Description、Created by user、Date）均为空
+4. 所有按钮均处于激活状态，Message标签默认隐藏
+
+#### 5.1.2 Clear按钮压下
+**开始**：用户点击[Clear]按钮。
+**前置处理**：获取所有输入字段。
+**结果处理**：清空所有输入字段。
+
+#### 5.1.3 Back按钮压下
+**开始**：用户点击[Back]按钮。
+**结果处理**：返回来源页面。
+
+#### 5.1.4 Search按钮压下
+**开始**：用户点击[Search]按钮。
+**前置处理**：获取所有输入字段的值。
+**空值校验 (Frontend Check)**：
+  若Variable为空且其他条件也为空：
+    设置Message = `请输入至少一个搜索条件`
+    **终止**流程
+**成功**：携带检索条件 跳转到 ExistingHdocVariablesResultList 画面
+
+#### 5.1.5 Add按钮压下
+**开始**：用户点击[Add]按钮。
+**前置处理**：获取Variable、Type、Description等字段值。
+**空值校验 (Frontend Check)**：
+  若Variable为空：
+    设置Message = `Variable为必填项`
+    **终止**流程
+  若Variable长度超过30字符：
+    设置Message = `Variable长度不能超过30字符`
+    **终止**流程
+  若Type未选择：
+    设置Message = `请选择变量类型`
+    **终止**流程
+**格式校验**：
+  若Variable包含非法字符（非半角英数字+记号）：
+    设置Message = `Variable只能包含半角英数字和记号`
+    **终止**流程
+**Variable存在性校验**：
+  调用 UD08SelectHdocvariables 检查Variable是否存在于HDOC_VARIABLES表中
+    若存在，设置Message = `Variant already exists. Please enter the correct content`
+    **终止**流程
+**API调用 (Backend Check)**：
+  调用 `UD10Add`
+  传递参数：Variable, Type, Description, CreatedByUser, Date
+**结果处理**：
+  **成功**：显示消息 `变量添加成功`，清空输入框
+  **失败**：显示错误消息 `Variant already exists. Please enter the correct content`
+
+#### 5.1.6 Update按钮压下
+**开始**：用户点击[Update]按钮。
+**前置处理**：获取Variable及要更新的字段值。
+**空值校验 (Frontend Check)**：
+  若Variable为空：
+    设置Message = `Variable为必填项`
+    **终止**流程
+**Variable存在性校验**：
+  调用 UD08SelectHdocvariables 检查Variable是否存在于HDOC_VARIABLES表中
+    若不存在，设置Message = `Variant does not exists. Please enter the correct content`
+    **终止**流程
+**API调用 (Backend Check)**：
+  调用 `UD10Update`
+  传递参数：Variable, Type, Description等
+**结果处理**：
+  **成功**：显示消息 `变量更新成功`
+  **失败**：显示错误消息 `Variant does not exists. Please enter the correct content`
+
+#### 5.1.7 Delete按钮压下
+**开始**：用户点击[Delete]按钮。
+**前置处理**：获取Variable字段值。
+**空值校验 (Frontend Check)**：
+  若Variable为空：
+    设置Message = `Variable为必填项`
+    **终止**流程
+**确认对话框**：
+  显示 `Do you really want to delete this variant?`
+  若用户取消：**终止**流程
+**Variable存在性校验**：
+  调用 UD08SelectHdocvariables 检查Variable是否存在于HDOC_VARIABLES表中
+    若不存在，设置Message = `Variant does not exists. Please enter the correct content`
+    **终止**流程
+**API调用 (Backend Check)**：
+  调用 `UD10Delete`
+  传递参数：Variable
+**结果处理**：
+  **成功**：显示消息 `变量删除成功`，清空输入框
+  **失败**：显示错误消息 `Variant does not exists. Please enter the correct content`
+
+#### 5.1.8 Excel按钮压下
+**开始**：用户点击[Excel]按钮。
+**处理**：
+   - 设置文件名：`HDoc_Variables_YYYYMMDD.csv`
+   - 触发浏览器下载。
+   - 显示消息"CSV文件导出成功"。
+
+### 5.2 校验详细规格表
+
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | Add操作 | Variable | 字段为空 | Variable为必填项 | 前端校验，阻止提交 |
+| 2 | Add操作 | Variable | 长度超过30字符 | Variable长度不能超过30字符 | 前端校验，阻止提交 |
+| 3 | Add操作 | Variable | 包含非法字符 | Variable只能包含半角英数字和记号 | 前端校验，阻止提交 |
+| 4 | Add操作 | Type | 未选择类型 | 请选择变量类型 | 前端校验，阻止提交 |
+| 5 | Add操作 | Variable | 后端校验-变量已存在 | Variant already exists. Please enter the correct content | 后端校验，显示错误 |
+| 6 | Update操作 | Variable | 字段为空 | Variable为必填项 | 前端校验，阻止提交 |
+| 7 | Update操作 | Variable | 后端校验-变量不存在 | Variant does not exists. Please enter the correct content | 后端校验，显示错误 |
+| 8 | Delete操作 | Variable | 字段为空 | Variable为必填项 | 前端校验，阻止提交 |
+| 9 | Delete操作 | Variable | 后端校验-变量不存在 | Variant does not exists. Please enter the correct content | 后端校验，显示错误 |
+| 10 | Search操作 | 所有搜索条件 | 全部为空 | 请输入至少一个搜索条件 | 前端校验，阻止提交 |
+
+## 6. 接口定义 (API Specification)
+
+### 6.1 UD08SelectHdocvariables
+
+- **功能**：检查变量是否存在。
+- **所属 API**：UD08HomologationVariablesApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/ud08/checkVariable`
+
+#### Request Body
+
+```json
+{
+  "variable": "string"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "変数校验成功",
+  "data": {
+    "variable": "xxx",
+    "exists": true,
+    "count": 1
+  }
+}
+```
+
+### 6.2 UD10Add - 新增变量
+
+- **功能**：向HDOC_VARIABLES表中添加新的变量记录。
+- **所属 API**：UD10HdocvariablesApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/variables/add`
+
+#### Request Body
+
+```json
+{
+  "variable": "VAR_NEW",
+  "type": "VDA",
+  "description": "新变量描述",
+  "createdByUser": "admin",
+  "date": "2023-10-15"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "变量添加成功",
+  "data": {
+    "variable": "变量名"
+  }
+}
+```
+
+#### Response Error (409 Conflict)
+
+```json
+{
+  "code": 409,
+  "message": "变量添加失败",
+  "data": null
+}
+```
+
+### 6.3 UD10Update - 更新变量
+
+- **功能**：更新HDOC_VARIABLES表中现有变量的信息。
+- **所属 API**：UD10HdocvariablesApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/variables/update`
+
+#### Request Body
+
+```json
+{
+  "variable": "VAR001",
+  "type": "VDA",
+  "description": "更新后的描述",
+  "createdByUser": "admin",
+  "date": "2023-10-15"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "变量更新成功",
+  "data": {
+    "variable": "变量名"
+  }
+}
+```
+
+#### Response Error (404 Not Found)
+
+```json
+{
+  "code": 404,
+  "message": "变量更新失败",
+  "data": null
+}
+```
+
+### 6.4 UD10Delete - 删除变量
+
+- **功能**：从HDOC_VARIABLES表中删除指定的变量记录。
+- **所属 API**：UD10HdocvariablesApi
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/hdoc/variables/delete`
+
+#### Request Body
+
+```json
+{
+  "variable": "VAR001"
+}
+```
+
+#### Response Success (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "变量删除成功",
+  "data": {
+    "variable": "变量名"
+  }
+}
+```
+
+#### Response Error (404 Not Found)
+
+```json
+{
+  "code": 404,
+  "message": "变量删除失败",
+  "data": null
+}
+```
+
+## 7. 异常处理 (Exception Handling)
+
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 数据库连接失败 | 捕获SQLException，记录日志，返回友好错误提示 | 系统繁忙，请稍后重试 |
+| 变量已存在（Add操作） | 捕获唯一约束冲突异常，返回409状态码 | Variant already exists. Please enter the correct content |
+| 变量不存在（Update/Delete操作） | 查询结果为空，返回404状态码 | Variant does not exists. Please enter the correct content |
+| 参数校验失败 | 前端校验拦截，不发送请求 | 根据具体校验项显示相应错误消息 |
+| CSV导出失败 | 捕获IO异常，记录日志 | CSV导出失败，请联系管理员 |
+| 网络超时 | 设置请求超时时间，捕获TimeoutException | 请求超时，请检查网络连接 |
+| 权限不足 | 检查用户登录状态和权限 | 您没有权限执行此操作 |
+
+## 8. 语言要求
+
+- 文档使用中文编写
+- 所有错误消息和成功消息使用中文（除特定英文提示外）
+- 技术术语可保留英文（如API、TextField、Pull-downList等）
+- 保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+- 特定的英文错误消息保持不变：
+  - "Variant already exists. Please enter the correct content"
+  - "Variant does not exists. Please enter the correct content"
+
+## 9. 输出要求
+
+- 生成完整的Markdown格式文档
+- 文件名格式：ExistingHDocVariables_詳細設計.md
+- 保存到：react-ud/src/doc/提示词/work目录

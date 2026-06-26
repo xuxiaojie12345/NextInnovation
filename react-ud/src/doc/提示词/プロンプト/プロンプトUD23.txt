@@ -1,0 +1,80 @@
+请根据以下要求生成Download and Print Quick Guides的详细设计文档：
+
+1.基本信息
+   文档编号:DES-DownloadAndPrintQuickGuides-001
+   模块名称:Download and Print Quick Guides
+   作成日:2026-05-20
+
+2. 背景 (Background)
+
+本模块提供Quick Guides文件下载功能，同时展示Quick Guides的打印方法和折叠方法说明。用户可以通过链接下载Quick Guides文件，并通过复选框查看打印和折叠的操作说明。
+
+- **目标**：提供Quick Guides文件的便捷下载入口，同时清晰展示打印和折叠的操作步骤。
+- **面向的用户群体**：需要下载Quick Guides文件并了解打印和折叠方法的HDoc系统用户。
+- **用户体验方面的考虑**：采用清晰的链接和复选框布局，用户点击链接即可下载文件，勾选复选框查看对应操作说明，界面简洁直观。
+- **安全性或特殊要求**：无需后端API调用，所有内容为静态展示，不涉及用户数据交互。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+| :-: | :------------ | :---------- | :--------: | :-------: | :----: | :----------------------- | :--------------: | :--------------: | :----------------: | :--- |
+| 1 | **Download and Print Quick Guides** | Link | - | - | Input | - | 左 (Left) | - | - | - |
+| 2 | **Volvo 3P Quick Guides** | Link | - | - | Input | - | 左 (Left) | - | - | - |
+| 3 | **To print do the following** | Checkbox | - | - | Input | - | 左 (Left) | - | - | - |
+| 4 | **To fold do the following** | Checkbox | - | - | Input | - | 左 (Left) | - | - | - |
+
+4. 功能描述 (Functional Description)
+
+  4.1 画面初期
+    功能说明：画面初期显示所有的快速入门指南和功能介绍
+    以下链接 只显示链接 不实装具体功能
+      Quick Guides 卡片展示区（上部）功能：以卡片的形式展示常用快速指南
+        文档封面缩略图（图片）
+        文档名称（如 WIS Quick Guide、PERF Quick Guide 等）
+        点击后可下载或预览文档 
+          当前显示的文档列表
+            1.WIS Quick Guide
+            2.PERF Quick Guide
+            3.W8-Calc Quick Guide
+            4.HDoc Quick Guide
+            5.EDB Quick Guide
+            6.COS Quick Guide
+            7.VBI Quick Guide (Intranet version)
+            8.VBI Quick Guide (Internet version)
+   
+      Volvo 3P Quick Guides 链接列表（下部）功能：展示更多专业的快速指南的下载链接
+        当前显示的文档列表
+          1.EDB Quick Guide
+          2.KBS Quick Guide
+          3.CVM Quick Guide
+          4.AVP Quick Guide
+          5.KAX Quick Guide
+          6.C&E Homepage Quick Guide
+          7.RPD Quick Guide
+          8.SPC Quick Guide
+          9.WebFRAME Quick Guide
+    
+    4.2[Back按钮押下]
+    功能说明：当Back按钮押下，画面跳转迁移回到HdocHelp画面
+
+5. 业务逻辑与校验规则 (Business Logic & Checks)
+    无
+    
+6. 接口定义 (API Specification)
+
+   本模块为静态页面，无需后端API调用。
+
+7. 异常处理 (Exception Handling)（TODO：共同化可能）
+    无
+
+8.语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（react-ud\src\内部設計模板.md）相同的格式结构
+
+9.输出要求
+  生成完整的Markdown格式文档
+  文件名格式：DocumentTypes_詳細設計.md
+  保存到：当前文件夹下的work目录
