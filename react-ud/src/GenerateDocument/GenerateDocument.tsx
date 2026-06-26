@@ -175,12 +175,6 @@ const GenerateDocument = () => {
     <div className='gd-container'>
       {/* 主内容区域 - 带边框的容器 */}
       <div className='gd-main-content'>
-        {/* 标题区域 */}
-        <div className='gd-header'>
-          <h1 className='gd-title'>Generate document</h1>
-          <p className='gd-error-label'>エラーメッセージエリア</p>
-        </div>
-
         {/* 错误消息显示 */}
         {errorMessage && <div className='gd-error-message'>{errorMessage}</div>}
 
