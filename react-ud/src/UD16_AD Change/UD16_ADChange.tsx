@@ -39,10 +39,11 @@ const UD16_ADChange: React.FC = () => {
    * @returns {{ serie: string, chnr: string }} 拆分后的系列和编号
    */
   const splitSerieChnr = (value: string) => {
-    // 提取前半部分英文字母作为serie
-    const matchSerie = value.match(/^[A-Za-z]+/);
+    // 去除连字符后提取前半部分英文字母作为serie
+    const cleaned = value.replace(/-/g, '');
+    const matchSerie = cleaned.match(/^[A-Za-z]+/);
     // 提取后半部分数字作为chnr
-    const matchChnr = value.match(/\d+$/);
+    const matchChnr = cleaned.match(/\d+$/);
     return {
       serie: matchSerie ? matchSerie[0] : '',
       chnr: matchChnr ? matchChnr[0] : '',
@@ -136,12 +137,13 @@ const UD16_ADChange: React.FC = () => {
           // 弹框显示警告消息
           const userConfirmed = window.confirm('AFTER DEF CHANGE IS NOT ACTIVATED');
           if (userConfirmed) {
-            // 用户点击OK后，调用添加API继续（将ACT字段更新为"Y"）
+            // 用户点击OK后，调用添加API继续（force=true跳过检查，直接更新ACT为"Y"）
             try {
               const retryResponse = await apiClient.post('/api/ud16/addchange', {
                 serie,
                 chnr,
                 desc: trimmedDesc,
+                force: true,
               });
               if (retryResponse.data && retryResponse.data.code === 200) {
                 showMessage('添加成功');
@@ -290,13 +292,13 @@ const UD16_ADChange: React.FC = () => {
       if (response.data && response.data.code === 200 && response.data.data) {
         if (response.data.data.exists) {
           // 记录存在
-          window.alert('对应的数据存在');
+          showMessage('对应的数据存在');
         } else {
           // 对应设计书 3.2 校验详细规格表 No.10
-          window.alert('记录不存在');
+          showMessage('记录不存在');
         }
       } else {
-        window.alert('记录不存在');
+        showMessage('记录不存在');
       }
     } catch (error: any) {
       // 异常处理
@@ -329,8 +331,8 @@ const UD16_ADChange: React.FC = () => {
    */
   const handleSerieChnrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 半角英数字校验
-    if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= MAX_SERIE_CHNR_LENGTH) {
+    // 半角英数字和连字符校验
+    if (/^[a-zA-Z0-9-]*$/.test(val) && val.length <= MAX_SERIE_CHNR_LENGTH) {
       setSerieChnr(val);
       // 用户重新输入时清空错误提示
       if (message) showMessage('');
@@ -358,14 +360,6 @@ const UD16_ADChange: React.FC = () => {
       <div className='ud16-content'>
         {/* 页面标题 */}
         <h1 className='ud16-title'>AD Change</h1>
-
-        {/* 错误消息显示区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.3 error message */}
-        {message && (
-          <div className='ud16-message'>
-            {message}
-          </div>
-        )}
 
         {/* 输入区域 */}
         <div className='ud16-form-section'>
@@ -401,15 +395,10 @@ const UD16_ADChange: React.FC = () => {
               placeholder='请输入描述'
               disabled={isLoading}
               maxLength={MAX_DESC_LENGTH}
-              rows={4}
+              rows={1}
             />
           </div>
         </div>
-
-        {/* 加载状态提示 */}
-        {isLoading && (
-          <div className='ud16-loading'>加载中...</div>
-        )}
 
         {/* 按钮区域 */}
         {/* 对应设计书 2.1 控件属性表 No.4 ADD, No.5 DELETE, No.6 CHECK */}
@@ -438,6 +427,14 @@ const UD16_ADChange: React.FC = () => {
             {isLoading ? '処理中...' : 'CHECK'}
           </button>
         </div>
+
+        {/* 错误消息显示区域 */}
+        {/* 对应设计书 2.1 控件属性表 No.3 error message */}
+        {message && (
+          <div className='ud16-message'>
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

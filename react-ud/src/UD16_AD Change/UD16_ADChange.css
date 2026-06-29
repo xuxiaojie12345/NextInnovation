@@ -5,24 +5,26 @@
 
 /* ---------- 页面主容器 ---------- */
 .ud16-container {
-  min-height: 100vh;
-  background-color: #ffffff;
-  padding: 20px;
+  /* min-height: 100vh; */
+  background-color: white;
+  padding: 5px 10px;
   font-family: Arial, sans-serif;
   box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
 }
 
 .ud16-container .ud16-content {
-  width: 100%;
-  max-width: 100%;
+  max-width: 85%;
   background-color: #ffffff;
+  margin-bottom: 50px;
 }
 
 /* ---------- 页面标题 ---------- */
 .ud16-container .ud16-title {
   font-size: 20px;
   font-weight: bold;
-  color: #000080;
+  color: #003366;
   margin-bottom: 15px;
   text-align: left;
   border: none;
@@ -35,20 +37,12 @@
   color: #ff4d4f;
   font-size: 13px;
   text-align: left;
-  margin-bottom: 10px;
+  margin-top: 20px;
   padding: 8px 12px;
   background-color: #fff2f0;
   border: 1px solid #ffccc7;
   border-radius: 4px;
   word-break: break-word;
-}
-
-/* ---------- 加载状态提示 ---------- */
-.ud16-container .ud16-loading {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 10px;
-  padding: 6px 0;
 }
 
 /* ---------- 表单区域 ---------- */
