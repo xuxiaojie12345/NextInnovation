@@ -2,6 +2,7 @@
   "name": "my-react-2",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8081",
   "dependencies": {
     "@ant-design/icons": "^5.3.5",
     "@emotion/react": "^11.11.4",
@@ -63,6 +64,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/react-router-dom": "^5.3.3",
     "sass": "^1.72.0"
   }

@@ -1,0 +1,40 @@
+2026-06-29 15:18:35.406 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.listFiles(SvnUtil.java:153) : Failed to list files for market JPN: SVN command failed with exit code 1: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7234/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/JPN' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:19:11.269 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.listFiles(SvnUtil.java:153) : Failed to list files for market USA: SVN command failed with exit code 1: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7240/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/USA' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:26:45.686 | http-nio-8081-exec-6raceId | ERROR | 13476 | http-nio-8081-exec-6 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 15:49:07.475 | http-nio-8081-exec-3raceId | ERROR | 13476 | http-nio-8081-exec-3 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: SVN command failed with exit code 1: Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:02:58.211 | http-nio-8081-exec-1raceId | ERROR | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: File not found in working copy: C:\temp\svn-working-copy/JPN/test.docx
+2026-06-29 16:07:47.864 | http-nio-8081-exec-5raceId | ERROR | 13476 | http-nio-8081-exec-5 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: File not found in working copy: C:\temp\svn-working-copy/JPN/test.docx
+2026-06-29 16:12:42.194 | http-nio-8081-exec-7raceId | ERROR | 13476 | http-nio-8081-exec-7 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:17:18.947 | http-nio-8081-exec-9raceId | ERROR | 13476 | http-nio-8081-exec-9 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:18:08.841 | http-nio-8081-exec-10raceId | ERROR | 13476 | http-nio-8081-exec-10 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:20:23.356 | http-nio-8081-exec-1raceId | ERROR | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd.txt (指定されたパスが見つかりません。)
+2026-06-29 16:21:13.277 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: SVN command failed with exit code 1: Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data .done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:21:56.066 | http-nio-8081-exec-5raceId | ERROR | 13476 | http-nio-8081-exec-5 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: SVN command failed with exit code 1: Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ..done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:22:04.963 | http-nio-8081-exec-6raceId | ERROR | 13476 | http-nio-8081-exec-6 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market CHN: SVN command failed with exit code 1: Adding         C:\temp\svn-working-copy\CHN\Login.txt
+Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ...done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������

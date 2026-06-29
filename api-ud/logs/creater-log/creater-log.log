@@ -1,0 +1,836 @@
+2026-06-29 12:31:50.275 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.StartupInfoLogger.logStarting(StartupInfoLogger.java:55) : Starting Application using Java 21.0.2 on wangjing with PID 13476 (E:\UDWorkspace\NextInnovation\api-ud\target\classes started by wangjing in E:\UDWorkspace\NextInnovation\api-ud)
+2026-06-29 12:31:50.423 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.SpringApplication.logStartupProfileInfo(SpringApplication.java:637) : The following 1 profile is active: "dev"
+2026-06-29 12:31:50.698 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.logging.DeferredLog.logTo(DeferredLog.java:255) : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-06-29 12:31:50.700 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.logging.DeferredLog.logTo(DeferredLog.java:255) : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-06-29 12:31:55.446 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:108) : Tomcat initialized with port(s): 8081 (http)
+2026-06-29 12:31:55.525 | restartedMainraceId | INFO  | 13476 | restartedMain | org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:173) : Initializing ProtocolHandler ["http-nio-8081"]
+2026-06-29 12:31:55.527 | restartedMainraceId | INFO  | 13476 | restartedMain | org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:173) : Starting service [Tomcat]
+2026-06-29 12:31:55.528 | restartedMainraceId | INFO  | 13476 | restartedMain | org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:173) : Starting Servlet engine: [Apache Tomcat/9.0.69]
+2026-06-29 12:31:55.939 | restartedMainraceId | INFO  | 13476 | restartedMain | org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:173) : Initializing Spring embedded WebApplicationContext
+2026-06-29 12:31:55.940 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.prepareWebApplicationContext(ServletWebServerApplicationContext.java:292) : Root WebApplicationContext: initialization completed in 5239 ms
+2026-06-29 12:31:56.267 | restartedMainraceId | INFO  | 13476 | restartedMain | com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure.dataSource(DruidDataSourceAutoConfigure.java:56) : Init DruidDataSource
+2026-06-29 12:31:56.723 | restartedMainraceId | INFO  | 13476 | restartedMain | com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:986) : {dataSource-1} inited
+2026-06-29 12:31:58.089 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer.startServer(OptionalLiveReloadServer.java:59) : LiveReload server is running on port 35729
+2026-06-29 12:31:58.679 | restartedMainraceId | INFO  | 13476 | restartedMain | org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:173) : Starting ProtocolHandler ["http-nio-8081"]
+2026-06-29 12:31:58.883 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.web.embedded.tomcat.TomcatWebServer.start(TomcatWebServer.java:220) : Tomcat started on port(s): 8081 (http) with context path ''
+2026-06-29 12:31:59.186 | restartedMainraceId | INFO  | 13476 | restartedMain | org.springframework.boot.StartupInfoLogger.logStarted(StartupInfoLogger.java:61) : Started Application in 10.661 seconds (JVM running for 14.031)
+2026-06-29 12:31:59.192 | restartedMainraceId | INFO  | 13476 | restartedMain | com.web.app.Application.main(Application.java:37) : Swagger的URL : http://localhost:8081/swagger-ui/index.html
+2026-06-29 14:37:05.708 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | org.springframework.web.servlet.FrameworkServlet.initServletBean(FrameworkServlet.java:525) : Initializing Servlet 'dispatcherServlet'
+2026-06-29 14:37:05.726 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | org.springframework.web.servlet.FrameworkServlet.initServletBean(FrameworkServlet.java:547) : Completed initialization in 5 ms
+2026-06-29 14:37:05.896 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 14:37:28.363 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 14:40:02.046 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=CHN, fileName=react_ud_sql(1).txt
+2026-06-29 14:40:03.534 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+2026-06-29 14:40:04.112 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7230.
+2026-06-29 14:40:04.305 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A         C:\temp\svn-working-copy\CHN\react_ud_sql(1).txt
+2026-06-29 14:40:05.787 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding         C:\temp\svn-working-copy\CHN\react_ud_sql(1).txt
+Transmitting file data .done
+Committing transaction...
+Committed revision 7231.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 14:40:05.787 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: react_ud_sql(1).txt to market CHN
+2026-06-29 14:42:46.523 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 14:42:46.834 | http-nio-8081-exec-4raceId | WARN  | 13476 | http-nio-8081-exec-4 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 318323
+2026-06-29 14:59:09.755 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 14:59:09.760 | http-nio-8081-exec-5raceId | WARN  | 13476 | http-nio-8081-exec-5 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 982869
+2026-06-29 15:18:00.256 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:00.264 | http-nio-8081-exec-6raceId | WARN  | 13476 | http-nio-8081-exec-6 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 1130386
+2026-06-29 15:18:13.168 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:14.243 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:15.171 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:16.149 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:17.276 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:18.197 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:19.212 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:29.198 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=10MB_file.docx
+2026-06-29 15:18:35.404 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7234/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/JPN' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:18:35.406 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.listFiles(SvnUtil.java:153) : Failed to list files for market JPN: SVN command failed with exit code 1: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7234/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/JPN' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:18:38.318 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: D         C:\temp\svn-working-copy\AUS
+D         C:\temp\svn-working-copy\CHN
+D         C:\temp\svn-working-copy\EUR
+Checked out revision 7234.
+2026-06-29 15:18:38.747 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A         C:\temp\svn-working-copy\JPN
+2026-06-29 15:18:40.255 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding         C:\temp\svn-working-copy\JPN
+Committing transaction...
+Committed revision 7235.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:18:41.734 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+A    C:\temp\svn-working-copy\CHN
+A    C:\temp\svn-working-copy\CHN\react_ud_sql(1).txt
+A    C:\temp\svn-working-copy\CHN\Menubk.txt
+A    C:\temp\svn-working-copy\AUS
+A    C:\temp\svn-working-copy\AUS\chat with Claude-AI about JET_full.pdf
+A    C:\temp\svn-working-copy\EUR
+A    C:\temp\svn-working-copy\EUR\Menu.txt
+A    C:\temp\svn-working-copy\EUR\Loginbk.txt
+A    C:\temp\svn-working-copy\EUR\aa.txt
+Updated to revision 7235.
+2026-06-29 15:18:41.993 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:42.954 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\10MB_file.docx
+2026-06-29 15:18:44.873 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\10MB_file.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7236.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:18:44.875 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: 10MB_file.docx to market JPN
+2026-06-29 15:18:47.863 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:52.245 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=normal_file.docx
+2026-06-29 15:18:52.769 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+2026-06-29 15:18:53.239 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7236.
+2026-06-29 15:18:53.492 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\normal_file.docx
+2026-06-29 15:18:55.155 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\normal_file.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7237.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:18:55.156 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: normal_file.docx to market JPN
+2026-06-29 15:18:56.321 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:18:56.820 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=small_file.txt
+2026-06-29 15:18:57.521 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+normal_file.docx
+2026-06-29 15:18:58.089 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7237.
+2026-06-29 15:18:58.487 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\small_file.txt
+2026-06-29 15:18:59.761 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\small_file.txt
+Transmitting file data .done
+Committing transaction...
+Committed revision 7238.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:18:59.767 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: small_file.txt to market JPN
+2026-06-29 15:19:00.935 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:01.408 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=new_template.docx
+2026-06-29 15:19:02.092 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:02.573 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7238.
+2026-06-29 15:19:02.776 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\new_template.docx
+2026-06-29 15:19:04.173 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\new_template.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7239.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:04.209 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: new_template.docx to market JPN
+2026-06-29 15:19:05.788 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:06.245 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=CHN, fileName=chn_template.docx
+2026-06-29 15:19:06.961 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+react_ud_sql(1).txt
+2026-06-29 15:19:07.463 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7239.
+2026-06-29 15:19:07.679 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\CHN\chn_template.docx
+2026-06-29 15:19:08.981 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\CHN\chn_template.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7240.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:08.981 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: chn_template.docx to market CHN
+2026-06-29 15:19:10.248 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:10.720 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=USA, fileName=usd_template.docx
+2026-06-29 15:19:11.269 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7240/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/USA' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:19:11.269 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.listFiles(SvnUtil.java:153) : Failed to list files for market USA: SVN command failed with exit code 1: svn: warning: W160013: '/svn/React2024SVN/!svn/rvr/7240/99_%E5%80%8B%E4%BA%BA%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/wangjing/UD12/USA' path not found
+svn: E200009: Could not list all targets because some targets don't exist
+2026-06-29 15:19:12.070 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: D         C:\temp\svn-working-copy\AUS
+D         C:\temp\svn-working-copy\CHN
+D         C:\temp\svn-working-copy\EUR
+D         C:\temp\svn-working-copy\JPN
+Checked out revision 7240.
+2026-06-29 15:19:12.254 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A         C:\temp\svn-working-copy\USA
+2026-06-29 15:19:13.451 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding         C:\temp\svn-working-copy\USA
+Committing transaction...
+Committed revision 7241.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:14.559 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+A    C:\temp\svn-working-copy\CHN
+A    C:\temp\svn-working-copy\CHN\chn_template.docx
+A    C:\temp\svn-working-copy\CHN\react_ud_sql(1).txt
+A    C:\temp\svn-working-copy\CHN\Menubk.txt
+A    C:\temp\svn-working-copy\JPN
+A    C:\temp\svn-working-copy\JPN\new_template.docx
+A    C:\temp\svn-working-copy\JPN\small_file.txt
+A    C:\temp\svn-working-copy\JPN\normal_file.docx
+A    C:\temp\svn-working-copy\JPN\10MB_file.docx
+A    C:\temp\svn-working-copy\AUS
+A    C:\temp\svn-working-copy\AUS\chat with Claude-AI about JET_full.pdf
+A    C:\temp\svn-working-copy\EUR
+A    C:\temp\svn-working-copy\EUR\Menu.txt
+A    C:\temp\svn-working-copy\EUR\Loginbk.txt
+A    C:\temp\svn-working-copy\EUR\aa.txt
+Updated to revision 7241.
+2026-06-29 15:19:14.745 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\USA\usd_template.docx
+2026-06-29 15:19:16.962 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\USA\usd_template.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7242.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:16.979 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: usd_template.docx to market USA
+2026-06-29 15:19:18.847 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:19.304 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=a.txt
+2026-06-29 15:19:19.767 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:20.236 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7242.
+2026-06-29 15:19:20.419 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\a.txt
+2026-06-29 15:19:21.671 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\a.txt
+Transmitting file data .done
+Committing transaction...
+Committed revision 7243.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:21.671 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: a.txt to market JPN
+2026-06-29 15:19:22.102 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=CHN, fileName=b.txt
+2026-06-29 15:19:22.547 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+chn_template.docx
+react_ud_sql(1).txt
+2026-06-29 15:19:22.990 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7243.
+2026-06-29 15:19:23.174 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\CHN\b.txt
+2026-06-29 15:19:24.410 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\CHN\b.txt
+Transmitting file data .done
+Committing transaction...
+Committed revision 7244.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:19:24.427 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: b.txt to market CHN
+2026-06-29 15:19:25.492 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:26.760 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:27.983 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:29.380 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:30.406 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:32.862 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:34.027 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:36.355 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:38.340 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:39.374 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:39.739 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:19:40.326 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:47.926 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:48.278 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:19:48.526 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=CHN
+2026-06-29 15:19:48.987 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:49.395 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:19:50.485 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:50.715 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:50.916 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+b.txt
+chn_template.docx
+react_ud_sql(1).txt
+2026-06-29 15:19:51.236 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:52.326 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:53.175 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:54.911 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:55.245 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:19:56.040 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:56.664 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:19:57.131 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:19:57.675 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:19:58.176 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:20:29.284 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:20:29.470 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:20:30.099 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:21:01.000 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:21:01.291 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:21:02.010 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:21:33.170 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:21:33.503 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:21:33.976 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:22:05.405 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:22:05.729 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:22:06.238 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:22:37.822 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:22:38.149 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:22:38.714 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:23:09.826 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:23:10.153 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:23:10.636 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:23:41.752 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:23:42.146 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:23:42.786 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:24:13.925 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:24:14.266 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:24:14.938 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:24:45.836 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:24:46.170 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:24:46.671 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:25:18.237 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:25:18.583 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:25:19.038 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:25:52.496 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:25:52.946 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:25:53.997 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:26:26.212 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:27.332 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:28.888 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:29.352 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=test.docx
+2026-06-29 15:26:30.041 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+2026-06-29 15:26:30.835 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7244.
+2026-06-29 15:26:31.152 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\test.docx
+2026-06-29 15:26:32.688 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7245.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:26:32.703 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: test.docx to market JPN
+2026-06-29 15:26:33.621 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:34.963 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:35.305 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:26:35.942 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+test.docx
+2026-06-29 15:26:37.542 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:39.865 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:41.121 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=test.docx
+2026-06-29 15:26:41.686 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+test.docx
+2026-06-29 15:26:42.263 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7245.
+2026-06-29 15:26:42.710 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:26:42.906 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:26:42.908 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: test.docx to market JPN
+2026-06-29 15:26:43.909 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:44.295 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=../../etc/passwd
+2026-06-29 15:26:45.090 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+test.docx
+2026-06-29 15:26:45.661 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7245.
+2026-06-29 15:26:45.686 | http-nio-8081-exec-6raceId | ERROR | 13476 | http-nio-8081-exec-6 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 15:26:52.135 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:52.706 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=test.docx
+2026-06-29 15:26:54.020 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+test.docx
+2026-06-29 15:26:55.189 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7245.
+2026-06-29 15:26:55.661 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:26:56.320 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:26:56.346 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: test.docx to market JPN
+2026-06-29 15:26:58.235 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:26:59.233 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=sample.txt
+2026-06-29 15:26:59.874 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+small_file.txt
+test.docx
+2026-06-29 15:27:00.653 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7245.
+2026-06-29 15:27:01.183 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\sample.txt
+2026-06-29 15:27:03.286 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\sample.txt
+Transmitting file data .done
+Committing transaction...
+Committed revision 7246.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:27:03.294 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: sample.txt to market JPN
+2026-06-29 15:27:03.927 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=sample.docx
+2026-06-29 15:27:04.507 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:27:05.022 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7246.
+2026-06-29 15:27:05.239 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\sample.docx
+2026-06-29 15:27:06.641 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\sample.docx
+Transmitting file data .done
+Committing transaction...
+Committed revision 7247.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:27:06.659 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: sample.docx to market JPN
+2026-06-29 15:27:07.628 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=sample.pdf
+2026-06-29 15:27:09.149 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:27:09.779 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7247.
+2026-06-29 15:27:09.980 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\sample.pdf
+2026-06-29 15:27:11.351 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\sample.pdf
+Transmitting file data .done
+Committing transaction...
+Committed revision 7248.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:27:11.353 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: sample.pdf to market JPN
+2026-06-29 15:27:12.112 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=sample.png
+2026-06-29 15:27:12.815 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.pdf
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:27:13.335 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7248.
+2026-06-29 15:27:13.608 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\sample.png
+2026-06-29 15:27:15.270 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\sample.png
+Transmitting file data .done
+Committing transaction...
+Committed revision 7249.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:27:15.285 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: sample.png to market JPN
+2026-06-29 15:27:15.760 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=sample.exe
+2026-06-29 15:27:16.262 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:27:16.710 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7249.
+2026-06-29 15:27:17.041 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\sample.exe
+2026-06-29 15:27:18.510 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\sample.exe
+Transmitting file data .done
+Committing transaction...
+Committed revision 7250.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 15:27:18.527 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: sample.exe to market JPN
+2026-06-29 15:28:27.891 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:28:27.983 | http-nio-8081-exec-5raceId | WARN  | 13476 | http-nio-8081-exec-5 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 89411
+2026-06-29 15:28:28.038 | http-nio-8081-exec-5raceId | WARN  | 13476 | http-nio-8081-exec-5 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 609945
+2026-06-29 15:28:28.788 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=USA, fileName=usd_template.docx
+2026-06-29 15:28:29.571 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: usd_template.docx
+2026-06-29 15:28:30.373 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 15:28:30.923 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:28:31.123 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 15:28:31.123 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: usd_template.docx to market USA
+2026-06-29 15:33:42.463 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:33:42.534 | http-nio-8081-exec-7raceId | WARN  | 13476 | http-nio-8081-exec-7 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 314281
+2026-06-29 15:33:42.827 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:33:43.992 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:49:00.943 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:49:01.207 | http-nio-8081-exec-9raceId | WARN  | 13476 | http-nio-8081-exec-9 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 918525
+2026-06-29 15:49:01.588 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:49:03.014 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:49:04.142 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.deleteFile(UD12UploadDeleteTemplateController.java:103) : Received request: DELETE /deleteFile, market=JPN, file=test.docx
+2026-06-29 15:49:05.033 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 15:49:05.715 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: D         C:\temp\svn-working-copy\JPN\test.docx
+2026-06-29 15:49:07.459 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 15:49:07.475 | http-nio-8081-exec-3raceId | ERROR | 13476 | http-nio-8081-exec-3 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: SVN command failed with exit code 1: Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 15:52:39.943 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:52:40.312 | http-nio-8081-exec-1raceId | WARN  | 13476 | http-nio-8081-exec-1 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 218882
+2026-06-29 15:52:42.089 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:52:42.943 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:56:16.041 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:56:16.268 | http-nio-8081-exec-4raceId | WARN  | 13476 | http-nio-8081-exec-4 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 215823
+2026-06-29 15:56:16.805 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:56:17.793 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 15:58:14.405 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 15:58:14.612 | http-nio-8081-exec-6raceId | WARN  | 13476 | http-nio-8081-exec-6 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 118133
+2026-06-29 15:58:15.025 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 15:58:15.832 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:01:09.712 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:01:09.884 | http-nio-8081-exec-8raceId | WARN  | 13476 | http-nio-8081-exec-8 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 175044
+2026-06-29 16:01:10.191 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 16:01:11.159 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:02:54.823 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:02:55.004 | http-nio-8081-exec-10raceId | WARN  | 13476 | http-nio-8081-exec-10 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 104964
+2026-06-29 16:02:55.478 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 16:02:56.542 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:02:57.427 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.deleteFile(UD12UploadDeleteTemplateController.java:103) : Received request: DELETE /deleteFile, market=JPN, file=test.docx
+2026-06-29 16:02:58.195 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:02:58.211 | http-nio-8081-exec-1raceId | ERROR | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: File not found in working copy: C:\temp\svn-working-copy/JPN/test.docx
+2026-06-29 16:07:43.806 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:07:43.959 | http-nio-8081-exec-2raceId | WARN  | 13476 | http-nio-8081-exec-2 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 288536
+2026-06-29 16:07:45.664 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.getFileList(UD12UploadDeleteTemplateController.java:86) : Received request: GET /getFileList, market=JPN
+2026-06-29 16:07:46.464 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:07:47.142 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.deleteFile(UD12UploadDeleteTemplateController.java:103) : Received request: DELETE /deleteFile, market=JPN, file=test.docx
+2026-06-29 16:07:47.861 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:07:47.864 | http-nio-8081-exec-5raceId | ERROR | 13476 | http-nio-8081-exec-5 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.deleteFile(UD12UploadDeleteTemplateServiceImpl.java:133) : Failed to delete file test.docx from market JPN: File not found in working copy: C:\temp\svn-working-copy/JPN/test.docx
+2026-06-29 16:12:40.091 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:12:40.279 | http-nio-8081-exec-6raceId | WARN  | 13476 | http-nio-8081-exec-6 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 296185
+2026-06-29 16:12:41.143 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=../../etc/passwd
+2026-06-29 16:12:41.710 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:12:42.194 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:12:42.194 | http-nio-8081-exec-7raceId | ERROR | 13476 | http-nio-8081-exec-7 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:17:17.220 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:17:17.235 | http-nio-8081-exec-8raceId | WARN  | 13476 | http-nio-8081-exec-8 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 276774
+2026-06-29 16:17:17.633 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=../../etc/passwd
+2026-06-29 16:17:18.282 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:17:18.947 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:17:18.947 | http-nio-8081-exec-9raceId | ERROR | 13476 | http-nio-8081-exec-9 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:18:07.739 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=../../etc/passwd
+2026-06-29 16:18:08.190 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:18:08.825 | http-nio-8081-exec-10raceId | INFO  | 13476 | http-nio-8081-exec-10 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:18:08.841 | http-nio-8081-exec-10raceId | ERROR | 13476 | http-nio-8081-exec-10 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd (指定されたパスが見つかりません。)
+2026-06-29 16:20:19.437 | http-nio-8081-exec-3raceId | INFO  | 13476 | http-nio-8081-exec-3 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:20:19.448 | http-nio-8081-exec-3raceId | WARN  | 13476 | http-nio-8081-exec-3 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 182158
+2026-06-29 16:20:20.756 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=../../etc/passwd.txt
+2026-06-29 16:20:22.019 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:20:23.356 | http-nio-8081-exec-1raceId | INFO  | 13476 | http-nio-8081-exec-1 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:20:23.356 | http-nio-8081-exec-1raceId | ERROR | 13476 | http-nio-8081-exec-1 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: C:\temp\svn-working-copy\JPN\..\..\etc\passwd.txt (指定されたパスが見つかりません。)
+2026-06-29 16:20:55.268 | http-nio-8081-exec-2raceId | INFO  | 13476 | http-nio-8081-exec-2 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:21:10.477 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=chat with Claude-AI about JET_full.pdf
+2026-06-29 16:21:11.113 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:21:11.695 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:21:12.075 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+2026-06-29 16:21:13.277 | http-nio-8081-exec-4raceId | INFO  | 13476 | http-nio-8081-exec-4 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data .done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:21:13.277 | http-nio-8081-exec-4raceId | ERROR | 13476 | http-nio-8081-exec-4 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: SVN command failed with exit code 1: Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data .done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:21:52.211 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=Login.txt
+2026-06-29 16:21:53.815 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+a.txt
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:21:54.697 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:21:54.998 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A         C:\temp\svn-working-copy\JPN\Login.txt
+2026-06-29 16:21:56.066 | http-nio-8081-exec-5raceId | INFO  | 13476 | http-nio-8081-exec-5 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ..done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:21:56.066 | http-nio-8081-exec-5raceId | ERROR | 13476 | http-nio-8081-exec-5 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market JPN: SVN command failed with exit code 1: Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ..done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:22:02.443 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=CHN, fileName=Login.txt
+2026-06-29 16:22:03.011 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+b.txt
+chn_template.docx
+react_ud_sql(1).txt
+2026-06-29 16:22:03.477 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7250.
+2026-06-29 16:22:03.695 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: A         C:\temp\svn-working-copy\CHN\Login.txt
+2026-06-29 16:22:04.963 | http-nio-8081-exec-6raceId | INFO  | 13476 | http-nio-8081-exec-6 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 1. Output: Adding         C:\temp\svn-working-copy\CHN\Login.txt
+Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ...done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:22:04.963 | http-nio-8081-exec-6raceId | ERROR | 13476 | http-nio-8081-exec-6 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:85) : Failed to upload file to market CHN: SVN command failed with exit code 1: Adding         C:\temp\svn-working-copy\CHN\Login.txt
+Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Deleting       C:\temp\svn-working-copy\JPN\test.docx
+Transmitting file data ...done
+Committing transaction...
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+�������Ȃ��̂ō폜�͎��s�ł��܂���A�Ǘ��҂ɘA�����Ă�������
+2026-06-29 16:33:12.047 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=CHN, fileName=Login.txt
+2026-06-29 16:33:12.990 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Menubk.txt
+b.txt
+chn_template.docx
+react_ud_sql(1).txt
+2026-06-29 16:33:13.872 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7251.
+2026-06-29 16:33:14.058 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 16:33:59.583 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Adding         C:\temp\svn-working-copy\CHN\Login.txt
+Adding         C:\temp\svn-working-copy\JPN\Login.txt
+Adding  (bin)  C:\temp\svn-working-copy\JPN\chat with Claude-AI about JET_full.pdf
+Transmitting file data ...done
+Committing transaction...
+Committed revision 7252.
+
+Warning: VisualSVN Server license expired. Please contact your system administrator.
+2026-06-29 16:33:59.593 | http-nio-8081-exec-7raceId | INFO  | 13476 | http-nio-8081-exec-7 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: Login.txt to market CHN
+2026-06-29 16:59:02.487 | http-nio-8081-exec-8raceId | INFO  | 13476 | http-nio-8081-exec-8 | com.web.app.controller.UD12UploadDeleteTemplateController.getMarkets(UD12UploadDeleteTemplateController.java:52) : Received request: GET /getMarket
+2026-06-29 16:59:02.519 | http-nio-8081-exec-8raceId | WARN  | 13476 | http-nio-8081-exec-8 | com.alibaba.druid.pool.DruidAbstractDataSource.testConnectionInternal(DruidAbstractDataSource.java:1489) : discard long time none received connection. , jdbcUrl : jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC, version : 1.2.5, lastPacketReceivedIdleMillis : 2287249
+2026-06-29 16:59:08.703 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.controller.UD12UploadDeleteTemplateController.uploadFile(UD12UploadDeleteTemplateController.java:70) : Received request: POST /uploadFile, market=JPN, fileName=10MB_file.docx
+2026-06-29 16:59:10.206 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 10MB_file.docx
+Login.txt
+a.txt
+chat with Claude-AI about JET_full.pdf
+new_template.docx
+normal_file.docx
+sample.docx
+sample.exe
+sample.pdf
+sample.png
+sample.txt
+small_file.txt
+test.docx
+2026-06-29 16:59:11.125 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: Updating 'C:\temp\svn-working-copy':
+At revision 7252.
+2026-06-29 16:59:11.551 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 16:59:12.075 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.tool.SvnUtil.executeCommand(SvnUtil.java:92) : SVN command executed. Exit code: 0. Output: 
+2026-06-29 16:59:12.078 | http-nio-8081-exec-9raceId | INFO  | 13476 | http-nio-8081-exec-9 | com.web.app.service.impl.UD12UploadDeleteTemplateServiceImpl.uploadFile(UD12UploadDeleteTemplateServiceImpl.java:82) : File uploaded successfully: 10MB_file.docx to market JPN

@@ -1,116 +1,143 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Menu.css';
 
 interface MenuItem {
+  id: number;
   label: string;
-  path?: string;
+  path: string;
+  category: string;
 }
 
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
+const menuItems: MenuItem[] = [
+  {
+    id: 1,
+    label: 'Generate>>Generate Doc',
+    path: '/generate/doc',
+    category: 'Generate Document'
+  },
+  {
+    id: 2,
+    label: 'Admin>>Update user defined variables (rules)',
+    path: '/admin/update-variables',
+    category: 'Admin'
+  },
+  {
+    id: 3,
+    label: 'Admin>>Existing HDoc variables',
+    path: '/admin/hdoc-variables',
+    category: 'Admin'
+  },
+  {
+    id: 4,
+    label: 'Admin>>Upload/Delete template',
+    path: '/UD12UploadDeletetemplate',
+    category: 'Admin'
+  },
+  {
+    id: 5,
+    label: 'Admin>>List available templates',
+    path: '/admin/list-templates',
+    category: 'Admin'
+  },
+  {
+    id: 6,
+    label: 'Admin>>VPPS Vin plate',
+    path: '/admin/vpps-vin-plate',
+    category: 'Admin'
+  },
+  {
+    id: 7,
+    label: 'Admin>>AD/CA Change',
+    path: '/admin/ad-ca-change',
+    category: 'Admin'
+  },
+  {
+    id: 8,
+    label: 'User Administration>>HDoc User Administration',
+    path: '/user-admin/hdoc-user-admin',
+    category: 'User Administration'
+  },
+  {
+    id: 9,
+    label: 'User Administration>>HDoc User Doc Administration',
+    path: '/user-admin/hdoc-doc-admin',
+    category: 'User Administration'
+  },
+  {
+    id: 10,
+    label: 'User Administration>>Search User',
+    path: '/user-admin/search-user',
+    category: 'User Administration'
+  },
+  {
+    id: 11,
+    label: 'User Administration>>Change Password',
+    path: '/user-admin/change-password',
+    category: 'User Administration'
+  },
+  {
+    id: 12,
+    label: 'Documentation>>User Guide',
+    path: '/documentation/user-guide',
+    category: 'Documentation'
+  }
+];
 
-const Menu: React.FC = () => {
-  const menuSections: MenuSection[] = [
-    {
-      title: 'Generate Document',
-      items: [
-        { label: 'Generate Doc' },
-        { label: 'Generate in Batch' },
-        { label: 'Regdata Archive' },
-        { label: 'Regdata Batch' },
-      ],
-    },
-    {
-      title: 'Admin',
-      items: [
-        { label: 'Update user defined variables (rules)' },
-        { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
-        { label: 'Unlock Document' },
-        { label: 'HDoc Number Series' },
-        { label: 'Upload/Delete template' },
-        { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
-      ],
-    },
-    {
-      title: 'User Administration',
-      items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
-        { label: 'Change Password' },
-        { label: 'User Position' },
-      ],
-    },
-    {
-      title: 'Archive',
-      items: [
-        { label: 'Search' },
-        { label: 'Upload Document' },
-      ],
-    },
-    {
-      title: 'Documentation',
-      items: [
-        { label: 'User Guide' },
-        { label: 'AD/CA Change Guide' },
-        { label: 'Vin plate Guide FM/FH' },
-        { label: 'Archive Guide' },
-        { label: 'Privacy' },
-      ],
-    },
-  ];
+function Menu() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userID = location.state?.userID || localStorage.getItem('userID');
 
-  const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+  const handleMenuClick = (path: string) => {
+    navigate(path);
   };
 
-  return (
-    <div className="menu-container">
-      <div className="menu-header">
-        <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-            const parent = (e.target as HTMLImageElement).parentElement;
-            if (parent) {
-              const textLogo = document.createElement('div');
-              textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
-              parent.appendChild(textLogo);
-            }
-          }}
-        />
-      </div>
+  // 按分类分组菜单项
+  const groupedMenus = menuItems.reduce(
+    (acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    },
+    {} as Record<string, MenuItem[]>
+  );
 
-      <div className="menu-content">
-        {menuSections.map((section, index) => (
-          <div key={index} className="menu-section">
-            <h3 className="section-title">{section.title}</h3>
-            <ul className="menu-list">
-              {section.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex} 
-                  className="menu-item"
-                  onClick={() => handleMenuItemClick(item)}
-                >
-                  <span className="menu-arrow">»</span>
-                  <span className="menu-label">{item.label}</span>
-                </li>
-              ))}
-            </ul>
+  return (
+    <div className='menu-container'>
+      <div className='menu-box'>
+        <h1 className='menu-title'>Menu</h1>
+
+        {userID && (
+          <div className='user-info'>
+            <span>Welcome, {userID}</span>
           </div>
-        ))}
+        )}
+
+        <div className='menu-content'>
+          {Object.entries(groupedMenus).map(([category, items]) => (
+            <div key={category} className='menu-category'>
+              <h2 className='category-title'>{category}</h2>
+              <ul className='menu-list'>
+                {items.map((item) => (
+                  <li key={item.id} className='menu-item'>
+                    <button
+                      className='menu-link'
+                      onClick={() => handleMenuClick(item.path)}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default Menu;

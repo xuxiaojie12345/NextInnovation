@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.LoginMapper">
+
+    <!-- 用户信息结果映射 -->
+    <resultMap id="userResultMap" type="com.web.app.entity.HdocUserInfor">
+        <result column="USERID" property="userid"/>
+        <result column="PASSWORD" property="password"/>
+        <result column="USERNAME" property="username"/>
+        <result column="RESPONSIBLE" property="responsible"/>
+        <result column="USERPOSITION" property="userposition"/>
+        <result column="E-MMAIL" property="eMmail"/>
+    </resultMap>
+
+    <!-- 根据用户ID和密码查询用户信息 -->
+    <select id="findByUserIdAndPassword" resultMap="userResultMap">
+        SELECT USERID, PASSWORD, USERNAME
+        FROM hdoc_user_infor
+        WHERE USERID = #{userId, jdbcType=VARCHAR}
+          AND PASSWORD = #{password, jdbcType=VARCHAR}
+    </select>
+
+</mapper>
