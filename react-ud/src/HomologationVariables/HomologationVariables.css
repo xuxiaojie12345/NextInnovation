@@ -42,12 +42,10 @@
 }
 
 .hv-btn-cell {
+  display: flex;
+  gap: 8px;
   padding: 8px 10px;
   text-align: left;
-}
-
-.hv-btn-cell .btn {
-  margin-right: 6px;
 }
 
 /* ═══════════════════════════════════════════

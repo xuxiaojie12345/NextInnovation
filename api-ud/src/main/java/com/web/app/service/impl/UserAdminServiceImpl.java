@@ -21,6 +21,16 @@ public class UserAdminServiceImpl implements UserAdminService {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("userId", userid);
 
+        // 查询用户扩展信息（职位、邮箱）
+        Map<String, Object> userInfo = userAdminMapper.selectUserInfo(userid);
+        if (userInfo != null) {
+            result.put("userPosition", userInfo.get("USERPOSITION"));
+            result.put("email", userInfo.get("EMAIL"));
+        } else {
+            result.put("userPosition", "");
+            result.put("email", "");
+        }
+
         if (authRecords == null || authRecords.isEmpty()) {
             result.put("username", "");
             result.put("authList", new ArrayList<>());

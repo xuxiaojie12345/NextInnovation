@@ -31,13 +31,4 @@
             UPDATE_PROCESS = 'UD16UpdateHdocAdcaChange'
     </update>
 
-    <update id="reactivateBySerieAndChnr">
-        UPDATE HDOC_ADCA_CHANGE
-        SET ACT = 'Y',
-            UPDATE_DATETIME = NOW(),
-            UPDATE_USER = #{currentUser},
-            UPDATE_PROCESS = 'UD16ReactivateHdocAdcaChange'
-        WHERE SERIE = #{serie} AND CHNR = #{chnr}
-    </update>
-
 </mapper>

@@ -4,10 +4,13 @@ import { api } from '../services/api';
 import '../common/css/common.css';
 import './EDBUserView.css';
 
-interface UserAuthData {
+const OPERATORS = ['=', '!=', '>', '<'];
+
+interface UserData {
   userId: string;
   username: string;
-  authList: { function: string; market: string }[];
+  userPosition?: string;
+  email?: string;
 }
 
 const EDBUserView: React.FC = () => {
@@ -15,54 +18,47 @@ const EDBUserView: React.FC = () => {
   const navigate = useNavigate();
   const state = location.state as { userid?: string } | null;
 
-  const [userid, setUserid] = useState(state?.userid || '');
-  const [userData, setUserData] = useState<UserAuthData | null>(null);
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState([
+    { label: 'Userid', operator: '=' as string, value: '' },
+    { label: 'Responsible', operator: '=' as string, value: '' },
+    { label: 'User Position', operator: '=' as string, value: '' },
+    { label: 'E-mail', operator: '=' as string, value: '' },
+  ]);
 
-  // 如果有从外部传入的 userid，自动查询
+  // 进入画面时获取用户信息并填入输入框
   useEffect(() => {
-    if (state?.userid) {
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state?.userid]);
+    const userId = state?.userid;
+    if (!userId) return;
 
-  const clearMessages = () => setMessage('');
-
-  const handleSearch = async () => {
-    clearMessages();
-
-    const trimmedId = userid.trim();
-    if (!trimmedId) {
-      setMessage('We did not find the userid you entered. Please try again.');
-      return;
-    }
-
-    setIsLoading(true);
-    setUserData(null);
-
-    try {
-      const res = await api.post<UserAuthData>('/user/info', {
-        userid: trimmedId,
-      });
-
-      if (res.code === 200 && res.data) {
-        setUserData(res.data);
-      } else {
-        setMessage('User information not found.');
+    (async () => {
+      try {
+        const res = await api.post<UserData>('/user/info', { userid: userId });
+        if (res.code === 200 && res.data) {
+          const d = res.data;
+          setFilters([
+            { label: 'Userid', operator: '=', value: d.userId },
+            { label: 'Responsible', operator: '=', value: d.username || '' },
+            { label: 'User Position', operator: '=', value: d.userPosition || '' },
+            { label: 'E-mail', operator: '=', value: d.email || '' },
+          ]);
+        }
+      } catch {
+        // 静默失败
       }
-    } catch {
-      setMessage('System error. Please contact administrator.');
-    } finally {
-      setIsLoading(false);
-    }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateFilter = (index: number, field: 'operator' | 'value', val: string) => {
+    setFilters((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: val };
+      return next;
+    });
   };
 
   const handleClear = () => {
-    setUserid('');
-    setUserData(null);
-    clearMessages();
+    setFilters(filters.map((f) => ({ ...f, operator: '=', value: '' })));
   };
 
   const handleBack = () => {
@@ -70,64 +66,40 @@ const EDBUserView: React.FC = () => {
   };
 
   return (
-    <div className="edb-container">
-      <div className="edb-header">
-        <h1>EDB User View</h1>
-      </div>
+      <div className="edb-container">
+        <div className="edb-header">
+          <h1>EDB User View</h1>
+        </div>
 
-      {message && <div className="edb-error">{message}</div>}
+        {/* Clear / Back 在表单最上方 */}
+        <div className="edb-btn-row">
+          <button className="btn" onClick={handleClear}>Clear</button>
+          <button className="btn" onClick={handleBack}>Back</button>
+        </div>
 
-      {/* ── Userid 输入 ── */}
-      <table className="edb-input-table">
-        <tbody>
-          <tr>
-            <td className="edb-label-cell">Userid</td>
-            <td>
+        <div className="edb-filters">
+          {filters.map((row, i) => (
+            <div className="edb-filter-row" key={row.label}>
+              <span className="edb-filter-label">{row.label}</span>
+              <select
+                className="edb-filter-operator"
+                value={row.operator}
+                onChange={(e) => updateFilter(i, 'operator', e.target.value)}
+              >
+                {OPERATORS.map((op) => (
+                  <option key={op} value={op}>{op}</option>
+                ))}
+              </select>
               <input
                 type="text"
-                className="edb-input"
-                value={userid}
-                onChange={(e) => setUserid(e.target.value)}
-                disabled={isLoading}
+                className="edb-filter-input"
+                value={row.value}
+                onChange={(e) => updateFilter(i, 'value', e.target.value)}
               />
-            </td>
-            <td>
-              <button className="btn" onClick={handleSearch} disabled={isLoading}>Search</button>
-            </td>
-            <td>
-              <button className="btn" onClick={handleClear} disabled={isLoading}>Clear</button>
-            </td>
-            <td>
-              <button className="btn" onClick={handleBack} disabled={isLoading}>Back</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* ── 用户信息 ── */}
-      {userData && (
-        <div className="edb-info-section">
-          <table className="edb-info-table">
-            <thead>
-              <tr>
-                <th>Userid</th>
-                <th>Responsible</th>
-                <th>User Position</th>
-                <th>E-mail</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{userData.userId}</td>
-                <td>{userData.username || '-'}</td>
-                <td>-</td>
-                <td>-</td>
-              </tr>
-            </tbody>
-          </table>
+            </div>
+          ))}
         </div>
-      )}
-    </div>
+      </div>
   );
 };
 

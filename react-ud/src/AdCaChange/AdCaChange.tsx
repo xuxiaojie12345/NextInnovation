@@ -60,27 +60,9 @@ const AdCaChange: React.FC = () => {
 
       if (checkRes.code === 200 && checkRes.data) {
         const count = parseInt(checkRes.data.count, 10);
-        const act = checkRes.data.act;
-        if (count > 0 && act === 'Y') {
-          // 已存在且为活性状态 → 不允许新增
+        if (count > 0) {
+          // 已存在 → 不允许新增（无论活性状态）
           setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
-          setIsLoading(false);
-          return;
-        }
-        if (count > 0 && act === 'N') {
-          // 已存在但为非活性状态 → 执行 reactivate（主键冲突不可 insert）
-          const updateUser = localStorage.getItem('userId') || '';
-          const reactivateRes = await api.post('/adca/reactivate', {
-            serie,
-            chnr,
-          });
-          if (reactivateRes.code === 200) {
-            setSuccessMessage('Record added successfully.');
-            setSerieChnr('');
-            setDesc('');
-          } else {
-            setMessage(reactivateRes.message || 'Failed to reactivate record.');
-          }
           setIsLoading(false);
           return;
         }
@@ -190,35 +172,37 @@ const AdCaChange: React.FC = () => {
         <h1>AD/CA Change</h1>
       </div>
 
-      <div className="adca-error">{message}</div>
-      <div className="adca-success">{successMessage}</div>
+      <div className="adca-body">
+        {message && <div className="adca-error">{message}</div>}
+        {successMessage && <div className="adca-success">{successMessage}</div>}
 
-      <div className="adca-form">
-        {/* Serie-Chnr */}
-        <div className="adca-row">
-          <span className="adca-label">Serie-Chnr</span>
-          <input
-            type="text"
-            className="adca-input"
-            value={serieChnr}
-            onChange={(e) => setSerieChnr(e.target.value)}
-            maxLength={15}
-            placeholder="e.g. FH-12345"
-            disabled={isLoading}
-          />
-        </div>
+        <div className="adca-form">
+          {/* Serie-Chnr */}
+          <div className="adca-row">
+            <span className="adca-label">Serie-Chnr</span>
+            <input
+              type="text"
+              className="adca-input"
+              value={serieChnr}
+              onChange={(e) => setSerieChnr(e.target.value)}
+              maxLength={15}
+              placeholder="e.g. FH-12345"
+              disabled={isLoading}
+            />
+          </div>
 
-        {/* Desc */}
-        <div className="adca-row">
-          <span className="adca-label">Desc</span>
-          <input
-            type="text"
-            className="adca-input adca-input-desc"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            maxLength={4000}
-            disabled={isLoading}
-          />
+          {/* Desc */}
+          <div className="adca-row">
+            <span className="adca-label">Desc</span>
+            <input
+              type="text"
+              className="adca-input adca-input-desc"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              maxLength={4000}
+              disabled={isLoading}
+            />
+          </div>
         </div>
 
         {/* Buttons */}

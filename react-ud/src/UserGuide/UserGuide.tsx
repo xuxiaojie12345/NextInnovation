@@ -48,7 +48,7 @@ const UserGuide: React.FC = () => {
             onClick={() => handleLinkClick(link)}
             title={link.disabled ? link.tooltip : ''}
           >
-            <span className="help-link-arrow">»</span>
+            <span className="help-link-arrow">•</span>
             <span className="help-link-text">{link.label}</span>
           </div>
         ))}

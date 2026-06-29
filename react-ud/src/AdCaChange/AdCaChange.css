@@ -3,8 +3,8 @@
    ═══════════════════════════════════════════ */
 
 .adca-container {
-  width: 60%;
-  padding: 0;
+  width: 40%;
+  padding: 4px;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #acb7ee;
 }
@@ -16,15 +16,21 @@
 }
 
 .adca-header h1 {
-  margin: 0;
+  margin: 0 0 4px 0;
   font-size: 14px;
   font-weight: 700;
   color: #333;
 }
 
+/* ── 除标题外的边框包裹 ── */
+.adca-body {
+  border: 1px solid #acb7ee;
+  padding: 0;
+  margin:15px;
+}
+
 /* ── 消息提示 ── */
 .adca-error {
-  min-height: 18px;
   padding: 2px 4px;
   color: #e53935;
   font-size: 12px;
@@ -32,7 +38,6 @@
 }
 
 .adca-success {
-  min-height: 18px;
   padding: 2px 4px;
   color: #389e0d;
   font-size: 12px;
@@ -93,6 +98,7 @@
 .adca-btn-row {
   display: flex;
   gap: 8px;
-  padding: 12px 0;
-  margin-top: 8px;
+  padding: 8px 10px;
+  background-color: #f1f3ff;
+  border-top: 1px solid #acb7ee;
 }

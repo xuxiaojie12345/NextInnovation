@@ -42,51 +42,63 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
       </div>
 
       <div className="dpg-content">
-        {/* Quick Guides 卡片展示区（上部） */}
-        <div className="dpg-link-section">
-          <div className="dpg-link-item">
-            <span className="dpg-link-arrow">»</span>
-            <span className="dpg-link">Download and Print Quick Guides</span>
-          </div>
-          {QUICK_GUIDES.map((name) => (
-            <div className="dpg-link-item" key={name}>
-              <span className="dpg-link-arrow">»</span>
-              <span className="dpg-link">{name}</span>
+        <div className="dpg-body">
+          {/* Back 单独一列在左侧 */}
+          <div className="dpg-back-column">
+            <div className="dpg-link-item dpg-back-link" onClick={handleBack}>
+              <span className="dpg-link">Back</span>
             </div>
-          ))}
-        </div>
-
-        {/* Volvo 3P Quick Guides 链接列表（下部） */}
-        <div className="dpg-link-section dpg-volvo-section">
-          {VOLVO_3P_GUIDES.map((name) => (
-            <div className="dpg-link-item" key={name}>
-              <span className="dpg-link-arrow">»</span>
-              <span className="dpg-link">{name}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Checkboxes */}
-        <div className="dpg-checkbox-section">
-          <div className="dpg-checkbox-item">
-            <label className="dpg-checkbox-label">
-              <input
-                type="checkbox"
-                checked={isPrintChecked}
-                onChange={(e) => setIsPrintChecked(e.target.checked)}
-              />
-              <span>To print do the following</span>
-            </label>
           </div>
-          <div className="dpg-checkbox-item">
-            <label className="dpg-checkbox-label">
-              <input
-                type="checkbox"
-                checked={isFoldChecked}
-                onChange={(e) => setIsFoldChecked(e.target.checked)}
-              />
-              <span>To fold do the following</span>
-            </label>
+
+          {/* 列表区域在右侧 */}
+          <div className="dpg-list-column">
+            {/* Quick Guides 卡片展示区（上部） */}
+            <div className="dpg-link-section">
+              <div className="dpg-link-item">
+                {/* <span className="dpg-link-arrow">•</span> */}
+                <span className="dpg-link">Download and Print Quick Guides</span>
+              </div>
+              {QUICK_GUIDES.map((name) => (
+                <div className="dpg-link-item" key={name}>
+                  <span className="dpg-link-arrow">•</span>
+                  <span className="dpg-link">{name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Volvo 3P Quick Guides 链接列表（下部） */}
+            <div className="dpg-link-section dpg-volvo-section">
+              {VOLVO_3P_GUIDES.map((name) => (
+                <div className="dpg-link-item" key={name}>
+                  <span className="dpg-link-arrow">•</span>
+                  <span className="dpg-link">{name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Checkboxes */}
+            <div className="dpg-checkbox-section">
+              <div className="dpg-checkbox-item">
+                <label className="dpg-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={isPrintChecked}
+                    onChange={(e) => setIsPrintChecked(e.target.checked)}
+                  />
+                  <span>To print do the following</span>
+                </label>
+              </div>
+              <div className="dpg-checkbox-item">
+                <label className="dpg-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={isFoldChecked}
+                    onChange={(e) => setIsFoldChecked(e.target.checked)}
+                  />
+                  <span>To fold do the following</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -115,10 +127,6 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
           </div>
         )}
 
-        {/* Back */}
-        <div className="dpg-back-row">
-          <button className="btn" onClick={handleBack}>Back</button>
-        </div>
       </div>
     </div>
   );

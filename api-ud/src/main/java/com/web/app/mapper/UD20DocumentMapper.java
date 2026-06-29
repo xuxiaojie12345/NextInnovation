@@ -8,5 +8,5 @@ import java.util.Map;
 @Mapper
 public interface UD20DocumentMapper {
 
-    List<Map<String, Object>> selectDocumentList();
+    List<Map<String, Object>> selectDocumentList(Map<String, String> params);
 }

@@ -11,6 +11,8 @@ public interface UserAdminMapper {
 
     List<Map<String, Object>> selectUserAuth(@Param("userid") String userid);
 
+    Map<String, Object> selectUserInfo(@Param("userid") String userid);
+
     int deleteFunctionAuth(@Param("userid") String userid);
 
     int deleteMarketAuth(@Param("userid") String userid);

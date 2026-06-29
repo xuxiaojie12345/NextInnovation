@@ -28,9 +28,5 @@ public class ADChangeServiceImpl implements ADChangeService {
         return adChangeMapper.updateAllActToN();
     }
 
-    @Override
-    public int reactivate(String serie, String chnr) {
-        String currentUser = "SYSTEM";
-        return adChangeMapper.reactivateBySerieAndChnr(serie, chnr, currentUser);
-    }
+
 }

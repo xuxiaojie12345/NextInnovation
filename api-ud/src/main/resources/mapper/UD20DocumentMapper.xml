@@ -3,7 +3,18 @@
 <mapper namespace="com.web.app.mapper.UD20DocumentMapper">
 
     <select id="selectDocumentList" resultType="map">
-        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME FROM HDOC_DOCUMENT_LIST
+        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
+        FROM HDOC_DOCUMENT_LIST
+        WHERE 1=1
+        <if test="doctype != null and doctype != ''">
+            AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
+        </if>
+        <if test="registerUser != null and registerUser != ''">
+            AND REGISTER_USER LIKE CONCAT('%', #{registerUser}, '%')
+        </if>
+        <if test="registerDatetime != null and registerDatetime != ''">
+            AND REGISTER_DATETIME LIKE CONCAT('%', #{registerDatetime}, '%')
+        </if>
     </select>
 
 </mapper>

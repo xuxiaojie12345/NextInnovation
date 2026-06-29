@@ -25,15 +25,19 @@ const MarketDocumentSettingsResultList: React.FC = () => {
     (async () => {
       setIsLoading(true);
       try {
-        const res = await api.post<{ documentList: DocumentRecord[] }>('/ud20/getDocumentList', {
+        const res = await api.post<{ documentList: any[] }>('/ud20/getDocumentList', {
           doctype: state?.doctype || '',
           registerUser: state?.registerUser || '',
           registerDatetime: state?.registerDatetime || '',
         });
         if (res.code === 200 && res.data) {
-          const docs = (res.data.documentList || []).map((d) => ({
-            ...d,
-            businessUnit: 'BU',
+          const rawList = res.data.documentList || [];
+          // MyBatis 返回大写字段名，映射为驼峰
+          const docs: DocumentRecord[] = rawList.map((d: any) => ({
+            doctype: d.DOCTYPE ?? '',
+            businessUnit: d.BUSINESS_UNIT ?? 'BU',
+            registerUser: d.REGISTER_USER ?? '',
+            registerDatetime: d.REGISTER_DATETIME ? String(d.REGISTER_DATETIME).substring(0, 10) : '',
           }));
           setResults(docs);
           if (docs.length === 0) {
@@ -66,7 +70,13 @@ const MarketDocumentSettingsResultList: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/menu/market-document-setting');
+    navigate('/menu/market-document-setting', {
+      state: {
+        doctype: state?.doctype || '',
+        registerUser: state?.registerUser || '',
+        registerDatetime: state?.registerDatetime || '',
+      },
+    });
   };
 
   const handlePrint = () => {

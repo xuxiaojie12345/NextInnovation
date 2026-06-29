@@ -39,12 +39,10 @@
 }
 
 .ehv-btn-cell {
+  display: flex;
+  gap: 8px;
   padding: 8px 10px;
   text-align: left;
-}
-
-.ehv-btn-cell .btn {
-  margin-right: 6px;
 }
 
 /* ═══════════════════════════════════════════

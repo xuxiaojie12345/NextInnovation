@@ -81,35 +81,6 @@ public class ADChangeController {
         }
     }
 
-    @PostMapping("/reactivate")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> reactivateHdocAdcaChange(
-            @RequestBody Map<String, String> request) {
-        try {
-            String serie = request.get("serie");
-            String chnr = request.get("chnr");
-
-            if (serie == null || chnr == null) {
-                return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(400, "Serie and CHNR are required."));
-            }
-
-            int result = adChangeService.reactivate(serie, chnr);
-            if (result > 0) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("serie", serie);
-                data.put("chnr", chnr);
-                data.put("act", "Y");
-                return ResponseEntity.ok(ApiResponse.success(data));
-            } else {
-                return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, "Record not found for reactivation."));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                .body(ApiResponse.error(500, "System error. Please contact administrator."));
-        }
-    }
-
     @PostMapping("/update")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateHdocAdcaChange() {
         try {

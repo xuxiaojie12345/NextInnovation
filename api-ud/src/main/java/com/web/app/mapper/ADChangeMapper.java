@@ -14,7 +14,4 @@ public interface ADChangeMapper {
                @Param("reason") String reason, @Param("currentUser") String currentUser);
 
     int updateAllActToN();
-
-    int reactivateBySerieAndChnr(@Param("serie") String serie, @Param("chnr") String chnr,
-                                  @Param("currentUser") String currentUser);
 }

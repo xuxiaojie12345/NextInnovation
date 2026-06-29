@@ -63,12 +63,10 @@
 }
 
 .ehvr-btn-cell {
+  display: flex;
+  gap: 8px;
   padding: 8px 10px;
   text-align: left;
-}
-
-.ehvr-btn-cell .btn {
-  margin-right: 6px;
 }
 
 /* ── テーブル外枠 ── */

@@ -195,22 +195,18 @@
 
 /* ── ボタンエリア ── */
 .hv-result-btn-table {
-  width: calc(100% - 20px);
+  width: 100%;
   border-collapse: collapse;
-  border: 2px solid #acb7ee;
-  border-left: none;
-  border-right: none;
+  border-top: 2px solid #acb7ee;
+  border-bottom: 2px solid #acb7ee;
   background-color: #f1f3ff;
-  margin: 10px;
 }
 
 .hv-result-btn-cell {
+  display: flex;
+  gap: 8px;
   padding: 8px 10px;
   text-align: left;
-}
-
-.hv-result-btn-cell .btn {
-  margin-right: 6px;
 }
 
 

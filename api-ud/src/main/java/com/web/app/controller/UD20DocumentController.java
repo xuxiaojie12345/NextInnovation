@@ -17,9 +17,10 @@ public class UD20DocumentController {
     private UD20DocumentService ud20DocumentService;
 
     @PostMapping("/getDocumentList")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getDocumentList() {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getDocumentList(
+            @RequestBody Map<String, String> params) {
         try {
-            List<Map<String, Object>> documentList = ud20DocumentService.getDocumentList();
+            List<Map<String, Object>> documentList = ud20DocumentService.getDocumentList(params);
             Map<String, Object> data = new HashMap<>();
             data.put("documentList", documentList != null ? documentList : new ArrayList<>());
             return ResponseEntity.ok(ApiResponse.success(data));
