@@ -23,6 +23,9 @@ const UD24 = React.memo(() => {
 
   return (
     <div className="ud24-container">
+      <header className="ud24-page-header">
+        <div className="ud24-page-header-logo">VOLVO</div>
+      </header>
       <main className="ud24-main">
         <div className="ud24-card">
           <h1 className="ud24-page-title">HDoc Help</h1>

@@ -112,6 +112,9 @@ const UD19 = React.memo(() => {
 
   return (
     <div className="ud19-container">
+      <header className="ud19-header">
+        <div className="ud19-header-logo">VOLVO</div>
+      </header>
       <main className="ud19-main">
         <div className="ud19-card">
           <h1 className="ud19-page-title">Search HDoc User</h1>

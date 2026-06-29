@@ -175,6 +175,9 @@ const UD11 = React.memo(() => {
   // ===== 渲染 =====
   return (
     <div className="ud11-container">
+      <header className="ud11-header">
+        <div className="ud11-header-logo">VOLVO</div>
+      </header>
       <main className="ud11-main">
         <div className="ud11-card">
           <h1 className="ud11-page-title">

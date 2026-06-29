@@ -88,6 +88,9 @@ const UD13 = React.memo(() => {
 
   return (
     <div className="ud13-container">
+      <header className="ud13-header">
+        <div className="ud13-header-logo">VOLVO</div>
+      </header>
       <main className="ud13-main">
         <div className="ud13-card">
           <h1 className="ud13-page-title">HDoc Template Check</h1>

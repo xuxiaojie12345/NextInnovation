@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部设计UD12</title>
+      <title>内部设计UD10</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="uploaddelete-template详细设计说明书">Upload&amp;Delete template详细设计说明书 </h1>
+<h1 id="existing-hdoc-variables详细设计说明书">Existing HDoc Variables详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD12</th>
+<th style="text-align:left">UD10</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,9 +40,9 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">HDoc模板管理 (Template Mgmt)</td>
+<td style="text-align:left">认证参数查询与维护 (Homo Vars Maint)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-26</td>
+<td style="text-align:left">2026-05-25</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
@@ -53,20 +53,20 @@
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块的核心功能是提供对车辆铭牌（VIN Plate）模板文件的上传、删除和校验操作。用户可通过该页面将模板文件上传至指定市场目录，或从目录中移除不再使用的模板，并在上传前进行格式校验。</p>
+<p>本模块的核心功能是提供对 <code>HDOC_VARIABLES</code> 表中认证参数（Homologation Variables）的查询、新增、更新、删除及导出操作。用户可通过输入条件进行筛选，并执行 CRUD 操作，支持数据批量管理。</p>
 <ul>
-<li><strong>目标</strong>：实现模板文件的集中化管理，确保文件格式合规（.rtf），并按市场分类存储。</li>
+<li><strong>目标</strong>：提供便捷的变量维护入口，确保数据完整性（Variable 必填、唯一性校验），并提供 CSV 导出功能以满足报表需求。</li>
 <li><strong>安全性</strong>：
 <ul>
-<li>删除操作需经过前端二次确认。</li>
+<li>“Variable” 字段在增改时为必填项。</li>
+<li>导出文件不包含敏感信息（如内部 ID）。</li>
 </ul>
 </li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>提供清晰的上传与删除区域划分。</li>
-<li>支持市场选择，确保模板按区域分类存储。</li>
-<li>提供模板校验链接，引导用户先校验再上传。</li>
-<li>所有操作均有明确的成功/失败反馈提示。</li>
+<li>查询条件字段清晰布局，便于快速定位。</li>
+<li>支持“Add/Update/Delete”按钮联动控制必填项提示。</li>
+<li>所有操作均有明确反馈提示（成功/失败消息）。</li>
 </ul>
 </li>
 </ul>
@@ -90,88 +90,148 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Template File</strong></td>
-<td style="text-align:left">File Input</td>
+<td style="text-align:left"><strong>Variable</strong></td>
+<td style="text-align:left">TextField</td>
 <td style="text-align:center">Y</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left"></td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Market (Upload)</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:center">3</td>
+<td style="text-align:center">30</td>
 <td style="text-align:center">Input</td>
 <td style="text-align:left">半角英数字+記号</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">JPN</td>
+<td style="text-align:center">空 (Empty)</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">选项：JPN, EU, US 等</td>
+<td style="text-align:left">Add/Update 时必填</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Upload file</strong></td>
+<td style="text-align:left"><strong>Type</strong></td>
+<td style="text-align:left">Pull-downList</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">选项：VDA, User Defined</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Description</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Created by user</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">自动填充，不可编辑</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Date</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">日付</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">自动填充，不可编辑</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Search</strong></td>
 <td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">触发上传流程</td>
+<td style="text-align:left">触发查询跳转</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Market (Delete)</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">选项同上传，用于筛选待删除模板</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Templates</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
+<td style="text-align:left"><strong>Clear</strong></td>
+<td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">动态加载，依赖 Market (Delete) 的选择</td>
+<td style="text-align:left">清空输入框</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Back</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">返回上一页面</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Add</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">新增记录</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Update</strong></td>
+<td style="text-align:left">Button</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">修改现有记录</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Delete</strong></td>
 <td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">触发删除流程</td>
+<td style="text-align:left">删除当前记录</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Check Template Link</strong></td>
-<td style="text-align:left">Link</td>
+<td style="text-align:left"><strong>Excel</strong></td>
+<td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">文本：“Check Template (Only for rtf files)”，跳转至校验页</td>
+<td style="text-align:left">导出 CSV 文件</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ErrorMessage</strong></td>
@@ -190,51 +250,44 @@
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>Templates 联动</strong>：当 <code>Market (Delete)</code> 改变时，应异步请求后端获取该市场下的模板列表并填充 <code>Templates</code> 下拉框。</li>
+<li><strong>Variable 必填</strong>：仅在点击 Add 或 Update 时强制校验。</li>
+<li><strong>Type 选项</strong>：固定为 <code>VDA</code> 和 <code>User Defined</code>，可由前端硬编码或从字典接口获取。</li>
+<li><strong>只读字段</strong>：<code>Created by user</code> 和 <code>Date</code> 在新增/编辑模式下应显示为禁用状态或纯文本。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在用户点击 <strong>[Upload file]</strong> 或 <strong>[Delete]</strong> 按钮时执行。</p>
+<p>所有校验逻辑均在用户点击 <strong>[Add]</strong>, <strong>[Update]</strong>, <strong>[Delete]</strong>, <strong>[Search]</strong> 或 <strong>[Excel]</strong> 按钮时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <ol>
 <li><strong>开始</strong>：用户点击操作按钮。</li>
-<li><strong>前置处理</strong>：获取表单数据或选中项。</li>
-<li><strong>空值/格式校验 (Frontend Check)</strong>：
+<li><strong>前置处理</strong>：获取表单数据或选中行数据。</li>
+<li><strong>空值/状态校验 (Frontend Check)</strong>：
 <ul>
-<li><strong>上传操作</strong>：
+<li>若点击 <strong>Add</strong> 或 <strong>Update</strong>：
 <ul>
-<li>若未选择文件：设置 <code>ErrorMessage</code> = <code>NO FILE UPLOADED</code>，<strong>终止</strong>流程。</li>
-<li>若文件大小超过 10MB：设置 <code>ErrorMessage</code> = <code>文件过大，请压缩后上传</code>，<strong>终止</strong>流程。</li>
+<li>检查 <code>Variable</code> 是否为空。</li>
+<li>若为空，设置 <code>ErrorMessage</code> = <code>Variable 是必填项</code>，<strong>终止</strong>流程。</li>
 </ul>
 </li>
-<li><strong>删除操作</strong>：
+<li>若点击 <strong>Delete</strong>：
 <ul>
-<li>若 <code>Market (Delete)</code> 为空：设置 <code>ErrorMessage</code> = <code>请选择市场</code>，<strong>终止</strong>流程。</li>
-<li>若 <code>Templates</code> 为空：设置 <code>ErrorMessage</code> = <code>请选择模板</code>，<strong>终止</strong>流程。</li>
-<li>弹出确认对话框：“Do you really want to delete template?”。若用户取消，<strong>终止</strong>流程。</li>
+<li>检查是否已选中记录（通常通过 Variable 或 ID 判断）。</li>
+<li>若未选中，设置 <code>ErrorMessage</code> = <code>请选择要删除的记录</code>，<strong>终止</strong>流程。</li>
 </ul>
 </li>
 </ul>
 </li>
 <li><strong>API 调用 (Backend Check)</strong>：
 <ul>
-<li><strong>初期表示（Market下拉）</strong>: 调用 <code>GET /api/ud12uploaddeletetemplatapi/ud12selectmarket</code>。</li>
-<li><strong>Upload</strong>: 调用 <code>POST /api/ud12uploaddeletetemplatapi/ud12uploadflie</code>。</li>
-<li><strong>Delete</strong>: 调用 <code>POST /api/ud12uploaddeletetemplatapi/ud12deleteflie</code>。</li>
-<li><strong>Check Link</strong>: 点击链接直接跳转至 <code>/template-check</code>，无需 API 调用。</li>
+<li><strong>Search</strong>: 携带查询条件跳转至结果页（或通过 API 获取列表并在当前页展示，依具体路由设计而定，UD10 描述为“跳转至现有文档参数查询结果页”）。</li>
+<li><strong>Add</strong>: 调用 <code>POST /api/UD10HdocvariablesApi/UD10Add</code>。</li>
+<li><strong>Update</strong>: 调用 <code>POST /api/UD10HdocvariablesApi/UD10Update</code>。</li>
+<li><strong>Delete</strong>: 调用 <code>POST /api/UD10HdocvariablesApi/UD10Delete</code>。</li>
+<li><strong>Excel</strong>: 调用 <code>GET /api/HDOC_VARIABLES/export</code>。</li>
 </ul>
 </li>
-<li><strong>结果处理</strong>：
-<ul>
-<li><strong>成功</strong>：
-<ul>
-<li>上传：提示 <code>TEMPLATE XXX WAS SUCCESSFULLY UPLOADED TO MARKET JPN</code>，清空文件输入框。</li>
-<li>删除：提示 <code>TEMPLATE XXX WAS SUCCESSFULLY DELETE FROM MARKET JPN</code>，刷新 <code>Templates</code> 下拉列表。</li>
-</ul>
-</li>
-<li><strong>失败</strong>：显示后端返回的错误消息。</li>
-</ul>
-</li>
+<li><strong>结果处理</strong>：ud10hdocvariablesapi/ud10a - <strong>成功</strong>：提示“操作成功”，刷新列表或清空表单。ud10hdocvariablesapi/ud10u - <strong>失败</strong>：显示后端返回的错误消息（如主键冲突、记ud10hdocvariablesapi/ud10d<br>
+hdoc_variables</li>
 </ol>
 <h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
 <table>
@@ -251,115 +304,133 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">Click Upload</td>
-<td style="text-align:center">File Selected</td>
-<td style="text-align:center"><code>File == null</code></td>
-<td style="text-align:center"><code>NO FILE UPLOADED</code></td>
+<td style="text-align:center">Click Add/Update</td>
+<td style="text-align:center">Variable</td>
+<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
+<td style="text-align:center"><code>Variable 是必填项</code></td>
+<td style="text-align:center">显示 ErrorMessage，焦点停留</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">API Response (Add)</td>
+<td style="text-align:center">Variable Uniqueness</td>
+<td style="text-align:center">变量已存在 (409)</td>
+<td style="text-align:center"><code>Variant already exists. Please enter the correct content</code></td>
 <td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:center">Click Upload</td>
-<td style="text-align:center">File Size</td>
-<td style="text-align:center"><code>Size &gt; 10MB</code></td>
-<td style="text-align:center"><code>文件过大，请压缩后上传</code></td>
+<td style="text-align:center">API Response (Update)</td>
+<td style="text-align:center">Record Existence</td>
+<td style="text-align:center">记录不存在 (404)</td>
+<td style="text-align:center"><code>Variant does not exist. Please enter the correct content</code></td>
 <td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 <tr>
 <td style="text-align:center">4</td>
-<td style="text-align:center">Click Delete</td>
-<td style="text-align:center">Market</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
-<td style="text-align:center"><code>请选择市场</code></td>
+<td style="text-align:center">API Response (Delete)</td>
+<td style="text-align:center">Record Existence</td>
+<td style="text-align:center">记录不存在 (404)</td>
+<td style="text-align:center"><code>Variant does not exist. Please enter the correct content</code></td>
 <td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 <tr>
 <td style="text-align:center">5</td>
-<td style="text-align:center">Click Delete</td>
-<td style="text-align:center">Template</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
-<td style="text-align:center"><code>请选择模板</code></td>
+<td style="text-align:center">Click Excel</td>
+<td style="text-align:center">Export Service</td>
+<td style="text-align:center">服务异常 (400/500)</td>
+<td style="text-align:center"><code>无法生成导出文件</code></td>
 <td style="text-align:center">显示 ErrorMessage</td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:center">Click Delete</td>
-<td style="text-align:center">User Confirm</td>
-<td style="text-align:center"><code>Confirmed == false</code></td>
-<td style="text-align:center"><code>操作已取消</code></td>
-<td style="text-align:center">终止流程</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取市场列表初期表示">4.1 获取市场列表（初期表示） </h3>
+<h3 id="41-ud10add-新增">4.1 UD10Add (新增) </h3>
 <ul>
-<li><strong>功能</strong>：获取可供选择的市场列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud12uploaddeletetemplatapi/ud12selectmarket</code></li>
-</ul>
-<h4 id="request">Request </h4>
-<p>无参数</p>
-<h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
-  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"查询成功"</span><span class="token punctuation">,</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"markets"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span> <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"JPN"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"EU"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"US"</span> <span class="token punctuation">}</span><span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre><h3 id="42-template-upload-上传">4.2 Template Upload (上传) </h3>
-<ul>
-<li><strong>功能</strong>：上传 VIN plate 模板文件至指定市场目录。</li>
+<li><strong>功能</strong>：新增一条认证参数记录。</li>
 <li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud12uploaddeletetemplatapi/ud12uploadflie</code></li>
-</ul>
-<h4 id="request-body-multipartform-data-或-json-with-base64">Request Body (Multipart/Form-Data 或 JSON with Base64) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"file"</span><span class="token operator">:</span> <span class="token string">"base64-encoded-rtf-content..."</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"JPN"</span>
-<span class="token punctuation">}</span>
-</code></pre><h4 id="response-success-201-created">Response Success (201 Created) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"TEMPLATE VIN_PLATE_JPN WAS SUCCESSFULLY UPLOADED TO MARKET JPN"</span>
-<span class="token punctuation">}</span>
-</code></pre><h4 id="response-error-400-bad-request">Response Error (400 Bad Request) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Invalid file type"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Only  files are allowed"</span>
-<span class="token punctuation">}</span>
-</code></pre><h3 id="43-template-delete-删除">4.3 Template Delete (删除) </h3>
-<ul>
-<li><strong>功能</strong>：从指定市场目录删除模板文件。</li>
-<li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud12uploaddeletetemplatapi/ud12deleteflie</code></li>
+<li><strong>Endpoint</strong>: <code>/api/UD10HdocvariablesApi/UD10Add</code></li>
 </ul>
 <h4 id="request-body">Request Body </h4>
+<pre data-role="codeBlock" data-info="jsonud10hdocvariablesapi/ud10a" class="language-jsonud10hdocvariablesapi/ud10a jsonud10hdocvariablesapi/ud10a"><code>{
+  "variable": "ENG_TORQUE",
+  "type": "VDA",
+  "description": "Engine Torque",
+  "createdByUser": "a304598"
+}
+</code></pre><h4 id="response-success-200-ok">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"JPN"</span><span class="token punctuation">,</span>
-  <span class="token property">"templateName"</span><span class="token operator">:</span> <span class="token string">"VIN_PLATE_JPCT"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"登录成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
 <span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400">Response Error (400) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Variant already exists. Please enter the correct content"</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="42-ud10update-更新">4.2 UD10Update (更新) </h3>
+<ul>
+<li><strong>功能</strong>：更新现有记录。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/UD10HdocvariablesApi/UD10Update</code></li>
+</ul>
+<h4 id="request-body-1">Request Body </h4>
+<pre data-role="codeBlock" data-info="jsonud10hdocvariablesapi/ud10u" class="language-jsonud10hdocvariablesapi/ud10u jsonud10hdocvariablesapi/ud10u"><code>{
+  "variable": "ENG_TORQUE",
+  "type": "User Defined",
+  "description": "Updated Engine Torque"
+}
 </code></pre><h4 id="response-success-200-ok-1">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"TEMPLATE VIN_PLATE_JPCT WAS SUCCESSFULLY DELETE FROM MARKET JPN"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
 <span class="token punctuation">}</span>
-</code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
+</code></pre><h4 id="response-error-400-1">Response Error (400) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Template not found"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Variant does not exists. Please enter the correct content"</span>
 <span class="token punctuation">}</span>
-</code></pre><h3 id="44-get-templates-list-获取模板列表---辅助接口">4.4 Get Templates List (获取模板列表 - 辅助接口) </h3>
-<p><em>注：Prompt 中未明确列出此接口，但为了实现“Market (Delete)”联动“Templates”下拉框，必须存在此接口。</em></p>
+</code></pre><h3 id="43-ud10delete-删除">4.3 UD10Delete (删除) </h3>
 <ul>
-<li><strong>功能</strong>：获取指定市场下的模板文件列表。</li>
-<li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/template/list/{market}</code></li>
+<li><strong>功能</strong>：删除指定记录。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/UD10HdocvariablesApi/UD10Delete</code></li>
 </ul>
-<h4 id="response-success-200-ok-2">Response Success (200 OK) </h4>
+<h4 id="request-body-2">Request Body </h4>
+<pre data-role="codeBlock" data-info="jsonud10hdocvariablesapi/ud10d" class="language-jsonud10hdocvariablesapi/ud10d jsonud10hdocvariablesapi/ud10d"><code>{
+  "variable": "ENG_TORQUE"
+}
+</code></pre><h4 id="response-success-200-ok-2">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"templates"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"VIN_PLATE_JPN"</span><span class="token punctuation">,</span> <span class="token string">"DIM_PLATE_JPN"</span><span class="token punctuation">]</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"删除成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-400-2">Response Error (400) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Variant does not exists. Please enter the correct content"</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="44-ud10export-导出">4.4 UD10Export (导出) </h3>
+<ul>
+<li><strong>功能</strong>：导出当前查询结果为 CSV 文件。</li>
+<li><strong>Method</strong>: <code>GET</code></li>
+<li><strong>Endpoint</strong>: <code>/api/HDOC_VARIABLES/export</code></li>
+</ul>
+<h4 id="request-parameters-query">Request Parameters (Query) </h4>
+<pre data-role="codeBlock" data-info="texthdoc_variables" class="language-texthdoc_variables texthdoc_variables"><code>?variable=ENG&amp;type=VDA
+</code></pre><h4 id="response-success-200-ok-3">Response Success (200 OK) </h4>
+<ul>
+<li>Content-Type: <code>text/csv</code></li>
+<li>Content-Disposition: <code>attachment; filename="HDoc_Variables_YYYYMMDD.csv"</code></li>
+<li>Body: [CSV File Stream]</li>
+</ul>
+<h4 id="response-error-400-bad-request">Response Error (400 Bad Request) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Invalid export request"</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"无法生成导出文件"</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
@@ -377,19 +448,24 @@
 <td style="text-align:left"><code>网络连接失败，请检查网络设置</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>文件过大</strong></td>
-<td style="text-align:left">前端校验</td>
-<td style="text-align:left"><code>文件过大，请压缩后上传</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>模板不存在</strong></td>
-<td style="text-align:left">捕获 API 404</td>
-<td style="text-align:left"><code>模板不存在</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>服务器内部错误</strong></td>
+<td style="text-align:left"><strong>数据库异常</strong></td>
 <td style="text-align:left">捕获 Server Error</td>
 <td style="text-align:left"><code>系统繁忙，请稍后再试</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>变量已存在</strong></td>
+<td style="text-align:left">捕获 API 409</td>
+<td style="text-align:left"><code>Variant already exists. Please enter the correct content</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>记录不存在</strong></td>
+<td style="text-align:left">捕获 API 404</td>
+<td style="text-align:left"><code>Variant does not exist. Please enter the correct content</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>导出失败</strong></td>
+<td style="text-align:left">捕获 API 400/500</td>
+<td style="text-align:left"><code>导出失败，请联系管理员</code></td>
 </tr>
 </tbody>
 </table>
@@ -397,26 +473,27 @@
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理 <code>uploadFile</code>, <code>uploadMarket</code>, <code>deleteMarket</code>, <code>deleteTemplate</code>, <code>templateOptions</code> (用于删除下拉框), <code>errorMessage</code>, <code>isLoading</code>。</li>
-<li><code>templateOptions</code> 需在 <code>deleteMarket</code> 变化时通过 <code>useEffect</code> 重新 fetch。</li>
+<li>使用 React State 管理表单数据 <code>formData</code>, <code>errorMessage</code>, <code>isLoading</code>。</li>
+<li>若是列表页内嵌编辑，需管理 <code>dataSource</code> 和 <code>selectedRowKeys</code>。</li>
 </ul>
 </li>
-<li><strong>文件处理</strong>：
+<li><strong>表单校验</strong>：
 <ul>
-<li>若使用 Base64 上传，注意大文件可能导致内存溢出或请求体过大，建议评估是否改用 <code>FormData</code> + <code>axios.post</code>。</li>
+<li>使用 Ant Design Form 或类似库进行 <code>Variable</code> 必填项校验。</li>
+<li><code>Type</code> 下拉框建议使用 <code>&lt;Select&gt;</code> 组件，选项固定。</li>
 </ul>
 </li>
 <li><strong>UI 细节</strong>：
 <ul>
-<li><strong>联动逻辑</strong>：<code>Market (Delete)</code> 选择后，若 <code>Templates</code> 下拉框为空，应显示 Loading 状态直到数据返回。</li>
-<li><strong>删除确认</strong>：使用 <code>Modal.confirm</code> 进行二次确认，标题为“Confirm Delete”，内容为“Do you really want to delete template?”。</li>
-<li><strong>成功提示</strong>：使用 <code>message.success</code> 展示后端返回的具体成功消息（包含文件名和市场）。</li>
+<li><strong>只读字段</strong>：<code>Created by user</code> 和 <code>Date</code> 在编辑模式下应显示为禁用状态。</li>
+<li><strong>按钮状态</strong>：在执行 API 请求期间，所有操作按钮应设为 <code>disabled</code>，防止重复提交。</li>
+<li><strong>删除确认</strong>：点击 Delete 按钮时，必须弹出 <code>Modal.confirm</code> 进行二次确认。</li>
+<li><strong>导出交互</strong>：点击 Excel 按钮后，建议显示 loading 状态，直到文件下载开始或失败。</li>
 </ul>
 </li>
 <li><strong>安全性</strong>：
 <ul>
-<li>后端应严格校验上传文件的格式，不仅仅依赖前端扩展名检查。</li>
-<li>删除接口的 <code>templateName</code> 应防止路径遍历攻击（如 <code>../../etc/passwd</code>），后端应只允许文件名，并拼接到固定的市场目录下。</li>
+<li>删除操作必须使用 <code>Modal.confirm</code> 进行二次确认。</li>
 </ul>
 </li>
 </ol>

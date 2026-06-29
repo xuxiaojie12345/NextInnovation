@@ -841,8 +841,10 @@ const UD08 = React.memo(() => {
 
   return (
     <div className="ud08-container">
-      {/* 主内容 */}
-      <main className="ud08-main ud08-main-noheader">
+      <header className="ud08-header">
+        <div className="ud08-header-logo">VOLVO</div>
+      </header>
+      <main className="ud08-main">
         <div className="ud08-form-card">
           {/* 页面标题 */}
           <h1 className="ud08-page-title">Homologation Variables</h1>

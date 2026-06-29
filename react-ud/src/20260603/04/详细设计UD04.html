@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部设计UD03</title>
+      <title>内部设计UD04</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="generate-homologation-document详细设计说明书">Generate Homologation Document详细设计说明书 </h1>
+<h1 id="generate-doc详细设计说明书">Generate Doc​详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD03</th>
+<th style="text-align:left">UD04</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,9 +40,9 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">认证文档生成查询 (Doc Gen Query)</td>
+<td style="text-align:left">车辆铭牌生成结果 (VIN Plate Result)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-27</td>
+<td style="text-align:left">2026-06-26</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
@@ -53,14 +53,16 @@
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块是认证文档生成流程的入口页面。用户通过输入车辆底盘系列（Chassis series）、底盘编号（Chassis no）和文档类型（Document type），发起文档生成请求。</p>
+<p>本模块是 VPPS 批处理程序生成车辆铭牌（VIN Plate）后的结果展示页面。用于确认生成结果，展示底盘数据、S-Notes、轮胎主数据、变更状态及最终生成的文档链接，并支持后续操作（如下载、修改、查看详情）。</p>
 <ul>
-<li><strong>目标</strong>：提供简洁的查询入口，支持自动回填上次检索条件以提升效率，并校验输入合法性后跳转至生成页面。</li>
+<li><strong>目标</strong>：清晰展示生成结果，提供关键信息的快速访问入口，并通过颜色区分异常状态（如 AD-Change）。</li>
+<li><strong>安全性</strong>：错误信息不暴露系统内部结构，所有通信需通过 HTTPS 加密。</li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>界面简洁，仅包含必要输入项（左侧为入力框名称，右侧为入力框以及下拉框，入力框和下拉框左面的对齐的。底板的三个按钮都为浅蓝色，按钮中的字体为深蓝色）。</li>
-<li>提供“Help”链接便于查阅说明。</li>
-<li>错误信息在页面内明确提示，避免弹窗打断。</li>
+<li>关键信息（Chassis no, Error message）突出显示。</li>
+<li>支持点击链接跳转至详情页或下载文件。</li>
+<li>变更状态以红色高亮显示，提示用户注意。</li>
+<li>提供清晰的系统时间与版本信息。</li>
 </ul>
 </li>
 </ul>
@@ -84,144 +86,286 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Chassis series</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:center">5</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字 (<code>a-z, A-Z, 0-9</code>)</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：JPCT；自动去除首尾空格</td>
-</tr>
-<tr>
 <td style="text-align:left"><strong>Chassis no</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">Y</td>
+<td style="text-align:left">Label/Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">可点击跳转至底盘详情页</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Ordernumber</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Build week</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">10</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角数字 (<code>0-9</code>)</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：028321；自动去除首尾空格</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">-</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Document type</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
+<td style="text-align:left"><strong>Spec week</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">数据源：<code>UD03SelectHdocdocumentlistApi</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Submit</strong></td>
-<td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
+<td style="text-align:center">非活性</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">触发校验与跳转</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Reset</strong></td>
-<td style="text-align:left">Button</td>
+<td style="text-align:left"><strong>Market</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
+<td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">清空表单</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Help</strong></td>
-<td style="text-align:left">Button/Link</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
+<td style="text-align:center">非活性</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">跳转至帮助页面</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Support Mail</strong></td>
+<td style="text-align:left"><strong>Master Market</strong></td>
 <td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center"><a href="mailto:support.tpi@volvo.com">support.tpi@volvo.com</a></td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">固定显示支持邮箱</td>
+<td style="text-align:center">-EU</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">固定值</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>S-Note NO</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">4000</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">显示 S-Notes 编号列表，若无则隐藏</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>S-Note Message</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">256</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">若存在 S-Note，显示红色提示：“The S-Notes above can affect homologation documents.”</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Load Index</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">Tire Master 数据来源</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Modify Doc Link</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">AD-Change 启用时显示红色，否则隐藏或禁用</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Using template</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">显示模板名称</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Replacing parameters</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">40</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">显示被替换参数列表</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Generated document</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">点击下载 .rtf 文件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Date</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">当前系统时间</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>HDoc version</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">当前程序版本</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ErrorMessage</strong></td>
 <td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">256</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
-<td style="text-align:left">任意可见字符</td>
+<td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">动态显示 (Dynamic)</td>
-<td style="text-align:left">仅在出错时显示红色文字</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">显示错误信息，若无则为空</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>半角英数字</strong>：正则表达式 <code>[a-zA-Z0-9]</code></li>
-<li><strong>半角数字</strong>：正则表达式 <code>[0-9]</code></li>
-<li><strong>Document Type 数据源</strong>：页面加载时调用接口获取下拉选项。</li>
+<li><strong>Modify Doc Link</strong>：当 <code>adChangeEnabled</code> 为 <code>true</code> 时，链接文本颜色设为红色（如 <code>#ff4d4f</code>），并允许点击；否则隐藏或置灰。</li>
+<li><strong>S-Note Message</strong>：仅当 <code>sNotes</code> 数组非空时显示。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在用户点击 <strong>[Submit]</strong> 按钮时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
+<h3 id="311-初期处理">3.1.1 初期处理 </h3>
 <ol>
-<li><strong>开始</strong>：用户点击 [Submit] 按钮。</li>
-<li><strong>前置处理</strong>：获取 <code>Chassis series</code>, <code>Chassis no</code>, <code>Document type</code>，执行 <code>trim()</code> 去除首尾空白。</li>
-<li><strong>空值校验 (Frontend Check)</strong>：
+<li><strong>开始</strong>：初期表示场合，接收前画面的参数。</li>
+<li><strong>前置处理</strong>：
 <ul>
-<li>若 <code>Chassis series</code> 为空 <strong>或</strong> <code>Chassis no</code> 为空：
-<ul>
-<li>设置 <code>ErrorMessage</code> = <code>Chassis series and chassis no are required.</code></li>
-<li><strong>终止</strong>流程。</li>
+<li>获取 URL 参数或 State 中的 <code>chassisNo</code>, <code>ordernumber</code>, <code>market</code>。</li>
+<li>执行非空校验。</li>
 </ul>
 </li>
-<li>若 <code>Document type</code> 未选择（值为空或默认占位符）：
+<li><strong>空值校验 (Frontend Check)</strong>：
 <ul>
-<li>设置 <code>ErrorMessage</code> = <code>Please select a document type.</code></li>
-<li><strong>终止</strong>流程。</li>
+<li>若 <code>chassisNo</code> 为空：
+<ul>
+<li>设置 <code>ErrorMessage</code> = <code>无法加载数据，请检查输入</code></li>
+<li><strong>终止</strong>流程，不调用 API。</li>
 </ul>
 </li>
 </ul>
 </li>
 <li><strong>API 调用 (Backend Check)</strong>：
 <ul>
-<li>若前端校验通过，调用后端接口验证底盘编号是否存在（隐含逻辑，根据需求描述“若失败则显示 Chassis no is not exists”）。</li>
-<li><em>注：此处假设存在一个验证接口或在跳转后的页面进行验证，根据UD03描述，此处主要做前端校验和获取下拉列表。若需在提交时验证存在性，需调用特定API。根据模板要求，此处主要描述获取下拉列表的初始化逻辑及提交动作。</em></li>
-<li><strong>修正</strong>：根据需求 5.1.2，页面加载时需调用 <code>UD03SelectHdocdocumentlistApi</code> 获取下拉列表。提交时，若后端验证底盘不存在，则返回错误。</li>
+<li>若校验通过，调用 <code>GET /api/ud04selectgeneratedocumentapi/selectgeneratedocument</code>。</li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>校验/验证成功</strong>：携带参数跳转至 <code>Generate document</code> 页面。</li>
-<li><strong>验证失败</strong>：设置 <code>ErrorMessage</code> = <code>Chassis no is not exists</code>。</li>
+<li><strong>成功 (200)</strong>：
+<ul>
+<li>渲染所有字段。</li>
+<li>若 <code>sNotes</code> 存在，显示 S-Note 列表及红色警告消息。</li>
+<li>若 <code>adChangeEnabled</code> 为 true，将 <code>Modify Doc Link</code> 标红并激活。</li>
+<li>绑定 <code>Generated document</code> 下载链接。</li>
+</ul>
+</li>
+<li><strong>失败 (404/500)</strong>：
+<ul>
+<li>设置 <code>ErrorMessage</code> = <code>数据加载失败，请稍后重试</code> 或具体错误消息（如 <code>Chassis not found</code>）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="312-chassis-no的机能处理">3.1.2 'Chassis no'的机能处理 </h3>
+<ol>
+<li><strong>开始</strong>：Chassis no的link按下。</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：
+<ul>
+<li>该当Chassis的详情页面表示（07_Vehicle Specification画面）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="312-generated-document的机能处理">3.1.2 'Generated document'的机能处理 </h3>
+<ol>
+<li><strong>开始</strong>：Generated document的link按下。</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：
+<ul>
+<li>文件下载（「Vin Plate」的.trf）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="313-modify的机能处理">3.1.3 'Modify'的机能处理 </h3>
+<ol>
+<li><strong>开始</strong>：Modify的link按下。</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：
+<ul>
+<li>迁移到Modify Document画面。</li>
+</ul>
+</li>
 </ul>
 </li>
 </ol>
@@ -240,115 +384,116 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">Click Submit</td>
-<td style="text-align:center">Chassis series</td>
+<td style="text-align:center">Page Mount</td>
+<td style="text-align:center">Chassis no</td>
 <td style="text-align:center"><code>Value == null</code> OR <code>Trim(Value) == ""</code></td>
-<td style="text-align:center"><code>Chassis series and chassis no are required.</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留在该字段</td>
+<td style="text-align:center"><code>无法加载数据，请检查输入</code></td>
+<td style="text-align:center">显示 ErrorMessage，停止加载</td>
 </tr>
 <tr>
 <td style="text-align:center">2</td>
-<td style="text-align:center">Click Submit</td>
-<td style="text-align:center">Chassis no</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>Trim(Value) == ""</code></td>
-<td style="text-align:center"><code>Chassis series and chassis no are required.</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留在该字段</td>
+<td style="text-align:center">API Response</td>
+<td style="text-align:center">Template Existence</td>
+<td style="text-align:center"><code>templateName == null</code></td>
+<td style="text-align:center"><code>Can not find template for doctype VIN-PLATE</code></td>
+<td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:center">Click Submit</td>
-<td style="text-align:center">Document type</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>Value == ""</code></td>
-<td style="text-align:center"><code>Please select a document type.</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留在该字段</td>
+<td style="text-align:center">API Response</td>
+<td style="text-align:center">Rule Match</td>
+<td style="text-align:center"><code>replacedParams</code> 为空且应有值</td>
+<td style="text-align:center"><code>No template rule defined for this truck.</code></td>
+<td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 <tr>
 <td style="text-align:center">4</td>
 <td style="text-align:center">API Response</td>
-<td style="text-align:center">Chassis Existence</td>
-<td style="text-align:center"><code>Status != Success</code> OR <code>Code == 404</code></td>
-<td style="text-align:center"><code>Chassis no is not exists</code></td>
+<td style="text-align:center">Batch Status</td>
+<td style="text-align:center"><code>status == 'FAILED'</code></td>
+<td style="text-align:center"><code>Batch processing failed: Failed to make the Inplate Error reson:XXX</code></td>
 <td style="text-align:center">显示 ErrorMessage</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-ud03selecthdocdocumentlistapi">4.1 UD03SelectHdocdocumentlistApi </h3>
+<h3 id="41-ud04selectgeneratedocumentapi">4.1 UD04SelectGeneratedocumentApi </h3>
 <ul>
-<li><strong>功能</strong>：获取文档类型下拉列表数据。</li>
+<li><strong>功能</strong>：获取指定底盘的车辆铭牌生成结果及相关元数据。</li>
 <li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud03selecthdocdocumentlistapi/types</code></li>
+<li><strong>Endpoint</strong>: <code>/ud04selectgeneratedocumentapi/selectgeneratedocument</code></li>
 </ul>
-<h4 id="request-body">Request Body </h4>
-<p>无参数。</p>
+<h4 id="request-parameters">Request Parameters </h4>
+<ul>
+<li><code>chassisNo</code>: String (Path Param)</li>
+<li><code>ordernumber</code>: String (Path Param)</li>
+<li><code>market</code>: String (Path Param)</li>
+</ul>
 <h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span> <span class="token property">"doctyp"</span><span class="token operator">:</span> <span class="token string">"Dimension Plate"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span> <span class="token property">"doctyp"</span><span class="token operator">:</span> <span class="token string">"VIN Plate"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span> <span class="token property">"doctyp"</span><span class="token operator">:</span> <span class="token string">"COC"</span> <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"chassisNo"</span><span class="token operator">:</span> <span class="token string">"JPCT_013945"</span><span class="token punctuation">,</span>
+  <span class="token property">"ordernumber"</span><span class="token operator">:</span> <span class="token string">"15101319"</span><span class="token punctuation">,</span>
+  <span class="token property">"buildWeek"</span><span class="token operator">:</span> <span class="token string">"2016173"</span><span class="token punctuation">,</span>
+  <span class="token property">"specWeek"</span><span class="token operator">:</span> <span class="token string">"201617"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"IDO"</span><span class="token punctuation">,</span>
+  <span class="token property">"masterMarket"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
+  <span class="token property">"sNotes"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"S161011"</span><span class="token punctuation">,</span> <span class="token string">"S1610174"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"sNoteMessage"</span><span class="token operator">:</span> <span class="token string">"The S-Notes above can affect homologation documents."</span><span class="token punctuation">,</span>
+  <span class="token property">"loadIndex"</span><span class="token operator">:</span> <span class="token string">"FTLI-150"</span><span class="token punctuation">,</span>
+  <span class="token property">"speedIndex"</span><span class="token operator">:</span> <span class="token string">"FTSI-K"</span><span class="token punctuation">,</span>
+  <span class="token property">"adChangeEnabled"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"templateName"</span><span class="token operator">:</span> <span class="token string">"_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf"</span><span class="token punctuation">,</span>
+  <span class="token property">"replacedParams"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"AXLE_CONF"</span><span class="token punctuation">,</span> <span class="token string">"WB_MM"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"generatedFileUrl"</span><span class="token operator">:</span> <span class="token string">"/download/vinplate/JPCT_013945.rtf"</span><span class="token punctuation">,</span>
+  <span class="token property">"date"</span><span class="token operator">:</span> <span class="token string">"2022-12-06 07:30:31"</span><span class="token punctuation">,</span>
+  <span class="token property">"hdocVersion"</span><span class="token operator">:</span> <span class="token string">"4.2.1"</span>
+<span class="token punctuation">}</span>
+</code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Chassis not found"</span>
+<span class="token punctuation">}</span>
 </code></pre><h4 id="response-error-500-internal-server-error">Response Error (500 Internal Server Error) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Internal Server Error"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Failed to load document types"</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Batch processing failed: Failed to make the Inplate Error reson:XXX"</span>
 <span class="token punctuation">}</span>
-</code></pre><p><em>(注：若提交时需要验证底盘存在性，应另有 API，如 <code>POST /api/chassis/verify</code>，此处仅列出模板中明确的 API)</em></p>
-<h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">异常场景</th>
-<th style="text-align:left">处理方式</th>
-<th style="text-align:left">Message 显示内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><strong>网络断开/超时</strong></td>
-<td style="text-align:left">捕获 Network Error</td>
-<td style="text-align:left"><code>Network error. Please check your connection.</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>底盘编号不存在</strong></td>
-<td style="text-align:left">捕获 API 404/业务错误</td>
-<td style="text-align:left"><code>Chassis no is not exists</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>服务器内部错误 (500)</strong></td>
-<td style="text-align:left">捕获 Server Error</td>
-<td style="text-align:left"><code>System error. Please contact administrator.</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>获取下拉列表失败</strong></td>
-<td style="text-align:left">禁用 Submit 或提示</td>
-<td style="text-align:left"><code>Failed to load document types. Please refresh.</code></td>
-</tr>
-</tbody>
-</table>
+</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<p>| 异常场景                 | 处理方式           | Message 显示内容                                                      |<br>
+| :----------------------- | :----------------- | :-------------------------------------------------------------------- | --- |<br>
+| <strong>网络断开/超时</strong>        | 捕获 Network Error | <code>网络连接失败，请检查网络设置</code>                                        |<br>
+| <strong>模板文件缺失</strong>         | 捕获 API 业务错误  | <code>无法找到模板文件，请联系管理员</code>                                      |<br>
+| <strong>批处理失败</strong>           | 捕获 API 业务错误  | <code>Batch processing failed: Failed to make the Inplate Error reson:XXX</code> |     |<br>
+| <strong>服务器内部错误 (500)</strong> | 捕获 Server Error  | <code>系统繁忙，请稍后再试</code>                                                |</p>
 <h2 id="6-实现注意事项-implementation-notes">6. 实现注意事项 (Implementation Notes) </h2>
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理 <code>chassisSeries</code>, <code>chassisNo</code>, <code>documentType</code>, <code>errorMessage</code>, <code>isLoading</code>, <code>docTypeOptions</code>。</li>
-<li><code>ErrorMessage</code> Label 默认隐藏（内容为空时不占位或高度为0）。</li>
+<li>使用 React State 管理 <code>vinPlateData</code>, <code>errorMessage</code>, <code>isLoading</code>。</li>
+<li><code>ErrorMessage</code> Label 默认隐藏。</li>
 </ul>
 </li>
-<li><strong>数据持久化</strong>：
+<li><strong>样式处理</strong>：
 <ul>
-<li>为了支持“自动回填上一次的检索条件”，建议在 <code>localStorage</code> 或 <code>sessionStorage</code> 中保存用户最后成功提交的查询条件。页面加载时读取并填充表单。</li>
+<li><code>Modify Doc Link</code> 的红色样式建议通过 CSS Class (<code>class="text-danger"</code>) 动态绑定。</li>
+<li><code>S-Note Message</code> 同样使用红色字体以示警示。</li>
+</ul>
+</li>
+<li><strong>下载功能</strong>：
+<ul>
+<li><code>Generated document</code> 链接点击时，建议使用 <code>window.location.href</code> 或创建隐藏的 <code>&lt;a&gt;</code> 标签触发下载，确保文件名正确（后端应在 Header 中设置 <code>Content-Disposition</code>）。</li>
+</ul>
+</li>
+<li><strong>跳转逻辑</strong>：
+<ul>
+<li><code>Chassis no</code> 点击跳转至 <code>/chassis-detail/${chassisNo}</code>。</li>
+<li><code>Modify Doc Link</code> 点击跳转至修改页面（路径需确认，如 <code>/modify-doc/${chassisNo}</code>）。</li>
 </ul>
 </li>
 <li><strong>安全性</strong>：
 <ul>
 <li>API 请求必须通过 HTTPS 发送。</li>
-<li>对输入内容进行 sanitization，防止 XSS 攻击（虽然主要是跳转，但需确保参数编码正确）。</li>
-</ul>
-</li>
-<li><strong>UI 细节</strong>：
-<ul>
-<li>[Submit]按钮在 <code>isLoading</code> 期间应设为 <code>disabled</code>，防止重复提交。</li>
-<li><code>ErrorMessage</code> 文字颜色建议使用红色 (<code>#ff4d4f</code>) 以起到警示作用。</li>
-<li><code>Reset</code> 按钮点击后，除了清空表单，也应清除 <code>localStorage</code> 中的临时缓存（可选，视产品定义而定，通常 Reset 仅清空当前视图）。</li>
+<li>对 URL 参数进行编码，防止注入攻击。</li>
 </ul>
 </li>
 </ol>

@@ -68,6 +68,9 @@ const UD20 = React.memo(() => {
 
   return (
     <div className="ud20-container">
+      <header className="ud20-header">
+        <div className="ud20-header-logo">VOLVO</div>
+      </header>
       <main className="ud20-main">
         <div className="ud20-card">
           <h1 className="ud20-page-title">HDoc - Market Document Settings</h1>

@@ -11,6 +11,25 @@
   box-sizing: border-box;
 }
 
+/* ---- Header 区域 ---- */
+.ud20-header {
+  background-color: #003057;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+  gap: 12px;
+  margin: -20px -24px 0;
+}
+
+.ud20-header-logo {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
 .ud20-main {
   flex: 1;
 }

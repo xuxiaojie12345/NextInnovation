@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部设计UD08</title>
+      <title>内部设计UD05</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="homologation-variables详细设计说明书">Homologation Variables详细设计说明书 </h1>
+<h1 id="modify-document详细设计说明书">Modify Document详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD08</th>
+<th style="text-align:left">UD05</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,7 +40,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">认证参数管理 (Homo Vars)</td>
+<td style="text-align:left">文档修改 (Modify Doc)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
 <td style="text-align:left">2026-05-22</td>
 </tr>
@@ -53,22 +53,16 @@
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块用于管理系统中的认证参数（Homologation Variables），支持对用户定义规则的查询、新增、修改和删除操作。</p>
+<p>本模块用于支持用户对车辆铭牌模板中的变量值进行修改，并保存修改后的数据。主要功能包括展示当前车辆的 VIN 及相关字段的当前值，允许用户编辑部分字段并提交修改，同时提供下载空白铭牌文件和跳转至底盘详细信息页面的功能。</p>
 <ul>
-<li><strong>目标</strong>：提供灵活的 CRUD 操作界面，确保数据完整性（主键唯一性、变量有效性），并自动记录审计信息（创建人、时间）。</li>
-<li><strong>安全性</strong>：
-<ul>
-<li><code>Product class</code>、<code>Number</code>、<code>Market</code> 组合为主键，禁止重复。</li>
-<li><code>Variable</code> 必须存在于 <code>HDOC_VARIABLES</code> 表中。</li>
-<li>所有写入操作需验证权限（由后端控制）。</li>
-<li>自动记录 <code>Created by user</code> 和 <code>Date</code> 字段，不可手动编辑。</li>
-</ul>
-</li>
+<li><strong>目标</strong>：提供便捷的变量修改入口，确保修改操作经过校验，防止覆盖未发布版本，并记录操作日志。</li>
+<li><strong>安全性</strong>：修改操作需校验是否已发布版本存在；所有修改必须经过系统验证后才允许提交；操作日志由后端记录。</li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>查询条件清晰排列，关键字段带星号标识必填项。</li>
-<li>操作按钮集中放置于顶部，便于快速访问。</li>
-<li>支持实时校验，减少提交错误。</li>
+<li>界面简洁，重点突出可编辑字段。</li>
+<li>明确区分输入项与输出项。</li>
+<li>提供清晰的操作反馈（如保存成功提示）。</li>
+<li>支持快速访问相关联的数据（如底盘详情、模板文件）。</li>
 </ul>
 </li>
 </ul>
@@ -92,208 +86,100 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Product class</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:center">2</td>
+<td style="text-align:left"><strong>Chassis no</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">15</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">Add/Update/Delete 时必填；数据源：<code>UD08SelectProductclassmaster</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Number</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">Y</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角数字 (<code>0-9</code>)</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">Add/Update/Delete 时必填</td>
+<td style="text-align:center">JPCT 028321</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">显示底盘编号，可点击跳转至详情页</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Market</strong></td>
-<td style="text-align:left">Pull-downList</td>
-<td style="text-align:center">Y</td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">3</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">Add/Update/Delete 时必填；数据源：<code>UD08SelectMarketmaster</code></td>
+<td style="text-align:center">AUS</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">固定显示市场信息</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Template Link</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Input</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">文本：<code>Template: aus/UD_TEST.odt</code>，点击下载空白文件</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Variable</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left">DataTable Col</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">20</td>
-<td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">若以 <code>TEMPLATE-</code> 开头，需校验后缀是否存在于 <code>HDOC_VARIABLES</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Value</strong></td>
-<td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">200</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
 <td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">变量名称列，来自 <code>HDOC_VARIABLES</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Variant string.1</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>Description</strong></td>
+<td style="text-align:left">DataTable Col</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">100</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
 <td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">字段说明列</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Variant string.2</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>Current value</strong></td>
+<td style="text-align:left">DataTable Col</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">100</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
 <td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">当前值列，来自 <code>HDOC_REC_DATA_KOLA_VARIANT</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Comments</strong></td>
+<td style="text-align:left"><strong>Modified value</strong></td>
 <td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">100</td>
+<td style="text-align:center">500</td>
 <td style="text-align:center">Input</td>
-<td style="text-align:left">半角英数字+記号</td>
+<td style="text-align:left">任意可见字符</td>
 <td style="text-align:center">左 (Left)</td>
 <td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">-</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">用户输入修改值；仅当 Current value 存在时激活</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Add</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">6</td>
-<td style="text-align:center">Input/Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">格式：YYYYWW</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Delete</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">6</td>
-<td style="text-align:center">Input/Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">格式：YYYYWW</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Created by user</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">Input/Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Date</strong></td>
-<td style="text-align:left">TextField</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Input/Output</td>
-<td style="text-align:left">日付</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Search</strong></td>
+<td style="text-align:left"><strong>Save</strong></td>
 <td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">Input</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">触发查询跳转</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Clear</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">清空所有输入框</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Add Btn</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">新增记录</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Update</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">修改现有记录</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Delete</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">删除当前记录</td>
+<td style="text-align:center">活性</td>
+<td style="text-align:left">提交修改，触发校验与 API 调用</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ErrorMessage</strong></td>
@@ -312,69 +198,72 @@
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>主键唯一性</strong>：<code>Product class</code> + <code>Number</code> + <code>Market</code> 必须唯一。</li>
-<li><strong>Variable 校验</strong>：前端可做初步校验，最终校验由后端执行。</li>
-<li><strong>时间戳格式</strong>：<code>Add</code> 和 <code>Delete</code> 字段格式为 <code>YYYYWW</code>（年+周），由后端生成或前端根据当前日期计算。</li>
+<li><strong>DataTable</strong>：实际渲染为多行数据，每行对应一个可修改变量。</li>
+<li><strong>Modified value</strong>：若对应的 <code>Current value</code> 为空或不可编辑，则该输入框应设为 <code>disabled</code>。</li>
+<li><strong>Template Link</strong>：点击后触发文件下载，文件格式实际为 <code>.odt</code>，但可能以 <code>.trf</code> 或其他扩展名提供（依后端配置而定）。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有校验逻辑均在用户点击 <strong>[Add]</strong>, <strong>[Update]</strong>, <strong>[Delete]</strong> 或 <strong>[Search]</strong> 按钮时执行。</p>
+<p>所有校验逻辑均在用户点击 <strong>[Save]</strong> 按钮时执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
+<h4 id="311-初期表示">3.1.1 初期表示 </h4>
 <ol>
-<li><strong>初始化处理</strong>: 页面加载时调用 <code>UD08SelectProductclassmaster</code>, <code>UD08SelectMarketmaster</code>, <code>UD08SelectHdocvariables</code> 获取选项。</li>
-<li><strong>开始</strong>：用户点击操作按钮。</li>
-<li><strong>前置处理</strong>：获取表单数据。</li>
-<li><strong>空值校验 (Frontend Check)</strong>：
+<li><strong>初期表示</strong>：调用API（/api/ud05modifydocumentapi/ud05selectvariablemodification），取得信息，表示</li>
+</ol>
+<h4 id="312-save-按钮">3.1.2 [Save] 按钮 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击 [Save] 按钮。</li>
+<li><strong>前置处理</strong>：
 <ul>
-<li>若点击 <strong>Add</strong> 或 <strong>Update</strong>：
-<ul>
-<li>检查 <code>Product class</code>, <code>Number</code>, <code>Market</code> 是否为空。</li>
-<li>若任一为空，设置 <code>ErrorMessage</code> = <code>Product class, Number, Market 是必填项</code>，<strong>终止</strong>流程。</li>
+<li>获取当前页面所有 <code>Modified value</code> 字段的输入值。</li>
+<li>对比 <code>Modified value</code> 与 <code>Current value</code>，识别出所有发生变化的字段。</li>
 </ul>
 </li>
-<li>若点击 <strong>Delete</strong>：
+<li><strong>空值/变更校验 (Frontend Check)</strong>：
 <ul>
-<li>检查是否已选中记录（通过主键判断）。</li>
-<li>若未选中，设置 <code>ErrorMessage</code> = <code>请选择要删除的记录</code>，<strong>终止</strong>流程。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><strong>更新校验</strong>：
+<li>若没有任何字段被修改（即所有 <code>Modified value</code> 为空或与 <code>Current value</code> 一致）：
 <ul>
-<li>点击 <strong>Add</strong>：
-<ul>
-<li>检查主键是否冲突。</li>
-<li>若数据库中已经存在该数据，设置 <code>ErrorMessage</code> = <code>Primary key conflict, Please enter the correct content</code>，<strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若点击 <strong>Add</strong>：
-<ul>
-<li>检查变量书否存在于 HDOC_VARIABLES</li>
-<li>若不存在，设置 <code>ErrorMessage</code> = <code>Variant does not exist, Please enter the correct content</code>，<strong>终止</strong>流程。</li>
-</ul>
-</li>
-<li>若点击 <strong>Update/Delete</strong>：
-<ul>
-<li>检查数据库中记录是否存在</li>
-<li>若不存在，设置 <code>ErrorMessage</code> = <code>Data does not exist, Please enter the correct content</code>，<strong>终止</strong>流程。</li>
+<li>设置 <code>ErrorMessage</code> = <code>NO UNRELEASED VERSION EXISTS!</code></li>
+<li><strong>终止</strong>流程，不调用 API。</li>
 </ul>
 </li>
 </ul>
 </li>
 <li><strong>API 调用 (Backend Check)</strong>：
 <ul>
-<li><strong>Search</strong>: 调用 <code>GET /api/.../ud08selectproductclassmaster</code> (注：此处可能指代查询列表接口，需根据实际后端定义调整，假设有一个统一的查询接口)。</li>
-<li><strong>Add</strong>: 调用 <code>POST /api/.../ud08add</code>。</li>
-<li><strong>Update</strong>: 调用 <code>PUT /api/.../ud08update</code>。</li>
-<li><strong>Delete</strong>: 调用 <code>DELETE /api/.../ud08delete</code>。</li>
-<li><strong>初始化下拉框</strong>: 页面加载时调用 <code>UD08SelectProductclassmaster</code>, <code>UD08SelectMarketmaster</code>, <code>UD08SelectHdocvariables</code> 获取选项。</li>
+<li>若校验通过，构造请求体，调用 <code>POST /api/ud05modifydocumentapi/ud05updatehdocadcamodification</code>。</li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>成功</strong>：提示“操作成功”，刷新列表或清空表单。</li>
-<li><strong>失败</strong>：显示后端返回的错误消息（如主键冲突、变量不存在等）。</li>
+<li><strong>成功</strong>：跳转至 <code>/document/confirm-modify</code> 页面，展示修改内容列表。</li>
+<li><strong>失败</strong>：设置 <code>ErrorMessage</code> = <code>保存失败，请检查输入内容</code> 或后端返回的具体错误信息。</li>
+</ul>
+</li>
+</ol>
+<h4 id="313-template-ausud_testodt链接按下处理">3.1.3 'Template: aus/UD_TEST.odt'链接按下处理 </h4>
+<ol>
+<li><strong>开始</strong>：Template: aus/UD_TEST.odt的link按下。</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：
+<ul>
+<li>文件下载（「Vin Plate」的.trf）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="314-chassis-no链接按下处理">3.1.4 'Chassis no'链接按下处理 </h4>
+<ol>
+<li><strong>开始</strong>：Chassis no的link按下。</li>
+<li><strong>结果处理</strong>：
+<ul>
+<li><strong>成功</strong>：
+<ul>
+<li>该当Chassis的详情页面表示（07_Vehicle Specification画面）。</li>
+</ul>
+</li>
 </ul>
 </li>
 </ol>
@@ -393,134 +282,82 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">Click Add/Update</td>
-<td style="text-align:center">Product class</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
-<td style="text-align:center"><code>Product class 是必填项</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留</td>
-</tr>
-<tr>
-<td style="text-align:center">2</td>
-<td style="text-align:center">Click Add/Update</td>
-<td style="text-align:center">Number</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
-<td style="text-align:center"><code>Number 是必填项</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留</td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:center">Click Add/Update</td>
-<td style="text-align:center">Market</td>
-<td style="text-align:center"><code>Value == null</code> OR <code>""</code></td>
-<td style="text-align:center"><code>Market 是必填项</code></td>
-<td style="text-align:center">显示 ErrorMessage，焦点停留</td>
+<td style="text-align:center">Click Save</td>
+<td style="text-align:center">Modified Values</td>
+<td style="text-align:center">无任何字段发生改变</td>
+<td style="text-align:center"><code>NO UNRELEASED VERSION EXISTS!</code></td>
+<td style="text-align:center">显示 ErrorMessage，阻止提交</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取下拉列表数据">4.1 获取下拉列表数据 </h3>
+<h3 id="41-ud05selectvariablemodificationapi">4.1 UD05SelectVariableModificationAPI </h3>
 <ul>
-<li><strong>功能</strong>：获取 Product Class, Market, Variable 的可选列表。</li>
+<li><strong>功能</strong>：获取当前底盘的变量修改信息及当前值。</li>
 <li><strong>Method</strong>: <code>GET</code></li>
-<li><strong>Endpoints</strong>:
-<ul>
-<li><code>/api/ud08homologationvariablesapi/ud08selectproductclassmaster</code></li>
-<li><code>/api/ud08homologationvariablesapi/ud08selectmarketmaster</code></li>
-<li><code>/api/ud08homologationvariablesapi/ud08selecthdocvariables</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud05Modifydocumentapi/ud05selectvariablemodification</code></li>
 </ul>
-</li>
+<h4 id="request-parameters">Request Parameters </h4>
+<ul>
+<li><code>SERIE</code>: String (Query Param, e.g., "JPCT")</li>
+<li><code>CHNO</code>: String (Query Param, e.g., "028321")</li>
 </ul>
 <h4 id="response-success-200-ok">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    ······
+  <span class="token property">"chassisNo"</span><span class="token operator">:</span> <span class="token string">"JPCT028321"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"AUS"</span><span class="token punctuation">,</span>
+  <span class="token property">"templateFile"</span><span class="token operator">:</span> <span class="token string">"aus/UD_TEST.odt"</span><span class="token punctuation">,</span>
+  <span class="token property">"modifications"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"VIN"</span><span class="token punctuation">,</span>
+      <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Vehicle Identification Number"</span><span class="token punctuation">,</span>
+      <span class="token property">"currentValue"</span><span class="token operator">:</span> <span class="token string">"JPCYZ50A2LT028321"</span><span class="token punctuation">,</span>
+      <span class="token property">"modifiedValue"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"ENGINE_TYPE"</span><span class="token punctuation">,</span>
+      <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Engine Type Code"</span><span class="token punctuation">,</span>
+      <span class="token property">"currentValue"</span><span class="token operator">:</span> <span class="token string">"D13K"</span><span class="token punctuation">,</span>
+      <span class="token property">"modifiedValue"</span><span class="token operator">:</span> <span class="token string">""</span>
+    <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
-</code></pre><h3 id="42-ud08add-新增">4.2 UD08Add (新增) </h3>
-<ul>
-<li><strong>功能</strong>：新增一条认证参数记录。</li>
-<li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud08homologationvariablesapi/ud08add</code></li>
-</ul>
-<h4 id="request-body">Request Body </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"ENG_TORQUE"</span><span class="token punctuation">,</span>
-  <span class="token property">"value"</span><span class="token operator">:</span> <span class="token string">"1000"</span><span class="token punctuation">,</span>
-  <span class="token property">"variantString1"</span><span class="token operator">:</span> <span class="token string">"E2-OMEGA"</span><span class="token punctuation">,</span>
-  <span class="token property">"variantString2"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
-  <span class="token property">"comments"</span><span class="token operator">:</span> <span class="token string">"Engine Torque"</span><span class="token punctuation">,</span>
-  <span class="token property">"Add"</span><span class="token operator">:</span> <span class="token string">"当前画面中Add的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Delete"</span><span class="token operator">:</span> <span class="token string">"当前画面中Delete的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Created by user"</span><span class="token operator">:</span> <span class="token string">"当前画面中Created by user的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Date"</span><span class="token operator">:</span> <span class="token string">"当前画面中Date的值"</span>
-<span class="token punctuation">}</span>
-</code></pre><p><em>(注：Add, Delete, CreatedBy, Date 由后端自动填充)</em></p>
-<h4 id="response-success-201-created">Response Success (201 Created) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"添加成功"</span>
-<span class="token punctuation">}</span>
-</code></pre><h4 id="response-error-409-conflict">Response Error (409 Conflict) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Conflict"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Primary key conflict, Please enter the correct content"</span>
-<span class="token punctuation">}</span>
-</code></pre><h3 id="43-ud08update-更新">4.3 UD08Update (更新) </h3>
-<ul>
-<li><strong>功能</strong>：更新现有记录。</li>
-<li><strong>Method</strong>: <code>PUT</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud08homologationvariablesapi/ud08update</code></li>
-</ul>
-<h4 id="request-body-1">Request Body </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"ENG_TORQUE"</span><span class="token punctuation">,</span>
-  <span class="token property">"value"</span><span class="token operator">:</span> <span class="token string">"1200"</span><span class="token punctuation">,</span>
-  <span class="token property">"variantString1"</span><span class="token operator">:</span> <span class="token string">"E2-OMEGA"</span><span class="token punctuation">,</span>
-  <span class="token property">"variantString2"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
-  <span class="token property">"comments"</span><span class="token operator">:</span> <span class="token string">"Updated Engine Torque"</span><span class="token punctuation">,</span>
-  <span class="token property">"Add"</span><span class="token operator">:</span> <span class="token string">"当前画面中Add的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Delete"</span><span class="token operator">:</span> <span class="token string">"当前画面中Delete的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Created by user"</span><span class="token operator">:</span> <span class="token string">"当前画面中Created by user的值"</span><span class="token punctuation">,</span>
-  <span class="token property">"Date"</span><span class="token operator">:</span> <span class="token string">"当前画面中Date的值"</span>
-<span class="token punctuation">}</span>
-</code></pre><h4 id="response-success-200-ok-1">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"更新成功"</span>
 <span class="token punctuation">}</span>
 </code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
   <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Data does not exist, Please enter the correct content"</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Chassis data not found"</span>
 <span class="token punctuation">}</span>
-</code></pre><h3 id="44-ud08delete-删除">4.4 UD08Delete (删除) </h3>
+</code></pre><h3 id="42-ud05updatehdocadcamodificationapi">4.2 UD05UpdateHdocAdcaModificationAPI </h3>
 <ul>
-<li><strong>功能</strong>：删除指定记录。</li>
-<li><strong>Method</strong>: <code>DELETE</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud08homologationvariablesapi/ud08delete</code></li>
+<li><strong>功能</strong>：提交文档修改请求，记录变更内容并生成待发布版本。</li>
+<li><strong>Method</strong>: <code>POST</code></li>
+<li><strong>Endpoint</strong>: <code>/api/ud05modifydocumentapi/ud05updatehdocadcamodification</code></li>
 </ul>
-<h4 id="request-body--params">Request Body / Params </h4>
+<h4 id="request-body">Request Body </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
+  <span class="token property">"chassisNo"</span><span class="token operator">:</span> <span class="token string">"JPCT028321"</span><span class="token punctuation">,</span>
+  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"AUS"</span><span class="token punctuation">,</span>
+  <span class="token property">"templateFile"</span><span class="token operator">:</span> <span class="token string">"aus/UD_TEST.odt"</span><span class="token punctuation">,</span>
+  <span class="token property">"modifications"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"VIN"</span><span class="token punctuation">,</span>
+      <span class="token property">"currentValue"</span><span class="token operator">:</span> <span class="token string">"JPCYZ50A2LT028321"</span><span class="token punctuation">,</span>
+      <span class="token property">"modifiedValue"</span><span class="token operator">:</span> <span class="token string">"JPCYZ50A2LT028322"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><p><em>(注：使用组合主键进行删除)</em></p>
-<h4 id="response-success-200-ok-2">Response Success (200 OK) </h4>
+</code></pre><h4 id="response-success-200-ok-1">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"删除成功"</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Success"</span><span class="token punctuation">,</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"redirectUrl"</span><span class="token operator">:</span> <span class="token string">"/document/confirm-modify"</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre><h4 id="response-error-404-not-found-1">Response Error (404 Not Found) </h4>
+</code></pre><h4 id="response-error-400500">Response Error (400/500) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Data does not exist, Please enter the correct content"</span>
+  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Bad Request"</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"保存失败，请检查输入内容"</span>
 <span class="token punctuation">}</span>
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
@@ -543,14 +380,14 @@
 <td style="text-align:left"><code>系统繁忙，请稍后再试</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>主键冲突</strong></td>
-<td style="text-align:left">捕获 API 409</td>
-<td style="text-align:left"><code>Primary key conflict, Please enter the correct content</code></td>
+<td style="text-align:left"><strong>无变更记录</strong></td>
+<td style="text-align:left">前端校验拦截</td>
+<td style="text-align:left"><code>NO UNRELEASED VERSION EXISTS!</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>变量不存在</strong></td>
-<td style="text-align:left">捕获 API 400/422</td>
-<td style="text-align:left"><code>Variant does not exist, Please enter the correct content</code></td>
+<td style="text-align:left"><strong>权限不足</strong></td>
+<td style="text-align:left">捕获 API 403</td>
+<td style="text-align:left"><code>您没有权限执行此操作</code></td>
 </tr>
 </tbody>
 </table>
@@ -558,28 +395,28 @@
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理表单数据 <code>formData</code>, <code>errorMessage</code>, <code>isLoading</code>, <code>dropdownOptions</code>。</li>
-<li><code>dropdownOptions</code> 在组件挂载时并行请求三个接口获取。</li>
+<li>使用 React State 管理 <code>chassisInfo</code>, <code>modificationsList</code>, <code>errorMessage</code>, <code>isLoading</code>。</li>
+<li><code>modificationsList</code> 应包含原始数据副本，以便在提交时对比变化。</li>
 </ul>
 </li>
-<li><strong>表单校验</strong>：
+<li><strong>交互细节</strong>：
 <ul>
-<li>使用 Ant Design Form 或类似库进行必填项校验。</li>
-<li><code>Number</code> 字段应限制只能输入数字。</li>
+<li><code>Modified value</code> 输入框建议添加 <code>onChange</code> 事件，实时标记该行是否“已修改”（例如行背景色变浅黄），提升用户体验。</li>
+<li>[Save]按钮在 <code>isLoading</code> 期间应设为 <code>disabled</code>，防止重复提交。</li>
 </ul>
 </li>
-<li><strong>UI 细节</strong>：
+<li><strong>跳转逻辑</strong>：
 <ul>
-<li><strong>只读字段</strong>：<code>Add</code>, <code>Delete</code>, <code>Created by user</code>, <code>Date</code> 在新增/编辑模式下应显示为禁用状态或纯文本，明确告知用户不可编辑。</li>
-<li><strong>按钮状态</strong>：在执行 API 请求期间，所有操作按钮应设为 <code>disabled</code>，防止重复提交。</li>
-<li><strong>错误提示</strong>：<code>ErrorMessage</code> 建议使用红色字体，并在操作成功后自动清除。</li>
+<li><code>Chassis no</code> 点击跳转至 <code>/chassis-detail/${chassisNo}</code>。</li>
+<li><code>Template Link</code> 点击直接触发下载，不跳转页面。</li>
+<li>保存成功后，使用 [navigate]或 <code>window.location.href</code> 跳转至确认页面。</li>
 </ul>
 </li>
 <li><strong>安全性</strong>：
 <ul>
 <li>API 请求必须通过 HTTPS 发送。</li>
 <li>对输入内容进行 sanitization，防止 XSS 攻击。</li>
-<li>敏感操作（Add/Update/Delete）应在后端再次校验用户权限。</li>
+<li>严禁在前端日志中打印敏感的车辆配置数据。</li>
 </ul>
 </li>
 </ol>

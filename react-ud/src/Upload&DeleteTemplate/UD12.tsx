@@ -200,6 +200,9 @@ const UD12 = React.memo(() => {
 
   return (
     <div className="ud12-container">
+      <header className="ud12-header">
+        <div className="ud12-header-logo">VOLVO</div>
+      </header>
       <main className="ud12-main">
         <div className="ud12-card">
           <h1 className="ud12-page-title">HDoc Template Upload</h1>

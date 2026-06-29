@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部设计UD09</title>
+      <title>内部设计UD25</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="homologation-variables-result-list详细设计说明书">Homologation Variables Result List详细设计说明书 </h1>
+<h1 id="edb-user-view详细设计说明书">EDB User View详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD09</th>
+<th style="text-align:left">UD25</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,34 +40,42 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">认证参数检索结果 (Homo Vars Result)</td>
+<td style="text-align:left">EDB用户信息查看页面 (EDB User View Page)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2026-05-25</td>
+<td style="text-align:left">2025-05-29</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">AI Assistant</td>
+<td style="text-align:left">Lingma Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块的核心功能是展示基于上一页查询条件所获取的“Homologation Variables”数据列表。该页面作为认证参数管理流程中的中间环节，支持用户对检索结果进行选择、打印、批量删除等操作，并提供跳转至用户详情页的功能，辅助用户完成数据确认与后续处理。</p>
+<p>本模块的核心功能是展示用户在 EDB 系统中的基本信息，包括 User ID、负责人姓名、职位和电子邮件。该页面用于提供用户信息的只读视图，支持系统管理员或相关人员查阅用户资料。</p>
 <ul>
-<li><strong>目标</strong>：清晰展示检索结果，提供高效的批量操作能力（选择、删除），并确保操作的安全性（权限控制、二次确认）。</li>
-<li><strong>安全性</strong>：
+<li><strong>目标</strong>：以只读表单形式呈现 EDB 用户信息，便于用户快速查阅用户资料。</li>
+<li><strong>面向的用户群体</strong>：
 <ul>
-<li>删除操作需经过前端二次确认及后端权限校验。</li>
-<li>“Created by user” 链接跳转需验证当前用户登录状态。</li>
-<li>打印功能不包含敏感系统内部ID。</li>
+<li>系统管理员</li>
+<li>IT 运维人员</li>
+<li>安全管理人员</li>
 </ul>
 </li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>支持多行勾选，提升批量操作效率。</li>
-<li>表格字段清晰，支持排序（Product Class, Market, Number）。</li>
-<li>底部显示记录总数，操作按钮语义明确。</li>
+<li>界面简洁，仅包含必要字段</li>
+<li>所有字段均为输出型，不可编辑</li>
+<li>支持快速浏览与返回操作</li>
+<li>提供清空按钮，便于重新查询</li>
+</ul>
+</li>
+<li><strong>安全性</strong>：
+<ul>
+<li>所有通信使用 HTTPS 加密</li>
+<li>数据来源为 Saviynt 的 AuthenticationApi，确保一致性</li>
+<li>不暴露敏感信息</li>
 </ul>
 </li>
 </ul>
@@ -91,278 +99,123 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Checkbox</strong></td>
-<td style="text-align:left">radio</td>
+<td style="text-align:left"><strong>Userid</strong></td>
+<td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Input</td>
+<td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">Unchecked</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">用于多选记录</td>
+<td style="text-align:left">示例：t009667</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Product class</strong></td>
-<td style="text-align:left">DataTable Col</td>
+<td style="text-align:left"><strong>Responsible</strong></td>
+<td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">2</td>
+<td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">支持排序</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Number</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角数字</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">支持排序</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Market</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">支持排序</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Variable</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">20</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
 <td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Value</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">200</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Variant string.</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">100</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Comments</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">100</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">半角英数字+記号</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Add</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">6</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">YYYYWW</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Delete</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">6</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">YYYYWW</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Created by user</strong></td>
-<td style="text-align:left">Link</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">半角英数字</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
+<td style="text-align:center">空 (Empty)</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">点击跳转至用户详情</td>
+<td style="text-align:left">示例：Mats Gustafsson</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Date</strong></td>
-<td style="text-align:left">DataTable Col</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">YYYY-MM-DD</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">-</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Count</strong></td>
-<td style="text-align:left">Label</td>
+<td style="text-align:left"><strong>User Position</strong></td>
+<td style="text-align:left">TextField</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">Number of lines found: 0</td>
-<td style="text-align:center">常显 (Visible)</td>
-<td style="text-align:left">显示总记录数</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">示例：Senior Solution Leader</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Select</strong></td>
+<td style="text-align:left"><strong>E-mail</strong></td>
+<td style="text-align:left">TextField</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">空 (Empty)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">示例：mats.e.gustavsson@volvo.com</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Clear</strong></td>
 <td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">返回并回填选中项</td>
+<td style="text-align:left">清空所有输入内容</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Back</strong></td>
 <td style="text-align:left">Button</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">中 (Center)</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">返回上一级</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Print</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">打印当前列表</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Delete selected</strong></td>
-<td style="text-align:left">Button</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">批量删除选中项</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>ErrorMessage</strong></td>
-<td style="text-align:left">Label</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center">256</td>
-<td style="text-align:center">Output</td>
-<td style="text-align:left">-</td>
-<td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">动态显示 (Dynamic)</td>
-<td style="text-align:left">仅在出错时显示红色文字</td>
+<td style="text-align:left">返回上一页面</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>排序</strong>：默认按 <code>Product Class</code>, <code>Market</code>, <code>Number</code> 升序排列。</li>
-<li><strong>Created by user</strong>：渲染为 <code>&lt;a&gt;</code> 标签或 Link 组件，点击触发路由跳转。</li>
+<li><strong>TextField</strong>：数据来源于后端 API 返回的用户信息，渲染为只读文本框。</li>
+<li><strong>Button</strong>：点击触发相应的操作（清空或返回）。</li>
+<li>所有输出字段均为只读显示，不提供编辑功能。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有操作逻辑均在用户点击相应按钮时执行。</p>
+<p>所有逻辑均在页面加载时自动执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
 <ol>
-<li><strong>开始</strong>：页面加载或用户点击操作按钮。</li>
-<li><strong>前置处理</strong>：
+<li><strong>开始</strong>：用户访问 EDB User View 页面。</li>
+<li><strong>前置处理</strong>：接受前画面数据（userid）。</li>
+<li><strong>空值校验 (Frontend Check)</strong>：
 <ul>
-<li>页面加载时，从 URL 或 State 获取查询条件，调用 API 获取数据列表。</li>
-<li>操作前，验证当前会话有效性。</li>
-</ul>
-</li>
-<li><strong>空值/状态校验 (Frontend Check)</strong>：
-<ul>
-<li>若点击 <strong>Select</strong> 或 <strong>Delete selected</strong>：
-<ul>
-<li>检查是否有至少一行被勾选。</li>
-<li>若无选中项，设置 <code>ErrorMessage</code> = <code>请至少选择一条记录</code>，<strong>终止</strong>流程。</li>
-</ul>
-</li>
+<li>无。</li>
 </ul>
 </li>
 <li><strong>API 调用 (Backend Check)</strong>：
 <ul>
-<li><strong>Delete</strong>: 调用 <code>POST /api/ud08homologationvariablesapi/ud08delete</code> (注：根据UD08定义，删除接口可能为POST或DELETE，此处依UD09描述调用)。</li>
-<li><strong>User Detail</strong>: 点击链接时，无需额外API调用即可跳转，或由前端路由携带UserID跳转至用户详情页，由详情页发起请求。</li>
-</ul>
-</li>
-<li><strong>机能处理</strong>：
-<ul>
-<li><strong>Select</strong>: 将选中数据通过 State 或 Callback 回传至父页面/上一级页面，并执行返回操作。</li>
-<li><strong>Back</strong>: 直接执行路由返回，不保存当前页状态。</li>
-<li><strong>Print</strong>: 调用浏览器 <code>window.print()</code>，并通过 CSS <code>@media print</code> 隐藏按钮和非必要元素。</li>
+<li>调用 <code>POST /api/AuthenticationApi/login</code>（仅传 <code>userid</code>，不传密码）获取用户信息。</li>
 </ul>
 </li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>Delete</strong>:
-<ul>
-<li>弹出确认框：“确定要删除选中的 X 条记录吗？”</li>
-<li>用户确认后，发送请求。</li>
-<li>成功：刷新列表，提示“删除成功，共删除 X 条记录”。</li>
-<li>失败：提示错误消息。</li>
-</ul>
-</li>
+<li><strong>成功</strong>：正常渲染 Userid、Responsible、User Position、E-mail 字段。</li>
+<li><strong>失败</strong>：显示错误消息：「无法加载用户信息，请稍后重试」。</li>
 </ul>
 </li>
 </ol>
-<h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
+<h3 id="32-清空功能处理流程">3.2 清空功能处理流程 </h3>
+<ol>
+<li><strong>开始</strong>：用户点击「Clear」按钮。</li>
+<li><strong>处理</strong>：清空页面所有文本框内容。</li>
+<li><strong>结束</strong>：页面恢复初始状态。</li>
+</ol>
+<h3 id="33-返回功能处理流程">3.3 返回功能处理流程 </h3>
+<ol>
+<li><strong>开始</strong>：用户点击「Back」按钮。</li>
+<li><strong>处理</strong>：系统跳转至前一个页面，不保存当前状态。</li>
+<li><strong>结束</strong>：页面跳转完成。</li>
+</ol>
+<h3 id="34-校验详细规格表">3.4 校验详细规格表 </h3>
 <table>
 <thead>
 <tr>
@@ -377,94 +230,46 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">Click Select/Delete</td>
-<td style="text-align:center">Selected Rows</td>
-<td style="text-align:center"><code>SelectedCount == 0</code></td>
-<td style="text-align:center"><code>请至少选择一条记录</code></td>
-<td style="text-align:center">显示 ErrorMessage，阻止提交</td>
-</tr>
-<tr>
-<td style="text-align:center">2</td>
-<td style="text-align:center">Click Delete</td>
-<td style="text-align:center">User Permission</td>
-<td style="text-align:center"><code>HasDeletePermission == false</code></td>
-<td style="text-align:center"><code>您没有权限执行此操作</code></td>
-<td style="text-align:center">禁用 Delete 按钮或点击后提示</td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:center">Click User Link</td>
-<td style="text-align:center">User Existence</td>
-<td style="text-align:center"><code>UserExists == false</code> (Backend)</td>
-<td style="text-align:center"><code>用户信息不存在</code></td>
-<td style="text-align:center">跳转至错误页或 Toast 提示</td>
+<td style="text-align:center">页面加载时</td>
+<td style="text-align:center">Userid</td>
+<td style="text-align:center">不存在于 Saviynt</td>
+<td style="text-align:center">「用户不存在」</td>
+<td style="text-align:center">显示警告信息</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取检索结果列表">4.1 获取检索结果列表 </h3>
+<h3 id="41-获取用户信息接口">4.1 获取用户信息接口 </h3>
 <ul>
-<li><strong>功能</strong>：根据条件查询认证参数列表。</li>
+<li><strong>功能</strong>：获取指定用户的详细信息。</li>
 <li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud08homologationvariablesapi/ud08searchlist</code></li>
-</ul>
-<h4 id="request-parameters-query-or-body">Request Parameters (Query or Body) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-  <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-  <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"ENG_TORQUE"</span>
-<span class="token punctuation">}</span>
-</code></pre><h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">{</span>
-      <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-      <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-      <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span><span class="token punctuation">,</span>
-      <span class="token property">"variable"</span><span class="token operator">:</span> <span class="token string">"ENG_TORQUE"</span><span class="token punctuation">,</span>
-      <span class="token property">"value"</span><span class="token operator">:</span> <span class="token string">"1000"</span><span class="token punctuation">,</span>
-      <span class="token property">"variantString"</span><span class="token operator">:</span> <span class="token string">"E2-OMEGA"</span><span class="token punctuation">,</span>
-      <span class="token property">"comments"</span><span class="token operator">:</span> <span class="token string">"Engine Torque"</span><span class="token punctuation">,</span>
-      <span class="token property">"addDate"</span><span class="token operator">:</span> <span class="token string">"202504"</span><span class="token punctuation">,</span>
-      <span class="token property">"deleteDate"</span><span class="token operator">:</span> <span class="token null keyword">null</span><span class="token punctuation">,</span>
-      <span class="token property">"createdByUser"</span><span class="token operator">:</span> <span class="token string">"a304598"</span><span class="token punctuation">,</span>
-      <span class="token property">"date"</span><span class="token operator">:</span> <span class="token string">"2025-04-05"</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token property">"totalCount"</span><span class="token operator">:</span> <span class="token number">98</span>
-<span class="token punctuation">}</span>
-</code></pre><h3 id="42-ud08delete">4.2 UD08Delete </h3>
-<ul>
-<li><strong>功能</strong>：删除指定的多条记录。</li>
-<li><strong>Method</strong>: <code>DELETE</code></li>
-<li><strong>Endpoint</strong>: <code>/api/ud08homologationvariablesapi/ud08delete</code></li>
+<li><strong>Endpoint</strong>: <code>/api/AuthenticationApi/login</code></li>
 </ul>
 <h4 id="request-body">Request Body </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-    <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"productClass"</span><span class="token operator">:</span> <span class="token string">"E2"</span><span class="token punctuation">,</span>
-    <span class="token property">"number"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-    <span class="token property">"market"</span><span class="token operator">:</span> <span class="token string">"-EU"</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
-</code></pre><p><em>(注：使用组合主键进行删除)</em></p>
-<h4 id="response-success-200-ok-1">Response Success (200 OK) </h4>
 <pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"success"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"删除成功"</span><span class="token punctuation">,</span>
-  <span class="token property">"deletedCount"</span><span class="token operator">:</span> <span class="token number">2</span>
+  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"t009667"</span>
 <span class="token punctuation">}</span>
+</code></pre><blockquote>
+<p><strong>注</strong>：仅传入 <code>userid</code> 时，系统执行用户信息查询（不验证密码）。<br>
+同时传入 <code>userid</code> 和 <code>password</code> 时，系统执行登录认证。</p>
+</blockquote>
+<h4 id="response-success-200-ok">Response Success (200 OK) </h4>
+<pre data-role="codeBlock" data-info="json（例）" class="language-json（例） json（例）"><code>{
+  "code": ***,
+  "msg": "登录成功",
+  "data": {
+    "userid": "t009667",
+    "responsible": "Mats Gustafsson",
+    "userPosition": "Senior Solution Leader",
+    "email": "mats.e.gustavsson@volvo.com"
+  }
+}
 </code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
-  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Data does not exist, Please enter the correct content"</span>
-<span class="token punctuation">}</span>
+<pre data-role="codeBlock" data-info="json（例）" class="language-json（例） json（例）"><code>{
+  "code": 404,
+  "msg": "用户不存在",
+  "data": null
+}
 </code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
 <thead>
@@ -476,24 +281,24 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>网络断开/超时</strong></td>
-<td style="text-align:left">捕获 Network Error</td>
-<td style="text-align:left"><code>网络连接失败，请检查网络设置</code></td>
+<td style="text-align:left"><strong>网络超时</strong></td>
+<td style="text-align:left">重试一次，若仍失败则提示</td>
+<td style="text-align:left">「网络连接失败，请检查网络设置」</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>用户不存在 (404)</strong></td>
+<td style="text-align:left">返回错误响应</td>
+<td style="text-align:left">「用户不存在」</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>数据库异常</strong></td>
+<td style="text-align:left">回滚事务，记录日志</td>
+<td style="text-align:left">「系统繁忙，请稍后再试」</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>服务器内部错误 (500)</strong></td>
 <td style="text-align:left">捕获 Server Error</td>
-<td style="text-align:left"><code>系统繁忙，请稍后再试</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>记录不存在</strong></td>
-<td style="text-align:left">捕获 API 404</td>
-<td style="text-align:left"><code>Data does not exist, Please enter the correct content</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>用户不存在</strong></td>
-<td style="text-align:left">跳转/提示</td>
-<td style="text-align:left"><code>用户信息不存在</code></td>
+<td style="text-align:left">「无法加载用户信息，请稍后重试」</td>
 </tr>
 </tbody>
 </table>
@@ -501,31 +306,35 @@
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理 <code>dataSource</code> (列表数据), <code>selectedRowKeys</code> (选中项的主键集合), <code>loading</code>, <code>errorMessage</code>。</li>
-<li>使用 <code>useLocation</code> 或 <code>useSearchParams</code> 获取上一页传来的查询条件。</li>
+<li>使用 React State 管理 <code>userInfo</code>（用户信息数据）、<code>isLoading</code>（加载状态）、<code>errorMessage</code>（错误消息）。</li>
+<li>页面初始化时自动触发数据加载。</li>
+</ul>
+</li>
+<li><strong>加载状态</strong>：
+<ul>
+<li>数据加载期间应显示 Loading 指示器（如 Spin 或 Skeleton），提升用户体验。</li>
+</ul>
+</li>
+<li><strong>错误处理</strong>：
+<ul>
+<li>API 调用失败时，页面中央显示错误消息，并提供重试按钮或提示用户刷新页面。</li>
 </ul>
 </li>
 <li><strong>UI 细节</strong>：
 <ul>
-<li><strong>表格选择</strong>：使用 Ant Design Table 的 <code>rowSelection</code> 属性实现多选。</li>
-<li><strong>打印样式</strong>：编写专门的 CSS <code>@media print</code> 规则，隐藏 <code>.no-print</code> 类（包含按钮、导航栏等），确保打印输出整洁。</li>
-<li><strong>用户链接</strong>：<code>Created by user</code> 列渲染为 <code>&lt;Link to={</code>/user/detail/${record.createdByUser}<code>}&gt;{record.createdByUser}&lt;/Link&gt;</code>。</li>
-<li><strong>计数显示</strong>：<code>Count</code> Label 动态更新为 <code>Number of lines found: ${dataSource.length}</code>。</li>
+<li>Userid 字段可在页面顶部突出显示，作为用户标识。</li>
+<li>E-mail 字段建议渲染为超链接（<code>mailto:</code>），便于快速发送邮件。</li>
+<li>「Clear」与「Back」按钮应置于页面底部或表单下方，保持布局一致。</li>
 </ul>
 </li>
-<li><strong>交互反馈</strong>：
+<li><strong>按钮交互</strong>：
 <ul>
-<li>删除操作必须使用 <code>Modal.confirm</code> 或类似组件进行二次确认。</li>
-<li>操作成功后，使用 <code>message.success</code> 提示用户，并重新加载列表数据。</li>
-</ul>
-</li>
-<li><strong>安全性</strong>：
-<ul>
-<li>API 请求必须通过 HTTPS 发送。</li>
-<li>删除接口的 Payload 应在后端再次校验当前用户是否有权限删除这些特定记录。</li>
+<li>「Clear」按钮点击时，无需调用 API，仅清空前端状态。</li>
+<li>「Back」按钮可使用 <code>window.history.back()</code> 或路由导航实现返回功能。</li>
 </ul>
 </li>
 </ol>
+<hr>
 
       </div>
       

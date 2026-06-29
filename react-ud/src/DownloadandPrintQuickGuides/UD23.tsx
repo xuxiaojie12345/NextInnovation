@@ -51,6 +51,9 @@ const UD23 = React.memo(() => {
 
   return (
     <div className="ud23-container">
+      <header className="ud23-header">
+        <div className="ud23-header-logo">VOLVO</div>
+      </header>
       <main className="ud23-main">
         <div className="ud23-card">
           {/* Back link */}

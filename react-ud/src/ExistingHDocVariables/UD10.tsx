@@ -223,6 +223,9 @@ const UD10 = React.memo(() => {
 
   return (
     <div className="ud10-container">
+      <header className="ud10-header">
+        <div className="ud10-header-logo">VOLVO</div>
+      </header>
       <main className="ud10-main">
         <div className="ud10-card">
           <h1 className="ud10-page-title">Existing HDoc Variables</h1>
@@ -270,7 +273,7 @@ const UD10 = React.memo(() => {
               {isSubmitting ? "Updating..." : "Update"}
             </button>
             <button
-              className="ud10-btn ud10-btn-danger"
+              className="ud10-btn"
               onClick={handleDelete}
               disabled={isSubmitting}
             >

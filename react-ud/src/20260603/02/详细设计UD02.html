@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>内部設計UD25</title>
+      <title>内部设计UD02</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="edb-user-view详细设计说明书">EDB User View详细设计说明书 </h1>
+<h1 id="menu画面详细设计说明书">Menu画面详细设计说明书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">UD25</th>
+<th style="text-align:left">UD02</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,42 +40,29 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">EDB用户信息查看页面 (EDB User View Page)</td>
+<td style="text-align:left">主菜单导航 (Main Menu)</td>
 <td style="text-align:left"><strong>作成日</strong></td>
-<td style="text-align:left">2025-05-29</td>
+<td style="text-align:left">2026-05-19</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>作成者</strong></td>
-<td style="text-align:left">Lingma Assistant</td>
+<td style="text-align:left">AI Assistant</td>
 <td style="text-align:left"><strong>状态</strong></td>
 <td style="text-align:left">正式稿</td>
 </tr>
 </tbody>
 </table>
 <h2 id="1-背景-background">1. 背景 (Background) </h2>
-<p>本模块的核心功能是展示用户在 EDB 系统中的基本信息，包括 User ID、负责人姓名、职位和电子邮件。该页面用于提供用户信息的只读视图，支持系统管理员或相关人员查阅用户资料。</p>
+<p>本模块是 VOLVO 公司内部工程数据库系统的主导航界面。用户在成功登录后进入此页面。</p>
 <ul>
-<li><strong>目标</strong>：以只读表单形式呈现 EDB 用户信息，便于用户快速查阅用户资料。</li>
-<li><strong>面向的用户群体</strong>：
-<ul>
-<li>系统管理员</li>
-<li>IT 运维人员</li>
-<li>安全管理人员</li>
-</ul>
-</li>
+<li><strong>目标</strong>：提供清晰的功能导航，将系统功能划分为"Generate"、"Admin"、"User Administration"和"Documentation"四大模块。渲染菜单项。作为系统操作的入口，点击菜单项触发相应的业务功能或页面跳转。</li>
+<li><strong>面向用户</strong>：已登录的 VOLVO 内部员工、工程师、管理员及支持人员。</li>
 <li><strong>用户体验</strong>：
 <ul>
-<li>界面简洁，仅包含必要字段</li>
-<li>所有字段均为输出型，不可编辑</li>
-<li>支持快速浏览与返回操作</li>
-<li>提供清空按钮，便于重新查询</li>
-</ul>
-</li>
-<li><strong>安全性</strong>：
-<ul>
-<li>所有通信使用 HTTPS 加密</li>
-<li>数据来源为 Saviynt 的 AuthenticationApi，确保一致性</li>
-<li>不暴露敏感信息</li>
+<li>界面布局简洁，靠左对齐，顶部logo是蓝色背景，下面菜单树是浅灰色背景，纵向：整体大小大约占据屏幕的30%，靠左表示，符合阅读习惯。</li>
+<li>顶部蓝色底板配合白色 Logo，强化品牌识别度。</li>
+<li>使用 <code>»</code> 符号明确标识可点击的操作链接，视觉引导性强。</li>
+<li>模块化分组展示，便于用户快速定位所需功能。</li>
 </ul>
 </li>
 </ul>
@@ -99,123 +86,233 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>Userid</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>HeaderLogo</strong></td>
+<td style="text-align:left">Label/Image</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：t009667</td>
+<td style="text-align:center">VOLVO</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">白色字体，蓝色背景底板</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Responsible</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>Generate</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：Mats Gustafsson</td>
+<td style="text-align:center">Generate</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">模块标题</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>User Position</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>GenDoc</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Generate Doc</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Admin</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：Senior Solution Leader</td>
+<td style="text-align:center">Admin</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">模块标题</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>E-mail</strong></td>
-<td style="text-align:left">TextField</td>
+<td style="text-align:left"><strong>UpdateRules</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Update user defined variables (rules)</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ExistingVars</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Existing HDoc variables</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>UploadDeleteTemplate</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Upload/Delete template</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ListTemplates</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">List available templates</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>VPPSVinPlate</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">VPPS Vin plate</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ADCAChange</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">AD/CA Change</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>UserAdministration</strong></td>
+<td style="text-align:left">Label</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">Output</td>
 <td style="text-align:left">-</td>
 <td style="text-align:center">左 (Left)</td>
-<td style="text-align:center">空 (Empty)</td>
-<td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">示例：mats.e.gustavsson@volvo.com</td>
+<td style="text-align:center">User Administration</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">模块标题</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Clear</strong></td>
-<td style="text-align:left">Button</td>
+<td style="text-align:left"><strong>HDocUserAdmin</strong></td>
+<td style="text-align:left">Link</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">HDoc User Administration</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">清空所有输入内容</td>
+<td style="text-align:left">前缀 <code>»</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>Back</strong></td>
-<td style="text-align:left">Button</td>
+<td style="text-align:left"><strong>HDocUserDocAdmin</strong></td>
+<td style="text-align:left">Link</td>
 <td style="text-align:center">-</td>
 <td style="text-align:center">-</td>
-<td style="text-align:center">Action</td>
+<td style="text-align:center">-</td>
 <td style="text-align:left">-</td>
-<td style="text-align:center">中 (Center)</td>
-<td style="text-align:center">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">HDoc User Doc Administration</td>
 <td style="text-align:center">活性 (Enabled)</td>
-<td style="text-align:left">返回上一页面</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>SearchUser</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Search User</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Documentation</strong></td>
+<td style="text-align:left">Label</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">Output</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">Documentation</td>
+<td style="text-align:center">非活性</td>
+<td style="text-align:left">模块标题</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>UserGuide</strong></td>
+<td style="text-align:left">Link</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">-</td>
+<td style="text-align:center">左 (Left)</td>
+<td style="text-align:center">User Guide</td>
+<td style="text-align:center">活性 (Enabled)</td>
+<td style="text-align:left">前缀 <code>»</code></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong>注</strong>：</p>
 <ul>
-<li><strong>TextField</strong>：数据来源于后端 API 返回的用户信息，渲染为只读文本框。</li>
-<li><strong>Button</strong>：点击触发相应的操作（清空或返回）。</li>
-<li>所有输出字段均为只读显示，不提供编辑功能。</li>
+<li>所有 Link/Button 控件前在 UI 上需显示 <code>»</code> 符号作为视觉引导。</li>
+<li>模块标题（Label）为常显，不可点击；操作项（Link/Button）为活性状态，可点击触发路由跳转。</li>
 </ul>
 </blockquote>
 <h2 id="3-业务逻辑与校验规则-business-logic--checks">3. 业务逻辑与校验规则 (Business Logic &amp; Checks) </h2>
-<p>所有逻辑均在页面加载时自动执行。</p>
 <h3 id="31-处理流程">3.1 处理流程 </h3>
+<h4 id="流程1-菜单渲染">流程1: 菜单渲染 </h4>
 <ol>
-<li><strong>开始</strong>：用户访问 EDB User View 页面。</li>
-<li><strong>前置处理</strong>：接受前画面数据（userid）。</li>
-<li><strong>空值校验 (Frontend Check)</strong>：
+<li><strong>开始</strong>：用户从登录页跳转至本页面（Page OnMount）。</li>
+<li><strong>前置处理</strong>：无。</li>
+<li><strong>菜单渲染逻辑</strong>：
 <ul>
-<li>无。</li>
+<li>遍历预定义的菜单结构。</li>
+<li>显示模块标题（Generate、Admin、User Administration、Documentation）及子菜单项。</li>
 </ul>
 </li>
-<li><strong>API 调用 (Backend Check)</strong>：
-<ul>
-<li>调用 <code>POST /api/AuthenticationApi/login</code>（仅传 <code>userid</code>，不传密码）获取用户信息。</li>
-</ul>
-</li>
+<li><strong>结果反馈</strong>：显示模块标题及子菜单项。</li>
+</ol>
+<h4 id="流程2-功能导航跳转">流程2: 功能导航跳转 </h4>
+<ol>
+<li><strong>开始</strong>：用户点击带有 <code>»</code> 符号的操作链接。</li>
+<li><strong>前置处理</strong>：无。</li>
+<li><strong>执行跳转</strong>：调用对应的后台服务接口或路由跳转。</li>
 <li><strong>结果处理</strong>：
 <ul>
-<li><strong>成功</strong>：正常渲染 Userid、Responsible、User Position、E-mail 字段。</li>
-<li><strong>失败</strong>：显示错误消息：「无法加载用户信息，请稍后重试」。</li>
+<li><strong>成功</strong>：进入对应的功能子页面或执行后台任务（如弹出下载框）。</li>
+<li><strong>失败</strong>：显示错误信息。</li>
 </ul>
 </li>
 </ol>
-<h3 id="32-清空功能处理流程">3.2 清空功能处理流程 </h3>
-<ol>
-<li><strong>开始</strong>：用户点击「Clear」按钮。</li>
-<li><strong>处理</strong>：清空页面所有文本框内容。</li>
-<li><strong>结束</strong>：页面恢复初始状态。</li>
-</ol>
-<h3 id="33-返回功能处理流程">3.3 返回功能处理流程 </h3>
-<ol>
-<li><strong>开始</strong>：用户点击「Back」按钮。</li>
-<li><strong>处理</strong>：系统跳转至前一个页面，不保存当前状态。</li>
-<li><strong>结束</strong>：页面跳转完成。</li>
-</ol>
-<h3 id="34-校验详细规格表">3.4 校验详细规格表 </h3>
+<h3 id="32-校验详细规格表">3.2 校验详细规格表 </h3>
 <table>
 <thead>
 <tr>
@@ -230,47 +327,17 @@
 <tbody>
 <tr>
 <td style="text-align:center">1</td>
-<td style="text-align:center">页面加载时</td>
-<td style="text-align:center">Userid</td>
-<td style="text-align:center">不存在于 Saviynt</td>
-<td style="text-align:center">「用户不存在」</td>
-<td style="text-align:center">显示警告信息</td>
+<td style="text-align:center">点击菜单项</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
 </tr>
 </tbody>
 </table>
 <h2 id="4-接口定义-api-specification">4. 接口定义 (API Specification) </h2>
-<h3 id="41-获取用户信息接口">4.1 获取用户信息接口 </h3>
-<ul>
-<li><strong>功能</strong>：获取指定用户的详细信息。</li>
-<li><strong>Method</strong>: <code>POST</code></li>
-<li><strong>Endpoint</strong>: <code>/api/AuthenticationApi/login</code></li>
-</ul>
-<h4 id="request-body">Request Body </h4>
-<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
-  <span class="token property">"userid"</span><span class="token operator">:</span> <span class="token string">"t009667"</span>
-<span class="token punctuation">}</span>
-</code></pre><blockquote>
-<p><strong>注</strong>：仅传入 <code>userid</code> 时，系统执行用户信息查询（不验证密码）。<br>
-同时传入 <code>userid</code> 和 <code>password</code> 时，系统执行登录认证。</p>
-</blockquote>
-<h4 id="response-success-200-ok">Response Success (200 OK) </h4>
-<pre data-role="codeBlock" data-info="json（例）" class="language-json（例） json（例）"><code>{
-  "code": ***,
-  "msg": "登录成功",
-  "data": {
-    "userid": "t009667",
-    "responsible": "Mats Gustafsson",
-    "userPosition": "Senior Solution Leader",
-    "email": "mats.e.gustavsson@volvo.com"
-  }
-}
-</code></pre><h4 id="response-error-404-not-found">Response Error (404 Not Found) </h4>
-<pre data-role="codeBlock" data-info="json（例）" class="language-json（例） json（例）"><code>{
-  "code": 404,
-  "msg": "用户不存在",
-  "data": null
-}
-</code></pre><h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
+<p>本模块无直接业务数据接口调用，主要为前端路由导航与菜单渲染。</p>
+<h2 id="5-异常处理-exception-handling">5. 异常处理 (Exception Handling) </h2>
 <table>
 <thead>
 <tr>
@@ -281,24 +348,19 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><strong>网络超时</strong></td>
-<td style="text-align:left">重试一次，若仍失败则提示</td>
-<td style="text-align:left">「网络连接失败，请检查网络设置」</td>
+<td style="text-align:left"><strong>会话过期 (401)</strong></td>
+<td style="text-align:left">捕获全局 Auth 错误，重定向至登录页</td>
+<td style="text-align:left"><code>Session expired. Please login again.</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>用户不存在 (404)</strong></td>
-<td style="text-align:left">返回错误响应</td>
-<td style="text-align:left">「用户不存在」</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>数据库异常</strong></td>
-<td style="text-align:left">回滚事务，记录日志</td>
-<td style="text-align:left">「系统繁忙，请稍后再试」</td>
+<td style="text-align:left"><strong>网络断开/超时</strong></td>
+<td style="text-align:left">捕获 Network Error</td>
+<td style="text-align:left"><code>Network error. Please check your connection.</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>服务器内部错误 (500)</strong></td>
 <td style="text-align:left">捕获 Server Error</td>
-<td style="text-align:left">「无法加载用户信息，请稍后重试」</td>
+<td style="text-align:left"><code>System error. Please contact support.</code></td>
 </tr>
 </tbody>
 </table>
@@ -306,35 +368,36 @@
 <ol>
 <li><strong>状态管理</strong>：
 <ul>
-<li>使用 React State 管理 <code>userInfo</code>（用户信息数据）、<code>isLoading</code>（加载状态）、<code>errorMessage</code>（错误消息）。</li>
-<li>页面初始化时自动触发数据加载。</li>
+<li>使用 React State 管理 <code>user</code>（用户信息）、<code>isLoading</code>（加载状态）。</li>
+<li>从 <code>localStorage</code> 中读取 <code>user_info</code> 和 <code>auth_token</code> 进行会话校验。</li>
 </ul>
 </li>
-<li><strong>加载状态</strong>：
+<li><strong>会话校验</strong>：
 <ul>
-<li>数据加载期间应显示 Loading 指示器（如 Spin 或 Skeleton），提升用户体验。</li>
-</ul>
-</li>
-<li><strong>错误处理</strong>：
-<ul>
-<li>API 调用失败时，页面中央显示错误消息，并提供重试按钮或提示用户刷新页面。</li>
+<li>页面加载时（OnMount）检查 Token 是否存在及是否过期。</li>
+<li>若 Token 无效（401），重定向至登录页，显示 <code>Session expired. Please login again.</code>。</li>
 </ul>
 </li>
 <li><strong>UI 细节</strong>：
 <ul>
-<li>Userid 字段可在页面顶部突出显示，作为用户标识。</li>
-<li>E-mail 字段建议渲染为超链接（<code>mailto:</code>），便于快速发送邮件。</li>
-<li>「Clear」与「Back」按钮应置于页面底部或表单下方，保持布局一致。</li>
+<li>顶部 Header 使用蓝色背景底板，白色字体显示 "VOLVO" Logo。</li>
+<li>菜单区域使用浅灰色背景，靠左对齐。</li>
+<li>整体大小大约占据屏幕的 30%，纵向靠左表示。</li>
+<li><code>»</code> 符号建议使用 CSS pseudo-element (<code>::before</code>) 实现，便于统一样式管理。</li>
+<li>菜单项 hover 效果应明显，提升交互反馈。</li>
 </ul>
 </li>
-<li><strong>按钮交互</strong>：
+<li><strong>路由配置</strong>：
 <ul>
-<li>「Clear」按钮点击时，无需调用 API，仅清空前端状态。</li>
-<li>「Back」按钮可使用 <code>window.history.back()</code> 或路由导航实现返回功能。</li>
+<li>菜单项的点击事件通过 <code>useNavigate</code> 实现路由跳转，路径根据各子模块的 Route 配置映射。</li>
+</ul>
+</li>
+<li><strong>性能优化</strong>：
+<ul>
+<li>菜单结构相对静态，可考虑使用 <code>React.memo</code> 避免不必要的重渲染。</li>
 </ul>
 </li>
 </ol>
-<hr>
 
       </div>
       
