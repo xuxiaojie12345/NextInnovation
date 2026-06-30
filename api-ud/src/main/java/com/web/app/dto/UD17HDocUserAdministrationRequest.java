@@ -1,5 +1,6 @@
 package com.web.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -27,23 +28,21 @@ public class UD17HDocUserAdministrationRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "用户ID", required = true, example = "user123")
+    @JsonProperty("userId")
     private String userid;
 
-    @ApiModelProperty(value = "市场权限列表")
-    private List<MarketAuthItem> marketAuths;
-
-    @ApiModelProperty(value = "机能权限列表")
-    private List<String> functionAuths;
+    @ApiModelProperty(value = "功能权限列表（含对应市场信息）")
+    private List<FunctionAuthItem> functionAuths;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @ApiModel(value = "市场权限项", description = "市场权限信息")
-    public static class MarketAuthItem implements Serializable {
+    @ApiModel(value = "功能权限项", description = "功能权限及对应市场权限信息")
+    public static class FunctionAuthItem implements Serializable {
         private static final long serialVersionUID = 1L;
-        @ApiModelProperty(value = "角色类型", example = "Standard User")
-        private String roleType;
-        @ApiModelProperty(value = "市场", example = "JP")
+        @ApiModelProperty(value = "功能权限", example = "Standard User")
+        private String function;
+        @ApiModelProperty(value = "市场", example = "-EU")
         private String market;
     }
 }

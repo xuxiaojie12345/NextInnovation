@@ -3,7 +3,7 @@
 <mapper namespace="com.web.app.mapper.UD18HDocUserDocAdministrationMapper">
 
     <!--
-        UD18 检查用户是否在机能权限表中存在
+        UD18 5.36 - 查询语句1: 检查HDOC_FUNCTION_AUTH是否存在该用户记录
     -->
     <select id="countFunctionAuthByUserId" resultType="java.lang.Integer">
         SELECT COUNT(1)
@@ -12,38 +12,37 @@
     </select>
 
     <!--
-        UD18 根据用户ID查询用户基本信息
+        UD18 5.37 - 查询语句2: 查询用户文档类型（doctype为可选参数）
+        - 当doctype不为空时，精确匹配文档类型
+        - 当doctype为空时，返回该用户所有文档类型
     -->
-    <select id="selectUserInfor" resultType="com.web.app.entity.HdocUserInfor">
-        SELECT
-            USERID AS userid,
-            USERNAME AS username,
-            RESPONSIBLE AS responsible,
-            USERPOSITION AS userposition,
-            EMAIL AS email
-        FROM HDOC_USER_INFOR
-        WHERE USERID = #{userId}
-    </select>
-
-    <!--
-        UD18 根据用户ID查询用户文档类型
-    -->
-    <select id="selectUserDocByUserId" resultType="com.web.app.entity.HdocUserDoc">
-        SELECT
-            USERID AS userid,
-            DOCTYPE AS doctype
+    <select id="selectUserDocByUserId" resultType="java.util.Map">
+        SELECT DOCTYPE AS doctype
         FROM HDOC_USER_DOC
         WHERE USERID = #{userId}
+        <if test="doctype != null and doctype != ''">
+            AND DOCTYPE = #{doctype}
+        </if>
     </select>
 
     <!--
-        UD18 更新用户文档类型
+        UD18 5.38.1 - 插入语句: 插入用户文档权限到HDOC_USER_DOC表
     -->
-    <update id="updateUserDoc">
-        UPDATE HDOC_USER_DOC
-        SET DOCTYPE = #{doctype},
-            UPDATE_DATETIME = NOW()
-        WHERE USERID = #{userId}
-    </update>
+    <insert id="insertUserDoc">
+        INSERT INTO HDOC_USER_DOC
+            (USERID, DOCTYPE, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+             UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+            (#{userId}, #{doctype}, NOW(), #{registerUser}, #{registerProcess},
+             NOW(), #{updateUser}, #{updateProcess})
+    </insert>
+
+    <!--
+        UD18 5.38.2 - 删除语句: 删除用户文档权限
+    -->
+    <delete id="deleteUserDoc">
+        DELETE FROM HDOC_USER_DOC
+        WHERE USERID = #{userId} AND DOCTYPE = #{doctype}
+    </delete>
 
 </mapper>

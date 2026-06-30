@@ -31,10 +31,10 @@ public class UD17HDocUserAdministrationController {
     @GetMapping("/userinfo")
     @ApiOperation(value = "获取用户权限信息", notes = "根据用户ID查询用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse userInfo(
-            @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userid") String userid) {
-        log.info("收到UD17查询用户权限信息请求, userid: {}", userid);
+            @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
+        log.info("收到UD17查询用户权限信息请求, userId: {}", userId);
         UD17HDocUserAdministrationRequest request = new UD17HDocUserAdministrationRequest();
-        request.setUserid(userid);
+        request.setUserid(userId);
         return ud17Service.userInfo(request);
     }
 
@@ -45,13 +45,10 @@ public class UD17HDocUserAdministrationController {
         return ud17Service.updateRole(request);
     }
 
-    @DeleteMapping("/deleteuser")
+    @PostMapping("/deleteuser")
     @ApiOperation(value = "删除用户权限", notes = "删除用户的机能权限和市场权限")
-    public UD17HDocUserAdministrationResponse deleteUser(
-            @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userid") String userid) {
-        log.info("收到UD17删除用户权限请求, userid: {}", userid);
-        UD17HDocUserAdministrationRequest request = new UD17HDocUserAdministrationRequest();
-        request.setUserid(userid);
+    public UD17HDocUserAdministrationResponse deleteUser(@RequestBody UD17HDocUserAdministrationRequest request) {
+        log.info("收到UD17删除用户权限请求, userid: {}", request.getUserid());
         return ud17Service.deleteUser(request);
     }
 }

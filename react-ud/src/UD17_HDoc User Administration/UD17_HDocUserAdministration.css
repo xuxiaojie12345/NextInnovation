@@ -1,0 +1,269 @@
+/* ============================================================
+   UD17_HDocUserAdministration.css
+   HDoc User Administration - 用户权限管理页面样式
+   参照UD16样式统一风格
+   ============================================================ */
+
+/* ==================== 页面主容器（参照UD16） ==================== */
+.ud17-container {
+  background-color: white;
+  padding: 5px 10px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== 页面标题（参照UD16） ==================== */
+.ud17-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
+}
+
+/* ==================== 表单区域（参照UD16） ==================== */
+.ud17-form-section {
+  border: 1px solid #9999cc;
+  padding: 20px;
+  background-color: #ffffff;
+  margin-bottom: 0;
+}
+
+/* ==================== 用户查询区域 ==================== */
+.ud17-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ud17-search-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ud17-search-group label {
+  font-size: 13px;
+  font-weight: normal;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+}
+
+.ud17-search-group input {
+  width: 140px;
+  padding: 4px 6px;
+  border: 1px solid #999;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.ud17-search-group input:focus {
+  border-color: #666;
+  outline: none;
+}
+
+/* User Info 按钮 */
+.ud17-btn-info {  
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud17-btn-info:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud17-btn-info:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== User标签行 ==================== */
+.ud17-user-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.ud17-user-label-text {
+  font-size: 13px;
+  font-weight: normal;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.ud17-user-value {
+  font-size: 13px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud17-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud17-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ==================== Roles区域（前两行共用标题） ==================== */
+.ud17-roles-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.ud17-roles-label {
+  font-size: 12px;
+  /* font-weight: bold; */
+  color: #333;
+  white-space: nowrap;
+  min-width: 150px;
+}
+
+.ud17-roles-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ==================== Checkbox行 ==================== */
+.ud17-checkbox-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.ud17-checkbox-row.ud17-row2 {
+  margin-bottom: 0;
+}
+
+/* 每个checkbox+market的列 */
+.ud17-checkbox-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ud17-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ud17-checkbox-wrapper input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  accent-color: #1890ff;
+}
+
+.ud17-checkbox-wrapper label {
+  color: #333;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Label类型角色（Market Super User） */
+.ud17-role-label {
+  color: #333;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 0;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Market Super User行：label和dropdown同行显示 */
+.ud17-checkbox-item-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* Market 下拉框 */
+.ud17-market-select {
+  padding: 3px 4px;
+  border: 1px solid #999;
+  font-size: 12px;
+  background-color: #ffffff;
+  cursor: pointer;
+  width: 50px;
+}
+
+.ud17-market-select:focus {
+  border-color: #666;
+  outline: none;
+}
+
+.ud17-market-select:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ==================== 操作按钮区域 ==================== */
+.ud17-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  border: 1px solid #9999cc; /* 与form-section相同的边框 */
+  border-top: none; /* 去掉上边框，与form-section连接 */
+}
+
+.ud17-btn-update,
+.ud17-btn-delete {
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud17-btn-update:hover,
+.ud17-btn-delete:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud17-btn-update:disabled,
+.ud17-btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

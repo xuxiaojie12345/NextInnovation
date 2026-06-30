@@ -1,0 +1,237 @@
+/* ============================================================
+   UD18_HDocUserDocAdministration.css
+   HDoc User Doc Administration - 用户文档权限管理页面样式
+   参照UD17样式统一风格
+   对应详细设计：DES-UD18-001
+   ============================================================ */
+
+/* ==================== 页面主容器（参照UD17） ==================== */
+.ud18-container {
+  background-color: white;
+  padding: 5px 10px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== 页面标题（参照UD17） ==================== */
+.ud18-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
+}
+
+/* ==================== 表单区域（参照UD17） ==================== */
+.ud18-form-section {
+  border: 1px solid #9999cc;
+  padding: 20px;
+  background-color: #ffffff;
+  margin-bottom: 0;
+}
+
+/* ==================== 用户查询区域 ==================== */
+.ud18-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ud18-search-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ud18-search-group label {
+  font-size: 15px;
+  font-weight: normal;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.ud18-search-group input {
+  width: 160px;
+  padding: 4px 6px;
+  border: 1px solid #9999cc;
+  border-radius: 0;
+  font-size: 13px;
+  box-sizing: border-box;
+  height: 26px;
+}
+
+.ud18-search-group input:focus {
+  outline: none;
+  border-color: #6666aa;
+}
+
+/* User Info 查询按钮（参照UD17） */
+.ud18-btn-info {
+  padding: 4px 14px;
+  background-color: #d0d0f0;
+  color: black;
+  border: 1px solid #003366;
+  border-radius: 0;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: normal;
+  white-space: nowrap;
+  height: 26px;
+  line-height: 16px;
+}
+
+.ud18-btn-info:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud18-btn-info:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* ==================== User 标签行（参照UD17） ==================== */
+.ud18-user-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.ud18-user-label-text {
+  font-size: 15px;
+  font-weight: normal;
+  color: #333;
+  white-space: nowrap;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.ud18-user-value {
+  font-size: 13px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* ==================== Document 区域 ==================== */
+.ud18-doc-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+  margin-left: 150px;
+}
+
+.ud18-doc-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+  width: 60px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* 多选提示文字 */
+.ud18-multi-hint {
+  font-size: 11px;
+  color: #999;
+  font-weight: normal;
+}
+
+/* Document 多选下拉框 */
+.ud18-document-select {
+  width: 300px;
+  padding: 4px;
+  border: 1px solid #9999cc;
+  border-radius: 0;
+  font-size: 13px;
+  background-color: #ffffff;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 60px;
+}
+
+.ud18-document-select:focus {
+  outline: none;
+  border-color: #b8d1f1;
+  color: #0a0a0a;
+}
+
+.ud18-document-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.ud18-document-select option {
+  padding: 3px 6px;
+}
+
+.ud18-document-select option:checked {
+  background-color: #b8d1f1;
+  color: #0a0a0a;
+  /* font-weight: 600; */
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud18-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud18-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ==================== 操作按钮区域 ==================== */
+.ud18-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  border: 1px solid #9999cc; /* 与form-section相同的边框 */
+  border-top: none; /* 去掉上边框，与form-section连接 */
+}
+
+/* Update 按钮（参照UD17） */
+.ud18-btn-update {
+  color: black;
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud18-btn-update:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud18-btn-update:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}

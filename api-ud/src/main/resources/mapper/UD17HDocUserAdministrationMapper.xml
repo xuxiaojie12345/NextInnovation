@@ -3,57 +3,131 @@
 <mapper namespace="com.web.app.mapper.UD17HDocUserAdministrationMapper">
 
     <!--
-        UD17 根据用户ID查询机能权限
+        UD17 userinfo - 查询语句1：从HDOC_USER_INFOR表获取用户名称（判断用户是否存在）
+        对应全体API設計 5.32 查询语句1
     -->
-    <select id="selectFunctionAuthByUserid" resultType="com.web.app.entity.HdocFunctionAuth">
-        SELECT
-            USERID AS userid,
-            `FUNCTION` AS function
-        FROM HDOC_FUNCTION_AUTH
+    <select id="selectUserNameByUserid" resultType="java.lang.String">
+        SELECT USERNAME FROM HDOC_USER_INFOR
         WHERE USERID = #{userid}
     </select>
 
     <!--
-        UD17 根据用户ID查询市场权限
+        UD17 userinfo - 查询语句2：关联查询功能权限和市场权限
+        对应全体API設計 5.32 查询语句2
+        对于有MARKET_AUTH记录的角色返回市场信息，没有的也从FUNCTION_AUTH返回type代码
     -->
-    <select id="selectMarketAuthByUserid" resultType="com.web.app.entity.HdocMarketAuth">
-        SELECT
-            USERID AS userid,
-            MARKET AS market,
-            TYPE AS type
-        FROM HDOC_MARKET_AUTH
-        WHERE USERID = #{userid}
+    <select id="selectAuthListByUserid" resultType="java.util.Map">
+        <!-- 从HDOC_MARKET_AUTH获取有市场权限的记录 -->
+        SELECT 
+            ma.MARKET AS market,
+            ma.TYPE AS type,
+            ma.BU AS bu
+        FROM HDOC_MARKET_AUTH ma
+        WHERE ma.USERID = #{userid}
+          AND ma.`TYPE` IN (
+            SELECT 
+                CASE fa.`FUNCTION`
+                    WHEN 'USER' THEN 'U'
+                    WHEN 'RULES' THEN 'R'
+                    WHEN 'TEMPLATE' THEN 'T'
+                    WHEN 'Document' THEN 'D'
+                    WHEN 'User Administrator' THEN 'A'
+                    WHEN 'ADAPTATION DOC' THEN 'DOCMOD'
+                    WHEN 'market super user' THEN 'MCSU'
+                    ELSE fa.`FUNCTION`
+                END
+            FROM HDOC_FUNCTION_AUTH fa
+            WHERE fa.USERID = #{userid}
+        )
+        UNION
+        <!-- 从HDOC_FUNCTION_AUTH获取没有市场权限的角色（如User Admin） -->
+        SELECT 
+            '' AS market,
+            CASE fa.`FUNCTION`
+                WHEN 'USER' THEN 'U'
+                WHEN 'RULES' THEN 'R'
+                WHEN 'TEMPLATE' THEN 'T'
+                WHEN 'Document' THEN 'D'
+                WHEN 'User Administrator' THEN 'A'
+                WHEN 'ADAPTATION DOC' THEN 'DOCMOD'
+                WHEN 'market super user' THEN 'MCSU'
+                ELSE fa.`FUNCTION`
+            END AS type,
+            '' AS bu
+        FROM HDOC_FUNCTION_AUTH fa
+        WHERE fa.USERID = #{userid}
+          AND CASE fa.`FUNCTION`
+                WHEN 'USER' THEN 'U'
+                WHEN 'RULES' THEN 'R'
+                WHEN 'TEMPLATE' THEN 'T'
+                WHEN 'Document' THEN 'D'
+                WHEN 'User Administrator' THEN 'A'
+                WHEN 'ADAPTATION DOC' THEN 'DOCMOD'
+                WHEN 'market super user' THEN 'MCSU'
+                ELSE fa.`FUNCTION`
+            END NOT IN (
+                SELECT TYPE FROM HDOC_MARKET_AUTH WHERE USERID = #{userid}
+            )
     </select>
 
     <!--
-        UD17 更新用户机能权限
+        UD17 updaterole - 先删除：删除HDOC_FUNCTION_AUTH表所有记录
     -->
-    <update id="updateFunctionAuth">
-        UPDATE HDOC_FUNCTION_AUTH
-        SET `FUNCTION` = #{function},
-            UPDATE_DATETIME = NOW()
+    <delete id="deleteFunctionAuthByUserid">
+        DELETE FROM HDOC_FUNCTION_AUTH
         WHERE USERID = #{userid}
-    </update>
+    </delete>
 
     <!--
-        UD17 更新用户市场权限
+        UD17 updaterole - 先删除：删除HDOC_MARKET_AUTH表所有记录
     -->
-    <update id="updateMarketAuth">
-        UPDATE HDOC_MARKET_AUTH
-        SET MARKET = #{market},
-            TYPE = #{type},
-            UPDATE_DATETIME = NOW()
+    <delete id="deleteMarketAuthByUserid">
+        DELETE FROM HDOC_MARKET_AUTH
         WHERE USERID = #{userid}
-    </update>
+    </delete>
 
     <!--
-        UD17 删除用户的机能权限和市场权限（关联删除）
+        UD17 updaterole - 后插入：插入HDOC_FUNCTION_AUTH表
+        对应全体API設計 5.33
     -->
-    <delete id="deleteUserAuth">
-        DELETE T1, T2
-        FROM HDOC_FUNCTION_AUTH T1
-        INNER JOIN HDOC_MARKET_AUTH T2 ON T1.USERID = T2.USERID
-        WHERE T1.USERID = #{userid}
+    <insert id="insertFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH
+            (USERID, `FUNCTION`, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+             UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+            (#{userid}, #{function}, NOW(), #{registerUser}, #{registerProcess},
+             NOW(), #{updateUser}, #{updateProcess})
+    </insert>
+
+    <!--
+        UD17 updaterole - 后插入：插入HDOC_MARKET_AUTH表
+        对应全体API設計 5.34（TYPE = #{function}，BU固定为"BU"）
+    -->
+    <insert id="insertMarketAuth">
+        INSERT INTO HDOC_MARKET_AUTH
+            (USERID, MARKET, TYPE, BU, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+             UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+            (#{userid}, #{market}, #{function}, 'BU', NOW(), #{registerUser}, #{registerProcess},
+             NOW(), #{updateUser}, #{updateProcess})
+    </insert>
+
+    <!--
+        UD17 deleteuser - 删除语句1：删除HDOC_FUNCTION_AUTH表
+        对应全体API設計 5.35 删除语句1
+    -->
+    <delete id="deleteUserFunctionAuth">
+        DELETE FROM HDOC_FUNCTION_AUTH
+        WHERE USERID = #{userid}
+    </delete>
+
+    <!--
+        UD17 deleteuser - 删除语句2：删除HDOC_MARKET_AUTH表
+        对应全体API設計 5.35 删除语句2
+    -->
+    <delete id="deleteUserMarketAuth">
+        DELETE FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
     </delete>
 
 </mapper>

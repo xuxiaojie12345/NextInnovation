@@ -59,9 +59,9 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                     log.warn("UD16添加AD/CA变更 - 记录存在但ACT未激活(U)");
                     return UD16ADChangeResponse.error(409, "AFTER DEF CHANGE IS NOT ACTIVATED");
                 }
-                // ACT='Y'（已激活）-> 直接返回成功
-                log.info("UD16添加AD/CA变更 - 记录已存在且已激活(Y)");
-                return UD16ADChangeResponse.success("添加成功", null);
+                // ACT='Y'（已激活）-> 提示信息后终止处理
+                log.warn("UD16添加AD/CA变更 - 记录已存在且已激活(Y)，处理终止");
+                return UD16ADChangeResponse.error(400, "记录已存在且已激活");
             } else {
                 // 不存在则插入新记录
                 HdocAdcaChange adcaChange = new HdocAdcaChange();

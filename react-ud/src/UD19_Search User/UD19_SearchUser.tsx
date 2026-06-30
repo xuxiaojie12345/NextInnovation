@@ -1,0 +1,406 @@
+import React, { useState, useEffect } from 'react';
+import './UD19_SearchUser.css';
+import apiClient from '../api/config';
+
+/* ============================================================
+   类型定义
+   ============================================================ */
+
+/** Market列表项 */
+interface MarketItem {
+  market: string;
+  description: string;
+}
+
+/** 搜索结果用户项 */
+interface SearchUserItem {
+  userId: string;
+  username: string;
+  market: string;
+}
+
+/** 搜索API响应数据结构 */
+// interface SearchResponseData {
+//   count: number;
+//   datatable: SearchUserItem[];
+// }
+
+/* ============================================================
+   UD19_SearchUser 组件
+   Search User - 用户搜索页面
+
+   功能说明：
+   - 提供多条件用户搜索功能（UserID、用户名、Market、权限类型）
+   - 以表格形式展示搜索结果
+   - 支持组合条件搜索
+
+   对应设计书：DES-UD19-001
+   ============================================================ */
+const UD19_SearchUser: React.FC = () => {
+
+  // ==================== 状态管理 ====================
+  const [userId, setUserId] = useState<string>('');              // UserID输入值
+  const [username, setUsername] = useState<string>('');          // 用户名输入值
+  const [selectedMarket, setSelectedMarket] = useState<string>(''); // 选中的Market
+  const [searchType, setSearchType] = useState<string>('notSet');  // 搜索类型: notSet/rule/template
+  const [marketOptions, setMarketOptions] = useState<MarketItem[]>([]); // Market下拉列表
+  const [searchResults, setSearchResults] = useState<SearchUserItem[]>([]); // 搜索结果
+  const [message, setMessage] = useState<string>('');            // 消息内容
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success'); // 消息类型
+  const [isLoading, setIsLoading] = useState<boolean>(false);    // 加载状态
+  const [hasSearched, setHasSearched] = useState<boolean>(false); // 是否已执行搜索
+
+  // ==================== 常量定义 ====================
+  const USER_ID_REGEX = /^[a-zA-Z0-9]*$/;            // 半角英数字
+  const USER_REGEX = /^[a-zA-Z0-9]*$/;               // 半角英数字
+  const MAX_USER_ID_LENGTH = 10;
+  const MAX_USERNAME_LENGTH = 32;
+
+  // ==================== 初期表示 ====================
+  // 对应设计书 3.1.1 初始显示
+  useEffect(() => {
+    fetchMarketList();
+  }, []);
+
+  /**
+   * 获取Market下拉列表数据
+   * 对应设计书 3.1.1 - 调用 UD19SelectMarketMaster() 方法
+   * 对应设计书 4.1 UD19SelectMarketMaster - 获取Market列表
+   */
+  const fetchMarketList = async () => {
+    try {
+      const response = await apiClient.get('/api/ud19/getmarket');
+      if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
+        setMarketOptions(response.data.data);
+      }
+    } catch (error) {
+      console.error('获取Market列表失败:', error);
+    }
+  };
+
+  // ==================== 事件处理函数 ====================
+
+  /**
+   * 处理 UserID 输入变化
+   * 限制：只允许半角英数字，最大长度10字符
+   */
+  const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
+      setUserId(val);
+    }
+  };
+
+  /**
+   * 处理用户名输入变化
+   * 限制：只允许半角英数字，最大长度32字符
+   */
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (USER_REGEX.test(val) && val.length <= MAX_USERNAME_LENGTH) {
+      setUsername(val);
+    }
+  };
+
+  /**
+   * 处理Market下拉框变化
+   */
+  const handleMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log('UD19 Market选择变化:', e.target.value);
+    setSelectedMarket(e.target.value);
+  };
+
+  /**
+   * 处理搜索类型单选框变化
+   * 对应设计书 3.1.5~3.1.7 - 搜索类型切换
+   *
+   * @param type - 搜索类型
+   */
+  const handleSearchTypeChange = (type: string) => {
+    setSearchType(type);
+  };
+
+  // ==================== API 调用 ====================
+
+  /**
+   * 搜索用户
+   * 对应设计书 3.1.2 Search按钮处理流程
+   * 对应设计书 4.2 UD19SearchHdoc - 搜索用户
+   *
+   * 处理流程：
+   * 1. 前置处理：获取所有搜索条件
+   * 2. 空值校验：至少需要一个搜索条件
+   * 3. 格式校验：UserID和用户名格式检查
+   * 4. 调用API搜索
+   * 5. 结果处理：显示DataTable
+   */
+  const handleSearch = async () => {
+    const trimmedUserId = userId.trim();
+    const trimmedUsername = username.trim();
+
+    // 校验：UserID格式（如果有输入）
+    // 对应设计书 3.2 校验详细规格表 No.2
+    if (trimmedUserId && !USER_ID_REGEX.test(trimmedUserId)) {
+      setMessageType('error');
+      setMessage('UserID只能包含半角英数字');
+      return;
+    }
+    // 对应设计书 3.2 校验详细规格表 No.3
+    if (trimmedUserId.length > MAX_USER_ID_LENGTH) {
+      setMessageType('error');
+      setMessage('UserID最大长度为10字符');
+      return;
+    }
+
+    // 校验用户名格式
+    // 对应设计书 3.2 校验详细规格表 No.4
+    if (trimmedUsername && !USER_REGEX.test(trimmedUsername)) {
+      setMessageType('error');
+      setMessage('用户名只能包含半角英数字');
+      return;
+    }
+    // 对应设计书 3.2 校验详细规格表 No.5
+    if (trimmedUsername.length > MAX_USERNAME_LENGTH) {
+      setMessageType('error');
+      setMessage('用户名最大长度为32字符');
+      return;
+    }
+
+    // API调用
+    setIsLoading(true);
+    setMessage('');
+    setHasSearched(true);
+
+    try {
+      // 构建查询参数
+      // 对应设计书 4.2 Request Parameters
+      const params: Record<string, string> = {};
+      if (trimmedUserId) params.userId = trimmedUserId;
+      if (trimmedUsername) params.username = trimmedUsername;
+      if (selectedMarket) params.market = selectedMarket;
+      if (searchType !== 'notSet') {
+        // 画面Radio值与数据库TYPE的映射: rule→R, template→T
+        params.type = searchType === 'rule' ? 'R' : 'T';
+      }
+
+      console.log('UD19 搜索参数:', JSON.stringify(params));
+
+      // 调用搜索API
+      // 对应设计书 4.2 - GET /api/ud19/search
+      const response = await apiClient.get('/api/ud19/search', {
+        params,
+      });
+
+      console.log('UD19 搜索响应:', JSON.stringify(response.data));
+
+      // 结果处理
+      if (response.data?.code === 200) {
+        const responseData = response.data.data;
+        const tableData: SearchUserItem[] = responseData?.datatable || [];
+        const count = responseData?.count || tableData.length;
+
+        setSearchResults(tableData);
+        // setResultCount(count);
+
+        if (count > 0) {
+          // 找到匹配用户
+          setMessageType('success');
+        //   setMessage(`查询成功，共找到 ${count} 条记录`);
+        } else {
+          // 未找到匹配用户
+          setSearchResults([]);
+          setMessageType('success');
+          setMessage('未找到匹配的用户');
+        }
+      } else {
+        // 对应设计书 3.2 校验详细规格表 No.7
+        setMessageType('error');
+        setMessage(response.data?.msg || '搜索失败');
+        setSearchResults([]);
+        // setResultCount(0);
+      }
+    } catch (error: any) {
+      // 异常处理
+      console.error('搜索用户失败:', error);
+      setMessageType('error');
+      setSearchResults([]);
+    //   setResultCount(0);
+
+      if (error.response) {
+        const statusCode = error.response.status;
+        const errorMsg = error.response.data?.msg;
+
+        if (statusCode === 400) {
+          setMessage(errorMsg || '请输入至少一个搜索条件');
+        } else if (statusCode >= 500) {
+          // 对应设计书 5. 异常处理 - 服务器内部错误
+          setMessage('服务器内部错误，请联系管理员');
+        } else {
+          // 对应设计书 3.2 校验详细规格表 No.7
+          setMessage(errorMsg || '搜索失败');
+        }
+      } else if (error.code === 'ECONNABORTED') {
+        // 对应设计书 5. 异常处理 - 超时错误
+        setMessage('请求超时，请稍后重试');
+      } else {
+        // 对应设计书 5. 异常处理 - 网络连接失败
+        setMessage('网络连接失败，请检查网络设置');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==================== 渲染 UI ====================
+  return (
+    <div className='ud19-container'>
+      {/* 页面标题 - 参照UD18样式 */}
+      <div className='ud19-title'>Search User</div>
+
+      {/* 消息显示区域 */}
+      {message && (
+        <div
+          className={`ud19-message ${
+            messageType === 'success' ? 'ud19-message-success' : 'ud19-message-error'
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
+      {/* 搜索条件区域 */}
+      {/* 对应设计书 2.1.1 搜索条件区域 */}
+      <div className='ud19-form-section'>
+
+        {/* UserID：label + input 同行 */}
+        {/* 对应设计书 No.1 Userid */}
+        <div className='ud19-field-row'>
+          <label htmlFor='ud19-userid'>Userid</label>
+          <input
+            id='ud19-userid'
+            type='text'
+            value={userId}
+            onChange={handleUserIdChange}
+            placeholder=''
+            disabled={isLoading}
+            maxLength={MAX_USER_ID_LENGTH}
+            className='ud19-input'
+          />
+        </div>
+
+        {/* User：label + input 同行 */}
+        {/* 对应设计书 No.2 User */}
+        <div className='ud19-field-row'>
+          <label htmlFor='ud19-user'>User</label>
+          <input
+            id='ud19-user'
+            type='text'
+            value={username}
+            onChange={handleUsernameChange}
+            placeholder=''
+            disabled={isLoading}
+            maxLength={MAX_USERNAME_LENGTH}
+            className='ud19-input'
+          />
+        </div>
+
+        {/* Market：label + dropdown + Radio 按钮 */}
+        {/* 对应设计书 No.3 Market / No.4 Not set / No.5 Rule / No.6 Template */}
+        <div className='ud19-market-row'>
+          <label htmlFor='ud19-market'>Market</label>
+          <select
+            id='ud19-market'
+            className='ud19-select'
+            value={selectedMarket}
+            onChange={handleMarketChange}
+            disabled={isLoading}
+            size={10}
+          >
+            <option value=''></option>
+            {marketOptions.map((item, index) => (
+              <option key={index} value={item.market}>
+                {item.market}
+              </option>
+            ))}
+          </select>
+          <div className='ud19-radio-group'>
+            <label className='ud19-radio-item'>
+              <input
+                type='radio'
+                name='searchType'
+                checked={searchType === 'notSet'}
+                onChange={() => handleSearchTypeChange('notSet')}
+                disabled={isLoading}
+              />
+              Not set
+            </label>
+            <label className='ud19-radio-item'>
+              <input
+                type='radio'
+                name='searchType'
+                checked={searchType === 'rule'}
+                onChange={() => handleSearchTypeChange('rule')}
+                disabled={isLoading}
+              />
+              Rule
+            </label>
+            <label className='ud19-radio-item'>
+              <input
+                type='radio'
+                name='searchType'
+                checked={searchType === 'template'}
+                onChange={() => handleSearchTypeChange('template')}
+                disabled={isLoading}
+              />
+              Template
+            </label>
+          </div>
+        </div>
+      </div>
+
+        {/* Search 按钮 - 下方居中 */}
+        {/* 对应设计书 No.7 Search */}
+        <div className='ud19-action-area'>
+          <button
+            className='ud19-btn-search'
+            onClick={handleSearch}
+            disabled={isLoading}
+          >
+            {isLoading ? '处理中...' : 'Search'}
+          </button>
+        </div>
+
+      {/* 搜索结果区域 */}
+      {/* 对应设计书 2.1.2 搜索结果区域(DataTable) */}
+      <div className='ud19-result-section'>
+
+          {hasSearched && searchResults.length > 0 ? (
+            <table className='ud19-table'>
+              <thead>
+                <tr>
+                  <th>Userid</th>
+                  <th>User</th>
+                  <th>Market</th>
+                </tr>
+              </thead>
+              <tbody>
+                {searchResults.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.userId}</td>
+                    <td>{item.username}</td>
+                    <td>{item.market}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : hasSearched && searchResults.length === 0 && !message ? (
+            <div className='ud19-empty'>未找到匹配的用户</div>
+          ) : !hasSearched ? (
+            <div className='ud19-empty'>请输入搜索条件后点击Search按钮</div>
+          ) : null}
+      </div>
+    </div>
+  );
+};
+
+export default UD19_SearchUser;

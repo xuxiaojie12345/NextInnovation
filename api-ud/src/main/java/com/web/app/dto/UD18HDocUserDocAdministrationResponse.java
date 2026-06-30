@@ -11,11 +11,12 @@ import java.io.Serializable;
 /**
  * UD18 用户文档权限管理响应对象
  *
- * 功能说明：返回用户文档权限查询、更新操作结果
+ * 功能说明：返回用户文档权限检查、查询、更新、删除操作结果
+ * 对应全体API設計：UD18HDocUserDocAdministrationApi
  *
  * @author GitHub Copilot
- * @version 1.0
- * @date 2026-06-24
+ * @version 2.0
+ * @date 2026-06-30
  */
 @Data
 @NoArgsConstructor
@@ -50,35 +51,5 @@ public class UD18HDocUserDocAdministrationResponse implements Serializable {
         response.setMsg(msg);
         response.setData(null);
         return response;
-    }
-
-    // ==================== 内部数据类 ====================
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @ApiModel(value = "用户信息数据", description = "用户基本信息")
-    public static class UserInfoData implements Serializable {
-        private static final long serialVersionUID = 1L;
-        @ApiModelProperty(value = "用户ID", example = "user123")
-        private String userid;
-        @ApiModelProperty(value = "用户名", example = "John Doe")
-        private String name;
-        @ApiModelProperty(value = "负责人", example = "Manager")
-        private String responsible;
-        @ApiModelProperty(value = "用户职位", example = "Engineer")
-        private String userPosition;
-        @ApiModelProperty(value = "邮箱", example = "john@example.com")
-        private String email;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @ApiModel(value = "用户文档数据", description = "用户文档类型信息")
-    public static class UserDocData implements Serializable {
-        private static final long serialVersionUID = 1L;
-        @ApiModelProperty(value = "文档类型", example = "Homologation Certificate")
-        private String doctype;
     }
 }

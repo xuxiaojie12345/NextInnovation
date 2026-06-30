@@ -7,7 +7,6 @@
     -->
     <select id="selectDocumentList" resultType="com.web.app.entity.HdocDocumentList">
         SELECT
-            ID AS id,
             DOCTYPE AS doctype,
             DESCRIPTION AS description,
             REGISTER_USER AS registerUser,

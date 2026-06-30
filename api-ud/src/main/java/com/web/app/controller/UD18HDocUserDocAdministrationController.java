@@ -13,11 +13,16 @@ import org.springframework.web.bind.annotation.*;
 /**
  * UD18 用户文档权限管理控制器
  *
- * 功能说明：提供用户文档权限检查、查询、更新接口
+ * 功能说明：提供用户文档权限检查、查询、新增、删除接口
+ * 对应全体API設計：UD18HDocUserDocAdministrationApi
+ * - 4.1 GET /checkauth - 检查用户权限
+ * - 4.2 GET /getuserdoc - 获取用户文档类型
+ * - 4.3 POST /createdoc - 新增文档权限（对应5.38.1）
+ * - 4.4 POST /deleteedoc - 删除文档权限（对应5.38.2）
  *
  * @author GitHub Copilot
- * @version 1.0
- * @date 2026-06-24
+ * @version 2.0
+ * @date 2026-06-30
  */
 @Slf4j
 @RestController
@@ -29,7 +34,7 @@ public class UD18HDocUserDocAdministrationController {
     private UD18HDocUserDocAdministrationService ud18Service;
 
     @GetMapping("/checkauth")
-    @ApiOperation(value = "检查用户权限", notes = "根据用户ID检查用户是否存在并返回用户基本信息")
+    @ApiOperation(value = "4.1 - 检查用户权限", notes = "根据用户ID检查HDOC_FUNCTION_AUTH表中是否存在该用户")
     public UD18HDocUserDocAdministrationResponse checkAuth(
             @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
         log.info("收到UD18检查用户权限请求, userId: {}", userId);
@@ -39,19 +44,28 @@ public class UD18HDocUserDocAdministrationController {
     }
 
     @GetMapping("/getuserdoc")
-    @ApiOperation(value = "获取用户文档类型", notes = "根据用户ID查询用户的文档类型权限")
+    @ApiOperation(value = "4.2 - 获取用户文档类型", notes = "根据用户ID查询HDOC_USER_DOC表中的文档类型（doctype可选）")
     public UD18HDocUserDocAdministrationResponse getUserDoc(
-            @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
-        log.info("收到UD18获取用户文档类型请求, userId: {}", userId);
+            @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId,
+            @ApiParam(value = "文档类型（可选）", example = "Homologation Certificate") @RequestParam(value = "doctype", required = false) String doctype) {
+        log.info("收到UD18获取用户文档类型请求, userId: {}, doctype: {}", userId, doctype);
         UD18HDocUserDocAdministrationRequest request = new UD18HDocUserDocAdministrationRequest();
         request.setUserId(userId);
+        request.setDoctype(doctype);
         return ud18Service.getUserDoc(request);
     }
 
-    @PutMapping("/updatedoc")
-    @ApiOperation(value = "更新用户文档权限", notes = "更新用户在HDOC_USER_DOC表中的文档类型")
-    public UD18HDocUserDocAdministrationResponse updateDoc(@RequestBody UD18HDocUserDocAdministrationRequest request) {
-        log.info("收到UD18更新用户文档权限请求, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
-        return ud18Service.updateDoc(request);
+    @PostMapping("/createdoc")
+    @ApiOperation(value = "4.3 - 新增用户文档权限", notes = "对应5.38.1，插入HDOC_USER_DOC表")
+    public UD18HDocUserDocAdministrationResponse createDoc(@RequestBody UD18HDocUserDocAdministrationRequest request) {
+        log.info("收到UD18新增用户文档权限请求, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
+        return ud18Service.createDoc(request);
+    }
+
+    @PostMapping("/deleteedoc")
+    @ApiOperation(value = "4.4 - 删除用户文档权限", notes = "对应5.38.2，从HDOC_USER_DOC表删除")
+    public UD18HDocUserDocAdministrationResponse deleteDoc(@RequestBody UD18HDocUserDocAdministrationRequest request) {
+        log.info("收到UD18删除用户文档权限请求, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
+        return ud18Service.deleteDoc(request);
     }
 }

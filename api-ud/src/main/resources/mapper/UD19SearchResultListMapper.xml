@@ -22,7 +22,8 @@
             T1.USERNAME AS username,
             T2.MARKET AS market
         FROM HDOC_USER_INFOR T1
-        INNER JOIN HDOC_MARKET_AUTH T2 ON T1.USERID = T2.USERID
+        INNER JOIN HDOC_MARKET_AUTH T2 
+        ON T1.USERID = T2.USERID
         <where>
             <if test="userId != null and userId != ''">
                 AND T1.USERID = #{userId}
