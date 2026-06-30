@@ -19,6 +19,9 @@ import UD13_HDocTemplateCheck from './UD13_HDocTemplateCheck/UD13_HDocTemplateCh
 import UD14_ListAvailableTemplates from './UD14_List available templates/UD14_ListAvailableTemplates';
 import UD15_VinPlate from './UD15_Vin Plate/UD15_VinPlate';
 import UD16_ADChange from './UD16_AD Change/UD16_ADChange';
+import UD17_HDocUserAdministration from './UD17_HDoc User Administration/UD17_HDocUserAdministration';
+import UD18_HDocUserDocAdministration from './UD18_HDoc User Doc Administration/UD18_HDocUserDocAdministration';
+import UD19_SearchUser from './UD19_Search User/UD19_SearchUser';
 
 function App() {
   return (
@@ -77,6 +80,15 @@ function App() {
 
             {/* UD16 AD Change */}
             <Route path='/UD16' element={<UD16_ADChange />} />
+
+            {/* UD17 HDoc User Administration */}
+            <Route path='/UD17' element={<UD17_HDocUserAdministration />} />
+
+            {/* UD18 HDoc User Doc Administration */}
+            <Route path='/UD18' element={<UD18_HDocUserDocAdministration />} />
+
+            {/* UD19 Search User */}
+            <Route path='/UD19' element={<UD19_SearchUser />} />
             
             {/* UD24 用户指南 */}
             <Route path='/UD24' element={<UD24_UDHDoc />} />
