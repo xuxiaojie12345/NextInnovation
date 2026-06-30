@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { AuthenticationApi } from '../services/AuthenticationApi';
 import '../common/css/common.css';
 import './HDocUserDocAdministration.css';
 
@@ -77,7 +78,9 @@ const HDocUserDocAdministration: React.FC = () => {
       });
 
       if (docRes.code === 200 && docRes.data) {
-        setUsername(trimmedId);
+        // 詳細設計書 UD18 に基づき AuthenticationApi からユーザー名を取得
+        const userName = await AuthenticationApi.getUsernameByUserId(trimmedId);
+        setUsername(userName);
         const docList = docRes.data.docTypeList || [];
         setSelectedDocs(new Set(docList));
         setSuccessMessage('User info loaded successfully.');

@@ -129,11 +129,14 @@ const ModifyDocument: React.FC = () => {
       <div className="modify-doc-info">
         <div className="modify-doc-info-item">
           <span className="info-label">Chassis no:</span>
-          <span className="info-value">{chassisDisplay}</span>
+          <span className="info-value">
+            <strong>{serie}</strong>
+            <strong style={{ textDecoration: 'underline', color: '#66707b', marginLeft: 4 }}>{chnr}</strong>
+          </span>
         </div>
         <div className="modify-doc-info-item">
-          <span className="info-label">Market:</span>
-          <span className="info-value">{market || '-'}</span>
+          <span className="info-label" style={{ fontWeight: 500 }}>Market:</span>
+          <span className="info-value" style={{ color: '#66707b', fontWeight: 500 }}>{market || '-'}</span>
         </div>
       </div>
 
