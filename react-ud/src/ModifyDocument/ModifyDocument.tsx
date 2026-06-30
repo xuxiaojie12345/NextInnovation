@@ -197,6 +197,20 @@ const ModifyDocument: React.FC = () => {
     }
   }, [variables, chassisNo, market, isAllModifiedEmpty, navigate]);
 
+  /**
+   * 点击 chassis no 链接 - 跳转到 Vehicle Specification 页面（UD07）
+   * 对应详细设计 2.1 chassis no Link押下时处理
+   * 传递参数：chassisNo（serie + 半角空格 + chassisNo 的拼接值）
+   */
+  const handleChassisNoClick = useCallback(() => {
+    const fullChassisNo = `${serie} ${chassisNo}`.trim();
+    if (fullChassisNo) {
+      navigate('/Menu/VehicleSpecification', {
+        state: { chassisNo: fullChassisNo }
+      });
+    }
+  }, [serie, chassisNo, navigate]);
+
   // 加载中状态
   if (loading) {
     return (
@@ -234,7 +248,13 @@ const ModifyDocument: React.FC = () => {
       <div className='vehicle-info-section'>
         <div className='info-item'>
           <label>chassis no:</label>
-          <span>{serie ? `${serie} ${chassisNo}` : (chassisNo || '-')}</span>
+          <span
+            className='chassis-link'
+            onClick={handleChassisNoClick}
+            title='点击查看车辆规格'
+          >
+            {serie ? `${serie} ${chassisNo}` : (chassisNo || '-')}
+          </span>
         </div>
         <div className='info-item'>
           <label>Market:</label>
@@ -242,15 +262,13 @@ const ModifyDocument: React.FC = () => {
         </div>
       </div>
 
-      {/* 模板文件链接（对应设计书 2.1 Template文件） */}
+      {/* 模板文件链接（对应设计书 2.1 Template文件 - 点击下载） */}
       {templateFile && (
         <div className='template-section'>
           <a
-            href='#'
+            href={`${API_BASE_URL}/api/ud05/template/download?file=${encodeURIComponent(templateFile)}`}
             className='template-link'
-            onClick={(e) => {
-              e.preventDefault();
-            }}
+            download
           >
             {`Template: ${templateFile}`}
           </a>

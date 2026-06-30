@@ -59,7 +59,7 @@ No. | 项目名 | 类型 | 必填 | MaxLength | 数据源_表 | 数据源_字段
 一级菜单：Generate
 - Generate Doc
 
-一级菜单：Admin
+二级菜单：Admin
 - Update user defined variables (rules)
 - Existing HDoc variables
 - Upload/Delete template

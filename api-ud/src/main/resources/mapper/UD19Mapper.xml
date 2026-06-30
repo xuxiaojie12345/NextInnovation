@@ -3,7 +3,7 @@
 <mapper namespace="com.web.app.mapper.UD19Mapper">
 
     <select id="selectAllMarkets" resultType="java.util.LinkedHashMap">
-        SELECT MARKET FROM MARKET_MASTER ORDER BY MARKET
+        SELECT MARKET, DESCRIPTION FROM MARKET_MASTER ORDER BY MARKET
     </select>
 
     <select id="searchByUserId" resultType="java.util.LinkedHashMap">

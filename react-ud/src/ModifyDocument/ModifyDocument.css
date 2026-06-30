@@ -8,7 +8,7 @@
 .modify-document-container {
   padding: 24px;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 0;
   font-family: Arial, sans-serif;
   background-color: #fff;
   border-radius: 6px;
@@ -92,6 +92,17 @@
   color: #003087;
   font-weight: 500;
   word-break: break-all;
+}
+
+/* chassis no 链接样式 */
+.chassis-link {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.chassis-link:hover {
+  color: #1890ff;
 }
 
 /* 模板文件链接区域 */

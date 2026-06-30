@@ -73,11 +73,19 @@
   white-space: nowrap;
 }
 
+.ud22-table thead th:first-child {
+  border-right: 1px solid #b0c4de;
+}
+
 .ud22-table tbody td {
   padding: 8px 16px;
   color: #333333;
   border-bottom: 1px solid #e0e0e0;
   vertical-align: middle;
+}
+
+.ud22-table tbody td:first-child {
+  border-right: 1px solid #e0e0e0;
 }
 
 .ud22-table tbody tr:hover {

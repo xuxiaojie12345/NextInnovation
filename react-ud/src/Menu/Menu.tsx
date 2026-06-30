@@ -27,30 +27,35 @@ interface MenuItem {
 // 菜单配置（对应详细设计2.2 画面布局说明）
 const menuItems: MenuItem[] = [
   {
-    key: "Generate",
-    label: "Generate",
+    key: "GenerateDucument",
+    label: "Generate Ducument",
     icon: <FileTextOutlined />,
     children: [
-      { key: "GenerateDoc", label: "Generate Doc", route: "/Menu/GenerateHomologationDocument" },
-      { key: "GenerateBatch", label: "Generate in Batch", route: "#" },
-      { key: "RegdataArchive", label: "Regdata Archive", route: "#" },
-      { key: "RegdataBatch", label: "Regdata Batch", route: "#" },
-    ],
-  },
-  {
-    key: "Admin",
-    label: "Admin",
-    icon: <SettingOutlined />,
-    children: [
-      { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
-      { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "/Menu/HomologationVariables" },
-      { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
-      { key: "UnlockDocument", label: "Unlock Document", route: "#" },
-      { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
-      { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
-      { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
-      { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
-      { key: "ADCAChange", label: "AD/CA Change", route: "#" },
+      {
+        key: "subGenerate",
+        label: "Generate",
+        children: [
+          { key: "GenerateDoc", label: "Generate Doc", route: "/Menu/GenerateHomologationDocument" },
+          { key: "GenerateBatch", label: "Generate in Batch", route: "#" },
+          { key: "RegdataArchive", label: "Regdata Archive", route: "#" },
+          { key: "RegdataBatch", label: "Regdata Batch", route: "#" },
+        ],
+      },
+      {
+        key: "subAdmin",
+        label: "Admin",
+        children: [
+          { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
+          { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "/Menu/HomologationVariables" },
+          { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
+          { key: "UnlockDocument", label: "Unlock Document", route: "#" },
+          { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
+          { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
+          { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
+          { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
+          { key: "ADCAChange", label: "AD/CA Change", route: "#" },
+        ],
+      },
     ],
   },
   {
@@ -79,7 +84,7 @@ const menuItems: MenuItem[] = [
     label: "Documentation",
     icon: <BookOutlined />,
     children: [
-      { key: "UserGuide", label: "User Guide", route: "#" },
+      { key: "UserGuide", label: "User Guide", route: "/Menu/UserGuide" },
       { key: "ADCAChangeGuide", label: "AD/CA Change Guide", route: "#" },
       { key: "VinPlateGuide", label: "Vin plate Guide FM/FH", route: "#" },
       { key: "ArchiveGuide", label: "Archive Guide", route: "#" },
@@ -111,14 +116,12 @@ const getUserPermissions = (): string[] => {
   }
 };
 
-// 根据权限过滤菜单项
+// 根据权限过滤菜单项（递归过滤所有层级）
 const filterMenuByPermissions = (items: MenuItem[], permissions: string[]): MenuItem[] => {
   return items
     .map((item) => {
       if (item.children) {
-        const filteredChildren = item.children.filter((child) =>
-          permissions.includes(child.key)
-        );
+        const filteredChildren = filterMenuByPermissions(item.children, permissions);
         return filteredChildren.length > 0
           ? { ...item, children: filteredChildren }
           : null;
