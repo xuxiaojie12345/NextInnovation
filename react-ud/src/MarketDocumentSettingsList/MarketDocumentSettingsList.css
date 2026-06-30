@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .mdsl-container {
-  width: 60%;
+  width: 600px;
   padding: 0;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #acb7ee;
@@ -74,9 +74,16 @@
   min-width: 200px;
 }
 
+/* ── 边框包裹：按钮 + 检索条件 ── */
+.mdsl-bordered {
+  /* border-bottom: 2px solid #acb7ee; */
+  border-top: 2px solid #acb7ee;
+}
+
 .mdsl-btn-row {
   display: flex;
   gap: 8px;
-  padding: 12px 0;
-  margin-top: 8px;
+  padding: 8px 10px;
+  background-color: #f1f3ff;
+  border-bottom: 2px solid #acb7ee;
 }

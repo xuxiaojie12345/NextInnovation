@@ -26,7 +26,7 @@ const SaveModifications: React.FC = () => {
   const modifications = state?.modifications || [];
 
   const [meta, setMeta] = useState<SaveModMeta | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

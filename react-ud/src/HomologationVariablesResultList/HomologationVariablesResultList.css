@@ -5,7 +5,7 @@
 
 /* ── 外层容器 ── */
 .hv-result-container {
-  width: 90%;
+  width: 1400px;
   padding: 0;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #8698e6;
@@ -138,6 +138,11 @@
   padding: 4px 8px;
   color: #333;
   font-size: 11px;
+  text-align: left !important;
+}
+
+.hv-result-table tbody td {
+  text-align: left !important;
 }
 
 /* 内部格子之间有边框，外侧无边框 */

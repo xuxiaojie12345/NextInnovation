@@ -95,7 +95,7 @@ const ExistingHDocVariables: React.FC = () => {
         sessionStorage.removeItem(STORAGE_KEY);
       }
     } catch { /* ignore */ }
-  }, []);
+  }, [location.state]);
 
   // ── 消息 ──
   const clearMessages = () => { setMessage(''); setSuccessMessage(''); };

@@ -173,7 +173,7 @@ const HomologationVariables: React.FC = () => {
       sessionStorage.removeItem(STORAGE_KEY);
       window.history.replaceState({}, document.title);
     }
-  }, []);
+  }, [location.state]);
 
   // ── 消息 ──
   const clearMessages = () => { setErrorMessage(''); setSuccessMessage(''); };

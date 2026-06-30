@@ -17,7 +17,7 @@ const HDocUserAdministration: React.FC = () => {
 
   // 各role的权限状态 - Market 改为 string[] 支持多选
   const [standardUser, setStandardUser] = useState(false);
-  const [standardMarket, setStandardMarket] = useState<string[]>(['-EU']);
+  const [standardMarket, setStandardMarket] = useState<string[]>([]);
   const [ruleAdmin, setRuleAdmin] = useState(false);
   const [ruleMarket, setRuleMarket] = useState<string[]>([]);
   const [templateAdmin, setTemplateAdmin] = useState(false);
@@ -28,7 +28,7 @@ const HDocUserAdministration: React.FC = () => {
 
   // Roles分组
   const [adaptationUser, setAdaptationUser] = useState(false);
-  const [adaptationMarket, setAdaptationMarket] = useState<string[]>(['-EU']);
+  const [adaptationMarket, setAdaptationMarket] = useState<string[]>([]);
   const [manageVarList, setManageVarList] = useState(false);
   const [marketSuperUser, setMarketSuperUser] = useState<string[]>([]);
 
@@ -66,7 +66,7 @@ const HDocUserAdministration: React.FC = () => {
     setUsername('');
     setPassword('');
     setStandardUser(false);
-    setStandardMarket(['-EU']);
+    setStandardMarket([]);
     setRuleAdmin(false);
     setRuleMarket([]);
     setTemplateAdmin(false);
@@ -75,7 +75,7 @@ const HDocUserAdministration: React.FC = () => {
     setDocAuthMarket([]);
     setUserAdmin(false);
     setAdaptationUser(false);
-    setAdaptationMarket(['-EU']);
+    setAdaptationMarket([]);
     setManageVarList(false);
     setMarketSuperUser([]);
   };
@@ -152,12 +152,13 @@ const HDocUserAdministration: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ userId: string; username: string; authList: AuthItem[] }>('/user/info', {
+      const res = await api.post<{ userId: string; username: string; password: string; authList: AuthItem[] }>('/user/info', {
         userid: trimmedId,
       });
 
       if (res && res.code === 200 && res.data) {
         setUsername(res.data.username || '');
+        setPassword(res.data.password || '');
         applyAuthList(res.data.authList || []);
         setSuccessMessage('User info loaded successfully.');
       } else {
@@ -239,10 +240,11 @@ const HDocUserAdministration: React.FC = () => {
   };
 
   return (
-    <div className="hua-container">
+    <>
       <div className="hua-header">
-        <h1>HDoc User Administration</h1>
+        <h1>HDoc User Admin</h1>
       </div>
+      <div className="hua-container">
 
       {message && <div className="hua-error">{message}</div>}
       {successMessage && <div className="hua-success">{successMessage}</div>}
@@ -291,7 +293,7 @@ const HDocUserAdministration: React.FC = () => {
                   />
                 </span>
               </td>
-              <td className="hua-label-cell">(re-type password)</td>
+              <td style={{ whiteSpace: 'nowrap', textAlign: 'left', paddingLeft: 4 }}>(re-type password)</td>
             </tr>
         </tbody>
       </table>
@@ -317,30 +319,48 @@ const HDocUserAdministration: React.FC = () => {
               size={5}
               value={standardMarket}
               onChange={(e) => setStandardMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
-              disabled={isLoading || !standardUser}
+              disabled={isLoading}
             >
               <option value="-EU">-EU</option>
-              {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
             </select>
           </div>
 
-          {/* Rule Admin */}
-          <div className="hua-grid-cell">
-            <div className="hua-cell-header">
-              <input type="checkbox" checked={ruleAdmin} onChange={(e) => setRuleAdmin(e.target.checked)} disabled={isLoading} />
-              <span className="hua-label">Rule Admin</span>
+          {/* Rule Admin + Adaptation user (同列) */}
+          <div className="hua-grid-cell" style={{ gap: 8 }}>
+            {/* Rule Admin */}
+            <div style={{ textAlign: 'left' }}>
+              <div className="hua-cell-header">
+                <input type="checkbox" checked={ruleAdmin} onChange={(e) => setRuleAdmin(e.target.checked)} disabled={isLoading} />
+                <span className="hua-label">Rule Admin</span>
+              </div>
+              <select
+                className="hua-listbox"
+                multiple
+                size={5}
+                value={ruleMarket}
+                onChange={(e) => setRuleMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
+                disabled={isLoading}
+              >
+                {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
+              </select>
             </div>
-            <select
-              className="hua-listbox"
-              multiple
-              size={5}
-              value={ruleMarket}
-              onChange={(e) => setRuleMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
-              disabled={isLoading || !ruleAdmin}
-            >
-              <option value="">-- Select --</option>
-              {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
-            </select>
+            {/* Adaptation user */}
+            <div style={{ textAlign: 'left' }}>
+              <div className="hua-cell-header">
+                <input type="checkbox" checked={adaptationUser} onChange={(e) => setAdaptationUser(e.target.checked)} disabled={isLoading} />
+                <span className="hua-label">Adaptation user</span>
+              </div>
+              <select
+                className="hua-listbox"
+                multiple
+                size={5}
+                value={adaptationMarket}
+                onChange={(e) => setAdaptationMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
+                disabled={isLoading}
+              >
+                <option value="-EU">-EU</option>
+              </select>
+            </div>
           </div>
 
           {/* Template Admin */}
@@ -355,9 +375,8 @@ const HDocUserAdministration: React.FC = () => {
               size={5}
               value={templateMarket}
               onChange={(e) => setTemplateMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
-              disabled={isLoading || !templateAdmin}
+              disabled={isLoading}
             >
-              <option value="">-- Select --</option>
               {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
             </select>
           </div>
@@ -374,9 +393,8 @@ const HDocUserAdministration: React.FC = () => {
               size={5}
               value={docAuthMarket}
               onChange={(e) => setDocAuthMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
-              disabled={isLoading || !docAuthAdmin}
+              disabled={isLoading}
             >
-              <option value="">-- Select --</option>
               {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
             </select>
           </div>
@@ -389,31 +407,10 @@ const HDocUserAdministration: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* 第二行：Adaptation use */}
-        <div className="hua-grid-row">
-          <div className="hua-grid-cell">
-            <div className="hua-cell-header">
-              <input type="checkbox" checked={adaptationUser} onChange={(e) => setAdaptationUser(e.target.checked)} disabled={isLoading} />
-              <span className="hua-label">Adaptation use</span>
-            </div>
-            <select
-              className="hua-listbox"
-              multiple
-              size={5}
-              value={adaptationMarket}
-              onChange={(e) => setAdaptationMarket(Array.from(e.target.selectedOptions, (opt) => opt.value))}
-              disabled={isLoading || !adaptationUser}
-            >
-              <option value="-EU">-EU</option>
-              {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
-            </select>
-          </div>
-        </div>
       </div>
     </div>
 
-        {/* 第三行：Manage Variable List */}
+        {/* 第二行：Manage Variable List */}
         <div className="hua-grid-row">
           <div className="hua-grid-cell">
             <div className="hua-cell-header-reverse">
@@ -435,7 +432,6 @@ const HDocUserAdministration: React.FC = () => {
               onChange={(e) => setMarketSuperUser(Array.from(e.target.selectedOptions, (opt) => opt.value))}
               disabled={isLoading}
             >
-              <option value="">-- Select --</option>
               {markets.map((m) => (<option key={m} value={m}>{m}</option>))}
             </select>
           </div>
@@ -448,6 +444,7 @@ const HDocUserAdministration: React.FC = () => {
           </div>
     </div>
     </div>
+    </>
   );
 };
 

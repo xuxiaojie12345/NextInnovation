@@ -33,12 +33,14 @@ public class UserAdminServiceImpl implements UserAdminService {
 
         if (authRecords == null || authRecords.isEmpty()) {
             result.put("username", "");
+            result.put("password", "");
             result.put("authList", new ArrayList<>());
             return result;
         }
 
         Map<String, Object> first = authRecords.get(0);
         result.put("username", first.get("USERNAME"));
+        result.put("password", first.get("PASSWORD"));
 
         List<Map<String, String>> authList = new ArrayList<>();
         for (Map<String, Object> record : authRecords) {

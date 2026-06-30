@@ -56,9 +56,19 @@ const MarketDocumentSettingsList: React.FC = () => {
 
       {message && <div className="mdsl-error">{message}</div>}
 
-      <div className="mdsl-form">
-        <div className="mdsl-row">
-          <span className="mdsl-label">Document type</span>
+      <div className="mdsl-bordered">
+        {/* 按钮区域：在上方，有背景色 */}
+        <div className="mdsl-btn-row">
+          <button className="btn" onClick={handleSearch}>Search</button>
+          <button className="btn" onClick={handleClear}>Clear</button>
+          <button className="btn" onClick={handleBack}>Back</button>
+          <button className="btn" onClick={handleUpdateMode}>Update Mode</button>
+        </div>
+
+        {/* 检索条件区域 */}
+        <div className="mdsl-form">
+          <div className="mdsl-row">
+            <span className="mdsl-label">Document type</span>
           <input
             type="text"
             className="mdsl-input"
@@ -116,13 +126,8 @@ const MarketDocumentSettingsList: React.FC = () => {
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
-        <div className="mdsl-btn-row">
-          <button className="btn" onClick={handleSearch}>Search</button>
-          <button className="btn" onClick={handleClear}>Clear</button>
-          <button className="btn" onClick={handleBack}>Back</button>
-          <button className="btn" onClick={handleUpdateMode}>Update Mode</button>
-        </div>
       </div>
+    </div>
     </div>
   );
 };

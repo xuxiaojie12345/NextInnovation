@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .hua-container {
-  width: 80%;
+  width: 1000px;
   padding: 0;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #acb7ee;
@@ -54,6 +54,7 @@
 
 .hua-label-cell {
   white-space: nowrap;
+  font-size: 12px;
   font-weight: 700;
   color: #333;
   text-align: left;
@@ -195,8 +196,8 @@
   color: #333;
   background-color: #fff;
   box-sizing: border-box;
-  min-width: 140px;
-  width: 150px;
+  min-width: 70px;
+  width: 80px;
   height: 190px;
 }
 
@@ -218,9 +219,9 @@
 }
 
 .hua-roles-sidebar {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  color: #1c2771;
+  color: #333;
   padding: 8px 4px;
   min-width: 180px;
   text-align: left;

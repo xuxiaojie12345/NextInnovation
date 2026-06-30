@@ -41,7 +41,6 @@ const AdCaChange: React.FC = () => {
     clearMessages();
 
     const trimmedValue = serieChnr.trim();
-    const trimmedDesc = desc.trim();
 
     const { serie, chnr } = parseSerieChnr(trimmedValue);
 

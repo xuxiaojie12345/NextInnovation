@@ -10,11 +10,6 @@ interface VariableItem {
   newVal: string;
 }
 
-interface Modification {
-  variable: string;
-  val: string;
-}
-
 const ModifyDocument: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -112,10 +107,6 @@ const ModifyDocument: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleCancel = () => {
-    navigate(-1);
   };
 
   if (isLoading) {
