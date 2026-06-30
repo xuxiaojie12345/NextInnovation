@@ -34,7 +34,7 @@ public class UD07ServiceImpl implements UD07Service {
     public VehicleSpecificationResponse getVehicleSpecification(String serie, String chnr) {
         logger.info("UD07 getVehicleSpecification called - serie: {}, chnr: {}", serie, chnr);
 
-        // 查询车辆基本信息
+        // sql1: 查询车辆基本信息（关联OM + VDA_GENERAL + VDA_VARIANTS，含FAMILY_ID, VARIANT_ID）
         VehicleSpecificationResponse.ChassisInfo chassisInfo = ud07Mapper.selectChassisInfo(serie, chnr);
         if (chassisInfo == null) {
             logger.warn("Chassis not found - serie: {}, chnr: {}", serie, chnr);
@@ -46,17 +46,28 @@ public class UD07ServiceImpl implements UD07Service {
         response.setChassisInfo(chassisInfo);
         response.setSNotes(new ArrayList<>());
 
-        // 查询发动机/符号信息
-        VehicleSpecificationResponse.EngineInfo engineInfo = ud07Mapper.selectEngineInfo(serie, chnr);
-        if (engineInfo == null) {
-            // 无匹配记录时，Engine no设为默认值
-            engineInfo = new VehicleSpecificationResponse.EngineInfo();
+        // sql2: 用 sql1 取得的 FAMILY_ID, VARIANT_ID 检索 KOLA_VARIANT
+        if (chassisInfo.getFamilyId() != null && chassisInfo.getVariantId() != null) {
+            VehicleSpecificationResponse.EngineInfo engineInfo =
+                    ud07Mapper.selectEngineInfo(chassisInfo.getFamilyId(), chassisInfo.getVariantId());
+            if (engineInfo == null) {
+                engineInfo = new VehicleSpecificationResponse.EngineInfo();
+                engineInfo.setEngineNo("A01");
+                engineInfo.setSymbolStr("");
+                engineInfo.setDescription("");
+                logger.warn("Engine info not found for familyId: {}, variantId: {}",
+                        chassisInfo.getFamilyId(), chassisInfo.getVariantId());
+            }
+            response.setEngineInfo(engineInfo);
+        } else {
+            // 无 FAMILY_ID/VARIANT_ID 时设默认值
+            VehicleSpecificationResponse.EngineInfo engineInfo = new VehicleSpecificationResponse.EngineInfo();
             engineInfo.setEngineNo("A01");
             engineInfo.setSymbolStr("");
             engineInfo.setDescription("");
-            logger.warn("Engine info not found - serie: {}, chnr: {}", serie, chnr);
+            response.setEngineInfo(engineInfo);
+            logger.warn("FAMILY_ID or VARIANT_ID is null for serie: {}, chnr: {}", serie, chnr);
         }
-        response.setEngineInfo(engineInfo);
 
         logger.info("UD07 query success for serie: {}, chnr: {}", serie, chnr);
         return response;

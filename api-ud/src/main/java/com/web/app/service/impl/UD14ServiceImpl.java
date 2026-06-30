@@ -5,22 +5,102 @@ import com.web.app.service.UD14Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * UD14SearchresultistApi 服务实现类
  * 对应全体APIのプロンプト.txt 【UD14SearchresultistApi】
+ *
+ * 功能：模板文件列表与使用状态查询
+ * 从网络共享文件夹 //172.17.0.63/hdoc/template/upload 读取文件列表
  */
 @Service
 public class UD14ServiceImpl implements UD14Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD14ServiceImpl.class);
 
+    /** 模板文件存储根目录 - 网络共享文件夹 */
+    @Value("${ud12.template.root:d://uploads/templates}")
+    private String templateRoot;
+
+    /** 网络共享文件夹用户名 */
+    @Value("${ud12.network.username:}")
+    private String networkUsername;
+
+    /** 网络共享文件夹密码 */
+    @Value("${ud12.network.password:}")
+    private String networkPassword;
+
+    /** 网络共享连接是否已验证 */
+    private boolean networkAuthenticated = false;
+
     @Autowired
     private UD14Mapper ud14Mapper;
+
+    /**
+     * 初始化时认证网络共享文件夹
+     */
+    @PostConstruct
+    public void init() {
+        authenticateNetworkShare();
+    }
+
+    /**
+     * 认证网络共享文件夹
+     */
+    private void authenticateNetworkShare() {
+        if (networkAuthenticated) return;
+
+        if (templateRoot != null && templateRoot.startsWith("\\\\")) {
+            if (networkUsername == null || networkUsername.isEmpty()) {
+                networkAuthenticated = true;
+                return;
+            }
+            try {
+                String shareRoot = templateRoot;
+                int firstSlash = templateRoot.indexOf('\\', 2);
+                if (firstSlash > 0) {
+                    int secondSlash = templateRoot.indexOf('\\', firstSlash + 1);
+                    if (secondSlash > 0) shareRoot = templateRoot.substring(0, secondSlash);
+                }
+
+                String command = String.format("net use %s %s /user:%s /persistent:no",
+                        shareRoot, networkPassword, networkUsername);
+
+                Process process = Runtime.getRuntime().exec(command);
+                boolean completed = process.waitFor(5, TimeUnit.SECONDS);
+
+                if (completed) {
+                    int exitCode = process.exitValue();
+                    if (exitCode == 0) {
+                        logger.info("UD14 - Network share authenticated: {}", shareRoot);
+                    } else {
+                        logger.warn("UD14 - Network share auth code: {}", exitCode);
+                    }
+                } else {
+                    process.destroyForcibly();
+                    logger.warn("UD14 - Network share auth timed out");
+                }
+                networkAuthenticated = true;
+            } catch (Exception e) {
+                logger.warn("UD14 - Network auth error: {}", e.getMessage());
+                networkAuthenticated = true;
+            }
+        } else {
+            networkAuthenticated = true;
+        }
+    }
 
     @Override
     public Map<String, Object> selectMarketMaster() {
@@ -42,25 +122,51 @@ public class UD14ServiceImpl implements UD14Service {
     public Map<String, Object> selectHdocUserDefinedRules(String market) {
         List<Map<String, Object>> fileList = new ArrayList<>();
 
-        // 返回固定值 deepseek01.txt~deepseek10.txt（对应文档 4.9）
-        for (int i = 1; i <= 10; i++) {
-            String fileName = "deepseek" + String.format("%02d", i) + ".txt";
-            Map<String, Object> item = new LinkedHashMap<>();
-            item.put("filename", fileName);
-            item.put("lastModified", "2024-01-01 12:00");
-            item.put("size", (100 + i) + " Kb");
-            item.put("downloadUrl", "/download/templates/" + market + "/" + fileName);
+        // 从网络共享文件夹读取实际文件列表（与UD12相同的路径）
+        Path marketDir = Paths.get(templateRoot, market);
 
-            // 查询该文件是否被引用
-            int refCount = ud14Mapper.countByMarketAndFileName(market, market + "/" + fileName);
-            item.put("used", refCount > 0 ? "TEMPLATE-VIN-PLATE" : "");
+        if (Files.exists(marketDir) && Files.isDirectory(marketDir)) {
+            try {
+                List<File> files = Files.list(marketDir)
+                        .filter(Files::isRegularFile)
+                        .map(Path::toFile)
+                        .sorted(Comparator.comparing(File::getName))
+                        .collect(Collectors.toList());
 
-            fileList.add(item);
+                for (File file : files) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("filename", file.getName());
+                    item.put("lastModified", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+                            .format(new Date(file.lastModified())));
+                    item.put("size", formatFileSize(file.length()));
+
+                    // 查询该文件是否被引用
+                    int refCount = ud14Mapper.countByMarketAndFileName(market, market + "/" + file.getName());
+                    item.put("used", refCount > 0 ? "TEMPLATE-VIN-PLATE" : "");
+
+                    fileList.add(item);
+                }
+
+                logger.info("UD14 - Found {} files in market {}", fileList.size(), market);
+            } catch (IOException e) {
+                logger.error("UD14 - Failed to list files for market: {}", market, e);
+            }
+        } else {
+            logger.warn("UD14 - Template directory not found for market: {}", market);
         }
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("files", fileList);
         result.put("totalCount", fileList.size());
         return result;
+    }
+
+    /**
+     * 格式化文件大小
+     */
+    private String formatFileSize(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
+        return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
     }
 }

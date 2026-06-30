@@ -213,7 +213,6 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     return (
       <div className='ud11-container'>
         <h1 className='ud11-title'>Existing HDoc Variables</h1>
-        <p className='ud11-subtitle'>Search Result List</p>
         <hr className='ud11-divider' />
         <div className='ud11-loading'>Loading...</div>
       </div>
@@ -222,41 +221,31 @@ const ExistingHDocVariablesResultList: React.FC = () => {
 
   return (
     <div className='ud11-container'>
-      {/* 页面标题 */}
-      <h1 className='ud11-title'>Existing HDoc Variables</h1>
-      <p className='ud11-subtitle'>Search Result List</p>
-      <hr className='ud11-divider' />
+      {/* 表单边框容器（参照UD10风格） */}
+      <div className='ud11-form'>
+        {/* 页面标题 */}
+        <h1 className='ud11-title'>Existing HDoc Variables</h1>
 
-      {/* 面包屑导航 */}
-      <div className='ud11-breadcrumb'>
-        Home &gt; <span onClick={() => navigate('/Menu/ExistingHDocVariables')}>Existing HDoc Variables</span> &gt; Search Result
-      </div>
-
-      {/* 消息提示区域 */}
-      {message && (
-        <div className={`ud11-message ${messageType}`}>
-          {message}
+        {/* 按钮组 - 紧贴表单顶部 */}
+        <div className='ud11-button-group'>
+          <button type='button' className='ud11-btn' onClick={handleSelect} disabled={disabled}>Select</button>
+          <button type='button' className='ud11-btn' onClick={handleBack} disabled={disabled}>Back</button>
+          <button type='button' className='ud11-btn' onClick={handleDown} disabled={disabled}>Down</button>
+          <button type='button' className='ud11-btn' onClick={handlePrint} disabled={disabled}>Print</button>
+          <button type='button' className='ud11-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>
         </div>
-      )}
 
-      {/* 按钮组 */}
-      <div className='ud11-button-group'>
-        <button type='button' className='ud11-btn' onClick={handleSelect} disabled={disabled}>Select</button>
-        <button type='button' className='ud11-btn' onClick={handleBack} disabled={disabled}>Back</button>
-        <button type='button' className='ud11-btn' onClick={handleDown} disabled={disabled}>Down</button>
-        <button type='button' className='ud11-btn' onClick={handlePrint} disabled={disabled}>Print</button>
-        <button type='button' className='ud11-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>
-      </div>
+        {/* 消息提示区域 */}
+        {message && (
+          <div className={`ud11-message ${messageType}`}>
+            {message}
+          </div>
+        )}
 
-      {/* 搜索结果计数 */}
-      <div className='ud11-count'>
-        Number of lines found: {dataList.length}
-      </div>
-
-      {/* 数据表格 */}
-      {dataList.length > 0 ? (
-        <div className='ud11-table-wrapper'>
-          <table className='ud11-table'>
+        {/* 数据表格 */}
+        {dataList.length > 0 ? (
+          <div className='ud11-table-wrapper'>
+            <table className='ud11-table'>
             <thead>
               <tr>
                 <th className='ud11-row-indicator'></th>
@@ -303,6 +292,12 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           No data found. Please try different search conditions.
         </div>
       )}
+
+      {/* 搜索结果计数 - 置于底部 */}
+      <div className='ud11-count'>
+        Number of lines found: {dataList.length}
+      </div>
+      </div>{/* end ud11-form */}
     </div>
   );
 };

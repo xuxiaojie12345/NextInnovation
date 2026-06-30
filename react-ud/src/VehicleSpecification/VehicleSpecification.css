@@ -6,16 +6,19 @@
 
 /* 页面容器 */
 .vehicle-specification-page {
-  padding: 20px;
+  max-width: 680px;
+  margin: 0;
+  padding: 20px 20px 120px;
   font-family: Arial, sans-serif;
   background-color: #fff;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* ========== 页面标题区域 ========== */
 .page-header-section {
-  border-bottom: 2px solid #003087;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .page-title {
@@ -56,8 +59,8 @@
   display: flex;
   align-items: center;
   width: 50%;
-  padding: 8px 12px;
-  min-height: 32px;
+  padding: 6px 6px;
+  min-height: 28px;
   box-sizing: border-box;
 }
 

@@ -28,11 +28,11 @@ public interface UD07Mapper {
     /**
      * 查询发动机/符号信息
      *
-     * @param serie 底盘系列号（SERIE）
-     * @param chnr  底盘编号（CHNR）
+     * @param familyId  系列ID（FAMILY_ID），来自 sql1 结果
+     * @param variantId 变体ID（VARIANT_ID），来自 sql1 结果
      * @return 发动机/符号信息
      */
     VehicleSpecificationResponse.EngineInfo selectEngineInfo(
-            @Param("serie") String serie,
-            @Param("chnr") String chnr);
+            @Param("familyId") String familyId,
+            @Param("variantId") String variantId);
 }

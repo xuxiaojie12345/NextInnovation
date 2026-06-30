@@ -1,288 +1,210 @@
-/* HDocUserAdministration.css - UD17模块 */
+/* ===== UD17 HDoc User Admin ===== */
+/* 参照 UD17.css (wangluxing) 风格调整 */
 
 .hvua-container {
-  width: 100%;
-  min-height: 100%;
-  background-color: #ffffff;
-  padding: 20px;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  min-height: 100vh;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
 }
 
-/* 标题 */
+.hvua-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 1200px;
+}
+
 .hvua-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #000080; /* 深蓝色 */
-  margin: 0 0 20px 0;
-  font-family: Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003057;
 }
 
-/* 边框容器 */
-.hvua-border-box {
-  max-width: 1400px;
-  margin: 0;
-  border: 1px solid #b4c7dc; /* 浅蓝色边框 */
-  background-color: #ffffff;
-  padding: 20px;
+/* ===== Message ===== */
+.hvua-msg {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.hvua-success {
+  background: #e6f7ed;
+  color: #1a7f42;
+  border: 1px solid #b7ebc8;
+}
+.hvua-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
-/* 搜索区域 */
-.hvua-search-section {
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-/* 角色权限配置区域 */
-.hvua-roles-section {
-  margin-bottom: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.hvua-role-group {
+/* ===== Section / Row ===== */
+.hvua-section {
   margin-bottom: 20px;
-  min-width: 250px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
 }
-
-/* 功能权限区域 */
-.hvua-function-section {
-  margin-bottom: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-
-/* Market Super User区域 */
-.hvua-super-user-section {
-  margin-bottom: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-
-/* 表单行 */
-.hvua-form-row {
+.hvua-row {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  line-height: 1.5;
   gap: 10px;
+  flex-wrap: wrap;
+}
+.hvua-row + .hvua-row {
+  margin-top: 12px;
 }
 
-/* 标签 */
-.hvua-label-required {
-  font-size: 13px;
-  color: #000000;
-  font-weight: normal;
-  min-width: 100px;
-  text-align: left;
-}
-
+/* ===== Label ===== */
 .hvua-label {
   font-size: 13px;
-  color: #000000;
-  font-weight: normal;
-  min-width: 150px;
-  text-align: left;
+  font-weight: 500;
+  color: #444;
+  min-width: 100px;
+  white-space: nowrap;
 }
 
-/* 复选框标签 */
-.hvua-checkbox-label {
+/* ===== Input ===== */
+.hvua-input {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
   font-size: 13px;
-  color: #000000;
-  font-weight: normal;
-  margin-left: 5px;
-  margin-right: 10px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.hvua-input:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+.hvua-input-readonly {
+  background: #f5f5f5;
+  color: #555;
+  cursor: default;
+}
+
+/* ===== Select Multiple ===== */
+.hvua-select-multi {
+  height: 200px;
+  width: 90px;
+  min-width: 70px;
+  padding: 4px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.hvua-select-multi:focus {
+  border-color: #003057;
+  box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
+}
+.hvua-select-multi:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* ===== Checkbox Label ===== */
+.hvua-chk-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  min-width: 170px;
+}
+.hvua-chk-lbl input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+}
+
+/* ===== Role Grid ===== */
+.hvua-role-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.hvua-role-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+  min-width: 140px;
+  max-width: 180px;
+}
+.hvua-role-item .hvua-chk-lbl {
   min-width: auto;
+  white-space: nowrap;
+}
+.hvua-role-item .hvua-select-multi {
+  min-width: 120px;
 }
 
-/* 输入框 */
-.hvua-input-short {
-  width: 150px;
-  height: 24px;
-  border: 1px solid #a0a0a0;
-  padding: 2px 8px;
-  font-size: 13px;
-  background-color: #ffffff;
-}
-
-.hvua-input-medium {
-  width: 250px;
-  height: 24px;
-  border: 1px solid #a0a0a0;
-  padding: 2px 8px;
-  font-size: 13px;
-  background-color: #f5f5f5;
-}
-
-.hvua-input-medium:read-only {
-  background-color: #f5f5f5;
-}
-
-/* 多选下拉框 */
-.hvua-select-multiple {
-  width: 60px;
-  height: 150px;
-  border: 1px solid #a0a0a0;
-  padding: 5px;
-  font-size: 13px;
-  background-color: #ffffff;
-  overflow-y: auto;
-}
-
-.hvua-select-multiple:disabled {
-  background-color: #f5f5f5;
-  opacity: 0.6;
-}
-
-.hvua-select-multiple:focus {
-  outline: none;
-  border-color: #4a90d9;
-  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
-}
-
-/* 单选下拉框（Standard User / Adaptation use 固定显示-EU） */
-.hvua-select-single {
-  width: 60px;
-  height: 150px;
-  border: 1px solid #a0a0a0;
-  padding: 5px;
-  font-size: 13px;
-  background-color: #ffffff;
-}
-
-.hvua-select-single:disabled {
-  background-color: #f5f5f5;
-  opacity: 0.6;
-}
-
-.hvua-select-single:focus {
-  outline: none;
-  border-color: #4a90d9;
-  box-shadow: 0 0 3px rgba(74, 144, 217, 0.5);
-}
-
-/* 按钮区域 */
-.hvua-button-bar {
-  background-color: #e8eef8;
+/* ===== Button Bar ===== */
+.hvua-btn-bar {
   margin-top: 20px;
-  padding: 15px;
+  padding: 14px 16px;
+  background: #e8f0f8;
+  border-radius: 4px;
   display: flex;
   gap: 10px;
-  justify-content: flex-start;
-  border-top: 1px solid #b4c7dc;
 }
 
-/* 按钮样式 */
 .hvua-btn {
-  background-color: #e0e0f0;
-  border: 1px solid #a0a0c0;
-  padding: 6px 15px;
+  height: 32px;
+  padding: 0 18px;
+  background: #e8f0f8;
+  border: 1px solid #003057;
+  border-radius: 4px;
+  color: #003057;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  color: #000000;
-  min-width: 120px;
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
 }
-
 .hvua-btn:hover:not(:disabled) {
-  background-color: #d0d0e0;
-  border-color: #8080a0;
+  background: #003057;
+  color: #fff;
 }
-
 .hvua-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-.hvua-btn-info {
-  background-color: #cce5ff;
-  border-color: #99c2ff;
-  font-weight: bold;
-  padding: 4px 10px;
-  min-width: 80px;
+/* ===== Super User Section ===== */
+.hvua-super-section {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
 }
-
-.hvua-btn-info:hover:not(:disabled) {
-  background-color: #b3d9ff;
-}
-
-.hvua-btn-primary {
-  background-color: #e0e0f0;
-  border-color: #a0a0c0;
-  color: #000000;
-  font-weight: normal;
-}
-
-.hvua-btn-primary:hover:not(:disabled) {
-  background-color: #d0d0e0;
-}
-
-.hvua-btn-danger {
-  background-color: #e0e0f0;
-  border-color: #a0a0c0;
-  color: #000000;
-  font-weight: normal;
-}
-
-.hvua-btn-danger:hover:not(:disabled) {
-  background-color: #d0d0e0;
-}
-
-/* 错误消息显示 */
-.hvua-error-message {
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  background-color: #fff5f5;
-  border-left: 3px solid #ff4d4f;
-  color: #ff4d4f;
+.hvua-super-title {
   font-size: 13px;
-  font-family: Arial, sans-serif;
-}
-
-/* 成功消息显示 */
-.hvua-success-message {
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  background-color: #f0fff0;
-  border-left: 3px solid #52c41a;
-  color: #52c41a;
-  font-size: 13px;
-  font-family: Arial, sans-serif;
-}
-
-/* 加载状态 */
-.hvua-loading {
-  text-align: center;
-  padding: 50px;
-  font-size: 16px;
-  color: #666666;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .hvua-form-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hvua-select-multiple {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .hvua-input-short,
-  .hvua-input-medium {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .hvua-button-bar {
-    flex-direction: column;
-  }
-
-  .hvua-btn {
-    width: 100%;
-  }
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 10px;
 }

@@ -260,102 +260,124 @@ const GenerateHomologationDocument: React.FC = () => {
 
   return (
     <div className='generate-homologation-container'>
-      {/* 页面标题区域 */}
-      <div className='page-header'>
-        <h1 className='page-title'>HDoc - Generate Homologation Document</h1>
-        {message && (
-          <div className={`error-message ${hasError ? 'error' : 'warning'}`}>
-            {message}
+      {/* Header - VOLVO logo */}
+      <header className='page-header'>
+        <div className='page-title'>VOLVO</div>
+      </header>
+
+      {/* 主内容区域 */}
+      <main className='form-container'>
+        <div className='form-card'>
+          {/* 表单标题 */}
+          <h1 className='form-card-title'>
+            HDoc - Generate Homologation Document
+          </h1>
+
+          {/* 错误消息 */}
+          {message && (
+            <div className='error-message'>
+              {message}
+            </div>
+          )}
+
+          {/* Chassis series */}
+          <div className='form-group'>
+            <label htmlFor='chassisSeries'>
+              Chassis series
+            </label>
+            <div className='field-control'>
+              <input
+                id='chassisSeries'
+                type='text'
+                value={chassisSeries}
+                onChange={handleChassisSeriesChange}
+                maxLength={5}
+                disabled={isLoading}
+                className={errorFields.has('chassisSeries') ? 'input-error' : ''}
+                placeholder='例: JPCT'
+              />
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* 表单区域 */}
-      <div className='form-container'>
-        {/* Chassis series */}
-        <div className='form-group'>
-          <label htmlFor='chassisSeries'>Chassis series</label>
-          <input
-            id='chassisSeries'
-            type='text'
-            value={chassisSeries}
-            onChange={handleChassisSeriesChange}
-            maxLength={5}
-            disabled={isLoading}
-            className={errorFields.has('chassisSeries') ? 'input-error' : ''}
-            placeholder='例: JPCT'
-          />
+          {/* Chassis no */}
+          <div className='form-group'>
+            <label htmlFor='chassisNo'>
+              Chassis no
+            </label>
+            <div className='field-control'>
+              <input
+                id='chassisNo'
+                type='text'
+                value={chassisNo}
+                onChange={handleChassisNoChange}
+                maxLength={10}
+                disabled={isLoading}
+                className={errorFields.has('chassisNo') ? 'input-error' : ''}
+                placeholder='例: 028321'
+              />
+            </div>
+          </div>
+
+          {/* Document type */}
+          <div className='form-group'>
+            <label htmlFor='documentType'>
+              Document type
+            </label>
+            <div className='field-control'>
+              <select
+                id='documentType'
+                value={documentType}
+                onChange={handleDocumentTypeChange}
+                disabled={isLoading}
+                className={errorFields.has('documentType') ? 'input-error' : ''}
+              >
+                <option value=''>-- Select --</option>
+                {documentTypeList
+                  .map((doc) => (
+                    <option key={doc.doctype} value={doc.doctype}>
+                      {doc.doctype}
+                      {doc.description ? ` - ${doc.description}` : ""}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          {/* 按钮区域 */}
+          <div className='button-area'>
+            <button
+              type='button'
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Submitting...' : 'Submit'}
+            </button>
+            <button
+              type='button'
+              onClick={handleReset}
+              disabled={isLoading}
+            >
+              Reset
+            </button>
+            <button
+              type='button'
+              onClick={handleHelp}
+              disabled={isLoading}
+            >
+              Help
+            </button>
+          </div>
+
         </div>
 
-        {/* Chassis no */}
-        <div className='form-group'>
-          <label htmlFor='chassisNo'>Chassis no</label>
-          <input
-            id='chassisNo'
-            type='text'
-            value={chassisNo}
-            onChange={handleChassisNoChange}
-            maxLength={10}
-            disabled={isLoading}
-            className={errorFields.has('chassisNo') ? 'input-error' : ''}
-            placeholder='例: 028321'
-          />
-        </div>
-
-        {/* Document type */}
-        <div className='form-group'>
-          <label htmlFor='documentType'>Document type</label>
-          <select
-            id='documentType'
-            value={documentType}
-            onChange={handleDocumentTypeChange}
-            disabled={isLoading}
-            className={errorFields.has('documentType') ? 'input-error' : ''}
-          >
-            <option value=''>-- 选择文档类型 --</option>
-            {documentTypeList
-              .map((doc) => (
-                <option key={doc.doctype} value={doc.doctype}>
-                  {doc.doctype}
-                  {doc.description ? ` - ${doc.description}` : ""}
-                </option>
-              ))}
-          </select>
-        </div>
-      </div>
-
-      {/* 按钮区域 */}
-      <div className='button-area'>
-        <button
-          type='button'
-          className='btn-submit'
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? '处理中...' : 'Submit'}
-        </button>
-        <button
-          type='button'
-          className='btn-reset'
-          onClick={handleReset}
-          disabled={isLoading}
-        >
-          Reset
-        </button>
-        <button
-          type='button'
-          className='btn-help'
-          onClick={handleHelp}
-          disabled={isLoading}
-        >
-          Help
-        </button>
-      </div>
-
-      {/* 支持邮箱信息 */}
-      <div className='support-info'>
-        <p>HDoc support: support.tpi@volvo.com</p>
-      </div>
+        {/* Support Mail */}
+        <p style={{ marginTop: 10, fontSize: 12, textAlign: 'left', width: '100%', maxWidth: 680 }}>
+          HDoc support:{' '}
+          <a href='mailto:support.tpi@volvo.com'>
+            support.tpi@volvo.com
+          </a>
+        </p>
+      </main>
     </div>
   );
 };

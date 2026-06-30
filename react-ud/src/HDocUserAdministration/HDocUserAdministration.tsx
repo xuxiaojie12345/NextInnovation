@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "./HDocUserAdministration.css";
 
+/** 市场数据类型 - API返回MARKET(大写) 映射为market(小写) */
 interface MarketItem {
   market: string;
   description: string;
@@ -61,6 +62,8 @@ const HDocUserAdministration = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // USER INFO检索后置为true，此时才将选中market置顶；正常勾选时不排序
+  const [searched, setSearched] = useState(false);
 
   // 页面初始化：加载市场列表数据
   useEffect(() => {
@@ -89,8 +92,13 @@ const HDocUserAdministration = () => {
       const data = await response.json();
       console.log("【marketList】response:", JSON.stringify(data));
       if (data.code === 200 && data.data) {
-        setMarketList(data.data);
-        console.log("【marketList】count:", data.data.length);
+        // API返回大写字段(MARKET, DESCRIPTION)，映射为小写(market, description)
+        const mapped = data.data.map((item: any) => ({
+          market: item.MARKET || item.market,
+          description: item.DESCRIPTION || item.description,
+        }));
+        setMarketList(mapped);
+        console.log("【marketList】count:", mapped.length);
       } else {
         setErrorMessage("获取市场列表失败，请联系管理员");
       }
@@ -107,6 +115,7 @@ const HDocUserAdministration = () => {
     setFormData({ ...formData, userId: e.target.value });
     setErrorMessage("");
     setSuccessMessage("");
+    setSearched(false); // 输入变化时取消置顶模式
   };
 
   // User Info按钮点击 - 查询用户信息
@@ -166,9 +175,13 @@ const HDocUserAdministration = () => {
           const descToCode: Record<string, string> = {
             "USER ADMINISTRATOR": "A",
             RULES: "R",
+            "RULE ADMIN": "R",
             TEMPLATE: "T",
+            "TEMPLATE ADMIN": "T",
             USER: "U",
+            "STANDARD USER": "U",
             DOCUMENT: "D",
+            "DOCUMENT AUTH ADMIN": "D",
             "ADAPTATION DOC": "DOCMOD",
             "MARKET SUPER USER": "MCSU",
           };
@@ -262,16 +275,19 @@ const HDocUserAdministration = () => {
           marketSuperUser: updatedFormData.marketSuperUserMarkets,
         });
         setFormData(updatedFormData);
+        setSearched(true); // 检索完成，允许market置顶
       } else {
         setErrorMessage(
           "We didn't recognize the userid you entered. Please try again.",
         );
+        setSearched(false);
       }
     } catch (error) {
       console.error("Error fetching user info:", error);
       setErrorMessage(
         "We didn't recognize the userid you entered. Please try again.",
       );
+      setSearched(false);
     } finally {
       setIsLoading(false);
     }
@@ -296,6 +312,7 @@ const HDocUserAdministration = () => {
           ? { [marketsKey]: [] }
           : {}),
     });
+    setSearched(false); // 手动勾选时取消置顶
   };
 
   // 处理Market多选下拉框变化
@@ -304,6 +321,7 @@ const HDocUserAdministration = () => {
     selectedValues: string[],
   ) => {
     setFormData({ ...formData, [role]: selectedValues });
+    setSearched(false); // 手动选择时取消置顶
   };
 
   // Update Role按钮点击 - 更新用户权限
@@ -451,8 +469,9 @@ const HDocUserAdministration = () => {
     }
   };
 
-  // 市场列表排序：选中的排前面
+  // 市场列表排序：检索后才将选中的排前面，正常勾选时保持原序
   const getSortedMarketList = (selectedMarkets: string[]) => {
+    if (!searched) return marketList;
     return [...marketList].sort((a, b) => {
       const aSelected = selectedMarkets.includes(a.market);
       const bSelected = selectedMarkets.includes(b.market);
@@ -463,45 +482,42 @@ const HDocUserAdministration = () => {
   };
 
   if (isLoading) {
-    return <div className='hvua-loading'>加载中...</div>;
+    return <div className='hvua-loading' style={{padding:20,color:'#666',fontSize:13}}>Loading...</div>;
   }
 
   return (
     <div className='hvua-container'>
-      {/* 标题 */}
-      <h2 className='hvua-title'>HDoc User Admin</h2>
+      <div className='hvua-card'>
+        <h1 className='hvua-title'>HDoc User Admin</h1>
 
       {/* 错误消息 */}
-      {errorMessage && <div className='hvua-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className='hvua-msg hvua-error'>{errorMessage}</div>}
 
       {/* 成功消息 */}
       {successMessage && (
-        <div className='hvua-success-message'>{successMessage}</div>
+        <div className='hvua-msg hvua-success'>{successMessage}</div>
       )}
 
-      {/* 边框容器 */}
-      <div className='hvua-border-box'>
         {/* 搜索区域 */}
-        <div className='hvua-search-section'>
-          <div className='hvua-form-row'>
-            <label className='hvua-label-required'>Userid</label>
+        <div className='hvua-section'>
+          <div className='hvua-row'>
+            <label className='hvua-label'>Userid</label>
             <input
               type='text'
-              className='hvua-input-short'
+              className='hvua-input'
               value={formData.userId}
               onChange={handleUserIdChange}
-              placeholder='v0c6900'
             />
-            <button className='hvua-btn hvua-btn-info' onClick={handleUserInfo}>
+            <button className='hvua-btn' onClick={handleUserInfo}>
               USER INFO
             </button>
           </div>
 
-          <div className='hvua-form-row'>
-            <label className='hvua-label-required'>User</label>
+          <div className='hvua-row'>
+            <label className='hvua-label'>User</label>
             <input
               type='text'
-              className='hvua-input-medium'
+              className='hvua-input hvua-input-readonly'
               value={formData.userName}
               readOnly
             />
@@ -509,13 +525,13 @@ const HDocUserAdministration = () => {
         </div>
 
         {/* 角色权限配置区域 - 横向排列 */}
-        <div className='hvua-roles-section'>
+        <div className='hvua-section'>
+          <div className='hvua-role-grid'>
           {/* Standard User */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+          <div className='hvua-role-item'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
-                id='standardUser'
                 checked={formData.standardUserChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -524,13 +540,11 @@ const HDocUserAdministration = () => {
                   )
                 }
               />
-              <label htmlFor='standardUser' className='hvua-checkbox-label'>
-                Standard User
-              </label>
-            </div>
+              Standard User
+            </label>
             <select
               multiple
-              className='hvua-select-single'
+              className='hvua-select-multi'
               value={formData.standardUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -541,30 +555,26 @@ const HDocUserAdministration = () => {
                   selectedOptions,
                 );
               }}
-              disabled={!formData.standardUserChecked}
             >
               <option value='-EU'>-EU</option>
             </select>
           </div>
 
           {/* Rule Admin */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+          <div className='hvua-role-item'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
-                id='ruleAdmin'
                 checked={formData.ruleAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange("ruleAdminChecked", e.target.checked)
                 }
               />
-              <label htmlFor='ruleAdmin' className='hvua-checkbox-label'>
-                Rule Admin
-              </label>
-            </div>
+              Rule Admin
+            </label>
             <select
               multiple
-              className='hvua-select-multiple'
+              className='hvua-select-multi'
               value={formData.ruleAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -572,7 +582,6 @@ const HDocUserAdministration = () => {
                 ).map((option) => option.value);
                 handleMarketSelectChange("ruleAdminMarkets", selectedOptions);
               }}
-              disabled={!formData.ruleAdminChecked}
             >
               {getSortedMarketList(formData.ruleAdminMarkets).map((market) => (
                 <option key={market.market} value={market.market}>
@@ -583,11 +592,10 @@ const HDocUserAdministration = () => {
           </div>
 
           {/* Template Admin */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+          <div className='hvua-role-item'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
-                id='templateAdmin'
                 checked={formData.templateAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -596,13 +604,11 @@ const HDocUserAdministration = () => {
                   )
                 }
               />
-              <label htmlFor='templateAdmin' className='hvua-checkbox-label'>
-                Template Admin
-              </label>
-            </div>
+              Template Admin
+            </label>
             <select
               multiple
-              className='hvua-select-multiple'
+              className='hvua-select-multi'
               value={formData.templateAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -613,7 +619,6 @@ const HDocUserAdministration = () => {
                   selectedOptions,
                 );
               }}
-              disabled={!formData.templateAdminChecked}
             >
               {getSortedMarketList(formData.templateAdminMarkets).map(
                 (market) => (
@@ -626,11 +631,10 @@ const HDocUserAdministration = () => {
           </div>
 
           {/* Document Auth Admin */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+          <div className='hvua-role-item'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
-                id='documentAuthAdmin'
                 checked={formData.documentAuthAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -639,16 +643,11 @@ const HDocUserAdministration = () => {
                   )
                 }
               />
-              <label
-                htmlFor='documentAuthAdmin'
-                className='hvua-checkbox-label'
-              >
-                Document Auth Admin
-              </label>
-            </div>
+              Document Auth Admin
+            </label>
             <select
               multiple
-              className='hvua-select-multiple'
+              className='hvua-select-multi'
               value={formData.documentAuthAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -659,7 +658,6 @@ const HDocUserAdministration = () => {
                   selectedOptions,
                 );
               }}
-              disabled={!formData.documentAuthAdminChecked}
             >
               {getSortedMarketList(formData.documentAuthAdminMarkets).map(
                 (market) => (
@@ -672,8 +670,8 @@ const HDocUserAdministration = () => {
           </div>
 
           {/* User Admin */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+          <div className='hvua-role-item'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
                 id='userAdmin'
@@ -682,15 +680,17 @@ const HDocUserAdministration = () => {
                   handleRoleCheckboxChange("userAdminChecked", e.target.checked)
                 }
               />
-              <label htmlFor='userAdmin' className='hvua-checkbox-label'>
-                User Admin
-              </label>
-            </div>
+              User Admin
+            </label>
           </div>
 
-          {/* Adaptation user */}
-          <div className='hvua-role-group'>
-            <div className='hvua-form-row'>
+        </div>
+      </div>
+
+        {/* Adaptation user - 单独一排 */}
+        <div className='hvua-section'>
+          <div className='hvua-row'>
+            <label className='hvua-chk-lbl'>
               <input
                 type='checkbox'
                 id='adaptationUser'
@@ -702,13 +702,11 @@ const HDocUserAdministration = () => {
                   )
                 }
               />
-              <label htmlFor='adaptationUser' className='hvua-checkbox-label'>
-                Adaptation use
-              </label>
-            </div>
+              Adaptation use
+            </label>
             <select
               multiple
-              className='hvua-select-single'
+              className='hvua-select-multi'
               value={formData.adaptationUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -719,7 +717,6 @@ const HDocUserAdministration = () => {
                   selectedOptions,
                 );
               }}
-              disabled={!formData.adaptationUserChecked}
             >
               <option value='-EU'>-EU</option>
             </select>
@@ -727,8 +724,8 @@ const HDocUserAdministration = () => {
         </div>
 
         {/* Manage Variable List */}
-        <div className='hvua-function-section'>
-          <div className='hvua-form-row'>
+        <div className='hvua-section'>
+          <div className='hvua-row'>
             <label className='hvua-label'>Manage Variable List</label>
             <input
               type='checkbox'
@@ -744,45 +741,45 @@ const HDocUserAdministration = () => {
         </div>
 
         {/* Market super user */}
-        <div className='hvua-super-user-section'>
-          <div className='hvua-form-row'>
-            <label className='hvua-label'>Market super user</label>
-            <select
-              multiple
-              className='hvua-select-multiple'
-              value={formData.marketSuperUserMarkets}
-              onChange={(e) => {
-                const selectedOptions = Array.from(
-                  e.target.selectedOptions,
-                ).map((option) => option.value);
-                handleMarketSelectChange(
-                  "marketSuperUserMarkets",
-                  selectedOptions,
-                );
-              }}
-            >
-              {getSortedMarketList(formData.marketSuperUserMarkets).map(
-                (market) => (
-                  <option key={market.market} value={market.market}>
-                    {market.market}
-                  </option>
-                ),
-              )}
-            </select>
-          </div>
+        <div className='hvua-super-section'>
+          <p className='hvua-super-title'>Market super user</p>
+          <select
+            multiple
+            className='hvua-select-multi'
+            value={formData.marketSuperUserMarkets}
+            onChange={(e) => {
+              const selectedOptions = Array.from(
+                e.target.selectedOptions,
+              ).map((option) => option.value);
+              handleMarketSelectChange(
+                "marketSuperUserMarkets",
+                selectedOptions,
+              );
+            }}
+          >
+            {getSortedMarketList(formData.marketSuperUserMarkets).map(
+              (market) => (
+                <option key={market.market} value={market.market}>
+                  {market.market}
+                </option>
+              ),
+            )}
+          </select>
         </div>
 
         {/* 操作按钮区域 */}
-        <div className='hvua-button-bar'>
+        <div className='hvua-btn-bar'>
           <button
-            className='hvua-btn hvua-btn-primary'
+            className='hvua-btn'
             onClick={handleUpdateRole}
+            disabled={isLoading}
           >
             Update Role
           </button>
           <button
-            className='hvua-btn hvua-btn-danger'
+            className='hvua-btn'
             onClick={handleDeleteRole}
+            disabled={isLoading}
           >
             Delete Role
           </button>

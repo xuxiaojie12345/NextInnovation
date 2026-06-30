@@ -66,3 +66,13 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: d://uploads/
     downloadFolder: d://downloads/
+
+# UD12 - 模板上传删除配置
+ud12:
+    template:
+        # 模板文件存储根目录（网络共享文件夹）
+        root: \\172.17.0.63\hdoc\template\upload
+    network:
+        # 网络共享文件夹访问凭据
+        username: Administrator
+        password: 3edcVFR$

@@ -16,7 +16,7 @@
          对应全体APIのプロンプト.txt 5.2 -->
     <select id="countByMarketAndFileName" resultType="int">
         SELECT COUNT(*) FROM HDOC_USER_DEFINED_RULES
-        WHERE MarketCd = #{market} AND Val = #{val}
+        WHERE MARKET = #{market} AND VAL = #{val}
     </select>
 
 </mapper>

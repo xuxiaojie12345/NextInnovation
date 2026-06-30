@@ -17,7 +17,9 @@
         - 排序：FUNCTION_GROUP（左补至4位）+ FAMILY_ID（3位）
     -->
 
-    <!-- 车辆基本信息查询 -->
+    <!-- 车辆基本信息查询（sql1）
+         关联三表：HDOC_REC_DATA_OM + HDOC_REC_DATA_VDA_GENERAL + HDOC_REC_DATA_VDA_VARIANTS
+         取得 Model、Built week、Product type、VIN、Country of Operation、FAMILY_ID、VARIANT_ID -->
     <select id="selectChassisInfo" resultType="com.web.app.domain.VehicleSpecificationResponse$ChassisInfo">
         SELECT
             CONCAT(om.SERIE, ' ', om.CHNR) AS chassisNo,
@@ -25,32 +27,29 @@
             om.BUILD AS buildWeek,
             vda.PRODUCT_TYPE AS productType,
             vda.VIN AS vin,
-            vda.COUNTRY_OF_OPERATION AS countryOfOperation
-        FROM HDOC_REC_DATA_OM om
-        INNER JOIN HDOC_REC_DATA_VDA_GENERAL vda
-            ON om.SERIE = vda.SERIE AND om.CHNR = vda.CHNR
-        WHERE om.SERIE = #{serie}
-          AND om.CHNR = #{chnr}
-        LIMIT 1
-    </select>
-
-    <!-- 发动机/符号信息查询 -->
-    <select id="selectEngineInfo" resultType="com.web.app.domain.VehicleSpecificationResponse$EngineInfo">
-        SELECT
-            'A01' AS engineNo,
-            RPAD(SUBSTRING(kv.SYMBOL, 1, 8), 8, ' ') AS symbolStr,
-            kv.DESCRIPTION AS description
+            vda.COUNTRY_OF_OPERATION AS countryOfOperation,
+            var.FAMILY_ID AS familyId,
+            var.VARIANT_ID AS variantId
         FROM HDOC_REC_DATA_OM om
         INNER JOIN HDOC_REC_DATA_VDA_GENERAL vda
             ON om.SERIE = vda.SERIE AND om.CHNR = vda.CHNR
         INNER JOIN HDOC_REC_DATA_VDA_VARIANTS var
             ON om.SERIE = var.SERIE AND om.CHNR = var.CHNR
-        INNER JOIN HDOC_REC_DATA_KOLA_VARIANT kv
-            ON var.FAMILY_ID = kv.FAMILY_ID AND var.VARIANT_ID = kv.VARIANT_ID
         WHERE om.SERIE = #{serie}
           AND om.CHNR = #{chnr}
-          AND var.FAMILY_ID LIKE 'DPX%'
-        ORDER BY CONCAT(RPAD(var.FUNCTION_GROUP, 4, ' '), var.FAMILY_ID)
+        LIMIT 1
+    </select>
+
+    <!-- 发动机/符号信息查询（sql2）
+         用 sql1 取得的 FAMILY_ID、VARIANT_ID 检索 HDOC_REC_DATA_KOLA_VARIANT -->
+    <select id="selectEngineInfo" resultType="com.web.app.domain.VehicleSpecificationResponse$EngineInfo">
+        SELECT
+            'A01' AS engineNo,
+            RPAD(SUBSTRING(kv.SYMBOL, 1, 8), 8, ' ') AS symbolStr,
+            kv.DESCRIPTION AS description
+        FROM HDOC_REC_DATA_KOLA_VARIANT kv
+        WHERE kv.FAMILY_ID = #{familyId}
+          AND kv.VARIANT_ID = #{variantId}
         LIMIT 1
     </select>
 

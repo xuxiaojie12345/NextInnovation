@@ -53,6 +53,8 @@ public class VehicleSpecificationResponse {
         private String productType;
         private String vin;
         private String countryOfOperation;
+        private String familyId;
+        private String variantId;
 
         public String getChassisNo() {
             return chassisNo;
@@ -100,6 +102,22 @@ public class VehicleSpecificationResponse {
 
         public void setCountryOfOperation(String countryOfOperation) {
             this.countryOfOperation = countryOfOperation;
+        }
+
+        public String getFamilyId() {
+            return familyId;
+        }
+
+        public void setFamilyId(String familyId) {
+            this.familyId = familyId;
+        }
+
+        public String getVariantId() {
+            return variantId;
+        }
+
+        public void setVariantId(String variantId) {
+            this.variantId = variantId;
         }
     }
 

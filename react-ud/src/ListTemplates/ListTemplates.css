@@ -1,7 +1,6 @@
 /**
  * ListTemplates 组件样式 - 模板列表页面（UD14）
- * 参照 Homologation Variables 页面风格
- * 对应详细设计：详细设计/詳細設計UD14.md
+ * 参照 UD12 (UploadDeleteTemplate) 风格
  */
 
 /* 容器 */
@@ -35,7 +34,6 @@
   background-color: #fee;
   color: #c33;
   padding: 8px 12px;
-  border-radius: 0;
   font-size: 13px;
   margin-bottom: 12px;
   border: 1px solid #fcc;
@@ -44,25 +42,36 @@
   max-width: fit-content;
 }
 
-/* 表单容器 */
-.ud14-form {
+/* 区块容器 - 参照UD12 */
+.ud14-section {
   border: 1px solid #b0c4de;
   padding: 0 20px 15px 20px;
   background-color: #ffffff;
-  box-sizing: border-box;
-  width: 100%;
+  margin-bottom: 20px;
   max-width: 800px;
 }
 
-/* 表单行 */
-.ud14-field {
+/* 区块标题 - 参照UD12 */
+.ud14-section-title {
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 -20px 15px -20px;
+  padding: 12px 20px;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
+}
+
+/* 表单组 - 参照UD12 */
+.ud14-form-group {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 12px;
   padding-top: 12px;
 }
 
-/* 字段标签 */
+/* 字段标签 - 参照UD12 */
 .ud14-label {
   width: 140px;
   text-align: left;
@@ -71,7 +80,7 @@
   flex-shrink: 0;
 }
 
-/* 下拉选择框 */
+/* 下拉选择框 - 参照UD12 */
 .ud14-select {
   padding: 4px 8px;
   font-size: 13px;
@@ -88,14 +97,13 @@
   border-color: #666666;
 }
 
-/* 表格容器 */
+/* ---- 表格 - 对应详细设计2.1控件属性表 ---- */
 .ud14-table-wrapper {
-  margin-top: 20px;
+  margin-top: 0;
   max-width: 800px;
   overflow-x: auto;
 }
 
-/* 数据表格 */
 .ud14-table {
   width: 100%;
   border-collapse: collapse;

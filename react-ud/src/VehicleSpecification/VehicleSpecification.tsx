@@ -157,12 +157,6 @@ const VehicleSpecification: React.FC = () => {
 
   return (
     <div className="vehicle-specification-page">
-      {/* 页面标题区域 */}
-      <div className="page-header-section">
-        <h1 className="page-title">Vehicle Specification</h1>
-        <p className="page-subtitle">07_Vehicle Specification</p>
-      </div>
-
       {/* 无数据时显示提示 */}
       {noData && (
         <div className="info-message-area">
@@ -173,6 +167,11 @@ const VehicleSpecification: React.FC = () => {
       {/* 信息展示区 - 合并为一个整体，外层边框 */}
       <div className="info-section">
         <div className="section-content">
+          {/* 页面标题 - 放在边框内 */}
+          <div className="page-header-section">
+            <h1 className="page-title">Vehicle Specification</h1>
+            <p className="page-subtitle">VDA - Vehicle Specification</p>
+          </div>
           <div className="info-row">
             <div className="info-field">
               <span className="info-label">Chassis no</span>
@@ -215,21 +214,17 @@ const VehicleSpecification: React.FC = () => {
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
             </div>
           </div>
+          {/* DESCRIPTION - 仅显示值，无值显示中划线 */}
           <div className="info-row">
-            <div className="info-field">
-              <span className="info-label">DESCRIPTION</span>
-              <span
-                className="info-value tooltip-value"
-                title={engineInfo?.description || ''}
-              >
-                {engineInfo?.description || '-'}
-              </span>
+            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
+              <span className="info-value" style={{ paddingLeft: 20 }}>{engineInfo?.description || '-'}</span>
             </div>
           </div>
+
+          {/* S-Note NO - 仅显示值，无值显示中划线 */}
           <div className="info-row">
-            <div className="info-field">
-              <span className="info-label">S-Note NO</span>
-              <span className="info-value">
+            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
+              <span className="info-value" style={{ paddingLeft: 20 }}>
                 {sNotes.length > 0 ? sNotes.map(n => n.noteNo).join(', ') : '-'}
               </span>
             </div>

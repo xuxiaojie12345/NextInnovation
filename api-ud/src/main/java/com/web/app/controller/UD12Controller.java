@@ -47,7 +47,7 @@ public class UD12Controller {
             return ApiResponse.success(marketList);
         } catch (Exception e) {
             logger.error("UD12SelectMarket error", e);
-            return ApiResponse.serverError();
+            return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }
 
@@ -66,7 +66,7 @@ public class UD12Controller {
         logger.info("UD12SelectMarket called - get templates for market: {}", marketCode);
 
         if (marketCode == null || marketCode.trim().isEmpty()) {
-            return ApiResponse.error(400, "Market code is required.");
+            return ApiResponse.error(400, "Please select market and template.");
         }
 
         try {
@@ -74,7 +74,7 @@ public class UD12Controller {
             return ApiResponse.success(fileList);
         } catch (Exception e) {
             logger.error("UD12SelectTemplateFiles error for market: " + marketCode, e);
-            return ApiResponse.serverError();
+            return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }
 
@@ -98,16 +98,16 @@ public class UD12Controller {
 
         // 参数非空校验
         if (file.isEmpty()) {
-            return ApiResponse.error(400, "No file uploaded.");
+            return ApiResponse.error(400, "NO FILE UPLOADED");
         }
 
         if (market == null || market.trim().isEmpty()) {
-            return ApiResponse.error(400, "Market code is required.");
+            return ApiResponse.error(400, "Please select market and template.");
         }
 
-        // 验证文件大小（最大10MB）
+        // 验证文件大小（最大10MB）- 对应详细设计 3.2 No.2
         if (file.getSize() > 10 * 1024 * 1024) {
-            return ApiResponse.error(400, "Invalid file type or size (Max 10MB)");
+            return ApiResponse.error(400, "File size exceeds the 10MB limit.");
         }
 
         try {
@@ -119,7 +119,7 @@ public class UD12Controller {
             return ApiResponse.error(400, e.getMessage());
         } catch (Exception e) {
             logger.error("UD12UploadFlie error", e);
-            return ApiResponse.serverError();
+            return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }
 
@@ -137,13 +137,10 @@ public class UD12Controller {
 
         logger.info("UD12DeleteFlie called - market: {}, file: {}", request.getMarket(), request.getFileName());
 
-        // 参数非空校验
-        if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
-            return ApiResponse.error(400, "Market code is required.");
-        }
-
-        if (request.getFileName() == null || request.getFileName().trim().isEmpty()) {
-            return ApiResponse.error(400, "File name is required.");
+        // 参数非空校验 - 对应详细设计 3.2 No.3
+        if (request.getMarket() == null || request.getMarket().trim().isEmpty()
+                || request.getFileName() == null || request.getFileName().trim().isEmpty()) {
+            return ApiResponse.error(400, "Please select market and template.");
         }
 
         try {
@@ -159,7 +156,7 @@ public class UD12Controller {
             return ApiResponse.error(400, e.getMessage());
         } catch (Exception e) {
             logger.error("UD12DeleteFlie error", e);
-            return ApiResponse.serverError();
+            return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }
 }

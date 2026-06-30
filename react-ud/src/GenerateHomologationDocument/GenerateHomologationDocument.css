@@ -1,205 +1,195 @@
+/* ========================================
+   Generate Homologation Document
+   认证文档生成查询模块 样式 (参照UD03)
+   所有选择器限定在 .generate-homologation-container 下，避免全局污染
+   ======================================== */
+
+/* ---- 整体容器 ---- */
 .generate-homologation-container {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   background-color: #f5f5f5;
-  padding: 20px;
-  font-family: Arial, sans-serif;
 }
 
-/* ヘッダー */
-.page-header {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+/* ---- Header 区域 ---- */
+.generate-homologation-container .page-header {
+  background-color: #003057;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+  gap: 12px;
 }
 
-.page-title {
-  color: #003057;
-  font-size: 24px;
-  margin: 0 0 10px 0;
+.generate-homologation-container .page-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
 }
 
-/* エラーメッセージ */
-.error-message {
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-top: 10px;
+/* ---- 错误消息 ---- */
+.generate-homologation-container .error-message {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-bottom: 14px;
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  text-align: left;
+  font-weight: 500;
 }
 
-.error-message.warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffc107;
+/* ---- 主内容区域 ---- */
+.generate-homologation-container .form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 30px 20px;
 }
 
-.error-message.error {
-  background-color: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
-}
-
-/* フォームコンテナ */
-.form-container {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.form-group input,
-.form-group select {
+/* ---- 表单卡片 ---- */
+.generate-homologation-container .form-card {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  background-color: white;
-  transition: border-color 0.2s;
+  max-width: 680px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 28px 24px 0;
   box-sizing: border-box;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #003057;
-  box-shadow: 0 0 0 3px rgba(0, 48, 87, 0.1);
+/* ---- 表单标题 ---- */
+.generate-homologation-container .form-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 20px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.form-group input::placeholder {
-  color: #999;
-}
-
-/* エラー状態の入力フィールド */
-.form-group input.input-error,
-.form-group select.input-error {
-  border-color: #ff4444;
-  border-width: 2px;
-  background-color: #fff5f5;
-}
-
-.form-group input.input-error:focus,
-.form-group select.input-error:focus {
-  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
-}
-
-/* ボタンエリア */
-.button-area {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* ---- 表单字段（水平布局：左侧标签，右侧入力框） ---- */
+.generate-homologation-container .form-group {
   display: flex;
-  gap: 15px;
-  max-width: 600px;
-  margin-bottom: 20px;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
-.button-area button {
-  padding: 10px 30px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  transition: all 0.2s;
-  min-width: 100px;
+.generate-homologation-container .form-group label {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  text-align: left;
+  line-height: 1.4;
 }
 
-.button-area button:disabled {
-  opacity: 0.6;
+.generate-homologation-container .field-control {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- 文本输入框 ---- */
+.generate-homologation-container .form-group input[type="text"] {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.generate-homologation-container .form-group input[type="text"]:focus {
+  border-color: #003057;
+}
+
+.generate-homologation-container .form-group input[type="text"]:disabled {
+  background-color: #f0f0f0;
+  color: #888888;
   cursor: not-allowed;
 }
 
-.btn-submit {
-  background-color: #e8f4f8;
-  color: #003057;
-  border: 2px solid #b0d4e8;
+.generate-homologation-container .form-group input[type="text"]::placeholder {
+  color: #b0b0b0;
 }
 
-.btn-submit:hover:not(:disabled) {
-  background-color: #d0e8f0;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* ---- 下拉选择框 ---- */
+.generate-homologation-container .form-group select {
+  width: 100%;
+  height: 32px;
+  padding: 0 24px 0 8px;
+  font-size: 13px;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  appearance: auto;
 }
 
-.btn-reset {
-  background-color: #e8f4f8;
-  color: #003057;
-  border: 2px solid #b0d4e8;
+.generate-homologation-container .form-group select:focus {
+  border-color: #003057;
 }
 
-.btn-reset:hover:not(:disabled) {
-  background-color: #d0e8f0;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.generate-homologation-container .form-group select:disabled {
+  background-color: #f0f0f0;
+  color: #888888;
+  cursor: not-allowed;
 }
 
-.btn-help {
-  background-color: #e8f4f8;
-  color: #003057;
-  border: 2px solid #b0d4e8;
+/* ---- 错误状态输入框 ---- */
+.generate-homologation-container .form-group input.input-error,
+.generate-homologation-container .form-group select.input-error {
+  border-color: #d32f2f;
+  background-color: #fff1f0;
 }
 
-.btn-help:hover:not(:disabled) {
-  background-color: #d0e8f0;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* ---- 按钮区域 ---- */
+.generate-homologation-container .button-area {
+  display: flex;
+  gap: 5px;
+  margin: 100px -24px 0 -24px;
+  padding: 8px 24px;
+  background-color: #e8f0fe;
+  border-top: 1px solid #b0c4de;
+  justify-content: flex-start;
 }
 
-/* サポート情報 */
-.support-info {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+.generate-homologation-container .button-area button {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: normal;
+  color: #333333;
+  background-color: #d0ddf0;
+  border: 1px solid #8da0c0;
+  border-radius: 0;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease;
 }
 
-.support-info p {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
+.generate-homologation-container .button-area button:hover:not(:disabled) {
+  background-color: #c0d0e5;
 }
 
-/* ローディング状態 */
-.button-area button:disabled {
-  position: relative;
+.generate-homologation-container .button-area button:active:not(:disabled) {
+  background-color: #b0c0d5;
 }
 
-.button-area button:disabled::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 50%;
-  left: 50%;
-  margin-left: -8px;
-  margin-top: -8px;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  border-top-color: transparent;
-  animation: spinner 0.6s linear infinite;
+.generate-homologation-container .button-area button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-@keyframes spinner {
-  to {
-    transform: rotate(360deg);
-  }
-}
+

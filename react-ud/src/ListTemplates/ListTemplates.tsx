@@ -1,33 +1,24 @@
 /**
  * ListTemplates 组件 - 模板列表页面（UD14）
- * 功能：展示各市场下的模板文件列表，支持按市场筛选查看文件详细信息及使用状态
- * 对应详细设计：详细设计/詳細設計UD14.md
+ * 功能：选择Market，显示该Market文件夹下的模板文件列表
+ * 参照 UD12 风格实现
  */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ListTemplates.css";
 
-/**
- * 市场数据类型
- */
+/** 市场数据类型 */
 interface MarketItem {
   market: string;
 }
 
-/**
- * 市场列表API响应数据类型
- * 对应详细设计 4.1 Response Success
- */
+/** 市场列表API响应 */
 interface MarketListResponse {
   markets: MarketItem[];
   totalCount: number;
 }
 
-/**
- * 模板文件数据类型
- * 对应详细设计 4.2 Response Success
- */
+/** 模板文件数据类型 */
 interface TemplateFile {
   filename: string;
   used: string;
@@ -36,9 +27,7 @@ interface TemplateFile {
   downloadUrl: string;
 }
 
-/**
- * 文件列表API响应数据类型
- */
+/** 文件列表API响应 */
 interface FileListResponse {
   files: TemplateFile[];
   totalCount: number;
@@ -49,12 +38,9 @@ const API_BASE_URL = "http://localhost:8081";
 
 /**
  * ListTemplates 组件
- * 显示各市场下的模板文件列表，支持市场筛选
- * 仅读操作，不涉及数据修改
+ * 选择Market后显示该市场文件夹下的模板文件列表
  */
 const ListTemplates: React.FC = () => {
-  const navigate = useNavigate();
-
   // 市场列表
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
   // 当前选中的市场
@@ -68,8 +54,6 @@ const ListTemplates: React.FC = () => {
 
   /**
    * 页面初始化 - 获取市场列表
-   * 调用 UD14SelectMarketmaster（GET /api/ud14/UD14SelectMarketmaster）
-   * 对应详细设计 3.1.1 页面初始化流程
    */
   useEffect(() => {
     const fetchMarkets = async () => {
@@ -83,10 +67,10 @@ const ListTemplates: React.FC = () => {
           const data: MarketListResponse = response.data.data;
           setMarketList(data.markets || []);
         } else {
-          setError("系统内部错误，请联系管理员");
+          setError("System error. Please contact administrator.");
         }
       } catch (err) {
-        setError("系统内部错误，请联系管理员");
+        setError("System error. Please contact administrator.");
       } finally {
         setLoading(false);
       }
@@ -96,8 +80,6 @@ const ListTemplates: React.FC = () => {
 
   /**
    * 市场选择处理 - 加载对应市场的文件列表
-   * 调用 UD14SelectHdocuserdefinedrules（GET /api/ud14/UD14SelectHdocuserdefinedrules?market={marketCode}）
-   * 对应详细设计 3.1.2 市场选择与文件列表加载流程
    */
   const handleMarketChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const market = e.target.value;
@@ -119,11 +101,11 @@ const ListTemplates: React.FC = () => {
         const data: FileListResponse = response.data.data;
         setFileList(data.files || []);
       } else {
-        setError("系统内部错误，请联系管理员");
+        setError("System error. Please contact administrator.");
         setFileList([]);
       }
     } catch (err) {
-      setError("系统内部错误，请联系管理员");
+      setError("System error. Please contact administrator.");
       setFileList([]);
     } finally {
       setLoading(false);
@@ -131,8 +113,7 @@ const ListTemplates: React.FC = () => {
   };
 
   /**
-   * 文件下载处理
-   * 对应详细设计 3.1.3 文件下载流程
+   * 文件下载处理 - 对应详细设计 3.1.3 文件下载流程
    */
   const handleFileDownload = (file: TemplateFile) => {
     try {
@@ -141,25 +122,21 @@ const ListTemplates: React.FC = () => {
       link.download = file.filename;
       link.click();
     } catch (err) {
-      setError("文件不存在，请联系管理员");
+      setError("File not found. Please contact administrator.");
     }
   };
 
   return (
     <div className="ud14-container">
-      {/* 页面标题 */}
       <h1 className="ud14-title">EDB Engineering Database - List Templates</h1>
 
-      {/* 加载状态 */}
       {loading && <div className="ud14-loading">Loading...</div>}
-
-      {/* 错误消息 */}
       {error && !loading && <div className="ud14-error">{error}</div>}
 
-      {/* Select Market 下拉列表 */}
-      <div className="ud14-form">
-        <div className="ud14-field">
-          <label className="ud14-label">Select Market</label>
+      {/* Select Market - 参照UD12的布局 */}
+      <div className="ud14-section">
+        <div className="ud14-form-group">
+          <label className="ud14-label">Market</label>
           <select
             className="ud14-select"
             value={selectedMarket}
@@ -175,7 +152,7 @@ const ListTemplates: React.FC = () => {
         </div>
       </div>
 
-      {/* 数据表格 */}
+      {/* 文件列表 - DataTable格式，对应详细设计2.1控件属性表 */}
       {!loading && selectedMarket && (
         <div className="ud14-table-wrapper">
           <table className="ud14-table">
@@ -210,9 +187,7 @@ const ListTemplates: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="ud14-empty">
-                    No files found.
-                  </td>
+                  <td colSpan={4} className="ud14-empty">No templates available</td>
                 </tr>
               )}
             </tbody>

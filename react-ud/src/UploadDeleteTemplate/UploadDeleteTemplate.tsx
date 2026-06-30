@@ -3,7 +3,7 @@
  * 功能：管理HDoc模板文件的上传和删除操作
  * 对应详细设计：详细设计/詳細設計UD12.md
  */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UploadDeleteTemplate.css";
@@ -43,7 +43,9 @@ const UploadDeleteTemplate: React.FC = () => {
 
   // Upload区域状态
   const [selectedUploadMarket, setSelectedUploadMarket] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // 文件输入框引用 - 直接通过DOM获取文件，避免React状态管理问题
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Delete区域状态
   const [selectedDeleteMarket, setSelectedDeleteMarket] = useState<string>("");
@@ -121,14 +123,13 @@ const UploadDeleteTemplate: React.FC = () => {
   };
 
   /**
-   * 文件选择处理
+   * 获取选中的File对象 - 直接从DOM的input.files读取，不受React渲染影响
    */
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
-      setError("");
-      setSuccessMessage("");
+  const getSelectedFile = (): File | null => {
+    if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files.length > 0) {
+      return fileInputRef.current.files[0];
     }
+    return null;
   };
 
   /**
@@ -149,15 +150,24 @@ const UploadDeleteTemplate: React.FC = () => {
     setError("");
     setSuccessMessage("");
 
+    // 直接从DOM文件输入框获取选中的文件
+    const file = getSelectedFile();
+
     // 校验：是否选择了文件（对应详细设计 3.2 No.1）
-    if (!selectedFile) {
+    if (!file) {
       setError("NO FILE UPLOADED");
+      return;
+    }
+
+    // 校验：是否选择了市场
+    if (!selectedUploadMarket) {
+      setError("Please select market and template.");
       return;
     }
 
     // 校验：文件大小是否超过10MB（对应详细设计 3.2 No.2）
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
-    if (selectedFile.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_FILE_SIZE) {
       setError("File size exceeds the 10MB limit.");
       return;
     }
@@ -165,13 +175,13 @@ const UploadDeleteTemplate: React.FC = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("file", file);
       formData.append("market", selectedUploadMarket);
 
+      // 注意：不要手动设置 Content-Type，axios 会自动设置 multipart boundary
       const response = await axios.post(
         `${API_BASE_URL}/api/ud12/upload`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        formData
       );
 
       if (response.data.code === 200) {
@@ -179,9 +189,7 @@ const UploadDeleteTemplate: React.FC = () => {
         setSuccessMessage(
           `TEMPLATE ${result.fileName} WAS SUCESSFULLY UPLOADED TO MARKET ${result.market}`
         );
-        setSelectedFile(null);
-        const fileInput = document.getElementById("templateFileInput") as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
+        if (fileInputRef.current) fileInputRef.current.value = "";
       } else if (response.data.code === 400) {
         setError(response.data.message || "Invalid file type or size (Max 10MB)");
       } else {
@@ -267,8 +275,8 @@ const UploadDeleteTemplate: React.FC = () => {
           <input
             type="file"
             id="templateFileInput"
+            ref={fileInputRef}
             className="ud12-file-input"
-            onChange={handleFileChange}
             accept=".rtf,.docx,.doc"
           />
         </div>

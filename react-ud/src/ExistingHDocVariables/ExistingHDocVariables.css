@@ -11,18 +11,18 @@
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 0;
   min-height: calc(100vh - 100px);
   box-sizing: border-box;
 }
 
 /* 页面标题 */
 .existing-hdoc-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
-  color: #222222;
+  color: #003057;
   margin: 0 0 4px 0;
-  text-align: center;
+  text-align: left;
 }
 
 /* 副标题 */
@@ -77,38 +77,42 @@
   color: #155724;
 }
 
-/* 按钮组 */
+/* 按钮组（参照 HomologationVariables 风格，置于表单顶部） */
 .existing-hdoc-button-group {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 5px;
+  padding: 8px 20px;
+  margin: 0 -20px;
+  background-color: #e8f0fe;
+  border-bottom: 1px solid #b0c4de;
   flex-wrap: wrap;
 }
 
 /* 操作按钮 */
 .existing-hdoc-btn {
-  padding: 6px 16px;
+  padding: 4px 12px;
   font-size: 13px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #ffffff;
+  font-weight: normal;
   color: #333333;
-  transition: all 0.2s ease;
-  min-width: 70px;
+  background-color: #d0ddf0;
+  border: 1px solid #8da0c0;
+  border-radius: 0;
+  cursor: pointer;
   text-align: center;
+  transition: background-color 0.2s ease;
 }
 
 .existing-hdoc-btn:hover {
-  border-color: #1890ff;
-  color: #1890ff;
+  background-color: #c0d0e5;
+}
+
+.existing-hdoc-btn:active {
+  background-color: #b0c0d5;
 }
 
 .existing-hdoc-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  border-color: #d9d9d9;
-  color: #bbbbbb;
 }
 
 /* 表单区域 */
@@ -117,7 +121,7 @@
   flex-direction: column;
   gap: 14px;
   border: 1px solid #e8e8e8;
-  padding: 20px;
+  padding: 0 20px 20px;
   background-color: #ffffff;
   border-radius: 4px;
   margin-bottom: 20px;
@@ -163,10 +167,10 @@
   flex-shrink: 0;
 }
 
-/* 必填标记 */
-.existing-hdoc-form-label.required::after {
-  content: ' *';
-  color: #ff4d4f;
+/* 必填标记 - 黑色星号放在标签前 */
+.existing-hdoc-form-label.required::before {
+  content: '* ';
+  color: #000000;
 }
 
 /* 表单控件包装 */

@@ -435,13 +435,7 @@ const ExistingHDocVariables: React.FC = () => {
     <div className='existing-hdoc-container'>
       {/* 页面标题 */}
       <h1 className='existing-hdoc-title'>Existing HDoc Variables</h1>
-      <p className='existing-hdoc-subtitle'>10_Search / Update / Delete of variables definition</p>
       <hr className='existing-hdoc-divider' />
-
-      {/* 支持信息区域 */}
-      <div className='existing-hdoc-support-info'>
-        <p>Enter the Variable name to search, add, update, or delete variable definitions.</p>
-      </div>
 
       {/* 消息提示区域 */}
       {message && (
@@ -450,19 +444,18 @@ const ExistingHDocVariables: React.FC = () => {
         </div>
       )}
 
-      {/* 按钮组 */}
-      <div className='existing-hdoc-button-group'>
-        <button type='button' className='existing-hdoc-btn' onClick={handleSearch} disabled={disabled}>Search</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleClear} disabled={disabled}>Clear</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleBack} disabled={disabled}>Back</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleAdd} disabled={disabled}>Add</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleUpdate} disabled={disabled}>Update</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleDelete} disabled={disabled}>Delete</button>
-        <button type='button' className='existing-hdoc-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>
-      </div>
-
-      {/* 表单区域 */}
+      {/* 表单区域（按钮组在表单边框内顶部） */}
       <div className='existing-hdoc-form'>
+        {/* 按钮组 - 紧贴表单顶部 */}
+        <div className='existing-hdoc-button-group'>
+          <button type='button' className='existing-hdoc-btn' onClick={handleSearch} disabled={disabled}>Search</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleClear} disabled={disabled}>Clear</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleBack} disabled={disabled}>Back</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleAdd} disabled={disabled}>Add</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleUpdate} disabled={disabled}>Update</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleDelete} disabled={disabled}>Delete</button>
+          <button type='button' className='existing-hdoc-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>
+        </div>
         {/* Variable */}
         <div className='existing-hdoc-form-row'>
           <label className='existing-hdoc-form-label required'>Variable</label>
