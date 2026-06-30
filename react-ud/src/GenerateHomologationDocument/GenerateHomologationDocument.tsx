@@ -219,8 +219,8 @@ const GenerateHomologationDocument = () => {
 
   // Help按钮处理
   const handleHelp = () => {
-    // 跳转到帮助文档页面
-    window.open("/help", "_blank");
+    // 跳转到HDocHelp画面
+    navigate("/hdoc-help");
   };
 
   // 输入框变化处理
