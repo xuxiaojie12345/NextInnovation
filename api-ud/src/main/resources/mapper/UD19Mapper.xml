@@ -11,6 +11,7 @@
         FROM HDOC_USER_INFOR u
         INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
         WHERE u.USERID = #{userid}
+        <if test="market != null and market != ''">AND a.MARKET = #{market}</if>
     </select>
 
     <select id="searchByUser" resultType="java.util.LinkedHashMap">
@@ -18,33 +19,37 @@
         FROM HDOC_USER_INFOR u
         INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
         WHERE u.USERID IN (SELECT USERID FROM HDOC_USER_INFOR WHERE USER = #{user})
+        <if test="market != null and market != ''">AND a.MARKET = #{market}</if>
     </select>
 
     <select id="searchByRule" resultType="java.util.LinkedHashMap">
-        SELECT u.USERID, u.USERNAME, a.MARKET
+        SELECT DISTINCT u.USERID, u.USERNAME, a.MARKET
         FROM HDOC_USER_INFOR u
         INNER JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID AND f.`FUNCTION` = 'Rule Admin'
-        LEFT JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
+        INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
         <where>
             <if test="market != null and market != ''">a.MARKET = #{market}</if>
         </where>
     </select>
 
     <select id="searchByTemplate" resultType="java.util.LinkedHashMap">
-        SELECT u.USERID, u.USERNAME, a.MARKET
+        SELECT DISTINCT u.USERID, u.USERNAME, a.MARKET
         FROM HDOC_USER_INFOR u
         INNER JOIN HDOC_FUNCTION_AUTH f ON u.USERID = f.USERID AND f.`FUNCTION` = 'Template Admin'
-        LEFT JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
+        INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
         <where>
             <if test="market != null and market != ''">a.MARKET = #{market}</if>
         </where>
     </select>
 
     <select id="searchAllUsers" resultType="java.util.LinkedHashMap">
-        SELECT u.USERID, u.USERNAME, m.MARKET
-        FROM MARKET_MASTER m
-        INNER JOIN HDOC_USER_INFOR u ON 1=1
-        LEFT JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
+        SELECT u.USERID, u.USERNAME, a.MARKET
+        FROM HDOC_USER_INFOR u
+        INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
+        <where>
+            <if test="market != null and market != ''">a.MARKET = #{market}</if>
+        </where>
+        ORDER BY u.USERID
     </select>
 
 </mapper>

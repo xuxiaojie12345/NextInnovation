@@ -47,17 +47,17 @@ public class UD19ServiceImpl implements UD19Service {
 
         if (userId != null && !userId.trim().isEmpty()) {
             // 输入Userid时
-            results = ud19Mapper.searchByUserId(userId.trim());
+            results = ud19Mapper.searchByUserId(userId.trim(), market);
         } else if (user != null && !user.trim().isEmpty()) {
             // 输入User时
-            results = ud19Mapper.searchByUser(user.trim());
+            results = ud19Mapper.searchByUser(user.trim(), market);
         } else if ("Rule".equals(type)) {
             results = ud19Mapper.searchByRule(market);
         } else if ("Template".equals(type)) {
             results = ud19Mapper.searchByTemplate(market);
         } else {
-            // Not set - 全用户
-            results = ud19Mapper.searchAllUsers();
+            // Not set - 全用户（带Market过滤）
+            results = ud19Mapper.searchAllUsers(market);
         }
 
         Map<String, Object> result = new LinkedHashMap<>();

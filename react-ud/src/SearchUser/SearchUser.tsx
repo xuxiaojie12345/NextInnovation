@@ -91,10 +91,12 @@ const SearchUser: React.FC = () => {
   };
 
   /**
-   * 处理 Market 下拉选择变化
+   * 处理 Market 多选列表变化
    */
   const handleMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMarket(e.target.value);
+    const selected = Array.from(e.target.selectedOptions);
+    const val = selected.length > 0 ? selected[selected.length - 1].value : '';
+    setMarket(val);
     if (message) clearMessage();
   };
 
@@ -123,9 +125,11 @@ const SearchUser: React.FC = () => {
       params.user = user.trim();
     } else if (authType === "Rule" || authType === "Template") {
       params.type = authType;
-      if (market) {
-        params.market = market;
-      }
+    }
+
+    // 无论哪种搜索方式，只要选择了 Market 就加入参数
+    if (market) {
+      params.market = market;
     }
 
     return params;
@@ -241,144 +245,134 @@ const SearchUser: React.FC = () => {
 
   return (
     <div className="ud19-container">
-      {/* 页面标题 */}
-      <h1 className="ud19-title">Search User</h1>
+      <main className="ud19-main">
+        <div className="ud19-card">
+          {/* 页面标题 */}
+          <h1 className="ud19-title">Search HDoc User</h1>
 
-      {/* 支持信息（对应详细设计 1. 背景说明） */}
-      <div className="ud19-support-info">
-        <p>
-          Search users by User ID, User name, Market, or permission type.
-          Supports combined conditions for precise search.
-        </p>
-      </div>
+          {/* 消息提示 */}
+          {message && <div className="ud19-message">{message}</div>}
 
-      {/* 消息提示（对应详细设计 5. 异常处理） */}
-      {message && <div className="ud19-message">{message}</div>}
-
-      {/* 搜索表单区域 */}
-      <div className="ud19-form">
-        {/* Userid 输入行（对应详细设计 2.1 控件属性表） */}
-        <div className="ud19-field">
-          <label className="ud19-label">Userid</label>
-          <input
-            type="text"
-            className="ud19-input"
-            value={userid}
-            onChange={handleUseridChange}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            maxLength={10}
-            placeholder="Enter User ID"
-          />
-        </div>
-
-        {/* User 输入行 */}
-        <div className="ud19-field">
-          <label className="ud19-label">User</label>
-          <input
-            type="text"
-            className="ud19-input"
-            value={user}
-            onChange={handleUserChange}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            maxLength={32}
-            placeholder="Enter User Name"
-          />
-        </div>
-
-        {/* Market 下拉选择行（对应详细设计 3.1.1 步骤2-3） */}
-        <div className="ud19-field">
-          <label className="ud19-label">Market</label>
-          <select
-            className="ud19-select"
-            value={market}
-            onChange={handleMarketChange}
-            disabled={isLoading}
-          >
-            <option value="">-- Select Market --</option>
-            {marketList.map((item, index) => (
-              <option key={index} value={item.MARKET}>
-                {item.MARKET}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* 权限类型单选按钮组（对应详细设计 6. 实现注意事项 - 单选按钮互斥） */}
-        <div className="ud19-field">
-          <label className="ud19-label">Type</label>
-          <div className="ud19-radio-group">
-            {(["Not set", "Rule", "Template"] as AuthType[]).map((type) => (
-              <label key={type} className="ud19-radio-label">
-                <input
-                  type="radio"
-                  className="ud19-radio"
-                  name="authType"
-                  checked={authType === type}
-                  onChange={() => handleAuthTypeChange(type)}
-                  disabled={isLoading}
-                />
-                {type}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* 按钮区域 */}
-        <div className="ud19-btn-row">
-          <button
-            type="button"
-            className="ud19-btn ud19-btn-primary"
-            onClick={handleSearch}
-            disabled={isLoading}
-          >
-            {isLoading ? "Searching..." : "Search"}
-          </button>
-          <button
-            type="button"
-            className="ud19-btn ud19-btn-default"
-            onClick={handleClear}
-            disabled={isLoading}
-          >
-            Clear
-          </button>
-        </div>
-      </div>
-
-      {/* 搜索结果区域（对应详细设计 3.1.2 ~ 3.1.4 步骤4） */}
-      {hasSearched && (
-        <div className="ud19-result-section">
-          <div className="ud19-result-header">
-            <span className="ud19-count-label">COUNT: {count}</span>
+          {/* Userid 输入行 */}
+          <div className="ud19-field">
+            <label className="ud19-label">Userid</label>
+            <input
+              type="text"
+              className="ud19-input"
+              value={userid}
+              onChange={handleUseridChange}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+              maxLength={10}
+              placeholder="Enter User ID"
+            />
           </div>
 
-          {searchResults.length > 0 ? (
-            <div className="ud19-table-wrapper">
-              <table className="ud19-table">
-                <thead>
-                  <tr>
-                    <th>Userid</th>
-                    <th>User</th>
-                    <th>Market</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.USERID || ""}</td>
-                      <td>{item.USERNAME || ""}</td>
-                      <td>{item.MARKET || ""}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* User 输入行 */}
+          <div className="ud19-field">
+            <label className="ud19-label">User</label>
+            <input
+              type="text"
+              className="ud19-input"
+              value={user}
+              onChange={handleUserChange}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+              maxLength={32}
+              placeholder="Enter User Name"
+            />
+          </div>
+
+          {/* Market 下拉 + Type 单选框 合并为一行 */}
+          <div className="ud19-field">
+            <label className="ud19-label">Market</label>
+            <select
+              className="ud19-select ud19-select-wide"
+              multiple
+              value={market ? [market] : []}
+              onChange={handleMarketChange}
+              disabled={isLoading}
+              size={8}
+            >
+              {marketList.map((item, index) => (
+                <option key={index} value={item.MARKET}>
+                  {item.MARKET}
+                </option>
+              ))}
+            </select>
+            {/* Type 单选框组 - 竖排放在 Market 右侧 */}
+            <div className="ud19-radio-group">
+              {(["Not set", "Rule", "Template"] as AuthType[]).map((type) => (
+                <label key={type} className="ud19-radio-label">
+                  <input
+                    type="radio"
+                    className="ud19-radio"
+                    name="authType"
+                    checked={authType === type}
+                    onChange={() => handleAuthTypeChange(type)}
+                    disabled={isLoading}
+                  />
+                  {type}
+                </label>
+              ))}
             </div>
-          ) : (
-            <div className="ud19-empty">未找到符合条件的用户</div>
+          </div>
+
+          {/* 按钮区域 */}
+          <div className="ud19-btn-row">
+            <button
+              type="button"
+              className="ud19-btn"
+              onClick={handleSearch}
+              disabled={isLoading}
+            >
+              {isLoading ? "Searching..." : "Search"}
+            </button>
+            <button
+              type="button"
+              className="ud19-btn"
+              onClick={handleClear}
+              disabled={isLoading}
+            >
+              Clear
+            </button>
+          </div>
+
+          {/* 搜索结果区域 */}
+          {hasSearched && (
+            <div className="ud19-result-section">
+              <div className="ud19-result-header">
+                <span className="ud19-count-label">COUNT: {count}</span>
+              </div>
+
+              {searchResults.length > 0 ? (
+                <div className="ud19-table-wrapper">
+                  <table className="ud19-table">
+                    <thead>
+                      <tr>
+                        <th>Userid</th>
+                        <th>User</th>
+                        <th>Market</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {searchResults.map((item, index) => (
+                        <tr key={index}>
+                          <td>{item.USERID || ""}</td>
+                          <td>{item.USERNAME || ""}</td>
+                          <td>{item.MARKET || ""}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="ud19-empty">未找到符合条件的用户</div>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </main>
     </div>
   );
 };

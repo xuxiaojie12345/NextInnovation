@@ -32,9 +32,9 @@ const menuItems: MenuItem[] = [
     icon: <FileTextOutlined />,
     children: [
       { key: "GenerateDoc", label: "Generate Doc", route: "/Menu/GenerateHomologationDocument" },
-      { key: "GenerateBatch", label: "Generate in Batch", route: "/Menu/GenerateInBatch" },
-      { key: "RegdataArchive", label: "Regdata Archive", route: "/Menu/RegdataArchive" },
-      { key: "RegdataBatch", label: "Regdata Batch", route: "/Menu/RegdataBatch" },
+      { key: "GenerateBatch", label: "Generate in Batch", route: "#" },
+      { key: "RegdataArchive", label: "Regdata Archive", route: "#" },
+      { key: "RegdataBatch", label: "Regdata Batch", route: "#" },
     ],
   },
   {
@@ -45,12 +45,12 @@ const menuItems: MenuItem[] = [
       { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
       { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "/Menu/HomologationVariables" },
       { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
-      { key: "UnlockDocument", label: "Unlock Document", route: "/Menu/UnlockDocument" },
-      { key: "HDocNumberSeries", label: "HDoc Number Series", route: "/Menu/HDocNumberSeries" },
+      { key: "UnlockDocument", label: "Unlock Document", route: "#" },
+      { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
       { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
       { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
       { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
-      { key: "ADCAChange", label: "AD/CA Change", route: "/Menu/ADCAChange" },
+      { key: "ADCAChange", label: "AD/CA Change", route: "#" },
     ],
   },
   {
@@ -61,8 +61,8 @@ const menuItems: MenuItem[] = [
       { key: "HDocUserAdmin", label: "HDoc User Administration", route: "/Menu/HDocUserAdministration" },
       { key: "HDocUserDocAdmin", label: "HDoc User Doc Administration", route: "/Menu/HDocUserDocAdministration" },
       { key: "SearchUser", label: "Search User", route: "/Menu/SearchUser" },
-      { key: "ChangePassword", label: "Change Password", route: "/Menu/ChangePassword" },
-      { key: "UserPosition", label: "User Position", route: "/Menu/UserPosition" },
+      { key: "ChangePassword", label: "Change Password", route: "#" },
+      { key: "UserPosition", label: "User Position", route: "#" },
     ],
   },
   {
@@ -70,8 +70,8 @@ const menuItems: MenuItem[] = [
     label: "Archive",
     icon: <FolderOpenOutlined />,
     children: [
-      { key: "ArchiveSearch", label: "Search", route: "/Menu/ArchiveSearch" },
-      { key: "UploadDocument", label: "Upload Document", route: "/Menu/UploadDocument" },
+      { key: "ArchiveSearch", label: "Search", route: "#" },
+      { key: "UploadDocument", label: "Upload Document", route: "#" },
     ],
   },
   {
@@ -79,11 +79,11 @@ const menuItems: MenuItem[] = [
     label: "Documentation",
     icon: <BookOutlined />,
     children: [
-      { key: "UserGuide", label: "User Guide", route: "/Menu/UserGuide" },
-      { key: "ADCAChangeGuide", label: "AD/CA Change Guide", route: "/Menu/ADCAChangeGuide" },
-      { key: "VinPlateGuide", label: "Vin plate Guide FM/FH", route: "/Menu/VinPlateGuide" },
-      { key: "ArchiveGuide", label: "Archive Guide", route: "/Menu/ArchiveGuide" },
-      { key: "Privacy", label: "Privacy", route: "/Menu/Privacy" },
+      { key: "UserGuide", label: "User Guide", route: "#" },
+      { key: "ADCAChangeGuide", label: "AD/CA Change Guide", route: "#" },
+      { key: "VinPlateGuide", label: "Vin plate Guide FM/FH", route: "#" },
+      { key: "ArchiveGuide", label: "Archive Guide", route: "#" },
+      { key: "Privacy", label: "Privacy", route: "#" },
     ],
   },
 ];
@@ -237,7 +237,7 @@ const Menu: React.FC = () => {
     const routeMap = buildRouteMap(filteredMenuItems);
     const route = routeMap[info.key];
 
-    if (route) {
+    if (route && route !== '#') {
       navigate(route);
     }
   };

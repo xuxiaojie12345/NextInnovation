@@ -260,11 +260,6 @@ const GenerateHomologationDocument: React.FC = () => {
 
   return (
     <div className='generate-homologation-container'>
-      {/* Header - VOLVO logo */}
-      <header className='page-header'>
-        <div className='page-title'>VOLVO</div>
-      </header>
-
       {/* 主内容区域 */}
       <main className='form-container'>
         <div className='form-card'>
