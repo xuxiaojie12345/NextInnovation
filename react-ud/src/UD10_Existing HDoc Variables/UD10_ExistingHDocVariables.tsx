@@ -303,6 +303,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Variable 输入框（对应设计书 2.1 序号1） */}
         <div className="ud10-row">
           <span className="ud10-label">*Variable</span>
+          <select className="ud10-compare-select" defaultValue="=">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             className="ud10-input"
             type="text"
@@ -321,6 +325,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Type 下拉框（对应设计书 2.1 序号2） */}
         <div className="ud10-row">
           <span className="ud10-label">Type</span>
+          <select className="ud10-compare-select" defaultValue="=">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <select
             className="ud10-select"
             value={type}
@@ -336,6 +344,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Description 输入框（对应设计书 2.1 序号3） */}
         <div className="ud10-row">
           <span className="ud10-label">Description</span>
+          <select className="ud10-compare-select" defaultValue="=">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             className="ud10-input"
             type="text"
@@ -353,6 +365,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Created by user 输入框（对应设计书 2.1 序号4）- 活性状态 */}
         <div className="ud10-row">
           <span className="ud10-label">Created by user</span>
+          <select className="ud10-compare-select" defaultValue="=">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             className="ud10-input"
             type="text"
@@ -365,6 +381,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Date 输入框（对应设计书 2.1 序号5）- 活性状态 */}
         <div className="ud10-row">
           <span className="ud10-label">Date</span>
+          <select className="ud10-compare-select" defaultValue="=">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             className="ud10-input"
             type="text"

@@ -153,11 +153,14 @@ const UD25_EDBUserView: React.FC = () => {
         {/* 用户ID */}
         <div className="ud25-form-group">
           <label>Userid</label>
+          <select className="ud25-compare-select">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             type="text"
             value={userid}
             readOnly
-            disabled
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -165,11 +168,14 @@ const UD25_EDBUserView: React.FC = () => {
         {/* 负责人 */}
         <div className="ud25-form-group">
           <label>Responsible</label>
+          <select className="ud25-compare-select">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             type="text"
             value={responsible}
             readOnly
-            disabled
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -177,11 +183,14 @@ const UD25_EDBUserView: React.FC = () => {
         {/* 用户职位 */}
         <div className="ud25-form-group">
           <label>User Position</label>
+          <select className="ud25-compare-select">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             type="text"
             value={userPosition}
             readOnly
-            disabled
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -189,11 +198,14 @@ const UD25_EDBUserView: React.FC = () => {
         {/* 邮箱 */}
         <div className="ud25-form-group">
           <label>E-mail</label>
+          <select className="ud25-compare-select">
+            <option value="=">=</option>
+            <option value="≠">≠</option>
+          </select>
           <input
             type="text"
             value={email}
             readOnly
-            disabled
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>

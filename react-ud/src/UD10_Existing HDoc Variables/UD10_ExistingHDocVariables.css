@@ -78,12 +78,27 @@
   white-space: nowrap;
 }
 
+/* 比较运算符下拉框 */
+.ud10-compare-select {
+  width: 50px;
+  height: 25px;
+  border: 1px solid #d9d9d9;
+  padding: 0 4px;
+  font-size: 13px;
+  color: #333;
+  background-color: #ffffff;
+  cursor: pointer;
+  margin-right: 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
 /* 输入框 */
 .ud10-row .ud10-input {
   flex: 1;
-  height: 32px;
+  height: 25px;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   padding: 0 10px;
   font-size: 14px;
   color: #333;
@@ -104,9 +119,9 @@
 /* 下拉选择框 */
 .ud10-row .ud10-select {
   flex: 1;
-  height: 32px;
+  height: 25px;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   padding: 0 8px;
   font-size: 14px;
   color: #333;

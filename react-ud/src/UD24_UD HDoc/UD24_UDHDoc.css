@@ -35,7 +35,7 @@
 
 /* ==================== 链接项样式 ==================== */
 .ud24-container .ud24-link-item {
-  padding: 16px 20px;
+  /* padding: 16px 20px; */
   margin-bottom: 12px;
   border-left: 4px solid transparent;
   cursor: pointer;

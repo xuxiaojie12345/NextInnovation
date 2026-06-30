@@ -1,0 +1,129 @@
+/* ============================================================
+   UD22_DocumentTypes.css
+   Document Types - 文档类型列表展示页面样式
+   对应详细设计：DES-UD22-001
+   ============================================================ */
+
+/* ==================== 页面主容器 ==================== */
+.ud22-container {
+  background-color: white;
+  padding: 5px 10px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== 页面标题 ==================== */
+.ud22-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud22-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud22-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ==================== 主内容区域 ==================== */
+.ud22-content {
+  border: 1px solid #9999cc;
+  padding: 16px;
+  background-color: #ffffff;
+}
+
+/* ==================== 表格区域 ==================== */
+.ud22-table-wrapper {
+  overflow-x: auto;
+}
+
+.ud22-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #d0d5dd;
+}
+
+.ud22-table thead {
+  background-color: #e8e8f0;
+}
+
+.ud22-table th {
+  padding: 7px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #d0d5dd;
+  border-right: 1px solid #d0d5dd;
+  font-size: 12px;
+  white-space: nowrap;
+  background-color: ghostwhite;
+}
+
+.ud22-table th:last-child {
+  border-right: none;
+}
+
+.ud22-table td {
+  padding: 6px 10px;
+  color: #444;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.ud22-table td:last-child {
+  border-right: none;
+}
+
+.ud22-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.ud22-table tbody tr:hover {
+  background-color: #e6f0ff;
+}
+
+.ud22-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 各列样式 */
+.ud22-cell-key {
+  width: 200px;
+  font-weight: 500;
+  color: #003366;
+}
+
+.ud22-cell-desc {
+  min-width: 250px;
+}
+
+/* 加载中和空数据提示 */
+.ud22-loading,
+.ud22-empty {
+  text-align: center;
+  padding: 30px 0;
+  color: #999;
+  font-size: 14px;
+}

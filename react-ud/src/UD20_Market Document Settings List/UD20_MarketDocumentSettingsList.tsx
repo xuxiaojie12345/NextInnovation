@@ -1,0 +1,225 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/config';
+import './UD20_MarketDocumentSettingsList.css';
+
+/**
+ * UD20_MarketDocumentSettingsList 市场文档设置列表页面组件
+ *
+ * 功能说明：
+ * - 从HDOC_DOCUMENT_LIST表获取文档设置列表数据
+ * - 以表格形式展示文档类型、业务单元、注册用户、注册时间
+ * - 提供Select（选择）、Back（返回）、Print（打印）操作按钮
+ * - User列可点击链接，跳转到UD25_EDBUserView用户信息画面
+ *
+ * @component
+ * @returns {JSX.Element} 市场文档设置列表页面元素
+ */
+const UD20_MarketDocumentSettingsList: React.FC = () => {
+  const navigate = useNavigate();
+
+  // ==================== 状态管理 ====================
+  // 对应设计书 2.1 控件属性表
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);   // 文档列表数据
+  const [selectedDocType, setSelectedDocType] = useState<string | null>(null); // 选中的文档类型
+  const [message, setMessage] = useState<string>('');                // 消息内容
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [isLoading, setIsLoading] = useState<boolean>(false);       // 加载状态
+
+  /** 文档列表项接口 */
+  interface DocumentItem {
+    id: number;
+    documentType: string;
+    businessUnit: string;
+    registerUser: string;
+    registerDateTime: string;
+  }
+
+  // ==================== 初期表示 ====================
+  // 对应设计书 3.1.1 初期显示 - 获取文档列表
+  useEffect(() => {
+    fetchDocumentList();
+  }, []);
+
+  /**
+   * 获取文档列表数据
+   * 对应设计书 4.1 UD20GetDocumentListApi
+   * GET /api/ud20/getdocumentlist
+   */
+  const fetchDocumentList = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.get('/api/ud20/getdocumentlist');
+      // 后端返回格式：{ code: 200, message: "success", data: [...] }
+      if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
+        setDocuments(response.data.data);
+      } else {
+        // 无数据或响应异常
+        setDocuments([]);
+        if (response.data?.code !== 200) {
+          setMessage(response.data?.message || '获取文档列表失败');
+          setMessageType('error');
+        }
+      }
+    } catch (error) {
+      console.error('获取文档列表失败:', error);
+      setMessage('获取文档列表失败，请稍后重试');
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==================== 事件处理函数 ====================
+
+  /**
+   * 处理表格行点击选择
+   * 对应设计书 3.1.2 行选择 - 点击行选中该记录
+   *
+   * @param docType - 选中记录的文档类型（唯一标识）
+   */
+  const handleRowSelect = useCallback((docType: string) => {
+    setSelectedDocType(docType);
+  }, []);
+
+  /**
+   * 处理 Select 按钮点击
+   * 对应设计书 3.1.3 Select按钮处理流程
+   * 将选中记录的数据传送到UD20-1画面
+   */
+  const handleSelect = useCallback(() => {
+    if (selectedDocType === null) {
+      setMessage('请先选择一条记录');
+      setMessageType('error');
+      return;
+    }
+    // 查找选中记录
+    const selected = documents.find((doc) => doc.documentType === selectedDocType);
+    if (selected) {
+      // 携带选中数据跳转到UD20-1画面
+      navigate('/UD201', { state: { selectedRecord: selected } });
+    }
+  }, [selectedDocType, documents, navigate]);
+
+  /**
+   * 处理 Back 按钮点击
+   * 对应设计书 3.1.4 Back按钮处理流程
+   * 返回前一个画面
+   */
+  const handleBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  /**
+   * 处理 Print 按钮点击
+   * 对应设计书 3.1.5 Print按钮处理流程
+   * 打印当前页面内容
+   */
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
+  /**
+   * 处理 User 链接点击
+   * 对应设计书 3.1.6 User链接 - 跳转到UD25用户信息画面
+   *
+   * @param userId - 用户ID
+   */
+  const handleUserClick = useCallback((userId: string) => {
+    navigate('/UD25', { state: { userId } });
+  }, [navigate]);
+
+  // ==================== 渲染 ====================
+  return (
+    <div className="ud20-container">
+      {/* 页面标题 */}
+      {/* 对应设计书 2.1 控件属性表 No.8 Page Title */}
+      <div className="ud20-title">Market Document Settings List</div>
+
+      {/* 消息显示区域 */}
+      {message && (
+        <div className={`ud20-message ${messageType === 'success' ? 'ud20-message-success' : 'ud20-message-error'}`}>
+          {message}
+        </div>
+      )}
+
+        {/* 按钮区域 */}
+        {/* 对应设计书 2.1 No.5 Select / No.6 Back / No.7 Print */}
+        <div className="ud20-button-row">
+          <button className="ud20-btn" onClick={handleSelect} disabled={isLoading}>
+            Select
+          </button>
+          <button className="ud20-btn" onClick={handleBack} disabled={isLoading}>
+            Back
+          </button>
+          <button className="ud20-btn" onClick={handlePrint} disabled={isLoading}>
+            Print
+          </button>
+        </div>  
+
+      {/* 主内容区域 */}
+      <div className="ud20-content">
+        
+        {/* 数据表格区域 */}
+        {/* 对应设计书 2.1 No.1 Document type / No.2 Bussines unit / No.3 User / No.4 Date */}
+        <div className="ud20-table-wrapper">
+          <table className="ud20-table">
+            <thead>
+              <tr>
+                <th className="ud20-col-select"></th>
+                <th className="ud20-col-doctype">Document type</th>
+                <th className="ud20-col-bu">Bussines unit</th>
+                <th className="ud20-col-user">User</th>
+                <th className="ud20-col-date">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="ud20-loading">加载中...</td>
+                </tr>
+              ) : documents.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="ud20-empty">暂无数据</td>
+                </tr>
+              ) : (
+                documents.map((doc) => (
+                  <tr
+                    key={doc.documentType}
+                    className={`ud20-row ${selectedDocType === doc.documentType ? 'ud20-row-selected' : ''}`}
+                    onClick={() => handleRowSelect(doc.documentType)}
+                  >
+                    <td className="ud20-col-select">
+                      <input
+                        type="radio"
+                        name="docSelect"
+                        checked={selectedDocType === doc.documentType}
+                        onChange={() => handleRowSelect(doc.documentType)}
+                      />
+                    </td>
+                    <td className="ud20-col-doctype">{doc.documentType}</td>
+                    <td className="ud20-col-bu">BU</td>
+                    <td className="ud20-col-user">
+                      <span
+                        className="ud20-user-link"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUserClick(doc.registerUser);
+                        }}
+                      >
+                        {doc.registerUser}
+                      </span>
+                    </td>
+                    <td className="ud20-col-date">{doc.registerDateTime}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UD20_MarketDocumentSettingsList;

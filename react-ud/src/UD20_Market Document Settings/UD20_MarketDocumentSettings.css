@@ -1,0 +1,145 @@
+/* ============================================================
+   UD20_MarketDocumentSettings.css
+   Market Document Settings - 市场文档设置更新页面样式
+   对应详细设计：DES-UD20-1-001
+   ============================================================ */
+
+/* ==================== 页面主容器 ==================== */
+.ud201-container {
+  background-color: white;
+  padding: 5px 10px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== 页面标题 ==================== */
+.ud201-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud201-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud201-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ==================== 按钮区域 ==================== */
+.ud201-button-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff;
+  border: 1px solid #9999cc;
+  border-bottom: none;
+}
+
+.ud201-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.ud201-btn:hover {
+  background-color: #c0c0e8;
+}
+
+.ud201-btn:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.ud201-btn-primary {
+  background-color: #b0b0d8;
+  font-weight: 500;
+}
+
+/* ==================== 表单区域 ==================== */
+.ud201-content {
+  border: 1px solid #9999cc;
+  padding: 20px 16px;
+  background-color: #ffffff;
+}
+
+/* 字段行 */
+.ud201-field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-left: 10px;
+}
+
+.ud201-label {
+  min-width: 130px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-align: left;
+  padding-right: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 比较运算符下拉框 */
+.ud201-compare-select {
+  width: 50px;
+  height: 28px;
+  border: 1px solid #d9d9d9;
+  padding: 0 4px;
+  font-size: 13px;
+  color: #333;
+  background-color: #ffffff;
+  cursor: pointer;
+  margin-right: 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.ud201-input {
+  flex: 1;
+  height: 28px;
+  border: 1px solid #d9d9d9;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  max-width: 300px;
+}
+
+.ud201-input:focus {
+  border-color: #003366;
+}
+
+.ud201-input-readonly {
+  background-color: #f5f5f5;
+  color: #666;
+}

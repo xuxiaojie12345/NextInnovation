@@ -1,0 +1,144 @@
+/* ============================================================
+   UD23_DownloadAndPrintQuickGuides.css
+   Download and Print Quick Guides - 下载和打印快速指南页面样式
+   对应详细设计：DES-UD23-001
+   ============================================================ */
+
+/* ==================== 页面主容器 ==================== */
+.ud23-container {
+  background-color: white;
+  padding: 10px 15px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== Back 按钮 ==================== */
+.ud23-back-btn {
+  background: none;
+  border: none;
+  color: #003366;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.ud23-back-btn:hover {
+  color: #0066cc;
+}
+
+/* ==================== 页面标题 ==================== */
+.ud23-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 10px 0px 20px;
+}
+
+/* ==================== 指南区域 ==================== */
+.ud23-section {
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* 单个指南项 */
+.ud23-guide-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 180px;
+}
+
+/* 图片占位区域 */
+.ud23-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.ud23-image-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 4px;
+  text-align: center;
+  word-break: break-word;
+}
+
+.ud23-image-box {
+  width: 160px;
+  height: 120px;
+  border: 1px solid #d0d5dd;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.ud23-image-icon {
+  font-size: 36px;
+  opacity: 0.4;
+}
+
+/* 下载链接区域 */
+.ud23-link-area {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.ud23-download-link {
+  color: #003366;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.ud23-download-link:hover {
+  color: #0066cc;
+}
+
+/* 内网标签 */
+.ud23-intranet-badge {
+  font-size: 11px;
+  color: #cc6600;
+  font-style: italic;
+}
+
+/* ==================== Volvo 3P 区域 ==================== */
+.ud23-volvo-section {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ud23-volvo-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.ud23-volvo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.ud23-volvo-item {
+  display: flex;
+  align-items: center;
+}

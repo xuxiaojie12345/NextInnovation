@@ -1,0 +1,133 @@
+/* ============================================================
+   UD21_MarketsInHDoc.css
+   Markets in HDoc - 市场列表展示页面样式
+   对应详细设计：DES-UD21-001
+   ============================================================ */
+
+/* ==================== 页面主容器 ==================== */
+.ud21-container {
+  background-color: white;
+  padding: 5px 10px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  width: 900px;
+}
+
+/* ==================== 页面标题 ==================== */
+.ud21-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud21-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud21-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+/* ==================== 主内容区域 ==================== */
+.ud21-content {
+  border: 1px solid #9999cc;
+  padding: 16px;
+  background-color: #ffffff;
+}
+
+/* ==================== 表格区域 ==================== */
+.ud21-table-wrapper {
+  overflow-x: auto;
+}
+
+.ud21-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #d0d5dd;
+}
+
+.ud21-table thead {
+  background-color: #e8e8f0;
+}
+
+.ud21-table th {
+  padding: 10px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #d0d5dd;
+  border-right: 1px solid #d0d5dd;
+  font-size: 15px;
+  white-space: nowrap;
+  background-color: ghostwhite;
+}
+
+.ud21-table th:last-child {
+  border-right: none;
+}
+
+.ud21-table td {
+  padding: 6px 10px;
+  color: #444;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.ud21-table td:last-child {
+  border-right: none;
+}
+
+.ud21-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.ud21-table tbody tr:hover {
+  background-color: #e6f0ff;
+}
+
+.ud21-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 各列样式 */
+.ud21-cell-market {
+  width: 120px;
+  font-weight: 500;
+}
+
+.ud21-cell-desc {
+  min-width: 200px;
+}
+
+.ud21-cell-weights {
+  min-width: 150px;
+  color: #999;
+}
+
+/* 加载中和空数据提示 */
+.ud21-loading,
+.ud21-empty {
+  text-align: center;
+  padding: 30px 0;
+  color: #999;
+  font-size: 14px;
+}
