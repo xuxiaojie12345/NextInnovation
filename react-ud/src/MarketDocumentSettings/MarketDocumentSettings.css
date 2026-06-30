@@ -33,14 +33,14 @@
   gap: 10px;
   margin-bottom: 20px;
   padding: 10px 15px;
-  background-color: #e8f0fe;
-  border: 1px solid #ccc;
+  background-color: #eaecf8;
+  border: 1px solid #cccccc;
 }
 
 /* 操作按钮样式 */
 .mds-action-button {
   padding: 6px 16px;
-  background-color: #c5d9f1;
+  background-color: #bcc4f0;
   color: #333;
   border: 1px solid #8fa4c7;
   border-radius: 2px;
@@ -50,7 +50,7 @@
 }
 
 .mds-action-button:hover:not(:disabled) {
-  background-color: #a8c4e6;
+  background-color: #dfe5ec;
 }
 
 .mds-action-button:disabled {
@@ -60,7 +60,7 @@
 
 /* Update Mode按钮特殊样式 */
 .mds-update-button {
-  background-color: #d4e5f7;
+  background-color: #bcc4f0;
 }
 
 /* 表单区域 */
@@ -193,6 +193,34 @@
   background-color: #fff5f5;
   border: 1px solid #ffcccc;
   border-radius: 3px;
+}
+
+/* 消息显示区域 */
+.message-display {
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid;
+}
+
+.message-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.message-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.message-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
 }
 
 /* Loading状态 */

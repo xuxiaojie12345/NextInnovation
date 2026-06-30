@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './DownloadAndPrintQuickGuides.css';
+import wisImage from './image/WIS Quick.png';
+import perfImage from './image/PERF Quick.png';
+import w8Image from './image/W8 Quick.png';
+import hdocImage from './image/HDOC Quick.png';
+import edbImage from './image/EDB Quick.png';
+import cosImage from './image/COS Quick.png';
+import vbiImage from './image/VBI Quick.png';
 
 /**
  * DownloadAndPrintQuickGuides组件 - 快速指南下载和打印页面
@@ -118,7 +125,16 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
                 {/* 图片区域 - 留出图片位置 */}
                 <div className='dapg-card-image'>
                   <img 
-                    src={`/placeholder-${guide.name.toLowerCase()}.png`} 
+                    src={
+                      guide.name === 'WIS' ? wisImage :
+                      guide.name === 'PERF' ? perfImage :
+                      guide.name === 'W8-Calc' ? w8Image :
+                      guide.name === 'HDoc' ? hdocImage :
+                      guide.name === 'EDB' ? edbImage :
+                      guide.name === 'COS' ? cosImage :
+                      (guide.name === 'VBI-Intranet' || guide.name === 'VBI-Internet') ? vbiImage :
+                      `/placeholder-${guide.name.toLowerCase()}.png`
+                    } 
                     alt={`${guide.name} Quick Guide Cover`}
                     onError={(e) => {
                       // 如果图片加载失败，显示占位符

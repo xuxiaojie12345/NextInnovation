@@ -8,7 +8,7 @@ spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://172.17.0.63:3306/react_use?&characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC
         username: root
         password: 1234
         druid:
@@ -38,6 +38,11 @@ mybatis:
     type-handlers-package: com.bjpowernode.springboot28mybatis.domain # 读取指定包中的所有类并取别名
     configuration:
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 设置mybatis的日志的具体实现
+
+# 模板上传路径
+upload:
+    template:
+        path: \\172.17.0.63\hdoc\template\upload
 
 swagger3:
     base-package: com.web.app.controller # 设置swagger扫描的controller所在的包

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaChangeMapper">
+
+    <!-- UD16: 查询 -->
+    <select id="selectBySerieAndChnr" resultType="com.web.app.entity.HdocAdcaChange">
+        SELECT SERIE, CHNR FROM HDOC_ADCA_CHANGE
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </select>
+
+    <!-- UD16: 新增 -->
+    <insert id="insertAdcaChange">
+        INSERT INTO HDOC_ADCA_CHANGE
+        (SERIE, CHNR, ACT, BU, REASON, REGISTER_USER, REGISTER_DATETIME, REGISTER_PROCESS,
+         UPDATE_USER, UPDATE_DATETIME, UPDATE_PROCESS)
+        VALUES
+        (#{serie}, #{chnr}, #{act}, #{bu}, #{reason}, #{registerUser}, #{registerDatetime}, #{registerProcess},
+         #{updateUser}, #{updateDatetime}, #{updateProcess})
+    </insert>
+
+    <!-- UD16: 更新ACT为N（软删除） -->
+    <update id="updateActToN">
+        UPDATE HDOC_ADCA_CHANGE
+        SET ACT = 'N',
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = #{updateProcess}
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </update>
+
+</mapper>

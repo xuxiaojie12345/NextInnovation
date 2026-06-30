@@ -9,113 +9,101 @@ import './ListAvailableTemplates.css';
  * @props 无Props
  */
 const ListAvailableTemplates: React.FC = () => {
-  // 状态管理 (对应设计书 7. 实现注意事项)
   const [marketList, setMarketList] = useState<string[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<string>('');
+  const [allFiles, setAllFiles] = useState<any[]>([]);
   const [dataTableList, setDataTableList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
 
-  /**
-   * 画面初期表示 - 调用API获取市场列表
-   * 对应设计书 3.1 ListAvailableTemplates初期表示 和 4.1.1 画面的初期表示
-   */
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
+
   useEffect(() => {
-    fetchMarketList();
+    fetchInitialData();
   }, []);
 
-  /**
-   * 监听selectedMarket变化，当用户选择市场后加载文件列表
-   * 对应设计书 3.2 Market的选择 和 4.1.2 下拉框数据选择
-   */
-  useEffect(() => {
-    if (selectedMarket) {
-      fetchFileListAndUsedData(selectedMarket);
-    } else {
-      // 若未选择市场，清空表格数据
-      setDataTableList([]);
-    }
-  }, [selectedMarket]);
-
-  /**
-   * 调用UD08SelectMarketmasterApi获取市场列表
-   * 对应设计书 5.1 UD08SelectMarketmasterApi
-   */
-  const fetchMarketList = async () => {
+  const fetchInitialData = async () => {
     setIsLoading(true);
-    setErrorMessage('');
-    
+    clearMessage();
+
     try {
-      // API请求 - 获取Market下拉列表数据
       const response = await axios.post('http://localhost:8081/api/ud14/selectmarketmaster');
-      
-      if (response.data.success) {
-        const markets = response.data.data.map((item: any) => item.market || item);
+
+      if (response.data.code === 200) {
+        const data = response.data.data || {};
+        const markets = (data.marketList || []).map((item: any) => item.market || item);
         setMarketList(markets);
+        setAllFiles(data.allFiles || []);
       } else {
-        setErrorMessage(response.data.message || '获取市场列表失败');
+        showMessage(response.data.msg || '获取数据失败', 'error');
       }
     } catch (error: any) {
-      console.error('获取市场列表失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage('网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
-  /**
-   * 并行调用两个API获取文件列表和Used数据
-   * 对应设计书 4.1.2 下拉框数据选择 步骤1和步骤2
-   */
-  const fetchFileListAndUsedData = async (market: string) => {
-    setIsLoading(true);
-    setErrorMessage('');
-    
+  const fetchUsedData = async (market: string, fileList: any[]) => {
     try {
-      // 并行调用两个API
-      const [fileResponse, usedResponse] = await Promise.all([
-        // API请求 - 获取该市场文件夹下的文件列表 (对应设计书 5.2 UD14SelectMarketFileApi)
-        axios.get('http://localhost:8081/api/ud14/select-market-file', {
-          params: { market }
-        }),
-        
-        // API请求 - 获取HDOC_USER_DEFINED_RULES表中的VARIABLE列表 (对应设计书 5.3 UD14SelectHdocUserDefinedUsedApi)
-        axios.get('http://localhost:8081/api/ud14/selecthdocuserdefinedused', {
-          params: { market }
-        })
-      ]);
-      
-      if (fileResponse.data.success && usedResponse.data.success) {
-        const fileList = fileResponse.data.data || [];
-        const usedVariables = usedResponse.data.data.variable ? [usedResponse.data.data.variable] : [];
-        
-        // 匹配文件名与VARIABLE，填充Used列 (对应设计书 7. 实现注意事项 - 数据匹配逻辑)
+      const response = await axios.post('http://localhost:8081/api/ud14/selecthdocuserdefinedused', {
+        market: market
+      });
+
+      if (response.data.code === 200) {
+        const usedData: Array<{variable: string; val: string}> = response.data.data || [];
         const matchedData = fileList.map((file: any) => {
-          // 去除文件扩展名后比较
-          const fileNameWithoutExt = file.fileName.split('.')[0];
-          const matchedVariable = usedVariables.find((variable: string) => 
-            variable.includes(fileNameWithoutExt) || fileNameWithoutExt.includes(variable)
-          );
-          
+          // 构造匹配key: {market}/{filename}
+          const valKey = market + '/' + (file.fileName || '');
+          // 查找VAL字段匹配这条数据的记录
+          const match = usedData.find((item: any) => item.val === valKey);
           return {
-            fileName: file.fileName,
-            used: matchedVariable || '',
-            lastMod: file.lastMod,
-            size: file.size
+            ...file,
+            used: match ? match.variable : ''
           };
         });
-        
         setDataTableList(matchedData);
-      } else {
-        setErrorMessage('获取文件列表失败');
       }
     } catch (error: any) {
-      console.error('获取文件列表失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
-    } finally {
-      setIsLoading(false);
+      showMessage('获取Used数据失败', 'error');
     }
   };
+
+  const handleDownload = async (market: string, fileName: string) => {
+    try {
+      const response = await axios.post('http://localhost:8081/api/ud14/downfile', {
+        market: market,
+        fileName: fileName
+      }, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      showMessage('文件下载成功', 'success');
+    } catch (error: any) {
+      showMessage('文件下载失败', 'error');
+    }
+  };
+
+  useEffect(() => {
+    if (selectedMarket) {
+      const filtered = allFiles.filter(f => f.market === selectedMarket);
+      setDataTableList(filtered);
+      fetchUsedData(selectedMarket, filtered);
+    } else {
+      setDataTableList([]);
+    }
+  }, [selectedMarket, allFiles]);
 
   return (
     <div className='lat-container'>
@@ -139,10 +127,10 @@ const ListAvailableTemplates: React.FC = () => {
           </select>
         </div>
         
-        {/* 错误信息显示 */}
-        {errorMessage && (
-          <div className='lat-error-message'>
-            {errorMessage}
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
           </div>
         )}
         
@@ -175,10 +163,16 @@ const ListAvailableTemplates: React.FC = () => {
                       className={index % 2 === 0 ? 'lat-row-even' : 'lat-row-odd'}
                     >
                       <td className='lat-td-icon'>
-                        {/* 文件图标占位符 */}
                         <span className='lat-file-icon'>📄</span>
                       </td>
-                      <td className='lat-td-filename'>{row.fileName}</td>
+                      <td className='lat-td-filename'>
+                        <span 
+                          className='lat-file-link' 
+                          onClick={() => handleDownload(selectedMarket, row.fileName)}
+                        >
+                          {row.fileName}
+                        </span>
+                      </td>
                       <td className='lat-td-used'>{row.used}</td>
                       <td className='lat-td-lastmod'>{row.lastMod}</td>
                       <td className='lat-td-size'>{row.size}</td>

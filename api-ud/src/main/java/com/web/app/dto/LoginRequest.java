@@ -1,5 +1,6 @@
 package com.web.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
@@ -25,6 +26,8 @@ public class LoginRequest {
      */
     @NotBlank(message = "用户ID不能为空")
     @Size(max = 10, message = "用户ID长度不能超过10")
+    @JsonProperty("UserId")
+    @JsonAlias({"userId", "UserId"})
     private String userId;
     
     /**

@@ -9,7 +9,7 @@
 
     <!-- UD20: 根据Doctype查询 -->
     <select id="selectByDoctype" resultType="com.web.app.entity.HdocDocumentList">
-        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
+        SELECT DOCTYPE, REGISTER_USER AS registerUser, REGISTER_DATETIME AS registerDatetime
         FROM HDOC_DOCUMENT_LIST
         WHERE DOCTYPE = #{doctype}
     </select>

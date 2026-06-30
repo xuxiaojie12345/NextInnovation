@@ -15,6 +15,7 @@ const MarketDocumentSettings: React.FC = () => {
 
   // 状态管理 (对应设计书 7. 实现注意事项)
   const [documentType, setDocumentType] = useState<string>('');
+  const [documentTypeList, setDocumentTypeList] = useState<string[]>([]);
   const [market, setMarket] = useState<string>('');
   const [setting, setSetting] = useState<string>('');
   const [businessUnit, setBusinessUnit] = useState<string>('');
@@ -22,19 +23,50 @@ const MarketDocumentSettings: React.FC = () => {
   const [date, setDate] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
 
   /**
    * 获取当前登录用户ID
    * TODO: 从JWT token或session中解析userId
    */
   const getCurrentUserId = (): string => {
-    return localStorage.getItem('userId') || 'test_user';
+    return sessionStorage.getItem('userId') || '';
+  };
+
+  /**
+   * 获取Document type下拉列表数据
+   */
+  const fetchDocumentTypeList = async () => {
+    try {
+      const response = await axios.post('http://localhost:8081/api/ud20/selectehdocdocumentlist', {});
+      if (response.data.code === 200) {
+        const list = response.data.data.map((item: any) => item.description || item);
+        setDocumentTypeList(list);
+      }
+    } catch (error) {
+      console.error('获取Document type列表失败:', error);
+    }
   };
 
   /**
    * 画面初期表示 - 接收前画面传递的参数
    * 对应设计书 3.1 画面初期 和 4.1.1 画面初期表示
    */
+  /**
+   * 画面初期表示 - 获取Document type下拉列表
+   */
+  useEffect(() => {
+    fetchDocumentTypeList();
+  }, []);
+
   useEffect(() => {
     // 若迁移元画面是MarketDocumentSettingsList画面，初期画面项目显示的数据是从迁移元画面传递过来的参数
     if (location.state) {
@@ -55,7 +87,7 @@ const MarketDocumentSettings: React.FC = () => {
    */
   const handleSearchClick = () => {
     // 将当前画面的UserID参数和Document type项目的值作为参数传递到下一个画面
-    navigate('/MarketDocumentSettingsList', { 
+    navigate('/HdocMenu/MarketDocumentSettingsList', { 
       state: { 
         userId: getCurrentUserId(),
         doctype: documentType,
@@ -87,7 +119,7 @@ const MarketDocumentSettings: React.FC = () => {
    * 对应设计书 3.4 Back按钮押下
    */
   const handleBackClick = () => {
-    navigate('/HdocHelp');
+    navigate('/HdocMenu/HdocHelp');
   };
 
   /**
@@ -95,34 +127,34 @@ const MarketDocumentSettings: React.FC = () => {
    * 对应设计书 3.5 Update Mode按钮押下 和 4.1.4 Update Mode按钮押下
    */
   const handleUpdateModeClick = async () => {
+    if (!documentType.trim()) {
+      showMessage('请输入Document type', 'error');
+      return;
+    }
     setIsLoading(true);
     setErrorMessage('');
+    clearMessage();
     
     try {
-      // 构建请求参数 (对应设计书 5.1 UD20UpdateHdocDocumentListApi)
-      const requestData = {
+      const response = await axios.post('http://localhost:8081/api/ud20-1/updatehdocdocumentlist', {
         doctype: documentType,
         registerUser: user || getCurrentUserId(),
-        registerDatetime: date || new Date().toISOString(),
-        registerProcess: 'MarketDocumentSettings', // 当前画面ID
+        registerDatetime: date 
+          ? (date.includes('T') ? date : date + 'T00:00:00') 
+          : new Date().toISOString().replace('Z', '').split('.')[0],
+        registerProcess: 'MarketDocumentSettings',
         updateUser: getCurrentUserId(),
-        updateDatetime: new Date().toISOString(),
-        updateProcess: 'MarketDocumentSettings' // 当前画面ID
-      };
-      
-      // API请求 - 更新文档list (对应设计书 5.1)
-      const response = await axios.get('/api/UD20/update-hdoc-document-list', {
-        params: requestData
+        updateDatetime: new Date().toISOString().replace('Z', '').split('.')[0],
+        updateProcess: 'MarketDocumentSettings'
       });
       
-      if (response.data.success) {
-        alert('数据更新成功');
+      if (response.data.code === 200) {
+        showMessage('数据更新成功', 'success');
       } else {
-        setErrorMessage(response.data.message || '更新失败');
+        showMessage(response.data.msg || '更新失败', 'error');
       }
     } catch (error: any) {
-      console.error('更新失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -179,14 +211,17 @@ const MarketDocumentSettings: React.FC = () => {
               <option value='&gt;='>&gt;=</option>
               <option value='&lt;='>&lt;=</option>
             </select>
-            <input 
-              type='text' 
-              className='mds-input mds-input-document-type' 
+            <select
+              className='mds-select mds-select-document-type'
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
-              maxLength={20}
               disabled={isLoading}
-            />
+            >
+              <option value=''></option>
+              {documentTypeList.map((doc, index) => (
+                <option key={index} value={doc}>{doc}</option>
+              ))}
+            </select>
           </div>
           
           {/* Market行 */}
@@ -218,7 +253,7 @@ const MarketDocumentSettings: React.FC = () => {
               onChange={(e) => setSetting(e.target.value)}
               disabled={isLoading}
             >
-              <option value=''>请选择</option>
+              <option value=''></option>
               <option value='NO_VDA_CACHE'>NO_VDA_CACHE</option>
               <option value='VDA_CACHE'>VDA_CACHE</option>
             </select>
@@ -237,7 +272,7 @@ const MarketDocumentSettings: React.FC = () => {
               onChange={(e) => setBusinessUnit(e.target.value)}
               disabled={isLoading}
             >
-              <option value=''>请选择</option>
+              <option value=''></option>
               <option value='VTC'>VTC</option>
               <option value='BU'>BU</option>
             </select>
@@ -285,6 +320,13 @@ const MarketDocumentSettings: React.FC = () => {
         {errorMessage && (
           <div className='mds-error-message'>
             {errorMessage}
+          </div>
+        )}
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
           </div>
         )}
         

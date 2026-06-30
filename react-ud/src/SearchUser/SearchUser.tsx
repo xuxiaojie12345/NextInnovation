@@ -12,13 +12,22 @@ const SearchUser: React.FC = () => {
   // 状态管理 (对应设计书 7. 实现注意事项)
   const [userId, setUserId] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
-  const [market, setMarket] = useState<string>('');
+  const [market, setMarket] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<string>('notSet'); // 默认选中Not set
   const [marketList, setMarketList] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
 
   /**
    * 画面初期表示 - 调用API获取市场列表
@@ -36,12 +45,11 @@ const SearchUser: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // API请求 - 获取Market下拉列表数据 (对应设计书 5.1)
-      const response = await axios.get('/api/UD08/select-marketmaster');
+      const response = await axios.post('http://localhost:8081/api/ud19/selectmarketmaster');
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const markets = response.data.data.map((item: any) => item.market || item);
-        setMarketList(markets);
+        setMarketList(['-EU', ...markets]);
       }
     } catch (error: any) {
       console.error('获取市场列表失败:', error);
@@ -57,35 +65,42 @@ const SearchUser: React.FC = () => {
   const handleSearchClick = async () => {
     setIsLoading(true);
     setErrorMessage('');
+    clearMessage();
     
     try {
-      // 构建请求参数 (对应设计书 5.2 UD19SelectHdocMarketAuthApi)
-      const requestData = {
-        userId: userId.trim() || undefined,
-        userName: userName.trim() || undefined,
-        market: market || undefined,
-        type: {
-          notSet: selectedType === 'notSet' ? 'true' : undefined,
-          rule: selectedType === 'rule' ? 'true' : undefined,
-          template: selectedType === 'template' ? 'true' : undefined
-        }
+      // 构建请求参数 - 后端Ud19SearchRequest字段: userid, userName, type, market
+      const typeMap: Record<string, string> = {
+        'notSet': 'Notset',
+        'rule': 'R',
+        'template': 'T'
       };
       
-      // API请求 - 查询用户信息 (对应设计书 5.2)
-      const response = await axios.post('/api/UD19/select-hdoc-market-auth', requestData);
+      const requestData: any = {
+        userid: userId.trim() || undefined,
+        userName: userName.trim() || undefined,
+        market: market.length > 0 ? market.join(',') : undefined
+      };
+      // type: 'Notset'时SQL跳过type条件；其他值则按对应字母过滤
+      if (selectedType !== 'notSet') {
+        requestData.type = typeMap[selectedType] || selectedType;
+      }
       
-      if (response.data.success) {
+      const response = await axios.post('http://localhost:8081/api/ud19/searchhdoc', requestData);
+      
+      if (response.data.code === 200) {
         const results = response.data.data || [];
+        if (results.length === 0) {
+          showMessage('没有找到对应的用户数据', 'info');
+        }
         setSearchResults(results);
         setTotalCount(results.length);
       } else {
-        setErrorMessage(response.data.message || '查询失败');
+        showMessage(response.data.msg || '查询失败', 'error');
         setSearchResults([]);
         setTotalCount(0);
       }
     } catch (error: any) {
-      console.error('查询失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
       setSearchResults([]);
       setTotalCount(0);
     } finally {
@@ -142,11 +157,14 @@ const SearchUser: React.FC = () => {
             <label className='su-label'>Market</label>
             <select 
               className='su-select su-select-market'
+              multiple
               value={market}
-              onChange={(e) => setMarket(e.target.value)}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                setMarket(selected);
+              }}
               disabled={isLoading}
             >
-              <option value=''>请选择</option>
               {marketList.map((m, index) => (
                 <option key={index} value={m}>{m}</option>
               ))}
@@ -206,6 +224,13 @@ const SearchUser: React.FC = () => {
         {errorMessage && (
           <div className='su-error-message'>
             {errorMessage}
+          </div>
+        )}
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
           </div>
         )}
         

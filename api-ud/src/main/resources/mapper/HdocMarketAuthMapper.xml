@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocMarketAuthMapper">
+
+    <!-- UD17: 查询用户权限（关联两张表） -->
+    <select id="selectUserAuthByUserId" resultType="com.web.app.dto.UserInfoResponse">
+        SELECT a.TYPE, a.MARKET, b.FUNCTION
+        FROM HDOC_MARKET_AUTH a
+        INNER JOIN HDOC_FUNCTION_AUTH b ON a.USERID = b.USERID
+        WHERE a.USERID = #{userId}
+    </select>
+
+    <!-- UD17: 插入MARKET_AUTH -->
+    <insert id="insertMarketAuth">
+        INSERT INTO HDOC_MARKET_AUTH
+        (USERID, MARKET, TYPE, BU, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+        (#{userid}, #{market}, #{type}, #{bu}, #{registerDatetime}, #{registerUser}, #{registerProcess},
+         #{updateDatetime}, #{updateUser}, #{updateProcess})
+    </insert>
+
+    <!-- UD17: 删除角色(MARKET_AUTH) -->
+    <delete id="deleteMarketAuthByUserId">
+        DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userId}
+    </delete>
+
+    <!-- UD17: 删除角色(FUNCTION_AUTH) -->
+    <delete id="deleteFunctionAuthByUserId">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userId}
+    </delete>
+
+    <!-- UD19: 查询用户信息 -->
+    <select id="searchUserList" parameterType="java.util.Map" resultType="com.web.app.dto.SearchResultResponse">
+        SELECT u.*, a.*
+        FROM HDOC_USER_INFOR u
+        INNER JOIN HDOC_MARKET_AUTH a ON u.USERID = a.USERID
+        <where>
+            <if test="userid != null and userid != ''">u.USERID = #{userid}</if>
+            <if test="userName != null and userName != ''">AND u.USERNAME = #{userName}</if>
+            <if test="market != null and market != ''">AND a.MARKET = #{market}</if>
+            <if test="type != null and type != '' and type != 'Notset'">AND a.TYPE = #{type}</if>
+        </where>
+    </select>
+
+</mapper>

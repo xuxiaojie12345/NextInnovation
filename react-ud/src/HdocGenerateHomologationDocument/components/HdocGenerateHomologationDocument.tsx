@@ -194,7 +194,7 @@ const HdocGenerateHomologationDocument: React.FC = () => {
    */
   const handleHelp = () => {
     // 跳转到Help画面
-    navigate('/HdocHelp');
+    navigate('/HdocMenu/HdocHelp');
   };
 
   return (
@@ -246,7 +246,7 @@ const HdocGenerateHomologationDocument: React.FC = () => {
             onChange={(e) => setDocumentType(e.target.value)}
             disabled={isLoading}
           >
-            <option value="">-- Select Document Type --</option>
+            <option value=""></option>
             {documentTypeOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

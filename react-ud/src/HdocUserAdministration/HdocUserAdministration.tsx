@@ -16,7 +16,16 @@ const HdocUserAdministration: React.FC = () => {
   const [marketList, setMarketList] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
+
   // 权限状态管理
   const [permissions, setPermissions] = useState({
     standardUser: { enabled: false, markets: ['-EU'] },
@@ -42,7 +51,7 @@ const HdocUserAdministration: React.FC = () => {
    * TODO: 从JWT token或session中解析userId
    */
   const getCurrentUserId = (): string => {
-    return localStorage.getItem('userId') || 'test_user';
+    return sessionStorage.getItem('userId') || '';
   };
 
   /**
@@ -54,11 +63,12 @@ const HdocUserAdministration: React.FC = () => {
     
     try {
       // API请求 - 获取Market下拉列表数据 (对应设计书 5.1)
-      const response = await axios.get('/api/UD08/select-marketmaster');
+      const response = await axios.post('http://localhost:8081/api/ud12/selectmarket');
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const markets = response.data.data.map((item: any) => item.market || item);
-        setMarketList(markets);
+        // 在所有pulldownlist第一行添加 "-EU"
+        setMarketList(['-EU', ...markets]);
       }
     } catch (error: any) {
       console.error('获取市场列表失败:', error);
@@ -74,72 +84,112 @@ const HdocUserAdministration: React.FC = () => {
   const handleUserInfoClick = async () => {
     // 校验：UserID不能为空 (对应设计书 2.1 控件属性表 - UserID为必填项)
     if (!userId.trim()) {
-      setErrorMessage('请输入UserID');
+      showMessage('请输入UserID', 'error');
       return;
     }
 
     setIsLoading(true);
     setErrorMessage('');
+    clearMessage();
     
     try {
       // 步骤1：查询用户名 (对应设计书 4.1.2 步骤2)
-      const userResponse = await axios.get('/api/UD01/select-hdoc-user-infor', {
-        params: { UserId: userId }
+      const userResponse = await axios.post('http://localhost:8081/api/ud01/login', {
+        UserId: userId
       });
       
       // 条件1：若用户userId不存在 (对应设计书 4.2 No.1)
-      if (!userResponse.data.success) {
-        setErrorMessage("We didn't recognize the userid you entered. Please try again.");
+      if (userResponse.data.code !== 200) {
+        showMessage("We didn't recognize the userid you entered. Please try again.", 'error');
         return;
       }
       
       // 条件2：若用户存在，显示用户名
-      setUserName(userResponse.data.data.userName || '');
+      setUserName(userResponse.data.data?.username || '');
       
       // 步骤2：查询用户权限 (对应设计书 4.1.2 步骤2)
-      const authResponse = await axios.get('/api/UD17/select-doc-market-auth', {
-        params: { UserId: userId }
+      const authResponse = await axios.post('http://localhost:8081/api/ud17/userinfo', {
+        UserId: userId
       });
       
-      if (authResponse.data.success) {
-        const authData = authResponse.data.data.type;
+      if (authResponse.data.code === 200) {
+        const authList = authResponse.data.data;
         
-        // 根据API返回的权限数据更新Checkbox状态 (对应设计书 4.1.2)
-        setPermissions({
-          standardUser: { 
-            enabled: authData.standardUser?.enabled || false, 
-            markets: authData.standardUser?.markets || ['-EU'] 
-          },
-          ruleAdmin: { 
-            enabled: authData.ruleAdmin?.enabled || false, 
-            markets: authData.ruleAdmin?.markets || [] 
-          },
-          templateAdmin: { 
-            enabled: authData.templateAdmin?.enabled || false, 
-            markets: authData.templateAdmin?.markets || [] 
-          },
-          documentAuthAdmin: { 
-            enabled: authData.documentAuthAdmin?.enabled || false, 
-            markets: authData.documentAuthAdmin?.markets || [] 
-          },
-          userAdmin: { 
-            enabled: authData.userAdmin?.enabled || false 
-          },
-          adaptationUser: { 
-            enabled: authData.adaptationUser?.enabled || false, 
-            markets: authData.adaptationUser?.markets || ['-EU'] 
-          },
-          manageVariableList: { 
-            enabled: authData.manageVariableList?.enabled || false 
-          },
-          marketSuperUser: { 
-            markets: authData.showChangeVariantsFields?.markets || [] 
-          }
-        });
+        // TYPE字母→权限Key映射 (HDOC_MARKET_AUTH)
+        const typeToPermissionKey: Record<string, string> = {
+          'A': 'userAdmin',
+          'R': 'ruleAdmin',
+          'T': 'templateAdmin',
+          'U': 'standardUser',
+          'D': 'documentAuthAdmin',
+          'DOCMOD': 'adaptationUser',
+          'MCSU': 'marketSuperUser'
+        };
+        
+        // FUNCTION名称→权限Key映射 (HDOC_FUNCTION_AUTH)
+        const functionToPermissionKey: Record<string, string> = {
+          'Standard User': 'standardUser',
+          'Rule Admin': 'ruleAdmin',
+          'Template Admin': 'templateAdmin',
+          'Document Auth Admin': 'documentAuthAdmin',
+          'User Admin': 'userAdmin',
+          'ADAPTATION DOC': 'adaptationUser',
+          'Manage Variable List': 'manageVariableList',
+          'Market Super User': 'marketSuperUser'
+        };
+        
+        // 初始化所有权限为disabled
+        const newPermissions: any = {
+          standardUser: { enabled: false, markets: [] as string[] },
+          ruleAdmin: { enabled: false, markets: [] as string[] },
+          templateAdmin: { enabled: false, markets: [] as string[] },
+          documentAuthAdmin: { enabled: false, markets: [] as string[] },
+          userAdmin: { enabled: false },
+          adaptationUser: { enabled: false, markets: [] as string[] },
+          manageVariableList: { enabled: false },
+          marketSuperUser: { markets: [] as string[] }
+        };
+        
+        // 遍历后端返回的权限列表
+        if (Array.isArray(authList)) {
+          authList.forEach((item: any) => {
+            const typeVal = item.type as string;
+            const market = item.market as string;
+            const funcVal = item.function as string;
+            
+            // === 处理 HDOC_MARKET_AUTH.TYPE → 权限checkbox + market高亮 ===
+            const permKey = typeToPermissionKey[typeVal];
+            if (permKey && newPermissions[permKey]) {
+              const perm = newPermissions[permKey];
+              // 有数据则勾选checkbox
+              if (typeof perm.enabled === 'boolean') {
+                perm.enabled = true;
+              }
+              // market高亮
+              if (market && perm.markets) {
+                if (!perm.markets.includes(market)) {
+                  perm.markets.push(market);
+                }
+              }
+            }
+            
+            // === 处理 HDOC_FUNCTION_AUTH.FUNCTION → 权限checkbox ===
+            if (funcVal && funcVal.trim()) {
+              const funcPermKey = functionToPermissionKey[funcVal.trim()];
+              if (funcPermKey && newPermissions[funcPermKey]) {
+                const perm = newPermissions[funcPermKey];
+                if (typeof perm.enabled === 'boolean') {
+                  perm.enabled = true;
+                }
+              }
+            }
+          });
+        }
+        
+        setPermissions(newPermissions);
       }
     } catch (error: any) {
-      console.error('查询用户信息失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +197,8 @@ const HdocUserAdministration: React.FC = () => {
 
   /**
    * Update Role按钮点击处理 - 更新用户权限
-   * 对应设计书 3.3 Update Role按钮押下 和 4.1.3 Update Role按钮押下
+   * 对应设计书 3.3 Update Role按钮押下
+   * 先删除旧数据，再按当前画面选择批量插入新数据
    */
   const handleUpdateRoleClick = async () => {
     // 校验：UserID不能为空
@@ -160,68 +211,69 @@ const HdocUserAdministration: React.FC = () => {
     setErrorMessage('');
     
     try {
-      // 步骤1：验证用户是否存在 (对应设计书 4.1.3 步骤2)
-      const userResponse = await axios.get('/api/UD01/select-hdoc-user-infor', {
-        params: { UserId: userId }
+      // 步骤1：验证用户是否存在
+      const userResponse = await axios.post('http://localhost:8081/api/ud01/login', {
+        UserId: userId
       });
       
-      // 条件1：若用户userId不存在 (对应设计书 4.2 No.2)
-      if (!userResponse.data.success) {
-        setErrorMessage("We didn't recognize the userid you entered. Please try again.");
+      if (userResponse.data.code !== 200) {
+        showMessage("We didn't recognize the userid you entered. Please try again.", 'error');
         return;
       }
       
-      // 条件2：若用户存在，执行权限更新操作
-      // 构建请求参数 (对应设计书 5.4 UD17UpdateHdocFunctionAuthApi)
-      const requestData = {
-        updateUser: userName || userId,
-        updateDatetime: new Date().toISOString(),
-        updateProcess: 'HdocUserAdministration', // 当前画面ID
-        type: {
-          standardUser: {
-            enabled: permissions.standardUser.enabled,
-            markets: permissions.standardUser.markets
-          },
-          ruleAdmin: {
-            enabled: permissions.ruleAdmin.enabled,
-            markets: permissions.ruleAdmin.markets
-          },
-          templateAdmin: {
-            enabled: permissions.templateAdmin.enabled,
-            markets: permissions.templateAdmin.markets
-          },
-          documentAuthAdmin: {
-            enabled: permissions.documentAuthAdmin.enabled,
-            markets: permissions.documentAuthAdmin.markets
-          },
-          userAdmin: {
-            enabled: permissions.userAdmin.enabled
-          },
-          adaptationUser: {
-            enabled: permissions.adaptationUser.enabled,
-            markets: permissions.adaptationUser.markets
-          },
-          manageVariableList: {
-            enabled: permissions.manageVariableList.enabled
-          },
-          showChangeVariantsFields: {
-            enabled: permissions.marketSuperUser.markets.length > 0,
-            markets: permissions.marketSuperUser.markets
-          }
-        }
+      // 权限配置：Key → TYPE字母 + FUNCTION名称
+      const permissionConfig: Record<string, { type: string; func: string; hasMarket: boolean }> = {
+        standardUser: { type: 'U', func: 'Standard User', hasMarket: true },
+        ruleAdmin: { type: 'R', func: 'Rule Admin', hasMarket: true },
+        templateAdmin: { type: 'T', func: 'Template Admin', hasMarket: true },
+        documentAuthAdmin: { type: 'D', func: 'Document Auth Admin', hasMarket: true },
+        userAdmin: { type: 'A', func: 'User Admin', hasMarket: false },
+        adaptationUser: { type: 'DOCMOD', func: 'ADAPTATION DOC', hasMarket: true },
+        manageVariableList: { type: '', func: 'Manage Variable List', hasMarket: false },
+        marketSuperUser: { type: 'MCSU', func: 'Market Super User', hasMarket: true }
       };
       
-      // API请求 - 更新用户权限 (对应设计书 5.4)
-      const response = await axios.put('/api/UD17/update-hdoc-function-auth', requestData);
+      // 构建 MARKET_AUTH 列表：每个勾选权限下每个market生成一条记录
+      const marketAuthList: { type: string; market: string }[] = [];
+      // 构建 FUNCTION_AUTH 列表：每个勾选权限生成一条记录
+      const functionAuthList: { function: string }[] = [];
       
-      if (response.data.success) {
-        alert('权限更新成功');
+      Object.entries(permissionConfig).forEach(([key, cfg]) => {
+        const perm = (permissions as any)[key];
+        if (!perm) return;
+        
+        const isEnabled = perm.enabled || (key === 'marketSuperUser' && perm.markets?.length > 0);
+        if (!isEnabled) return;
+        
+        // FUNCTION_AUTH：每个启用的权限加一条function记录
+        functionAuthList.push({ function: cfg.func });
+        
+        // MARKET_AUTH：有market的权限，每个market生成一条记录
+        if (cfg.hasMarket && cfg.type && perm.markets && Array.isArray(perm.markets)) {
+          perm.markets.forEach((market: string) => {
+            if (market && market.trim()) {
+              marketAuthList.push({ type: cfg.type, market: market.trim() });
+            }
+          });
+        }
+      });
+      
+      // API请求 - 更新用户权限
+      const response = await axios.post('http://localhost:8081/api/ud17/updaterole', {
+        userId: userId,
+        updateUser: getCurrentUserId(),
+        updateProcess: 'HdocUserAdministration',
+        marketAuthList: marketAuthList,
+        functionAuthList: functionAuthList
+      });
+      
+      if (response.data.code === 200) {
+        showMessage('权限更新成功', 'success');
       } else {
-        setErrorMessage(response.data.message || '权限更新失败');
+        showMessage(response.data.msg || '权限更新失败', 'error');
       }
     } catch (error: any) {
-      console.error('更新权限失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -234,21 +286,22 @@ const HdocUserAdministration: React.FC = () => {
   const handleDeleteRoleClick = async () => {
     // 校验：UserID不能为空
     if (!userId.trim()) {
-      setErrorMessage('请输入UserID');
+      showMessage('请输入UserID', 'error');
       return;
     }
 
     setIsLoading(true);
     setErrorMessage('');
+    clearMessage();
     
     try {
       // API请求 - 删除用户权限 (对应设计书 5.5 UD17DeleteHdocFunctionAuthApi)
-      const response = await axios.delete('/api/UD17/delete-hdoc-function-auth', {
-        params: { UserId: userId }
+      const response = await axios.post('http://localhost:8081/api/ud17/deleterole', {
+        UserId: userId
       });
       
-      if (response.data.success) {
-        alert('权限删除成功');
+      if (response.data.code === 200) {
+        showMessage('权限删除成功', 'success');
         // 清空所有权限状态
         setPermissions({
           standardUser: { enabled: false, markets: ['-EU'] },
@@ -261,11 +314,10 @@ const HdocUserAdministration: React.FC = () => {
           marketSuperUser: { markets: [] }
         });
       } else {
-        setErrorMessage(response.data.message || '权限删除失败');
+        showMessage(response.data.msg || '权限删除失败', 'error');
       }
     } catch (error: any) {
-      console.error('删除权限失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -404,7 +456,7 @@ const HdocUserAdministration: React.FC = () => {
                 const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                 handleMarketChange('standardUser', selected);
               }}
-              disabled={!permissions.standardUser.enabled || isLoading}
+              disabled={isLoading}
             >
               {marketList.map((market, index) => (
                 <option key={index} value={market}>{market}</option>
@@ -419,7 +471,7 @@ const HdocUserAdministration: React.FC = () => {
                 const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                 handleMarketChange('ruleAdmin', selected);
               }}
-              disabled={!permissions.ruleAdmin.enabled || isLoading}
+              disabled={isLoading}
             >
               {marketList.map((market, index) => (
                 <option key={index} value={market}>{market}</option>
@@ -434,7 +486,7 @@ const HdocUserAdministration: React.FC = () => {
                 const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                 handleMarketChange('templateAdmin', selected);
               }}
-              disabled={!permissions.templateAdmin.enabled || isLoading}
+              disabled={isLoading}
             >
               {marketList.map((market, index) => (
                 <option key={index} value={market}>{market}</option>
@@ -449,7 +501,7 @@ const HdocUserAdministration: React.FC = () => {
                 const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                 handleMarketChange('documentAuthAdmin', selected);
               }}
-              disabled={!permissions.documentAuthAdmin.enabled || isLoading}
+              disabled={isLoading}
             >
               {marketList.map((market, index) => (
                 <option key={index} value={market}>{market}</option>
@@ -479,7 +531,7 @@ const HdocUserAdministration: React.FC = () => {
                 const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                 handleMarketChange('adaptationUser', selected);
               }}
-              disabled={!permissions.adaptationUser.enabled || isLoading}
+              disabled={isLoading}
             >
               {marketList.map((market, index) => (
                 <option key={index} value={market}>{market}</option>
@@ -522,6 +574,13 @@ const HdocUserAdministration: React.FC = () => {
         {errorMessage && (
           <div className='hua-error-message'>
             {errorMessage}
+          </div>
+        )}
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
           </div>
         )}
         

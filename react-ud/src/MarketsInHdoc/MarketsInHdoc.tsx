@@ -29,12 +29,10 @@ const MarketsInHdoc: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // API请求 - 查询市场信息 (对应设计书 5.1)
-      const response = await axios.get('/api/UD21/select-market-master');
+      const response = await axios.post('http://localhost:8081/api/ud19/selectmarketmaster');
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data || [];
-        // 将查询到的Market和Description在画面上以列表的形式展示
         setMarketList(Array.isArray(data) ? data : [data]);
       } else {
         setMarketList([]);

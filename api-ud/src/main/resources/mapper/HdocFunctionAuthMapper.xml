@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocFunctionAuthMapper">
+
+    <!-- UD18: 查询用户功能权限 -->
+    <select id="selectByUserId" resultType="com.web.app.entity.HdocFunctionAuth">
+        SELECT USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userId} LIMIT 1
+    </select>
+
+    <!-- UD17: 插入FUNCTION_AUTH -->
+    <insert id="insertFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH
+        (USERID, `FUNCTION`, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+        (#{userid}, #{function}, #{registerDatetime}, #{registerUser}, #{registerProcess},
+         #{updateDatetime}, #{updateUser}, #{updateProcess})
+    </insert>
+
+</mapper>

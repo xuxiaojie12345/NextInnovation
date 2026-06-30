@@ -30,11 +30,10 @@ const DocumentTypes: React.FC = () => {
     
     try {
       // API请求 - 查询文档类型信息 (对应设计书 5.1)
-      const response = await axios.get('/api/UD03/select-hdoc-document-list');
+      const response = await axios.post('http://localhost:8081/api/ud20/selecthdocdocumentlist');
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data || [];
-        // 将查询到的Doctype和Description在画面上以列表的形式展示
         setDocumentTypeList(Array.isArray(data) ? data : [data]);
       } else {
         setDocumentTypeList([]);

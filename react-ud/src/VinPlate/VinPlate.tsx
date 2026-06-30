@@ -20,7 +20,16 @@ const VinPlate: React.FC = () => {
   const [printItems, setPrintItems] = useState<any[]>([]);
   const [vpData, setVpData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDetailVisible, setIsDetailVisible] = useState<boolean>(false); // 控制详细信息区域显示/隐藏
+  const [isDetailVisible, setIsDetailVisible] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | 'info'>('info');
+
+  const showMessage = (msg: string, type: 'error' | 'success' | 'info' = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+  };
+
+  const clearMessage = () => setMessage('');
 
   /**
    * Status数字转文字映射 (对应设计书 2.1 控件属性表)
@@ -36,16 +45,15 @@ const VinPlate: React.FC = () => {
    * Plate Type数字转文字映射 (对应设计书 2.1 控件属性表)
    */
   const plateTypeMap: Record<number, string> = {
-    1: 'basic',
+    1: 'BASIC',
     2: 'ADVANCED (with weights)'
   };
 
   /**
    * 获取当前登录用户ID
-   * TODO: 从JWT token或session中解析userId
    */
   const getCurrentUserId = (): string => {
-    return localStorage.getItem('userId') || 'test_user';
+    return sessionStorage.getItem('userId') || '';
   };
 
   /**
@@ -55,20 +63,21 @@ const VinPlate: React.FC = () => {
   const handleViewInfoClick = async () => {
     // 校验：底盘号不能为空
     if (!chassisNumber.trim()) {
-      setErrorMessage('请输入底盘号');
+      showMessage('请输入底盘号', 'error');
       return;
     }
-
     setIsLoading(true);
     setErrorMessage('');
+    clearMessage();
+    setIsDetailVisible(false);
     
     try {
-      // API请求 - 查询底盘号是否存在 (对应设计书 5.1 UD15SelectHdocSendDataVinPlateApi)
-      const response = await axios.get('/api/UD15/select-hdoc-send-data-vin-plate', {
-        params: { ChassisNumber: chassisNumber }
+      // API请求 - 查询底盘号VinPlate信息 (对应设计书 5.1 API)
+      const response = await axios.post('http://localhost:8081/api/ud15/viewinfo', {
+        ChassisNumber: chassisNumber
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data;
         
         // 设置基本信息
@@ -78,23 +87,22 @@ const VinPlate: React.FC = () => {
         setDataReady(data.docReady || '');
         setSentToCabFactory(data.docSent || '');
         
-        // 解析XML文档，提取Print items和VP Data (对应设计书 7. 实现注意事项 - XML解析)
-        if (data.xmlDoc) {
-          const parsedXml = parseXmlDocument(data.xmlDoc);
-          setPrintItems(parsedXml.printItems);
-          setVpData(parsedXml.vpData);
+        // 解析XML文档，提取Print items和VP Data
+        if (data.xmlContent) {
+          const parsed = parseXmlDocument(data.xmlContent);
+          setPrintItems(parsed.printItems);
+          setVpData(parsed.vpData);
         }
         
-        // 显示详细信息区域，隐藏固定提示文本
         setIsDetailVisible(true);
+        showMessage('查询成功', 'success');
       } else {
-        // 底盘号不存在 (对应设计书 4.2 校验详细规格表 No.1)
-        setErrorMessage(`Chassis number ${chassisNumber} not found.`);
+        // 底盘号不存在
+        showMessage(response.data.msg || `Chassis number ${chassisNumber} not found.`, 'error');
         setIsDetailVisible(false);
       }
     } catch (error: any) {
-      console.error('查询失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
       setIsDetailVisible(false);
     } finally {
       setIsLoading(false);
@@ -102,89 +110,44 @@ const VinPlate: React.FC = () => {
   };
 
   /**
-   * Set Regenerate按钮点击处理 - 更新Status为'0' (新規追加)
-   * 对应设计书 3.3 Set Regenerate按钮押下 和 4.1.3 Set Regenerate按钮押下
+   * 通用的Call Update API调用
+   * 对应设计书 5.2-5.5 各更新API
    */
-  const handleSetRegenerateClick = async () => {
-    await updateVinPlateStatus('0', undefined);
-  };
-
-  /**
-   * Set OK按钮点击处理 - 更新Status为'1' (xml doc 作成済み)
-   * 对应设计书 3.4 Set OK按钮押下 和 4.1.4 Set OK按钮押下
-   */
-  const handleSetOkClick = async () => {
-    await updateVinPlateStatus('1', undefined);
-  };
-
-  /**
-   * Change to Basic Info按钮点击处理 - 更新Status为'0'，Type为'1' (basic)
-   * 对应设计书 3.5 Change to Basic Info按钮押下 和 4.1.5 Change to Basic Info按钮押下
-   */
-  const handleChangeToBasicInfoClick = async () => {
-    await updateVinPlateStatus('0', '1');
-  };
-
-  /**
-   * Change to Advanced Info按钮点击处理 - 更新Status为'0'，Type为'2' (ADVANCED with weights)
-   * 对应设计书 3.6 Change to Advanced Info按钮押下 和 4.1.6 Change to Advanced Info按钮押下
-   */
-  const handleChangeToAdvancedInfoClick = async () => {
-    await updateVinPlateStatus('0', '2');
-  };
-
-  /**
-   * 通用更新VIN Plate状态函数
-   * @param statusValue 状态值 ('0' 或 '1')
-   * @param typeValue 类型值 ('1' 或 '2'，可选)
-   */
-  const updateVinPlateStatus = async (statusValue: string, typeValue?: string) => {
-    // 校验：底盘号不能为空
+  const callUpdateApi = async (endpoint: string, statusValue: string, typeValue?: string) => {
     if (!chassisNumber.trim()) {
-      setErrorMessage('请输入底盘号');
+      showMessage('请输入底盘号', 'error');
       return;
     }
-
     setIsLoading(true);
-    setErrorMessage('');
-    
+    clearMessage();
     try {
-      // 构建请求参数 (对应设计书 5.2 UD15UpdateHdocSendDataVinPlateApi)
       const requestData: any = {
         ChassisNumber: chassisNumber,
         Status: parseInt(statusValue),
         UpdateUser: getCurrentUserId(),
         UpdateDatetime: new Date().toISOString(),
-        UpdateProcess: 'VinPlate' // 当前画面ID
+        UpdateProcess: 'VinPlate'
       };
-      
-      // 如果有type值，添加到请求参数
       if (typeValue !== undefined) {
         requestData.Type = parseInt(typeValue);
       }
-      
-      // API请求 - 更新VIN Plate状态 (对应设计书 5.2 UD15UpdateHdocSendDataVinPlateApi)
-      const response = await axios.put('/api/UD15/update-hdoc-send-data-vin-plate', requestData);
-      
-      if (response.data.success) {
-        // 更新画面显示
-        setStatus(statusMap[parseInt(statusValue)] || '');
-        
-        if (typeValue !== undefined) {
-          setPlateType(plateTypeMap[parseInt(typeValue)] || '');
-        }
-        
-        alert('更新成功');
+      const response = await axios.post(`http://localhost:8081/api/ud15/${endpoint}`, requestData);
+      if (response.data.code === 200) {
+        showMessage('情报更新成功', 'success');
       } else {
-        setErrorMessage(response.data.message || '更新失败');
+        showMessage(response.data.msg || '更新失败', 'error');
       }
     } catch (error: any) {
-      console.error('更新失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      showMessage(error.response?.data?.msg || '网络连接失败，请稍后重试', 'error');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleSetRegenerateClick = () => callUpdateApi('setregenerate', '0');
+  const handleSetOkClick = () => callUpdateApi('setok', '1');
+  const handleChangeToBasicInfoClick = () => callUpdateApi('changetobasicinfo', '0', '1');
+  const handleChangeToAdvancedInfoClick = () => callUpdateApi('changetoadvancedinfo', '0', '2');
 
   /**
    * 解析XML文档，提取PrintItemName和各Variant名/Value
@@ -231,9 +194,6 @@ const VinPlate: React.FC = () => {
         {/* 标题区域 */}
         <h2 className='vp-title'>Vin Plate</h2>
         
-        <div className='vp-hint-solide'>
-          
-       
         {/* Chassis number输入框区域 */}
         <div className='vp-input-section'>
           <label className='vp-label'>Chassis number</label>
@@ -284,13 +244,19 @@ const VinPlate: React.FC = () => {
           >
             Change to Advanced Info
           </button>
-           </div>
-        </div>
+          </div>
         
         {/* 错误信息显示 */}
         {errorMessage && (
           <div className='vp-error-message'>
             {errorMessage}
+          </div>
+        )}
+        
+        {/* 消息显示区域 */}
+        {message && (
+          <div className={`message-display message-${messageType}`}>
+            {message}
           </div>
         )}
         

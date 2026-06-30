@@ -76,9 +76,11 @@
         </where>
     </select>
 
-    <!-- UD14: 根据Market查询Variable -->
-    <select id="selectVariableByMarket" resultType="string">
-        SELECT VARIABLE FROM HDOC_USER_DEFINED_RULES WHERE MARKET = #{market}
+    <!-- UD14: 根据Market查询记录(MARKET, VARIABLE, VAL) -->
+    <select id="selectByMarket" resultType="com.web.app.entity.HdocUserDefinedRules">
+        SELECT MARKET, VARIABLE, VAL
+        FROM HDOC_USER_DEFINED_RULES
+        WHERE MARKET = #{market}
     </select>
 
 </mapper>

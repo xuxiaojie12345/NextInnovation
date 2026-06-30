@@ -63,8 +63,8 @@ function App() {
                 <Route path='DownloadAndPrintQuickGuides' element={<DownloadAndPrintQuickGuides />} />
             
               
-              <Route path='MarketDocumentSettings' element={<MarketDocumentSettings />} />
-              <Route path='MarketDocumentSettingsList' element={<MarketDocumentSettingsList />} />
+              <Route path='MarketDocumentSettings' element={<MarketDocumentSettings />} ></Route>
+                <Route path='MarketDocumentSettingsList' element={<MarketDocumentSettingsList />} />
               <Route path='MarketsInHdoc' element={<MarketsInHdoc />} />
               <Route path='DocumentTypes' element={<DocumentTypes />} /> 
               

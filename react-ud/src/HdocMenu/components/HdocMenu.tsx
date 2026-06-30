@@ -54,7 +54,7 @@ const FULL_MENU_DATA: MenuCategory[] = [
     categoryName: 'Admin',
     items: [
       { id: 'menu-admin-update-rules', name: 'Update user defined variables (rules)', routePath: '/HdocMenu/HomologationVariables' },
-      { id: 'menu-admin-update-unicode', name: 'Update user defined variables (UNICODE rules)', routePath: '/admin/update-unicode' },
+      { id: 'menu-admin-update-unicode', name: 'Update user defined variables (UNICODE rules)', routePath: '' },
       { 
         id: 'menu-admin-existing-variables', 
         name: 'Existing HDoc variables', 
@@ -68,7 +68,7 @@ const FULL_MENU_DATA: MenuCategory[] = [
         routePath: '/HdocMenu/UploadDeleteTemplate'
       },
       { id: 'menu-admin-list-templates', name: 'List available templates', routePath: '/HdocMenu/ListAvailableTemplates' },
-      { id: 'menu-admin-vpps-vin', name: 'VPPS Vin plate', routePath: '/admin/vpps-vin' },
+      { id: 'menu-admin-vpps-vin', name: 'VPPS Vin plate', routePath: '/HdocMenu/VinPlate' },
       { id: 'menu-admin-ad-ca-change', name: 'AD/CA Change', routePath: '/HdocMenu/AdChange' }
     ]
   },
@@ -76,8 +76,8 @@ const FULL_MENU_DATA: MenuCategory[] = [
     categoryName: 'User Administration',
     items: [
       { id: 'menu-user-admin-hdoc-user', name: 'HDoc User Administration', routePath: '/HdocMenu/HDocUserAdministration' },
-      { id: 'menu-user-admin-hdoc-doc', name: 'HDoc User Doc Administration', routePath: '/user-admin/hdoc-doc' },
-      { id: 'menu-user-admin-search', name: 'Search User', routePath: '/user-admin/search' },
+      { id: 'menu-user-admin-hdoc-doc', name: 'HDoc User Doc Administration', routePath: '/HdocMenu/HDocUserDocAdministration' },
+      { id: 'menu-user-admin-search', name: 'Search User', routePath: '/HdocMenu/SearchUser' },
       { id: 'menu-user-admin-change-password', name: 'Change Password', routePath: '/user-admin/change-password' },
       { id: 'menu-user-admin-position', name: 'User Position', routePath: '/user-admin/position' }
     ]

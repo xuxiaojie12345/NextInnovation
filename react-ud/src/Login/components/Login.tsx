@@ -133,6 +133,20 @@ const Login: React.FC = () => {
      <div className="container">
       <div className="backgroundLayer" ></div>
  
+      {/* EDB标题区域 */}
+      <div className="edbTitleSection">
+        <div className="edbMainTitle">
+          <span className="edbBold">EDB</span> Engineering Database
+        </div>
+        <div className="edbSubTitle">
+          Use Outlook id and password
+        </div>
+        <div className="edbSupportText">
+          Support, authorization request or improvement suggestions, send mail to:{' '}
+          <span className="edbSupportLink">Support TPI</span>
+        </div>
+      </div>
+
       <div className="card">
 
        

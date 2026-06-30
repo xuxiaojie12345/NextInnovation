@@ -45,21 +45,20 @@ const MarketDocumentSettingsList: React.FC = () => {
     
     try {
       // API请求 - 查询文档list (对应设计书 5.1)
-      const response = await axios.get('/api/UD20/select-hdoc-document-list', {
-        params: { doctype: doctype }
+      const response = await axios.post('http://localhost:8081/api/ud20/selectehdocdocumentlist', {
+        doctype: doctype
       });
       
-      if (response.data.success) {
+      if (response.data.code === 200) {
         const data = response.data.data || [];
-        // 将数据显示在DataTable中，每条数据前添加radiobox
         setDataTableList(Array.isArray(data) ? data : [data]);
       } else {
-        setErrorMessage(response.data.message || '查询失败');
+        setErrorMessage(response.data.msg || '查询失败');
         setDataTableList([]);
       }
     } catch (error: any) {
       console.error('查询失败:', error);
-      setErrorMessage(error.response?.data?.message || '网络连接失败，请稍后重试');
+      setErrorMessage(error.response?.data?.msg || '网络连接失败，请稍后重试');
       setDataTableList([]);
     } finally {
       setIsLoading(false);
@@ -86,12 +85,12 @@ const MarketDocumentSettingsList: React.FC = () => {
     
     // 条件2：若画面的一条数据选中后
     // 跳转到前画面Market Document Settings，携带Document type、Bussines unit、User、Date参数
-    navigate('/MarketDocumentSettings', { 
+    navigate('/HdocMenu/MarketDocumentSettings', { 
       state: { 
         documentType: selectedRow.doctype,
-        businessUnit: 'BU', // 固定表示
+        businessUnit: 'BU',
         user: selectedRow.registerUser,
-        date: selectedRow.registerDatetime
+        date: selectedRow.registerDatetime ? selectedRow.registerDatetime.substring(0, 10) : ''
       } 
     });
   };

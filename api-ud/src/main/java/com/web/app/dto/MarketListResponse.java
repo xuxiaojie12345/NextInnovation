@@ -6,4 +6,5 @@ import lombok.Data;
 @Data
 public class MarketListResponse {
     private String market;
+    private String description;
 }
