@@ -191,7 +191,7 @@ const UploadDeleteTemplate: React.FC = () => {
                   onChange={(e) => setUploadMarket(e.target.value)}
                   disabled={isLoading}
                 >
-                  <option value="">-- Select --</option>
+
                   {markets.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
@@ -210,6 +210,12 @@ const UploadDeleteTemplate: React.FC = () => {
         </table>
       </div>
 
+      <div className="udt-notice">
+        Before uploading new wIN plate templates, inform support.tpi@123.com
+        <br />
+        to make sure that the connection to the cab factory will work.
+      </div>
+
       <div style={{ height: '60px' }}></div>
 
       {/* ═══════ Delete 区域 ═══════ */}
@@ -226,7 +232,7 @@ const UploadDeleteTemplate: React.FC = () => {
                   onChange={(e) => setDeleteMarket(e.target.value)}
                   disabled={isLoading}
                 >
-                  <option value="">-- Select --</option>
+
                   {markets.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
@@ -240,9 +246,7 @@ const UploadDeleteTemplate: React.FC = () => {
                   className="udt-select"
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
-                  disabled={isLoading || templates.length === 0}
                 >
-                  <option value="">-- Select --</option>
                   {templates.map((t) => (
                     <option key={t.filename} value={t.filename}>{t.filename}</option>
                   ))}
@@ -262,6 +266,16 @@ const UploadDeleteTemplate: React.FC = () => {
       </div>
 
       {/* ═══════ 链接 ═══════ */}
+      <div className="udt-check-info">
+        <p>Check your rtf template</p>
+        <p>
+          In case you have a rtf template you should run a check on it before uploading it.
+          <br />
+          After check download the template to your desktop and then upload it to your template directory.
+          <br />
+          Use the link bellow.
+        </p>
+      </div>
       <div className="udt-link-area">
         <span className="udt-link" onClick={handleCheckTemplate}>
           Check Template (Only for rtf files)

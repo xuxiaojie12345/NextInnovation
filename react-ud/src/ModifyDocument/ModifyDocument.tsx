@@ -182,7 +182,7 @@ const ModifyDocument: React.FC = () => {
                         value={modifiedValues[v.variable] || ''}
                         onChange={(e) => handleValueChange(v.variable, e.target.value)}
                         maxLength={500}
-                        placeholder="Enter new value"
+                        // placeholder="Enter new value"
                         disabled={isSaving}
                       />
                     </td>

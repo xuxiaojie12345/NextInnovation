@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .udt-container {
-  width: 600px;
+  width: 700px;
   padding: 20px;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   border: 2px solid #acb7ee;
@@ -90,19 +90,37 @@
 
 /* ── Link Area ── */
 .udt-link-area {
-  padding: 10px 16px;
-  /* border-top: 1px solid #acb7ee; */
+  padding: 10px 0;
+  text-align: left;
+}
+
+/* ── 模板检查提示 ── */
+.udt-check-info {
+  padding: 8px 16px 0 0;
+  font-size: 12px;
+  color: #333;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.udt-check-info p {
+  margin: 4px 0;
+}
+
+.udt-check-info p:first-child {
+  font-weight: 700;
+  color: #cf400f;
 }
 
 .udt-link {
-  color: #1890ff;
+  color: #86759b;
   text-decoration: underline;
   cursor: pointer;
   font-size: 12px;
 }
 
 .udt-link:hover {
-  color: #0050b3;
+  color: #86759b;
 }
 
 /* ── Messages ── */
@@ -122,4 +140,14 @@
   color: #389e0d;
   font-size: 12px;
   margin: 6px 10px;
+}
+
+/* ── 提示信息 ── */
+.udt-notice {
+  padding: 10px 0px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  text-align: left;
+
 }
