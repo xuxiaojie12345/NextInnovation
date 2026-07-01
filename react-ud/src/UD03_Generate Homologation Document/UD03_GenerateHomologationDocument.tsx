@@ -215,7 +215,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
         {/* エラーメッセージエリア */}
         <div className='error-message-area'>
-          エラーメッセージエリア
+          {message}
         </div>
 
         {/* フォームエリア */}
@@ -271,14 +271,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
               ))}
             </select>
           </div>
-
-          {/* エラーメッセージ表示エリア */}
-          {/* 对应設計書 2.1 コントロール属性表 No.7 */}
-          {message && (
-            <div className='error-message'>
-              {message}
-            </div>
-          )}
 
         </div>
 

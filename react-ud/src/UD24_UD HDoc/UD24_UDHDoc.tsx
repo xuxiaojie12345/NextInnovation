@@ -87,7 +87,7 @@ const UD24_UDHDoc: React.FC = () => {
    */
   const handleMarketSettingsClick = () => {
     try {
-      navigate("/UD20");
+      navigate("/UD201");
     } catch (error) {
       console.error("页面跳转失败:", error);
       alert("页面跳转失败，请稍后重试");

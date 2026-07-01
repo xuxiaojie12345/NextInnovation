@@ -22,6 +22,11 @@ import UD16_ADChange from './UD16_AD Change/UD16_ADChange';
 import UD17_HDocUserAdministration from './UD17_HDoc User Administration/UD17_HDocUserAdministration';
 import UD18_HDocUserDocAdministration from './UD18_HDoc User Doc Administration/UD18_HDocUserDocAdministration';
 import UD19_SearchUser from './UD19_Search User/UD19_SearchUser';
+import UD20_MarketDocumentSettingsList from './UD20_Market Document Settings List/UD20_MarketDocumentSettingsList';
+import UD21_MarketsInHDoc from './UD21_Markets in HDoc/UD21_MarketsInHDoc';
+import UD22_DocumentTypes from './UD22__Document Types/UD22_DocumentTypes';
+import UD23_DownloadAndPrintQuickGuides from './UD23__Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides';
+import UD20_MarketDocumentSettings from './UD20_Market Document Settings/UD20_MarketDocumentSettings';
 
 function App() {
   return (
@@ -89,6 +94,21 @@ function App() {
 
             {/* UD19 Search User */}
             <Route path='/UD19' element={<UD19_SearchUser />} />
+            
+            {/* UD20 Market Document Settings List */}
+            <Route path='/UD20' element={<UD20_MarketDocumentSettingsList />} />
+            
+            {/* UD21 Markets in HDoc */}
+            <Route path='/UD21' element={<UD21_MarketsInHDoc />} />
+            
+            {/* UD22 Document Types */}
+            <Route path='/UD22' element={<UD22_DocumentTypes />} />
+            
+            {/* UD23 Download and Print Quick Guides */}
+            <Route path='/UD23' element={<UD23_DownloadAndPrintQuickGuides />} />
+            
+            {/* UD20-1 Market Document Settings */}
+            <Route path='/UD201' element={<UD20_MarketDocumentSettings />} />
             
             {/* UD24 用户指南 */}
             <Route path='/UD24' element={<UD24_UDHDoc />} />

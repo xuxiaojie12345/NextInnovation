@@ -1,10 +1,11 @@
 .ud06-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   /* display: flex; */
   justify-content: center;
   align-items: center;
   background-color: #e9eef6;
-  padding: 24px 12px;
+  /* padding: 24px 12px; */
+  max-width: 520px;
 }
 
 .ud06-card {
@@ -12,14 +13,15 @@
   max-width: 520px;
   background-color: #ffffff;
   /* border: 1px solid #2d5fa3; */
-  border-radius: 8px;
-  padding: 28px 26px;
+  /* border-radius: 8px; */
+  padding: 5px 20px;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #d0d5dd;
 }
 
 .ud06-title {
-  margin: 0 0 20px;
+  margin: 0px;
   color: #1f4c8b;
   font-size: 26px;
   font-weight: 700;

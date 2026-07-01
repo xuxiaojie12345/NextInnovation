@@ -45,6 +45,12 @@ const UD08_HomologationVariables: React.FC = () => {
   const [displayCreatedByUser, setDisplayCreatedByUser] = useState<string>('');
   const [displayDate, setDisplayDate] = useState<string>('');
 
+  // Add/Delete/Created by user/Date 字段的运算符状态
+  const [addDateOp, setAddDateOp] = useState<string>('=');
+  const [deleteDateOp, setDeleteDateOp] = useState<string>('=');
+  const [createdByUserOp, setCreatedByUserOp] = useState<string>('=');
+  const [registerDatetimeOp, setRegisterDatetimeOp] = useState<string>('=');
+
   // 下拉列表数据源
   const [productClassOptions, setProductClassOptions] = useState<string[]>([]);
   const [marketOptions, setMarketOptions] = useState<string[]>([]);
@@ -58,9 +64,11 @@ const UD08_HomologationVariables: React.FC = () => {
 
   // 操作符选项（固定值）
   // Add和Delete项目后面的下拉框内容为：【=,<,>】（对应设计书 3.1 备注）
-  const OPERATOR_OPTIONS_DATE = ['=', '<', '>'];
+  // 值使用 "gt"/"lt" 而非 ">"/"<" 以避免 OGNL 解析问题
+  const OPERATOR_OPTIONS_DATE = ['=', 'lt', 'gt'];
   // 其他项目后的下拉框内容为：【=,≠】（对应设计书 3.1 备注）
-  const OPERATOR_OPTIONS_DEFAULT = ['=', '≠'];
+  // 值使用 "!=" 而非 "≠" 以避免 URL/XML 编码问题
+  const OPERATOR_OPTIONS_DEFAULT = ['=', '!='];
 
   // ==================== 初始数据加载 ====================
   useEffect(() => {
@@ -141,6 +149,10 @@ const UD08_HomologationVariables: React.FC = () => {
       setDisplayDeleteDate(backFormData.displayDeleteDate || '');
       setDisplayCreatedByUser(backFormData.displayCreatedByUser || '');
       setDisplayDate(backFormData.displayDate || '');
+      setAddDateOp(backFormData.addDateOp || '=');
+      setDeleteDateOp(backFormData.deleteDateOp || '=');
+      setCreatedByUserOp(backFormData.createdByUserOp || '=');
+      setRegisterDatetimeOp(backFormData.registerDatetimeOp || '=');
     }
 
     // 清除location.state，防止刷新页面时重复填充
@@ -204,6 +216,10 @@ const UD08_HomologationVariables: React.FC = () => {
     setDisplayDeleteDate('');
     setDisplayCreatedByUser('');
     setDisplayDate('');
+    setAddDateOp('=');
+    setDeleteDateOp('=');
+    setCreatedByUserOp('=');
+    setRegisterDatetimeOp('=');
     setMessage('');
     setMessageType('info');
   }, []);
@@ -218,15 +234,58 @@ const UD08_HomologationVariables: React.FC = () => {
    */
   const handleSearch = useCallback(() => {
     // 构建检索参数字典（只包含非空值）
+    // 同时传递每个字段的运算符，用于UD09检索时区分 = / ≠ 等条件
     const params: Record<string, string> = {};
-    if (productClass.value) params.productClass = productClass.value;
-    if (number.value) params.number = number.value;
-    if (market.value) params.market = market.value;
-    if (variable.value) params.variable = variable.value;
-    if (value.value) params.value = value.value;
-    if (variantString1.value) params.variantString1 = variantString1.value;
-    if (variantString2.value) params.variantString2 = variantString2.value;
-    if (comments.value) params.comments = comments.value;
+    if (productClass.value) {
+      params.productClass = productClass.value;
+      params.productClassOp = productClass.operator;
+    }
+    if (number.value) {
+      params.number = number.value;
+      params.numberOp = number.operator;
+    }
+    if (market.value) {
+      params.market = market.value;
+      params.marketOp = market.operator;
+    }
+    if (variable.value) {
+      params.variable = variable.value;
+      params.variableOp = variable.operator;
+    }
+    if (value.value) {
+      params.value = value.value;
+      params.valueOp = value.operator;
+    }
+    if (variantString1.value) {
+      params.variantString1 = variantString1.value;
+      params.variantString1Op = variantString1.operator;
+    }
+    if (variantString2.value) {
+      params.variantString2 = variantString2.value;
+      params.variantString2Op = variantString2.operator;
+    }
+    if (comments.value) {
+      params.comments = comments.value;
+      params.commentsOp = comments.operator;
+    }
+
+    // 将信息标签字段也加入检索参数
+    if (displayAddDate) {
+      params.addDate = displayAddDate;
+      params.addDateOp = addDateOp;
+    }
+    if (displayDeleteDate) {
+      params.deleteDate = displayDeleteDate;
+      params.deleteDateOp = deleteDateOp;
+    }
+    if (displayCreatedByUser) {
+      params.createdByUser = displayCreatedByUser;
+      params.createdByUserOp = createdByUserOp;
+    }
+    if (displayDate) {
+      params.registerDatetime = displayDate;
+      params.registerDatetimeOp = registerDatetimeOp;
+    }
 
     // 保存当前表单数据，用于UD09点Back返回时恢复输入
     const formData = {
@@ -247,15 +306,20 @@ const UD08_HomologationVariables: React.FC = () => {
       comments: comments.value,
       commentsOp: comments.operator,
       displayAddDate,
+      addDateOp,
       displayDeleteDate,
+      deleteDateOp,
       displayCreatedByUser,
+      createdByUserOp,
       displayDate,
+      registerDatetimeOp,
     };
 
     // 画面迁移到 UD09，同时传递检索条件和当前表单数据
     navigate('/UD09', { state: { searchParams: params, formData } });
   }, [navigate, productClass, number, market, variable, value, variantString1, variantString2, comments,
-      displayAddDate, displayDeleteDate, displayCreatedByUser, displayDate]);
+      displayAddDate, addDateOp, displayDeleteDate, deleteDateOp,
+      displayCreatedByUser, createdByUserOp, displayDate, registerDatetimeOp]);
 
   /**
    * 执行前端校验
@@ -591,7 +655,9 @@ const UD08_HomologationVariables: React.FC = () => {
         onChange={(e) => onOperatorChange(e.target.value)}
       >
         {(operatorOptions || OPERATOR_OPTIONS_DEFAULT).map((op) => (
-          <option key={op} value={op}>{op}</option>
+          <option key={op} value={op}>
+            {op === '!=' ? '≠' : op === 'gt' ? '>' : op === 'lt' ? '<' : op}
+          </option>
         ))}
       </select>
       {fieldType === 'select' ? (
@@ -744,18 +810,18 @@ const UD08_HomologationVariables: React.FC = () => {
         {/* Add和Delete项目后面的下拉框内容为：【=,<,>】（对应设计书 3.1 备注） */}
         {renderFieldRow(
           'Add', 'input',
-          displayAddDate, '=',
+          displayAddDate, addDateOp,
           (val) => setDisplayAddDate(val),
-          () => {},
+          (op) => setAddDateOp(op),
           undefined, 6, undefined,
           OPERATOR_OPTIONS_DATE
         )}
 
         {renderFieldRow(
           'Delete', 'input',
-          displayDeleteDate, '=',
+          displayDeleteDate, deleteDateOp,
           (val) => setDisplayDeleteDate(val),
-          () => {},
+          (op) => setDeleteDateOp(op),
           undefined, 6, undefined,
           OPERATOR_OPTIONS_DATE
         )}
@@ -763,17 +829,17 @@ const UD08_HomologationVariables: React.FC = () => {
         {/* 其他项目后的下拉框内容为：【=,≠】（对应设计书 3.1 备注） */}
         {renderFieldRow(
           'Created by user', 'input',
-          displayCreatedByUser, '=',
+          displayCreatedByUser, createdByUserOp,
           (val) => setDisplayCreatedByUser(val),
-          () => {},
+          (op) => setCreatedByUserOp(op),
           undefined, 16
         )}
 
         {renderFieldRow(
           'Date', 'input',
-          displayDate, '=',
+          displayDate, registerDatetimeOp,
           (val) => setDisplayDate(val),
-          () => {},
+          (op) => setRegisterDatetimeOp(op),
           undefined, undefined, undefined,
           OPERATOR_OPTIONS_DATE
         )}

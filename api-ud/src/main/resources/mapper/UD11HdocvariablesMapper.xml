@@ -18,19 +18,60 @@
         FROM HDOC_VARIABLES
         <where>
             <if test="variable != null and variable != ''">
-                AND VARIABLE = #{variable}
+                <choose>
+                    <when test="variableOp != null and variableOp.equals('!=')">
+                        AND VARIABLE != #{variable}
+                    </when>
+                    <otherwise>
+                        AND VARIABLE = #{variable}
+                    </otherwise>
+                </choose>
             </if>
             <if test="type != null and type != ''">
-                AND TYPE = #{type}
+                <choose>
+                    <when test="typeOp != null and typeOp.equals('!=')">
+                        AND TYPE != #{type}
+                    </when>
+                    <otherwise>
+                        AND TYPE = #{type}
+                    </otherwise>
+                </choose>
             </if>
             <if test="description != null and description != ''">
-                AND DESCRIPTION = #{description}
+                <choose>
+                    <when test="descriptionOp != null and descriptionOp.equals('!=')">
+                        AND DESCRIPTION != #{description}
+                    </when>
+                    <otherwise>
+                        AND DESCRIPTION = #{description}
+                    </otherwise>
+                </choose>
             </if>
             <if test="createdByUser != null and createdByUser != ''">
-                AND REGISTER_USER = #{createdByUser}
+                <choose>
+                    <when test="createdByUserOp != null and createdByUserOp.equals('!=')">
+                        AND REGISTER_USER != #{createdByUser}
+                    </when>
+                    <otherwise>
+                        AND REGISTER_USER = #{createdByUser}
+                    </otherwise>
+                </choose>
             </if>
-            <if test="date != null">
-                AND REGISTER_DATETIME = #{date}
+            <if test="registerDatetime != null and registerDatetime != ''">
+                <choose>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('!=')">
+                        AND (REGISTER_DATETIME != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('lt')">
+                        AND (REGISTER_DATETIME &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('gt')">
+                        AND (REGISTER_DATETIME &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <otherwise>
+                        AND REGISTER_DATETIME = #{registerDatetime}
+                    </otherwise>
+                </choose>
             </if>
         </where>
         ORDER BY VARIABLE

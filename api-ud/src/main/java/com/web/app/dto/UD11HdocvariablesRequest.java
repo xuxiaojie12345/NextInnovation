@@ -28,15 +28,30 @@ public class UD11HdocvariablesRequest implements Serializable {
     @ApiModelProperty(value = "变量名", example = "VAR001")
     private String variable;
 
+    @ApiModelProperty(value = "变量名运算符(= / ≠)", example = "=")
+    private String variableOp;
+
     @ApiModelProperty(value = "类型", example = "STRING")
     private String type;
+
+    @ApiModelProperty(value = "类型运算符(= / ≠)", example = "=")
+    private String typeOp;
 
     @ApiModelProperty(value = "描述", example = "变量描述信息")
     private String description;
 
+    @ApiModelProperty(value = "描述运算符(= / ≠)", example = "=")
+    private String descriptionOp;
+
     @ApiModelProperty(value = "创建用户", example = "admin")
     private String createdByUser;
 
-    @ApiModelProperty(value = "日期", example = "2026-06-24")
-    private String date;
+    @ApiModelProperty(value = "创建用户运算符(= / ≠)", example = "=")
+    private String createdByUserOp;
+
+    @ApiModelProperty(value = "注册日期(REGISTER_DATETIME)", example = "2026-06-24")
+    private String registerDatetime;
+
+    @ApiModelProperty(value = "注册日期运算符(= / ≠)", example = "=")
+    private String registerDatetimeOp;
 }

@@ -4,21 +4,27 @@ import com.web.app.dto.UD20MarketDocumentSettingsRequest;
 import com.web.app.dto.UD20MarketDocumentSettingsResponse;
 
 /**
- * UD20 市场文档设置服务接口
+ * UD20-1 市场文档设置更新服务接口
  *
- * 功能说明：定义文档列表查询的业务方法
+ * 功能说明：定义文档设置更新的业务方法
  *
  * @author GitHub Copilot
  * @version 1.0
- * @date 2026-06-24
+ * @date 2026-07-01
  */
 public interface UD20MarketDocumentSettingsService {
 
     /**
-     * 获取文档列表
+     * 更新文档列表
+     * 对应设计文档 4.3 - 控制器层调用此方法
      *
-     * @param request 请求对象
-     * @return 响应对象
+     * 业务逻辑：
+     * 1. 对请求参数进行非空、合法性校验
+     * 2. 检查该 DOCTYPE 是否存在于 HDOC_DOCUMENT_LIST 表
+     * 3. 更新 HDOC_DOCUMENT_LIST 表的 REGISTER_USER 和 REGISTER_DATETIME
+     *
+     * @param request 请求对象，包含 doctype, registerUser, registerDatetime
+     * @return UD20MarketDocumentSettingsResponse 响应对象
      */
-    UD20MarketDocumentSettingsResponse getDocumentList(UD20MarketDocumentSettingsRequest request);
+    UD20MarketDocumentSettingsResponse updateDocument(UD20MarketDocumentSettingsRequest request);
 }

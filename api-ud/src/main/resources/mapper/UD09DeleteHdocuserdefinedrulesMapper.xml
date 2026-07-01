@@ -24,28 +24,142 @@
         FROM HDOC_USER_DEFINED_RULES
         <where>
             <if test="productClass != null and productClass != ''">
-                AND PC = #{productClass}
+                <choose>
+                    <when test="productClassOp != null and productClassOp.equals('!=')">
+                        AND PC != #{productClass}
+                    </when>
+                    <otherwise>
+                        AND PC = #{productClass}
+                    </otherwise>
+                </choose>
             </if>
             <if test="number != null">
-                AND NUM = #{number}
+                <choose>
+                    <when test="numberOp != null and numberOp.equals('!=')">
+                        AND NUM != #{number}
+                    </when>
+                    <otherwise>
+                        AND NUM = #{number}
+                    </otherwise>
+                </choose>
             </if>
             <if test="market != null and market != ''">
-                AND MARKET = #{market}
+                <choose>
+                    <when test="marketOp != null and marketOp.equals('!=')">
+                        AND MARKET != #{market}
+                    </when>
+                    <otherwise>
+                        AND MARKET = #{market}
+                    </otherwise>
+                </choose>
             </if>
             <if test="variable != null and variable != ''">
-                AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+                <choose>
+                    <when test="variableOp != null and variableOp.equals('!=')">
+                        AND VARIABLE NOT LIKE CONCAT('%', #{variable}, '%')
+                    </when>
+                    <otherwise>
+                        AND VARIABLE LIKE CONCAT('%', #{variable}, '%')
+                    </otherwise>
+                </choose>
             </if>
             <if test="value != null and value != ''">
-                AND VAL LIKE CONCAT('%', #{value}, '%')
+                <choose>
+                    <when test="valueOp != null and valueOp.equals('!=')">
+                        AND VAL NOT LIKE CONCAT('%', #{value}, '%')
+                    </when>
+                    <otherwise>
+                        AND VAL LIKE CONCAT('%', #{value}, '%')
+                    </otherwise>
+                </choose>
             </if>
             <if test="variantString1 != null and variantString1 != ''">
-                AND VS LIKE CONCAT('%', #{variantString1}, '%')
+                <choose>
+                    <when test="variantString1Op != null and variantString1Op.equals('!=')">
+                        AND VS NOT LIKE CONCAT('%', #{variantString1}, '%')
+                    </when>
+                    <otherwise>
+                        AND VS LIKE CONCAT('%', #{variantString1}, '%')
+                    </otherwise>
+                </choose>
             </if>
             <if test="variantString2 != null and variantString2 != ''">
-                AND VS2 LIKE CONCAT('%', #{variantString2}, '%')
+                <choose>
+                    <when test="variantString2Op != null and variantString2Op.equals('!=')">
+                        AND VS2 NOT LIKE CONCAT('%', #{variantString2}, '%')
+                    </when>
+                    <otherwise>
+                        AND VS2 LIKE CONCAT('%', #{variantString2}, '%')
+                    </otherwise>
+                </choose>
             </if>
             <if test="comments != null and comments != ''">
-                AND COMMENTS LIKE CONCAT('%', #{comments}, '%')
+                <choose>
+                    <when test="commentsOp != null and commentsOp.equals('!=')">
+                        AND COMMENTS NOT LIKE CONCAT('%', #{comments}, '%')
+                    </when>
+                    <otherwise>
+                        AND COMMENTS LIKE CONCAT('%', #{comments}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="addDate != null and addDate != ''">
+                <choose>
+                    <when test="addDateOp != null and addDateOp.equals('!=')">
+                        AND (ADD_DATE != #{addDate} OR ADD_DATE IS NULL)
+                    </when>
+                    <when test="addDateOp != null and addDateOp.equals('lt')">
+                        AND (ADD_DATE &lt; #{addDate} OR ADD_DATE IS NULL)
+                    </when>
+                    <when test="addDateOp != null and addDateOp.equals('gt')">
+                        AND (ADD_DATE &gt; #{addDate} OR ADD_DATE IS NULL)
+                    </when>
+                    <otherwise>
+                        AND ADD_DATE = #{addDate}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="deleteDate != null and deleteDate != ''">
+                <choose>
+                    <when test="deleteDateOp != null and deleteDateOp.equals('!=')">
+                        AND (DELETE_DATE != #{deleteDate} OR DELETE_DATE IS NULL)
+                    </when>
+                    <when test="deleteDateOp != null and deleteDateOp.equals('lt')">
+                        AND (DELETE_DATE &lt; #{deleteDate} OR DELETE_DATE IS NULL)
+                    </when>
+                    <when test="deleteDateOp != null and deleteDateOp.equals('gt')">
+                        AND (DELETE_DATE &gt; #{deleteDate} OR DELETE_DATE IS NULL)
+                    </when>
+                    <otherwise>
+                        AND DELETE_DATE = #{deleteDate}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="createdByUser != null and createdByUser != ''">
+                <choose>
+                    <when test="createdByUserOp != null and createdByUserOp.equals('!=')">
+                        AND REGISTER_USER NOT LIKE CONCAT('%', #{createdByUser}, '%')
+                    </when>
+                    <otherwise>
+                        AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="registerDatetime != null and registerDatetime != ''">
+                <choose>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('!=')">
+                        AND (REGISTER_DATETIME != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('lt')">
+                        AND (REGISTER_DATETIME &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('gt')">
+                        AND (REGISTER_DATETIME &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <otherwise>
+                        AND REGISTER_DATETIME = #{registerDatetime}
+                    </otherwise>
+                </choose>
             </if>
         </where>
         ORDER BY PC, NUM, MARKET

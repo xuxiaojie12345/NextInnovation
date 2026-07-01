@@ -1,33 +1,45 @@
 package com.web.app.mapper;
 
-import com.web.app.entity.HdocDocumentList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 /**
- * UD20 市场文档设置数据访问层
+ * UD20-1 市场文档设置更新数据访问层
  *
- * 功能说明：执行文档列表的查询操作
+ * 功能说明：更新 HDOC_DOCUMENT_LIST 表的文档信息
  *
  * @author GitHub Copilot
  * @version 1.0
- * @date 2026-06-24
+ * @date 2026-07-01
  */
 @Mapper
 public interface UD20MarketDocumentSettingsMapper {
 
     /**
-     * 动态条件查询文档列表
+     * 根据 DOCTYPE 统计记录数
+     * 用于检查指定文档类型是否存在
      *
-     * @param doctype          文档类型
-     * @param registerUser     注册用户
-     * @param registerDatetime 注册时间
-     * @return 文档列表
+     * @param doctype 文档类型
+     * @return 记录数
      */
-    List<HdocDocumentList> selectDocumentList(
+    int countByDoctype(@Param("doctype") String doctype);
+
+    /**
+     * 更新文档列表
+     * 对应设计文档 5.42 - 更新语句
+     *
+     * SQL：UPDATE HDOC_DOCUMENT_LIST SET
+     * REGISTER_USER = #{registerUser},
+     * REGISTER_DATETIME = #{registerDatetime}
+     * WHERE DOCTYPE = #{doctype}
+     *
+     * @param doctype          文档类型（主键）
+     * @param registerUser     注册用户
+     * @param registerDatetime 注册日期时间
+     * @return 影响的行数
+     */
+    int updateDocumentList(
             @Param("doctype") String doctype,
-            @Param("registerUser") String registerUser,
-            @Param("registerDatetime") String registerDatetime);
+            @Param("user") String user,
+            @Param("date") String date);
 }

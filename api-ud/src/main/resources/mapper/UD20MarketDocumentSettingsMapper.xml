@@ -3,27 +3,28 @@
 <mapper namespace="com.web.app.mapper.UD20MarketDocumentSettingsMapper">
 
     <!--
-        UD20 动态条件查询文档列表
+        UD20-1 根据 DOCTYPE 统计记录数
+        用于检查指定文档类型是否存在
     -->
-    <select id="selectDocumentList" resultType="com.web.app.entity.HdocDocumentList">
-        SELECT
-            DOCTYPE AS doctype,
-            DESCRIPTION AS description,
-            REGISTER_USER AS registerUser,
-            REGISTER_DATETIME AS registerDatetime
+    <select id="countByDoctype" resultType="int">
+        SELECT COUNT(1)
         FROM HDOC_DOCUMENT_LIST
-        <where>
-            <if test="doctype != null and doctype != ''">
-                AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
-            </if>
-            <if test="registerUser != null and registerUser != ''">
-                AND REGISTER_USER = #{registerUser}
-            </if>
-            <if test="registerDatetime != null and registerDatetime != ''">
-                AND REGISTER_DATETIME &gt;= #{registerDatetime}
-            </if>
-        </where>
-        ORDER BY DOCTYPE
+        WHERE DOCTYPE = #{doctype}
     </select>
+
+    <!--
+        UD20-1 更新文档列表
+        对应设计文档 5.42 - 更新语句
+        
+        功能说明：根据 DOCTYPE 更新 HDOC_DOCUMENT_LIST 表
+        - 更新 REGISTER_USER 和 REGISTER_DATETIME 字段
+    -->
+    <update id="updateDocumentList">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET
+            REGISTER_USER = #{user},
+            REGISTER_DATETIME = #{date}
+        WHERE DOCTYPE = #{doctype}
+    </update>
 
 </mapper>

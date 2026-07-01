@@ -8,37 +8,58 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * UD20 市场文档设置控制器
+ * UD20-1 市场文档设置更新控制器
  *
- * 功能说明：提供文档列表查询接口
+ * 功能说明：提供文档设置更新的 REST API 接口
  *
  * @author GitHub Copilot
  * @version 1.0
- * @date 2026-06-24
+ * @date 2026-07-01
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/ud20")
-@Api(tags = "UD20 - 市场文档设置")
+@RequestMapping("/api/ud201")
+@Api(tags = "UD20-1 - 市场文档设置更新")
 public class UD20MarketDocumentSettingsController {
 
     @Autowired
-    private UD20MarketDocumentSettingsService ud20Service;
+    private UD20MarketDocumentSettingsService ud201Service;
 
-    @GetMapping("/getdocumentlist")
-    @ApiOperation(value = "获取文档列表", notes = "根据可选条件查询HDOC_DOCUMENT_LIST表中的文档信息")
-    public UD20MarketDocumentSettingsResponse getDocumentList(
-            @ApiParam(value = "文档类型", example = "Homologation Certificate") @RequestParam(value = "doctype", required = false) String doctype,
-            @ApiParam(value = "注册用户", example = "john.doe") @RequestParam(value = "registerUser", required = false) String registerUser,
-            @ApiParam(value = "注册时间", example = "2026-05-15 10:30:00") @RequestParam(value = "registerDatetime", required = false) String registerDatetime) {
-        log.info("收到UD20查询文档列表请求");
-        UD20MarketDocumentSettingsRequest request = new UD20MarketDocumentSettingsRequest();
-        request.setDoctype(doctype);
-        request.setRegisterUser(registerUser);
-        request.setRegisterDatetime(registerDatetime);
-        return ud20Service.getDocumentList(request);
+    /**
+     * 更新文档列表
+     * 对应设计文档 4.1 - 客户端通过POST请求访问接口 /api/ud201/updatedocument
+     *
+     * 接口说明：
+     * - Method: POST
+     * - Endpoint: /api/ud201/updatedocument
+     * - 参数: doctype（必填）, user, date
+     * - 返回: 更新结果
+     *
+     * 处理流程：
+     * 1. 接收前端PUT请求及请求体参数
+     * 2. 调用 Service 层更新文档列表
+     * 3. 返回标准响应格式
+     *
+     * @param request 请求体，包含 doctype, registerUser, registerDatetime
+     * @return UD20MarketDocumentSettingsResponse 响应对象
+     */
+    @PostMapping("/updatedocument")
+    @ApiOperation(value = "更新文档列表", notes = "根据 DOCTYPE 更新 HDOC_DOCUMENT_LIST 表的 REGISTER_USER 和 REGISTER_DATETIME")
+    public UD20MarketDocumentSettingsResponse updateDocument(
+            @ApiParam(value = "更新请求", required = true) @RequestBody UD20MarketDocumentSettingsRequest request) {
+        log.info("收到UD20-1更新文档列表请求, doctype: {}", request.getDoctype());
+
+        // 4.2 接收前端请求，通过 Request 对象封装并校验请求参数
+        // 4.3 调用 Service 层处理业务逻辑
+        UD20MarketDocumentSettingsResponse response = ud201Service.updateDocument(request);
+
+        log.info("返回响应，code: {}, msg: {}", response.getCode(), response.getMsg());
+        return response;
     }
 }

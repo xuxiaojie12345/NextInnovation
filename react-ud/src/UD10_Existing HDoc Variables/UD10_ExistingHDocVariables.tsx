@@ -22,10 +22,15 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   // ==================== 状态管理 ====================
   // 对应设计书 2.1 控件属性表
   const [variable, setVariable] = useState<string>('');           // 变量名（必填）
+  const [variableOp, setVariableOp] = useState<string>('=');     // Variable运算符
   const [type, setType] = useState<string>('');                   // 类型（下拉框）
+  const [typeOp, setTypeOp] = useState<string>('=');             // Type运算符
   const [description, setDescription] = useState<string>('');     // 描述
+  const [descriptionOp, setDescriptionOp] = useState<string>('='); // Description运算符
   const [displayCreatedByUser, setDisplayCreatedByUser] = useState<string>(''); // 创建用户（Output）
+  const [createdByUserOp, setCreatedByUserOp] = useState<string>('='); // Created by user运算符
   const [displayDate, setDisplayDate] = useState<string>('');     // 日期（Output）
+  const [registerDateOp, setRegisterDateOp] = useState<string>('='); // Date运算符
 
   // Type下拉框固定选项（对应设计书 2.1 备注）
   const TYPE_OPTIONS = ['VDA', 'User Defined'];
@@ -60,6 +65,11 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       setDescription(backFormData.description || '');
       setDisplayCreatedByUser(backFormData.displayCreatedByUser || '');
       setDisplayDate(backFormData.displayDate || '');
+      setVariableOp(backFormData.variableOp || '=');
+      setTypeOp(backFormData.typeOp || '=');
+      setDescriptionOp(backFormData.descriptionOp || '=');
+      setCreatedByUserOp(backFormData.createdByUserOp || '=');
+      setRegisterDateOp(backFormData.registerDateOp || '=');
     }
 
     if (selectedRecord || backFormData) {
@@ -77,15 +87,39 @@ const UD10_ExistingHDocVariables: React.FC = () => {
    */
   const handleSearch = useCallback(() => {
     const params: Record<string, string> = {};
-    if (variable.trim()) params.variable = variable.trim();
-    if (type) params.type = type;
-    if (description.trim()) params.description = description.trim();
+    if (variable.trim()) {
+      params.variable = variable.trim();
+      params.variableOp = variableOp;
+    }
+    if (type) {
+      params.type = type;
+      params.typeOp = typeOp;
+    }
+    if (description.trim()) {
+      params.description = description.trim();
+      params.descriptionOp = descriptionOp;
+    }
+    if (displayCreatedByUser.trim()) {
+      params.createdByUser = displayCreatedByUser.trim();
+      params.createdByUserOp = createdByUserOp;
+    }
+    if (displayDate.trim()) {
+      params.registerDatetime = displayDate.trim();
+      params.registerDatetimeOp = registerDateOp;
+    }
 
     // 保存当前表单数据，用于UD11点Back返回时恢复输入
-    const formData = { variable, type, description, displayCreatedByUser, displayDate };
+    const formData = {
+      variable, variableOp,
+      type, typeOp,
+      description, descriptionOp,
+      displayCreatedByUser, createdByUserOp,
+      displayDate, registerDateOp,
+    };
 
     navigate('/UD11', { state: { searchParams: params, formData } });
-  }, [navigate, variable, type, description, displayCreatedByUser, displayDate]);
+  }, [navigate, variable, variableOp, type, typeOp, description, descriptionOp,
+      displayCreatedByUser, createdByUserOp, displayDate, registerDateOp]);
 
   /**
    * 处理 Clear 按钮点击
@@ -97,6 +131,11 @@ const UD10_ExistingHDocVariables: React.FC = () => {
     setDescription('');
     setDisplayCreatedByUser('');
     setDisplayDate('');
+    setVariableOp('=');
+    setTypeOp('=');
+    setDescriptionOp('=');
+    setCreatedByUserOp('=');
+    setRegisterDateOp('=');
     setMessage('');
     setMessageType('info');
   }, []);
@@ -303,9 +342,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Variable 输入框（对应设计书 2.1 序号1） */}
         <div className="ud10-row">
           <span className="ud10-label">*Variable</span>
-          <select className="ud10-compare-select" defaultValue="=">
+          <select className="ud10-compare-select" value={variableOp} onChange={(e) => setVariableOp(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud10-input"
@@ -325,9 +364,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Type 下拉框（对应设计书 2.1 序号2） */}
         <div className="ud10-row">
           <span className="ud10-label">Type</span>
-          <select className="ud10-compare-select" defaultValue="=">
+          <select className="ud10-compare-select" value={typeOp} onChange={(e) => setTypeOp(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <select
             className="ud10-select"
@@ -344,9 +383,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Description 输入框（对应设计书 2.1 序号3） */}
         <div className="ud10-row">
           <span className="ud10-label">Description</span>
-          <select className="ud10-compare-select" defaultValue="=">
+          <select className="ud10-compare-select" value={descriptionOp} onChange={(e) => setDescriptionOp(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud10-input"
@@ -365,9 +404,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Created by user 输入框（对应设计书 2.1 序号4）- 活性状态 */}
         <div className="ud10-row">
           <span className="ud10-label">Created by user</span>
-          <select className="ud10-compare-select" defaultValue="=">
+          <select className="ud10-compare-select" value={createdByUserOp} onChange={(e) => setCreatedByUserOp(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud10-input"
@@ -381,9 +420,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         {/* Date 输入框（对应设计书 2.1 序号5）- 活性状态 */}
         <div className="ud10-row">
           <span className="ud10-label">Date</span>
-          <select className="ud10-compare-select" defaultValue="=">
+          <select className="ud10-compare-select" value={registerDateOp} onChange={(e) => setRegisterDateOp(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="lt">&lt;</option>
+            <option value="gt">&gt;</option>
           </select>
           <input
             className="ud10-input"

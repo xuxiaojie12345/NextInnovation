@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/config';
 import './UD20_MarketDocumentSettingsList.css';
 
@@ -17,6 +17,7 @@ import './UD20_MarketDocumentSettingsList.css';
  */
 const UD20_MarketDocumentSettingsList: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // ==================== 状态管理 ====================
   // 对应设计书 2.1 控件属性表
@@ -38,18 +39,24 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   // ==================== 初期表示 ====================
   // 对应设计书 3.1.1 初期显示 - 获取文档列表
   useEffect(() => {
-    fetchDocumentList();
-  }, []);
+    // 从location.state获取从UD20-1传来的搜索参数
+    const state = location.state as any;
+    const searchParams = state?.searchParams || {};
+
+    fetchDocumentList(searchParams);
+  }, [location.state]);
 
   /**
    * 获取文档列表数据
    * 对应设计书 4.1 UD20GetDocumentListApi
    * GET /api/ud20/getdocumentlist
+   *
+   * @param params - 从UD20-1传来的搜索条件
    */
-  const fetchDocumentList = async () => {
+  const fetchDocumentList = async (params: Record<string, string> = {}) => {
     setIsLoading(true);
     try {
-      const response = await apiClient.get('/api/ud20/getdocumentlist');
+      const response = await apiClient.get('/api/ud20/getdocumentlist', { params });
       // 后端返回格式：{ code: 200, message: "success", data: [...] }
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         setDocuments(response.data.data);
