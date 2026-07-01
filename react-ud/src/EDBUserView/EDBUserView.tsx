@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import '../common/css/common.css';
 import './EDBUserView.css';
 
-const OPERATORS = ['=', '!=', '>', '<'];
+const OPERATORS = ['=', '!='];
 
 interface UserData {
   userId: string;

@@ -270,6 +270,25 @@ const ExistingHDocVariables: React.FC = () => {
     setSuccessMessage('CSV文件导出成功');
   };
 
+  // ── 辅助函数 ──
+  const isNumericField = (field: string): boolean => {
+    return field === 'Date';
+  };
+
+  const renderOpSelect = (field: string, op: Operator, onChange: (v: Operator) => void) => {
+    const numericOps = ['=', '>', '<'] as Operator[];
+    const nonNumericOps = ['=', '!='] as Operator[];
+    const ops = isNumericField(field) ? numericOps : nonNumericOps;
+    const currentOp = ops.includes(op) ? op : '=';
+    return (
+      <select className="ehv-op-select" value={currentOp} onChange={(e) => onChange(e.target.value as Operator)} disabled={isLoading}>
+        {ops.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    );
+  };
+
   // ── JSX ──
   return (
     <div className="ehv-container">
@@ -300,12 +319,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Variable */}
         <div className="ehv-row">
           <span className="ehv-label required">Variable</span>
-          <select className="ehv-op-select" value={variableOp} onChange={(e) => setVariableOp(e.target.value as Operator)} disabled={isLoading}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value=">">&gt;</option>
-            <option value="<">&lt;</option>
-          </select>
+          {renderOpSelect('Variable', variableOp, setVariableOp)}
           <input
             type="text"
             className="ehv-input ehv-input-variable"
@@ -319,12 +333,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Type */}
         <div className="ehv-row">
           <span className="ehv-label required">Type</span>
-          <select className="ehv-op-select" value={typeOp} onChange={(e) => setTypeOp(e.target.value as Operator)} disabled={isLoading}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value=">">&gt;</option>
-            <option value="<">&lt;</option>
-          </select>
+          {renderOpSelect('Type', typeOp, setTypeOp)}
           <select
             className="ehv-input ehv-select"
             value={type}
@@ -340,12 +349,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Description */}
         <div className="ehv-row ehv-row-description">
           <span className="ehv-label">Description</span>
-          <select className="ehv-op-select" value={descriptionOp} onChange={(e) => setDescriptionOp(e.target.value as Operator)} disabled={isLoading}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value=">">&gt;</option>
-            <option value="<">&lt;</option>
-          </select>
+          {renderOpSelect('Description', descriptionOp, setDescriptionOp)}
           <input
             type="text"
             className="ehv-input ehv-input-description"
@@ -359,12 +363,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Created by user */}
         <div className="ehv-row">
           <span className="ehv-label">Created by user</span>
-          <select className="ehv-op-select" value={createdByUserOp} onChange={(e) => setCreatedByUserOp(e.target.value as Operator)} disabled={isLoading}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value=">">&gt;</option>
-            <option value="<">&lt;</option>
-          </select>
+          {renderOpSelect('Created by user', createdByUserOp, setCreatedByUserOp)}
           <input
             type="text"
             className="ehv-input ehv-input-created-by"
@@ -378,12 +377,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Date */}
         <div className="ehv-row">
           <span className="ehv-label">Date</span>
-          <select className="ehv-op-select" value={dateOp} onChange={(e) => setDateOp(e.target.value as Operator)} disabled={isLoading}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value=">">&gt;</option>
-            <option value="<">&lt;</option>
-          </select>
+          {renderOpSelect('Date', dateOp, setDateOp)}
           <input
             type="text"
             className="ehv-input ehv-input-date"

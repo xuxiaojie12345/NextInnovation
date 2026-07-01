@@ -14,7 +14,11 @@ interface DocumentRecord {
 const MarketDocumentSettingsResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { doctype?: string; registerUser?: string; registerDatetime?: string } | null;
+  const state = location.state as {
+    doctype?: string; doctypeOp?: string;
+    registerUser?: string; registerUserOp?: string;
+    registerDatetime?: string; registerDatetimeOp?: string;
+  } | null;
 
   const [results, setResults] = useState<DocumentRecord[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number>(-1);
@@ -27,8 +31,11 @@ const MarketDocumentSettingsResultList: React.FC = () => {
       try {
         const res = await api.post<{ documentList: any[] }>('/ud20/getDocumentList', {
           doctype: state?.doctype || '',
+          doctypeOp: state?.doctypeOp || '=',
           registerUser: state?.registerUser || '',
+          registerUserOp: state?.registerUserOp || '=',
           registerDatetime: state?.registerDatetime || '',
+          registerDatetimeOp: state?.registerDatetimeOp || '=',
         });
         if (res.code === 200 && res.data) {
           const rawList = res.data.documentList || [];
@@ -52,7 +59,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
         setIsLoading(false);
       }
     })();
-  }, [state?.doctype, state?.registerUser, state?.registerDatetime]);
+  }, [state?.doctype, state?.doctypeOp, state?.registerUser, state?.registerUserOp, state?.registerDatetime, state?.registerDatetimeOp]);
 
   const handleSelect = () => {
     if (selectedIdx < 0) {
@@ -73,8 +80,11 @@ const MarketDocumentSettingsResultList: React.FC = () => {
     navigate('/menu/market-document-setting', {
       state: {
         doctype: state?.doctype || '',
+        doctypeOp: state?.doctypeOp || '=',
         registerUser: state?.registerUser || '',
+        registerUserOp: state?.registerUserOp || '=',
         registerDatetime: state?.registerDatetime || '',
+        registerDatetimeOp: state?.registerDatetimeOp || '=',
       },
     });
   };

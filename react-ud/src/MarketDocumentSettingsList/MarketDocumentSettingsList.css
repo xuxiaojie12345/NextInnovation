@@ -74,6 +74,27 @@
   min-width: 200px;
 }
 
+/* ── 运算符下拉列表 ── */
+.mdsl-op-select {
+  width: 55px;
+  padding: 3px 2px;
+  border: 1px solid #b0b0b0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 22px;
+  text-align: center;
+  appearance: auto;
+  flex-shrink: 0;
+}
+
+.mdsl-op-select:focus {
+  outline: none;
+  border-color: #002060;
+}
+
 /* ── 边框包裹：按钮 + 检索条件 ── */
 .mdsl-bordered {
   /* border-bottom: 2px solid #acb7ee; */

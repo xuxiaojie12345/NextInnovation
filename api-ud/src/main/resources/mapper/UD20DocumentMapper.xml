@@ -7,13 +7,29 @@
         FROM HDOC_DOCUMENT_LIST
         WHERE 1=1
         <if test="doctype != null and doctype != ''">
-            AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
+            <choose>
+                <when test='doctypeOp == "!="'> AND DOCTYPE != #{doctype}</when>
+                <when test='doctypeOp == "&gt;"'> AND DOCTYPE &gt; #{doctype}</when>
+                <when test='doctypeOp == "&lt;"'> AND DOCTYPE &lt; #{doctype}</when>
+                <otherwise> AND DOCTYPE = #{doctype}</otherwise>
+            </choose>
         </if>
+
         <if test="registerUser != null and registerUser != ''">
-            AND REGISTER_USER LIKE CONCAT('%', #{registerUser}, '%')
+            <choose>
+                <when test='registerUserOp == "!="'> AND REGISTER_USER != #{registerUser}</when>
+                <when test='registerUserOp == "&gt;"'> AND REGISTER_USER &gt; #{registerUser}</when>
+                <when test='registerUserOp == "&lt;"'> AND REGISTER_USER &lt; #{registerUser}</when>
+                <otherwise> AND REGISTER_USER = #{registerUser}</otherwise>
+            </choose>
         </if>
         <if test="registerDatetime != null and registerDatetime != ''">
-            AND REGISTER_DATETIME LIKE CONCAT('%', #{registerDatetime}, '%')
+            <choose>
+                <when test='registerDatetimeOp == "!="'> AND REGISTER_DATETIME != #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&gt;"'> AND REGISTER_DATETIME &gt; #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&lt;"'> AND REGISTER_DATETIME &lt; #{registerDatetime}</when>
+                <otherwise> AND REGISTER_DATETIME = #{registerDatetime}</otherwise>
+            </choose>
         </if>
     </select>
 

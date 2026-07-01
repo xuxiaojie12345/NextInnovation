@@ -352,6 +352,10 @@ const HomologationVariables: React.FC = () => {
   // ── 渲染函数 ──
   const isRequired = (label: string) => ['Product class', 'Number', 'Market'].includes(label);
 
+  const isNumericField = (label: string): boolean => {
+    return ['Number', 'Add', 'Delete', 'Created by user', 'Date'].includes(label);
+  };
+
   const renderValueControl = (label: string, value: string, onChange: (v: string) => void) => {
     if (label === 'Product class') {
       return (
@@ -393,19 +397,24 @@ const HomologationVariables: React.FC = () => {
     return null;
   };
 
-  const renderOpSelect = (op: Operator, onChange: (op: Operator) => void) => (
-    <select className="hv-op-select" value={op} onChange={(e) => onChange(e.target.value as Operator)} disabled={isLoading}>
-      <option value="=">=</option>
-      <option value="!=">!=</option>
-      <option value=">">&gt;</option>
-      <option value="<">&lt;</option>
-    </select>
-  );
+  const renderOpSelect = (label: string, op: Operator, onChange: (op: Operator) => void) => {
+    const numericOps = ['=', '>', '<'] as Operator[];
+    const nonNumericOps = ['=', '!='] as Operator[];
+    const ops = isNumericField(label) ? numericOps : nonNumericOps;
+    const currentOp = ops.includes(op) ? op : '=';
+    return (
+      <select className="hv-op-select" value={currentOp} onChange={(e) => onChange(e.target.value as Operator)} disabled={isLoading}>
+        {ops.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    );
+  };
 
   const renderSimpleRow = (cond: Condition, idx: number) => (
     <div className={`hv-cond-row ${getRowClass(cond.label)}`} key={cond.label}>
       <span className={`hv-cond-label${isRequired(cond.label) ? ' required' : ''}`}>{cond.label}</span>
-      {renderOpSelect(cond.operator, (op) => updateConditionOp(idx, op))}
+      {renderOpSelect(cond.label, cond.operator, (op) => updateConditionOp(idx, op))}
       {renderValueControl(cond.label, cond.value, (v) => updateConditionVal(idx, v))}
       {getSuffix(cond.label) && <span className="hv-input-suffix">{getSuffix(cond.label)}</span>}
     </div>
@@ -416,11 +425,11 @@ const HomologationVariables: React.FC = () => {
       <span className="hv-cond-label">Variant string</span>
       <div className="hv-variant-group">
         <div className="hv-variant-subrow">
-          {renderOpSelect(variantCond.operator1, (op) => setVariantCond((p) => ({ ...p, operator1: op })))}
+          {renderOpSelect('Variant string', variantCond.operator1, (op) => setVariantCond((p) => ({ ...p, operator1: op })))}
           {renderValueControl('Variant string', variantCond.value1, (v) => setVariantCond((p) => ({ ...p, value1: v })))}
         </div>
         <div className="hv-variant-subrow">
-          {renderOpSelect(variantCond.operator2, (op) => setVariantCond((p) => ({ ...p, operator2: op })))}
+          {renderOpSelect('Variant string', variantCond.operator2, (op) => setVariantCond((p) => ({ ...p, operator2: op })))}
           {renderValueControl('Variant string', variantCond.value2, (v) => setVariantCond((p) => ({ ...p, value2: v })))}
         </div>
       </div>
