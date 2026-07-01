@@ -24,8 +24,8 @@ import UD18_HDocUserDocAdministration from './UD18_HDoc User Doc Administration/
 import UD19_SearchUser from './UD19_Search User/UD19_SearchUser';
 import UD20_MarketDocumentSettingsList from './UD20_Market Document Settings List/UD20_MarketDocumentSettingsList';
 import UD21_MarketsInHDoc from './UD21_Markets in HDoc/UD21_MarketsInHDoc';
-import UD22_DocumentTypes from './UD22__Document Types/UD22_DocumentTypes';
-import UD23_DownloadAndPrintQuickGuides from './UD23__Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides';
+import UD22_DocumentTypes from './UD22_Document Types/UD22_DocumentTypes';
+import UD23_DownloadAndPrintQuickGuides from './UD23_Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides';
 import UD20_MarketDocumentSettings from './UD20_Market Document Settings/UD20_MarketDocumentSettings';
 
 function App() {

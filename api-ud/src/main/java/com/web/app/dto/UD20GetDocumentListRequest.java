@@ -28,9 +28,18 @@ public class UD20GetDocumentListRequest implements Serializable {
     @ApiModelProperty(value = "文档类型（支持模糊查询）", example = "Homologation")
     private String doctype;
 
+    @ApiModelProperty(value = "文档类型运算符(= / ≠)", example = "=")
+    private String doctypeOp;
+
     @ApiModelProperty(value = "注册用户", example = "john.doe")
     private String registerUser;
 
-    @ApiModelProperty(value = "注册日期（起始日期，大于等于条件）", example = "2026-01-01")
+    @ApiModelProperty(value = "注册用户运算符(= / ≠)", example = "=")
+    private String registerUserOp;
+
+    @ApiModelProperty(value = "注册日期", example = "2026-01-01")
     private String registerDatetime;
+
+    @ApiModelProperty(value = "注册日期运算符(= / < / >)", example = "=")
+    private String registerDatetimeOp;
 }

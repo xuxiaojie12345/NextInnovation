@@ -56,15 +56,21 @@ public class UD20GetDocumentListController {
     @ApiOperation(value = "获取文档列表", notes = "从 HDOC_DOCUMENT_LIST 表中查询文档信息，支持按 doctype（模糊）、registerUser、registerDatetime 动态条件查询")
     public UD20GetDocumentListResponse getDocumentList(
             @ApiParam(value = "文档类型（支持模糊查询）", example = "Homologation") @RequestParam(value = "doctype", required = false) String doctype,
+            @ApiParam(value = "文档类型运算符") @RequestParam(value = "doctypeOp", required = false) String doctypeOp,
             @ApiParam(value = "注册用户", example = "john.doe") @RequestParam(value = "registerUser", required = false) String registerUser,
-            @ApiParam(value = "注册日期（起始日期，大于等于条件）", example = "2026-01-01") @RequestParam(value = "registerDatetime", required = false) String registerDatetime) {
+            @ApiParam(value = "注册用户运算符") @RequestParam(value = "registerUserOp", required = false) String registerUserOp,
+            @ApiParam(value = "注册日期（起始日期，大于等于条件）", example = "2026-01-01") @RequestParam(value = "registerDatetime", required = false) String registerDatetime,
+            @ApiParam(value = "注册日期运算符") @RequestParam(value = "registerDatetimeOp", required = false) String registerDatetimeOp) {
         log.info("收到UD20获取文档列表请求");
 
         // 4.2 封装请求参数
         UD20GetDocumentListRequest request = new UD20GetDocumentListRequest();
         request.setDoctype(doctype);
+        request.setDoctypeOp(doctypeOp);
         request.setRegisterUser(registerUser);
+        request.setRegisterUserOp(registerUserOp);
         request.setRegisterDatetime(registerDatetime);
+        request.setRegisterDatetimeOp(registerDatetimeOp);
 
         // 4.3 调用Service层处理业务逻辑
         UD20GetDocumentListResponse response = ud20Service.getDocumentList(request);

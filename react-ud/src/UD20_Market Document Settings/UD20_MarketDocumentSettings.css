@@ -120,6 +120,7 @@
   margin-right: 6px;
   box-sizing: border-box;
   flex-shrink: 0;
+  border-radius: 3px;
 }
 
 .ud201-input {
@@ -133,6 +134,7 @@
   background-color: #ffffff;
   box-sizing: border-box;
   max-width: 300px;
+  border-radius: 3px;
 }
 
 .ud201-input:focus {

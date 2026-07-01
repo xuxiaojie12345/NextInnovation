@@ -19,13 +19,40 @@
         FROM HDOC_DOCUMENT_LIST
         <where>
             <if test="doctype != null and doctype != ''">
-                AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
+                <choose>
+                    <when test="doctypeOp != null and doctypeOp.equals('!=')">
+                        AND DOCTYPE NOT LIKE CONCAT('%', #{doctype}, '%')
+                    </when>
+                    <otherwise>
+                        AND DOCTYPE LIKE CONCAT('%', #{doctype}, '%')
+                    </otherwise>
+                </choose>
             </if>
             <if test="registerUser != null and registerUser != ''">
-                AND REGISTER_USER = #{registerUser}
+                <choose>
+                    <when test="registerUserOp != null and registerUserOp.equals('!=')">
+                        AND REGISTER_USER != #{registerUser}
+                    </when>
+                    <otherwise>
+                        AND REGISTER_USER = #{registerUser}
+                    </otherwise>
+                </choose>
             </if>
             <if test="registerDatetime != null and registerDatetime != ''">
-                AND REGISTER_DATETIME &gt;= #{registerDatetime}
+                <choose>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('!=')">
+                        AND (REGISTER_DATETIME != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('lt')">
+                        AND (REGISTER_DATETIME &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('gt')">
+                        AND (REGISTER_DATETIME &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    </when>
+                    <otherwise>
+                        AND REGISTER_DATETIME = #{registerDatetime}
+                    </otherwise>
+                </choose>
             </if>
         </where>
         ORDER BY DOCTYPE
