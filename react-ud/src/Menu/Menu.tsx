@@ -234,11 +234,13 @@ const Menu: React.FC = () => {
     <div className='navigation-menu'>
       {/* 标题区域 */}
       <div className='menu-header'>
-        <h1>Generate Document</h1>
+        <h1>VOLVO</h1>
       </div>
 
       {/* 菜单项列表 */}
       <ul className='menu-list'>
+        {/* 副标题：Generate Document */}
+        <div className='menu-subtitle'>Generate Document</div>
         {menuData.map((module) => (
           <li key={module.id} className='menu-group'>
             <div className='group-title'>{module.label}</div>
@@ -251,7 +253,7 @@ const Menu: React.FC = () => {
                     className={`menu-item ${isLink ? "clickable" : "disabled"}`}
                     onClick={() => handleItemClick(item.path)}
                   >
-                    <span className='arrow-icon'>{isLink ? "»" : "-"}</span>
+                    <span className='arrow-icon'>»</span>
                     <span className='item-label'>{item.label}</span>
                   </li>
                 );
