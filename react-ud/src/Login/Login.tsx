@@ -61,8 +61,8 @@ const Login = () => {
 
       if (response.success) {
         // 登录成功，保存用户 ID 到 localStorage
-        localStorage.setItem('currentUser', userId.trim());
-        
+        localStorage.setItem("currentUser", userId.trim());
+
         // 跳转到菜单页面
         window.location.href = "/menu";
       } else {
@@ -70,7 +70,6 @@ const Login = () => {
         setErrors((prev) => ({
           ...prev,
           authentication:
-            response.message ||
             "We didn't recognize the username or password you entered. Please try again.",
         }));
       }
