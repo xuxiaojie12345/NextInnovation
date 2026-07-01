@@ -39,7 +39,18 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   // 对应设计书 3.1.1 初期表示 - 判断后画面返回场合
   useEffect(() => {
     const state = location.state as any;
-    if (state?.selectedRecord) {
+    if (state?.backFormData) {
+      // 从UD20 List点Back返回，恢复之前输入的值和运算符
+      const back = state.backFormData;
+      setDocumentType(back.documentType || '');
+      setUser(back.user || '');
+      setDate(back.date || '');
+      setCompareDocType(back.compareDocType || '=');
+      setCompareBU(back.compareBU || '=');
+      setCompareUser(back.compareUser || '=');
+      setCompareDate(back.compareDate || '=');
+      window.history.replaceState({}, document.title);
+    } else if (state?.selectedRecord) {
       // 从UD20 Select按钮返回，回填选中记录
       const record = state.selectedRecord;
       setDocumentType(record.documentType || '');
@@ -47,19 +58,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       setDate(record.registerDateTime || '');
       // 清除state防止刷新重复回填
       window.history.replaceState({}, document.title);
-    }
-    // 从UD20返回时恢复之前的下拉框状态
-    if (state?.formData?.compareDocType) {
-      setCompareDocType(state.formData.compareDocType);
-    }
-    if (state?.formData?.compareBU) {
-      setCompareBU(state.formData.compareBU);
-    }
-    if (state?.formData?.compareUser) {
-      setCompareUser(state.formData.compareUser);
-    }
-    if (state?.formData?.compareDate) {
-      setCompareDate(state.formData.compareDate);
     }
   }, [location.state]);
 
@@ -75,22 +73,23 @@ const UD20_MarketDocumentSettings: React.FC = () => {
    */
   const handleSearch = useCallback(() => {
     const params: Record<string, string> = {};
-    if (documentType.trim()) params.doctype = documentType.trim();
-    if (user.trim()) params.registerUser = user.trim();
-    if (date.trim()) params.registerDatetime = date.trim();
-
-    // 同时传递下拉框比较运算符
-    const compares: Record<string, string> = {
-      doctype: compareDocType,
-      registerUser: compareUser,
-      registerDatetime: compareDate,
-    };
+    if (documentType.trim()) {
+      params.doctype = documentType.trim();
+      params.doctypeOp = compareDocType;
+    }
+    if (user.trim()) {
+      params.registerUser = user.trim();
+      params.registerUserOp = compareUser;
+    }
+    if (date.trim()) {
+      params.registerDatetime = date.trim();
+      params.registerDatetimeOp = compareDate;
+    }
 
     // 保存当前输入，用于从UD20返回时恢复
     navigate('/UD20', {
       state: {
         searchParams: params,
-        compareParams: compares,
         formData: { documentType, user, date, compareDocType, compareBU, compareUser, compareDate },
       },
     });
@@ -118,7 +117,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
    * 对应设计书 3.1.3 - 返回前页面
    */
   const handleBack = useCallback(() => {
-    navigate(-1);
+    navigate('/UD24');
   }, [navigate]);
 
   /**
@@ -207,7 +206,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           <span className="ud201-label">Document type</span>
           <select className="ud201-compare-select" value={compareDocType} onChange={(e) => setCompareDocType(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud201-input"
@@ -230,7 +229,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           <span className="ud201-label">Bussines unit</span>
           <select className="ud201-compare-select" value={compareBU} onChange={(e) => setCompareBU(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud201-input"
@@ -246,7 +245,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           <span className="ud201-label">User</span>
           <select className="ud201-compare-select" value={compareUser} onChange={(e) => setCompareUser(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="!=">≠</option>
           </select>
           <input
             className="ud201-input"
@@ -268,7 +267,8 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           <span className="ud201-label">Date</span>
           <select className="ud201-compare-select" value={compareDate} onChange={(e) => setCompareDate(e.target.value)}>
             <option value="=">=</option>
-            <option value="≠">≠</option>
+            <option value="lt">&lt;</option>
+            <option value="gt">&gt;</option>
           </select>
           <input
             className="ud201-input"

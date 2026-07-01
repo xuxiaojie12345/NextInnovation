@@ -44,10 +44,7 @@ public class UD20GetDocumentListServiceImpl implements UD20GetDocumentListServic
 
         try {
             // 4.5 通过数据访问层查询数据库（动态SQL）
-            List<UD20GetDocumentListResponse.DocumentData> documentList = ud20Mapper.selectDocumentList(
-                    request.getDoctype(),
-                    request.getRegisterUser(),
-                    request.getRegisterDatetime());
+            List<UD20GetDocumentListResponse.DocumentData> documentList = ud20Mapper.selectDocumentList(request);
 
             if (documentList == null || documentList.isEmpty()) {
                 log.warn("未查询到任何文档数据");

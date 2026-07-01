@@ -114,8 +114,10 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
    * 返回前一个画面
    */
   const handleBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
+    // 从location.state中取出UD201传来的formData，回传给UD201恢复输入数据
+    const formData = (location.state as any)?.formData;
+    navigate('/UD201', { state: { backFormData: formData } });
+  }, [navigate, location.state]);
 
   /**
    * 处理 Print 按钮点击
