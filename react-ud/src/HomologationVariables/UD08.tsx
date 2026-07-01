@@ -280,6 +280,10 @@ const UD08 = React.memo(() => {
       setDeleteVal(record.deleteDate || record.delete || "");
       setCreatedByVal(record.createdByUser || "");
       setDateVal(record.date || "");
+      // 清除 sessionStorage，避免初始化 useEffect 异步完成后覆盖本次回填数据
+      try {
+        sessionStorage.removeItem(STORAGE_KEY_UD08_FORM);
+      } catch {}
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);

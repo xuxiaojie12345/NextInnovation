@@ -135,82 +135,6 @@ const UD09 = React.memo(() => {
   const getRowKey = (record: HomoVarRecord, index: number): string =>
     `${record.productClass}-${record.number}-${record.market}-${index}`;
 
-  /** Select - 返回上一页并回填选中项 */
-  const handleSelect = useCallback(() => {
-    if (selectedKeys.length === 0) {
-      setErrorMessage("请至少选择一条记录");
-      return;
-    }
-    const selectedRecords = selectedKeys.map(
-      (key) => dataSource[parseInt(key, 10)],
-    );
-    navigate("/UD08", { state: { selectedRecords } });
-  }, [selectedKeys, dataSource, navigate]);
-
-  /** Back - 返回上一页 */
-  const handleBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
-
-  /** Print - 打印当前列表 */
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
-
-  /** Delete selected - 批量删除 */
-  const handleDeleteSelected = useCallback(async () => {
-    if (selectedKeys.length === 0) {
-      setErrorMessage("请至少选择一条记录");
-      return;
-    }
-
-    if (!window.confirm(`确定要删除选中的 ${selectedKeys.length} 条记录吗？`)) {
-      return;
-    }
-
-    setIsDeleting(true);
-    setErrorMessage("");
-
-    try {
-      const recordsToDelete = selectedKeys.map(
-        (key) => dataSource[parseInt(key, 10)],
-      );
-      const deleteParams = recordsToDelete.map((r) => ({
-        pc: r.productClass,
-        num: String(r.number),
-        market: r.market,
-      }));
-
-      const result = await homologationVariablesApi.deleteSelected({
-        selectedRecords: deleteParams,
-      });
-
-      if (result && result.code === 200) {
-        alert(`删除成功，共删除 ${selectedKeys.length} 条记录`);
-        // 刷新列表：从 dataSource 中移除已删除项
-        const keySet = new Set(selectedKeys);
-        setDataSource((prev) =>
-          prev.filter((_, idx) => !keySet.has(idx.toString())),
-        );
-        setSelectedKeys([]);
-      } else {
-        setErrorMessage(result?.msg || "删除失败，请稍后重试");
-      }
-    } catch {
-      setErrorMessage("删除失败，请稍后重试");
-    } finally {
-      setIsDeleting(false);
-    }
-  }, [selectedKeys, dataSource]);
-
-  /** 点击 Created by user 链接 */
-  const handleUserLinkClick = useCallback(
-    (userId: string) => {
-      navigate(`/UD25?userid=${encodeURIComponent(userId)}`);
-    },
-    [navigate],
-  );
-
   /** 排序处理（简单切换排序方向） */
   const [sortField, setSortField] = useState<string>("productClass");
   const [sortAsc, setSortAsc] = useState<boolean>(true);
@@ -239,6 +163,94 @@ const UD09 = React.memo(() => {
     if (sortField !== field) return "";
     return sortAsc ? " ▲" : " ▼";
   };
+
+  /** Select - 返回上一页并回填选中项 */
+  const handleSelect = useCallback(() => {
+    if (selectedKeys.length === 0) {
+      setErrorMessage("请至少选择一条记录");
+      return;
+    }
+    // 从排序后的数据中取得选中记录（解决排序导致的索引不一致问题）
+    const sortedList = [...dataSource].sort((a, b) => {
+      const aVal = String((a as any)[sortField] || "");
+      const bVal = String((b as any)[sortField] || "");
+      return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    });
+    const selectedRecords = selectedKeys.map(
+      (key) => sortedList[parseInt(key, 10)],
+    );
+    navigate("/UD08", { state: { selectedRecords } });
+  }, [selectedKeys, dataSource, sortField, sortAsc, navigate]);
+
+  /** Back - 返回上一页 */
+  const handleBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  /** Print - 打印当前列表 */
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
+  /** Delete selected - 批量删除 */
+  const handleDeleteSelected = useCallback(async () => {
+    if (selectedKeys.length === 0) {
+      setErrorMessage("请至少选择一条记录");
+      return;
+    }
+
+    if (!window.confirm(`确定要删除选中的 ${selectedKeys.length} 条记录吗？`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setErrorMessage("");
+
+    try {
+      // 从排序后的数据中取得选中记录（解决排序导致的索引不一致问题）
+      const sortedList = [...dataSource].sort((a, b) => {
+        const aVal = String((a as any)[sortField] || "");
+        const bVal = String((b as any)[sortField] || "");
+        return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
+      const recordsToDelete = selectedKeys.map(
+        (key) => sortedList[parseInt(key, 10)],
+      );
+      const deleteParams = recordsToDelete.map((r) => ({
+        pc: r.productClass,
+        num: String(r.number),
+        market: r.market,
+      }));
+
+      const result = await homologationVariablesApi.deleteSelected({
+        selectedRecords: deleteParams,
+      });
+
+      if (result && result.code === 200) {
+        alert(`删除成功，共删除 ${selectedKeys.length} 条记录`);
+        // 刷新列表：从 dataSource 中移除已删除项
+        const keySet = new Set(selectedKeys);
+        setDataSource((prev) =>
+          prev.filter((_, idx) => !keySet.has(idx.toString())),
+        );
+        setSelectedKeys([]);
+      } else {
+        setErrorMessage(result?.msg || "删除失败，请稍后重试");
+      }
+    } catch {
+      setErrorMessage("删除失败，请稍后重试");
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [selectedKeys, dataSource, sortField, sortAsc]);
+
+  /** 点击 Created by user 链接 */
+  const handleUserLinkClick = useCallback(
+    (userId: string) => {
+      navigate(`/UD25?userid=${encodeURIComponent(userId)}`);
+    },
+    [navigate],
+  );
 
   // ===== 加载状态 =====
 

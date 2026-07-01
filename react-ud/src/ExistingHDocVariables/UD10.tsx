@@ -224,7 +224,7 @@ const UD10 = React.memo(() => {
   return (
     <div className="ud10-container">
       <header className="ud10-header">
-        <div className="ud10-header-logo">VOLVO</div>
+        <div className="ud10-header-logo"></div>
       </header>
       <main className="ud10-main">
         <div className="ud10-card">

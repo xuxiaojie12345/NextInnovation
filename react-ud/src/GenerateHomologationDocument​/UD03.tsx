@@ -347,7 +347,6 @@ const UD03 = React.memo(() => {
                 onChange={handleDocumentTypeChange}
                 disabled={isLoading}
               >
-                <option value="">-- Select --</option>
                 {docTypeOptions.map((opt, index) => (
                   <option key={index} value={opt.doctype}>
                     {opt.doctype}
