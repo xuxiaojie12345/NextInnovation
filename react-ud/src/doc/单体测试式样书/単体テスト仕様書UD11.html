@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>単体テスト仕様書UD03</title>
+      <title>単体テスト仕様書UD11</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="generate-homologation-document-模块-ud03-测试规格书">Generate Homologation Document 模块 (UD03) 测试规格书 </h1>
+<h1 id="existing-hdoc-variables-result-list-模块-ud11-测试规格书">Existing HDoc Variables Result List 模块 (UD11) 测试规格书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">TEST-UD03-001</th>
+<th style="text-align:left">TEST-UD11-001</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,7 +40,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Generate Homologation Document</td>
+<td style="text-align:left">Existing HDoc Variables Result List</td>
 <td style="text-align:left"><strong>创建日期</strong></td>
 <td style="text-align:left">2026-06-30</td>
 </tr>
@@ -71,60 +71,76 @@
 <tr>
 <td style="text-align:center">1</td>
 <td style="text-align:left">画面初期显示-基本元素</td>
-<td style="text-align:left">1. 访问 Generate Homologation Document 页面<br>2. 确认页面整体显示</td>
+<td style="text-align:left">1. 访问 Existing HDoc Variables Result List 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "HDoc - Generate Homologation Document"<br>2. 显示 Chassis series 输入框（带红色 * 标记）<br>3. 显示 Chassis no 输入框（带红色 * 标记）<br>4. 显示 Document type 下拉列表（带红色 * 标记）<br>5. 显示 Submit、Reset、Help 三个按钮</td>
+<td style="text-align:left">1. 显示 DataTable 列表（列：Variable、Type、Description、Created by user、Date）<br>2. 显示按钮：Search、Down、Back、Print、Excel<br>3. 显示 Count 标签</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">2</td>
-<td style="text-align:left">画面初期显示-输入框和按钮初始状态</td>
-<td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始值</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Chassis series 输入框为空，最大长度 5，可用（Enabled）<br>2. Chassis no 输入框为空，最大长度 10，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
+<td style="text-align:left">画面初期显示-搜索结果加载</td>
+<td style="text-align:left">1. 从前画面获取搜索条件<br>2. 访问页面<br>3. 等待 API 响应<br>4. 确认 DataTable 显示</td>
+<td style="text-align:left">搜索条件有效</td>
+<td style="text-align:left">1. 调用 UD11HdocvariablesApi（POST <code>/api/ud11/search</code>）<br>2. 传递搜索条件参数<br>3. 数据显示到 DataTable 中<br>4. Count 显示 "Number of lines found: XXX"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用成功</td>
-<td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认 Document type 下拉列表</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 默认选中第一项<br>5. Error message 区域不显示</td>
+<td style="text-align:left">画面初期显示-无匹配数据</td>
+<td style="text-align:left">1. 搜索条件无匹配结果<br>2. 访问页面<br>3. 确认显示</td>
+<td style="text-align:left">搜索条件无匹配</td>
+<td style="text-align:left">1. DataTable 显示为空<br>2. Count 显示 "Number of lines found: 0"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">4</td>
-<td style="text-align:left">画面初期显示-文档类型列表为空</td>
-<td style="text-align:left">1. 模拟 API 返回 doctypeList 为空列表<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 返回 code=200 但数据为空<br>2. 设置 Error message area = "Chassis no is not exists"<br>3. Document type 下拉框被禁用或清空</td>
+<td style="text-align:left">画面初期显示-服务器错误</td>
+<td style="text-align:left">1. API 返回 500 错误<br>2. 访问页面<br>3. 确认错误消息</td>
+<td style="text-align:left">API 返回 500</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. DataTable 保持为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">5</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用失败</td>
-<td style="text-align:left">1. 模拟 API 请求异常<br>2. 访问页面<br>3. 确认显示</td>
+<td style="text-align:left">画面初期显示-网络异常</td>
+<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. API 调用失败<br>2. 设置 Error message area = "System error. Please contact support." 或 "Network error. Please try again."<br>3. 错误消息显示红色</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:left">画面初期显示-从本地存储加载前次条件</td>
-<td style="text-align:left">1. 本地存储中存在前次搜索条件<br>2. 访问页面<br>3. 确认各输入框的默认值</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 显示上次的值<br>2. Chassis no 显示上次的值<br>3. Document type 选中上次的值（若存在于新列表中）<br>4. Error message 区域不显示</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. DataTable 保持为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="空值校验前端校验">空值校验（前端校验） </h3>
+<h3 id="search-搜索处理">Search 搜索处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left">Search-重新搜索</td>
+<td style="text-align:left">1. 点击 Search 按钮<br>2. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 重新调用搜索接口<br>2. 重新加载 DataTable 数据<br>3. Count 更新为新的搜索结果数量</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="select-选择处理">Select 选择处理 </h3>
 <table>
 <thead>
 <tr>
@@ -140,43 +156,59 @@
 <tbody>
 <tr>
 <td style="text-align:center">7</td>
-<td style="text-align:left">空值校验-Chassis series 为空</td>
-<td style="text-align:left">1. Chassis series 输入框留空<br>2. Chassis no 输入任意有效值<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: ``<br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis series is required"<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">Select-未选择记录时点击</td>
+<td style="text-align:left">1. 未选择任何记录<br>2. 点击 Select 按钮（单击行）<br>3. 确认结果</td>
+<td style="text-align:left">无选中记录</td>
+<td style="text-align:left">1. 显示错误消息："Please select a record."<br>2. 终止流程<br>3. 不执行返回操作</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">8</td>
-<td style="text-align:left">空值校验-Chassis no 为空</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入框留空<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: ``<br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis no is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">9</td>
-<td style="text-align:left">空值校验-Document type 未选择</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入有效值<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: ``</td>
-<td style="text-align:left">1. 显示错误消息："Document type is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">10</td>
-<td style="text-align:left">空值校验-三者均为空</td>
-<td style="text-align:left">1. Chassis series 留空<br>2. Chassis no 留空<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>&lt;br&gt;Chassis no: </code><br>Document type: ``</td>
-<td style="text-align:left">1. 先触发 Chassis series 空值校验<br>2. 显示错误消息："Chassis series is required"<br>3. Chassis no 和 Document type 的校验不执行<br>4. 不调用 API</td>
+<td style="text-align:left">Select-已选择记录时点击</td>
+<td style="text-align:left">1. 选择一条记录<br>2. 点击 Select 按钮（单击行）<br>3. 确认结果</td>
+<td style="text-align:left">选中一条记录</td>
+<td style="text-align:left">1. 获取选中记录的完整数据<br>2. 将数据存储到 state 或 sessionStorage<br>3. 返回前画面（/ExistingHDocVariables）<br>4. 前画面自动填充选中数据到对应输入字段</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="submit-处理">Submit 处理 </h3>
+<h3 id="down-跳转处理">Down 跳转处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:left">Down-未选择记录时点击</td>
+<td style="text-align:left">1. 未选择任何记录<br>2. 点击 Down 按钮<br>3. 确认结果</td>
+<td style="text-align:left">无选中记录</td>
+<td style="text-align:left">1. 显示警告消息："No key defined for table."<br>2. 终止流程<br>3. 不执行跳转</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:left">Down-已选择记录时跳转</td>
+<td style="text-align:left">1. 选择一条记录<br>2. 点击 Down 按钮<br>3. 确认结果</td>
+<td style="text-align:left">选中记录，Variable=<code>FTLI</code></td>
+<td style="text-align:left">1. 获取选中记录的 Variable 字段值<br>2. 跳转到 /HomologationVariables 路由<br>3. 传递 Variable 作为 URL 参数</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="back-返回处理">Back 返回处理 </h3>
 <table>
 <thead>
 <tr>
@@ -192,25 +224,41 @@
 <tbody>
 <tr>
 <td style="text-align:center">11</td>
-<td style="text-align:left">Submit 成功-正常跳转</td>
-<td style="text-align:left">1. 输入所有必填项<br>2. 点击 Submit 按钮<br><br>3. 确认结果</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 前端校验通过<br>2. 调用导航跳转到 Generate document 画面<br>3. Error message 区域不显示</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">12</td>
-<td style="text-align:left">Submit-底盘系列和编号拼接后跳转</td>
-<td style="text-align:left">1. 输入 Chassis series 和 Chassis no<br>2. 点击 Submit 按钮<br>3. 确认跳转 URL</td>
-<td style="text-align:left">Chassis series: <code>ABCD</code><br>Chassis no: <code>123456</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 和 Chassis no 拼接传递<br>2. 跳转到 Generate document 画面并携带拼接后的参数</td>
+<td style="text-align:left">Back-返回前画面</td>
+<td style="text-align:left">1. 点击 Back 按钮<br>2. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 保存搜索条件到 state 或 sessionStorage<br>2. 返回前画面（/ExistingHDocVariables）<br>3. 前画面保留搜索条件</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="reset-处理">Reset 处理 </h3>
+<h3 id="print-打印处理">Print 打印处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:left">Print-打印搜索结果</td>
+<td style="text-align:left">1. 搜索结果加载完成后<br>2. 点击 Print 按钮<br>3. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 调用 window.print() 方法<br>2. 浏览器打开打印预览对话框<br>3. 打印内容包括 DataTable 中的所有数据和 Count 信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="excel-导出处理">Excel 导出处理 </h3>
 <table>
 <thead>
 <tr>
@@ -226,25 +274,25 @@
 <tbody>
 <tr>
 <td style="text-align:center">13</td>
-<td style="text-align:left">Reset-正常重置</td>
-<td style="text-align:left">1. 输入各字段值后点击 Reset 按钮<br>2. 确认各控件状态</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 被清空<br>2. Chassis no 被清空<br>3. Document type 重置为 "Please select"<br>4. Error message 区域被清除<br>5. 画面回到初始状态</td>
+<td style="text-align:left">Excel-导出成功</td>
+<td style="text-align:left">1. 搜索结果存在<br>2. 点击 Excel 按钮<br>3. 确认结果</td>
+<td style="text-align:left">搜索结果存在</td>
+<td style="text-align:left">1. 调用导出 API 或前端生成 CSV<br>2. 触发浏览器文件下载<br>3. 文件名为 CSV 格式</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">14</td>
-<td style="text-align:left">Reset-有错误消息时重置</td>
-<td style="text-align:left">1. 先触发校验错误<br>2. 错误消息显示后点击 Reset 按钮<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 被清除<br>2. 所有输入框被清空<br>3. Document type 重置为 "Please select"<br>4. 画面回到初始状态</td>
+<td style="text-align:left">Excel-导出失败（API 错误）</td>
+<td style="text-align:left">1. 点击 Excel 按钮<br>2. API 返回错误<br>3. 确认结果</td>
+<td style="text-align:left">API 返回错误</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. 不触发下载</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="help-处理">Help 处理 </h3>
+<h3 id="datatable-显示">DataTable 显示 </h3>
 <table>
 <thead>
 <tr>
@@ -260,62 +308,37 @@
 <tbody>
 <tr>
 <td style="text-align:center">15</td>
-<td style="text-align:left">Help-点击 Help 按钮</td>
-<td style="text-align:left">1. 点击 Help 按钮<br>2. 确认画面行为</td>
+<td style="text-align:left">DataTable-列标题显示</td>
+<td style="text-align:left">1. 搜索结果显示后<br>2. 确认表格列标题</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 跳转到 Help 画面<br>2. 当前页面输入框内容保持不变</td>
+<td style="text-align:left">1. 显示列标题：Variable、Type、Description、Created by user、Date<br>2. 列标题显示完整</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="输入字符控制">输入字符控制 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">16</td>
-<td style="text-align:left">Chassis series-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入 6 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 6 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 5 个字符<br>2. 超出部分无法输入</td>
+<td style="text-align:left">DataTable-单选功能</td>
+<td style="text-align:left">1. 搜索结果显示后<br>2. 点击行选择记录</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. DataTable 支持单行选择功能<br>2. 选中行高亮显示<br>3. 点击另一行时切换选择</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">17</td>
-<td style="text-align:left">Chassis series-半角英文字符输入</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入半角英文字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>ABCDE</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Created by user-链接显示</td>
+<td style="text-align:left">1. 搜索结果显示后<br>2. 确认 Created by user 列显示</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Created by user 显示为可点击链接<br>2. 点击后跳转到 EDB User View 页面（UD25）<br>3. 携带参数 userid（当前行的 registerUser 值）</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">18</td>
-<td style="text-align:left">Chassis no-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入 11 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 11 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 10 个字符<br>2. 超出部分无法输入</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">19</td>
-<td style="text-align:left">Chassis no-半角数字输入</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>1234567890</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Count-搜索结果计数显示</td>
+<td style="text-align:left">1. 搜索结果显示后<br>2. 确认 Count 标签显示</td>
+<td style="text-align:left">搜索结果数量为 N</td>
+<td style="text-align:left">1. Count 显示 "Number of lines found: N"<br>2. 始终显示当前结果数量</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -336,26 +359,35 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
-<td style="text-align:left">异常处理-网络断开</td>
-<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:center">19</td>
+<td style="text-align:left">异常处理-API 超时</td>
+<td style="text-align:left">1. 模拟 API 响应超时（超过 10 秒）<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："网络错误。请检查您的连接。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 超时后显示错误消息："System error. Please contact administrator."<br>2. DataTable 保持为空</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">20</td>
+<td style="text-align:left">异常处理-JSON 解析失败</td>
+<td style="text-align:left">1. API 返回非法 JSON 格式<br>2. 访问页面<br>3. 确认结果</td>
+<td style="text-align:left">非法 JSON 响应</td>
+<td style="text-align:left">1. 捕获解析异常<br>2. 显示错误消息："System error. Please contact administrator."<br>3. 控制台输出错误日志</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">21</td>
-<td style="text-align:left">异常处理-服务器 500 错误</td>
-<td style="text-align:left">1. 模拟 API 返回 HTTP 500 错误<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:left">异常处理-用户未登录</td>
+<td style="text-align:left">1. 清除登录状态<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 检查会话状态<br>2. 跳转到登录页面<br>3. 显示提示 "Please login first"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="错误消息显示">错误消息显示 </h3>
+<h3 id="ui-交互">UI 交互 </h3>
 <table>
 <thead>
 <tr>
@@ -371,19 +403,28 @@
 <tbody>
 <tr>
 <td style="text-align:center">22</td>
-<td style="text-align:left">错误消息显示样式</td>
-<td style="text-align:left">1. 触发任意空值校验错误<br>2. 确认错误消息的显示样式</td>
+<td style="text-align:left">按钮-加载中禁用</td>
+<td style="text-align:left">1. 执行搜索或其他操作<br>2. 在 API 响应前确认按钮状态</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 区域显示<br>2. 文字颜色为红色<br>3. 默认隐藏（内容为空时不占位）</td>
+<td style="text-align:left">1. 操作按钮（Search、Down、Back、Print、Excel）在加载期间禁用（disabled）<br>2. 防止重复提交</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">23</td>
-<td style="text-align:left">错误消息-输入后自动清除</td>
-<td style="text-align:left">1. 触发空值校验，显示错误消息<br>2. 在对应输入框中输入有效值<br>3. 确认错误消息状态</td>
+<td style="text-align:left">错误消息-显示样式</td>
+<td style="text-align:left">1. 触发任意错误<br>2. 确认错误消息样式</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 输入有效值后错误消息自动清除<br>2. Error message 区域隐藏</td>
+<td style="text-align:left">1. Message 显示红色（<a class="tag" data-tag="ff4d4f" href="tag://ff4d4f">#ff4d4f</a>）<br>2. 默认隐藏（内容为空时不占位或高度为 0）</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:left">页面刷新</td>
+<td style="text-align:left">1. 数据加载完成后<br>2. 刷新页面（F5）<br>3. 确认画面</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 页面重新加载<br>2. 重新获取搜索条件<br>3. 重新调用 API<br>4. 数据正常显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -404,11 +445,20 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">24</td>
-<td style="text-align:left">安全性-API 请求加密</td>
-<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行页面初始化<br>3. 检查网络请求</td>
+<td style="text-align:center">25</td>
+<td style="text-align:left">安全性-API 请求协议</td>
+<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行搜索操作<br>3. 检查网络请求</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含明文敏感信息</td>
+<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含敏感信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">26</td>
+<td style="text-align:left">安全性-用户登录认证</td>
+<td style="text-align:left">1. 未登录状态下直接访问页面 URL<br>2. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 需要用户登录认证后才能访问<br>2. 未登录时跳转到登录页面</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

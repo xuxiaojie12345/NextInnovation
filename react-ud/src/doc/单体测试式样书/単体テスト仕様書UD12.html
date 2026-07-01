@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>単体テスト仕様書UD03</title>
+      <title>単体テスト仕様書UD12</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="generate-homologation-document-模块-ud03-测试规格书">Generate Homologation Document 模块 (UD03) 测试规格书 </h1>
+<h1 id="uploaddelete-template-模块-ud12-测试规格书">Upload&amp;Delete Template 模块 (UD12) 测试规格书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">TEST-UD03-001</th>
+<th style="text-align:left">TEST-UD12-001</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,7 +40,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Generate Homologation Document</td>
+<td style="text-align:left">Upload&amp;Delete Template</td>
 <td style="text-align:left"><strong>创建日期</strong></td>
 <td style="text-align:left">2026-06-30</td>
 </tr>
@@ -71,146 +71,121 @@
 <tr>
 <td style="text-align:center">1</td>
 <td style="text-align:left">画面初期显示-基本元素</td>
-<td style="text-align:left">1. 访问 Generate Homologation Document 页面<br>2. 确认页面整体显示</td>
+<td style="text-align:left">1. 访问 Upload&amp;Delete Template 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "HDoc - Generate Homologation Document"<br>2. 显示 Chassis series 输入框（带红色 * 标记）<br>3. 显示 Chassis no 输入框（带红色 * 标记）<br>4. 显示 Document type 下拉列表（带红色 * 标记）<br>5. 显示 Submit、Reset、Help 三个按钮</td>
+<td style="text-align:left">1. 显示 "HDoc Template Upload" 标题<br>2. 显示 "HDoc Template Delete/Archive" 标题<br>3. 上传区域显示：文件选择输入框、Market 下拉列表、Upload file 按钮<br>4. 删除区域显示：Market 下拉列表、Templates 下拉列表、Delete 按钮</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">2</td>
-<td style="text-align:left">画面初期显示-输入框和按钮初始状态</td>
-<td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始值</td>
+<td style="text-align:left">画面初期显示-市场列表加载</td>
+<td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认下拉列表</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Chassis series 输入框为空，最大长度 5，可用（Enabled）<br>2. Chassis no 输入框为空，最大长度 10，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
+<td style="text-align:left">1. 调用 UD12UploadDeletetemplatApi（GET <code>/api/ud12/getmarketlist</code>）获取市场列表<br>2. 两个 Market 下拉列表均显示从 API 获取的市场列表<br>3. Templates 下拉列表初始化为空或禁用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用成功</td>
-<td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认 Document type 下拉列表</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 默认选中第一项<br>5. Error message 区域不显示</td>
+<td style="text-align:left">画面初期显示-加载市场列表失败</td>
+<td style="text-align:left">1. 模拟 API 返回 500 错误<br>2. 访问页面<br>3. 确认错误消息</td>
+<td style="text-align:left">API 返回 500</td>
+<td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 市场下拉列表为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
+</tbody>
+</table>
+<h3 id="hdoc-template-upload-区域">HDoc Template Upload 区域 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td style="text-align:center">4</td>
-<td style="text-align:left">画面初期显示-文档类型列表为空</td>
-<td style="text-align:left">1. 模拟 API 返回 doctypeList 为空列表<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 返回 code=200 但数据为空<br>2. 设置 Error message area = "Chassis no is not exists"<br>3. Document type 下拉框被禁用或清空</td>
+<td style="text-align:left">文件选择-未选择文件时点击上传</td>
+<td style="text-align:left">1. 不选择文件<br>2. Market 选择任意有效值<br>3. 点击 Upload file 按钮<br>4. 确认结果</td>
+<td style="text-align:left">未选择文件</td>
+<td style="text-align:left">1. 显示错误消息："NO FILE UPLOADED"<br>2. 不调用 API<br>3. Upload file 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">5</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用失败</td>
-<td style="text-align:left">1. 模拟 API 请求异常<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 调用失败<br>2. 设置 Error message area = "System error. Please contact support." 或 "Network error. Please try again."<br>3. 错误消息显示红色</td>
+<td style="text-align:left">文件上传-成功</td>
+<td style="text-align:left">1. 选择文件<br>2. 选择 Market<br>3. 点击 Upload file 按钮<br>4. API 返回成功<br>5. 确认结果</td>
+<td style="text-align:left"><code>test_template.docx</code>（1KB）<br>Market: <code>JPN</code></td>
+<td style="text-align:left">1. 按钮在加载中变为禁用状态<br>2. API 调用成功<br>3. 显示成功消息："TEMPLATE test_template.docx WAS SUCESSFULLY UPLOADED TO MARKET JPN"<br>4. 成功消息显示绿色（<a class="tag" data-tag="52c41a" href="tag://52c41a">#52c41a</a>）<br>5. 文件选择被清空<br>6. Market 选择被清空<br>7. 按钮恢复为可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">6</td>
-<td style="text-align:left">画面初期显示-从本地存储加载前次条件</td>
-<td style="text-align:left">1. 本地存储中存在前次搜索条件<br>2. 访问页面<br>3. 确认各输入框的默认值</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 显示上次的值<br>2. Chassis no 显示上次的值<br>3. Document type 选中上次的值（若存在于新列表中）<br>4. Error message 区域不显示</td>
+<td style="text-align:left">文件上传-失败（API 返回 400）</td>
+<td style="text-align:left">1. 选择文件<br>2. 选择 Market<br>3. 点击 Upload file 按钮<br>4. API 返回 400<br>5. 确认结果</td>
+<td style="text-align:left">文件类型或大小无效</td>
+<td style="text-align:left">1. 显示错误消息："Invalid file type or size"<br>2. 按钮恢复可用状态<br>3. 保持表单数据</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="空值校验前端校验">空值校验（前端校验） </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">7</td>
-<td style="text-align:left">空值校验-Chassis series 为空</td>
-<td style="text-align:left">1. Chassis series 输入框留空<br>2. Chassis no 输入任意有效值<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: ``<br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis series is required"<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">文件上传-失败（API 返回 500）</td>
+<td style="text-align:left">1. 选择文件<br>2. 选择 Market<br>3. 点击 Upload file 按钮<br>4. API 返回 500<br>5. 确认结果</td>
+<td style="text-align:left">API 返回 500</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. 按钮恢复可用状态<br>3. 保持表单数据</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">8</td>
-<td style="text-align:left">空值校验-Chassis no 为空</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入框留空<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: ``<br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis no is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">文件上传-失败（网络异常）</td>
+<td style="text-align:left">1. 选择文件<br>2. 选择 Market<br>3. 点击 Upload file 按钮<br>4. 模拟网络断开<br>5. 确认结果</td>
+<td style="text-align:left">网络断开</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">9</td>
-<td style="text-align:left">空值校验-Document type 未选择</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入有效值<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: ``</td>
-<td style="text-align:left">1. 显示错误消息："Document type is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">文件上传-加载中按钮禁用</td>
+<td style="text-align:left">1. 选择文件和 Market<br>2. 点击 Upload file 按钮<br>3. 在 API 响应前确认按钮状态</td>
+<td style="text-align:left">文件有效</td>
+<td style="text-align:left">1. Upload file 按钮在加载期间禁用（disabled）<br>2. 防止重复提交</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">10</td>
-<td style="text-align:left">空值校验-三者均为空</td>
-<td style="text-align:left">1. Chassis series 留空<br>2. Chassis no 留空<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>&lt;br&gt;Chassis no: </code><br>Document type: ``</td>
-<td style="text-align:left">1. 先触发 Chassis series 空值校验<br>2. 显示错误消息："Chassis series is required"<br>3. Chassis no 和 Document type 的校验不执行<br>4. 不调用 API</td>
+<td style="text-align:left">文件上传-防止重复提交</td>
+<td style="text-align:left">1. 选择文件和 Market<br>2. 点击 Upload file 按钮<br>3. 在 API 响应前再次点击<br>4. 确认 API 调用次数</td>
+<td style="text-align:left">文件有效</td>
+<td style="text-align:left">1. 第二次点击无效（按钮已禁用）<br>2. 只发起一次 API 调用</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="submit-处理">Submit 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">11</td>
-<td style="text-align:left">Submit 成功-正常跳转</td>
-<td style="text-align:left">1. 输入所有必填项<br>2. 点击 Submit 按钮<br><br>3. 确认结果</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 前端校验通过<br>2. 调用导航跳转到 Generate document 画面<br>3. Error message 区域不显示</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">12</td>
-<td style="text-align:left">Submit-底盘系列和编号拼接后跳转</td>
-<td style="text-align:left">1. 输入 Chassis series 和 Chassis no<br>2. 点击 Submit 按钮<br>3. 确认跳转 URL</td>
-<td style="text-align:left">Chassis series: <code>ABCD</code><br>Chassis no: <code>123456</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 和 Chassis no 拼接传递<br>2. 跳转到 Generate document 画面并携带拼接后的参数</td>
+<td style="text-align:left">文件上传-不同 Market 上传</td>
+<td style="text-align:left">1. 上传文件到 Market CHN<br>2. 上传文件到 Market USA<br>3. 确认两次结果</td>
+<td style="text-align:left"><code>file1.docx</code> -&gt; <code>CHN</code><br><code>file2.docx</code> -&gt; <code>USA</code></td>
+<td style="text-align:left">1. 第一次上传成功后清空输入<br>2. 第二次可正常选择新文件和新 Market<br>3. 两次上传均成功，显示对应的成功消息</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="reset-处理">Reset 处理 </h3>
+<h3 id="hdoc-template-deletearchive-区域">HDoc Template Delete/Archive 区域 </h3>
 <table>
 <thead>
 <tr>
@@ -225,97 +200,144 @@
 </thead>
 <tbody>
 <tr>
+<td style="text-align:center">12</td>
+<td style="text-align:left">删除区域-市场选择加载模板列表</td>
+<td style="text-align:left">1. 删除区域选择 Market<br>2. 等待 API 响应<br>3. 确认 Templates 下拉列表</td>
+<td style="text-align:left">Market: <code>JPN</code></td>
+<td style="text-align:left">1. 调用获取模板文件列表 API<br>2. Templates 下拉列表加载对应文件列表<br>3. Templates 下拉列表可用</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
 <td style="text-align:center">13</td>
-<td style="text-align:left">Reset-正常重置</td>
-<td style="text-align:left">1. 输入各字段值后点击 Reset 按钮<br>2. 确认各控件状态</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 被清空<br>2. Chassis no 被清空<br>3. Document type 重置为 "Please select"<br>4. Error message 区域被清除<br>5. 画面回到初始状态</td>
+<td style="text-align:left">删除区域-切换 Market 清空模板列表</td>
+<td style="text-align:left">1. 选择 Market JPN，加载模板列表<br>2. 切换 Market 为 CHN<br>3. 确认结果</td>
+<td style="text-align:left">JPN -&gt; CHN</td>
+<td style="text-align:left">1. Templates 列表被清空<br>2. 重新调用 API 获取新市场下的模板文件列表<br>3. Templates 下拉列表显示 CHN 的文件列表</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">14</td>
-<td style="text-align:left">Reset-有错误消息时重置</td>
-<td style="text-align:left">1. 先触发校验错误<br>2. 错误消息显示后点击 Reset 按钮<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 被清除<br>2. 所有输入框被清空<br>3. Document type 重置为 "Please select"<br>4. 画面回到初始状态</td>
+<td style="text-align:left">删除区域-所选市场无模板文件</td>
+<td style="text-align:left">1. 选择无模板文件的市场<br>2. 确认 Templates 下拉列表</td>
+<td style="text-align:left">市场无模板文件</td>
+<td style="text-align:left">1. Templates 下拉列表显示为空或显示 "No templates available"<br>2. Templates 下拉列表禁用</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="help-处理">Help 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">15</td>
-<td style="text-align:left">Help-点击 Help 按钮</td>
-<td style="text-align:left">1. 点击 Help 按钮<br>2. 确认画面行为</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 跳转到 Help 画面<br>2. 当前页面输入框内容保持不变</td>
+<td style="text-align:left">Delete-未选择市场或模板时点击</td>
+<td style="text-align:left">1. 未选择 Market 或 Templates<br>2. 点击 Delete 按钮<br>3. 确认结果</td>
+<td style="text-align:left">未选择</td>
+<td style="text-align:left">1. 显示错误消息："Please select market and template."<br>2. 不弹出确认对话框<br>3. 不调用 API</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="输入字符控制">输入字符控制 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">16</td>
-<td style="text-align:left">Chassis series-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入 6 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 6 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 5 个字符<br>2. 超出部分无法输入</td>
+<td style="text-align:left">Delete-确认对话框-点击取消</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框出现<br>4. 点击取消<br>5. 确认结果</td>
+<td style="text-align:left">Market: <code>JPN</code><br>Template: <code>test.rtf</code></td>
+<td style="text-align:left">1. 弹出确认对话框，显示 "Do you really want to delete template?"<br>2. 点击取消后流程终止<br>3. 不调用 API<br>4. Delete 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">17</td>
-<td style="text-align:left">Chassis series-半角英文字符输入</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入半角英文字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>ABCDE</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Delete-确认对话框-点击确定并成功删除</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. API 返回成功<br>5. 确认结果</td>
+<td style="text-align:left">Market: <code>JPN</code><br>Template: <code>test.rtf</code></td>
+<td style="text-align:left">1. 弹出确认对话框<br>2. 点击确定后按钮变为禁用状态<br>3. 调用删除 API<br>4. 显示成功消息："TEMPLATE test.rtf WAS SUCESSFULLY DELETE FROM MARKET JPN"<br>5. 成功消息显示绿色<br>6. 刷新 Templates 下拉列表</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">18</td>
-<td style="text-align:left">Chassis no-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入 11 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 11 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 10 个字符<br>2. 超出部分无法输入</td>
+<td style="text-align:left">Delete-删除失败（文件不存在 404）</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. API 返回 404<br>5. 确认结果</td>
+<td style="text-align:left">API 返回 404</td>
+<td style="text-align:left">1. 显示错误消息："File not found"<br>2. Delete 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">19</td>
-<td style="text-align:left">Chassis no-半角数字输入</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>1234567890</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Delete-删除失败（API 返回 500）</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. API 返回 500<br>5. 确认结果</td>
+<td style="text-align:left">API 返回 500</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. Delete 按钮恢复可用状态<br>3. 保持表单数据</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">20</td>
+<td style="text-align:left">Delete-删除失败（网络异常）</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. 模拟网络断开<br>5. 确认结果</td>
+<td style="text-align:left">网络断开</td>
+<td style="text-align:left">1. 显示错误消息："System error. Please contact administrator."<br>2. Delete 按钮恢复可用状态</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">21</td>
+<td style="text-align:left">Delete-删除成功后刷新模板列表</td>
+<td style="text-align:left">1. 删除某市场下的模板文件<br>2. 删除 API 成功<br>3. 确认 Templates 下拉列表</td>
+<td style="text-align:left">Market: <code>JPN</code><br>Template: <code>test.rtf</code></td>
+<td style="text-align:left">1. 删除成功后，重新调用获取模板列表 API<br>2. Templates 列表被刷新（不包含已删除的文件）<br>3. Templates 选中值被清空</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">22</td>
+<td style="text-align:left">Delete-删除中按钮禁用</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. 在 API 响应前确认按钮状态</td>
+<td style="text-align:left">Market: <code>JPN</code><br>Template: <code>test.rtf</code></td>
+<td style="text-align:left">1. Delete 按钮在加载期间禁用（disabled）<br>2. 防止重复提交</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">23</td>
+<td style="text-align:left">Delete-防止重复提交</td>
+<td style="text-align:left">1. 选择 Market 和 Templates<br>2. 点击 Delete 按钮<br>3. 确认对话框点击确定<br>4. 在 API 响应前再次点击<br>5. 确认 API 调用次数</td>
+<td style="text-align:left">Market: <code>JPN</code><br>Template: <code>test.rtf</code></td>
+<td style="text-align:left">1. 第二次点击无效（按钮已禁用）<br>2. 只发起一次 API 调用</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="跳转模板检查页面">跳转模板检查页面 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:left">跳转-Check Template 链接</td>
+<td style="text-align:left">1. 点击 "Check Template (Only for rtf files)" 链接<br>2. 确认画面跳转</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 使用 navigate 跳转到 /HDocTemplateCheck 路由<br>2. 画面迁移到 HDoc Template Check 页面</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">25</td>
+<td style="text-align:left">Check Template 链接-UI 显示</td>
+<td style="text-align:left">1. 访问页面<br>2. 确认 Check Template 区域的显示</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 显示 "Check your rtf template" 标题<br>2. 显示说明文本<br>3. 链接按钮显示 "Check Template (Only for rtf files)"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -336,26 +358,26 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
-<td style="text-align:left">异常处理-网络断开</td>
-<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:center">26</td>
+<td style="text-align:left">异常处理-API 超时</td>
+<td style="text-align:left">1. 模拟 API 响应超时（超过 10 秒）<br>2. 执行上传或删除操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："网络错误。请检查您的连接。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 超时后显示错误消息："System error. Please contact administrator."<br>2. 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
-<td style="text-align:left">异常处理-服务器 500 错误</td>
-<td style="text-align:left">1. 模拟 API 返回 HTTP 500 错误<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:center">27</td>
+<td style="text-align:left">异常处理-用户未登录</td>
+<td style="text-align:left">1. 清除登录状态<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 检查会话状态<br>2. 跳转到登录页面<br>3. 显示提示 "Please login first"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="错误消息显示">错误消息显示 </h3>
+<h3 id="ui-交互">UI 交互 </h3>
 <table>
 <thead>
 <tr>
@@ -370,20 +392,38 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">22</td>
-<td style="text-align:left">错误消息显示样式</td>
-<td style="text-align:left">1. 触发任意空值校验错误<br>2. 确认错误消息的显示样式</td>
+<td style="text-align:center">28</td>
+<td style="text-align:left">错误消息-显示样式</td>
+<td style="text-align:left">1. 触发任意错误<br>2. 确认错误消息样式</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 区域显示<br>2. 文字颜色为红色<br>3. 默认隐藏（内容为空时不占位）</td>
+<td style="text-align:left">1. 错误消息显示红色（<a class="tag" data-tag="ff4d4f" href="tag://ff4d4f">#ff4d4f</a>）<br>2. 默认隐藏（内容为空时不占位或高度为 0）</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">23</td>
-<td style="text-align:left">错误消息-输入后自动清除</td>
-<td style="text-align:left">1. 触发空值校验，显示错误消息<br>2. 在对应输入框中输入有效值<br>3. 确认错误消息状态</td>
+<td style="text-align:center">29</td>
+<td style="text-align:left">成功消息-显示样式</td>
+<td style="text-align:left">1. 执行上传或删除成功操作<br>2. 确认成功消息样式</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 输入有效值后错误消息自动清除<br>2. Error message 区域隐藏</td>
+<td style="text-align:left">1. 成功消息显示绿色（<a class="tag" data-tag="52c41a" href="tag://52c41a">#52c41a</a>）<br>2. 消息显示文件名称和市场代码</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">30</td>
+<td style="text-align:left">上传和删除互不干扰</td>
+<td style="text-align:left">1. 上传区域开始上传<br>2. 确认删除区域的按钮和控件状态</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 上传区域按钮禁用<br>2. 删除区域按钮和控件仍可用<br>3. 反之亦然：删除操作时上传区域不受影响</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">31</td>
+<td style="text-align:left">页面刷新</td>
+<td style="text-align:left">1. 数据加载完成后<br>2. 刷新页面（F5）<br>3. 确认画面</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 页面重新加载<br>2. 重新调用获取市场列表 API<br>3. 下拉列表重新加载市场数据<br>4. Templates 下拉列表恢复为空或禁用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -404,11 +444,29 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">24</td>
-<td style="text-align:left">安全性-API 请求加密</td>
-<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行页面初始化<br>3. 检查网络请求</td>
+<td style="text-align:center">32</td>
+<td style="text-align:left">安全性-API 请求协议</td>
+<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行上传或删除操作<br>3. 检查网络请求</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含明文敏感信息</td>
+<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含敏感信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">33</td>
+<td style="text-align:left">安全性-用户登录认证</td>
+<td style="text-align:left">1. 未登录状态下直接访问页面 URL<br>2. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 需要用户登录认证后才能访问<br>2. 未登录时跳转到登录页面</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">34</td>
+<td style="text-align:left">安全性-文件上传验证</td>
+<td style="text-align:left">1. 尝试上传非法类型或超大文件<br>2. 确认后端处理</td>
+<td style="text-align:left">非法文件</td>
+<td style="text-align:left">1. 后端验证文件类型和大小<br>2. 非法文件被拒绝<br>3. 返回错误消息 "Invalid file type or size"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

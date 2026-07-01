@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>単体テスト仕様書UD03</title>
+      <title>単体テスト仕様書UD20-1</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="generate-homologation-document-模块-ud03-测试规格书">Generate Homologation Document 模块 (UD03) 测试规格书 </h1>
+<h1 id="market-document-settings-模块-ud20-1-测试规格书">Market Document Settings 模块 (UD20-1) 测试规格书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">TEST-UD03-001</th>
+<th style="text-align:left">TEST-UD20-1-001</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,7 +40,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Generate Homologation Document</td>
+<td style="text-align:left">Market Document Settings</td>
 <td style="text-align:left"><strong>创建日期</strong></td>
 <td style="text-align:left">2026-06-30</td>
 </tr>
@@ -71,60 +71,42 @@
 <tr>
 <td style="text-align:center">1</td>
 <td style="text-align:left">画面初期显示-基本元素</td>
-<td style="text-align:left">1. 访问 Generate Homologation Document 页面<br>2. 确认页面整体显示</td>
+<td style="text-align:left">1. 访问 Market Document Settings 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "HDoc - Generate Homologation Document"<br>2. 显示 Chassis series 输入框（带红色 * 标记）<br>3. 显示 Chassis no 输入框（带红色 * 标记）<br>4. 显示 Document type 下拉列表（带红色 * 标记）<br>5. 显示 Submit、Reset、Help 三个按钮</td>
+<td style="text-align:left">1. 显示标题 "HDoc - Market Document Settings"<br>2. 显示 Document type 输入框<br>3. 显示 Market 输入框<br>4. 显示 Setting 下拉列表<br>5. 显示 Bussines unit 输入框（固定显示 "BU"）<br>6. 显示 User 输入框<br>7. 显示 Date 输入框<br>8. 显示 Search、Clear、Back、Update Mode 四个按钮</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">2</td>
-<td style="text-align:left">画面初期显示-输入框和按钮初始状态</td>
-<td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始值</td>
+<td style="text-align:left">画面初期显示-初期化状态</td>
+<td style="text-align:left">1. 访问页面（初期化场合）<br>2. 确认各字段初始值</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Chassis series 输入框为空，最大长度 5，可用（Enabled）<br>2. Chassis no 输入框为空，最大长度 10，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
+<td style="text-align:left">1. Document type 为空<br>2. Market 为空<br>3. Setting 下拉列表显示初始选项<br>4. Bussines unit 固定显示 "BU"<br>5. User 为空<br>6. Date 为空<br>7. 所有输入框可用（Enabled）<br>8. 四个按钮均可用（Enabled）<br>9. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用成功</td>
-<td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认 Document type 下拉列表</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 默认选中第一项<br>5. Error message 区域不显示</td>
+<td style="text-align:left">画面初期显示-从后画面 Select 返回</td>
+<td style="text-align:left">1. 从 Market Document Settings List 画面点击 Select 返回<br>2. 确认各字段值</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>Bussines unit: <code>BU</code><br>User: <code>admin</code><br>Date: <code>2026-06-30 12:00:00</code></td>
+<td style="text-align:left">1. Document type 显示 "VIN_PLATE"<br>2. Bussines unit 显示 "BU"<br>3. User 显示 "admin"<br>4. Date 显示 "2026-06-30 12:00:00"<br>5. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">4</td>
-<td style="text-align:left">画面初期显示-文档类型列表为空</td>
-<td style="text-align:left">1. 模拟 API 返回 doctypeList 为空列表<br>2. 访问页面<br>3. 确认显示</td>
+<td style="text-align:left">画面初期显示-从后画面 Back 返回</td>
+<td style="text-align:left">1. 从 Market Document Settings List 画面点击 Back 返回<br>2. 确认画面状态</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. API 返回 code=200 但数据为空<br>2. 设置 Error message area = "Chassis no is not exists"<br>3. Document type 下拉框被禁用或清空</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用失败</td>
-<td style="text-align:left">1. 模拟 API 请求异常<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 调用失败<br>2. 设置 Error message area = "System error. Please contact support." 或 "Network error. Please try again."<br>3. 错误消息显示红色</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:left">画面初期显示-从本地存储加载前次条件</td>
-<td style="text-align:left">1. 本地存储中存在前次搜索条件<br>2. 访问页面<br>3. 确认各输入框的默认值</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 显示上次的值<br>2. Chassis no 显示上次的值<br>3. Document type 选中上次的值（若存在于新列表中）<br>4. Error message 区域不显示</td>
+<td style="text-align:left">1. 画面保持进入列表前的原有状态<br>2. 各字段值不变<br>3. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="空值校验前端校验">空值校验（前端校验） </h3>
+<h3 id="search-处理">Search 处理 </h3>
 <table>
 <thead>
 <tr>
@@ -139,44 +121,94 @@
 </thead>
 <tbody>
 <tr>
+<td style="text-align:center">5</td>
+<td style="text-align:left">Search-携带检索条件跳转</td>
+<td style="text-align:left">1. 输入 Document type、User、Date 检索条件<br>2. 点击 Search 按钮<br>3. 确认跳转</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 携带检索条件跳转到 Market Document Settings List 画面<br>2. 跳转 URL 包含 Document type、User、Date 参数<br>3. 检索条件可为空</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left">Search-检索条件为空跳转</td>
+<td style="text-align:left">1. 不输入任何检索条件<br>2. 点击 Search 按钮<br>3. 确认跳转</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 携带空检索条件跳转到 Market Document Settings List 画面<br>2. 跳转正常<br>3. 后画面显示全部数据</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
 <td style="text-align:center">7</td>
-<td style="text-align:left">空值校验-Chassis series 为空</td>
-<td style="text-align:left">1. Chassis series 输入框留空<br>2. Chassis no 输入任意有效值<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: ``<br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis series is required"<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">8</td>
-<td style="text-align:left">空值校验-Chassis no 为空</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入框留空<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: ``<br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis no is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">9</td>
-<td style="text-align:left">空值校验-Document type 未选择</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入有效值<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: ``</td>
-<td style="text-align:left">1. 显示错误消息："Document type is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">10</td>
-<td style="text-align:left">空值校验-三者均为空</td>
-<td style="text-align:left">1. Chassis series 留空<br>2. Chassis no 留空<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>&lt;br&gt;Chassis no: </code><br>Document type: ``</td>
-<td style="text-align:left">1. 先触发 Chassis series 空值校验<br>2. 显示错误消息："Chassis series is required"<br>3. Chassis no 和 Document type 的校验不执行<br>4. 不调用 API</td>
+<td style="text-align:left">Search-部分检索条件跳转</td>
+<td style="text-align:left">1. 仅输入 Document type<br>2. 点击 Search 按钮<br>3. 确认跳转</td>
+<td style="text-align:left">Document type: <code>COC</code></td>
+<td style="text-align:left">1. 仅携带 Document type 参数跳转<br>2. User 和 Date 为空<br>3. 跳转正常</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="submit-处理">Submit 处理 </h3>
+<h3 id="clear-处理">Clear 处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:left">Clear-正常清空</td>
+<td style="text-align:left">1. 输入各字段值<br>2. 点击 Clear 按钮<br>3. 确认各字段状态</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. Document type 被清空<br>2. Bussines unit 恢复为 "BU"（固定值）<br>3. User 被清空<br>4. Date 被清空<br>5. Market 被清空<br>6. Setting 重置为初始选项<br>7. Error message 区域被清除</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:left">Clear-有错误消息时清空</td>
+<td style="text-align:left">1. 触发任意错误消息<br>2. 错误消息显示后点击 Clear 按钮<br>3. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Error message 被清除<br>2. 所有输入框被清空<br>3. Bussines unit 恢复为 "BU"<br>4. 画面回到初始状态</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="back-处理">Back 处理 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:left">Back-返回前画面</td>
+<td style="text-align:left">1. 输入任意内容<br>2. 点击 Back 按钮<br>3. 确认画面跳转</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 返回前页面<br>2. 不携带任何数据<br>3. 跳转正常</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="update-mode-处理">Update Mode 处理 </h3>
 <table>
 <thead>
 <tr>
@@ -192,130 +224,55 @@
 <tbody>
 <tr>
 <td style="text-align:center">11</td>
-<td style="text-align:left">Submit 成功-正常跳转</td>
-<td style="text-align:left">1. 输入所有必填项<br>2. 点击 Submit 按钮<br><br>3. 确认结果</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 前端校验通过<br>2. 调用导航跳转到 Generate document 画面<br>3. Error message 区域不显示</td>
+<td style="text-align:left">Update Mode-空值校验（Document type 为空）</td>
+<td style="text-align:left">1. Document type 输入框留空<br>2. 输入 User 和 Date<br>3. 点击 Update Mode 按钮<br>4. 确认结果</td>
+<td style="text-align:left">Document type: ``<br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 显示错误消息："Document type不能为空"<br>2. 类型为 Error（红色）<br>3. 不调用 API<br>4. Update Mode 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">12</td>
-<td style="text-align:left">Submit-底盘系列和编号拼接后跳转</td>
-<td style="text-align:left">1. 输入 Chassis series 和 Chassis no<br>2. 点击 Submit 按钮<br>3. 确认跳转 URL</td>
-<td style="text-align:left">Chassis series: <code>ABCD</code><br>Chassis no: <code>123456</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 和 Chassis no 拼接传递<br>2. 跳转到 Generate document 画面并携带拼接后的参数</td>
+<td style="text-align:left">Update Mode-更新成功</td>
+<td style="text-align:left">1. Document type 输入有效值<br>2. User 输入有效值<br>3. Date 输入有效值<br>4. Market 输入有效值<br>5. Setting 选择有效值<br>6. 点击 Update Mode 按钮<br>7. 等待 API 响应<br>8. 确认结果</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30 12:00:00</code><br>Market: <code>JPN</code><br>Setting: <code>option1</code></td>
+<td style="text-align:left">1. 前端校验通过<br>2. 调用 POST <code>/api/ud20-1/UpdateHdocDocumentList</code> API<br>3. 请求体包含操作类型 "UPDATE_HDOC_DOCUMENT_LIST"<br>4. API 返回 code=200<br>5. 显示成功消息："更新成功"<br>6. 类型为 Information</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="reset-处理">Reset 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">13</td>
-<td style="text-align:left">Reset-正常重置</td>
-<td style="text-align:left">1. 输入各字段值后点击 Reset 按钮<br>2. 确认各控件状态</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 被清空<br>2. Chassis no 被清空<br>3. Document type 重置为 "Please select"<br>4. Error message 区域被清除<br>5. 画面回到初始状态</td>
+<td style="text-align:left">Update Mode-更新失败（API 返回 500）</td>
+<td style="text-align:left">1. 模拟 API 返回 500<br>2. 输入有效值<br>3. 点击 Update Mode 按钮<br>4. 确认结果</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 调用 API<br>2. API 返回 code=500<br>3. 显示错误消息："更新失败"<br>4. 类型为 Error（红色）<br>5. Update Mode 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">14</td>
-<td style="text-align:left">Reset-有错误消息时重置</td>
-<td style="text-align:left">1. 先触发校验错误<br>2. 错误消息显示后点击 Reset 按钮<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 被清除<br>2. 所有输入框被清空<br>3. Document type 重置为 "Please select"<br>4. 画面回到初始状态</td>
+<td style="text-align:left">Update Mode-Document type 不存在（404）</td>
+<td style="text-align:left">1. 模拟 API 返回 404<br>2. Document type 输入不存在的值<br>3. 点击 Update Mode 按钮<br>4. 确认结果</td>
+<td style="text-align:left">Document type: <code>NONEXISTENT</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 调用 API<br>2. API 返回 code=404<br>3. 显示错误消息："Document type does not exists. Please enter the correct content."<br>4. 类型为 Error（红色）<br>5. Update Mode 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="help-处理">Help 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">15</td>
-<td style="text-align:left">Help-点击 Help 按钮</td>
-<td style="text-align:left">1. 点击 Help 按钮<br>2. 确认画面行为</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 跳转到 Help 画面<br>2. 当前页面输入框内容保持不变</td>
+<td style="text-align:left">Update Mode-加载中按钮禁用</td>
+<td style="text-align:left">1. 输入有效值<br>2. 点击 Update Mode 按钮<br>3. 在 API 响应前确认按钮状态</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. Update Mode 按钮处于禁用状态（disabled）<br>2. 按钮文字变化（如 "Updating..."）<br>3. 防止重复提交</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="输入字符控制">输入字符控制 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">16</td>
-<td style="text-align:left">Chassis series-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入 6 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 6 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 5 个字符<br>2. 超出部分无法输入</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">17</td>
-<td style="text-align:left">Chassis series-半角英文字符输入</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入半角英文字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>ABCDE</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">18</td>
-<td style="text-align:left">Chassis no-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入 11 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 11 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 10 个字符<br>2. 超出部分无法输入</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">19</td>
-<td style="text-align:left">Chassis no-半角数字输入</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>1234567890</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Update Mode-加载中防止重复提交</td>
+<td style="text-align:left">1. 输入有效值<br>2. 点击 Update Mode 按钮<br>3. 在 API 响应前再次点击 Update Mode 按钮<br>4. 确认操作次数</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 第二次点击无效（按钮已禁用）<br>2. 只发起一次 API 调用</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -336,54 +293,38 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">17</td>
+<td style="text-align:left">异常处理-数据库连接失败</td>
+<td style="text-align:left">1. 模拟数据库连接失败<br>2. 点击 Update Mode 按钮<br>3. 确认结果</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 显示错误消息："系统暂时不可用，请联系管理员"<br>2. 类型为 Error（红色）<br>3. Update Mode 按钮恢复可用状态</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">18</td>
 <td style="text-align:left">异常处理-网络断开</td>
-<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："网络错误。请检查您的连接。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 模拟网络断开<br>2. 点击 Update Mode 按钮<br>3. 确认结果</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 显示错误消息："系统错误，请稍后重试"<br>2. 类型为 Error（红色）<br>3. Update Mode 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
-<td style="text-align:left">异常处理-服务器 500 错误</td>
-<td style="text-align:left">1. 模拟 API 返回 HTTP 500 错误<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 类型为 Error（红色）</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-</tbody>
-</table>
-<h3 id="错误消息显示">错误消息显示 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">22</td>
-<td style="text-align:left">错误消息显示样式</td>
-<td style="text-align:left">1. 触发任意空值校验错误<br>2. 确认错误消息的显示样式</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 区域显示<br>2. 文字颜色为红色<br>3. 默认隐藏（内容为空时不占位）</td>
+<td style="text-align:center">19</td>
+<td style="text-align:left">异常处理-API 超时</td>
+<td style="text-align:left">1. 模拟 API 响应超时（&gt;30秒）<br>2. 点击 Update Mode 按钮<br>3. 等待超时<br>4. 确认结果</td>
+<td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
+<td style="text-align:left">1. 超时后显示错误消息："系统错误，请稍后重试"<br>2. Update Mode 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">23</td>
-<td style="text-align:left">错误消息-输入后自动清除</td>
-<td style="text-align:left">1. 触发空值校验，显示错误消息<br>2. 在对应输入框中输入有效值<br>3. 确认错误消息状态</td>
+<td style="text-align:center">20</td>
+<td style="text-align:left">异常处理-用户未登录</td>
+<td style="text-align:left">1. 清除登录状态<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 输入有效值后错误消息自动清除<br>2. Error message 区域隐藏</td>
+<td style="text-align:left">1. 检测到未登录状态<br>2. 跳转到登录页面</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -404,11 +345,20 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">24</td>
-<td style="text-align:left">安全性-API 请求加密</td>
-<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行页面初始化<br>3. 检查网络请求</td>
+<td style="text-align:center">21</td>
+<td style="text-align:left">安全性-API 请求协议</td>
+<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行 Update Mode 操作<br>3. 检查网络请求</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含明文敏感信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">22</td>
+<td style="text-align:left">安全性-权限控制</td>
+<td style="text-align:left">1. 无文档管理权限的用户访问页面<br>2. 确认 Update Mode 按钮状态</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 无权限用户无法执行更新操作<br>2. Update Mode 按钮处于禁用状态或隐藏<br>3. 显示无权限提示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

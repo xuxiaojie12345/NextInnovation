@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>単体テスト仕様書UD03</title>
+      <title>単体テスト仕様書UD13</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -27,12 +27,12 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="generate-homologation-document-模块-ud03-测试规格书">Generate Homologation Document 模块 (UD03) 测试规格书 </h1>
+<h1 id="hdoc-template-check-模块-ud13-测试规格书">HDoc Template Check 模块 (UD13) 测试规格书 </h1>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">文档编号</th>
-<th style="text-align:left">TEST-UD03-001</th>
+<th style="text-align:left">TEST-UD13-001</th>
 <th style="text-align:left">版本号</th>
 <th style="text-align:left">v1.0</th>
 </tr>
@@ -40,7 +40,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><strong>模块名称</strong></td>
-<td style="text-align:left">Generate Homologation Document</td>
+<td style="text-align:left">HDoc Template Check</td>
 <td style="text-align:left"><strong>创建日期</strong></td>
 <td style="text-align:left">2026-06-30</td>
 </tr>
@@ -71,60 +71,76 @@
 <tr>
 <td style="text-align:center">1</td>
 <td style="text-align:left">画面初期显示-基本元素</td>
-<td style="text-align:left">1. 访问 Generate Homologation Document 页面<br>2. 确认页面整体显示</td>
+<td style="text-align:left">1. 访问 HDoc Template Check 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "HDoc - Generate Homologation Document"<br>2. 显示 Chassis series 输入框（带红色 * 标记）<br>3. 显示 Chassis no 输入框（带红色 * 标记）<br>4. 显示 Document type 下拉列表（带红色 * 标记）<br>5. 显示 Submit、Reset、Help 三个按钮</td>
+<td style="text-align:left">1. 显示标题 "Check your rtf template"<br>2. 显示说明文本<br>3. 显示文件选择输入框<br>4. 显示 Check 按钮<br>5. Download checked template 链接默认隐藏<br>6. 错误消息和成功消息区域为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">2</td>
-<td style="text-align:left">画面初期显示-输入框和按钮初始状态</td>
-<td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始值</td>
+<td style="text-align:left">画面初期显示-初始状态</td>
+<td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始状态</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Chassis series 输入框为空，最大长度 5，可用（Enabled）<br>2. Chassis no 输入框为空，最大长度 10，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用成功</td>
-<td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认 Document type 下拉列表</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 默认选中第一项<br>5. Error message 区域不显示</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">4</td>
-<td style="text-align:left">画面初期显示-文档类型列表为空</td>
-<td style="text-align:left">1. 模拟 API 返回 doctypeList 为空列表<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 返回 code=200 但数据为空<br>2. 设置 Error message area = "Chassis no is not exists"<br>3. Document type 下拉框被禁用或清空</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:left">画面初期显示-文档类型列表 API 调用失败</td>
-<td style="text-align:left">1. 模拟 API 请求异常<br>2. 访问页面<br>3. 确认显示</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. API 调用失败<br>2. 设置 Error message area = "System error. Please contact support." 或 "Network error. Please try again."<br>3. 错误消息显示红色</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:left">画面初期显示-从本地存储加载前次条件</td>
-<td style="text-align:left">1. 本地存储中存在前次搜索条件<br>2. 访问页面<br>3. 确认各输入框的默认值</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 显示上次的值<br>2. Chassis no 显示上次的值<br>3. Document type 选中上次的值（若存在于新列表中）<br>4. Error message 区域不显示</td>
+<td style="text-align:left">1. 文件选择框为空<br>2. Check 按钮可用<br>3. Download checked template 链接隐藏<br>4. 无错误消息和成功消息显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="空值校验前端校验">空值校验（前端校验） </h3>
+<h3 id="文件选择">文件选择 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:left">文件选择-选择 rtf 文件</td>
+<td style="text-align:left">1. 点击文件选择按钮<br>2. 在弹出的对话框中选择一个 rtf 文件<br>3. 确认显示</td>
+<td style="text-align:left"><code>test_template.rtf</code>（有效 rtf 文件）</td>
+<td style="text-align:left">1. 文件被成功选择<br>2. 文件名显示在按钮旁<br>3. 不显示错误消息<br>4. Check 按钮可用</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:left">文件选择-取消选择</td>
+<td style="text-align:left">1. 点击文件选择按钮<br>2. 在弹出的对话框中点击取消<br>3. 确认显示</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 文件选择框仍为空<br>2. 无文件被选择<br>3. 不显示错误消息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:left">文件选择-选择后重新选择</td>
+<td style="text-align:left">1. 先选择文件 <code>a.rtf</code><br>2. 再次点击按钮选择文件 <code>b.rtf</code><br>3. 确认显示</td>
+<td style="text-align:left">第一次: <code>a.rtf</code><br>第二次: <code>b.rtf</code></td>
+<td style="text-align:left">1. 显示最新选择的文件名 <code>b.rtf</code><br>2. 原文件被替换</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left">文件选择-非 rtf 文件</td>
+<td style="text-align:left">1. 点击文件选择按钮<br>2. 选择非 rtf 文件（如 .docx、.txt、.pdf）<br>3. 确认结果</td>
+<td style="text-align:left"><code>.docx</code> 文件</td>
+<td style="text-align:left">1. 可选择非 rtf 文件（浏览器端通常不限制文件类型）<br>2. 点击 Check 后可显示文件类型提示</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="check-检查处理">Check 检查处理 </h3>
 <table>
 <thead>
 <tr>
@@ -140,111 +156,79 @@
 <tbody>
 <tr>
 <td style="text-align:center">7</td>
-<td style="text-align:left">空值校验-Chassis series 为空</td>
-<td style="text-align:left">1. Chassis series 输入框留空<br>2. Chassis no 输入任意有效值<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: ``<br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis series is required"<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">Check-未选择文件时点击</td>
+<td style="text-align:left">1. 不选择任何文件<br>2. 点击 Check 按钮<br>3. 确认结果</td>
+<td style="text-align:left">未选择文件</td>
+<td style="text-align:left">1. 显示错误消息："ERROR: Unable to access file!"<br>2. 不执行检查<br>3. Check 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">8</td>
-<td style="text-align:left">空值校验-Chassis no 为空</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入框留空<br>3. Document type 选择任意有效值<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: ``<br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 显示错误消息："Chassis no is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">Check-文件读取失败</td>
+<td style="text-align:left">1. 选择文件后模拟文件读取失败<br>2. 点击 Check 按钮<br>3. 确认结果</td>
+<td style="text-align:left">文件读取失败</td>
+<td style="text-align:left">1. 显示错误消息："ERROR: Unable to access file!"<br>2. Check 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">9</td>
-<td style="text-align:left">空值校验-Document type 未选择</td>
-<td style="text-align:left">1. Chassis series 输入有效值<br>2. Chassis no 输入有效值<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: ``</td>
-<td style="text-align:left">1. 显示错误消息："Document type is required."<br>2. Error message 区域显示红色<br>3. 不调用 API<br>4. Submit 按钮恢复可用状态</td>
+<td style="text-align:left">Check-文件中没有找到变量</td>
+<td style="text-align:left">1. 选择不含 <code>$...$</code> 变量的 rtf 文件<br>2. 点击 Check 按钮<br>3. 确认结果</td>
+<td style="text-align:left">不含 <code>$...$</code> 变量的文件</td>
+<td style="text-align:left">1. 显示错误消息："ERROR: The file content is incorrect!"<br>2. 不显示下载链接<br>3. Check 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">10</td>
-<td style="text-align:left">空值校验-三者均为空</td>
-<td style="text-align:left">1. Chassis series 留空<br>2. Chassis no 留空<br>3. Document type 选择 "Please select"<br>4. 点击 Submit 按钮</td>
-<td style="text-align:left">Chassis series: <code>&lt;br&gt;Chassis no: </code><br>Document type: ``</td>
-<td style="text-align:left">1. 先触发 Chassis series 空值校验<br>2. 显示错误消息："Chassis series is required"<br>3. Chassis no 和 Document type 的校验不执行<br>4. 不调用 API</td>
+<td style="text-align:left">Check-成功-找到变量</td>
+<td style="text-align:left">1. 选择含 <code>$...$</code> 变量的 rtf 文件<br>2. 点击 Check 按钮<br>3. 确认结果</td>
+<td style="text-align:left">含多个 <code>$变量名$</code> 的 rtf 文件</td>
+<td style="text-align:left">1. 使用 FileReader API 读取文件内容<br>2. 使用正则表达式匹配 <code>$...$</code> 格式的变量<br>3. 统计变量数量并显示<br>4. 显示成功消息（绿色）<br>5. 显示 Download checked template 链接<br>6. Check 按钮恢复可用状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="submit-处理">Submit 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">11</td>
-<td style="text-align:left">Submit 成功-正常跳转</td>
-<td style="text-align:left">1. 输入所有必填项<br>2. 点击 Submit 按钮<br><br>3. 确认结果</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. 前端校验通过<br>2. 调用导航跳转到 Generate document 画面<br>3. Error message 区域不显示</td>
+<td style="text-align:left">Check-成功-变量数量统计</td>
+<td style="text-align:left">1. 选择含 5 个 <code>$...$</code> 变量的 rtf 文件<br>2. 点击 Check 按钮<br>3. 确认变量数量</td>
+<td style="text-align:left">含 5 个 <code>$变量名$</code> 的 rtf 文件</td>
+<td style="text-align:left">1. 正确统计出变量数量为 5<br>2. 显示变量数量信息<br>3. 显示下载链接</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">12</td>
-<td style="text-align:left">Submit-底盘系列和编号拼接后跳转</td>
-<td style="text-align:left">1. 输入 Chassis series 和 Chassis no<br>2. 点击 Submit 按钮<br>3. 确认跳转 URL</td>
-<td style="text-align:left">Chassis series: <code>ABCD</code><br>Chassis no: <code>123456</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 和 Chassis no 拼接传递<br>2. 跳转到 Generate document 画面并携带拼接后的参数</td>
+<td style="text-align:left">Check-成功-单个变量</td>
+<td style="text-align:left">1. 选择仅含 1 个 <code>$...$</code> 变量的 rtf 文件<br>2. 点击 Check 按钮<br>3. 确认变量数量</td>
+<td style="text-align:left">含 1 个 <code>$变量名$</code> 的 rtf 文件</td>
+<td style="text-align:left">1. 正确统计出变量数量为 1<br>2. 显示变量数量信息<br>3. 显示下载链接</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="reset-处理">Reset 处理 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">13</td>
-<td style="text-align:left">Reset-正常重置</td>
-<td style="text-align:left">1. 输入各字段值后点击 Reset 按钮<br>2. 确认各控件状态</td>
-<td style="text-align:left">Chassis series: <code>ABC</code><br>Chassis no: <code>12345</code><br>Document type: <code>VIN Plate</code></td>
-<td style="text-align:left">1. Chassis series 被清空<br>2. Chassis no 被清空<br>3. Document type 重置为 "Please select"<br>4. Error message 区域被清除<br>5. 画面回到初始状态</td>
+<td style="text-align:left">Check-加载中按钮禁用</td>
+<td style="text-align:left">1. 选择文件<br>2. 点击 Check 按钮<br>3. 在处理完成前确认按钮状态</td>
+<td style="text-align:left">有效 rtf 文件</td>
+<td style="text-align:left">1. Check 按钮在加载期间禁用（disabled）<br>2. 防止重复提交</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">14</td>
-<td style="text-align:left">Reset-有错误消息时重置</td>
-<td style="text-align:left">1. 先触发校验错误<br>2. 错误消息显示后点击 Reset 按钮<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 被清除<br>2. 所有输入框被清空<br>3. Document type 重置为 "Please select"<br>4. 画面回到初始状态</td>
+<td style="text-align:left">Check-防止重复提交</td>
+<td style="text-align:left">1. 选择文件<br>2. 点击 Check 按钮<br>3. 在处理完成前再次点击<br>4. 确认处理次数</td>
+<td style="text-align:left">有效 rtf 文件</td>
+<td style="text-align:left">1. 第二次点击无效（按钮已禁用）<br>2. 只执行一次检查处理</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="help-处理">Help 处理 </h3>
+<h3 id="download-checked-template-下载处理">Download checked template 下载处理 </h3>
 <table>
 <thead>
 <tr>
@@ -260,62 +244,19 @@
 <tbody>
 <tr>
 <td style="text-align:center">15</td>
-<td style="text-align:left">Help-点击 Help 按钮</td>
-<td style="text-align:left">1. 点击 Help 按钮<br>2. 确认画面行为</td>
+<td style="text-align:left">Download-检查成功后显示链接</td>
+<td style="text-align:left">1. 检查成功完成后<br>2. 确认 Download checked template 链接显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 跳转到 Help 画面<br>2. 当前页面输入框内容保持不变</td>
+<td style="text-align:left">1. Download checked template 链接显示（绿色文字）<br>2. 链接可用</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-</tbody>
-</table>
-<h3 id="输入字符控制">输入字符控制 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预期结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:center">16</td>
-<td style="text-align:left">Chassis series-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入 6 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 6 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 5 个字符<br>2. 超出部分无法输入</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">17</td>
-<td style="text-align:left">Chassis series-半角英文字符输入</td>
-<td style="text-align:left">1. 在 Chassis series 输入框中输入半角英文字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>ABCDE</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">18</td>
-<td style="text-align:left">Chassis no-最大长度校验</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入 11 个以上字符<br>2. 确认输入结果</td>
-<td style="text-align:left">输入 11 个以上字符</td>
-<td style="text-align:left">1. 输入框最多只能输入 10 个字符<br>2. 超出部分无法输入</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">19</td>
-<td style="text-align:left">Chassis no-半角数字输入</td>
-<td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字<br>2. 确认输入结果</td>
-<td style="text-align:left"><code>1234567890</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left">Download-点击链接下载</td>
+<td style="text-align:left">1. 检查成功完成后<br>2. 点击 Download checked template 链接<br>3. 确认下载行为</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 触发浏览器下载功能<br>2. 下载检查后的模板文件</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -336,26 +277,26 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
-<td style="text-align:left">异常处理-网络断开</td>
-<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:center">17</td>
+<td style="text-align:left">异常处理-未预期的 JavaScript 错误</td>
+<td style="text-align:left">1. 模拟处理过程中抛出异常<br>2. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："网络错误。请检查您的连接。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 捕获异常并记录错误日志<br>2. 显示错误消息："System error. Please contact administrator."</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
-<td style="text-align:left">异常处理-服务器 500 错误</td>
-<td style="text-align:left">1. 模拟 API 返回 HTTP 500 错误<br>2. 访问页面<br>3. 确认文档类型列表加载失败后的显示</td>
+<td style="text-align:center">18</td>
+<td style="text-align:left">异常处理-用户未登录</td>
+<td style="text-align:left">1. 清除登录状态<br>2. 访问页面<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 类型为 Error（红色）</td>
+<td style="text-align:left">1. 检查会话状态<br>2. 跳转到登录页面<br>3. 显示提示 "Please login first"</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
-<h3 id="错误消息显示">错误消息显示 </h3>
+<h3 id="ui-交互">UI 交互 </h3>
 <table>
 <thead>
 <tr>
@@ -370,20 +311,38 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">22</td>
-<td style="text-align:left">错误消息显示样式</td>
-<td style="text-align:left">1. 触发任意空值校验错误<br>2. 确认错误消息的显示样式</td>
+<td style="text-align:center">19</td>
+<td style="text-align:left">错误消息-显示样式</td>
+<td style="text-align:left">1. 触发错误（如未选文件点击 Check）<br>2. 确认错误消息样式</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Error message 区域显示<br>2. 文字颜色为红色<br>3. 默认隐藏（内容为空时不占位）</td>
+<td style="text-align:left">1. 错误消息显示红色（<a class="tag" data-tag="ff4d4f" href="tag://ff4d4f">#ff4d4f</a>）<br>2. 消息以 "ERROR:" 开头</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">23</td>
-<td style="text-align:left">错误消息-输入后自动清除</td>
-<td style="text-align:left">1. 触发空值校验，显示错误消息<br>2. 在对应输入框中输入有效值<br>3. 确认错误消息状态</td>
+<td style="text-align:center">20</td>
+<td style="text-align:left">成功消息-显示样式</td>
+<td style="text-align:left">1. 检查成功<br>2. 确认成功消息样式</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 输入有效值后错误消息自动清除<br>2. Error message 区域隐藏</td>
+<td style="text-align:left">1. 成功消息显示绿色（<a class="tag" data-tag="52c41a" href="tag://52c41a">#52c41a</a>）<br>2. 显示变量数量等信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">21</td>
+<td style="text-align:left">消息清空-新操作时覆盖</td>
+<td style="text-align:left">1. 先触发错误消息<br>2. 再次执行检查操作<br>3. 确认旧消息是否被清除</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 第一次操作显示错误消息<br>2. 再次执行检查时前一条消息被清除<br>3. 显示新操作对应的消息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">22</td>
+<td style="text-align:left">页面刷新</td>
+<td style="text-align:left">1. 检查成功后<br>2. 刷新页面（F5）<br>3. 确认画面</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 页面重新加载<br>2. 文件选择框被清空<br>3. Download checked template 链接隐藏<br>4. 错误消息和成功消息被清除<br>5. 页面回到初始状态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -404,11 +363,20 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">24</td>
-<td style="text-align:left">安全性-API 请求加密</td>
-<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行页面初始化<br>3. 检查网络请求</td>
+<td style="text-align:center">23</td>
+<td style="text-align:left">安全性-用户登录认证</td>
+<td style="text-align:left">1. 未登录状态下直接访问页面 URL<br>2. 确认结果</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含明文敏感信息</td>
+<td style="text-align:left">1. 需要用户登录认证后才能访问<br>2. 未登录时跳转到登录页面</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:left">安全性-文件类型验证</td>
+<td style="text-align:left">1. 尝试选择非 rtf 文件<br>2. 点击 Check<br>3. 确认结果</td>
+<td style="text-align:left">非 rtf 文件</td>
+<td style="text-align:left">1. 仅允许 rtf 文件进行检查<br>2. 非 rtf 文件显示提示 "Please select an RTF file."</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
