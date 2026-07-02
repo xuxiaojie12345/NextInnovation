@@ -1,6 +1,6 @@
 // SaveModifications.tsx - UD06模块
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import "./SaveModifications.css";
 
 interface ModificationData {
@@ -8,13 +8,14 @@ interface ModificationData {
   chassisNumber: string;
   doctype: string;
   version: string;
-  storing: string;
+  storingList: string[];
   foundUnreleasedVersion: string;
   message: string;
 }
 
 const SaveModifications = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [modificationData, setModificationData] =
     useState<ModificationData | null>(null);
@@ -52,7 +53,26 @@ const SaveModifications = () => {
         return;
       }
 
-      // 调用UD06 API
+      // 先从location state获取前画面传过来的修改变量列表
+      const savedVars = (
+        location.state as
+          | { savedVariables?: Array<{ variable: string; newval: string }> }
+          | undefined
+      )?.savedVariables;
+      console.log("Saved variables from state:", savedVars);
+
+      // 使用URL参数设置基本信息
+      const modificationInfo: ModificationData = {
+        chassisSerie: chassisSerieParam,
+        chassisNumber: chassisNumberParam,
+        doctype: "-",
+        version: "-",
+        storingList: [],
+        foundUnreleasedVersion: "0",
+        message: "VERSION IS RELEASED",
+      };
+
+      // 始终调用API获取Doctype/Version等基本信息
       const API_BASE_URL = "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD06/saveModifications?chassisSerie=${encodeURIComponent(chassisSerieParam)}&chassisNumber=${encodeURIComponent(chassisNumberParam)}`,
@@ -81,52 +101,43 @@ const SaveModifications = () => {
       console.log("========================================");
 
       if (data.code === 200 && data.data) {
-        // 处理返回的数据
-        const modificationList = data.data.modificationList || [];
-        console.log("modificationList length:", modificationList.length);
+        const list = data.data.modificationList || [];
+        console.log("modificationList length:", list.length);
 
-        // 使用URL参数设置基本信息
-        const modificationInfo: ModificationData = {
-          chassisSerie: chassisSerieParam,
-          chassisNumber: chassisNumberParam,
-          doctype: "-",
-          version: "-",
-          storing: "-",
-          foundUnreleasedVersion: "0",
-          message: "VERSION IS RELEASED",
-        };
+        if (list.length > 0) {
+          const firstRecord = list[0];
+          modificationInfo.doctype =
+            firstRecord.doctype ?? firstRecord.DOCTYPE ?? "-";
+          modificationInfo.version =
+            firstRecord.vers ?? firstRecord.VERS ?? "-";
+          modificationInfo.foundUnreleasedVersion =
+            firstRecord.vers ?? firstRecord.VERS ?? "0";
 
-        // 如果有数据，用第一条记录的字段填充显示
-        // 注意：后端返回所有记录，但画面目前按原有布局只展示第一条的核心信息
-        if (modificationList.length > 0) {
-          const firstRecord = modificationList[0];
-          console.log("========== First Record Debug ==========");
-          console.log("firstRecord:", JSON.stringify(firstRecord, null, 2));
-          console.log("firstRecord.doctype:", firstRecord.doctype);
-          console.log("firstRecord.vers:", firstRecord.vers);
-          console.log("firstRecord.variable:", firstRecord.variable);
-          console.log("firstRecord.newval:", firstRecord.newval);
-          console.log("========================================");
-
-          const storingValue = `${firstRecord.variable} ${firstRecord.newval}`;
-
-          modificationInfo.doctype = firstRecord.doctype || "-";
-          modificationInfo.version = firstRecord.vers || "-";
-          modificationInfo.storing = storingValue;
-          modificationInfo.foundUnreleasedVersion = firstRecord.vers || "0";
-
-          console.log(
-            "Final modificationInfo:",
-            JSON.stringify(modificationInfo, null, 2),
-          );
+          // Storing列表：优先使用location state中的变量（从ModifyDocument画面传递过来的）
+          // 这样只显示本次修改的记录，而非数据库中的所有记录
+          if (savedVars && savedVars.length > 0) {
+            console.log(
+              "Using saved variables from location state for Storing",
+            );
+            modificationInfo.storingList = savedVars.map(
+              (v) => `${v.variable} ${v.newval}`,
+            );
+          } else {
+            // 无state时使用API返回的所有记录
+            modificationInfo.storingList = list.map(
+              (record: Record<string, unknown>) =>
+                `${record.variable ?? record.VARIABLE ?? "-"} ${record.newval ?? record.NEWVAL ?? "-"}`,
+            );
+          }
+          console.log("Final storingList:", modificationInfo.storingList);
         } else {
           console.warn("No modification records found for this chassis");
         }
-
-        setModificationData(modificationInfo);
       } else {
         throw new Error(data.msg || "Failed to load modification data");
       }
+
+      setModificationData(modificationInfo);
     } catch (error) {
       console.error("Fetch modification data error:", error);
       if (error instanceof Error) {
@@ -180,7 +191,16 @@ const SaveModifications = () => {
           <div className='sm-info-row sm-spacer'></div>
           <div className='sm-info-row'>
             <span className='sm-label'>Storing:</span>
-            <span className='sm-value'>{modificationData?.storing}</span>
+            <span className='sm-value sm-storing-list'>
+              {modificationData?.storingList &&
+              modificationData.storingList.length > 0
+                ? modificationData.storingList.map((item, idx) => (
+                    <div key={idx} className='sm-storing-item'>
+                      {item}
+                    </div>
+                  ))
+                : "-"}
+            </span>
           </div>
           <div className='sm-info-row'>
             <span className='sm-label'>FOUND UNRELEASED VERSION:</span>

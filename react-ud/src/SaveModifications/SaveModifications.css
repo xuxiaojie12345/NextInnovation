@@ -58,6 +58,18 @@
   font-family: monospace; /* 等宽字体，保持对齐 */
 }
 
+/* Storing多条记录列表 */
+.sm-storing-list {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.sm-storing-item {
+  line-height: 1.8;
+  white-space: nowrap;
+  text-align: left;
+}
+
 /* 绿色高亮消息 */
 .sm-message-highlight {
   font-size: 14px;

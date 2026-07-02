@@ -227,9 +227,10 @@ const ModifyDocument = () => {
         console.log("  Chassis serie:", chassisSeries);
         console.log("  Chassis number:", chassisNoPart);
 
-        // 跳转到UD06 Save Modifications页面，传递Chassis serie和Chassis number参数
+        // 跳转到UD06 Save Modifications页面，传递Chassis serie、Chassis number和修改的变量
         navigate(
           `/save-modifications?chassisSerie=${encodeURIComponent(chassisSeries)}&chassisNumber=${encodeURIComponent(chassisNoPart)}`,
+          { state: { savedVariables: requestBody.variables } },
         );
       } else {
         throw new Error(data.msg || "Failed to update document");
