@@ -219,6 +219,22 @@
   text-align: center;
 }
 
+/* ---- 底部信息 ---- */
+.ud03-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 20px;
+  font-size: 11px;
+  color: #888888;
+}
+
+.ud03-footer-date,
+.ud03-footer-version {
+  line-height: 1.4;
+}
+
 /* ---- 加载状态 ---- */
 .loading-message {
   display: flex;

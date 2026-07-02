@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { documentApi } from "../services/api";
-import UD24 from "../UserGuide/UD24";
 import "./UD03.css";
 
 // ===== 类型定义 =====
@@ -100,7 +99,6 @@ const UD03 = React.memo(() => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true); // 页面加载/API调用中
   const [docTypeOptions, setDocTypeOptions] = useState<DocTypeOption[]>([]);
-  const [helpVisible, setHelpVisible] = useState<boolean>(false);
   const [user, setUser] = useState<{
     userId: string;
     name: string;
@@ -245,15 +243,11 @@ const UD03 = React.memo(() => {
   }, []);
 
   /**
-   * Help 按钮处理：弹出HDoc Help子画面
+   * Help 按钮处理：跳转到 UD24 HDoc Help 页面
    */
   const handleHelp = useCallback(() => {
-    setHelpVisible(true);
-  }, []);
-
-  const handleHelpClose = useCallback(() => {
-    setHelpVisible(false);
-  }, []);
+    navigate("/UD24");
+  }, [navigate]);
 
   // ===== 加载状态 =====
 
@@ -269,9 +263,8 @@ const UD03 = React.memo(() => {
 
   return (
     <div className="ud03-container">
-      {/* Header - only VOLVO logo */}
       <header className="ud03-header">
-        <div className="ud03-header-logo">VOLVO</div>
+        <div className="ud03-header-logo"></div>
       </header>
 
       {/* 表单区域 */}
