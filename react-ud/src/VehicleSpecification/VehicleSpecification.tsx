@@ -21,7 +21,6 @@ interface VariantItem {
 }
 
 const VehicleSpecification = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [chassisNo, setChassisNo] = useState("");
   const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo | null>(null);

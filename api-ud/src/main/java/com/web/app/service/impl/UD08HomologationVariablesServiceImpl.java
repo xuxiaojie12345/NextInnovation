@@ -159,11 +159,11 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 return ApiResponse.error(409, "Primary key conflict, Please enter the correct content");
             }
             
-            // 设置系统字段
+            // 设置系统字段（addDate使用画面传入的值，为空时使用当前年月）
+            if (rules.getAddDate() == null || rules.getAddDate().trim().isEmpty()) {
+                rules.setAddDate(new SimpleDateFormat("yyyyMM").format(new Date()));
+            }
             String currentUser = rules.getUserid() != null ? rules.getUserid() : "SYSTEM";
-            
-            rules.setAddDate(new SimpleDateFormat("yyyyMM").format(new Date()));
-            rules.setUserid(currentUser);
             rules.setUpDate(new SimpleDateFormat("yyyyMM").format(new Date()));
             rules.setRegisterDatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             rules.setRegisterUser(currentUser);

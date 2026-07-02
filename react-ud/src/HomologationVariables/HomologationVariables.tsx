@@ -456,6 +456,7 @@ const HomologationVariables = () => {
             vs: formData.variantString1,
             vs2: formData.variantString2,
             comments: formData.comments,
+            addDate: formData.addDate,
             userid: formData.createdByUser, // 传递 Created by user 的值
           }),
         },

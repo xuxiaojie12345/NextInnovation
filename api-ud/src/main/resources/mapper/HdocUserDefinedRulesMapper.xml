@@ -60,7 +60,7 @@
             #{userid}, 
             #{upDate}, 
             #{comments}, 
-            DATE_FORMAT(CURRENT_TIMESTAMP, '%Y%m'), 
+            #{addDate}, 
             CURRENT_TIMESTAMP, 
             #{registerUser}, 
             #{registerProcess}, 
