@@ -128,6 +128,13 @@ const Login: React.FC = () => {
               />
             </div>
             
+            {/* 错误消息 */}
+            {message && (
+              <div className="error-message">
+                {message}
+              </div>
+            )}
+            
             <div className="form-group">
               <button
                 type="submit"
@@ -138,13 +145,6 @@ const Login: React.FC = () => {
               </button>
             </div>
           </form>
-          
-          {/* 错误消息 */}
-          {message && (
-            <div className="error-message">
-              {message}
-            </div>
-          )}
         </div>
       </div>
     </div>
