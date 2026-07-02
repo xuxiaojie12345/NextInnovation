@@ -45,7 +45,7 @@
   width: 100%;
   max-width: 520px;
   background-color: #ffffff;
-  border: 1px solid #d0d0d0;
+  border: 1px solid #003057;
   padding: 28px 24px 20px;
   box-sizing: border-box;
 }
@@ -156,6 +156,8 @@
   display: flex;
   gap: 8px;
   margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #003057;
   justify-content: flex-start;
 }
 

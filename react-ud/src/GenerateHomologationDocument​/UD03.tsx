@@ -385,15 +385,7 @@ const UD03 = React.memo(() => {
             </a>
           </div>
         </div>
-
-        {/* 用户信息 */}
-        {user && (
-          <div className="ud03-user-info">
-            <span>Logged in as: {user.name}</span>
-          </div>
-        )}
       </main>
-      {/* HDoc Help - 已迁移到独立页面 UD24 */}
     </div>
   );
 });
