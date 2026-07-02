@@ -140,14 +140,6 @@ const UD03 = React.memo(() => {
         setDocTypeOptions([]);
       }
 
-      // 回填上次检索条件（在下拉列表加载完成后进行）
-      const lastCriteria = loadSearchCriteria();
-      if (lastCriteria) {
-        setChassisSeries(lastCriteria.chassisSeries || "");
-        setChassisNo(lastCriteria.chassisNo || "");
-        setDocumentType(lastCriteria.documentType || "");
-      }
-
       setIsLoading(false);
     };
 
@@ -347,6 +339,9 @@ const UD03 = React.memo(() => {
                 onChange={handleDocumentTypeChange}
                 disabled={isLoading}
               >
+                <option value="" disabled>
+                  -- Select --
+                </option>
                 {docTypeOptions.map((opt, index) => (
                   <option key={index} value={opt.doctype}>
                     {opt.doctype}
