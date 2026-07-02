@@ -203,8 +203,14 @@ const ADChange = () => {
 
   return (
     <div className='adc-container'>
+      {/* 消息显示 */}
+      {successMessage && (
+        <div className='adc-success-message'>{successMessage}</div>
+      )}
+      {errorMessage && <div className='adc-error-message'>{errorMessage}</div>}
+
       {/* 画面标题 */}
-      <h2 className='adc-section-title'>AD/CA Change</h2>
+      <h2 className='adc-section-title'>AD Change</h2>
 
       {/* 输入区域 */}
       <div className='adc-section'>
@@ -264,14 +270,6 @@ const ADChange = () => {
           Please enter a Serie-Chnr to add, delete or check an AD Change record.
         </p>
       )}
-
-      {/* 成功消息 */}
-      {successMessage && (
-        <div className='adc-success-message'>{successMessage}</div>
-      )}
-
-      {/* 错误消息 */}
-      {errorMessage && <div className='adc-error-message'>{errorMessage}</div>}
     </div>
   );
 };

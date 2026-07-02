@@ -103,7 +103,7 @@ const Menu: React.FC = () => {
         {
           // ✅ 带有 Link
           id: "admin_pps_vin",
-          label: "PPS Vin plate",
+          label: "VPPS Vin plate",
           path: "/vin-plate",
           type: "link",
         },

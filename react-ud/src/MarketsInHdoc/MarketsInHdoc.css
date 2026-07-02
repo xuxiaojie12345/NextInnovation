@@ -33,6 +33,7 @@
   background-color: #ffffff;
   border: 1px solid #cccccc;
   overflow-x: auto;
+  width: 70%;
 }
 
 .markets-table {
@@ -56,15 +57,15 @@
 }
 
 .market-column {
-  width: 120px;
+  width: 40px;
 }
 
 .description-column {
-  width: auto;
+  width: 80px;
 }
 
 .weights-column {
-  width: 160px;
+  width: 100px;
   text-align: center;
 }
 

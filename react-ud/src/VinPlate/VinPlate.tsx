@@ -347,24 +347,6 @@ const VinPlate = () => {
     }
   };
 
-  // 解析XML_DOC中的Print Items和VP Data
-  const parseXmlDoc = (xmlDoc: string) => {
-    try {
-      // 这里需要根据实际的XML格式进行解析
-      // 暂时返回原始内容，实际使用时需要实现具体的解析逻辑
-      return {
-        printItems: [],
-        vpData: [],
-      };
-    } catch (error) {
-      console.error("Error parsing XML doc:", error);
-      return {
-        printItems: [],
-        vpData: [],
-      };
-    }
-  };
-
   if (isLoading) {
     return (
       <div className='vp-container'>

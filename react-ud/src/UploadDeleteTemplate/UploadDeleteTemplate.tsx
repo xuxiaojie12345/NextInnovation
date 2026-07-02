@@ -52,10 +52,6 @@ const UploadDeleteTemplate = () => {
 
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
-        // 默认选择第一个市场（如果有）
-        if (data.data.length > 0) {
-          setUploadMarket(data.data[0].market);
-        }
       } else {
         setErrorMessage(data.msg || "Failed to load market list");
       }
@@ -165,7 +161,14 @@ const UploadDeleteTemplate = () => {
       const API_BASE_URL = "http://localhost:8081";
 
       console.log("Uploading file to:", `${API_BASE_URL}/api/template/upload`);
-      console.log("Selected file:", selectedFile.name, "size:", selectedFile.size, "type:", selectedFile.type);
+      console.log(
+        "Selected file:",
+        selectedFile.name,
+        "size:",
+        selectedFile.size,
+        "type:",
+        selectedFile.type,
+      );
       console.log("Target market:", uploadMarket);
 
       // 构建FormData（确保使用file对象的原始数据）
@@ -175,7 +178,13 @@ const UploadDeleteTemplate = () => {
 
       // 检查FormData内容
       for (const pair of (formData as any).entries()) {
-        console.log("FormData entry:", pair[0], pair[1] instanceof File ? `File(${pair[1].name}, ${pair[1].size} bytes)` : pair[1]);
+        console.log(
+          "FormData entry:",
+          pair[0],
+          pair[1] instanceof File
+            ? `File(${pair[1].name}, ${pair[1].size} bytes)`
+            : pair[1],
+        );
       }
 
       const response = await fetch(`${API_BASE_URL}/api/template/upload`, {
@@ -312,6 +321,12 @@ const UploadDeleteTemplate = () => {
           <div className='udt-loading'>Uploading...</div>
         </div>
       )}
+      {/* 消息显示 */}
+      {errorMessage && <div className='udt-error-message'>{errorMessage}</div>}
+      {successMessage && (
+        <div className='udt-success-message'>{successMessage}</div>
+      )}
+
       {/* HDoc Template Upload区域 */}
       <div className='udt-section'>
         <h2 className='udt-section-title'>HDoc Template Upload</h2>
@@ -432,14 +447,6 @@ const UploadDeleteTemplate = () => {
           </a>
         </div>
       </div>
-
-      {/* 错误消息显示 */}
-      {errorMessage && <div className='udt-error-message'>{errorMessage}</div>}
-
-      {/* 成功消息显示 */}
-      {successMessage && (
-        <div className='udt-success-message'>{successMessage}</div>
-      )}
     </div>
   );
 };

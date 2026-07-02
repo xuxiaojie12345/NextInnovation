@@ -32,7 +32,7 @@
 .table-container {
   background-color: #ffffff;
   border: 1px solid #cccccc;
-  overflow-x: auto;
+  overflow-x: 60%;
 }
 
 .document-types-table {
@@ -56,11 +56,11 @@
 }
 
 .key-column {
-  width: 120px;
+  width: 10px;
 }
 
 .description-column {
-  width: auto;
+  width: 100px;
 }
 
 .document-types-table td {

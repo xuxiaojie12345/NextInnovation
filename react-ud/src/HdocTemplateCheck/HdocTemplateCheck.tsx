@@ -18,14 +18,14 @@ const HdocTemplateCheck = () => {
   // 处理文件选择
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
-    
+
     // 验证文件类型（仅允许rtf文件）
-    if (file && !file.name.toLowerCase().endsWith('.rtf')) {
+    if (file && !file.name.toLowerCase().endsWith(".rtf")) {
       setErrorMessage("Please select an RTF file.");
       setSelectedFile(null);
       return;
     }
-    
+
     setSelectedFile(file);
     setErrorMessage("");
     setSuccessMessage("");
@@ -73,11 +73,11 @@ const HdocTemplateCheck = () => {
 
       // 读取文件内容
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const content = e.target?.result as string;
-          
+
           if (!content) {
             setErrorMessage("ERROR: Unable to access file!");
             setIsLoading(false);
@@ -88,7 +88,7 @@ const HdocTemplateCheck = () => {
 
           // 解析变量
           const extractedVariables = parseRtfContent(content);
-          
+
           console.log("Extracted variables:", extractedVariables);
 
           if (extractedVariables.length === 0) {
@@ -98,11 +98,11 @@ const HdocTemplateCheck = () => {
             // 成功找到变量
             setVariables(extractedVariables);
             setSuccessMessage(
-              `Found ${extractedVariables.length} variable(s) in the template.`
+              `Found ${extractedVariables.length} variable(s) in the template.`,
             );
 
             // 创建检查后的文件下载链接
-            const blob = new Blob([content], { type: 'application/rtf' });
+            const blob = new Blob([content], { type: "application/rtf" });
             const url = URL.createObjectURL(blob);
             setCheckedFileUrl(url);
           }
@@ -125,7 +125,9 @@ const HdocTemplateCheck = () => {
     } catch (error) {
       console.error("Check error:", error);
       setErrorMessage(
-        error instanceof Error ? error.message : "System error. Please contact administrator."
+        error instanceof Error
+          ? error.message
+          : "System error. Please contact administrator.",
       );
       setIsLoading(false);
     }
@@ -139,12 +141,12 @@ const HdocTemplateCheck = () => {
 
     // 生成文件名
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const originalName = selectedFile.name.replace('.rtf', '');
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+    const originalName = selectedFile.name.replace(".rtf", "");
     const fileName = `checked_${originalName}_${dateStr}.rtf`;
 
     // 创建下载链接
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = checkedFileUrl;
     link.download = fileName;
     document.body.appendChild(link);
@@ -162,36 +164,8 @@ const HdocTemplateCheck = () => {
 
   return (
     <div className='htc-container'>
-      {/* HDoc Template Check区域 */}
-      <div className='htc-section'>
-        <h2 className='htc-section-title'>HDoc Template Check</h2>
-        
-        <div className='htc-form-group'>
-          <label className='htc-label'>Template File:</label>
-          <input
-            id="template-file-input"
-            type="file"
-            className='htc-file-input'
-            onChange={handleFileSelect}
-            accept=".rtf"
-          />
-        </div>
-
-        <div className='htc-button-row'>
-          <button
-            className='htc-btn'
-            onClick={handleCheck}
-            disabled={isLoading}
-          >
-            Check
-          </button>
-        </div>
-      </div>
-
-      {/* 错误消息显示 */}
+      {/* 消息显示 */}
       {errorMessage && <div className='htc-error-message'>{errorMessage}</div>}
-
-      {/* 成功消息显示 */}
       {successMessage && (
         <div className='htc-success-message'>
           {successMessage}
@@ -209,6 +183,32 @@ const HdocTemplateCheck = () => {
           )}
         </div>
       )}
+
+      {/* HDoc Template Check区域 */}
+      <div className='htc-section'>
+        <h2 className='htc-section-title'>HDoc Template Check</h2>
+
+        <div className='htc-form-group'>
+          <label className='htc-label'>Template File:</label>
+          <input
+            id='template-file-input'
+            type='file'
+            className='htc-file-input'
+            onChange={handleFileSelect}
+            accept='.rtf'
+          />
+        </div>
+
+        <div className='htc-button-row'>
+          <button
+            className='htc-btn'
+            onClick={handleCheck}
+            disabled={isLoading}
+          >
+            Check
+          </button>
+        </div>
+      </div>
 
       {/* 下载链接显示 */}
       {checkedFileUrl && (

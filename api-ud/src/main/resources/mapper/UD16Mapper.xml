@@ -29,15 +29,10 @@
         )
     </insert>
 
-    <!-- 逻辑删除（ACT置为'N'） -->
-    <update id="softDelete">
-        UPDATE HDOC_ADCA_CHANGE
-        SET
-            ACT = 'N',
-            UPDATE_DATETIME = CURRENT_TIMESTAMP,
-            UPDATE_USER = #{updateUser},
-            UPDATE_PROCESS = #{updateProcess}
+    <!-- 物理删除记录 -->
+    <delete id="softDelete">
+        DELETE FROM HDOC_ADCA_CHANGE
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
-    </update>
+    </delete>
 
 </mapper>

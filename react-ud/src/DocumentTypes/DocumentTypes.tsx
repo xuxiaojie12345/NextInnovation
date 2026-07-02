@@ -27,10 +27,11 @@ const DocumentTypes: React.FC = () => {
       console.log("开始获取文档类型列表...");
 
       const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {

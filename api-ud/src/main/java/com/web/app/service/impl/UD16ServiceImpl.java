@@ -197,10 +197,10 @@ public class UD16ServiceImpl implements UD16Service {
             String currentUser = request.getUpdateUser() != null && !request.getUpdateUser().trim().isEmpty()
                     ? request.getUpdateUser().trim() : "SYSTEM";
 
-            // 逻辑删除（ACT置为'N'）
+            // 物理删除记录
             int result = ud16Mapper.softDelete(serie, chnr, currentUser, "UD16_DELETE");
             if (result > 0) {
-                log.info("AD Change record deleted (logical): {}-{}", serie, chnr);
+                log.info("AD Change record deleted (physical): {}-{}", serie, chnr);
                 Map<String, Object> data = new HashMap<>();
                 data.put("serie", serie);
                 data.put("chnr", chnr);

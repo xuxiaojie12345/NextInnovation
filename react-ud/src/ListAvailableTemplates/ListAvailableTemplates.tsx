@@ -183,6 +183,12 @@ const ListAvailableTemplates = () => {
 
   return (
     <div className='lat-container'>
+      {/* 消息显示 */}
+      {errorMessage && <div className='lat-error-message'>{errorMessage}</div>}
+      {successMessage && (
+        <div className='lat-success-message'>{successMessage}</div>
+      )}
+
       {/* List Templates区域 */}
       <div className='lat-section'>
         <h2 className='lat-section-title'>List Templates</h2>
@@ -254,14 +260,6 @@ const ListAvailableTemplates = () => {
           </table>
         </div>
       </div>
-
-      {/* 错误消息显示 */}
-      {errorMessage && <div className='lat-error-message'>{errorMessage}</div>}
-
-      {/* 成功消息显示 */}
-      {successMessage && (
-        <div className='lat-success-message'>{successMessage}</div>
-      )}
     </div>
   );
 };
