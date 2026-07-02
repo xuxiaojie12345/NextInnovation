@@ -22,15 +22,10 @@ interface EngineInfo {
   description: string;
 }
 
-interface SNote {
-  noteNo: string;
-  description: string;
-}
-
 interface VehicleSpecificationData {
   chassisInfo: ChassisInfo;
   engineInfo: EngineInfo;
-  sNotes: SNote[];
+  sNoteNo: string;
 }
 
 /** 后端API基础地址 */
@@ -56,7 +51,7 @@ const VehicleSpecification: React.FC = () => {
   // 页面数据状态
   const [chassisInfo, setChassisInfo] = useState<ChassisInfo | null>(null);
   const [engineInfo, setEngineInfo] = useState<EngineInfo | null>(null);
-  const [sNotes, setSNotes] = useState<SNote[]>([]);
+  const [sNoteNo, setSNoteNo] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
@@ -90,19 +85,19 @@ const VehicleSpecification: React.FC = () => {
           const data: VehicleSpecificationData = response.data.data;
           setChassisInfo(data.chassisInfo);
           setEngineInfo(data.engineInfo);
-          setSNotes(data.sNotes || []);
+          setSNoteNo(data.sNoteNo || '');
         } else {
           // API返回非200或data为null，不清空数据，页面保持显示"-"
           setChassisInfo(null);
           setEngineInfo(null);
-          setSNotes([]);
+          setSNoteNo('');
         }
       } catch (err: any) {
         // 异常处理：API返回异常时不清除页面结构，数据字段显示"-"
         console.error("UD07 API error:", err);
         setChassisInfo(null);
         setEngineInfo(null);
-        setSNotes([]);
+        setSNoteNo('');
         if (err.response) {
           if (err.response.status === 400) {
             // 无数据时不是错误，页面显示空字段
@@ -197,21 +192,19 @@ const VehicleSpecification: React.FC = () => {
               <span className="info-label">VIN</span>
               <span className="info-value">{chassisInfo?.vin || '-'}</span>
             </div>
-          </div>
-          <div className="info-row">
             <div className="info-field">
               <span className="info-label">Engine no</span>
               <span className="info-value">{engineInfo?.engineNo || '-'}</span>
-            </div>
-            <div className="info-field">
-              <span className="info-label">SYMBOL</span>
-              <span className="info-value">{engineInfo?.symbolStr || '-'}</span>
             </div>
           </div>
           <div className="info-row">
             <div className="info-field">
               <span className="info-label">Country of operation</span>
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
+            </div>
+            <div className="info-field">
+              <span className="info-label">SYMBOL_STR</span>
+              <span className="info-value">{engineInfo?.symbolStr || '-'}</span>
             </div>
           </div>
           {/* DESCRIPTION - 仅显示值，无值显示中划线 */}
@@ -225,7 +218,7 @@ const VehicleSpecification: React.FC = () => {
           <div className="info-row">
             <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
               <span className="info-value" style={{ paddingLeft: 20 }}>
-                {sNotes.length > 0 ? sNotes.map(n => n.noteNo).join(', ') : '-'}
+                {sNoteNo || '-'}
               </span>
             </div>
           </div>

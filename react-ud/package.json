@@ -15,7 +15,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.82",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
     "antd": "^5.29.1",
@@ -27,6 +26,7 @@
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
+    "mysql2": "^3.22.5",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -63,6 +63,9 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^26.0.1",
     "@types/react-router-dom": "^5.3.3",
     "sass": "^1.72.0"
   }

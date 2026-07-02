@@ -19,7 +19,7 @@
 
     <!-- 车辆基本信息查询（sql1）
          关联三表：HDOC_REC_DATA_OM + HDOC_REC_DATA_VDA_GENERAL + HDOC_REC_DATA_VDA_VARIANTS
-         取得 Model、Built week、Product type、VIN、Country of Operation、FAMILY_ID、VARIANT_ID -->
+         取得 Model、Built week、Product type、VIN、Country of Operation、FAMILY_ID、VARIANT_ID、S-Note NO -->
     <select id="selectChassisInfo" resultType="com.web.app.domain.VehicleSpecificationResponse$ChassisInfo">
         SELECT
             CONCAT(om.SERIE, ' ', om.CHNR) AS chassisNo,
@@ -29,7 +29,8 @@
             vda.VIN AS vin,
             vda.COUNTRY_OF_OPERATION AS countryOfOperation,
             var.FAMILY_ID AS familyId,
-            var.VARIANT_ID AS variantId
+            var.VARIANT_ID AS variantId,
+            om.CUSTOMER_ADAP AS sNoteNo
         FROM HDOC_REC_DATA_OM om
         INNER JOIN HDOC_REC_DATA_VDA_GENERAL vda
             ON om.SERIE = vda.SERIE AND om.CHNR = vda.CHNR

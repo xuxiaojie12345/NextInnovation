@@ -146,81 +146,70 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='login-container'>
-      <div className='login-box'>
-        {/* 系统标题区域 */}
-        <div className='login-header'>
-          <h1 className='system-title'>
-            <span className='title-edb'>EDB</span> Engineering Database
-          </h1>
-          <p className='system-subtitle'>Use Outlook id and password</p>
-        </div>
-
-        {/* 支持信息 */}
-        <div className='support-info'>
+    <div className="login-container">
+      {/* 左侧信息面板 */}
+      <div className="login-info-panel">
+        <div className="left-content">
+          <h1><strong>EDB</strong> Engineering Database</h1>
+          <p>Use Outlook id and password</p>
           <p>
-            Support, authorization request or improvement suggestions: send
-            mail to Support TPI
+            Support, authorization request or improvement suggestions, send mail to: Support TPI
           </p>
         </div>
+      </div>
 
-        {/* Message Label: Output, Left Align, Red Color */}
-        {message && <div className='error-message'>{message}</div>}
+      {/* 右侧表单面板 */}
+      <div className="login-form-panel">
+        <div className="login-form">
+          {/* Message Label: Output, Left Align, Red Color */}
+          {message && <div className="error-message">{message}</div>}
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          {/* username: TextField, Input, Left Align */}
-          <div className='form-group'>
-            <label htmlFor='username'>username</label>
-            <input
-              id='username'
-              type='text'
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder='Enter username'
-              disabled={isLoading}
-              autoComplete='username'
-              className={hasError ? 'input-error' : ''}
-            />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+          >
+            {/* username: TextField, Input, Left Align */}
+            <div className="form-group">
+              <input
+                id="username"
+                type="text"
+                value={userID}
+                onChange={handleUserIDChange}
+                placeholder="UserID"
+                disabled={isLoading}
+                autoComplete="username"
+                className={hasError ? 'input-error' : ''}
+              />
+            </div>
+
+            {/* password: TextField, Input, Left Align, Masked */}
+            <div className="form-group">
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder="Password"
+                disabled={isLoading}
+                autoComplete="current-password"
+                className={hasError ? 'input-error' : ''}
+              />
+            </div>
+
+            {/* Login Button: Center Align, Active/Disabled Control */}
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? "Processing..." : "Login"}
+            </button>
+          </form>
+
+          {/* 备用登录链接提示 */}
+          <div className="alternative-login-info">
+            <p>If you get error message: "Your account is locked. Please contact your system administrator."</p>
+            <p>Please try this alternative login link before contacting support.</p>
+            <p>We are working to find root cause of problem.</p>
           </div>
-
-          {/* password: TextField, Input, Left Align, Masked */}
-          <div className='form-group'>
-            <label htmlFor='password'>password</label>
-            <input
-              id='password'
-              type='password'
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder='Enter password'
-              disabled={isLoading}
-              autoComplete='current-password'
-              className={hasError ? 'input-error' : ''}
-            />
-          </div>
-
-          {/* Login Button: Center Align, Active/Disabled Control */}
-          <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
-          </button>
-        </form>
-
-        {/* 备用登录链接提示 */}
-        <div className='maintenance-info'>
-          <p>
-            If you get error message: "Your account is locked. Please contact
-            your system administrator."
-          </p>
-          <p>
-            Please try this alternative login link before contacting support.
-          </p>
-          <p>
-            We are working to find root cause of problem.
-          </p>
         </div>
       </div>
     </div>

@@ -80,13 +80,6 @@
   word-break: break-all;
 }
 
-/* Tooltip样式 */
-.tooltip-value {
-  cursor: pointer;
-  border-bottom: 1px dashed #1890ff;
-  color: #1890ff;
-}
-
 /* ========== 消息区域 ========== */
 .info-message-area {
   background-color: #fffbe6;

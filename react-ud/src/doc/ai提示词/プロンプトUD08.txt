@@ -392,17 +392,24 @@
 
 **Response Success (200)**：
 ```json
-[
-  {
-    "pc": "string",
-    "description": "string"
-  }
-]
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "pc": "string",
+      "description": "string"
+    }
+  ]
+}
+```
 
 **Response Error (500)**：
 ```json
 {
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 
@@ -417,17 +424,24 @@
 
 **Response Success (200)**：
 ```json
-[
-  {
-    "market": "string",
-    "description": "string"
-  }
-]
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "market": "string",
+      "description": "string"
+    }
+  ]
+}
+```
 
 **Response Error (500)**：
 ```json
 {
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 
@@ -442,16 +456,23 @@
 
 **Response Success (200)**：
 ```json
-[
-  {
-    "variable": "string"
-  }
-]
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "variable": "string"
+    }
+  ]
+}
+```
 
 **Response Error (500)**：
 ```json
 {
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 
@@ -460,7 +481,7 @@
 
 **Method**：POST
 
-**Endpoint**：/api/ud08/add（具体路径需根据实际API定义）
+**Endpoint**：/api/ud08/add
 
 **Request**：
 ```json
@@ -482,136 +503,140 @@
 **Response Success (200)**：
 ```json
 {
-  "success": true,
-  "message": "Record added successfully."
+  "code": 200,
+  "message": "Record added successfully.",
+  "data": "Record added successfully."
 }
 ```
 
 **Response Error (409)**：
 ```json
 {
-  "success": false,
-  "message": "Primary key conflict, Please enter the correct content"
+  "code": 409,
+  "message": "Primary key conflict, Please enter the correct content",
+  "data": null
 }
 ```
 
 **Response Error (400)**：
 ```json
 {
-  "success": false,
-  "message": "Variant does not exist, Please enter the correct content"
+  "code": 400,
+  "message": "Variant does not exist, Please enter the correct content",
+  "data": null
 }
 ```
 
 **Response Error (500)**：
 ```json
 {
-  "success": false,
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 
 ### 6.5 UD08Update
 **功能**：更新用户自定义规则记录
 
-**Method**：POST或PUT
+**Method**：POST
 
-**Endpoint**：/api/ud08/update（具体路径需根据实际API定义）
+**Endpoint**：/api/ud08/update
 
 **Request**：
 ```json
 {
-  "productClass": "string",
-  "number": "string",
-  "market": "string",
-  "variable": "string",
-  "value": "string",
-  "vs": "string",
-  "vs2": "string",
-  "comments": "string",
-  "addDate": "string",
-  "deleteDate": "string",
-  "updateUser": "string",
-  "updateDatetime": "string"
+  "productClass": "string（主键标识，必填）",
+  "number": "string（主键标识，必填）",
+  "market": "string（主键标识，必填）",
+  "variable": "string（可选，有入力时更新）",
+  "value": "string（可选，有入力时更新）",
+  "vs": "string（可选，有入力时更新）",
+  "vs2": "string（可选，有入力时更新）",
+  "comments": "string（可选，有入力时更新）",
+  "addDate": "string（可选，有入力时更新）",
+  "deleteDate": "string（可选，有入力时更新）",
+  "updateUser": "string（可选，有入力时更新）",
+  "updateDatetime": "string（可选，有入力时更新）"
 }
-
+```
 
 **Response Success (200)**：
 ```json
 {
-  "success": true,
-  "message": "Record updated successfully."
+  "code": 200,
+  "message": "Record updated successfully.",
+  "data": "Record updated successfully."
 }
 ```
 
 **Response Error (404)**：
 ```json
 {
-  "success": false,
-  "message": "Data does not exist, Please enter the correct content"
-}
-```
-
-**Response Error (409)**：
-```json
-{
-  "success": false,
-  "message": "Primary key conflict, Please enter the correct content"
+  "code": 404,
+  "message": "Data does not exist, Please enter the correct content",
+  "data": null
 }
 ```
 
 **Response Error (400)**：
 ```json
 {
-  "success": false,
-  "message": "Variant does not exist, Please enter the correct content"
+  "code": 400,
+  "message": "Variant does not exist, Please enter the correct content",
+  "data": null
 }
 ```
 
 **Response Error (500)**：
 ```json
 {
-  "success": false,
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 
 ### 6.6 UD08Delete
 **功能**：删除用户自定义规则记录
 
-**Method**：POST或DELETE
+**Method**：POST
 
-**Endpoint**：/api/ud08/delete（具体路径需根据实际API定义）
+**Endpoint**：/api/ud08/delete
 
 **Request**：
 ```json
 {
-  "productClass": "string",
-  "number": "string",
-  "market": "string"
+  "productClass": "string（必填）",
+  "number": "string（必填）",
+  "market": "string（必填）"
 }
+```
 
 **Response Success (200)**：
 ```json
 {
-  "success": true,
-  "message": "Record deleted successfully."
+  "code": 200,
+  "message": "Record deleted successfully.",
+  "data": "Record deleted successfully."
 }
 ```
 
 **Response Error (404)**：
 ```json
 {
-  "success": false,
-  "message": "Data does not exist, Please enter the correct content"
+  "code": 404,
+  "message": "Data does not exist, Please enter the correct content",
+  "data": null
 }
 ```
 
 **Response Error (500)**：
 ```json
 {
-  "success": false,
-  "message": "Internal server error"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 ```
 

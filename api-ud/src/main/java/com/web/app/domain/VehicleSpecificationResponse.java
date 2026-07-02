@@ -1,7 +1,5 @@
 package com.web.app.domain;
 
-import java.util.List;
-
 /**
  * UD07车辆规格信息响应对象
  * 对应详细设计：DES-VehicleSpecification-001
@@ -16,8 +14,8 @@ public class VehicleSpecificationResponse {
     /** 发动机信息 */
     private EngineInfo engineInfo;
     
-    /** S-Note列表 */
-    private List<SNote> sNotes;
+    /** S-Note编号 */
+    private String sNoteNo;
 
     public ChassisInfo getChassisInfo() {
         return chassisInfo;
@@ -35,12 +33,12 @@ public class VehicleSpecificationResponse {
         this.engineInfo = engineInfo;
     }
 
-    public List<SNote> getSNotes() {
-        return sNotes;
+    public String getSNoteNo() {
+        return sNoteNo;
     }
 
-    public void setSNotes(List<SNote> sNotes) {
-        this.sNotes = sNotes;
+    public void setSNoteNo(String sNoteNo) {
+        this.sNoteNo = sNoteNo;
     }
 
     /**
@@ -55,6 +53,7 @@ public class VehicleSpecificationResponse {
         private String countryOfOperation;
         private String familyId;
         private String variantId;
+        private String sNoteNo;
 
         public String getChassisNo() {
             return chassisNo;
@@ -119,6 +118,14 @@ public class VehicleSpecificationResponse {
         public void setVariantId(String variantId) {
             this.variantId = variantId;
         }
+
+        public String getSNoteNo() {
+            return sNoteNo;
+        }
+
+        public void setSNoteNo(String sNoteNo) {
+            this.sNoteNo = sNoteNo;
+        }
     }
 
     /**
@@ -154,27 +161,5 @@ public class VehicleSpecificationResponse {
         }
     }
 
-    /**
-     * S-Note信息
-     */
-    public static class SNote {
-        private String noteNo;
-        private String description;
 
-        public String getNoteNo() {
-            return noteNo;
-        }
-
-        public void setNoteNo(String noteNo) {
-            this.noteNo = noteNo;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-    }
 }

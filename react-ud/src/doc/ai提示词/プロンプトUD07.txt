@@ -13,7 +13,7 @@
 - 展示发动机编号及符号信息
 - 显示国家运营区域与产品类型
 - 提供S-Note编号信息
-- 支持通过tooltip查看KOLA Variant的描述信息
+- 显示KOLA Variant的描述信息
 
 面向用户群体为车辆配置工程师、质量审核人员和生产准备人员。  
 用户体验方面需保证信息清晰、字段排列合理、关键信息突出显示。  
@@ -30,10 +30,10 @@
 | 3   | Built week | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.BUILD |
 | 4   | Product type | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.PRODUCT_TYPE |
 | 5   | VIN | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.VIN |
-| 6   | Engine no | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT 的 SYMBOL 字段；获取逻辑如下：<br>① 根据Chassis no在HDOC_REC_DATA_VDA_VARIANTS中查找FAMILY_ID和VARIANT_ID（条件：Family ID Like 'DPX%'）<br>② 使用上述结果在HDOC_REC_DATA_KOLA_VARIANT中查询SYMBOL字段 |
+| 6   | Engine no | label | - | - | Output | - | 左 | A01 | - | 设定式样暂不明确，实际实装固定值"A01" |
 | 7   | Country of Operation | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION |
-| 8   | SYMBOL_STR | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT；处理逻辑如下：<br>① 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID<br>② 查询HDOC_REC_DATA_KOLA_VARIANT获取Symbol<br>③ 取Symbol前8位，不足则左补半角空格<br>④ 按FUNCTION_GROUP（左补至4位）+ FAMILY_ID（3位）排序显示 |
-| 9   | DESCRIPTION | tooltip | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION；鼠标悬停时显示该字段内容 |
+| 8   | SYMBOL_STR | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT；处理逻辑如下：<br>① 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID<br>② 查询HDOC_REC_DATA_KOLA_VARIANT获取Symbol<br>③ 取Symbol前8位，不足则左补半角空格 |
+| 9   | DESCRIPTION | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION；直接显示描述内容 |
 | 10  | S-Note NO | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.CUSTOMER_ADAP |
 
 ---
@@ -47,10 +47,9 @@
 2. 调用 `UD07VehicleSpecificationApi` 获取车辆基础信息。
 3. 从HDOC_REC_DATA_OM表中提取Model、Built week等信息。
 4. 从HDOC_REC_DATA_VDA_GENERAL表中提取VIN、Product Type、Country of Operation等信息。
-5. 通过组合查询HDOC_REC_DATA_VDA_VARIANTS和HDOC_REC_DATA_KOLA_VARIANT获取Engine no和SYMBOL_STR。
+5. 通过组合查询HDOC_REC_DATA_VDA_VARIANTS和HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL_STR。
 6. 显示S-Note NO信息。
-7. 在SYMBOL_STR字段上方设置tooltip，当用户将鼠标悬停于该字段时，显示对应的DESCRIPTION内容。
-8. 所有字段以标签形式静态展示，无交互操作。
+7. 所有字段以标签形式静态展示，无交互操作。
 
 ---
 
@@ -63,7 +62,7 @@
 - 获取当前Chassis编号
 - 查询HDOC_REC_DATA_OM获取Model、Build Week等信息
 - 查询HDOC_REC_DATA_VDA_GENERAL获取VIN、Product Type、Country of Operation
-- 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID（条件：Chassis no + Family ID Like 'DPX%'）
+- 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID
 - 查询HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL和DESCRIPTION
 - 查询HDOC_REC_DATA_OM获取S-Note NO
 
@@ -83,7 +82,7 @@
 - 若返回失败，记录错误日志并显示通用错误消息
 
 #### 5.2 结果处理：
-- 成功：正常渲染所有标签与tooltip
+- 成功：正常渲染所有标签
 - 失败：显示“系统内部错误，请联系管理员”
 
 ### 5.3 校验详细规格表
@@ -103,42 +102,56 @@
 - **Method**：GET
 - **Endpoint**：/api/v1/ud07/vehiclespecification
 
-#### Request [请求格式]
+#### Request Parameters
+
+| 参数名 | 类型 | 必填 | 说明 |
+| :--- | :--- | :---: | :--- |
+| chassisNo | String | Y | 底盘编号（serie + 半角空格 + chassisNo，如"JPCT 013945"） |
+
+**请求示例**：`/api/v1/ud07/vehiclespecification?chassisNo=JPCT%20013945`
+
+#### Response Success (200)
+
 ```json
 {
-  "chassisNo": "JPCT 013945"
-}
-Response Success (200)
-{
-  "chassisInfo": {
-    "chassisNo": "JPCT 013945",
-    "model": "UD-HDE",
-    "buildWeek": "1617",
-    "productType": "EM 64 R",
-    "vin": "JPCZZ30D8GT013945",
-    "countryOfOperation": "IDN"
-  },
-  "engineInfo": {
-    "engineNo": "428328",
-    "symbolStr": "FTLI-150   ",
-    "description": "Front load index: FTLI-150"
-  },
-  "sNotes": [
-    {
-      "noteNo": "S1610111",
+  "code": 200,
+  "message": "success",
+  "data": {
+    "chassisInfo": {
+      "chassisNo": "JPCT 013945",
+      "model": "UD-HDE",
+      "buildWeek": "1617",
+      "productType": "EM 64 R",
+      "vin": "JPCZZ30D8GT013945",
+      "countryOfOperation": "IDN"
+    },
+    "engineInfo": {
+      "engineNo": "A01",
+      "symbolStr": "FTLI-150   ",
       "description": "Front load index: FTLI-150"
-    }
-  ]
+    },
+    "sNoteNo": "S1610111"
+  }
 }
-Response Error (400)
+```
+
+#### Response Error (400)
+
+```json
 {
-  "error": "Invalid chassis number",
-  "message": "Chassis number is required"
+  "code": 400,
+  "message": "Invalid chassis number",
+  "data": null
 }
-Response Error (500)
+```
+
+#### Response Error (500)
+
+```json
 {
-  "error": "Internal Server Error",
-  "message": "Failed to retrieve data from database"
+  "code": 500,
+  "message": "Internal server error",
+  "data": null
 }
 7. 异常处理 (Exception Handling)
 异常场景	处理方式	Message显示内容

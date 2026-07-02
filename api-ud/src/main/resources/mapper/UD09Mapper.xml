@@ -28,7 +28,7 @@
     <select id="searchUserDefinedRules" resultMap="HdocUserDefinedRulesMap"
             parameterType="com.web.app.domain.UD08SearchRequest">
         SELECT PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE,
-               REGISTER_USER, REGISTER_DATETIME
+               UPDATE_USER, UPDATE_DATETIME
         FROM HDOC_USER_DEFINED_RULES
         WHERE 1=1
         <if test="productClass != null and productClass != ''">
@@ -94,14 +94,14 @@
         </if>
         <if test="updateUser != null and updateUser != ''">
             <choose>
-                <when test="updateUserOp == '!='">AND REGISTER_USER != #{updateUser}</when>
-                <otherwise>AND REGISTER_USER = #{updateUser}</otherwise>
+                <when test="updateUserOp == '!='">AND UPDATE_USER != #{updateUser}</when>
+                <otherwise>AND UPDATE_USER = #{updateUser}</otherwise>
             </choose>
         </if>
         <if test="updateDatetime != null and updateDatetime != ''">
             <choose>
-                <when test="updateDatetimeOp == '!='">AND REGISTER_DATETIME != #{updateDatetime}</when>
-                <otherwise>AND REGISTER_DATETIME = #{updateDatetime}</otherwise>
+                <when test="updateDatetimeOp == '!='">AND UPDATE_DATETIME != #{updateDatetime}</when>
+                <otherwise>AND UPDATE_DATETIME = #{updateDatetime}</otherwise>
             </choose>
         </if>
         ORDER BY PC, MARKET, NUM

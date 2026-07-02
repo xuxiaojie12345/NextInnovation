@@ -98,6 +98,8 @@ const HomologationVariables: React.FC = () => {
   const [isOperating, setIsOperating] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [hasError, setHasError] = useState<boolean>(false);
+  // 从UD09搜索结果页传入的原始主键值，用于Update时主键变更校验
+  const [originalKeys, setOriginalKeys] = useState<{ productClass: string; number: string; market: string } | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -118,7 +120,14 @@ const HomologationVariables: React.FC = () => {
         const state = location.state as Record<string, any> | null;
         if (state?.selectedRecord) {
           // Select操作：从搜索结果页面选中一条记录返回
-          setFormData(prev => ({ ...prev, ...state.selectedRecord }));
+          const record = state.selectedRecord as Record<string, string>;
+          setFormData(prev => ({ ...prev, ...record }));
+          // 保存原始主键值（用于Update时主键变更校验）
+          setOriginalKeys({
+            productClass: record.productClass || '',
+            number: record.number || '',
+            market: record.market || ''
+          });
         } else if (state?.searchConditions) {
           // Back操作：从搜索结果页面携带搜索条件返回
           // searchConditions 包含字段值和运算符（key 以 Op 结尾）
@@ -217,6 +226,17 @@ const HomologationVariables: React.FC = () => {
     setMessage(''); setHasError(false);
     const err = validateRequired() || validateVariable();
     if (err) { setMessage(err); setHasError(true); return; }
+    // 主键变更校验：若从UD09返回（有原始主键值），检查主键是否被修改
+    if (originalKeys) {
+      const { productClass, number, market } = formData;
+      if (productClass !== originalKeys.productClass ||
+          number !== originalKeys.number ||
+          market !== originalKeys.market) {
+        setMessage('Primary key cannot be updated.');
+        setHasError(true);
+        return;
+      }
+    }
     setIsOperating(true);
     try {
       const res = await axios.post(`${API_BASE_URL}/api/ud08/update`, formData);
@@ -231,7 +251,7 @@ const HomologationVariables: React.FC = () => {
       else setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally { setIsOperating(false); }
-  }, [formData]);
+  }, [formData, originalKeys]);
 
   const handleDelete = useCallback(async () => {
     setMessage(''); setHasError(false);

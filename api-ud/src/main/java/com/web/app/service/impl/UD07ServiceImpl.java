@@ -44,7 +44,7 @@ public class UD07ServiceImpl implements UD07Service {
         // 构建响应对象
         VehicleSpecificationResponse response = new VehicleSpecificationResponse();
         response.setChassisInfo(chassisInfo);
-        response.setSNotes(new ArrayList<>());
+        response.setSNoteNo(chassisInfo.getSNoteNo());
 
         // sql2: 用 sql1 取得的 FAMILY_ID, VARIANT_ID 检索 KOLA_VARIANT
         if (chassisInfo.getFamilyId() != null && chassisInfo.getVariantId() != null) {
