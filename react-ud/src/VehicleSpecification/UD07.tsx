@@ -77,8 +77,12 @@ const UD07 = React.memo(() => {
         const result = await documentApi.getVehicleSpecification(chassisNo);
 
         console.log("--UD07-1----------------------------------" + chassisNo);
-        console.log("--UD07-2----------------------------------" + result);
-        console.log("--UD07-3----------------------------------" + result.data);
+        console.log("--UD07-2----------------------------------", result);
+        console.log("--UD07-3----------------------------------", result?.data);
+        console.log(
+          "--UD07-symbols---------------------------",
+          result?.data?.symbols,
+        );
 
         if (result && result.data) {
           setVehicleData(result.data);
@@ -167,15 +171,19 @@ const UD07 = React.memo(() => {
               {/* Symbols（仅显示SYMBOL_STR，hover时Tooltip显示description） */}
               {vehicleData.symbols && vehicleData.symbols.length > 0 && (
                 <div className="ud07-symbols-block">
-                  {vehicleData.symbols.map((item, index) => (
-                    <span
-                      key={index}
-                      className="ud07-symbol-item"
-                      data-tip={item.description}
-                    >
-                      {item.symbol}
-                    </span>
-                  ))}
+                  {vehicleData.symbols
+                    .filter(
+                      (item) => item.symbol && item.symbol.trim().length > 0,
+                    )
+                    .map((item, index) => (
+                      <span
+                        key={index}
+                        className="ud07-symbol-item"
+                        data-tip={item.description}
+                      >
+                        {item.symbol}
+                      </span>
+                    ))}
                 </div>
               )}
 

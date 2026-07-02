@@ -390,13 +390,6 @@ const UD09 = React.memo(() => {
           <div className="ud09-count">
             Number of lines found: {dataSource.length}
           </div>
-
-          {/* 用户信息 */}
-          {user && (
-            <div className="ud09-user-info">
-              <span>Logged in as: {user.name}</span>
-            </div>
-          )}
         </div>
       </main>
     </div>

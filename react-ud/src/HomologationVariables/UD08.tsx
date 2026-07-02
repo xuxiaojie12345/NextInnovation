@@ -1152,15 +1152,6 @@ const UD08 = React.memo(() => {
               <span className="ud08-auto-value">{dateVal || "Automatic"}</span>
             </div>
           </div>
-
-          {/* 搜索结果表格（已移至UD09） */}
-
-          {/* 用户信息 */}
-          {user && (
-            <div className="ud08-user-info">
-              <span>Logged in as: {user.name}</span>
-            </div>
-          )}
         </div>
       </main>
     </div>
