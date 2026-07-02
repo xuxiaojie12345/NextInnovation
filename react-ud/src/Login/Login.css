@@ -1,84 +1,261 @@
+/* 登录页面整体容器 */
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f2f5;
-  background-image: url("/src/fTRYDXFAD.jpeg");
-  /* 建议改为 cover 以适配不同分辨率屏幕 */
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-
-.login-box {
-  /* 启用背景和 Padding 以符合常规登录框设计 */
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
-  /* 移除 absolute 定位，由父容器 Flex 居中 */
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  background-image: url('../fTRYDXFAD.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: relative;
 }
 
-.login-header h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-  margin-top: 0;
+/* 左侧标题区域 */
+.login-left-section {
+  flex: 1;
+  padding-left: 120px;
+  max-width: 700px;
+  z-index: 1;
 }
 
-.form-group {
-  margin-bottom: 20px;
-  text-align: left; /* 确保 Label 和 Input 左对齐 */
-}
-
-.form-group label {
-  display: block;
+/* EDB Engineering Database 标题 */
+.login-title {
+  font-size: 64px;
+  font-weight: 300;
+  color: #ffffff;
   margin-bottom: 8px;
-  color: #666;
-  font-weight: 500;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  line-height: 1.2;
+}
+
+.title-edb {
+  font-weight: 700;
+  margin-right: 20px;
+}
+
+.title-full {
+  font-weight: 300;
+}
+
+/* 副标题 */
+.login-subtitle {
+  font-size: 18px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* 支持信息文本 */
+.login-support {
   font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+/* 右侧登录表单区域 */
+.login-right-section {
+  width: 440px;
+  margin-right: 120px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 48px 40px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  z-index: 1;
+}
+
+/* 登录表单 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Ant Design Input包装器样式调整 */
+.login-form .ant-input-affix-wrapper {
   border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
-  text-align: left; /* 输入文字左对齐 */
+  border: 1px solid #d9d9d9;
+  padding: 8px 12px;
+  height: 48px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.form-group input:focus {
-  border-color: #1890ff;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+.login-form .ant-input-affix-wrapper:hover {
+  border-color: #4096ff;
 }
 
-.login-button {
-  width: 100%;
-  padding: 12px;
-  /* 启用按钮背景色 */
-  background-color: #1890ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
+.login-form .ant-input-affix-wrapper-focused {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+}
+
+.login-form .ant-input-prefix {
+  margin-right: 8px;
+  color: #bfbfbf;
   font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  text-align: center; /* 按钮文字居中 */
-  font-weight: 500;
+}
+
+.login-form .ant-input-affix-wrapper-focused .ant-input-prefix {
+  color: #1677ff;
+}
+
+.login-form .ant-input {
+  font-size: 15px;
+}
+
+/* 登录按钮 */
+.login-button {
+  height: 48px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #1a73e8 !important;
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3) !important;
+  transition: background 0.3s, box-shadow 0.3s !important;
 }
 
 .login-button:hover {
-  background-color: #40a9ff;
+  background: #1557b0 !important;
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4) !important;
 }
 
-.login-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.login-button:active {
+  background: #0d47a1 !important;
+}
+
+/* 错误消息显示区域 */
+.login-message {
+  margin-top: 4px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #ff4d4f;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  animation: fadeIn 0.25s ease-in;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 平板电脑响应式 (≤1024px) */
+@media screen and (max-width: 1024px) {
+  .login-left-section {
+    padding-left: 60px;
+    max-width: 50%;
+  }
+  .login-right-section {
+    width: 380px;
+    margin-right: 60px;
+    padding: 36px 32px 32px;
+  }
+  .login-title {
+    font-size: 48px;
+  }
+}
+
+/* 平板电脑响应式 (≤768px) */
+@media screen and (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px;
+  }
+  .login-left-section {
+    padding-left: 0;
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 32px;
+  }
+  .login-title {
+    font-size: 40px;
+  }
+  .login-subtitle {
+    font-size: 16px;
+  }
+  .login-support {
+    font-size: 13px;
+    max-width: 100%;
+  }
+  .login-right-section {
+    width: 100%;
+    max-width: 420px;
+    margin-right: 0;
+    padding: 32px 28px 28px;
+  }
+}
+
+/* 手机响应式 (≤480px) */
+@media screen and (max-width: 480px) {
+  .login-left-section {
+    margin-bottom: 24px;
+  }
+  .login-title {
+    font-size: 32px;
+  }
+  .title-edb {
+    margin-right: 12px;
+  }
+  .login-subtitle {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .login-support {
+    font-size: 12px;
+  }
+  .login-right-section {
+    padding: 24px 20px 20px;
+  }
+  .login-form .ant-input-affix-wrapper {
+    height: 44px;
+  }
+  .login-button {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+  .login-message {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .login-form .ant-input-affix-wrapper {
+    border-width: 2px;
+    border-color: #000;
+  }
+  .login-message {
+    border-width: 2px;
+    color: #d10000;
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  .login-message {
+    animation: none;
+  }
+  .login-form .ant-input-affix-wrapper {
+    transition: none;
+  }
+  .login-button {
+    transition: none !important;
+  }
 }

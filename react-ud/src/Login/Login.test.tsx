@@ -1,349 +1,360 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import axios from 'axios';
 import Login from './Login';
 
-// Mock useNavigate hook
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+// Mock axios
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock authenticationApi to control test scenarios
-jest.mock('./Login', () => {
-  const originalModule = jest.requireActual('./Login');
-  
-  // Create a mock function that we can control in tests
-  const mockAuthenticationApi = jest.fn();
-  
-  return {
-    __esModule: true,
-    ...originalModule,
-    // We'll override this in each test
-  };
-});
-
+/**
+ * 登录组件单元测试
+ */
 describe('Login Component', () => {
+  const mockNavigate = jest.fn();
+
   beforeEach(() => {
-    mockNavigate.mockClear();
+    // 清除所有mock
     jest.clearAllMocks();
+    
+    // Mock useNavigate
+    jest.mock('react-router-dom', () => ({
+      ...jest.requireActual('react-router-dom'),
+      useNavigate: () => mockNavigate
+    }));
   });
 
-  const renderLogin = () => {
-    return render(
+  /**
+   * 测试1：渲染登录页面基本元素
+   */
+  test('renders login page with all elements', () => {
+    render(
       <BrowserRouter>
         <Login />
       </BrowserRouter>
     );
-  };
 
-  describe('Initial Render', () => {
-    test('renders login form with all required elements', () => {
-      renderLogin();
-      
-      expect(screen.getByLabelText(/UserID/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Login/i })).toBeInTheDocument();
-    });
-
-    test('initial values are empty', () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i) as HTMLInputElement;
-      const passwordInput = screen.getByLabelText(/Password/i) as HTMLInputElement;
-      
-      expect(userIDInput.value).toBe('');
-      expect(passwordInput.value).toBe('');
-    });
-
-    test('error message is not displayed initially', () => {
-      renderLogin();
-      
-      expect(screen.queryByText(/Username and password are required/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/We didn't recognize the username or password/i)).not.toBeInTheDocument();
-    });
+    // 检查标题是否存在
+    expect(screen.getByText(/EDB/i)).toBeInTheDocument();
+    expect(screen.getByText(/Engineering Database/i)).toBeInTheDocument();
+    
+    // 检查副标题
+    expect(screen.getByText(/Use Outlook id and password/i)).toBeInTheDocument();
+    
+    // 检查支持信息
+    expect(screen.getByText(/Support.TPI/i)).toBeInTheDocument();
+    
+    // 检查输入框
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs).toHaveLength(2);
+    
+    // 检查登录按钮
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
   });
 
-  describe('Input Validation', () => {
-    test('UserID input accepts only alphanumeric characters', () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin123' } });
-      expect((userIDInput as HTMLInputElement).value).toBe('admin123');
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin@123' } });
-      expect((userIDInput as HTMLInputElement).value).toBe('admin123'); // Special chars should be rejected
+  /**
+   * 测试2：用户ID为空时显示错误消息
+   */
+  test('shows error message when userId is empty', async () => {
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 只输入密码，不输入用户ID
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    // 等待错误消息显示
+    await waitFor(() => {
+      expect(screen.getByText(/Username and password are required/i)).toBeInTheDocument();
     });
 
-    test('UserID input respects MaxLength of 10', () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      
-      fireEvent.change(userIDInput, { target: { value: '12345678901' } });
-      expect((userIDInput as HTMLInputElement).value.length).toBeLessThanOrEqual(10);
-    });
-
-    test('Password input accepts alphanumeric and special characters', () => {
-      renderLogin();
-      
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      fireEvent.change(passwordInput, { target: { value: 'Pass@123!' } });
-      expect((passwordInput as HTMLInputElement).value).toBe('Pass@123!');
-    });
-
-    test('Password input respects MaxLength of 32', () => {
-      renderLogin();
-      
-      const passwordInput = screen.getByLabelText(/Password/i);
-      const longPassword = 'a'.repeat(33);
-      
-      fireEvent.change(passwordInput, { target: { value: longPassword } });
-      expect((passwordInput as HTMLInputElement).value.length).toBeLessThanOrEqual(32);
-    });
+    // 验证API未被调用
+    expect(mockedAxios.post).not.toHaveBeenCalled();
   });
 
-  describe('Empty Field Validation', () => {
-    test('shows error when UserID is empty and Login button is clicked', async () => {
-      renderLogin();
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
+  /**
+   * 测试3：密码为空时显示错误消息
+   */
+  test('shows error message when password is empty', async () => {
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 只输入用户ID，不输入密码
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.click(loginButton);
+
+    // 等待错误消息显示
+    await waitFor(() => {
+      expect(screen.getByText(/Username and password are required/i)).toBeInTheDocument();
+    });
+
+    // 验证API未被调用
+    expect(mockedAxios.post).not.toHaveBeenCalled();
+  });
+
+  /**
+   * 测试4：认证成功时跳转到菜单页面
+   */
+  test('navigates to menu on successful login', async () => {
+    // Mock成功的API响应
+    mockedAxios.post.mockResolvedValue({
+      data: {
+        status: 'success',
+        code: 200,
+        data: {
+          userId: 'testuser',
+          name: 'Test User',
+          role: 'USER'
+        },
+        message: 'success'
+      }
+    });
+
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 输入用户ID和密码
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    // 等待API调用和跳转
+    await waitFor(() => {
+      expect(mockedAxios.post).toHaveBeenCalledWith('/api/AuthenticationApi', {
+        userId: 'testuser',
+        password: 'password123'
       });
     });
 
-    test('shows error when Password is empty and Login button is clicked', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
-      });
+    // 验证sessionStorage中保存了用户信息
+    expect(sessionStorage.getItem('userInfo')).toBeTruthy();
+    
+    // 验证跳转到菜单页面
+    expect(mockNavigate).toHaveBeenCalledWith('/menu');
+  });
+
+  /**
+   * 测试5：认证失败时显示错误消息
+   */
+  test('shows error message on authentication failure', async () => {
+    // Mock失败的API响应（401）
+    mockedAxios.post.mockRejectedValue({
+      response: {
+        status: 401,
+        data: {
+          message: 'Invalid username or password.'
+        }
+      }
     });
 
-    test('shows error when both fields are empty and Login button is clicked', async () => {
-      renderLogin();
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
-      });
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 输入用户ID和密码
+    fireEvent.change(userIdInput, { target: { value: 'wronguser' } });
+    fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
+    fireEvent.click(loginButton);
+
+    // 等待错误消息显示
+    await waitFor(() => {
+      expect(screen.getByText(/We didn't recognize the username or password/i)).toBeInTheDocument();
     });
 
-    test('error message disappears when user starts typing', async () => {
-      renderLogin();
-      
-      // First trigger the error
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
-      });
-      
-      // Then type in UserID field
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      
-      expect(screen.queryByText('Username and password are required.')).not.toBeInTheDocument();
+    // 验证密码框被清空
+    expect(passwordInput).toHaveValue('');
+  });
+
+  /**
+   * 测试6：网络错误时显示相应消息
+   */
+  test('shows network error message on network failure', async () => {
+    // Mock网络错误
+    mockedAxios.post.mockRejectedValue({
+      request: {}
+    });
+
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 输入用户ID和密码
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    // 等待错误消息显示
+    await waitFor(() => {
+      expect(screen.getByText(/Network error/i)).toBeInTheDocument();
     });
   });
 
-  describe('API Authentication', () => {
-    test('calls authentication API with correct credentials', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      fireEvent.change(passwordInput, { target: { value: '123456' } });
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      // Wait for the async operation
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/TestMain');
-      }, { timeout: 2000 });
+  /**
+   * 测试7：服务器500错误时显示相应消息
+   */
+  test('shows system busy message on server 500 error', async () => {
+    // Mock服务器500错误
+    mockedAxios.post.mockRejectedValue({
+      response: {
+        status: 500
+      }
     });
 
-    test('shows error message when credentials are incorrect', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      fireEvent.change(userIDInput, { target: { value: 'wronguser' } });
-      fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            "We didn't recognize the username or password you entered. Please try again."
-          )
-        ).toBeInTheDocument();
-      }, { timeout: 2000 });
-    });
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
 
-    test('navigates to TestMain on successful authentication', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      fireEvent.change(passwordInput, { target: { value: '123456' } });
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/TestMain');
-      }, { timeout: 2000 });
-    });
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
-    test('trims whitespace from UserID and Password before validation', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      // Input with leading/trailing spaces
-      fireEvent.change(userIDInput, { target: { value: '  admin  ' } });
-      fireEvent.change(passwordInput, { target: { value: '  123456  ' } });
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/TestMain');
-      }, { timeout: 2000 });
+    // 输入用户ID和密码
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    // 等待错误消息显示
+    await waitFor(() => {
+      expect(screen.getByText(/System is busy/i)).toBeInTheDocument();
     });
   });
 
-  describe('Loading State', () => {
-    test('disables inputs and button during API call', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      fireEvent.change(passwordInput, { target: { value: '123456' } });
-      fireEvent.click(loginButton);
-      
-      // Check if button shows "Processing..." and is disabled
-      expect(loginButton).toHaveTextContent('Processing...');
-      expect(loginButton).toBeDisabled();
+  /**
+   * 测试8：按Enter键触发登录
+   */
+  test('triggers login on Enter key press', async () => {
+    // Mock成功的API响应
+    mockedAxios.post.mockResolvedValue({
+      data: {
+        status: 'success',
+        code: 200,
+        data: {
+          userId: 'testuser',
+          name: 'Test User',
+          role: 'USER'
+        },
+        message: 'success'
+      }
     });
 
-    test('re-enables form after failed authentication', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      
-      fireEvent.change(userIDInput, { target: { value: 'wronguser' } });
-      fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            "We didn't recognize the username or password you entered. Please try again."
-          )
-        ).toBeInTheDocument();
-      }, { timeout: 2000 });
-      
-      // Form should be re-enabled
-      expect(loginButton).not.toBeDisabled();
-      expect(loginButton).toHaveTextContent('Login');
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+
+    // 输入用户ID和密码
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    
+    // 在密码框按Enter键
+    fireEvent.keyDown(passwordInput, { key: 'Enter' });
+
+    // 等待API调用
+    await waitFor(() => {
+      expect(mockedAxios.post).toHaveBeenCalled();
     });
   });
 
-  describe('Form Submission', () => {
-    test('submits form when Enter key is pressed', async () => {
-      renderLogin();
-      
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      
-      fireEvent.change(userIDInput, { target: { value: 'admin' } });
-      fireEvent.change(passwordInput, { target: { value: '123456' } });
-      
-      // Press Enter in password field
-      fireEvent.keyDown(passwordInput, { key: 'Enter', code: 'Enter' });
-      
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/TestMain');
-      }, { timeout: 2000 });
-    });
+  /**
+   * 测试9：加载状态时按钮禁用
+   */
+  test('disables button during loading state', async () => {
+    // Mock一个延迟的API响应
+    mockedAxios.post.mockImplementation(() => 
+      new Promise((resolve) => setTimeout(resolve, 100))
+    );
+
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // 输入用户ID和密码并点击登录
+    fireEvent.change(userIdInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
+
+    // 验证按钮在加载期间被禁用
+    expect(loginButton).toBeDisabled();
   });
 
-  describe('Error Message Display', () => {
-    test('error message is left-aligned and styled correctly', async () => {
-      renderLogin();
-      
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
-      });
-      
-      // Verify error message exists (it's already styled in the component)
-      const errorMessage = screen.getByText('Username and password are required.');
-      expect(errorMessage).toBeInTheDocument();
+  /**
+   * 测试10：用户ID最大长度限制为10
+   */
+  test('limits userId input to 10 characters', () => {
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const userIdInput = screen.getAllByRole('textbox')[0];
+    
+    // 尝试输入超过10个字符
+    fireEvent.change(userIdInput, { 
+      target: { value: '123456789012345' } 
     });
 
-    test('only one error message is shown at a time', async () => {
-      renderLogin();
-      
-      // Trigger empty field error
-      const loginButton = screen.getByRole('button', { name: /Login/i });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username and password are required.')).toBeInTheDocument();
-      });
-      
-      // Fill in fields but with wrong credentials
-      const userIDInput = screen.getByLabelText(/UserID/i);
-      const passwordInput = screen.getByLabelText(/Password/i);
-      fireEvent.change(userIDInput, { target: { value: 'wronguser' } });
-      fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
-      fireEvent.click(loginButton);
-      
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            "We didn't recognize the username or password you entered. Please try again."
-          )
-        ).toBeInTheDocument();
-      }, { timeout: 2000 });
-      
-      // Old error should be gone
-      expect(screen.queryByText('Username and password are required.')).not.toBeInTheDocument();
-    });
+    // 验证maxLength属性
+    expect(userIdInput).toHaveAttribute('maxLength', '10');
+  });
+
+  /**
+   * 测试11：密码最大长度限制为32
+   */
+  test('limits password input to 32 characters', () => {
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    const passwordInput = screen.getAllByRole('textbox')[1];
+    
+    // 验证maxLength属性
+    expect(passwordInput).toHaveAttribute('maxLength', '32');
   });
 });

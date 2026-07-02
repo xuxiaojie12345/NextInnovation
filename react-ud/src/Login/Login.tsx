@@ -1,155 +1,141 @@
-import React, { useState } from "react";
-import "./Login.css";
-import { useNavigate } from "react-router-dom";
-// ... existing code ...
-
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
-const authenticationApi = async (
-  userID: string,
-  password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
-  });
-};
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Input, Button } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { z } from 'zod';
+import axios from 'axios';
+import './Login.css';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
-  // 状态管理 (对应设计书 6. 实现注意事项)
-  const [userID, setUserID] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
+  const [userId, setUserId] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // 处理 UserID 输入 (限制：半角英数字, MaxLength 10)
-  const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    // 正则校验：只允许半角英数字
-    if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 10) {
-      setUserID(val);
-      // 用户体验优化：用户重新输入时清空错误提示
-      if (message) setMessage("");
+  const navigate = useNavigate();
+
+  // 使用Zod定义数据验证规则
+  const loginSchema = z.object({
+    userId: z.string().min(1, 'Username and password are required.'),
+    password: z.string().min(1, 'Username and password are required.'),
+  });
+
+  // 执行表单验证
+  const validateForm = (): boolean => {
+    const result = loginSchema.safeParse({
+      userId: userId.trim(),
+      password: password,
+    });
+    if (!result.success) {
+      const firstError = result.error.errors[0];
+      setMessage(firstError.message);
+      return false;
     }
+    return true;
   };
 
-  // 处理 Password 输入 (限制：半角英数字+记号, MaxLength 32)
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    // 正则校验：允许半角英数字及常见 ASCII 符号
-    if (
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(val) &&
-      val.length <= 32
-    ) {
-      setPassword(val);
-      if (message) setMessage("");
+  // 处理登录按钮点击事件
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
     }
-  };
-
-  // 点击 Login 按钮触发 (对应设计书 3. 业务逻辑与校验规则)
-  const handleLogin = async () => {
-    // 1. 前置处理：去除首尾空格
-    const trimmedUserID = userID.trim();
-    const trimmedPassword = password.trim();
-
-    // 2. 空值校验 (Frontend Check)
-    if (!trimmedUserID || !trimmedPassword) {
-      setMessage("Username and password are required.");
-      return; // 终止流程，不调用 API
+    setMessage('');
+    if (!validateForm()) {
+      return;
     }
-
-    // 3. API 调用 (Backend Check)
     setIsLoading(true);
-    setMessage(""); // 清除旧消息
-
     try {
-      const result = await authenticationApi(trimmedUserID, trimmedPassword);
-
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
-        navigate("/Menu");
+      const response = await axios.post('/api/AuthenticationApi', {
+        userId: userId.trim(),
+        password: password,
+      });
+      if (response.data.status === 'success') {
+        sessionStorage.setItem('userInfo', JSON.stringify(response.data.data));
+        navigate('/menu');
       } else {
-        // 认证失败：显示指定错误信息
-        setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        setMessage("We didn't recognize the username or password you entered. Please try again.");
+        setPassword('');
       }
-    } catch (error) {
-      // 异常处理：网络错误或服务器错误
-      setMessage("System error. Please contact administrator.");
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          setMessage("We didn't recognize the username or password you entered. Please try again.");
+          setPassword('');
+        } else if (error.response.status >= 500) {
+          setMessage('System is busy, please try again later.');
+        } else {
+          setMessage('An unexpected error occurred. Please contact support.');
+        }
+      } else if (error.request) {
+        setMessage('Network error, please try again later.');
+      } else {
+        setMessage('An unexpected error occurred. Please contact support.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 处理键盘按键事件支持回车键登录
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
-    <div className='login-container'>
-      <div className='login-box'>
-        <div className='login-header'>
-          <h2>Login</h2>
-        </div>
-
-        {/* Message Label: Output, Left Align, Red Color */}
-        {message && (
-          <div
-            className='error-message'
-            style={{
-              color: "#ff4d4f",
-              textAlign: "left",
-              marginBottom: "15px",
-              fontSize: "14px",
-              wordBreak: "break-word",
-            }}
+    <div className="login-container">
+      {/* 左侧标题区域 */}
+      <div className="login-left-section">
+        <h1 className="login-title">
+          <span className="title-edb">EDB</span>
+          <span className="title-full">Engineering Database</span>
+        </h1>
+        <p className="login-subtitle">Use Outlook id and password</p>
+        <p className="login-support">
+          Support, authorization request or improvement suggestions, send mail to: Support.TPI
+        </p>
+      </div>
+      {/* 右侧登录表单区域 */}
+      <div className="login-right-section">
+        <form className="login-form" onSubmit={handleLogin}>
+          {/* 用户ID输入框 */}
+          <Input
+            size="large"
+            className="login-input"
+            placeholder="User ID"
+            prefix={<UserOutlined />}
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            maxLength={10}
+          />
+          {/* 密码输入框 */}
+          <Input.Password
+            size="large"
+            className="login-input"
+            placeholder="Password"
+            prefix={<LockOutlined />}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            maxLength={32}
+          />
+          {/* 登录按钮 */}
+          <Button
+            type="primary"
+            size="large"
+            className="login-button"
+            htmlType="submit"
+            loading={isLoading}
+            block
           >
-            {message}
-          </div>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          {/* UserID: TextField, Input, Left Align */}
-          <div className='form-group'>
-            <label htmlFor='userID'>UserID</label>
-            <input
-              id='userID'
-              type='text'
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder='Enter User ID'
-              disabled={isLoading}
-              autoComplete='username'
-            />
-          </div>
-
-          {/* Password: TextField, Input, Left Align, Masked */}
-          <div className='form-group'>
-            <label htmlFor='password'>Password</label>
-            <input
-              id='password'
-              type='password'
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder='Enter Password'
-              disabled={isLoading}
-              autoComplete='current-password'
-            />
-          </div>
-
-          {/* Login Button: Center Align, Active/Disabled Control */}
-          <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
-          </button>
+            Login
+          </Button>
+          {/* 错误消息显示区域 */}
+          {message && <div className="login-message">{message}</div>}
         </form>
       </div>
     </div>
