@@ -156,70 +156,89 @@ const UD08 = React.memo(() => {
 
         // 处理下拉列表数据
         // 返回格式: { code: 200, data: { productClasses: [{pc, description}, ...] } }
+        // 也可能 data 本身就是数组: { code: 200, data: [{pc, description}, ...] }
         const extractArray = (
           res: any,
           labelName: string = "",
+          useValueAsLabel: boolean = false,
         ): SelectOption[] => {
           if (!res || !res.data) return [];
+          // 如果 data 本身就是数组
+          if (Array.isArray(res.data)) {
+            return mapItems(res.data, labelName, useValueAsLabel);
+          }
           const dataObj = res.data;
           // 遍历 data 内的所有属性，找到第一个数组
           for (const key of Object.keys(dataObj)) {
             if (Array.isArray(dataObj[key])) {
-              const result = dataObj[key].map((item: any) => {
-                if (typeof item === "string") {
-                  return { value: item, label: item };
-                }
-                if (typeof item === "object" && item !== null) {
-                  // 尝试各种可能的字段名
-                  const possibleValueKeys = [
-                    "pc",
-                    "value",
-                    "code",
-                    "key",
-                    "id",
-                    "market",
-                    "mk",
-                    "productClass",
-                    "variable",
-                  ];
-                  const possibleLabelKeys = [
-                    "description",
-                    "label",
-                    "name",
-                    "desc",
-                    "text",
-                    "marketDescription",
-                    "marketName",
-                  ];
-                  let val = "";
-                  let lbl = "";
-                  for (const k of possibleValueKeys) {
-                    if (item[k] !== undefined) {
-                      val = String(item[k]);
-                      break;
-                    }
-                  }
-                  for (const k of possibleLabelKeys) {
-                    if (item[k] !== undefined) {
-                      lbl = String(item[k]);
-                      break;
-                    }
-                  }
-                  if (!val) val = labelName || `item_${Math.random()}`;
-                  if (!lbl) lbl = val;
-                  return { value: val, label: lbl };
-                }
-                return { value: String(item), label: String(item) };
-              });
-              // 调试日志
-              console.log(`UD08 extractArray (${key}):`, result.slice(0, 3));
-              return result;
+              console.log(
+                `UD08 extractArray found key: ${key}`,
+                dataObj[key].slice(0, 2),
+              );
+              return mapItems(dataObj[key], labelName, useValueAsLabel);
             }
           }
           return [];
         };
 
-        setProductClassOptions(extractArray(productRes));
+        const mapItems = (
+          items: any[],
+          labelName: string,
+          useValueAsLabel: boolean = false,
+        ): SelectOption[] => {
+          return items.map((item: any) => {
+            if (typeof item === "string") {
+              return { value: item, label: item };
+            }
+            if (typeof item === "object" && item !== null) {
+              // 尝试各种可能的字段名
+              const possibleValueKeys = [
+                "pc",
+                "value",
+                "code",
+                "key",
+                "id",
+                "market",
+                "mk",
+                "productClass",
+                "variable",
+              ];
+              const possibleLabelKeys = [
+                "description",
+                "label",
+                "name",
+                "desc",
+                "text",
+                "marketDescription",
+                "marketName",
+              ];
+              let val = "";
+              let lbl = "";
+              for (const k of possibleValueKeys) {
+                if (item[k] !== undefined) {
+                  val = String(item[k]);
+                  break;
+                }
+              }
+              for (const k of possibleLabelKeys) {
+                if (item[k] !== undefined) {
+                  lbl = String(item[k]);
+                  break;
+                }
+              }
+              if (!val) val = labelName || `item_${Math.random()}`;
+              if (useValueAsLabel) {
+                lbl = val;
+              } else if (!lbl) {
+                lbl = val;
+              }
+              return { value: val, label: lbl };
+            }
+            return { value: String(item), label: String(item) };
+          });
+        };
+
+        setProductClassOptions(extractArray(productRes, "", true));
         setMarketOptions(extractArray(marketRes));
         setVariableOptions(extractArray(variableRes));
         // 从 sessionStorage 恢复上次检索条件（从UD09返回时）
