@@ -1,0 +1,266 @@
+/* Login页面整体容器 */
+.login-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 背景图 */
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../fTRYDXFAD.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* 内容区域 */
+.login-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 80px;
+  gap: 100px;
+}
+
+/* 左侧标题区域 */
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* EDB标志 */
+.edb-logo {
+  font-size: 72px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-right: 15px;
+  display: inline-block;
+}
+
+/* Engineering Database文字 */
+.engineering-text {
+  font-size: 48px;
+  font-weight: 300;
+  color: #ffffff;
+  display: inline-block;
+}
+
+/* 主标题 */
+.login-title {
+  font-size: 0;
+  margin: 0 0 20px 0;
+  line-height: 1.2;
+}
+
+/* 副标题 */
+.login-subtitle {
+  font-size: 18px;
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+/* 支持信息 */
+.login-support {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.85;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+/* 支持链接 */
+.support-link {
+  color: #ffffff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.support-link:hover {
+  opacity: 0.8;
+}
+
+/* 右侧登录表单区域 */
+.login-right {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 登录表单 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 表单组 */
+.form-group {
+  width: 100%;
+}
+
+/* 输入框 */
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-input:disabled {
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: not-allowed;
+}
+
+/* 登录按钮 */
+.login-button {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.login-button:disabled {
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 错误消息 */
+.error-message {
+  margin-top: 20px;
+  padding: 12px 15px;
+  font-size: 13px;
+  color: #ff4d4f;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  line-height: 1.5;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .login-content {
+    padding: 0 40px;
+    gap: 60px;
+  }
+  
+  .edb-logo {
+    font-size: 56px;
+  }
+  
+  .engineering-text {
+    font-size: 36px;
+  }
+  
+  .login-right {
+    width: 350px;
+  }
+}
+
+@media (max-width: 992px) {
+  .login-content {
+    flex-direction: column;
+    padding: 40px;
+    gap: 40px;
+  }
+  
+  .login-left {
+    text-align: center;
+    align-items: center;
+  }
+  
+  .login-support {
+    max-width: 100%;
+  }
+  
+  .login-right {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-content {
+    padding: 20px;
+  }
+  
+  .edb-logo {
+    font-size: 42px;
+  }
+  
+  .engineering-text {
+    font-size: 28px;
+  }
+  
+  .login-subtitle {
+    font-size: 16px;
+  }
+  
+  .login-support {
+    font-size: 12px;
+  }
+  
+  .form-input,
+  .login-button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
