@@ -121,19 +121,36 @@ const GenerateDocument = () => {
   };
 
   // 处理文档下载
-  const handleDownloadDocument = () => {
+  const handleDownloadDocument = async () => {
     if (!documentData?.generatedFilePath) {
       setErrorMessage("Document file not found");
       return;
     }
 
-    // 触发文件下载
-    const link = document.createElement("a");
-    link.href = documentData.generatedFilePath;
-    link.download = `VIN_PLATE_${documentData.chnr}.trf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // 使用 fetch 获取文件内容
+      const response = await fetch(documentData.generatedFilePath);
+      if (!response.ok) {
+        throw new Error("File download failed");
+      }
+      const blob = await response.blob();
+      // 创建 blob URL
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // 触发文件下载
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `VIN_PLATE_${documentData.chnr}.trf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // 释放 blob URL
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download error:", error);
+      setErrorMessage("Document file not found");
+    }
   };
 
   // 跳转到Modify Document页面
@@ -175,6 +192,11 @@ const GenerateDocument = () => {
     <div className='gd-container'>
       {/* 主内容区域 - 带边框的容器 */}
       <div className='gd-main-content'>
+        {/* 标题区域 */}
+        <div className='gd-header'>
+          <h1 className='gd-title'>Generate document</h1>
+        </div>
+
         {/* 错误消息显示 */}
         {errorMessage && <div className='gd-error-message'>{errorMessage}</div>}
 

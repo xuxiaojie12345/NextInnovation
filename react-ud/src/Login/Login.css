@@ -44,6 +44,16 @@
   align-items: center;
 }
 
+.left-content .sub-title {
+  text-align: center;
+  align-self: center;
+}
+
+.left-content .support-text {
+  text-align: center;
+  align-self: center;
+}
+
 .support-text {
   font-size: 16px; /* 放大支持文字字体 */
   margin: 0;

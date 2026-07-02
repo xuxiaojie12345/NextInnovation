@@ -18,7 +18,6 @@
             AND CHNO = #{chassisNo}
         ORDER BY 
             UPDATE_DATETIME DESC
-        LIMIT 1
     </select>
     
 </mapper>

@@ -43,7 +43,10 @@ const ModifyDocument = () => {
   }, [searchParams]);
 
   // 获取文档数据
-  const fetchDocumentData = async (chassisNo: string, marketFromUrl: string) => {
+  const fetchDocumentData = async (
+    chassisNo: string,
+    marketFromUrl: string,
+  ) => {
     setIsLoading(true);
     setErrorMessage("");
 
@@ -75,10 +78,15 @@ const ModifyDocument = () => {
         const ud04Data = await ud04Response.json();
         if (ud04Data.code === 200 && ud04Data.data) {
           setDocumentData(ud04Data.data);
-          console.log("UD04 data loaded, generatedFilePath:", ud04Data.data.generatedFilePath);
+          console.log(
+            "UD04 data loaded, generatedFilePath:",
+            ud04Data.data.generatedFilePath,
+          );
         }
       } else {
-        console.warn("Failed to fetch UD04 data, template download may not work");
+        console.warn(
+          "Failed to fetch UD04 data, template download may not work",
+        );
       }
 
       // 调用UD05 API - 初期表示（只获取variables，不获取market和template）
@@ -210,15 +218,15 @@ const ModifyDocument = () => {
 
       if (data.code === 200) {
         alert("Document updated successfully!");
-        
+
         // 拆分完整的底盘号为 Chassis series 和 Chassis no
         const chassisSeries = chassisNo.substring(0, 4);
         const chassisNoPart = chassisNo.substring(4);
-        
+
         console.log("Navigating to Save Modifications with:");
         console.log("  Chassis serie:", chassisSeries);
         console.log("  Chassis number:", chassisNoPart);
-        
+
         // 跳转到UD06 Save Modifications页面，传递Chassis serie和Chassis number参数
         navigate(
           `/save-modifications?chassisSerie=${encodeURIComponent(chassisSeries)}&chassisNumber=${encodeURIComponent(chassisNoPart)}`,
@@ -232,12 +240,6 @@ const ModifyDocument = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Cancel按钮处理
-  const handleCancel = () => {
-    // 返回到Generate Document页面
-    navigate(`/generate-document?chassisNo=${encodeURIComponent(chassisNo)}`);
   };
 
   // Template链接点击处理 - 下载Vin Plate的.trf文件
@@ -255,7 +257,7 @@ const ModifyDocument = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     console.log("Downloading template file:", documentData.generatedFilePath);
     console.log("Downloaded filename:", `VIN_PLATE_${chassisNo}.trf`);
   };
@@ -281,17 +283,26 @@ const ModifyDocument = () => {
           <span className='md-label'>Chassis no:</span>
           <span className='md-value md-chassis-no'>
             {chassisNo.substring(0, 4)}
-            <a 
-              href="#" 
+            <a
+              href='#'
               onClick={(e) => {
                 e.preventDefault(); // 阻止默认行为
                 if (chassisNo && chassisNo !== "-") {
-                  console.log("Navigating to Vehicle Specification with chassis no:", chassisNo);
-                  navigate(`/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`);
+                  console.log(
+                    "Navigating to Vehicle Specification with chassis no:",
+                    chassisNo,
+                  );
+                  navigate(
+                    `/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`,
+                  );
                 }
               }}
               className='md-link'
-              style={{ cursor: 'pointer', color: '#0000ff', textDecoration: 'underline' }}
+              style={{
+                cursor: "pointer",
+                color: "#0000ff",
+                textDecoration: "underline",
+              }}
             >
               {chassisNo.substring(4)}
             </a>
@@ -354,6 +365,7 @@ const ModifyDocument = () => {
                     }
                     className='md-input'
                     placeholder=''
+                    maxLength={500}
                   />
                 </td>
               </tr>

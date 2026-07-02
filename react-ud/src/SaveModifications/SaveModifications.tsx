@@ -85,7 +85,7 @@ const SaveModifications = () => {
         const modificationList = data.data.modificationList || [];
         console.log("modificationList length:", modificationList.length);
 
-        // 即使没有数据，也设置基本信息（从URL参数获取）
+        // 使用URL参数设置基本信息
         const modificationInfo: ModificationData = {
           chassisSerie: chassisSerieParam,
           chassisNumber: chassisNumberParam,
@@ -96,7 +96,8 @@ const SaveModifications = () => {
           message: "VERSION IS RELEASED",
         };
 
-        // 如果有数据，填充具体值
+        // 如果有数据，用第一条记录的字段填充显示
+        // 注意：后端返回所有记录，但画面目前按原有布局只展示第一条的核心信息
         if (modificationList.length > 0) {
           const firstRecord = modificationList[0];
           console.log("========== First Record Debug ==========");
@@ -107,7 +108,6 @@ const SaveModifications = () => {
           console.log("firstRecord.newval:", firstRecord.newval);
           console.log("========================================");
 
-          // 构建Storing字段：VARIABLE NEWVAL (注意：后端返回的是小写字段名，中间用空格分隔)
           const storingValue = `${firstRecord.variable} ${firstRecord.newval}`;
 
           modificationInfo.doctype = firstRecord.doctype || "-";
@@ -141,7 +141,6 @@ const SaveModifications = () => {
 
   // Close按钮处理
   const handleClose = () => {
-    // 返回到前一个画面（使用浏览器历史）
     navigate(-1);
   };
 
