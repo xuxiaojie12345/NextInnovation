@@ -161,13 +161,6 @@ const UD02 = React.memo(() => {
             )}
           </div>
         ))}
-
-        {/* 用户信息显示 */}
-        {user && (
-          <div className="user-info">
-            <span>Logged in as: {user.name}</span>
-          </div>
-        )}
       </nav>
     </div>
   );
