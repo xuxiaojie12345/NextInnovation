@@ -36,7 +36,7 @@ const UD21 = React.memo(() => {
   return (
     <div className="ud21-container">
       <header className="ud21-header">
-        <div className="ud21-header-logo">VOLVO</div>
+        <div className="ud21-header-logo"></div>
       </header>
       <main className="ud21-main">
         <div className="ud21-card">
