@@ -91,10 +91,6 @@ const VehicleSpecification: React.FC = () => {
       <h1 className="vs-title">VDA - Vehicle Specification</h1>
 
       {/* 表头左对齐 */}
-      {/* <div className="vs-section-header">Vehicle Information</div> */}
-
-      {/* Vehicle Information 表头 */}
-      {/* <div className="vs-section-header">Vehicle Information</div> */}
 
       {/* 四列表格：项目名: | 项目值 | 项目名: | 项目值 */}
       <table className="vs-info-table">
@@ -130,10 +126,6 @@ const VehicleSpecification: React.FC = () => {
       <div style={{ height: '30px' }} />
 
       {/* KOLA Configuration 左对齐 */}
-      {/* <div className="vs-section-header">KOLA Configuration</div> */}
-
-      {/* 间隔 30px */}
-      {/* <div style={{ height: '30px' }} /> */}
 
       {data.kolaList && data.kolaList.length > 0 ? (
         <div className="vs-symbol-list">

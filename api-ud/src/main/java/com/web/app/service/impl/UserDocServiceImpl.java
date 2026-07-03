@@ -27,6 +27,16 @@ public class UserDocServiceImpl implements UserDocService {
     }
 
     @Override
+    public int deleteUserDoc(String userid) {
+        return userDocMapper.deleteUserDoc(userid);
+    }
+
+    @Override
+    public int createUserDoc(String userid, String doctype, String currentUser) {
+        return userDocMapper.insertUserDoc(userid, doctype, currentUser);
+    }
+
+    @Override
     public int selectFunctionAuthCount(String userid) {
         return userDocMapper.selectFunctionAuthCount(userid);
     }

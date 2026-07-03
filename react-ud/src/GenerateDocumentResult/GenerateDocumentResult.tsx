@@ -56,7 +56,7 @@ const GenerateDocumentResult: React.FC = () => {
         if (res.code === 200 && res.data) {
           setData(res.data);
         } else {
-          setErrorMessage(res.message || 'Chassis no is not exists');
+          setErrorMessage(res.message || 'Vehicle data not found.');
         }
       } catch {
         setErrorMessage('System error. Please contact administrator.');
@@ -180,12 +180,9 @@ const GenerateDocumentResult: React.FC = () => {
         </div>       
       </div>
 
-      
-
       {/* 文档信息 */}
       <div className="doc-section">
         <div className="info-row" style={{ marginTop: '25px',marginBottom: '10px' }}>
-          {/* <span className="info-label">Analyze Rules</span> */}
           <span className="info-value">
             <span className="link-like" onClick={() => alert('Analyze Rules clicked')}>
               Analyze Rules
@@ -195,7 +192,6 @@ const GenerateDocumentResult: React.FC = () => {
 
         {data?.modifyDocLink && (
           <div className="info-row">
-            {/* <span className="info-label">Modify Doc</span> */}
             <span className="info-value modify-warning link-like" style={{ textDecorationColor: 'red', color: 'red', marginBottom: '10px', cursor: 'pointer' }} onClick={handleModifyDocClick}>
               After def change detected. Document need to be modified.
             </span>
@@ -254,11 +250,6 @@ const GenerateDocumentResult: React.FC = () => {
         </div>
       </div>
 
-      {/* <div className="gen-doc-result-actions">
-        <button className="btn btn-secondary" onClick={() => navigate('/menu/generate-doc')}>
-          Back
-        </button>
-      </div> */}
     </div>
   );
 };

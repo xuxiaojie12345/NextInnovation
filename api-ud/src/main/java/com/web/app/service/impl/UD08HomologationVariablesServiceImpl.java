@@ -40,15 +40,20 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
 
     @Override
     public int addRule(HdocUserDefinedRules rule) {
-        String currentUser = "SYSTEM";
-        rule.setRegisterUser(currentUser);
-        rule.setUpdateUser(currentUser);
+        if (rule.getRegisterUser() == null || rule.getRegisterUser().trim().isEmpty()) {
+            rule.setRegisterUser("SYSTEM");
+        }
+        if (rule.getUpdateUser() == null || rule.getUpdateUser().trim().isEmpty()) {
+            rule.setUpdateUser("SYSTEM");
+        }
         return mapper.insertRule(rule);
     }
 
     @Override
     public int updateRule(HdocUserDefinedRules rule) {
-        rule.setUpdateUser("SYSTEM");
+        if (rule.getUpdateUser() == null || rule.getUpdateUser().trim().isEmpty()) {
+            rule.setUpdateUser("SYSTEM");
+        }
         return mapper.updateRule(rule);
     }
 

@@ -17,8 +17,10 @@
             UPDATE_USER,
             UPDATE_PROCESS
         FROM hdoc_user_infor
-        WHERE USERID = #{userid} 
+        WHERE USERID = #{userid}
+        <if test="password != null and password != ''">
           AND PASSWORD = #{password}
+        </if>
     </select>
     
 </mapper>

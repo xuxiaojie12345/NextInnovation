@@ -55,7 +55,6 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             {/* Quick Guides 卡片展示区（上部） */}
             <div className="dpg-link-section">
               <div className="dpg-link-item">
-                {/* <span className="dpg-link-arrow">•</span> */}
                 <span className="dpg-link">Download and Print Quick Guides</span>
               </div>
               {QUICK_GUIDES.map((name) => (

@@ -16,28 +16,45 @@ public class UserDocController {
     @Autowired
     private UserDocService userDocService;
 
-    @PostMapping("/user/doc/update")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> updateUserDoc(@RequestBody Map<String, Object> request) {
+    @PostMapping("/user/doc/delete")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteUserDoc(@RequestBody Map<String, String> request) {
+        try {
+            String userid = request.get("userid");
+            if (userid == null || userid.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "User ID is required."));
+            }
+
+            userDocService.deleteUserDoc(userid);
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", userid);
+            return ResponseEntity.ok(ApiResponse.success(data));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+        }
+    }
+
+    @PostMapping("/user/doc/create")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> createUserDoc(@RequestBody Map<String, Object> request) {
         try {
             String userid = (String) request.get("userid");
-            @SuppressWarnings("unchecked")
-            List<String> doctypeList = (List<String>) request.get("doctype");
+            String doctype = (String) request.get("doctype");
+            String currentUser = (String) request.getOrDefault("currentUser", "SYSTEM");
 
             if (userid == null || userid.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                     .body(ApiResponse.error(400, "User ID is required."));
             }
-            if (doctypeList == null || doctypeList.isEmpty()) {
+            if (doctype == null || doctype.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(400, "Document type list is required."));
+                    .body(ApiResponse.error(400, "Document type is required."));
             }
 
-            userDocService.updateUserDoc(userid, doctypeList);
+            userDocService.createUserDoc(userid, doctype, currentUser);
             Map<String, Object> data = new HashMap<>();
             data.put("userId", userid);
-            data.put("docType", doctypeList);
-            data.put("updateTime", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                .format(new java.util.Date()));
+            data.put("docType", doctype);
             return ResponseEntity.ok(ApiResponse.success(data));
         } catch (Exception e) {
             return ResponseEntity.status(500)

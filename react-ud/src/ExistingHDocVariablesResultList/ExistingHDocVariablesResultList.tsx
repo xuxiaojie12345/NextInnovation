@@ -134,15 +134,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Down 操作：跳转到 Homologation Variables 页面并携带选中记录的 Variable
    */
   const handleDown = () => {
-    if (selectedIdx < 0) {
-      setErrorMessage('No key defined for table.');
-      return;
-    }
-    const record = results[selectedIdx];
-    // 跳转到 Homologation Variables 页面，携带 variable 参数
-    navigate('/menu/homologation-variables', {
-      state: { downVariable: record.variable },
-    });
+    window.alert('暂定不实装');
   };
 
   /**
@@ -151,7 +143,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   const handleExcel = () => {
     setErrorMessage('');
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const fileName = `HDoc_Variables_${today}.csv`;
+    const fileName = `ExistingHDocVariablesResultList_${today}.csv`;
 
     const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
     const csvRows = results.map(r =>

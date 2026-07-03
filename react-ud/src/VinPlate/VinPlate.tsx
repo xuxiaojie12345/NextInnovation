@@ -38,13 +38,6 @@ const VinPlate: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   const clearMessages = () => {
     setMessage('');
     setSuccessMessage('');
@@ -156,9 +149,8 @@ const VinPlate: React.FC = () => {
           parseXmlDoc(res.data.xmlDoc);
         }
 
-        setSuccessMessage('VIN Plate information loaded successfully.');
       } else {
-        setMessage('Chassis record not found.');
+        setMessage(`Chassis number ${chassisNumber.trim()} not found.`);
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -177,10 +169,11 @@ const VinPlate: React.FC = () => {
     }
 
     const { serie, chnr } = parseChassis(chassisNumber);
+    const currentUser = localStorage.getItem('userId') || '';
 
     setIsLoading(true);
     try {
-      const res = await api.post(endpoint, { serie, chnr });
+      const res = await api.post(endpoint, { serie, chnr, currentUser });
 
       if (res.code === 200) {
         setSuccessMessage(successMsg);
@@ -202,11 +195,14 @@ const VinPlate: React.FC = () => {
   const handleChangeToAdvanced = () => executeAction('/ud15/changeToAdvancedInfo', 'Type changed to Advanced Info.');
 
   // ── 状态/类型映射 ──
-  const getStatusText = (status: string): string => {
-    switch (status) {
-      case '0': return 'Regenerate';
-      case '1': return 'OK';
-      default: return status || '-';
+  const getStatusText = (status: any): string => {
+    const s = String(status);
+    switch (s) {
+      case '0': return '新规追加';
+      case '1': return 'XML文档已作成';
+      case '2': return '已发送';
+      case '9': return '错误';
+      default: return s || '-';
     }
   };
 

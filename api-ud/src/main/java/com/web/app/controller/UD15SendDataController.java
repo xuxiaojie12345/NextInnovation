@@ -51,7 +51,8 @@ public class UD15SendDataController {
                     .body(ApiResponse.error(400, "Serie and CHNR are required."));
             }
 
-            int result = ud15SendDataService.setRegenerate(serie, chnr);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = ud15SendDataService.setRegenerate(serie, chnr, currentUser);
             if (result > 0) {
                 return ResponseEntity.ok(ApiResponse.success(null));
             } else {
@@ -75,7 +76,8 @@ public class UD15SendDataController {
                     .body(ApiResponse.error(400, "Serie and CHNR are required."));
             }
 
-            int result = ud15SendDataService.setOK(serie, chnr);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = ud15SendDataService.setOK(serie, chnr, currentUser);
             if (result > 0) {
                 return ResponseEntity.ok(ApiResponse.success(null));
             } else {
@@ -99,7 +101,8 @@ public class UD15SendDataController {
                     .body(ApiResponse.error(400, "Serie and CHNR are required."));
             }
 
-            int result = ud15SendDataService.changeToBasicInfo(serie, chnr);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = ud15SendDataService.changeToBasicInfo(serie, chnr, currentUser);
             if (result > 0) {
                 return ResponseEntity.ok(ApiResponse.success(null));
             } else {
@@ -123,7 +126,8 @@ public class UD15SendDataController {
                     .body(ApiResponse.error(400, "Serie and CHNR are required."));
             }
 
-            int result = ud15SendDataService.changeToAdvancedInfo(serie, chnr);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = ud15SendDataService.changeToAdvancedInfo(serie, chnr, currentUser);
             if (result > 0) {
                 return ResponseEntity.ok(ApiResponse.success(null));
             } else {

@@ -69,14 +69,16 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateUserRole(String userid, List<Map<String, String>> authList) {
+    public int updateUserRole(String userid, List<Map<String, String>> authList, String currentUser) {
         // 1. Delete existing function auth
         userAdminMapper.deleteFunctionAuth(userid);
         // 2. Delete existing market auth
         userAdminMapper.deleteMarketAuth(userid);
 
         int count = 0;
-        String currentUser = "SYSTEM";
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            currentUser = "SYSTEM";
+        }
         // 3. Insert new auth records (deduplicate function auth)
         Set<String> insertedFunctions = new HashSet<>();
         for (Map<String, String> auth : authList) {

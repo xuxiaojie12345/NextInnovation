@@ -3,7 +3,7 @@
 <mapper namespace="com.web.app.mapper.UD20DocumentMapper">
 
     <select id="selectDocumentList" resultType="map">
-        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
+        SELECT DOCTYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME
         FROM HDOC_DOCUMENT_LIST
         WHERE 1=1
         <if test="doctype != null and doctype != ''">
@@ -25,12 +25,22 @@
         </if>
         <if test="registerDatetime != null and registerDatetime != ''">
             <choose>
-                <when test='registerDatetimeOp == "!="'> AND REGISTER_DATETIME != #{registerDatetime}</when>
-                <when test='registerDatetimeOp == "&gt;"'> AND REGISTER_DATETIME &gt; #{registerDatetime}</when>
-                <when test='registerDatetimeOp == "&lt;"'> AND REGISTER_DATETIME &lt; #{registerDatetime}</when>
-                <otherwise> AND REGISTER_DATETIME = #{registerDatetime}</otherwise>
+                <when test='registerDatetimeOp == "!="'> AND DATE(REGISTER_DATETIME) != #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&gt;"'> AND DATE(REGISTER_DATETIME) &gt; #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "&lt;"'> AND DATE(REGISTER_DATETIME) &lt; #{registerDatetime}</when>
+                <otherwise> AND DATE(REGISTER_DATETIME) = #{registerDatetime}</otherwise>
             </choose>
         </if>
     </select>
+
+    <update id="updateDocumentList" parameterType="map">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET REGISTER_USER = #{registerUser},
+            REGISTER_DATETIME = #{registerDatetime},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{currentUser},
+            UPDATE_PROCESS = 'UD20MarketDocumentSettingsApi'
+        WHERE DOCTYPE = #{doctype}
+    </update>
 
 </mapper>

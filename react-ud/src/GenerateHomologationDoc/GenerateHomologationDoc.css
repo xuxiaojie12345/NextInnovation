@@ -5,7 +5,6 @@
   width: 700px;
   max-width: 800px;
   padding: 0;
-  /* margin-top: 20px; */
 }
 
 /* ── 顶部标题栏 ── */
@@ -15,8 +14,6 @@
   gap: 10px;
   padding: 12px 20px;
   border-bottom: 2px solid #acb7ee;
-  /* border-bottom: none; */
-  /* border-radius: 6px 6px 0 0; */
   margin-bottom: 0;
 }
 
@@ -35,7 +32,6 @@
   background-color: #ffffff;
   border: 2px solid #acb7ee;
   border-top: none;
-  /* border-radius: 0 0 6px 6px; */
   padding: 24px 24px 0;
   box-sizing: border-box;
 }

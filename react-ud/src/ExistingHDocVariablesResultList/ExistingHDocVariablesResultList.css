@@ -185,3 +185,42 @@
 .link-user:hover {
   color: #001a4d;
 }
+
+/* ═══════════════════════════════════════════
+   印刷用スタイル
+   ═══════════════════════════════════════════ */
+@media print {
+  .ehvr-btn-table,
+  .ehvr-count,
+  .th-check,
+  .td-check {
+    display: none !important;
+  }
+
+  .ehvr-container {
+    width: 100% !important;
+    border: none !important;
+  }
+
+  .ehvr-table-wrapper {
+    overflow-x: visible !important;
+    margin: 0 !important;
+  }
+
+  .ehvr-table {
+    width: 100% !important;
+    font-size: 9px !important;
+    table-layout: fixed !important;
+  }
+
+  .ehvr-table th,
+  .ehvr-table td {
+    padding: 3px 4px !important;
+    font-size: 9px !important;
+    word-break: break-all !important;
+  }
+
+  .ehvr-table th {
+    min-width: auto !important;
+  }
+}

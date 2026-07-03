@@ -31,6 +31,15 @@
   margin-bottom: 6px;
 }
 
+.mdsl-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
 .mdsl-form {
   padding: 8px 10px;
 }
@@ -97,7 +106,6 @@
 
 /* ── 边框包裹：按钮 + 检索条件 ── */
 .mdsl-bordered {
-  /* border-bottom: 2px solid #acb7ee; */
   border-top: 2px solid #acb7ee;
 }
 

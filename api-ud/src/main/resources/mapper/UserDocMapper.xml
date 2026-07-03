@@ -11,8 +11,8 @@
             REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
             UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
         VALUES (#{userid}, #{doctype},
-            NOW(), #{currentUser}, 'UserDocUpdate',
-            NOW(), #{currentUser}, 'UserDocUpdate')
+            NOW(), #{currentUser}, 'UD18CreateHdocUserDoc',
+            NOW(), #{currentUser}, 'UD18CreateHdocUserDoc')
     </insert>
 
     <select id="selectFunctionAuthCount" resultType="int">

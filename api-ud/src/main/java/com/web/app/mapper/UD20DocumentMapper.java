@@ -9,4 +9,5 @@ import java.util.Map;
 public interface UD20DocumentMapper {
 
     List<Map<String, Object>> selectDocumentList(Map<String, String> params);
+    int updateDocumentList(Map<String, String> params);
 }

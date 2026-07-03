@@ -40,7 +40,6 @@
   text-align: left;
   margin-bottom: 12px;
   padding-bottom: 6px;
-  /* border-bottom: 1px solid #e0e0e0; */
 }
 
 /* ── 4列情報テーブル（項目名: | 値 | 項目名: | 値） ── */
@@ -70,9 +69,6 @@
 /* ── KOLA シンボルリスト（左詰め） ── */
 /* ── KOLA シンボルリスト（左詰め） ── */
 .vs-symbol-list {
-  /* display: flex;
-  flex-direction: column; */
-  /* gap: 4px; */
 }
 
 .vs-symbol-item {

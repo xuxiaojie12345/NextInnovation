@@ -100,7 +100,7 @@ const ModifyDocument: React.FC = () => {
           },
         });
       } else {
-        setErrorMessage(res.message || 'Failed to save modifications.');
+        setErrorMessage(res.message || 'Failed to save modifications. Please try again.');
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');
@@ -182,7 +182,6 @@ const ModifyDocument: React.FC = () => {
                         value={modifiedValues[v.variable] || ''}
                         onChange={(e) => handleValueChange(v.variable, e.target.value)}
                         maxLength={500}
-                        // placeholder="Enter new value"
                         disabled={isSaving}
                       />
                     </td>

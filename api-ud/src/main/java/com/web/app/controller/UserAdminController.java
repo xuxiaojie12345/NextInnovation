@@ -49,7 +49,8 @@ public class UserAdminController {
                     .body(ApiResponse.error(400, "Auth list is required."));
             }
 
-            int updateCount = userAdminService.updateUserRole(userid, authList);
+            String currentUser = (String) request.getOrDefault("currentUser", "SYSTEM");
+            int updateCount = userAdminService.updateUserRole(userid, authList, currentUser);
             Map<String, Object> data = new HashMap<>();
             data.put("userId", userid);
             data.put("updateCount", updateCount);

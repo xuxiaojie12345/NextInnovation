@@ -67,6 +67,7 @@
     "@playwright/test": "^1.61.1",
     "@types/react-router-dom": "^5.3.3",
     "http-proxy-middleware": "^2.0.9",
+    "mysql2": "^3.22.5",
     "playwright": "^1.61.1",
     "sass": "^1.72.0"
   }

@@ -29,13 +29,6 @@ const ListAvailableTemplates: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   const clearMessages = () => {
     setMessage('');
     setSuccessMessage('');
@@ -186,7 +179,7 @@ const ListAvailableTemplates: React.FC = () => {
   return (
     <div className="lat-container">
       <div className="lat-header">
-        <h1>List Available Templates</h1>
+        <h1>List Templates</h1>
       </div>
 
       {message && <div className="lat-error">{message}</div>}

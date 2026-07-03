@@ -13,7 +13,6 @@
 
 /* ── 标题区域（深蓝色条） ── */
 .homologation-vars-header {
-  /* background-color: #002060; */
   padding: 6px 16px;
   margin-bottom: 0;
   text-align: left;
@@ -145,6 +144,12 @@
   min-width: 230px;
 }
 
+/* Number 和 Market 等宽 */
+.hv-row-number .hv-cond-input,
+.hv-row-market .hv-cond-select {
+  min-width: 180px;
+}
+
 /* Variable 输入框加宽 50px */
 .hv-row-variable .hv-cond-input {
   min-width: 170px;
@@ -211,8 +216,8 @@
   color: #888;
   white-space: nowrap;
   flex-shrink: 0;
-  margin-left: auto;
-  margin-right: 20px;
+  margin-right: auto; /* 右边自动填充，元素靠左 */
+  margin-left: 360px;
 }
 
 /* ═══════════════════════════════════════════

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { api } from '../services/api';
 import '../common/css/common.css';
@@ -24,6 +24,7 @@ const SearchUser: React.FC = () => {
   const [results, setResults] = useState<UserRecord[]>([]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const marketRef = useRef<HTMLSelectElement>(null);
 
   // 加载 Market 列表
   useEffect(() => {
@@ -32,12 +33,21 @@ const SearchUser: React.FC = () => {
         const res = await api.post<{ marketList: string[] }>('/ud19/selectMarketMaster', {});
         if (res.code === 200 && res.data) {
           setMarkets(res.data.marketList || []);
+        } else {
+          setMessage('System error. Please contact administrator.');
         }
       } catch {
-        // silently fail
+        setMessage('System error. Please contact administrator.');
       }
     })();
   }, []);
+
+  // Market 列表加载完成后，取消所有选中项
+  useEffect(() => {
+    if (marketRef.current) {
+      marketRef.current.selectedIndex = -1;
+    }
+  }, [markets]);
 
   // 如果有从外部传入的 userid（如从 EDB User View），自动执行查询
   useEffect(() => {
@@ -52,16 +62,30 @@ const SearchUser: React.FC = () => {
   const handleSearch = async () => {
     clearMessages();
 
-    if (!userid.trim() && !username.trim() && !market && !permissionFilter) {
+    const trimmedUserid = userid.trim();
+    const trimmedUsername = username.trim();
+
+    if (!trimmedUserid && !trimmedUsername && !market && !permissionFilter) {
       setMessage('请输入至少一个查询条件');
+      return;
+    }
+
+    // 半角英数字校验
+    const alphanumericRegex = /^[a-zA-Z0-9]*$/;
+    if (trimmedUserid && !alphanumericRegex.test(trimmedUserid)) {
+      setMessage('Userid must be alphanumeric.');
+      return;
+    }
+    if (trimmedUsername && !alphanumericRegex.test(trimmedUsername)) {
+      setMessage('User must be alphanumeric.');
       return;
     }
 
     setIsLoading(true);
     try {
       const res = await api.post<{ hdocList: UserRecord[] }>('/ud19/searchHdoc', {
-        userid: userid.trim(),
-        user: username.trim(),
+        userid: trimmedUserid,
+        user: trimmedUsername,
         check: permissionFilter,
         market: market,
       });
@@ -118,9 +142,10 @@ const SearchUser: React.FC = () => {
           <div className="su-market-section">
             <span className="su-label">Market</span>
             <select
+              ref={marketRef}
               className="su-market-listbox"
               size={Math.max(markets.length, 3)}
-              value={market}
+              defaultValue=""
               onChange={(e) => setMarket(e.target.value)}
               disabled={isLoading}
             >
@@ -130,7 +155,6 @@ const SearchUser: React.FC = () => {
             </select>
           </div>
           <div className="su-perm-section">
-            {/* <span className="su-label">Permission</span> */}
             <div className="su-perm-group">
               <label className="su-radio-label">
                 <input

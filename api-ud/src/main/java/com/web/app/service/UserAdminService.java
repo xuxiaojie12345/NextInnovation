@@ -5,6 +5,6 @@ import java.util.Map;
 
 public interface UserAdminService {
     Map<String, Object> getUserAuthList(String userid);
-    int updateUserRole(String userid, List<Map<String, String>> authList);
+    int updateUserRole(String userid, List<Map<String, String>> authList, String currentUser);
     void deleteUserRole(String userid);
 }

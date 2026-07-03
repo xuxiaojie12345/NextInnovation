@@ -238,7 +238,7 @@ const HomologationVariablesResultList: React.FC = () => {
                   <td>{row.market}</td>
                   <td>{row.variable}</td>
                   <td>{row.val}</td>
-                  <td>{row.vs}</td>
+                  <td>{row.vs}-{row.vs2}</td>
                   <td>{row.comments}</td>
                   <td>{row.addDate}</td>
                   <td>{row.deleteDate}</td>

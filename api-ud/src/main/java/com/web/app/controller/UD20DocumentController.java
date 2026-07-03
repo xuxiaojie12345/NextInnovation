@@ -29,4 +29,34 @@ public class UD20DocumentController {
                 .body(ApiResponse.error(500, "System error. Please contact administrator."));
         }
     }
+
+    @PostMapping("/updateDocumentList")
+    public ResponseEntity<ApiResponse<Void>> updateDocumentList(
+            @RequestBody Map<String, String> params) {
+        try {
+            String doctype = params.get("doctype");
+            String registerUser = params.get("registerUser");
+            String registerDatetime = params.get("registerDatetime");
+
+            if (doctype == null || doctype.isEmpty() ||
+                registerUser == null || registerUser.isEmpty() ||
+                registerDatetime == null || registerDatetime.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "Document type, User and Date are required."));
+            }
+
+            int rows = ud20DocumentService.updateDocumentList(params);
+            if (rows > 0) {
+                ApiResponse<Void> res = ApiResponse.success(null);
+                res.setMessage("更新成功");
+                return ResponseEntity.ok(res);
+            } else {
+                return ResponseEntity.status(404)
+                    .body(ApiResponse.error(404, "No matching data found. Update failed."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+        }
+    }
 }

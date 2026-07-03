@@ -18,23 +18,27 @@ public class UD15SendDataServiceImpl implements UD15SendDataService {
         return mapper.selectVinPlateInfo(serie, chnr);
     }
 
-    @Override
-    public int setRegenerate(String serie, String chnr) {
-        return mapper.updateStatus(serie, chnr, "0", null, "UD15SetRegenerate");
+    private String resolveUser(String updateUser) {
+        return (updateUser != null && !updateUser.trim().isEmpty()) ? updateUser.trim() : "SYSTEM";
     }
 
     @Override
-    public int setOK(String serie, String chnr) {
-        return mapper.updateStatus(serie, chnr, "1", null, "UD15SetOK");
+    public int setRegenerate(String serie, String chnr, String updateUser) {
+        return mapper.updateStatus(serie, chnr, "0", null, "UD15SetRegenerate", resolveUser(updateUser));
     }
 
     @Override
-    public int changeToBasicInfo(String serie, String chnr) {
-        return mapper.updateStatusAndType(serie, chnr, "0", "1", "UD15ChangetoBasicInfo");
+    public int setOK(String serie, String chnr, String updateUser) {
+        return mapper.updateStatus(serie, chnr, "1", null, "UD15SetOK", resolveUser(updateUser));
     }
 
     @Override
-    public int changeToAdvancedInfo(String serie, String chnr) {
-        return mapper.updateStatusAndType(serie, chnr, "0", "2", "UD15ChangetoAdvancedInfo");
+    public int changeToBasicInfo(String serie, String chnr, String updateUser) {
+        return mapper.updateStatusAndType(serie, chnr, "0", "1", "UD15ChangetoBasicInfo", resolveUser(updateUser));
+    }
+
+    @Override
+    public int changeToAdvancedInfo(String serie, String chnr, String updateUser) {
+        return mapper.updateStatusAndType(serie, chnr, "0", "2", "UD15ChangetoAdvancedInfo", resolveUser(updateUser));
     }
 }

@@ -4,7 +4,6 @@
   max-width: 720px;
   padding: 16px 20px;
   border: 2px solid #acb7ee;
-  /* border-radius: 6px; */
   box-sizing: border-box;
 }
 
@@ -46,7 +45,6 @@
   display: flex;
   align-items: flex-start;
   padding: 3px 0;
-  /* border-bottom: 1px solid #f0f0f0; */
 }
 
 .info-row:last-child {
@@ -113,7 +111,6 @@
   color: #aca4a0;
   font-weight: bold; /* 粗体 */
   text-decoration: underline; /* 下划线 */
-  /* 可选：去除默认hover样式，按需开启 */
 }
 
 /* 可选：hover 保持样式不变 */

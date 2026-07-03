@@ -18,4 +18,9 @@ public class UD20DocumentServiceImpl implements UD20DocumentService {
     public List<Map<String, Object>> getDocumentList(Map<String, String> params) {
         return ud20DocumentMapper.selectDocumentList(params);
     }
+
+    @Override
+    public int updateDocumentList(Map<String, String> params) {
+        return ud20DocumentMapper.updateDocumentList(params);
+    }
 }

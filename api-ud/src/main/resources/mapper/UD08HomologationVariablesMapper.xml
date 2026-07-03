@@ -110,10 +110,10 @@
         <!-- Variant string 条件2 -->
         <if test="vsVal2 != null and vsVal2 != ''">
             <choose>
-                <when test='vsOp2 == "!="'> AND VS != #{vsVal2}</when>
-                <when test='vsOp2 == ">"'> AND VS &gt; #{vsVal2}</when>
-                <when test='vsOp2 == "&lt;"'> AND VS &lt; #{vsVal2}</when>
-                <otherwise> AND VS = #{vsVal2}</otherwise>
+                <when test='vsOp2 == "!="'> AND VS2 != #{vsVal2}</when>
+                <when test='vsOp2 == ">"'> AND VS2 &gt; #{vsVal2}</when>
+                <when test='vsOp2 == "&lt;"'> AND VS2 &lt; #{vsVal2}</when>
+                <otherwise> AND VS2 = #{vsVal2}</otherwise>
             </choose>
         </if>
         <!-- Comments -->
@@ -151,9 +151,10 @@
         <!-- Date (REGISTER_DATETIME) -->
         <if test="date != null and date != ''">
             <choose>
-                <when test='dateOp1 == "!="'> AND REGISTER_DATETIME != #{date}</when>
+                <when test='dateOp1 == "!="'> AND DATE(REGISTER_DATETIME) != #{date}</when>
+                <when test='dateOp1 == "&gt;"'> AND REGISTER_DATETIME &gt; #{date}</when>
                 <when test='dateOp1 == "&lt;"'> AND REGISTER_DATETIME &lt; #{date}</when>
-                <otherwise> AND REGISTER_DATETIME = #{date}</otherwise>
+                <otherwise> AND DATE(REGISTER_DATETIME) = #{date}</otherwise>
             </choose>
         </if>
         ORDER BY PC, MARKET, num

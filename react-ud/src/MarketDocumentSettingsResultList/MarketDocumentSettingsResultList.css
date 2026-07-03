@@ -119,6 +119,44 @@
   border-right: none;
 }
 
+/* ── 印刷用 ── */
+@media print {
+  .mdsr-container {
+    width: 100%;
+    border: none;
+  }
+  .mdsr-header h1 {
+    font-size: 12px;
+  }
+  .mdsr-btn-table {
+    display: none !important;
+  }
+  .mdsr-table-wrapper {
+    overflow: visible;
+    margin: 0;
+  }
+  .mdsr-table {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 9px;
+  }
+  .mdsr-table th {
+    font-size: 9px;
+    padding: 3px 4px;
+  }
+  .mdsr-table td {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+  .mdsr-link-user {
+    text-decoration: none !important;
+    color: #333 !important;
+  }
+  .mdsr-error {
+    display: none !important;
+  }
+}
+
 .mdsr-table tbody tr:nth-child(odd) td {
   background-color: #ffffff;
 }

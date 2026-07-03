@@ -29,13 +29,6 @@ const ExistingHDocVariables: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   // ── 从 Result List 返回时恢复条件或选中记录 ──
   useEffect(() => {
     const st = location.state as
@@ -54,7 +47,7 @@ const ExistingHDocVariables: React.FC = () => {
       setDescriptionOp('=');
       setCreatedByUser(toStr(rec.registerUser));
       setCreatedByUserOp('=');
-      setDate(toStr(rec.registerDatetime));
+      setDate(toStr(rec.registerDatetime).substring(0, 10));
       setDateOp('=');
       window.history.replaceState({}, document.title);
       return;
@@ -115,13 +108,6 @@ const ExistingHDocVariables: React.FC = () => {
     if (!keepSuccess) clearMessages();
   };
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   // ── 搜索 ──
   const handleSearch = async () => {
     clearMessages();
@@ -163,12 +149,28 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
+    // Variable 存在性校验
+    try {
+      const checkRes = await api.post<{ exists: boolean }>('/ud08/checkVariable', {
+        variable: variable.trim(),
+      });
+      if (checkRes.code === 200 && checkRes.data?.exists) {
+        setMessage('Variant already exists. Please enter the correct content');
+        return;
+      }
+    } catch {
+      setMessage('System error. Please contact administrator.');
+      return;
+    }
+
+    const currentUser = createdByUser.trim() || localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
       const res = await api.post('/variables/add', {
         variable: variable.trim(),
         type,
         description: description.trim(),
+        currentUser,
       });
       if (res.code === 200) {
         setSuccessMessage('变量添加成功');
@@ -192,12 +194,28 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
+    // Variable 存在性校验
+    try {
+      const checkRes = await api.post<{ exists: boolean }>('/ud08/checkVariable', {
+        variable: variable.trim(),
+      });
+      if (checkRes.code === 200 && !checkRes.data?.exists) {
+        setMessage('Variant does not exists. Please enter the correct content');
+        return;
+      }
+    } catch {
+      setMessage('System error. Please contact administrator.');
+      return;
+    }
+
+    const currentUser = createdByUser.trim() || localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
       const res = await api.post('/variables/update', {
         variable: variable.trim(),
         type,
         description: description.trim(),
+        currentUser,
       });
       if (res.code === 200) {
         setSuccessMessage('变量更新成功');
@@ -251,7 +269,7 @@ const ExistingHDocVariables: React.FC = () => {
   const handleExcel = () => {
     clearMessages();
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const fileName = `HDoc_Variables_${today}.csv`;
+    const fileName = `ExistingHDocVariables_${today}.csv`;
 
     const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
     const row = [variable, type, description, createdByUser, date];

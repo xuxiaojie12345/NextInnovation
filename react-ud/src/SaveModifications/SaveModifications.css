@@ -4,7 +4,6 @@
   max-width: 400px;
   padding: 16px 20px;
   border: 2px solid #acb7ee;
-  /* border-radius: 6px; */
   box-sizing: border-box;
 }
 
@@ -60,7 +59,6 @@
   gap: 4px;
   align-items: center;
   margin-top: 30px;
-  /* margin-bottom: 50px; */
 }
 
 .save-mod-version-row .info-label {

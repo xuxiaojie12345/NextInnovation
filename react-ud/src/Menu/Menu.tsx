@@ -115,7 +115,6 @@ const Menu: React.FC = () => {
       <main className="menu-main">
         {isRootMenu ? (
           <>
-            {/* <h1>Select a menu item to get started</h1> */}
             <h2 style={{ marginTop: '40px', textAlign: 'left', color: '#1c2771' }}>
               Welcome to the HDoc system. Please select an option from the menu on the left.
             </h2>

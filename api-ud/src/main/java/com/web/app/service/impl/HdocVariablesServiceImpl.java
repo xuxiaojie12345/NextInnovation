@@ -14,14 +14,18 @@ public class HdocVariablesServiceImpl implements HdocVariablesService {
     private HdocVariablesMapper hdocVariablesMapper;
 
     @Override
-    public int addVariable(String variable, String type, String description) {
-        String currentUser = "SYSTEM";
+    public int addVariable(String variable, String type, String description, String currentUser) {
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            currentUser = "SYSTEM";
+        }
         return hdocVariablesMapper.insertVariable(variable, type, description, currentUser);
     }
 
     @Override
-    public int updateVariable(String variable, String type, String description) {
-        String currentUser = "SYSTEM";
+    public int updateVariable(String variable, String type, String description, String currentUser) {
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            currentUser = "SYSTEM";
+        }
         return hdocVariablesMapper.updateVariable(variable, type, description, currentUser);
     }
 

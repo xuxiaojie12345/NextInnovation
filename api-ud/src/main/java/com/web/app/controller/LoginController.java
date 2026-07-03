@@ -21,8 +21,7 @@ public class LoginController {
     public ResponseEntity<ApiResponse<LoginResponse.LoginData>> login(@RequestBody LoginRequest request) {
         try {
             // 验证请求参数
-            if (request.getUserid() == null || request.getUserid().trim().isEmpty() ||
-                request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(401, "Username and password are required."));
             }

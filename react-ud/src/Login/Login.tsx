@@ -39,8 +39,6 @@ const Login: React.FC = () => {
 
       if (contentType.includes('application/json')) {
         try {
-          // safe-parse JSON in case server returns non-standard body
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           result = await response.json();
         } catch (e) {
           console.error('Failed parsing JSON login response:', e);
@@ -59,7 +57,7 @@ const Login: React.FC = () => {
         localStorage.setItem('username', result.data.username);
         window.location.href = '/menu';
       } else {
-        // 登录失败 — prefer server message when available
+        // 登录失败
         const serverMsg = result && result.message ? result.message : `Login failed: ${response.status} ${response.statusText}`;
         console.warn('Login failed response:', response.status, serverMsg, result);
         setMessage(serverMsg || 'Login failed. Please try again.');
@@ -93,6 +91,7 @@ const Login: React.FC = () => {
                 value={userid}
                 onChange={(e) => setUserid(e.target.value)}
                 placeholder="UserID"
+                maxLength={10}
                 disabled={isLoading}
               />
             </div>
@@ -102,6 +101,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                maxLength={32}
                 disabled={isLoading}
               />
             </div>

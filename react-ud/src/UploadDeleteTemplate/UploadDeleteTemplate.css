@@ -23,11 +23,6 @@
 }
 
 /* ── Section ── */
-.udt-section {
-  /* padding: 10px 16px; */
-  /* border-top: 1px solid #acb7ee; */
-}
-
 .udt-section-title {
   font-size: 13px;
   font-weight: 700;
@@ -43,7 +38,6 @@
   border-left: none;
   border-right: none;
   border: 2px solid #acb7ee;
-  /* border-bottom: none; */
 }
 
 .udt-form-table td {

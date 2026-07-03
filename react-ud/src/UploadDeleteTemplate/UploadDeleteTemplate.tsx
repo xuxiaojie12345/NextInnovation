@@ -28,13 +28,6 @@ const UploadDeleteTemplate: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   // ── 加载 Market 下拉数据 ──
   useEffect(() => {
     (async () => {
@@ -44,7 +37,7 @@ const UploadDeleteTemplate: React.FC = () => {
           setMarkets(res.data.marketList || []);
         }
       } catch {
-        setMessage('Failed to load market list.');
+        setMessage('System error. Please contact administrator.');
       }
     })();
   }, []);
@@ -89,6 +82,13 @@ const UploadDeleteTemplate: React.FC = () => {
     }
     if (!uploadMarket) {
       setMessage('NO Market UPLOADED');
+      return;
+    }
+
+    // 文件大小校验（10MB）
+    const maxSize = 10 * 1024 * 1024;
+    if (selectedFile.size > maxSize) {
+      setMessage('File size exceeds 10MB limit. Please select a smaller file.');
       return;
     }
 

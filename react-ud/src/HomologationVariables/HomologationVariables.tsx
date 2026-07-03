@@ -48,7 +48,11 @@ const HomologationVariables: React.FC = () => {
 
   // ── 条件状态 ──
   const [conditions, setConditions] = useState<Condition[]>(
-    ALL_LABELS.map((label) => ({ label, operator: '=' as Operator, value: '' }))
+    ALL_LABELS.map((label) => ({
+      label,
+      operator: '=' as Operator,
+      value: '',
+    }))
   );
 
   const [variantCond, setVariantCond] = useState<VariantCond>({
@@ -65,6 +69,9 @@ const HomologationVariables: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // ── 原始主键（从 Result List 返回时保存，用于 Update 时校验主键是否被修改） ──
+  const [originalKeys, setOriginalKeys] = useState<{ pc: string; num: string; market: string } | null>(null);
 
   // ── 更新函数 ──
   const updateConditionOp = (i: number, op: Operator) =>
@@ -134,11 +141,25 @@ const HomologationVariables: React.FC = () => {
             Add: toStr(rec.addDate),
             Delete: toStr(rec.deleteDate),
             'Created by user': toStr(rec.updateUser),
-            Date: toStr(rec.updateDatetime),
+            Date: toStr(rec.updateDatetime).substring(0, 10),
           };
           return { label, operator: '=' as Operator, value: valMap[label] ?? '' };
         })
       );
+      // 回显 Variant string 的 vs 和 vs2
+      setVariantCond({
+        label: 'Variant string',
+        operator1: '=',
+        value1: toStr(rec.vs),
+        operator2: '=',
+        value2: toStr(rec.vs2),
+      });
+      // 保存原始主键，用于 Update 时校验
+      setOriginalKeys({
+        pc: toStr(rec.pc),
+        num: toStr(rec.num),
+        market: toStr(rec.market),
+      });
       window.history.replaceState({}, document.title);
       return;
     }
@@ -159,6 +180,14 @@ const HomologationVariables: React.FC = () => {
 
       setConditions(ALL_LABELS.map((l) => ({ label: l, operator: getOp(l), value: getVal(l) })));
 
+      // Back 返回时，将当前查询条件中的主键值保存为原始主键
+      const backPc = getVal('Product class');
+      const backNum = getVal('Number');
+      const backMkt = getVal('Market');
+      if (backPc && backNum && backMkt) {
+        setOriginalKeys({ pc: backPc, num: backNum, market: backMkt });
+      }
+
       const vs = rawConds.find((c: any) => c.label === 'Variant string');
       if (vs) {
         setVariantCond({
@@ -169,6 +198,7 @@ const HomologationVariables: React.FC = () => {
           value2: vs.value2 ?? '',
         });
       }
+      // Back 返回（非 Select）时不清除原始主键，保留之前 Select 保存的值
 
       sessionStorage.removeItem(STORAGE_KEY);
       window.history.replaceState({}, document.title);
@@ -179,18 +209,18 @@ const HomologationVariables: React.FC = () => {
   const clearMessages = () => { setErrorMessage(''); setSuccessMessage(''); };
 
   const clearForm = (keepSuccess = false) => {
-    setConditions((prev) => prev.map((c) => ({ ...c, operator: '=' as Operator, value: '' })));
+    setConditions((prev) =>
+      prev.map((c) => ({
+        ...c,
+        operator: '=' as Operator,
+        value: '',
+      }))
+    );
     setVariantCond({ label: 'Variant string', operator1: '=', value1: '', operator2: '=', value2: '' });
+    setOriginalKeys(null);
     sessionStorage.removeItem(STORAGE_KEY);
     if (!keepSuccess) clearMessages();
   };
-
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
 
   // ── 工具函数 ──
   const getCondValue = (label: string): string =>
@@ -273,11 +303,13 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
+    const createdBy = getFormVal('Created by user') || localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
       const res = await api.post('/ud08/add', {
         pc, num, market: mkt, variable: processedVar, val: valVal,
         vs: variantCond.value1, vs2: variantCond.value2, comments: cmt, addDate: addDt, deleteDate: delDt,
+        registerUser: createdBy, updateUser: createdBy,
       });
       if (res.code === 200) { setSuccessMessage('Rule added successfully.'); clearForm(true); }
       else setErrorMessage(res.message || 'Failed to add rule.');
@@ -301,6 +333,14 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
+    // 主键更改校验：从 Result List 返回时有原始主键，检查是否被修改
+    if (originalKeys) {
+      if (pc !== originalKeys.pc || num !== originalKeys.num || mkt !== originalKeys.market) {
+        setErrorMessage('Data does not exist, Please enter the correct content.');
+        return;
+      }
+    }
+
     if (!(await checkRuleExists(pc, num, mkt))) {
       setErrorMessage('Data does not exist, Please enter the correct content.');
       return;
@@ -312,11 +352,13 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
+    const createdBy = getFormVal('Created by user') || localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
       const res = await api.post('/ud08/update', {
         pc, num, market: mkt, variable: processedVar, val: valVal,
         vs: variantCond.value1, vs2: variantCond.value2, comments: cmt, addDate: addDt, deleteDate: delDt,
+        updateUser: createdBy,
       });
       if (res.code === 200) { setSuccessMessage('Rule updated successfully.'); clearForm(true); }
       else setErrorMessage(res.message || 'Failed to update rule.');
@@ -357,6 +399,19 @@ const HomologationVariables: React.FC = () => {
   };
 
   const renderValueControl = (label: string, value: string, onChange: (v: string) => void) => {
+    const getMaxLength = (lbl: string): number | undefined => {
+      const map: Record<string, number> = {
+        Number: 10,
+        Variable: 20,
+        Value: 200,
+        Comments: 100,
+        Add: 6,
+        Delete: 6,
+        'Created by user': 16,
+        'Variant string': 100,
+      };
+      return map[lbl];
+    };
     if (label === 'Product class') {
       return (
         <select className="hv-cond-input hv-cond-select" value={value} onChange={(e) => onChange(e.target.value)} disabled={isLoading}>
@@ -372,13 +427,13 @@ const HomologationVariables: React.FC = () => {
         <select className="hv-cond-input hv-cond-select" value={value} onChange={(e) => onChange(e.target.value)} disabled={isLoading}>
           <option value="">-- Select --</option>
           {markets.map((m) => (
-            <option key={m.market} value={m.market}>{m.market} - {m.description}</option>
+            <option key={m.market} value={m.market}>{m.market}</option>
           ))}
         </select>
       );
     }
     return (
-      <input type="text" className="hv-cond-input" value={value} onChange={(e) => onChange(e.target.value)} disabled={isLoading} />
+      <input type="text" className="hv-cond-input" value={value} onChange={(e) => onChange(e.target.value)} maxLength={getMaxLength(label)} disabled={isLoading} />
     );
   };
 
@@ -393,7 +448,7 @@ const HomologationVariables: React.FC = () => {
 
   const getSuffix = (label: string): string | null => {
     if (label === 'Add' || label === 'Delete') return 'YYYYWW';
-    if (label === 'Created by user' || label === 'Date') return 'Haohetao123';
+    if (label === 'Created by user' || label === 'Date') return 'Automatic';
     return null;
   };
 

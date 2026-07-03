@@ -25,6 +25,10 @@
         DELETE FROM hdoc_variables WHERE VARIABLE = #{variable}
     </delete>
 
+    <select id="countVariable" resultType="int">
+        SELECT COUNT(*) FROM hdoc_variables WHERE VARIABLE = #{variable}
+    </select>
+
     <select id="searchVariables" resultType="map">
         SELECT VARIABLE, TYPE, DESCRIPTION, REGISTER_USER, REGISTER_DATETIME
         FROM hdoc_variables
@@ -63,10 +67,10 @@
         </if>
         <if test="registerDatetime != null and registerDatetime != ''">
             <choose>
-                <when test='registerDatetimeOp == "!="'> AND REGISTER_DATETIME != #{registerDatetime}</when>
+                <when test='registerDatetimeOp == "!="'> AND DATE(REGISTER_DATETIME) != #{registerDatetime}</when>
                 <when test='registerDatetimeOp == "&gt;"'> AND REGISTER_DATETIME &gt; #{registerDatetime}</when>
                 <when test='registerDatetimeOp == "&lt;"'> AND REGISTER_DATETIME &lt; #{registerDatetime}</when>
-                <otherwise> AND REGISTER_DATETIME = #{registerDatetime}</otherwise>
+                <otherwise> AND DATE(REGISTER_DATETIME) = #{registerDatetime}</otherwise>
             </choose>
         </if>
         ORDER BY VARIABLE

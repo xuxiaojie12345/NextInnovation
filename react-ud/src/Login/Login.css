@@ -8,15 +8,12 @@
 html, body {
     width: 100%;
     height: 100%;
-    /* 可选：禁止页面默认滚动条（如果不需要滚动的话） */
-    /* overflow: hidden; */
 }
 
 /* 如果你有一个根容器（比如 .container） */
 .container {
     width: 100%;
     height: 100%;
-    /* 其他样式 */
 }
 
 

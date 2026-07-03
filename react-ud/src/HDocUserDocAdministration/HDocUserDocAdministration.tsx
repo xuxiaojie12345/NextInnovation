@@ -20,22 +20,21 @@ const HDocUserDocAdministration: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
 
   // 页面初始化: 加载文档类型列表
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get<DocumentType[]>('/document/types');
+        const res = await api.post<{ documentList: any[] }>('/ud20/getDocumentList', {});
         if (res.code === 200 && res.data) {
-          setDocumentTypes(res.data);
+          const list = (res.data.documentList || []).map((d: any) => ({
+            doctype: d.DOCTYPE ?? '',
+            description: d.DESCRIPTION ?? '',
+          }));
+          setDocumentTypes(list);
         }
-      } catch {
-        setMessage('System error. Please contact administrator.');
+      } catch (err: any) {
+        setMessage(err?.message || 'System error. Please contact administrator.');
       }
     })();
   }, []);
@@ -65,28 +64,32 @@ const HDocUserDocAdministration: React.FC = () => {
         userid: trimmedId,
       });
 
-      if (authRes.code !== 200) {
-        setMessage('UserID is required');
-        setIsLoading(false);
-        return;
+      if (authRes.code == 200 && authRes.data?.authCount === 0) {
+        throw new Error("We didn't recognize the userid you entered. Please try again.");
       }
 
-      // Step 2: 获取用户文档权限
+      // Step 2: 调用 AuthenticationApi (/login) 取得用户名
+      const loginRes = await api.post<{ userId: string; username: string }>('/login', {
+        userid: trimmedId,
+        password: '',
+      });
+      if (loginRes.code === 200 && loginRes.data) {
+        setUsername(loginRes.data.username || trimmedId);
+      } else {
+        setUsername(trimmedId);
+      }
+
+      // Step 3: 调用 UD18SelectHdocUserDoc 获取文档权限
       const docRes = await api.post<{ userId: string; docTypeList: string[] }>('/user/doc/select', {
         userid: trimmedId,
       });
 
       if (docRes.code === 200 && docRes.data) {
-        // 获取用户名
-        const userRes = await api.post<{ username: string }>('/user/info', { userid: trimmedId });
-        const userName = userRes.code === 200 && userRes.data ? userRes.data.username : trimmedId;
-        setUsername(userName);
         const docList = docRes.data.docTypeList || [];
         setSelectedDocs(new Set(docList));
-        setSuccessMessage('User info loaded successfully.');
       }
-    } catch {
-      setMessage('System error. Please contact administrator.');
+    } catch (err: any) {
+      setMessage(err?.message || 'System error. Please contact administrator.');
     } finally {
       setIsLoading(false);
     }
@@ -104,18 +107,42 @@ const HDocUserDocAdministration: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ userId: string; docType: string[]; updateTime: string }>('/user/doc/update', {
+      const currentUser = localStorage.getItem('userId') || '';
+
+      // Step 1: 检查用户是否存在功能权限表中
+      const authRes = await api.post<{ userId: string; authCount: number }>('/function/auth/count', {
         userid: trimmedId,
-        doctype: Array.from(selectedDocs),
       });
 
-      if (res.code === 200) {
-        setSuccessMessage('用户文档权限更新成功');
-      } else {
-        setMessage(res.message || 'Failed to update document permissions.');
+      if (authRes.code == 200 && authRes.data?.authCount === 0) {
+        throw new Error("We didn't recognize the userid you entered. Please try again.");
       }
-    } catch {
-      setMessage('System error. Please contact administrator.');
+
+      // Step 1: UD18DeleteHdocUserDoc - 删除用户文档权限
+      const deleteRes = await api.post('/user/doc/delete', { userid: trimmedId });
+      if (deleteRes.code !== 200) {
+        setMessage(deleteRes.message || 'Failed to delete document permissions.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 2: UD18CreateHdocUserDoc - 新增用户文档权限
+      for (const doctype of Array.from(selectedDocs)) {
+        const createRes = await api.post('/user/doc/create', {
+          userid: trimmedId,
+          doctype: doctype,
+          currentUser: currentUser,
+        });
+        if (createRes.code !== 200) {
+          setMessage(createRes.message || `Failed to add document permission: ${doctype}`);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      setSuccessMessage('用户文档权限更新成功');
+    } catch (err: any) {
+      setMessage(err?.message || 'System error. Please contact administrator.');
     } finally {
       setIsLoading(false);
     }
@@ -151,17 +178,14 @@ const HDocUserDocAdministration: React.FC = () => {
               </button>
             </td>
           </tr>
-          {/* {username && ( */}
-            <tr>
-              <td className="huda-label-cell">User:</td>
-              <td colSpan={2} className="huda-value">{username}</td>
-            </tr>
-          {/* )} */}
+          <tr>
+            <td className="huda-label-cell">User:</td>
+            <td colSpan={2} className="huda-value">{username}</td>
+          </tr>
         </tbody>
       </table>
 
       {/* ── 文档权限多选列表 ── */}
-      {/* {username && ( */}
         <div className="huda-doc-section">
           <select
             className="huda-doc-listbox"
@@ -179,16 +203,13 @@ const HDocUserDocAdministration: React.FC = () => {
             ))}
           </select>
         </div>
-      {/* )} */}
 
       {/* ── 操作按钮 ── */}
-      {/* {username && ( */}
         <div className="huda-btn-row">
           <button className="btn" onClick={handleUpdate} disabled={isLoading}>
             UPDATE
           </button>
         </div>
-      {/* )} */}
     </div>
   );
 };

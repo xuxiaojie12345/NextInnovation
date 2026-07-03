@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { api } from '../services/api';
 import '../common/css/common.css';
 import './MarketDocumentSettingsList.css';
 
@@ -23,8 +24,13 @@ const MarketDocumentSettingsList: React.FC = () => {
   const [date, setDate] = useState(state?.registerDatetime || '');
   const [dateOp, setDateOp] = useState<Operator>((state?.registerDatetimeOp as Operator) || '=');
   const [message, setMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const clearMessages = () => setMessage('');
+  const clearMessages = () => {
+    setMessage('');
+    setSuccessMessage('');
+  };
 
   const isNumericField = (label: string): boolean => {
     return label === 'Date';
@@ -78,9 +84,37 @@ const MarketDocumentSettingsList: React.FC = () => {
     navigate('/menu/guide-user');
   };
 
-  const handleUpdateMode = () => {
-    // 机能暂时不实装
-    return;
+  const handleUpdateMode = async () => {
+    clearMessages();
+
+    const trimmedDoctype = documentType.trim();
+    const trimmedUser = user.trim();
+    const trimmedDate = date.trim();
+
+    if (!trimmedDoctype || !trimmedUser || !trimmedDate) {
+      setMessage('Document type, User and Date are required.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await api.post('/ud20/updateDocumentList', {
+        doctype: trimmedDoctype,
+        registerUser: trimmedUser,
+        registerDatetime: trimmedDate,
+        currentUser: trimmedUser,
+      });
+
+      if (res.code === 200) {
+        setSuccessMessage(res.message);
+      } else {
+        setMessage(res.message);
+      }
+    } catch {
+      setMessage('System error. Please contact administrator.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -90,6 +124,7 @@ const MarketDocumentSettingsList: React.FC = () => {
       </div>
 
       {message && <div className="mdsl-error">{message}</div>}
+      {successMessage && <div className="mdsl-success">{successMessage}</div>}
 
       <div className="mdsl-bordered">
         {/* 按钮区域：在上方，有背景色 */}
@@ -97,7 +132,7 @@ const MarketDocumentSettingsList: React.FC = () => {
           <button className="btn" onClick={handleSearch}>Search</button>
           <button className="btn" onClick={handleClear}>Clear</button>
           <button className="btn" onClick={handleBack}>Back</button>
-          <button className="btn" onClick={handleUpdateMode}>Update Mode</button>
+          <button className="btn" onClick={handleUpdateMode} disabled={isLoading}>Update Mode</button>
         </div>
 
         {/* 检索条件区域 */}

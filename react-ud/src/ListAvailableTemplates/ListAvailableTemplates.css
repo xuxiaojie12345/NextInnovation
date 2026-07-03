@@ -119,6 +119,7 @@
   color: #333;
   font-size: 12px;
   border: 1px solid #8698e6;
+  text-align: left;
 }
 
 /* 第一行无上边框 */
@@ -167,7 +168,7 @@
 
 .lat-td-icon {
   width: 32px;
-  text-align: center;
+  text-align: left;
 }
 
 .lat-file-icon {

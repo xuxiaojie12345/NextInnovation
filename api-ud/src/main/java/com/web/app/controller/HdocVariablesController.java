@@ -31,7 +31,8 @@ public class HdocVariablesController {
                     .body(ApiResponse.error(400, "Variable name is required."));
             }
 
-            int result = hdocVariablesService.addVariable(variable, type, description);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = hdocVariablesService.addVariable(variable, type, description, currentUser);
             if (result > 0) {
                 Map<String, String> data = new HashMap<>();
                 data.put("variable", variable);
@@ -58,7 +59,8 @@ public class HdocVariablesController {
                     .body(ApiResponse.error(400, "Variable name is required."));
             }
 
-            int result = hdocVariablesService.updateVariable(variable, type, description);
+            String currentUser = request.getOrDefault("currentUser", "SYSTEM");
+            int result = hdocVariablesService.updateVariable(variable, type, description, currentUser);
             if (result > 0) {
                 Map<String, String> data = new HashMap<>();
                 data.put("variable", variable);

@@ -19,7 +19,7 @@
         UPDATE HDOC_SEND_DATA_VIN_PLATE
         SET STATUS = #{status},
             UPDATE_DATETIME = NOW(),
-            UPDATE_USER = 'SYSTEM',
+            UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{process}
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
@@ -29,7 +29,7 @@
         SET STATUS = #{status},
             TYPE = #{type},
             UPDATE_DATETIME = NOW(),
-            UPDATE_USER = 'SYSTEM',
+            UPDATE_USER = #{updateUser},
             UPDATE_PROCESS = #{process}
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>

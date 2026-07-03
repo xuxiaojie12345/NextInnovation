@@ -11,8 +11,8 @@
         FROM HDOC_USER_INFOR u
         INNER JOIN HDOC_MARKET_AUTH m ON u.USERID = m.USERID
         WHERE 1=1
-        <if test="userid != null and userid != ''"> AND u.USERID LIKE CONCAT('%', #{userid}, '%')</if>
-        <if test="user != null and user != ''"> AND u.USERNAME LIKE CONCAT('%', #{user}, '%')</if>
+        <if test="userid != null and userid != ''"> AND u.USERID = #{userid}</if>
+        <if test="user != null and user != ''"> AND u.USERNAME = #{user}</if>
         <if test="market != null and market != ''"> AND m.MARKET = #{market}</if>
         <if test="check != null and check != ''"> AND m.TYPE = #{check}</if>
     </select>

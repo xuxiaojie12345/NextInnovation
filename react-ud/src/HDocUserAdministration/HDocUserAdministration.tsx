@@ -37,12 +37,6 @@ const HDocUserAdministration: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   // 加载 Market 列表
   useEffect(() => {
     (async () => {
@@ -146,7 +140,7 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage('Userid are required.');
+      setMessage('Userid is required.');
       return;
     }
 
@@ -157,12 +151,16 @@ const HDocUserAdministration: React.FC = () => {
       });
 
       if (res && res.code === 200 && res.data) {
+        // 查询结果为 0 件时显示错误消息
+        if (!res.data.username && (!res.data.authList || res.data.authList.length === 0)) {
+          setMessage("We didn't recognize the userid you entered. Please try again.");
+          return;
+        }
         setUsername(res.data.username || '');
         setPassword(res.data.password || '');
         applyAuthList(res.data.authList || []);
-        setSuccessMessage('User info loaded successfully.');
       } else {
-        setMessage(res?.message || 'Userid are required.');
+        setMessage(res?.message || "We didn't recognize the userid you entered. Please try again.");
       }
     } catch {
       setMessage('System error. Please contact administrator.');
@@ -177,7 +175,26 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage('Userid are required.');
+      setMessage('Userid is required.');
+      return;
+    }
+
+    // 检索用户是否存在
+    try {
+      const infoRes = await api.post<{ username: string; authList: AuthItem[] }>('/user/info', {
+        userid: trimmedId,
+      });
+      if (infoRes.code === 200 && infoRes.data) {
+        if (!infoRes.data.username && (!infoRes.data.authList || infoRes.data.authList.length === 0)) {
+          setMessage("We didn't recognize the userid you entered. Please try again.");
+          return;
+        }
+      } else {
+        setMessage("We didn't recognize the userid you entered. Please try again.");
+        return;
+      }
+    } catch {
+      setMessage('System error. Please contact administrator.');
       return;
     }
 
@@ -187,11 +204,13 @@ const HDocUserAdministration: React.FC = () => {
       return;
     }
 
+    const currentUser = localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
       const res = await api.post<{ userId: string; updateCount: number; authList: AuthItem[] }>('/user/update/role', {
         userid: trimmedId,
         authList,
+        currentUser,
       });
 
       if (res.code === 200) {
@@ -212,11 +231,7 @@ const HDocUserAdministration: React.FC = () => {
 
     const trimmedId = userid.trim();
     if (!trimmedId) {
-      setMessage('Userid are required.');
-      return;
-    }
-
-    if (!window.confirm('Do you really want to delete all roles for this user?')) {
+      setMessage('Userid is required.');
       return;
     }
 
@@ -280,20 +295,8 @@ const HDocUserAdministration: React.FC = () => {
                   autoComplete="no"
                 />
               </td>
-              <td>
-                <span className="hua-pwd-wrapper">
-                  <input
-                    type="password"
-                    className="hua-input"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    maxLength={32}
-                    disabled={isLoading}
-                    autoComplete="new-password"
-                  />
-                </span>
-              </td>
-              <td style={{ whiteSpace: 'nowrap', textAlign: 'left', paddingLeft: 4 }}>(re-type password)</td>
+              <td></td>
+              <td></td>
             </tr>
         </tbody>
       </table>

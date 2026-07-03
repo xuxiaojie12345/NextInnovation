@@ -21,6 +21,8 @@ public interface HdocVariablesMapper {
 
     int deleteVariable(@Param("variable") String variable);
 
+    int countVariable(@Param("variable") String variable);
+
     List<Map<String, Object>> searchVariables(@Param("variable") String variable,
                                               @Param("variableOp") String variableOp,
                                               @Param("type") String type,

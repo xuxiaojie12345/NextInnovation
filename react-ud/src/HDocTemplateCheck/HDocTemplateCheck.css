@@ -53,12 +53,8 @@
 
 /* ── 按钮行：背景色 + 边框 ── */
 .htc-btn-row {
-  display: flex;
-  gap: 8px;
   background-color: #f1f3ff;
-  border: 2px solid #acb7ee;
-  border-left: none;
-  border-right: none;
+  border-top: 2px solid #acb7ee;
 }
 
 .htc-result {

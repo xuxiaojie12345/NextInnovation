@@ -13,13 +13,6 @@ const AdCaChange: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 成功消息自动消失 ──
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = setTimeout(() => setSuccessMessage(''), 3000);
-    return () => clearTimeout(t);
-  }, [successMessage]);
-
   const clearMessages = () => {
     setMessage('');
     setSuccessMessage('');
@@ -100,10 +93,6 @@ const AdCaChange: React.FC = () => {
 
     if (!serie || !chnr) {
       setMessage('Please enter a valid Serie-Chnr (e.g. "FH-12345").');
-      return;
-    }
-
-    if (!window.confirm('Do you really want to delete this AD/CA change record?')) {
       return;
     }
 
