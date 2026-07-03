@@ -55,9 +55,7 @@ const GenerateDocumentResult: React.FC = () => {
 
         if (res.code === 200 && res.data) {
           setData(res.data);
-        } else {
-          setErrorMessage(res.message || 'Vehicle data not found.');
-        }
+        } 
       } catch {
         setErrorMessage('System error. Please contact administrator.');
       } finally {
