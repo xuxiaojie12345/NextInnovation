@@ -93,7 +93,16 @@ const SearchUser: React.FC = () => {
       if (res.code === 200 && res.data) {
         const list = res.data.hdocList || [];
         setResults(list);
-        if (list.length === 0) {
+        if (list.length > 0) {
+          // Userid 已输入、User 为空时，用搜索结果中的 username 填充 User
+          if (trimmedUserid && !trimmedUsername) {
+            setUsername(list[0].username);
+          }
+          // User 已输入、Userid 为空时，用搜索结果中的 userid 填充 Userid
+          if (trimmedUsername && !trimmedUserid) {
+            setUserid(list[0].userid);
+          }
+        } else {
           setMessage('没有找到匹配的用户');
         }
       } else {
