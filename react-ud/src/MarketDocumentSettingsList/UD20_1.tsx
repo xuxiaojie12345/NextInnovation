@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useCallback, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { marketDocSettingsApi } from "../services/api";
 import "./UD20_1.css";
 
@@ -7,6 +7,8 @@ const BUSINESS_UNITS = ["VTC", "UD", "BU1", "BU2"];
 
 const UD20_1 = React.memo(() => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [docType, setDocType] = useState("");
   const [businessUnit, setBusinessUnit] = useState("");
   const [user, setUser] = useState("");
@@ -14,6 +16,17 @@ const UD20_1 = React.memo(() => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // 从UD20选择的数据回填
+  useEffect(() => {
+    const selected = (location.state as any)?.selected;
+    if (selected) {
+      setDocType(selected.doctype || "");
+      setBusinessUnit(selected.businessUnit || "");
+      setUser(selected.registerUser || "");
+      setDate(selected.registerDatetime || "");
+    }
+  }, [location.state]);
 
   const clearMessage = useCallback(() => {
     setMessage("");
@@ -82,6 +95,26 @@ const UD20_1 = React.memo(() => {
             </div>
           )}
 
+          {/* Buttons */}
+          <div className="ud20-1-btns">
+            <button className="ud20-1-btn" onClick={handleSearch}>
+              Search
+            </button>
+            <button className="ud20-1-btn" onClick={handleClear}>
+              Clear
+            </button>
+            <button className="ud20-1-btn" onClick={handleBack}>
+              Back
+            </button>
+            <button
+              className="ud20-1-btn"
+              onClick={handleUpdate}
+              disabled={isLoading}
+            >
+              Update Mode
+            </button>
+          </div>
+
           {/* Document type */}
           <div className="ud20-1-row">
             <label className="ud20-1-lbl">Document type</label>
@@ -148,26 +181,6 @@ const UD20_1 = React.memo(() => {
               }}
               placeholder="Date"
             />
-          </div>
-
-          {/* Buttons */}
-          <div className="ud20-1-btns">
-            <button className="ud20-1-btn" onClick={handleSearch}>
-              Search
-            </button>
-            <button className="ud20-1-btn" onClick={handleClear}>
-              Clear
-            </button>
-            <button className="ud20-1-btn" onClick={handleBack}>
-              Back
-            </button>
-            <button
-              className="ud20-1-btn"
-              onClick={handleUpdate}
-              disabled={isLoading}
-            >
-              Update Mode
-            </button>
           </div>
         </div>
       </main>

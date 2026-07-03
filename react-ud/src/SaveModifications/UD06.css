@@ -125,6 +125,13 @@
   cursor: pointer;
 }
 
+/* ── Storing 折行表示 ── */
+.ud06-storing-value {
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.6;
+}
+
 .ud06-btn:hover {
   background-color: #9cc0dc;
   border-color: #7aaac8;

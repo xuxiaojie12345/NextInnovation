@@ -175,27 +175,27 @@ const UD18 = React.memo(() => {
                 <div
                   className="ud18-doc-item"
                   key={doc.doctype}
+                  onClick={() => {
+                    setUserDocs((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(doc.doctype)) {
+                        next.delete(doc.doctype);
+                      } else {
+                        next.add(doc.doctype);
+                      }
+                      return next;
+                    });
+                  }}
                   style={
                     userDocs.has(doc.doctype)
-                      ? { background: "#dce8f0", fontWeight: 500 }
-                      : undefined
+                      ? {
+                          background: "#dce8f0",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                        }
+                      : { cursor: "pointer" }
                   }
                 >
-                  <input
-                    type="checkbox"
-                    checked={userDocs.has(doc.doctype)}
-                    onChange={() => {
-                      setUserDocs((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(doc.doctype)) {
-                          next.delete(doc.doctype);
-                        } else {
-                          next.add(doc.doctype);
-                        }
-                        return next;
-                      });
-                    }}
-                  />
                   <span className="ud18-doc-lbl">
                     {doc.description || doc.doctype}
                   </span>

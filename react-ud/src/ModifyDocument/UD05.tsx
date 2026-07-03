@@ -12,13 +12,6 @@ interface ModificationItem {
   modifiedValue: string;
 }
 
-interface UD05Data {
-  chassisNo: string;
-  market: string;
-  templateFile: string;
-  modifications: ModificationItem[];
-}
-
 const STORAGE_KEY_USER = "user_info";
 const STORAGE_KEY_TOKEN = "auth_token";
 
@@ -166,10 +159,16 @@ const UD05 = React.memo(() => {
 
       // 成功：跳转至UD06保存修改结果页面
       const parts = (stateData?.chassisNo || "").split("_");
+      // 收集所有修改项的 Variable 和 Modified value
+      const modData = changedItems.map((item) => ({
+        variable: item.variable,
+        modifiedValue: item.modifiedValue,
+      }));
       navigate("/UD06", {
         state: {
           chassisSerie: parts[0] || "",
           chassisNumber: parts[1] || "",
+          modifications: modData,
         },
       });
     } catch {

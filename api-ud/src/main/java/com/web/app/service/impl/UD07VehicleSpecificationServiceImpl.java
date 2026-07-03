@@ -102,15 +102,17 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
         }
         data.put("symbols", symbols);
 
-        // S-Notes（CUSTOMER_ADAP返回单个字符串，按空格拆分为列表）
+        // S-Notes（遍历所有CUSTOMER_ADAP行）
         List<String> sNotes = new ArrayList<>();
         if (sNoteData != null && !sNoteData.isEmpty()) {
-            String raw = sNoteData.get(0).getSnoteNo();
-            if (raw != null && !raw.trim().isEmpty()) {
-                String[] parts = raw.split("\\s+");
-                for (String part : parts) {
-                    if (!part.trim().isEmpty()) {
-                        sNotes.add(part.trim());
+            for (KapSnote item : sNoteData) {
+                String raw = item.getSnoteNo();
+                if (raw != null && !raw.trim().isEmpty()) {
+                    String[] parts = raw.split("\\s+");
+                    for (String part : parts) {
+                        if (!part.trim().isEmpty()) {
+                            sNotes.add(part.trim());
+                        }
                     }
                 }
             }

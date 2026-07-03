@@ -147,6 +147,13 @@ export const userApi = {
     apiRequest("/api/UD17HDocUserAdministrationApi/UD17DeleteRole", "POST", {
       userid,
     }),
+
+  // 获取市场列表（从MARKET_MASTER表）
+  getMarkets: () =>
+    apiRequest(
+      "/api/UD08HomologationVariablesApi/UD08SelectMarketmaster",
+      "GET",
+    ),
 };
 
 /**
@@ -188,9 +195,9 @@ export const adcaApi = {
       user,
     }),
 
-  // 删除 ADCA 变更 (DELETE)
+  // 删除 ADCA 变更 (DELETE / 物理删除)
   deleteAdcaChange: (serieChnr: string, user: string) =>
-    apiRequest("/api/UD16ADChangeApi/UD16UpdateHdocAdcaChange", "POST", {
+    apiRequest("/api/UD16ADChangeApi/UD16DeleteHdocAdcaChange", "POST", {
       serieChnr,
       user,
     }),

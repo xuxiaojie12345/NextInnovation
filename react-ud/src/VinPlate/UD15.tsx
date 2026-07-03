@@ -66,7 +66,21 @@ const UD15 = React.memo(() => {
         const result = await action(chassis);
         if (result && result.code === 200) {
           setSuccessMessage(result.msg || successMsg);
-          setChassisInput("");
+          // 如果当前有详细数据显示，更新后重新从数据库获取最新数据
+          if (vinPlateInfo) {
+            try {
+              const refreshResult = await vinPlateApi.viewInfo(chassis);
+              if (
+                refreshResult &&
+                refreshResult.code === 200 &&
+                refreshResult.data
+              ) {
+                setVinPlateInfo(refreshResult.data as VinPlateInfo);
+              }
+            } catch {
+              // 刷新失败时不清空已显示的数据
+            }
+          }
         } else {
           setErrorMessage(result?.msg || "操作失败，请稍后重试");
         }
@@ -76,16 +90,8 @@ const UD15 = React.memo(() => {
         setIsLoading(false);
       }
     },
-    [chassisInput, clearMessages],
+    [chassisInput, vinPlateInfo, clearMessages],
   );
-
-  const statusLabel = (status: number): string => {
-    return status === 0 ? "新增" : "XML已生成";
-  };
-
-  const typeLabel = (type: number): string => {
-    return type === 1 ? "基础版" : "高级版";
-  };
 
   return (
     <div className="ud15-container">

@@ -81,6 +81,18 @@ const UD20 = React.memo(() => {
             </div>
           )}
 
+          <div className="ud20-btns">
+            <button className="ud20-btn" onClick={handleSelect}>
+              Select
+            </button>
+            <button className="ud20-btn" onClick={handleBack}>
+              Back
+            </button>
+            <button className="ud20-btn" onClick={handlePrint}>
+              Print
+            </button>
+          </div>
+
           {isLoading ? (
             <div className="ud20-loading">Loading...</div>
           ) : (
@@ -138,18 +150,6 @@ const UD20 = React.memo(() => {
               </table>
             </div>
           )}
-
-          <div className="ud20-btns">
-            <button className="ud20-btn" onClick={handleSelect}>
-              Select
-            </button>
-            <button className="ud20-btn" onClick={handleBack}>
-              Back
-            </button>
-            <button className="ud20-btn" onClick={handlePrint}>
-              Print
-            </button>
-          </div>
         </div>
       </main>
     </div>

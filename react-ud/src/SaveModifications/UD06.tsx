@@ -40,9 +40,15 @@ const UD06 = React.memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  interface ModDataItem {
+    variable: string;
+    modifiedValue: string;
+  }
+
   const stateData = location.state as {
     chassisSerie?: string;
     chassisNumber?: string;
+    modifications?: ModDataItem[];
   } | null;
 
   const [modStatusData, setModStatusData] = useState<ModStatusData | null>(
@@ -155,8 +161,13 @@ const UD06 = React.memo(() => {
                 </div>
                 <div className="ud06-info-row">
                   <span className="ud06-info-label">Storing:</span>
-                  <span className="ud06-info-value">
-                    {modStatusData.storing}
+                  <span className="ud06-info-value ud06-storing-value">
+                    {stateData?.modifications &&
+                    stateData.modifications.length > 0
+                      ? stateData.modifications
+                          .map((m) => m.variable + " " + m.modifiedValue)
+                          .join("\n")
+                      : modStatusData.storing}
                   </span>
                 </div>
                 <div className="ud06-info-row">

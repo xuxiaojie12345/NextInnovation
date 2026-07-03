@@ -1,30 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { userApi } from "../services/api";
 import "./UD17.css";
-
-const MARKET_OPTIONS = [
-  "-EU",
-  "-UD",
-  "1AD",
-  "1CZ",
-  "1ES",
-  "1RU",
-  "1CN",
-  "1JP",
-  "1US",
-  "1AU",
-  "1BR",
-  "1IN",
-  "1KR",
-  "1ZA",
-  "1UK",
-  "1SE",
-  "1DE",
-  "1FR",
-  "1IT",
-  "1NL",
-  "1PL",
-];
 
 interface RoleEntry {
   checked: boolean;
@@ -43,14 +19,30 @@ const createRoleMap = (): Record<string, RoleEntry> => ({
 const UD17 = React.memo(() => {
   const [userId, setUserId] = useState<string>("");
   const [userField1, setUserField1] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [roles, setRoles] = useState<Record<string, RoleEntry>>(createRoleMap);
   const [manageVarChecked, setManageVarChecked] = useState(false);
   const [superUserMarket, setSuperUserMarket] = useState("");
-  const [superUserSubMarket, setSuperUserSubMarket] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const [isLoading, setIsLoading] = useState(false);
+  const [marketOptions, setMarketOptions] = useState<string[]>([]);
+
+  // 从后台API获取Market列表
+  useEffect(() => {
+    userApi
+      .getMarkets()
+      .then((res: any) => {
+        if (res?.code === 200 && res.data && Array.isArray(res.data.markets)) {
+          const markets = res.data.markets.map(
+            (item: any) => item.market || item,
+          );
+          setMarketOptions(markets);
+        }
+      })
+      .catch(() => {
+        // 静默失败
+      });
+  }, []);
 
   const clearMessage = useCallback(() => {
     setMessage("");
@@ -81,7 +73,6 @@ const UD17 = React.memo(() => {
         const fullName = result.data.username || result.data.name || "";
         const parts = fullName.split(" ", 2);
         setUserField1(parts[0] || fullName);
-        setPassword(parts[1] || "");
         const perms = result.data.permissions || [];
         const next = createRoleMap();
         if (Array.isArray(perms)) {
@@ -107,7 +98,6 @@ const UD17 = React.memo(() => {
         );
         setMessageType("error");
         setUserField1("");
-        setPassword("");
         setRoles(createRoleMap());
       }
     } catch {
@@ -170,9 +160,7 @@ const UD17 = React.memo(() => {
         setRoles(createRoleMap());
         setManageVarChecked(false);
         setSuperUserMarket("");
-        setSuperUserSubMarket("");
         setUserField1("");
-        setPassword("");
       } else {
         setMessage(result?.msg || "操作失败，请稍后重试");
         setMessageType("error");
@@ -267,7 +255,7 @@ const UD17 = React.memo(() => {
                 {role !== "User Admin" && (
                   <div className="ud17-role-market">
                     {role === "Standard User" ? (
-                      <select size={6} className="ud17-sel" value="-EU">
+                      <select size={6} className="ud17-sel">
                         <option value="-EU">-EU</option>
                       </select>
                     ) : (
@@ -279,7 +267,7 @@ const UD17 = React.memo(() => {
                           setRole(role, "market", e.target.value)
                         }
                       >
-                        {MARKET_OPTIONS.map((m) => (
+                        {marketOptions.map((m) => (
                           <option key={m} value={m}>
                             {m}
                           </option>
@@ -318,11 +306,7 @@ const UD17 = React.memo(() => {
                   Adaptation user
                 </label>
                 <div className="ud17-role-market">
-                  <select
-                    size={6}
-                    className="ud17-sel"
-                    value={roles["Adaptation user"]?.market || ""}
-                  >
+                  <select size={6} className="ud17-sel">
                     <option value="-EU">-EU</option>
                   </select>
                 </div>
@@ -357,7 +341,7 @@ const UD17 = React.memo(() => {
                 value={superUserMarket}
                 onChange={(e) => setSuperUserMarket(e.target.value)}
               >
-                {MARKET_OPTIONS.map((m) => (
+                {marketOptions.map((m) => (
                   <option key={m} value={m}>
                     {m}
                   </option>

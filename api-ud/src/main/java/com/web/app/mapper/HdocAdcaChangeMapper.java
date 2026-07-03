@@ -24,4 +24,9 @@ public interface HdocAdcaChangeMapper {
      * 更新ADCA变更（逻辑删除）
      */
     int updateActToN(@Param("serie") String serie, @Param("chnr") String chnr);
+
+    /**
+     * 物理删除ADCA变更
+     */
+    int deleteByCondition(@Param("serie") String serie, @Param("chnr") String chnr);
 }

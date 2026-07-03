@@ -139,18 +139,6 @@ const UD09 = React.memo(() => {
   const [sortField, setSortField] = useState<string>("productClass");
   const [sortAsc, setSortAsc] = useState<boolean>(true);
 
-  const handleSort = useCallback(
-    (field: string) => {
-      if (sortField === field) {
-        setSortAsc((prev) => !prev);
-      } else {
-        setSortField(field);
-        setSortAsc(true);
-      }
-    },
-    [sortField],
-  );
-
   /** 排序后的数据 */
   const sortedData = [...dataSource].sort((a, b) => {
     const aVal = String((a as any)[sortField] || "");

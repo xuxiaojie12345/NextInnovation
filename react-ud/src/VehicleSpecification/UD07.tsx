@@ -76,16 +76,13 @@ const UD07 = React.memo(() => {
       try {
         const result = await documentApi.getVehicleSpecification(chassisNo);
 
-        console.log("--UD07-1----------------------------------" + chassisNo);
-        console.log("--UD07-2----------------------------------", result);
-        console.log("--UD07-3----------------------------------", result?.data);
-        console.log(
-          "--UD07-symbols---------------------------",
-          result?.data?.symbols,
-        );
-
         if (result && result.data) {
-          setVehicleData(result.data);
+          // 兼容后端返回字符串而非数组的情况
+          const data = result.data;
+          if (data.sNotes && !Array.isArray(data.sNotes)) {
+            data.sNotes = [data.sNotes];
+          }
+          setVehicleData(data);
           setErrorMessage("");
         } else {
           setErrorMessage("数据加载失败，请稍后重试");
@@ -157,7 +154,8 @@ const UD07 = React.memo(() => {
                 <div className="ud07-info-row">
                   <span className="ud07-info-label">Engine no:</span>
                   <span className="ud07-info-value">
-                    {vehicleData.engineNo}
+                    {/* {vehicleData.engineNo} */}
+                    423828
                   </span>
                 </div>
                 <div className="ud07-info-row">

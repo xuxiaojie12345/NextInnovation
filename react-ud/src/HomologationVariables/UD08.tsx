@@ -28,17 +28,6 @@ interface HomoVarRecord {
 }
 /** sessionStorage 键名 - 保存检索条件 */
 const STORAGE_KEY_UD08_FORM = "ud08_search_criteria";
-/** 检索条件 */
-interface SearchParams {
-  productClass: string;
-  number: string;
-  market: string;
-  variable: string;
-  value: string;
-  variantString1: string;
-  variantString2: string;
-  comments: string;
-}
 
 const STORAGE_KEY_USER = "user_info";
 const STORAGE_KEY_TOKEN = "auth_token";
@@ -59,8 +48,8 @@ const getCurrentUser = (): {
     const userInfo = JSON.parse(userStr);
     const token = localStorage.getItem(STORAGE_KEY_TOKEN);
     return {
-      userId: userInfo.userId || "",
-      name: userInfo.name || "",
+      userId: token || userInfo.user?.userId || userInfo.userId || "",
+      name: userInfo.user?.name || userInfo.name || "",
       token: token || "",
     };
   } catch {
@@ -114,7 +103,6 @@ const UD08 = React.memo(() => {
   const [variableOptions, setVariableOptions] = useState<SelectOption[]>([]);
 
   // 搜索结果列表
-  const [searchResults, setSearchResults] = useState<HomoVarRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<HomoVarRecord | null>(
     null,
   );
@@ -139,6 +127,16 @@ const UD08 = React.memo(() => {
       return;
     }
     setUser(currentUser);
+    // 初期表示时，Created by user默认显示登录用户ID
+    setCreatedByVal(currentUser.userId);
+    // 初期表示时，Date显示当前时间
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    setDateVal(`${year}-${month}-${day} ${hours}:${minutes}`);
 
     const initPage = async () => {
       try {
@@ -633,39 +631,6 @@ const UD08 = React.memo(() => {
   ]);
 
   /**
-   * 选择搜索结果中的记录
-   */
-  const handleSelectRecord = useCallback((record: HomoVarRecord) => {
-    setSelectedRecord(record);
-    setProductClass(record.productClass);
-    setNumber(String(record.number));
-    setMarket(record.market);
-    setVariable(record.variable);
-    setValue(record.value);
-    setVariantString1(record.variantString1);
-    setVariantString2(record.variantString2);
-    setComments(record.comments);
-    setAddVal(record.add || "");
-    setDeleteVal(record.delete || "");
-    setCreatedByVal(record.createdByUser || "");
-    setDateVal(record.date || "");
-    // 运算符重置为 "="
-    setOpProductClass("=");
-    setOpNumber("=");
-    setOpMarket("=");
-    setOpVariable("=");
-    setOpValue("=");
-    setOpVariantString1("=");
-    setOpVariantString2("=");
-    setOpComments("=");
-    setOpAdd("=");
-    setOpDelete("=");
-    setOpCreatedBy("=");
-    setOpDate("=");
-    setErrorMessage("");
-  }, []);
-
-  /**
    * 表单校验 - Add / Update 时检查必填项
    */
   const validateRequired = useCallback((): boolean => {
@@ -1116,7 +1081,7 @@ const UD08 = React.memo(() => {
                   disabled={isSubmitting}
                 />
               </div>
-              <span className="ud08-auto-value">{addVal || "YYYYWW"}</span>
+              <span className="ud08-auto-value">{"YYYYWW"}</span>
             </div>
             {/* Delete - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
@@ -1133,7 +1098,7 @@ const UD08 = React.memo(() => {
                   disabled={isSubmitting}
                 />
               </div>
-              <span className="ud08-auto-value">{deleteVal || "YYYYWW"}</span>
+              <span className="ud08-auto-value">{"YYYYWW"}</span>
             </div>
             {/* Created by user - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
@@ -1150,9 +1115,7 @@ const UD08 = React.memo(() => {
                   disabled={isSubmitting}
                 />
               </div>
-              <span className="ud08-auto-value">
-                {createdByVal || "Automatic"}
-              </span>
+              <span className="ud08-auto-value">{"Automatic"}</span>
             </div>
             {/* Date - 短入力框 + 右侧自动值 */}
             <div className="ud08-field-row">
@@ -1168,7 +1131,7 @@ const UD08 = React.memo(() => {
                   disabled={isSubmitting}
                 />
               </div>
-              <span className="ud08-auto-value">{dateVal || "Automatic"}</span>
+              <span className="ud08-auto-value">{"Automatic"}</span>
             </div>
           </div>
         </div>

@@ -36,4 +36,10 @@ public class UD16ADChangeController {
     public UD16ADChangeResponse updateHdocAdcaChange(@RequestBody UD16ADChangeRequest request) {
         return ud16ADChangeService.updateHdocAdcaChange(request);
     }
+
+    @PostMapping("/UD16DeleteHdocAdcaChange")
+    @ApiOperation("物理删除ADCA Change")
+    public UD16ADChangeResponse deleteHdocAdcaChange(@RequestBody UD16ADChangeRequest request) {
+        return ud16ADChangeService.deleteHdocAdcaChange(request);
+    }
 }

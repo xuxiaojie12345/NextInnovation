@@ -15,7 +15,6 @@ const UD19 = React.memo(() => {
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [searchType, setSearchType] = useState<string>("");
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [count, setCount] = useState(0);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const [isLoading, setIsLoading] = useState(false);
@@ -81,14 +80,12 @@ const UD19 = React.memo(() => {
         const data = result.data || result;
         const users: SearchResult[] = data.users || [];
         setResults(users);
-        setCount(data.count ?? users.length);
         setMessageType("success");
         setMessage(result.message || result.msg || "查询成功");
       } else {
         setMessage(result?.msg || "查询失败，请稍后再试");
         setMessageType("error");
         setResults([]);
-        setCount(0);
       }
     } catch {
       setMessage("查询失败，请稍后再试");

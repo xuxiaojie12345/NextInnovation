@@ -98,14 +98,6 @@ const UD24 = React.memo(() => {
               HDoc - Market Document Setting
             </button>
           </div>
-
-          {/* Other Information */}
-          <div className="ud24-section">
-            <label className="ud24-chk">
-              <input type="checkbox" />
-              Other Information
-            </label>
-          </div>
         </div>
       </main>
     </div>

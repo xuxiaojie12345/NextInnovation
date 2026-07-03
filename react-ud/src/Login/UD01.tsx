@@ -179,11 +179,11 @@ const UD01: React.FC = () => {
             maxLength={10}
             disabled={isLoading}
             style={{ marginBottom: 16 }}
-            prefix={<span style={{ color: "#999" }}>ID:</span>}
           />
 
           {/* Password 输入框 */}
-          <Input.Password
+          <Input
+            type="password"
             placeholder="Password"
             value={password}
             onChange={handlePasswordChange}

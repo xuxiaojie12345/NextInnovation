@@ -22,4 +22,9 @@ public interface UD16ADChangeService {
      * 删除ADCA Change（逻辑删除）
      */
     UD16ADChangeResponse updateHdocAdcaChange(UD16ADChangeRequest request);
+
+    /**
+     * 物理删除ADCA Change
+     */
+    UD16ADChangeResponse deleteHdocAdcaChange(UD16ADChangeRequest request);
 }

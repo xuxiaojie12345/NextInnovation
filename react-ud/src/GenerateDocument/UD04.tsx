@@ -12,8 +12,8 @@ interface VinPlateData {
   specWeek: string;
   market: string;
   masterMarket: string;
-  sNotes: string[];
-  sNoteMessage: string;
+  snotes: string[];
+  snotemessage: string;
   frontLoadIndex: string;
   frontSpeedIndex: string;
   driveLoadIndex: string;
@@ -240,16 +240,23 @@ const UD04 = React.memo(() => {
               </div>
 
               {/* ── S-Notes ── */}
-              {vinPlateData.sNotes && vinPlateData.sNotes.length > 0 && (
+              {vinPlateData.snotes && vinPlateData.snotes.length > 0 && (
                 <div className="ud04-snote-section">
-                  {vinPlateData.sNotes.map((note, index) => (
+                  {vinPlateData.snotes.map((note, index) => (
                     <div key={index} className="ud04-snote-item">
                       {note}
                     </div>
                   ))}
                   <div className="ud04-snote-warning">
-                    {vinPlateData.sNoteMessage}
+                    {vinPlateData.snotemessage}
                   </div>
+                </div>
+              )}
+
+              {/* ── S-Note 警告文言（S-Note存在时表示） ── */}
+              {vinPlateData.snotes && vinPlateData.snotes.length > 0 && (
+                <div className="ud04-snote-warning-text">
+                  The S-Notes above can affect homologation documents.
                 </div>
               )}
 
@@ -304,7 +311,8 @@ const UD04 = React.memo(() => {
                 <div className="ud04-info-row">
                   <span className="ud04-info-label">Using template:</span>
                   <span className="ud04-info-value">
-                    {vinPlateData.templateName}
+                    {/* {vinPlateData.templateName} */}
+                    eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHILtf
                   </span>
                 </div>
               </div>
@@ -313,6 +321,9 @@ const UD04 = React.memo(() => {
               {vinPlateData.replacedParams &&
                 vinPlateData.replacedParams.length > 0 && (
                   <div className="ud04-replaced-section">
+                    <div className="ud04-replaced-title">
+                      Replacing parameters
+                    </div>
                     {vinPlateData.replacedParams.map((param, index) => (
                       <div key={index} className="ud04-info-row">
                         <span className="ud04-info-label">

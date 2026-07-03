@@ -39,4 +39,10 @@
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
     
+    <!-- 物理删除ADCA变更 -->
+    <delete id="deleteByCondition">
+        DELETE FROM HDOC_ADCA_CHANGE 
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
+    </delete>
+    
 </mapper>

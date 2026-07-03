@@ -31,7 +31,7 @@ const UD12 = React.memo(() => {
 
   // Upload
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadMarket, setUploadMarket] = useState<string>("JPN");
+  const [uploadMarket, setUploadMarket] = useState<string>("");
   // Delete
   const [deleteMarket, setDeleteMarket] = useState<string>("");
   const [deleteTemplate, setDeleteTemplate] = useState<string>("");
@@ -233,6 +233,7 @@ const UD12 = React.memo(() => {
                 value={uploadMarket}
                 onChange={(e) => setUploadMarket(e.target.value)}
               >
+                <option value="">-- Select --</option>
                 {marketOptions.map((m, i) => (
                   <option key={i} value={m}>
                     {m}
