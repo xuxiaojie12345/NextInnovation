@@ -194,26 +194,6 @@ const VinPlate: React.FC = () => {
   const handleChangeToBasic = () => executeAction('/ud15/changeToBasicInfo', 'Type changed to Basic Info.');
   const handleChangeToAdvanced = () => executeAction('/ud15/changeToAdvancedInfo', 'Type changed to Advanced Info.');
 
-  // ── 状态/类型映射 ──
-  const getStatusText = (status: any): string => {
-    const s = String(status);
-    switch (s) {
-      case '0': return '新规追加';
-      case '1': return 'XML文档已作成';
-      case '2': return '已发送';
-      case '9': return '错误';
-      default: return s || '-';
-    }
-  };
-
-  const getTypeText = (type: string): string => {
-    switch (type) {
-      case '1': return 'Basic Info';
-      case '2': return 'Advanced Info';
-      default: return type || '-';
-    }
-  };
-
   return (
     <div className="vp-container">
       <div className="vp-header">
@@ -258,11 +238,11 @@ const VinPlate: React.FC = () => {
               </tr>
               <tr>
                 <td className="vp-info-label">Plate type</td>
-                <td className="vp-info-value">{getTypeText(vinPlateInfo.type)}</td>
+                <td className="vp-info-value">{vinPlateInfo.type != null ? String(vinPlateInfo.type) : '-'}</td>
               </tr>
               <tr>
                 <td className="vp-info-label">Status</td>
-                <td className="vp-info-value">{getStatusText(vinPlateInfo.status)}</td>
+                <td className="vp-info-value">{vinPlateInfo.status != null ? String(vinPlateInfo.status) : '-'}</td>
               </tr>
               <tr>
                 <td className="vp-info-label">Error Message</td>
