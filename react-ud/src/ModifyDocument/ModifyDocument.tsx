@@ -131,7 +131,10 @@ const ModifyDocument: React.FC = () => {
           <span className="info-label">Chassis no:</span>
           <span className="info-value">
             <strong>{serie}</strong>
-            <strong style={{ textDecoration: 'underline', color: '#66707b', marginLeft: 4 }}>{chnr}</strong>
+            <strong
+              style={{ textDecoration: 'underline', color: '#66707b', marginLeft: 4, cursor: 'pointer' }}
+              onClick={() => navigate('/menu/vehicle-specification', { state: { serie, chnr } })}
+            >{chnr}</strong>
           </span>
         </div>
         <div className="modify-doc-info-item">
