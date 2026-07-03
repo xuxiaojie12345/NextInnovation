@@ -288,6 +288,11 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
+    if (!/^[0-9]+$/.test(num)) {
+      setErrorMessage('Number must contain only digits (0-9).');
+      return;
+    }
+
     if (await checkRuleExists(pc, num, mkt)) {
       setErrorMessage('Primary key conflict, Please enter the correct content.');
       return;
@@ -306,10 +311,11 @@ const HomologationVariables: React.FC = () => {
     const createdBy = getFormVal('Created by user') || localStorage.getItem('userId') || '';
     setIsLoading(true);
     try {
+      const tokenUser = localStorage.getItem('userId') || 'SYSTEM';
       const res = await api.post('/ud08/add', {
         pc, num, market: mkt, variable: processedVar, val: valVal,
         vs: variantCond.value1, vs2: variantCond.value2, comments: cmt, addDate: addDt, deleteDate: delDt,
-        registerUser: createdBy, updateUser: createdBy,
+        registerUser: tokenUser, updateUser: createdBy,
       });
       if (res.code === 200) { setSuccessMessage('Rule added successfully.'); clearForm(true); }
       else setErrorMessage(res.message || 'Failed to add rule.');
@@ -333,10 +339,15 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
+    if (!/^[0-9]+$/.test(num)) {
+      setErrorMessage('Number must contain only digits (0-9).');
+      return;
+    }
+
     // 主键更改校验：从 Result List 返回时有原始主键，检查是否被修改
     if (originalKeys) {
       if (pc !== originalKeys.pc || num !== originalKeys.num || mkt !== originalKeys.market) {
-        setErrorMessage('Data does not exist, Please enter the correct content.');
+        setErrorMessage('Primary key conflict, Please enter the correct content');
         return;
       }
     }
@@ -433,7 +444,15 @@ const HomologationVariables: React.FC = () => {
       );
     }
     return (
-      <input type="text" className="hv-cond-input" value={value} onChange={(e) => onChange(e.target.value)} maxLength={getMaxLength(label)} disabled={isLoading} />
+      <input type="text" className="hv-cond-input" value={value}
+        onChange={(e) => {
+          const raw = e.target.value;
+          // Number 字段仅允许半角数字
+          const filtered = label === 'Number' ? raw.replace(/[^0-9]/g, '') : raw;
+          onChange(filtered);
+        }}
+        maxLength={getMaxLength(label)}
+        disabled={isLoading} />
     );
   };
 

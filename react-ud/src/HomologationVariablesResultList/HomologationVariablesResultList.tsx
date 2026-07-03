@@ -218,8 +218,8 @@ const HomologationVariablesResultList: React.FC = () => {
                 <th className="hv-th-underline hv-th-noborder">Comments</th>
                 <th className="hv-th-sub hv-th-noborder">Add<div className="hv-th-subtext">(YYYWW)</div></th>
                 <th className="hv-th-sub hv-th-noborder">Delete<div className="hv-th-subtext">(YYYWW)</div></th>
-                <th className="hv-th-sub hv-th-noborder">Created by user<div className="hv-th-subtext">(Haohetao123)</div></th>
-                <th className="hv-th-sub hv-th-noborder">Date<div className="hv-th-subtext">(Haohetao123)</div></th>
+                <th className="hv-th-sub hv-th-noborder">Created by user<div className="hv-th-subtext">(Automatic)</div></th>
+                <th className="hv-th-sub hv-th-noborder">Date<div className="hv-th-subtext">(Automatic)</div></th>
               </tr>
             </thead>
             <tbody>

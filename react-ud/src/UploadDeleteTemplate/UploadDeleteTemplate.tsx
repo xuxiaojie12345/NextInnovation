@@ -191,7 +191,7 @@ const UploadDeleteTemplate: React.FC = () => {
                   onChange={(e) => setUploadMarket(e.target.value)}
                   disabled={isLoading}
                 >
-
+                  <option value=""></option>
                   {markets.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
@@ -232,7 +232,7 @@ const UploadDeleteTemplate: React.FC = () => {
                   onChange={(e) => setDeleteMarket(e.target.value)}
                   disabled={isLoading}
                 >
-
+                  <option value=""></option>
                   {markets.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
