@@ -13,5 +13,5 @@ public interface ADChangeMapper {
                @Param("act") String act, @Param("bu") String bu,
                @Param("reason") String reason, @Param("currentUser") String currentUser);
 
-    int updateAllActToN();
+    int updateAllActToN(@Param("currentUser") String currentUser);
 }

@@ -18,14 +18,19 @@ public class ADChangeServiceImpl implements ADChangeService {
     }
 
     @Override
-    public int insert(String serie, String chnr, String act, String bu, String reason) {
-        String currentUser = "SYSTEM";
+    public int insert(String serie, String chnr, String act, String bu, String reason, String currentUser) {
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            currentUser = "SYSTEM";
+        }
         return adChangeMapper.insert(serie, chnr, act, bu, reason, currentUser);
     }
 
     @Override
-    public int updateAllActToN() {
-        return adChangeMapper.updateAllActToN();
+    public int updateAllActToN(String currentUser) {
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            currentUser = "SYSTEM";
+        }
+        return adChangeMapper.updateAllActToN(currentUser);
     }
 
 

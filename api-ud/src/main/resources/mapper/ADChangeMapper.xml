@@ -27,7 +27,7 @@
         UPDATE HDOC_ADCA_CHANGE
         SET ACT = 'N',
             UPDATE_DATETIME = NOW(),
-            UPDATE_USER = 'SYSTEM',
+            UPDATE_USER = #{currentUser},
             UPDATE_PROCESS = 'UD16UpdateHdocAdcaChange'
     </update>
 

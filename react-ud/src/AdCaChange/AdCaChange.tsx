@@ -98,7 +98,8 @@ const AdCaChange: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post('/adca/update', {});
+      const updateUser = localStorage.getItem('userId') || '';
+      const res = await api.post('/adca/update', { updateUser });
 
       if (res.code === 200) {
         setSuccessMessage('Record updated/deleted successfully.');

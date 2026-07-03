@@ -58,13 +58,14 @@ public class ADChangeController {
             String act = request.get("act");
             String bu = request.get("bu");
             String reason = request.get("reason");
+            String updateUser = request.get("updateUser");
 
             if (serie == null || chnr == null || act == null) {
                 return ResponseEntity.badRequest()
                     .body(ApiResponse.error(400, "Serie, CHNR and ACT are required."));
             }
 
-            int result = adChangeService.insert(serie, chnr, act, bu, reason);
+            int result = adChangeService.insert(serie, chnr, act, bu, reason, updateUser);
             if (result > 0) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("serie", serie);
@@ -82,9 +83,11 @@ public class ADChangeController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> updateHdocAdcaChange() {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateHdocAdcaChange(
+            @RequestBody Map<String, String> request) {
         try {
-            int updateCount = adChangeService.updateAllActToN();
+            String updateUser = request.get("updateUser");
+            int updateCount = adChangeService.updateAllActToN(updateUser);
             Map<String, Object> data = new HashMap<>();
             data.put("updateCount", String.valueOf(updateCount));
             data.put("updateContent", "ACT status has been set to N for all records.");
