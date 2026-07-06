@@ -168,7 +168,7 @@ const VinPlate: React.FC = () => {
             }}
             disabled={loading}
             maxLength={15}
-            placeholder="Enter chassis number"
+            placeholder="例: JPCT-1234567890"
           />
         </div>
       </div>

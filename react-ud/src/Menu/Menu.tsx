@@ -53,7 +53,7 @@ const menuItems: MenuItem[] = [
           { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
           { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
           { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
-          { key: "ADCAChange", label: "AD/CA Change", route: "#" },
+          { key: "ADCAChange", label: "AD/CA Change", route: "/Menu/ADCAChange" },
         ],
       },
     ],
@@ -205,8 +205,16 @@ const Menu: React.FC = () => {
     const filtered = filterMenuByPermissions(menuItems, permissions);
     setFilteredMenuItems(filtered);
 
-    // 初始化默认展开的一级菜单
-    const defaultOpenKeys = filtered.map((item) => item.key);
+    // 递归收集所有层级的 key，使所有子菜单默认展开
+    const getAllKeys = (items: MenuItem[]): string[] => {
+      const keys: string[] = [];
+      for (const item of items) {
+        keys.push(item.key);
+        if (item.children) keys.push(...getAllKeys(item.children));
+      }
+      return keys;
+    };
+    const defaultOpenKeys = getAllKeys(filtered);
     setOpenKeys(defaultOpenKeys);
   }, [navigate]);
 

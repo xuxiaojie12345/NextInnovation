@@ -36,9 +36,9 @@ public class UD15Controller {
         }
 
         try {
-            // 解析 chassisNumber: "serie chnr"
+            // 解析 chassisNumber: "serie-chnr"（使用中划线分隔）
             String chassisNumber = request.getChassisNumber().trim();
-            String[] parts = chassisNumber.split(" ", 2);
+            String[] parts = chassisNumber.split("-", 2);
             String serie = parts[0];
             String chnr = parts.length > 1 ? parts[1] : "";
 

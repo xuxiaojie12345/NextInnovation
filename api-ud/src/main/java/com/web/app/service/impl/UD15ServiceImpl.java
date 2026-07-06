@@ -37,11 +37,11 @@ public class UD15ServiceImpl implements UD15Service {
     private Map<String, Object> handleViewInfo(String serie, String chnr) {
         Map<String, Object> info = ud15Mapper.selectVinPlateInfo(serie, chnr);
         if (info == null) {
-            throw new IllegalArgumentException("Chassis number " + serie + " " + chnr + " not found.");
+            throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         // 映射字段名为前端期望的格式（对应详细设计 2.1 控件属性表）
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("chassisNumber", serie + " " + chnr);
+        result.put("chassisNumber", serie + "-" + chnr);
         result.put("plateType", info.getOrDefault("TYPE", ""));
         result.put("status", info.getOrDefault("STATUS", ""));
         result.put("errorMessage", info.getOrDefault("MSG", ""));
@@ -56,7 +56,7 @@ public class UD15ServiceImpl implements UD15Service {
     private Map<String, Object> handleSetRegenerate(String serie, String chnr) {
         int rows = ud15Mapper.updateStatus(serie, chnr, "0");
         if (rows == 0) {
-            throw new IllegalArgumentException("Chassis number " + serie + " " + chnr + " not found.");
+            throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Status updated to 0 (New Addition)");
@@ -66,7 +66,7 @@ public class UD15ServiceImpl implements UD15Service {
     private Map<String, Object> handleSetOK(String serie, String chnr) {
         int rows = ud15Mapper.updateStatus(serie, chnr, "1");
         if (rows == 0) {
-            throw new IllegalArgumentException("Chassis number " + serie + " " + chnr + " not found.");
+            throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Status updated to 1 (XML Doc Created)");
@@ -76,7 +76,7 @@ public class UD15ServiceImpl implements UD15Service {
     private Map<String, Object> handleChangeToBasicInfo(String serie, String chnr) {
         int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "1");
         if (rows == 0) {
-            throw new IllegalArgumentException("Chassis number " + serie + " " + chnr + " not found.");
+            throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Status updated to 0 and Type updated to 1 (Basic)");
@@ -86,7 +86,7 @@ public class UD15ServiceImpl implements UD15Service {
     private Map<String, Object> handleChangeToAdvancedInfo(String serie, String chnr) {
         int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "2");
         if (rows == 0) {
-            throw new IllegalArgumentException("Chassis number " + serie + " " + chnr + " not found.");
+            throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Status updated to 0 and Type updated to 2 (ADVANCED with weights)");

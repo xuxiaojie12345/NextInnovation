@@ -78,6 +78,7 @@
     tire.LOAD_INDEX,
     cha.ACT,
     admod.VARIABLE
+        LIMIT 1
     </select>
 
 </mapper>

@@ -155,11 +155,7 @@ const GenerateDocument: React.FC = () => {
         <div className='info-item info-item-chassis'>
           <span className='chassis-label'>Chassis no:</span>
           <span className='chassis-value'>
-            <strong
-              className='chassis-series chassis-link'
-              onClick={handleChassisNoClick}
-              title='点击查看车辆规格'
-            >
+            <strong className='chassis-series'>
               {currentChassisSeries || documentData?.serie || '-'}
             </strong>{' '}
             <u
