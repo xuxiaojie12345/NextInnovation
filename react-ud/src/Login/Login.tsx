@@ -97,6 +97,12 @@ const Login: React.FC = () => {
         return;
       }
 
+      if (response.status === 403) {
+        setMessage("Your account is locked. Please contact your system administrator.");
+        setHasError(true);
+        return;
+      }
+
       if (!response.ok) {
         console.error("API request failed with status:", response.status);
         throw new Error('Authentication request failed');

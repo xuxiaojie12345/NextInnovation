@@ -164,15 +164,15 @@
   background-color: #c0d0e5;
 }
 
-/* 危险按钮 */
+/* 删除按钮 */
 .ud12-btn-danger {
-  color: #ffffff;
-  background-color: #e74c3c;
-  border-color: #c0392b;
+  color: #333333;
+  background-color: #d0ddf0;
+  border-color: #8da0c0;
 }
 
 .ud12-btn-danger:hover:not(:disabled) {
-  background-color: #c0392b;
+  background-color: #c0d0e5;
 }
 
 /* 链接区域 */

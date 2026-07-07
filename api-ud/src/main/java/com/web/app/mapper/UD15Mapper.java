@@ -20,11 +20,12 @@ public interface UD15Mapper {
      * 更新STATUS
      */
     int updateStatus(@Param("serie") String serie, @Param("chnr") String chnr,
-                     @Param("status") String status);
+                     @Param("status") String status, @Param("updateUser") String updateUser);
 
     /**
      * 更新STATUS和TYPE
      */
     int updateStatusAndType(@Param("serie") String serie, @Param("chnr") String chnr,
-                            @Param("status") String status, @Param("type") String type);
+                            @Param("status") String status, @Param("type") String type,
+                            @Param("updateUser") String updateUser);
 }

@@ -141,7 +141,7 @@
 
 **处理步骤**：
 - 从路由参数或上下文获取底盘号
-- 调用UD04SelectGeneratedocumentApi（GET方法）
+- 调用UD04SelectGeneratedocumentApi（POST方法）
 - 传递参数：chassisNo（底盘号）
 - 等待API响应
 

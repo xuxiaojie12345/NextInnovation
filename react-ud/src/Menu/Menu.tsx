@@ -3,12 +3,9 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Layout, Menu as AntMenu, Typography } from "antd";
 import {
   FileTextOutlined,
-  SettingOutlined,
   UserOutlined,
   FolderOpenOutlined,
   BookOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import "./Menu.css";
 
@@ -179,7 +176,6 @@ const getLeafKeys = (items: MenuItem[]): string[] => {
 const Menu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -253,9 +249,9 @@ const Menu: React.FC = () => {
     }
   };
 
-  // 处理一级菜单展开/折叠
-  const handleOpenChange = (keys: string[]) => {
-    setOpenKeys(keys);
+  // 禁止折叠：所有子菜单始终保持展开
+  const handleOpenChange = () => {
+    // 不执行任何操作，阻止用户折叠菜单
   };
 
   // 转换为 Ant Design Menu 数据格式
@@ -268,30 +264,24 @@ const Menu: React.FC = () => {
     <Layout className="menu-layout">
       {/* 左侧菜单区 */}
       <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        width={280}
+        width={340}
         className="menu-sider"
-        trigger={null}
       >
         {/* 系统标题 */}
         <div className="menu-header">
-          {!collapsed && (
-            <div className="menu-title">
-              <Text strong style={{ color: "#fff", fontSize: 16 }}>
-                EDB Engineering Database
-              </Text>
-              {currentUser && (
-                <div className="menu-user-info">
-                  <UserOutlined style={{ marginRight: 4 }} />
-                  <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>
-                    {currentUser}
-                  </Text>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="menu-title">
+            <Text strong style={{ color: "#fff", fontSize: 16 }}>
+              EDB Engineering Database
+            </Text>
+            {currentUser && (
+              <div className="menu-user-info">
+                <UserOutlined style={{ marginRight: 4 }} />
+                <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>
+                  {currentUser}
+                </Text>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 菜单树 */}
@@ -307,28 +297,12 @@ const Menu: React.FC = () => {
             className="menu-tree"
           />
         </div>
-
-        {/* 折叠按钮 */}
-        <div className="menu-footer">
-          <div
-            className="menu-collapse-btn"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          </div>
-        </div>
       </Sider>
 
       {/* 右侧内容区 */}
       <Layout className="menu-content-layout">
         <Header className="menu-content-header">
           <div className="header-left">
-            <span
-              className="header-collapse-trigger"
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            </span>
             <Text className="header-title">EDB Engineering Database</Text>
           </div>
           <div className="header-right">

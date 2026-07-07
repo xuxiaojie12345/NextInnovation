@@ -60,11 +60,22 @@ const VinPlate: React.FC = () => {
 
     setLoading(true);
     try {
+      // 获取当前登录用户ID
+      let updateUser = '';
+      try {
+        const userInfoStr = localStorage.getItem('userInfo');
+        if (userInfoStr) {
+          const userInfo = JSON.parse(userInfoStr);
+          updateUser = userInfo.userid || userInfo.username || '';
+        }
+      } catch { /* ignore */ }
+
       const response = await axios.post(
         `${API_BASE_URL}/api/ud15/UD15SelecthdocsenddatavinplateApi`,
         {
           chassisNumber: chassisNumber.trim(),
-          operation
+          operation,
+          updateUser
         }
       );
 
@@ -143,7 +154,7 @@ const VinPlate: React.FC = () => {
   return (
     <div className="ud15-container">
       {/* 页面标题 */}
-      <h1 className="ud15-title">EDB Engineering Database - Vin Plate</h1>
+      <h1 className="ud15-title">Vin Plate</h1>
 
       {/* 消息提示区域 */}
       {message && (

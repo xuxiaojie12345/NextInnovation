@@ -161,7 +161,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
     // 校验：是否选择了市场
     if (!selectedUploadMarket) {
-      setError("Please select market and template.");
+      setError("Please select market.");
       return;
     }
 
@@ -189,6 +189,7 @@ const UploadDeleteTemplate: React.FC = () => {
         setSuccessMessage(
           `TEMPLATE ${result.fileName} WAS SUCESSFULLY UPLOADED TO MARKET ${result.market}`
         );
+        setSelectedUploadMarket("");
         if (fileInputRef.current) fileInputRef.current.value = "";
       } else if (response.data.code === 400) {
         setError(response.data.message || "Invalid file type or size (Max 10MB)");
@@ -277,7 +278,7 @@ const UploadDeleteTemplate: React.FC = () => {
             id="templateFileInput"
             ref={fileInputRef}
             className="ud12-file-input"
-            accept=".rtf,.docx,.doc"
+
           />
         </div>
 
@@ -349,15 +350,25 @@ const UploadDeleteTemplate: React.FC = () => {
 
         <div className="ud12-btn-group">
           <button type="button" className="ud12-btn ud12-btn-danger"
-            onClick={handleDeleteClick}
-            disabled={loading || !selectedDeleteMarket || !selectedTemplate}>
+            onClick={handleDeleteClick}>
             Delete
           </button>
         </div>
       </div>
 
-      {/* 底部链接 - 对应详细设计 2.1 其他控件 */}
+      {/* Check Template 说明文字 + 链接 */}
       <div className="ud12-link-section">
+        <p style={{ color: '#ff4d4f', fontWeight: 'bold', margin: 0 }}>Check your rtf template</p>
+        <p className="ud12-check-text">
+          In case you have a rtf template you should run a check on it
+          before uploading it.
+          <br />
+          After check download the template to your desktop and then upload
+          it to your template directory.
+          <br />
+          Use the link bellow.
+        </p>
+        <br />
         <a href="#" className="ud12-link" onClick={handleCheckTemplateClick}>
           Check Template (Only for rtf files)
         </a>

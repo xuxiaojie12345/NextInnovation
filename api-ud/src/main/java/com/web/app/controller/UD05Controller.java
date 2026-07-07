@@ -91,7 +91,8 @@ public class UD05Controller {
                     request.getSerie(),
                     request.getChno(),
                     request.getVariable(),
-                    request.getModifiedValue());
+                    request.getModifiedValue(),
+                    request.getUpdateUser());
 
             if (success) {
                 logger.info("UD05 update success for chno: {}, variable: {}", request.getChno(), request.getVariable());

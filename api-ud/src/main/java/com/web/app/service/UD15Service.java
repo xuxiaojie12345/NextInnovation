@@ -14,5 +14,5 @@ public interface UD15Service {
      * @param operation 操作类型
      * @return 操作结果
      */
-    Map<String, Object> processVinPlate(String serie, String chnr, String operation);
+    Map<String, Object> processVinPlate(String serie, String chnr, String operation, String updateUser);
 }

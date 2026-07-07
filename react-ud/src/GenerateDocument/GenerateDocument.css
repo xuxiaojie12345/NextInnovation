@@ -7,9 +7,10 @@
 }
 
 .page-header {
-  border-bottom: 2px solid #003087;
   padding-bottom: 15px;
   margin-bottom: 20px;
+  border: none !important;
+  border-bottom: none !important;
 }
 
 .page-title {
@@ -17,6 +18,10 @@
   font-size: 24px;
   font-weight: bold;
   margin: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
 }
 
 .loading-message {

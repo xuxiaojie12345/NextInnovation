@@ -262,9 +262,14 @@ const ExistingHDocVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
+      // 补全日期格式：如果 registerDatetime 只有日期部分则添加时间
+      const submitData = { ...formData };
+      if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
+        submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
+      }
       const res = await axios.post<ApiResponse<string>>(
         `${API_BASE_URL}/api/ud10/add`,
-        formData
+        submitData
       );
       if (res.data.code === 200) {
         setMessage('Record added successfully.');
@@ -303,9 +308,14 @@ const ExistingHDocVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
+      // 补全日期格式：如果 registerDatetime 只有日期部分则添加时间
+      const submitData = { ...formData };
+      if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
+        submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
+      }
       const res = await axios.post<ApiResponse<string>>(
         `${API_BASE_URL}/api/ud10/update`,
-        formData
+        submitData
       );
       if (res.data.code === 200) {
         setMessage('Record updated successfully.');
@@ -391,7 +401,7 @@ const ExistingHDocVariables: React.FC = () => {
    * 对应详细设计 3.1.8 返回流程
    */
   const handleBack = useCallback(() => {
-    navigate('/Menu/HomologationVariables');
+    navigate('/Menu');
   }, [navigate]);
 
   /**
@@ -419,7 +429,7 @@ const ExistingHDocVariables: React.FC = () => {
     // 生成文件名
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-    const filename = `HDOC_Variables_${dateStr}.csv`;
+    const filename = `HDOC_Variables_Form_${dateStr}.csv`;
 
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');

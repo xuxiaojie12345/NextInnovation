@@ -32,7 +32,7 @@
 | 5   | VIN | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.VIN |
 | 6   | Engine no | label | - | - | Output | - | 左 | A01 | - | 设定式样暂不明确，实际实装固定值"A01" |
 | 7   | Country of Operation | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION |
-| 8   | SYMBOL_STR | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS 和 HDOC_REC_DATA_KOLA_VARIANT；处理逻辑如下：<br>① 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID<br>② 查询HDOC_REC_DATA_KOLA_VARIANT获取Symbol<br>③ 取Symbol前8位，不足则左补半角空格 |
+
 | 9   | DESCRIPTION | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION；直接显示描述内容 |
 | 10  | S-Note NO | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.CUSTOMER_ADAP |
 
@@ -47,7 +47,7 @@
 2. 调用 `UD07VehicleSpecificationApi` 获取车辆基础信息。
 3. 从HDOC_REC_DATA_OM表中提取Model、Built week等信息。
 4. 从HDOC_REC_DATA_VDA_GENERAL表中提取VIN、Product Type、Country of Operation等信息。
-5. 通过组合查询HDOC_REC_DATA_VDA_VARIANTS和HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL_STR。
+
 6. 显示S-Note NO信息。
 7. 所有字段以标签形式静态展示，无交互操作。
 
@@ -63,7 +63,7 @@
 - 查询HDOC_REC_DATA_OM获取Model、Build Week等信息
 - 查询HDOC_REC_DATA_VDA_GENERAL获取VIN、Product Type、Country of Operation
 - 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID
-- 查询HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL和DESCRIPTION
+- 查询HDOC_REC_DATA_KOLA_VARIANT获取DESCRIPTION
 - 查询HDOC_REC_DATA_OM获取S-Note NO
 
 #### 空值校验等 (Frontend Check)：
@@ -72,10 +72,9 @@
   - 终止流程
 - 若HDOC_REC_DATA_VDA_VARIANTS中未找到匹配记录：
   - 设置Message = “未找到对应变体信息”
-  - Engine no和SYMBOL_STR字段留空
+  - Engine no字段留空
 - 若HDOC_REC_DATA_KOLA_VARIANT中未找到对应Symbol：
-  - Engine no字段显示“N/A”
-  - SYMBOL_STR字段显示“N/A”
+  - Engine no字段显示"N/A"
 
 #### 5.1.2 API调用 (Backend Check)：
 - 调用 `UD07VehicleSpecificationApi` 接口获取初始数据
@@ -90,8 +89,8 @@
 | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
 |-----|---------|---------|---------|--------------------------|------|
 | 1 | 页面加载前 | Chassis编号 | 为空 | “未指定Chassis编号” | 终止流程 |
-| 2 | 查询变体信息时 | HDOC_REC_DATA_VDA_VARIANTS | 无匹配记录 | “未找到对应变体信息” | Engine no和SYMBOL_STR设为空 |
-| 3 | 查询Symbol信息时 | HDOC_REC_DATA_KOLA_VARIANT | 无匹配记录 | “无法获取发动机符号信息” | Engine no设为“N/A”，SYMBOL_STR设为“N/A” |
+| 2 | 查询变体信息时 | HDOC_REC_DATA_VDA_VARIANTS | 无匹配记录 | "未找到对应变体信息" | Engine no设为空 |
+| 3 | 查询Symbol信息时 | HDOC_REC_DATA_KOLA_VARIANT | 无匹配记录 | "无法获取发动机符号信息" | Engine no设为"N/A" |
 
 ---
 
@@ -127,7 +126,6 @@
     },
     "engineInfo": {
       "engineNo": "A01",
-      "symbolStr": "FTLI-150   ",
       "description": "Front load index: FTLI-150"
     },
     "sNoteNo": "S1610111"

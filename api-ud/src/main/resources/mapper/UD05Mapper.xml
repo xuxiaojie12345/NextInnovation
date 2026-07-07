@@ -33,7 +33,10 @@
     -->
     <update id="updateHdocAdcaModification">
         UPDATE HDOC_ADCA_MODIFICATION
-        SET NEWVAL = #{modifiedValue}
+        SET NEWVAL = #{modifiedValue},
+            UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_PROCESS = 'UD05'
         WHERE SERIE = #{serie} AND CHNO = #{chno} AND VARIABLE = #{variable}
     </update>
 

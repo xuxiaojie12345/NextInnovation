@@ -43,5 +43,6 @@ public interface UD05Mapper {
             @Param("serie") String serie,
             @Param("chno") String chno,
             @Param("variable") String variable,
-            @Param("modifiedValue") String modifiedValue);
+            @Param("modifiedValue") String modifiedValue,
+            @Param("updateUser") String updateUser);
 }

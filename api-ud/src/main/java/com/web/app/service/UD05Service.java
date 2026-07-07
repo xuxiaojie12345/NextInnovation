@@ -32,5 +32,5 @@ public interface UD05Service {
      * @param modifiedValue 修改后的值
      * @return 是否更新成功
      */
-    boolean updateHdocAdcaModification(String serie, String chno, String variable, String modifiedValue);
+    boolean updateHdocAdcaModification(String serie, String chno, String variable, String modifiedValue, String updateUser);
 }

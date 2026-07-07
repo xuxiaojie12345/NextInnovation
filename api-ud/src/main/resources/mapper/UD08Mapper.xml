@@ -142,7 +142,6 @@
             <if test="comments != null">COMMENTS = #{comments},</if>
             <if test="addDate != null">ADD_DATE = #{addDate},</if>
             <if test="deleteDate != null">DELETE_DATE = #{deleteDate},</if>
-            <if test="registerUser != null">REGISTER_USER = #{registerUser},</if>
             <if test="updateDatetime != null">UPDATE_DATETIME = #{updateDatetime},</if>
             <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
             <if test="updateProcess != null">UPDATE_PROCESS = #{updateProcess},</if>

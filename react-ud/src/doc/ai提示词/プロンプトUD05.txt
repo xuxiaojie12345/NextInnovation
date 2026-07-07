@@ -20,7 +20,7 @@
 |-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
 | 1   | chassis no | Link | - | - | Output | - | 左 | 从前一画面传递 | 活性 (Enabled) | 底盘系列号（serie）和底盘编号（chassisNo）合并显示，格式：**serie** **chassisNo**。点击跳转到Vehicle Specification页面（UD07），传递参数chassisNo（serie + 半角空格 + chassisNo） |
 | 2   | Market | Label | - | - | Output | - | 左 | 从前一画面传递 | - | 市场信息，来自前一页面 |
-| 3   | Template文件 | Link | - | - | Output | - | 左 | 模板文件名 | - | 点击可下载.trf格式的模板文件(不含填充值)，如"Template: aus/UD_TEST.odt" |
+| 3   | Template文件 | Link | - | - | Output | - | 左 | 模板文件名 | - | 当前为占位显示，下载功能未实装，如"Template: aus/UD_TEST.odt" |
 | 4   | Variable | DataTable | - | - | Output | - | 左 | - | - | 变量名列表，来自Template文件的Template项目 |
 | 5   | Description | DataTable | - | - | Output | - | 左 | - | - | 变量描述，来自HDOC_VARIABLES表的DESCRIPTION字段 |
 | 6   | Current value | DataTable | - | - | Output | - | 左 | 从HDOC_ADCA_MODIFICATION表获取NEWVAL | - | 当前值，从HDOC_ADCA_MODIFICATION表获取NEWVAL |
@@ -47,12 +47,10 @@
 8. 如果某变量在HDOC_ADCA_MODIFICATION表中不存在记录，则Current value和Modified value均为空
 
 ### 4.2 下载模板文件
-功能说明：下载对应的.trf模板文件（不含填充值）
+功能说明：当前版本未实装文件下载功能
 操作步骤：
 1. 用户点击Template文件链接（如"Template: aus/UD_TEST.odt"）
-2. 系统触发文件下载请求
-3. 下载对应的Vin Plate .trf文件（不包含已填充的值）
-4. 浏览器自动下载文件到本地
+2. 显示提示消息"模板文件下载功能未实装"
 
 ### 4.3 查看底盘详细信息
 功能说明：跳转到底盘详细信息页面
@@ -104,13 +102,10 @@ API调用：
 成功：填充DataTable，显示变量列表
 失败：显示错误消息
 
-### 5.2 下载模板文件流程
+### 5.2 下载模板文件流程（未实装）
 开始：用户点击Template文件链接
 处理步骤：
-- 根据模板文件名，从服务器下载对应的.trf格式模板文件（不含填充值）
-结果处理：
-- 成功：浏览器触发文件下载
-- 失败：显示错误消息"Template file download failed."
+- 当前版本未实装文件下载功能，点击后显示提示消息"模板文件下载功能未实装"
 
 ### 5.3 查看底盘详细信息流程
 开始：用户点击chassis no链接
@@ -203,8 +198,7 @@ Response Error (500)
 | UD05ModifyDocumentApi超时 | 设置超时时间，超时后提示 | 请求超时，请检查网络连接 |
 | UD05ModifyDocumentApi数据库异常 | 记录日志，返回通用错误 | 系统异常，请联系管理员 |
 | 参数缺失 | 检查URL参数或localStorage | 缺少必要的底盘信息 |
-| 权限不足 | 检查用户登录状态 | 请先登录后再操作 |
-| 模板文件不存在 | 检查文件路径，返回错误 | 模板文件不存在，请联系管理员 |
+| 模板文件下载未实装 | 点击后显示提示消息 | 模板文件下载功能未实装 |
 | localStorage读写失败 | 忽略错误，继续使用空值或默认值 | 不显示错误消息 |
 
 ## 8. 语言要求

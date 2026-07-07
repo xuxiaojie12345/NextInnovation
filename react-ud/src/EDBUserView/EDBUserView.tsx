@@ -31,8 +31,12 @@ const EDBUserView: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 从导航状态中获取userId（由前画面传递，如UD09/HomologationVariablesResultList的Created by user链接）
-  const userId = (location.state as { userId?: string })?.userId || "";
+  // 从导航状态或URL参数中获取userId
+  // 支持两种方式：1) location.state.userId（SPA内导航） 2) URL查询参数（新窗口打开）
+  const stateUserId = (location.state as { userId?: string })?.userId || "";
+  const params = new URLSearchParams(location.search);
+  const queryUserId = params.get("userId") || "";
+  const userId = stateUserId || queryUserId;
 
   // 用户信息状态（对应详细设计 2.1 控件属性表）
   const [userInfo, setUserInfo] = useState<UserInfo>({

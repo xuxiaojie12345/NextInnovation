@@ -45,7 +45,7 @@ const GenerateHomologationDocument: React.FC = () => {
       // 获取文档类型列表
       await fetchDocumentTypeList();
     } catch (error) {
-      setMessage('System error occurred. Please contact the administrator.');
+      setMessage('System error. Please contact administrator.');
     }
   };
 
@@ -169,7 +169,7 @@ const GenerateHomologationDocument: React.FC = () => {
 
     // Document type 必填检查
     if (!documentType || documentType.trim() === '') {
-      errors.push('Please select a Document type.');
+      errors.push('Document type is required.');
       newErrorFields.add('documentType');
     }
 
@@ -215,7 +215,7 @@ const GenerateHomologationDocument: React.FC = () => {
       });
       
     } catch (error) {
-      setMessage('System error occurred. Please contact the administrator.');
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally {
       setIsLoading(false);
@@ -251,11 +251,10 @@ const GenerateHomologationDocument: React.FC = () => {
   };
 
   /**
-   * Help 按钮点击处理
+   * Help 按钮点击处理 - 跳转到 User Guide 页面
    */
   const handleHelp = () => {
-    // TODO: 跳转到帮助页面
-    alert('请实现帮助页面跳转处理');
+    navigate('/Menu/UserGuide');
   };
 
   return (

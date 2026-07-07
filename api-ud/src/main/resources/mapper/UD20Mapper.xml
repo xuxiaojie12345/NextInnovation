@@ -2,10 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.UD20Mapper">
 
-    <!-- UD20GetDocumentListApi: 从HDOC_DOCUMENT_LIST表查询 -->
+    <!-- UD20GetDocumentListApi: 从HDOC_DOCUMENT_LIST表查询（支持按documentType过滤） -->
     <select id="selectHdocDocumentList" resultType="java.util.LinkedHashMap">
         SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
         FROM HDOC_DOCUMENT_LIST
+        <where>
+            <if test="documentType != null and documentType != ''">
+                DOCTYPE LIKE CONCAT('%', #{documentType}, '%')
+            </if>
+        </where>
         ORDER BY DOCTYPE
     </select>
 

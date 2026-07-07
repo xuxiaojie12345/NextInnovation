@@ -53,8 +53,7 @@ public class UD12ServiceImpl implements UD12Service {
     /** 允许上传的最大文件大小（10MB） */
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-    /** 允许上传的文件扩展名 */
-    private static final List<String> ALLOWED_EXTENSIONS = java.util.Arrays.asList("rtf", "docx", "doc");
+
 
     /** 网络共享连接是否已验证 */
     private boolean networkAuthenticated = false;
@@ -224,15 +223,6 @@ public class UD12ServiceImpl implements UD12Service {
         // 验证文件大小
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File size exceeds the 10MB limit.");
-        }
-
-        // 验证文件类型
-        String originalFileName = file.getOriginalFilename();
-        if (originalFileName != null && originalFileName.contains(".")) {
-            String extension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
-            if (!ALLOWED_EXTENSIONS.contains(extension)) {
-                throw new IllegalArgumentException("Invalid file type or size (Max 10MB)");
-            }
         }
 
         Path rootPath = getTemplateRootPath();

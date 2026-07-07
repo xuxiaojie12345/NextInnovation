@@ -128,7 +128,7 @@ const ListTemplates: React.FC = () => {
 
   return (
     <div className="ud14-container">
-      <h1 className="ud14-title">EDB Engineering Database - List Templates</h1>
+      <h1 className="ud14-title">List Templates</h1>
 
       {loading && <div className="ud14-loading">Loading...</div>}
       {error && !loading && <div className="ud14-error">{error}</div>}
@@ -136,7 +136,7 @@ const ListTemplates: React.FC = () => {
       {/* Select Market - 参照UD12的布局 */}
       <div className="ud14-section">
         <div className="ud14-form-group">
-          <label className="ud14-label">Market</label>
+          <label className="ud14-label">Select Market</label>
           <select
             className="ud14-select"
             value={selectedMarket}

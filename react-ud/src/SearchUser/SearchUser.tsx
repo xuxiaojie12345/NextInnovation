@@ -221,20 +221,6 @@ const SearchUser: React.FC = () => {
   };
 
   /**
-   * Clear 按钮处理 - 清空所有搜索条件和结果
-   */
-  const handleClear = () => {
-    setUserid("");
-    setUser("");
-    setMarket("");
-    setAuthType("Not set");
-    setSearchResults([]);
-    setCount(0);
-    setHasSearched(false);
-    clearMessage();
-  };
-
-  /**
    * 处理键盘事件 - 按回车触发搜索
    */
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -327,14 +313,6 @@ const SearchUser: React.FC = () => {
               disabled={isLoading}
             >
               {isLoading ? "Searching..." : "Search"}
-            </button>
-            <button
-              type="button"
-              className="ud19-btn"
-              onClick={handleClear}
-              disabled={isLoading}
-            >
-              Clear
             </button>
           </div>
 

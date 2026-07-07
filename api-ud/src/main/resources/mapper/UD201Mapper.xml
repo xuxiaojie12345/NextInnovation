@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.UD201Mapper">
+
+    <!-- 根据doctype统计记录数 -->
+    <select id="countByDoctype" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM HDOC_DOCUMENT_LIST
+        WHERE DOCTYPE = #{doctype}
+    </select>
+
+    <!-- 更新HDOC_DOCUMENT_LIST表 -->
+    <update id="updateHdocDocumentList">
+        UPDATE HDOC_DOCUMENT_LIST
+        SET UPDATE_USER = #{updateUser},
+            UPDATE_DATETIME = #{updateDatetime},
+            UPDATE_PROCESS = 'UD20-1'
+        WHERE DOCTYPE = #{doctype}
+    </update>
+
+</mapper>

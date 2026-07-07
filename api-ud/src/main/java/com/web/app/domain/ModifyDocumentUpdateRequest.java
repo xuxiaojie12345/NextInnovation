@@ -19,6 +19,9 @@ public class ModifyDocumentUpdateRequest {
     /** 修改后的值 */
     private String modifiedValue;
 
+    /** 更新用户ID */
+    private String updateUser;
+
     public String getSerie() {
         return serie;
     }
@@ -49,5 +52,13 @@ public class ModifyDocumentUpdateRequest {
 
     public void setModifiedValue(String modifiedValue) {
         this.modifiedValue = modifiedValue;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 }

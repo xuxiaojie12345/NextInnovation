@@ -100,40 +100,19 @@ const HomologationVariablesResultList: React.FC = () => {
   }, []);
 
   /**
-   * 切换单条记录的选中状态
+   * 单选切换（Radio 行为）
    * @param key 记录的唯一标识 "pc|num|market"
    */
   const toggleSelect = (key: string) => {
     setSelectedKeys(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(key)) {
-        newSet.delete(key);
+      if (prev.has(key)) {
+        // 点击已选中项 → 取消选中
+        return new Set();
       } else {
-        newSet.add(key);
+        // 选中新项（单选，只保留一个）
+        return new Set([key]);
       }
-      return newSet;
     });
-    // 清除之前的消息
-    if (message) {
-      setMessage('');
-    }
-  };
-
-  /**
-   * 全选/取消全选
-   */
-  const toggleSelectAll = () => {
-    if (selectedKeys.size === dataList.length) {
-      // 全部已选中 → 取消全选
-      setSelectedKeys(new Set());
-    } else {
-      // 全选
-      const allKeys = new Set<string>();
-      dataList.forEach(item => {
-        allKeys.add(`${item.pc}|${item.num}|${item.market}`);
-      });
-      setSelectedKeys(allKeys);
-    }
     if (message) {
       setMessage('');
     }
@@ -292,8 +271,6 @@ const HomologationVariablesResultList: React.FC = () => {
     return (
       <div className='result-list-container'>
         <h1 className='result-list-title'>Homologation Variables</h1>
-        <p className='result-list-subtitle'>Search Result List</p>
-        <hr className='title-divider' />
         <div className='loading-overlay'>Loading...</div>
       </div>
     );
@@ -303,8 +280,6 @@ const HomologationVariablesResultList: React.FC = () => {
     <div className='result-list-container'>
       {/* 页面标题 */}
       <h1 className='result-list-title'>Homologation Variables</h1>
-      <p className='result-list-subtitle'>Search Result List</p>
-      <hr className='title-divider' />
 
       {/* 面包屑导航 */}
       <div className='breadcrumb'>
@@ -365,14 +340,7 @@ const HomologationVariablesResultList: React.FC = () => {
           <table className='data-table'>
             <thead>
               <tr>
-                <th className='checkbox-cell'>
-                  <input
-                    type='checkbox'
-                    checked={selectedKeys.size === dataList.length && dataList.length > 0}
-                    onChange={toggleSelectAll}
-                    disabled={disabled}
-                  />
-                </th>
+                <th className='checkbox-cell'></th>
                 <th>Product class</th>
                 <th>Number</th>
                 <th>Market</th>
@@ -397,7 +365,8 @@ const HomologationVariablesResultList: React.FC = () => {
                   >
                     <td className='checkbox-cell' onClick={(e) => e.stopPropagation()}>
                       <input
-                        type='checkbox'
+                        type='radio'
+                        name='selectedRecord'
                         checked={isSelected(item)}
                         onChange={() => toggleSelect(key)}
                         disabled={disabled}
@@ -408,7 +377,7 @@ const HomologationVariablesResultList: React.FC = () => {
                     <td>{item.market}</td>
                     <td>{item.variable}</td>
                     <td>{item.val}</td>
-                    <td>{item.vs}</td>
+                    <td>{(item.vs || '') + (item.vs && item.vs2 ? ', ' : '') + (item.vs2 || '') || '-'}</td>
                     <td>{item.comments}</td>
                     <td>{item.addDate}</td>
                     <td>{item.deleteDate}</td>

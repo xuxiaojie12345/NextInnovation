@@ -197,7 +197,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     // 生成文件名
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-    const filename = `HDOC_Variables_${dateStr}.csv`;
+    const filename = `HDOC_Variables_ResultList_${dateStr}.csv`;
 
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');

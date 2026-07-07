@@ -232,7 +232,7 @@ const HomologationVariables: React.FC = () => {
       if (productClass !== originalKeys.productClass ||
           number !== originalKeys.number ||
           market !== originalKeys.market) {
-        setMessage('Primary key cannot be updated.');
+        setMessage('Primary key conflict, Please enter the correct content');
         setHasError(true);
         return;
       }
@@ -310,7 +310,7 @@ const HomologationVariables: React.FC = () => {
   if (loading) {
     return (
       <div className='homologation-variables-container'>
-        <h1 className='page-title'>EDB Engineering Database - Homologation Variables</h1>
+        <h1 className='page-title'>Homologation Variables</h1>
         <div className='loading-message'>Loading...</div>
       </div>
     );
@@ -318,7 +318,7 @@ const HomologationVariables: React.FC = () => {
 
   return (
     <div className='homologation-variables-container'>
-      <h1 className='page-title'>EDB Engineering Database - Homologation Variables</h1>
+      <h1 className='page-title'>Homologation Variables</h1>
 
       {message && (
         <div className={hasError ? 'error-message' : 'success-message'}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./VehicleSpecification.css";
 
@@ -18,7 +18,6 @@ interface ChassisInfo {
 
 interface EngineInfo {
   engineNo: string;
-  symbolStr: string;
   description: string;
 }
 
@@ -43,8 +42,6 @@ const API_BASE_URL = "http://localhost:8081";
  */
 const VehicleSpecification: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-
   // 从路由参数获取底盘编号（格式：serie + 半角空格 + chassisNo）
   const chassisNo = (location.state as { chassisNo?: string })?.chassisNo || "";
 
@@ -118,13 +115,6 @@ const VehicleSpecification: React.FC = () => {
     fetchVehicleSpecification();
   }, [chassisNo]);
 
-  /**
-   * 返回前画面
-   */
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   // 加载状态
   if (loading) {
     return (
@@ -164,47 +154,42 @@ const VehicleSpecification: React.FC = () => {
         <div className="section-content">
           {/* 页面标题 - 放在边框内 */}
           <div className="page-header-section">
-            <h1 className="page-title">Vehicle Specification</h1>
-            <p className="page-subtitle">VDA - Vehicle Specification</p>
+            <h1 className="page-title">VDA - Vehicle Specification</h1>
           </div>
           <div className="info-row">
             <div className="info-field">
-              <span className="info-label">Chassis no</span>
+              <span className="info-label">Chassis no:</span>
               <span className="info-value">{chassisInfo?.chassisNo || chassisNo || '-'}</span>
             </div>
             <div className="info-field">
-              <span className="info-label">Model</span>
+              <span className="info-label">Model:</span>
               <span className="info-value">{chassisInfo?.model || '-'}</span>
             </div>
           </div>
           <div className="info-row">
             <div className="info-field">
-              <span className="info-label">Built week</span>
+              <span className="info-label">Built week:</span>
               <span className="info-value">{chassisInfo?.buildWeek || '-'}</span>
             </div>
             <div className="info-field">
-              <span className="info-label">Product type</span>
+              <span className="info-label">Product type:</span>
               <span className="info-value">{chassisInfo?.productType || '-'}</span>
             </div>
           </div>
           <div className="info-row">
             <div className="info-field">
-              <span className="info-label">VIN</span>
+              <span className="info-label">VIN:</span>
               <span className="info-value">{chassisInfo?.vin || '-'}</span>
             </div>
             <div className="info-field">
-              <span className="info-label">Engine no</span>
+              <span className="info-label">Engine no:</span>
               <span className="info-value">{engineInfo?.engineNo || '-'}</span>
             </div>
           </div>
           <div className="info-row">
             <div className="info-field">
-              <span className="info-label">Country of operation</span>
+              <span className="info-label">Country of operation:</span>
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
-            </div>
-            <div className="info-field">
-              <span className="info-label">SYMBOL_STR</span>
-              <span className="info-value">{engineInfo?.symbolStr || '-'}</span>
             </div>
           </div>
           {/* DESCRIPTION - 仅显示值，无值显示中划线 */}

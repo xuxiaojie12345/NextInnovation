@@ -120,7 +120,7 @@ public class UserInfo implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public Date getRegisterDatetime() {
         return registerDatetime;
     }

@@ -128,7 +128,6 @@ public class UD08ServiceImpl implements UD08Service {
         record.setUpdateDatetime(LocalDateTime.now());
         String updateUser = request.getUpdateUser() != null ? request.getUpdateUser().trim() : null;
         record.setUpdateUser(updateUser);
-        record.setRegisterUser(updateUser);
         record.setUpdateProcess("UD08Update");
 
         ud08Mapper.updateByPrimaryKey(record);

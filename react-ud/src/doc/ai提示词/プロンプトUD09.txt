@@ -41,8 +41,8 @@
 | 3 | Market | DataTable | - | - | Output | - | 左 | - | - | 市场，从HDOC_USER_DEFINED_RULES表获取MARKET字段 |
 | 4 | Variable | DataTable | - | - | Output | - | 左 | - | - | 变量名，从HDOC_USER_DEFINED_RULES表获取VARIABLE字段 |
 | 5 | Value | DataTable | - | - | Output | - | 左 | - | - | 变量值，从HDOC_USER_DEFINED_RULES表获取VAL字段 |
-| 6 | Variant string. | DataTable | - | - | Output | - | 左 | - | - | 变体字符串，从HDOC_USER_DEFINED_RULES表获取VS字段 |
-| 7 | Comments | DataTable | - | - | Output | - | 左 | - | - | 备注说明，从HDOC_USER_DEFINED_RULES表获取VS2字段 |
+| 6 | Variant string. | DataTable | - | - | Output | - | 左 | - | - | 从HDOC_USER_DEFINED_RULES表获取VS和VS2字段，用逗号+空格拼接显示 |
+| 7 | Comments | DataTable | - | - | Output | - | 左 | - | - | 备注说明，从HDOC_USER_DEFINED_RULES表获取COMMENTS字段 |
 | 8 | Add | DataTable | - | - | Output | - | 左 | - | - | 添加日期，从HDOC_USER_DEFINED_RULES表获取ADD_DATE字段 |
 | 9 | Delete | DataTable | - | - | Output | - | 左 | - | - | 删除日期，从HDOC_USER_DEFINED_RULES表获取DELETE_DATE字段 |
 | 10 | Created by user | DataTable | - | - | Output | - | 左 | - | - | 创建用户，从HDOC_USER_DEFINED_RULES表获取UPDATE_USER字段，显示为可点击链接，点击跳转到EDB User View页面 |
@@ -279,8 +279,8 @@
     "vs2": "Variant 2",
     "addDate": "202201",
     "deleteDate": "",
-    "registerUser": "admin",
-    "registerDatetime": "2022-12-02 05:11:45"
+    "updateUser": "admin",
+    "updateDatetime": "2022-12-02 05:11:45"
   }
 ]
 

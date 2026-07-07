@@ -7,6 +7,7 @@ public class UD15Request {
 
     private String chassisNumber;
     private String operation;
+    private String updateUser;
 
     public String getChassisNumber() {
         return chassisNumber;
@@ -22,5 +23,13 @@ public class UD15Request {
 
     public void setOperation(String operation) {
         this.operation = operation;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 }

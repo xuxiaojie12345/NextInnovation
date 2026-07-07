@@ -24,10 +24,11 @@ public class UD20Controller {
     private UD20Service ud20Service;
 
     @GetMapping("/marketdocumentsettings")
-    public ApiResponse<List<Map<String, Object>>> getDocumentList() {
-        logger.info("UD20GetDocumentListApi called");
+    public ApiResponse<List<Map<String, Object>>> getDocumentList(
+            @RequestParam(required = false) String documentType) {
+        logger.info("UD20GetDocumentListApi called - documentType: {}", documentType);
         try {
-            return ApiResponse.success(ud20Service.getDocumentList());
+            return ApiResponse.success(ud20Service.getDocumentList(documentType));
         } catch (Exception e) {
             logger.error("UD20GetDocumentListApi error", e);
             return ApiResponse.serverError();

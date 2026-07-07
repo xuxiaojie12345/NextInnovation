@@ -43,7 +43,8 @@ public class UD15Controller {
             String chnr = parts.length > 1 ? parts[1] : "";
 
             String operation = request.getOperation().trim();
-            Map<String, Object> result = ud15Service.processVinPlate(serie, chnr, operation);
+            String updateUser = request.getUpdateUser() != null ? request.getUpdateUser().trim() : "";
+            Map<String, Object> result = ud15Service.processVinPlate(serie, chnr, operation, updateUser);
 
             // 对于viewInfo,直接返回数据; 对于更新操作,将message放到外层
             if ("viewInfo".equals(operation)) {

@@ -41,13 +41,19 @@ const MarketDocumentSettingsList: React.FC = () => {
   /**
    * 页面初始化 - 获取文档列表（对应详细设计 3.1.1 页面初始化流程）
    * 调用 UD20SelectHdocDocumentList（GET /api/ud20/marketdocumentsettings）
+   * 从URL参数中获取检索条件 documentType
    */
   useEffect(() => {
     const fetchDocumentList = async () => {
       setIsLoading(true);
       try {
+        // 从URL参数中获取检索条件
+        const params = new URLSearchParams(location.search);
+        const documentType = params.get("documentType") || "";
+
         const response = await axios.get(
-          `${API_BASE_URL}/api/ud20/marketdocumentsettings`
+          `${API_BASE_URL}/api/ud20/marketdocumentsettings`,
+          { params: { documentType: documentType || undefined } }
         );
 
         if (response.data.code === 200 && Array.isArray(response.data.data)) {
@@ -161,7 +167,7 @@ const MarketDocumentSettingsList: React.FC = () => {
   return (
     <div className="ud20-container">
       {/* 页面标题 */}
-      <h1 className="ud20-title">Market Document Settings List</h1>
+      <h1 className="ud20-title">HDoc - Market Document Settings</h1>
 
       {/* 工具栏按钮组 */}
       <div className="ud20-btn-group">

@@ -108,7 +108,7 @@ const MarketDocumentSettings: React.FC = () => {
    */
   const handleBack = () => {
     clearMessage();
-    navigate(-1);
+    navigate('/Menu');
   };
 
   /**
@@ -121,6 +121,16 @@ const MarketDocumentSettings: React.FC = () => {
       setMessageType("error");
       return;
     }
+    // 获取当前登录用户ID
+    let updateUser = '';
+    try {
+      const userInfoStr = localStorage.getItem('userInfo');
+      if (userInfoStr) {
+        const userInfo = JSON.parse(userInfoStr);
+        updateUser = userInfo.userid || userInfo.username || '';
+      }
+    } catch { /* ignore */ }
+
     setIsLoading(true);
 
     try {
@@ -132,7 +142,8 @@ const MarketDocumentSettings: React.FC = () => {
           user: user.trim(),
           date: date.trim(),
           market: market.trim(),
-          setting: setting.trim()
+          setting: setting.trim(),
+          updateUser: updateUser
         }
       );
 

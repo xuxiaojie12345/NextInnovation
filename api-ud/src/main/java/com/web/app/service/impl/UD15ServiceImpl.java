@@ -17,18 +17,18 @@ public class UD15ServiceImpl implements UD15Service {
     private UD15Mapper ud15Mapper;
 
     @Override
-    public Map<String, Object> processVinPlate(String serie, String chnr, String operation) {
+    public Map<String, Object> processVinPlate(String serie, String chnr, String operation, String updateUser) {
         switch (operation) {
             case "viewInfo":
                 return handleViewInfo(serie, chnr);
             case "setRegenerate":
-                return handleSetRegenerate(serie, chnr);
+                return handleSetRegenerate(serie, chnr, updateUser);
             case "setOK":
-                return handleSetOK(serie, chnr);
+                return handleSetOK(serie, chnr, updateUser);
             case "changeToBasicInfo":
-                return handleChangeToBasicInfo(serie, chnr);
+                return handleChangeToBasicInfo(serie, chnr, updateUser);
             case "changeToAdvancedInfo":
-                return handleChangeToAdvancedInfo(serie, chnr);
+                return handleChangeToAdvancedInfo(serie, chnr, updateUser);
             default:
                 throw new IllegalArgumentException("Unknown operation: " + operation);
         }
@@ -53,43 +53,43 @@ public class UD15ServiceImpl implements UD15Service {
         return result;
     }
 
-    private Map<String, Object> handleSetRegenerate(String serie, String chnr) {
-        int rows = ud15Mapper.updateStatus(serie, chnr, "0");
+    private Map<String, Object> handleSetRegenerate(String serie, String chnr, String updateUser) {
+        int rows = ud15Mapper.updateStatus(serie, chnr, "0", updateUser);
         if (rows == 0) {
             throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Status updated to 0 (New Addition)");
+        result.put("message", "Status updated successfully.");
         return result;
     }
 
-    private Map<String, Object> handleSetOK(String serie, String chnr) {
-        int rows = ud15Mapper.updateStatus(serie, chnr, "1");
+    private Map<String, Object> handleSetOK(String serie, String chnr, String updateUser) {
+        int rows = ud15Mapper.updateStatus(serie, chnr, "1", updateUser);
         if (rows == 0) {
             throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Status updated to 1 (XML Doc Created)");
+        result.put("message", "Status updated successfully.");
         return result;
     }
 
-    private Map<String, Object> handleChangeToBasicInfo(String serie, String chnr) {
-        int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "1");
+    private Map<String, Object> handleChangeToBasicInfo(String serie, String chnr, String updateUser) {
+        int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "1", updateUser);
         if (rows == 0) {
             throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Status updated to 0 and Type updated to 1 (Basic)");
+        result.put("message", "Status and Type updated successfully.");
         return result;
     }
 
-    private Map<String, Object> handleChangeToAdvancedInfo(String serie, String chnr) {
-        int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "2");
+    private Map<String, Object> handleChangeToAdvancedInfo(String serie, String chnr, String updateUser) {
+        int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "2", updateUser);
         if (rows == 0) {
             throw new IllegalArgumentException("Chassis number " + serie + "-" + chnr + " not found.");
         }
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Status updated to 0 and Type updated to 2 (ADVANCED with weights)");
+        result.put("message", "Status and Type updated successfully.");
         return result;
     }
 }

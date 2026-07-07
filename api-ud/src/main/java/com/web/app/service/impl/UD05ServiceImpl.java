@@ -58,12 +58,12 @@ public class UD05ServiceImpl implements UD05Service {
     }
 
     @Override
-    public boolean updateHdocAdcaModification(String serie, String chno, String variable, String modifiedValue) {
-        logger.debug("UD05ServiceImpl.updateHdocAdcaModification - serie: {}, chno: {}, variable: {}, modifiedValue: {}",
-                serie, chno, variable, modifiedValue);
+    public boolean updateHdocAdcaModification(String serie, String chno, String variable, String modifiedValue, String updateUser) {
+        logger.debug("UD05ServiceImpl.updateHdocAdcaModification - serie: {}, chno: {}, variable: {}, modifiedValue: {}, updateUser: {}",
+                serie, chno, variable, modifiedValue, updateUser);
 
         try {
-            int rows = ud05Mapper.updateHdocAdcaModification(serie, chno, variable, modifiedValue);
+            int rows = ud05Mapper.updateHdocAdcaModification(serie, chno, variable, modifiedValue, updateUser);
 
             if (rows > 0) {
                 logger.info("UD05 update success for serie: {}, chno: {}, variable: {}", serie, chno, variable);

@@ -26,20 +26,6 @@
 }
 
 /* 副标题 */
-.result-list-subtitle {
-  font-size: 12px;
-  color: #999999;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-/* 标题下方分割线 */
-.title-divider {
-  border: none;
-  border-top: 1px solid #e8e8e8;
-  margin: 0 0 16px 0;
-}
-
 /* 面包屑导航 */
 .breadcrumb {
   font-size: 12px;
@@ -201,7 +187,8 @@
   text-align: center;
 }
 
-.checkbox-cell input[type="checkbox"] {
+.checkbox-cell input[type="checkbox"],
+.checkbox-cell input[type="radio"] {
   cursor: pointer;
   width: 15px;
   height: 15px;
@@ -223,6 +210,33 @@
 .table-wrapper {
   overflow-x: auto;
   margin-bottom: 16px;
+}
+
+/* 打印样式：确保表格完整显示，隐藏滚动条 */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .table-wrapper {
+    overflow: visible !important;
+    width: 100%;
+  }
+  .data-table {
+    width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word;
+  }
+  .data-table th,
+  .data-table td {
+    white-space: normal;
+    word-break: break-all;
+  }
+  .checkbox-cell,
+  .action-button-group,
+  .no-print {
+    display: none !important;
+  }
 }
 
 /* 加载状态 */

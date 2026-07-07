@@ -43,7 +43,7 @@
 | 5 | Date | TextField | - | - | Input | 日付 | 左 | 空 | 活性 | 日期时间 |
 | 6 | Search | Button | - | - | Action | - | 中 | - | 活性 | 执行搜索操作，跳转到搜索结果页面 |
 | 7 | Clear | Button | - | - | Action | - | 中 | - | 活性 | 清空所有输入字段 |
-| 8 | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回前画面 |
+| 8 | Back | Button | - | - | Action | - | 中 | - | 活性 | 返回Menu画面 |
 | 9 | Add | Button | - | - | Action | - | 中 | - | 活性 | 新增变量定义记录 |
 | 10 | Update | Button | - | - | Action | - | 中 | - | 活性 | 更新变量定义记录 |
 | 11 | Delete | Button | - | - | Action | - | 中 | - | 活性 | 删除变量定义记录 |
@@ -239,7 +239,7 @@
 **开始**：用户点击Back按钮
 
 **处理步骤**：
-- 使用React Router navigate返回/HomologationVariables页面
+- 使用React Router navigate返回/Menu页面
 - 可选：传递返回标志位
 
 #### 5.1.5 新增流程

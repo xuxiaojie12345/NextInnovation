@@ -12,14 +12,20 @@
     <!-- 更新STATUS -->
     <update id="updateStatus">
         UPDATE HDOC_SEND_DATA_VIN_PLATE
-        SET STATUS = #{status}
+        SET STATUS = #{status},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = 'UD15'
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
 
     <!-- 更新STATUS和TYPE -->
     <update id="updateStatusAndType">
         UPDATE HDOC_SEND_DATA_VIN_PLATE
-        SET STATUS = #{status}, TYPE = #{type}
+        SET STATUS = #{status}, TYPE = #{type},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{updateUser},
+            UPDATE_PROCESS = 'UD15'
         WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
 

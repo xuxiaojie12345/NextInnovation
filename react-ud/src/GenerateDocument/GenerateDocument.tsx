@@ -35,6 +35,7 @@ const GenerateDocument: React.FC = () => {
   const [documentData, setDocumentData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [docDownloadError, setDocDownloadError] = useState<string>('');
 
   // 页面初始化时获取数据（对应设计书 3.1.1 页面初始化流程）
   useEffect(() => {
@@ -42,6 +43,15 @@ const GenerateDocument: React.FC = () => {
       if (!currentChassisNo) {
         setError('Chassis not found');
         setLoading(false);
+        return;
+      }
+
+      // 用户登录检查（对应设计书 5. 异常处理 - 用户未登录）
+      const userInfoStr = localStorage.getItem('userInfo');
+      if (!userInfoStr) {
+        setError('Please login first');
+        setLoading(false);
+        navigate('/');
         return;
       }
 
@@ -66,7 +76,11 @@ const GenerateDocument: React.FC = () => {
         }
       } catch (err: any) {
         if (err.response) {
-          if (err.response.status === 404) {
+          if (err.response.status === 401) {
+            // 会话过期（对应设计书 5. 异常处理 - 用户未登录）
+            setError('Please login first');
+            navigate('/');
+          } else if (err.response.status === 404) {
             setError('Chassis not found');
           } else {
             setError('System error. Please contact administrator.');
@@ -103,7 +117,14 @@ const GenerateDocument: React.FC = () => {
     }
   }, [isAdcaActive, currentChassisSeries, currentChassisNo, currentDocumentType, navigate]);
 
-  // Generated document 静态显示，link不实装具体功能
+  /**
+   * Generated document 点击处理
+   * 对应设计书 5. 异常处理 - 文档文件不存在
+   * 当前功能尚未实装文件下载，点击显示提示信息
+   */
+  const handleGeneratedDocClick = useCallback(() => {
+    setDocDownloadError('Document file not found');
+  }, []);
 
   /**
    * 点击Chassis no链接 - 跳转到Vehicle Specification页面（UD07）
@@ -168,8 +189,12 @@ const GenerateDocument: React.FC = () => {
           </span>
         </div>
         <div className='info-item'>
-          <label>Model:</label>
+          <label>Ordernumber:</label>
           <span>{documentData?.ordernumber || '-'}</span>
+        </div>
+        <div className='info-item'>
+          <label>Build week:</label>
+          <span>{documentData?.buildWeek || '-'}</span>
         </div>
         <div className='info-item'>
           <label>Spec week:</label>
@@ -235,9 +260,16 @@ const GenerateDocument: React.FC = () => {
         </div>
       )}
 
-      {/* Generated document（对应设计书 2.1）- Link类型，不实装功能 */}
+      {/* Generated document（对应设计书 2.1）- Link类型 */}
       <div className='generated-doc-section'>
-        <span className='generated-doc-link'>Generated document</span>
+        <span className='generated-doc-link' onClick={handleGeneratedDocClick}>
+          Generated document
+        </span>
+        {docDownloadError && (
+          <div className='error-message-area'>
+            <p>{docDownloadError}</p>
+          </div>
+        )}
       </div>
 
       {/* 系统信息（对应设计书 2.1 Date / HDoc version） */}

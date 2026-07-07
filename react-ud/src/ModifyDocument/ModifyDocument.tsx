@@ -57,6 +57,7 @@ const ModifyDocument: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [templateDownloadError, setTemplateDownloadError] = useState<string>('');
 
   /**
    * 页面初始化 - 调用 UD05SelectVariableModificationApi
@@ -81,7 +82,8 @@ const ModifyDocument: React.FC = () => {
           {
             serie: serie,
             chno: chassisNo
-          }
+          },
+          { timeout: 10000 }
         );
 
         if (response.data.code === 200 && response.data.data) {
@@ -93,7 +95,10 @@ const ModifyDocument: React.FC = () => {
           setError(response.data.message || '未找到该底盘的修改记录');
         }
       } catch (err: any) {
-        if (err.response) {
+        if (err.code === 'ECONNABORTED') {
+          // 请求超时（对应设计书 5. 异常处理 - API超时）
+          setError('请求超时，请检查网络连接');
+        } else if (err.response) {
           if (err.response.status === 404) {
             setError('未找到该底盘的修改记录');
           } else {
@@ -170,6 +175,16 @@ const ModifyDocument: React.FC = () => {
     try {
       // 调用 UD05UpdateHdocAdcaModificationApi（POST）
       // 对应设计书 4.1 更新接口
+      // 获取当前登录用户ID
+      let updateUser = '';
+      try {
+        const userInfoStr = localStorage.getItem('userInfo');
+        if (userInfoStr) {
+          const userInfo = JSON.parse(userInfoStr);
+          updateUser = userInfo.userid || userInfo.username || '';
+        }
+      } catch { /* ignore */ }
+
       const updatePromises = variables
         .filter((row) => row.modifiedValue && row.modifiedValue.trim() !== '')
         .map((row) =>
@@ -177,21 +192,36 @@ const ModifyDocument: React.FC = () => {
             serie: serie,
             chno: chassisNo,
             variable: row.variable,
-            modifiedValue: row.modifiedValue.trim()
-          })
+            modifiedValue: row.modifiedValue.trim(),
+            updateUser: updateUser
+          }, { timeout: 10000 })
         );
 
       await Promise.all(updatePromises);
+
+      // 收集已修改变量的列表（仅包含用户实际改动过的值，用于UD06 Storing显示）
+      const modifiedVariables = variables
+        .filter((row) => row.modifiedValue && row.modifiedValue.trim() !== '' && row.modifiedValue !== row.currentValue)
+        .map((row) => ({
+          variable: row.variable,
+          modifiedValue: row.modifiedValue.trim()
+        }));
 
       // 保存成功，跳转到 Save Modifications 页面（对应设计书 3.1.2 步骤4）
       navigate('/Menu/SaveModifications', {
         state: {
           chassisNo,
-          serie
+          serie,
+          modifiedVariables
         }
       });
-    } catch {
-      setMessage('保存失败，请稍后重试');
+    } catch (err: any) {
+      if (err.code === 'ECONNABORTED') {
+        // 请求超时（对应设计书 5. 异常处理 - API超时）
+        setMessage('请求超时，请检查网络连接');
+      } else {
+        setMessage('保存失败，请稍后重试');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -210,6 +240,13 @@ const ModifyDocument: React.FC = () => {
       });
     }
   }, [serie, chassisNo, navigate]);
+
+  /**
+   * 模板文件点击处理 - 当前版本未实装下载功能
+   */
+  const handleTemplateDownload = useCallback(() => {
+    setTemplateDownloadError('模板文件下载功能未实装');
+  }, []);
 
   // 加载中状态
   if (loading) {
@@ -265,13 +302,17 @@ const ModifyDocument: React.FC = () => {
       {/* 模板文件链接（对应设计书 2.1 Template文件 - 点击下载） */}
       {templateFile && (
         <div className='template-section'>
-          <a
-            href={`${API_BASE_URL}/api/ud05/template/download?file=${encodeURIComponent(templateFile)}`}
+          <span
             className='template-link'
-            download
+            onClick={() => handleTemplateDownload(templateFile)}
           >
             {`Template: ${templateFile}`}
-          </a>
+          </span>
+          {templateDownloadError && (
+            <div className='error-message-area'>
+              <p>{templateDownloadError}</p>
+            </div>
+          )}
         </div>
       )}
 
