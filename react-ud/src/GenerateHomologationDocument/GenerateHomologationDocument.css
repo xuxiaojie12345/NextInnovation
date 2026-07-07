@@ -1,0 +1,207 @@
+/* Generate Homologation Document 页面容器 */
+.generate-homologation-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 顶部标题栏 */
+.gh-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.gh-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* 表单内容区域 */
+.gh-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.gh-form {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 32px 36px 28px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 表单字段容器 */
+.gh-field {
+  margin-bottom: 22px;
+}
+
+/* 字段标签 */
+.gh-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* 必填标记 */
+.gh-required {
+  color: #ff4d4f;
+  margin-left: 2px;
+}
+
+/* Ant Design Input 样式覆盖 */
+.gh-form .ant-input-affix-wrapper,
+.gh-input.ant-input {
+  border-radius: 4px;
+  border: 1px solid #d0d0d0;
+  height: 36px;
+  font-size: 14px;
+  color: #333333;
+  width: 100%;
+}
+
+.gh-form .ant-input-affix-wrapper:hover,
+.gh-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.gh-form .ant-input-affix-wrapper-focused,
+.gh-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+/* Ant Design Select 样式覆盖 */
+.gh-select.ant-select {
+  width: 100%;
+}
+
+.gh-select .ant-select-selector {
+  border-radius: 4px !important;
+  border: 1px solid #d0d0d0 !important;
+  height: 36px !important;
+  font-size: 14px !important;
+  color: #333333 !important;
+}
+
+.gh-select .ant-select-selector:hover {
+  border-color: #4096ff !important;
+}
+
+.gh-select.ant-select-focused .ant-select-selector {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+/* 错误消息区域 */
+.gh-error-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  animation: fadeIn 0.25s ease-in;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 按钮容器 */
+.gh-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* 通用按钮样式 */
+.gh-button {
+  height: 36px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  min-width: 90px;
+}
+
+/* Submit 按钮 */
+.gh-button-submit {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.25) !important;
+}
+
+.gh-button-submit:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.gh-button-submit:active {
+  background-color: #0d47a1 !important;
+  border-color: #0d47a1 !important;
+}
+
+/* Reset 按钮 */
+.gh-button-reset {
+  background-color: #ffffff !important;
+  border-color: #d0d0d0 !important;
+  color: #333333 !important;
+}
+
+.gh-button-reset:hover {
+  border-color: #1a73e8 !important;
+  color: #1a73e8 !important;
+}
+
+/* Help 按钮 */
+.gh-button-help {
+  background-color: #ffffff !important;
+  border-color: #d0d0d0 !important;
+  color: #333333 !important;
+}
+
+.gh-button-help:hover {
+  border-color: #1a73e8 !important;
+  color: #1a73e8 !important;
+}
+
+/* 页脚 */
+.gh-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.gh-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.gh-footer-link:hover {
+  color: #e0e0e0;
+}

@@ -1,76 +1,158 @@
+/* 菜单容器 */
 .menu-container {
-  width: 300px;
+  width: 320px;
   background-color: #e8e8e8;
-  border: 1px solid #ccc;
+  border: 1px solid #c0c0c0;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
 }
 
+/* 顶部标题区域 */
 .menu-header {
   background-color: #003366;
-  padding: 15px 20px;
+  padding: 20px 24px;
   text-align: center;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
+.menu-logo {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 3px;
 }
 
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
+/* 菜单内容区域 */
 .menu-content {
   padding: 0;
 }
 
+/* 菜单分组 */
 .menu-section {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #d0d0d0;
 }
 
 .menu-section:last-child {
   border-bottom: none;
 }
 
-.section-title {
+/* 分组标题 */
+.menu-section-title {
   background-color: #f5f5f5;
   color: #003366;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 10px 16px;
+  border-bottom: 1px solid #d0d0d0;
+  letter-spacing: 0.3px;
 }
 
+/* 菜单列表 */
 .menu-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* 菜单项 */
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  padding: 8px 16px;
   cursor: pointer;
   color: #003366;
   font-size: 13px;
-  transition: background-color 0.2s;
+  transition: background-color 0.15s;
+  outline: none;
 }
 
 .menu-item:hover {
   background-color: #d5e3f0;
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
+.menu-item:focus-visible {
+  background-color: #d5e3f0;
+  outline: 2px solid #003366;
+  outline-offset: -2px;
 }
 
+/* 菜单箭头 */
+.menu-arrow {
+  margin-right: 10px;
+  color: #003366;
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* 菜单文本 */
 .menu-label {
   flex: 1;
+  line-height: 1.4;
+}
+
+/* 加载动画 */
+.menu-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.menu-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #d0d0d0;
+  border-top-color: #003366;
+  border-radius: 50%;
+  animation: menuSpin 0.7s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes menuSpin {
+  to { transform: rotate(360deg); }
+}
+
+.menu-loading-text {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 错误显示区域 */
+.menu-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.menu-error-text {
+  color: #cc0000;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+/* 重试按钮 */
+.menu-retry-button {
+  padding: 10px 28px;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #003366;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-retry-button:hover {
+  background-color: #002244;
+}
+
+.menu-retry-button:active {
+  background-color: #001533;
 }
