@@ -1,70 +1,70 @@
-/**
- * DownloadPrintQuickGuides 组件样式 - 下载打印快速指南页面（UD23）
- * 对应详细设计：详细设计/詳細設計UD23.md
- * 风格与 HomologationVariables 保持一致
- */
+/* ========================================
+   DownloadPrintQuickGuides.css - UD23
+   下载打印快速指南页面 样式
+   参照 UD23.css 外观风格
+   ======================================== */
 
-/* 页面容器 */
+/* ---- 整体容器 ---- */
 .ud23-container {
-  padding: 20px;
-  background-color: #ffffff;
-  min-height: 100vh;
-  overflow-x: hidden;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  min-height: 100%;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+  padding: 20px 24px;
+  background: #f4f6f9;
+  box-sizing: border-box;
 }
 
-/* 页面标题 */
-.ud23-title {
-  color: #2c3e50;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 10px;
+/* ---- 主内容区域 ---- */
+.ud23-main {
+  flex: 1;
 }
 
-/* 错误消息提示 */
-.ud23-message {
-  padding: 8px 12px;
-  border-radius: 0;
-  font-size: 13px;
-  margin-bottom: 12px;
-  text-align: left;
-  display: inline-block;
-  max-width: fit-content;
-  background-color: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
+/* ---- 卡片容器 ---- */
+.ud23-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  max-width: 960px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-/* 内容区块 */
+/* ---- 页面标题 ---- */
+.ud23-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #cc3300;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ---- 内容区块 ---- */
 .ud23-section {
   margin-bottom: 24px;
-  width: 100%;
-  max-width: 650px;
 }
 
-/* 区块标题 */
+/* ---- 区块标题 ---- */
 .ud23-section-title {
   font-size: 15px;
   font-weight: 600;
-  color: #333333;
+  color: #cc3300;
   margin: 0 0 12px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-/* 下载链接列表 */
+/* ---- 链接列表 ---- */
 .ud23-link-list {
-  border: 1px solid #b0c4de;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
   overflow: hidden;
 }
 
-/* 下载链接项 */
+/* ---- 链接项 ---- */
 .ud23-link-item {
   display: flex;
   justify-content: space-between;
@@ -80,27 +80,32 @@
 }
 
 .ud23-link-item:hover {
-  background-color: #e8f0fe;
+  background-color: #f0f4f8;
 }
 
-/* 下载链接文字 */
+/* ---- 链接文字 ---- */
 .ud23-link-text {
-  color: #0066cc;
+  color: #003057;
   font-size: 14px;
   text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
   transition: color 0.2s;
 }
 
-.ud23-link-item:hover .ud23-link-text {
-  color: #003366;
+.ud23-link-text:hover {
+  color: #1a6db5;
 }
 
-/* Checkbox 行 */
+/* ---- Checkbox 行 ---- */
 .ud23-checkbox-row {
   margin-bottom: 8px;
 }
 
-/* Checkbox 标签 */
+/* ---- Checkbox 标签 ---- */
 .ud23-checkbox-label {
   display: flex;
   align-items: center;
@@ -111,21 +116,22 @@
   user-select: none;
 }
 
-/* Checkbox 控件 */
+/* ---- Checkbox 控件 ---- */
 .ud23-checkbox {
   margin: 0;
   cursor: pointer;
 }
 
-/* 操作说明内容 */
+/* ---- 操作说明内容 ---- */
 .ud23-guide-content {
-  border: 1px solid #b0c4de;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
   padding: 16px 20px;
   background-color: #fafafa;
   animation: ud23-fadeIn 0.3s ease;
 }
 
-/* 操作说明列表 */
+/* ---- 操作说明列表 ---- */
 .ud23-guide-list {
   margin: 0;
   padding-left: 20px;
@@ -138,7 +144,7 @@
   margin-bottom: 2px;
 }
 
-/* 淡入动画 */
+/* ---- 淡入动画 ---- */
 @keyframes ud23-fadeIn {
   from {
     opacity: 0;
@@ -150,15 +156,25 @@
   }
 }
 
-/* ========== 响应式适配 ========== */
+/* ---- Note（参照 UD23 参考样式） ---- */
+.ud23-note {
+  font-size: 12px;
+  color: #000;
+  font-style: italic;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
 
+/* ========================================
+   响应式适配
+   ======================================== */
 @media (max-width: 768px) {
   .ud23-container {
     padding: 12px;
   }
 
-  .ud23-section {
-    max-width: 100%;
+  .ud23-card {
+    padding: 16px;
   }
 
   .ud23-link-item {

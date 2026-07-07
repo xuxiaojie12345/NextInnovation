@@ -269,142 +269,139 @@ const HomologationVariablesResultList: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='result-list-container'>
-        <h1 className='result-list-title'>Homologation Variables</h1>
-        <div className='loading-overlay'>Loading...</div>
+      <div className="ud09-container">
+        <div className="ud09-loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className='result-list-container'>
-      {/* 页面标题 */}
-      <h1 className='result-list-title'>Homologation Variables</h1>
+    <div className="ud09-container">
+      <main className="ud09-main">
+        <div className="ud09-card">
+          {/* 页面标题 */}
+          <h1 className="ud09-page-title">Homologation Variables</h1>
 
-      {/* 面包屑导航 */}
-      <div className='breadcrumb'>
-        Home &gt; <span onClick={() => navigate('/Menu/HomologationVariables')}>Homologation Variables</span> &gt; Search Result
-      </div>
+          {/* 消息提示区域 */}
+          {message && (
+            <div className={`ud09-message ${messageType}`}>
+              {message}
+            </div>
+          )}
 
-      {/* 消息提示区域 */}
-      {message && (
-        <div className={`result-message ${messageType}`}>
-          {message}
-        </div>
-      )}
+          {/* 按钮组 */}
+          <div className="ud09-button-row">
+            <button
+              type="button"
+              className="ud09-btn"
+              onClick={handleSelect}
+              disabled={disabled}
+            >
+              Select
+            </button>
+            <button
+              type="button"
+              className="ud09-btn"
+              onClick={handleBack}
+              disabled={disabled}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="ud09-btn"
+              onClick={handlePrint}
+              disabled={disabled}
+            >
+              Print
+            </button>
+            <button
+              type="button"
+              className="ud09-btn ud09-btn-danger"
+              onClick={handleDeleteSelected}
+              disabled={disabled}
+            >
+              {isOperating ? "Deleting..." : "Delete selected"}
+            </button>
+          </div>
 
-      {/* 按钮组 */}
-      <div className='result-button-group'>
-        <button
-          type='button'
-          className='result-btn primary'
-          onClick={handleSelect}
-          disabled={disabled}
-        >
-          Select
-        </button>
-        <button
-          type='button'
-          className='result-btn'
-          onClick={handleBack}
-          disabled={disabled}
-        >
-          Back
-        </button>
-        <button
-          type='button'
-          className='result-btn'
-          onClick={handlePrint}
-          disabled={disabled}
-        >
-          Print
-        </button>
-        <button
-          type='button'
-          className='result-btn danger'
-          onClick={handleDeleteSelected}
-          disabled={disabled}
-        >
-          Delete selected
-        </button>
-      </div>
+          {/* 搜索结果计数 */}
+          <div className="ud09-count">
+            Number of lines found: {dataList.length}
+          </div>
 
-      {/* 搜索结果计数 */}
-      <div className='result-count'>
-        Number of lines found: {dataList.length}
-      </div>
-
-      {/* 数据表格 */}
-      {dataList.length > 0 ? (
-        <div className='table-wrapper'>
-          <table className='data-table'>
-            <thead>
-              <tr>
-                <th className='checkbox-cell'></th>
-                <th>Product class</th>
-                <th>Number</th>
-                <th>Market</th>
-                <th>Variable</th>
-                <th>Value</th>
-                <th>Variant string.</th>
-                <th>Comments</th>
-                <th>Add</th>
-                <th>Delete</th>
-                <th>Created by user</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataList.map((item) => {
-                const key = getKey(item);
-                return (
-                  <tr
-                    key={key}
-                    className={isSelected(item) ? 'selected' : ''}
-                    onClick={() => toggleSelect(key)}
-                  >
-                    <td className='checkbox-cell' onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type='radio'
-                        name='selectedRecord'
-                        checked={isSelected(item)}
-                        onChange={() => toggleSelect(key)}
-                        disabled={disabled}
-                      />
-                    </td>
-                    <td>{item.pc}</td>
-                    <td>{item.num}</td>
-                    <td>{item.market}</td>
-                    <td>{item.variable}</td>
-                    <td>{item.val}</td>
-                    <td>{(item.vs || '') + (item.vs && item.vs2 ? ', ' : '') + (item.vs2 || '') || '-'}</td>
-                    <td>{item.comments}</td>
-                    <td>{item.addDate}</td>
-                    <td>{item.deleteDate}</td>
-                    <td>
-                      <span
-                        className='user-link'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Created by user 显示为蓝色可点击链接，点击跳转到 EDB User View 页面（UD25）
-                          navigate('/Menu/EDBUserView', { state: { userId: item.updateUser } });
-                        }}
-                      >
-                        {item.updateUser}
-                      </span>
-                    </td>
-                    <td>{item.updateDatetime}</td>
+          {/* 数据表格 */}
+          {dataList.length > 0 ? (
+            <div className="ud09-table-wrapper">
+              <table className="ud09-table">
+                <thead>
+                  <tr>
+                    <th className="ud09-th-checkbox"></th>
+                    <th>Product class</th>
+                    <th>Number</th>
+                    <th>Market</th>
+                    <th>Variable</th>
+                    <th>Value</th>
+                    <th>Variant string.</th>
+                    <th>Comments</th>
+                    <th>Add</th>
+                    <th>Delete</th>
+                    <th>Created by user</th>
+                    <th>Date</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {dataList.map((item) => {
+                    const key = getKey(item);
+                    return (
+                      <tr
+                        key={key}
+                        className={`ud09-tr${isSelected(item) ? ' ud09-tr-selected' : ''}`}
+                        onClick={() => toggleSelect(key)}
+                      >
+                        <td className="ud09-td-checkbox" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="radio"
+                            name="selectedRecord"
+                            checked={isSelected(item)}
+                            onChange={() => toggleSelect(key)}
+                            disabled={disabled}
+                          />
+                        </td>
+                        <td>{item.pc}</td>
+                        <td>{item.num}</td>
+                        <td>{item.market}</td>
+                        <td>{item.variable}</td>
+                        <td>{item.val}</td>
+                        <td>{(item.vs || '') + (item.vs && item.vs2 ? ', ' : '') + (item.vs2 || '') || '-'}</td>
+                        <td>{item.comments}</td>
+                        <td>{item.addDate}</td>
+                        <td>{item.deleteDate}</td>
+                        <td>
+                          <span
+                            className="ud09-user-link"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/Menu/EDBUserView', { state: { userId: item.updateUser } });
+                            }}
+                          >
+                            {item.updateUser}
+                          </span>
+                        </td>
+                        <td>{item.updateDatetime}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="ud09-td-empty">
+              No data found. Please try different search conditions.
+            </div>
+          )}
         </div>
-      ) : (
-        <div className='empty-data'>
-          No data found. Please try different search conditions.
-        </div>
-      )}
+      </main>
     </div>
   );
 };

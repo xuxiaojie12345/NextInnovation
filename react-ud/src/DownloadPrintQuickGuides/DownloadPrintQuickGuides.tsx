@@ -32,77 +32,81 @@ const DownloadPrintQuickGuides: React.FC = () => {
 
   return (
     <div className="ud23-container">
-      {/* 页面标题 */}
-      <h1 className="ud23-title">Download and Print Quick Guides</h1>
+      <main className="ud23-main">
+        <div className="ud23-card">
+          {/* 页面标题 */}
+          <h1 className="ud23-page-title">Download and Print Quick Guides</h1>
 
-      {/* 快速指南链接区域（仅画面展示，暂不实现下载功能） */}
-      <div className="ud23-section">
-        <h2 className="ud23-section-title">Quick Guides</h2>
-        <div className="ud23-link-list">
-          <div className="ud23-link-item">
-            <span className="ud23-link-text">Download and Print Quick Guides</span>
+          {/* 快速指南链接区域（仅画面展示，暂不实现下载功能） */}
+          <div className="ud23-section">
+            <h2 className="ud23-section-title">Quick Guides</h2>
+            <div className="ud23-link-list">
+              <div className="ud23-link-item">
+                <span className="ud23-link-text">Download and Print Quick Guides</span>
+              </div>
+              <div className="ud23-link-item">
+                <span className="ud23-link-text">Volvo 3P Quick Guides</span>
+              </div>
+            </div>
           </div>
-          <div className="ud23-link-item">
-            <span className="ud23-link-text">Volvo 3P Quick Guides</span>
+
+          {/* To print 操作说明区域（对应详细设计 3.1.4） */}
+          <div className="ud23-section">
+            <div className="ud23-checkbox-row">
+              <label className="ud23-checkbox-label">
+                <input
+                  type="checkbox"
+                  className="ud23-checkbox"
+                  checked={showPrintGuide}
+                  onChange={handlePrintCheckChange}
+                />
+                To print do the following
+              </label>
+            </div>
+
+            {showPrintGuide && (
+              <div className="ud23-guide-content">
+                <ol className="ud23-guide-list">
+                  <li>Open the downloaded PDF file.</li>
+                  <li>Select "Print" from the File menu or press Ctrl+P.</li>
+                  <li>In the print dialog, select "Actual Size" or "100%" scale.</li>
+                  <li>Select "Auto portrait/landscape" orientation.</li>
+                  <li>Click "Print" to start printing.</li>
+                  <li>Ensure the printed pages are collated correctly.</li>
+                </ol>
+              </div>
+            )}
+          </div>
+
+          {/* To fold 操作说明区域（对应详细设计 3.1.5） */}
+          <div className="ud23-section">
+            <div className="ud23-checkbox-row">
+              <label className="ud23-checkbox-label">
+                <input
+                  type="checkbox"
+                  className="ud23-checkbox"
+                  checked={showFoldGuide}
+                  onChange={handleFoldCheckChange}
+                />
+                To fold do the following
+              </label>
+            </div>
+
+            {showFoldGuide && (
+              <div className="ud23-guide-content">
+                <ol className="ud23-guide-list">
+                  <li>Place the printed page face up on a flat surface.</li>
+                  <li>Fold the page in half lengthwise, matching the edges.</li>
+                  <li>Crease the fold firmly with your fingers.</li>
+                  <li>Fold the page in half widthwise for the final size.</li>
+                  <li>Ensure all panels are aligned correctly.</li>
+                  <li>The guide is now ready for use.</li>
+                </ol>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-
-      {/* To print 操作说明区域（对应详细设计 3.1.4） */}
-      <div className="ud23-section">
-        <div className="ud23-checkbox-row">
-          <label className="ud23-checkbox-label">
-            <input
-              type="checkbox"
-              className="ud23-checkbox"
-              checked={showPrintGuide}
-              onChange={handlePrintCheckChange}
-            />
-            To print do the following
-          </label>
-        </div>
-
-        {showPrintGuide && (
-          <div className="ud23-guide-content">
-            <ol className="ud23-guide-list">
-              <li>Open the downloaded PDF file.</li>
-              <li>Select "Print" from the File menu or press Ctrl+P.</li>
-              <li>In the print dialog, select "Actual Size" or "100%" scale.</li>
-              <li>Select "Auto portrait/landscape" orientation.</li>
-              <li>Click "Print" to start printing.</li>
-              <li>Ensure the printed pages are collated correctly.</li>
-            </ol>
-          </div>
-        )}
-      </div>
-
-      {/* To fold 操作说明区域（对应详细设计 3.1.5） */}
-      <div className="ud23-section">
-        <div className="ud23-checkbox-row">
-          <label className="ud23-checkbox-label">
-            <input
-              type="checkbox"
-              className="ud23-checkbox"
-              checked={showFoldGuide}
-              onChange={handleFoldCheckChange}
-            />
-            To fold do the following
-          </label>
-        </div>
-
-        {showFoldGuide && (
-          <div className="ud23-guide-content">
-            <ol className="ud23-guide-list">
-              <li>Place the printed page face up on a flat surface.</li>
-              <li>Fold the page in half lengthwise, matching the edges.</li>
-              <li>Crease the fold firmly with your fingers.</li>
-              <li>Fold the page in half widthwise for the final size.</li>
-              <li>Ensure all panels are aligned correctly.</li>
-              <li>The guide is now ready for use.</li>
-            </ol>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 };

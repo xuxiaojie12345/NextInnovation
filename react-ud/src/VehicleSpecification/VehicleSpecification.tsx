@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { Tooltip } from "@mui/material";
 import "./VehicleSpecification.css";
 
 /**
@@ -18,6 +19,7 @@ interface ChassisInfo {
 
 interface EngineInfo {
   engineNo: string;
+  symbolStr: string;
   description: string;
 }
 
@@ -191,11 +193,11 @@ const VehicleSpecification: React.FC = () => {
               <span className="info-label">Country of operation:</span>
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
             </div>
-          </div>
-          {/* DESCRIPTION - 仅显示值，无值显示中划线 */}
-          <div className="info-row">
-            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
-              <span className="info-value" style={{ paddingLeft: 20 }}>{engineInfo?.description || '-'}</span>
+            <div className="info-field">
+              <span className="info-label">SYMBOL_STR:</span>
+              <Tooltip title={engineInfo?.description || '-'} arrow placement="top">
+                <span className="info-value info-value-tooltip">{engineInfo?.symbolStr || '-'}</span>
+              </Tooltip>
             </div>
           </div>
 

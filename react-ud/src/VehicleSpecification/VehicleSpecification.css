@@ -80,6 +80,12 @@
   word-break: break-all;
 }
 
+/* 带Tooltip的信息值 - 鼠标悬停时显示下划线光标提示 */
+.info-value-tooltip {
+  border-bottom: 1px dashed #999;
+  cursor: help;
+}
+
 /* ========== 消息区域 ========== */
 .info-message-area {
   background-color: #fffbe6;

@@ -233,6 +233,9 @@ public class UD12ServiceImpl implements UD12Service {
             // 创建市场文件夹（如果不存在）
             Files.createDirectories(marketDir);
 
+            // 获取原始文件名
+            String originalFileName = file.getOriginalFilename();
+
             // 构建目标文件路径
             Path targetPath = marketDir.resolve(originalFileName);
 

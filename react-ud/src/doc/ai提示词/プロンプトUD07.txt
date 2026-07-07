@@ -13,7 +13,7 @@
 - 展示发动机编号及符号信息
 - 显示国家运营区域与产品类型
 - 提供S-Note编号信息
-- 显示KOLA Variant的描述信息
+- 显示SYMBOL_STR，鼠标悬停时以Tooltip形式显示DESCRIPTION
 
 面向用户群体为车辆配置工程师、质量审核人员和生产准备人员。  
 用户体验方面需保证信息清晰、字段排列合理、关键信息突出显示。  
@@ -32,8 +32,8 @@
 | 5   | VIN | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.VIN |
 | 6   | Engine no | label | - | - | Output | - | 左 | A01 | - | 设定式样暂不明确，实际实装固定值"A01" |
 | 7   | Country of Operation | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_GENERAL.COUNTRY_OF_OPERATION |
-
-| 9   | DESCRIPTION | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION；直接显示描述内容 |
+| 8   | SYMBOL_STR | label | - | - | Output | SYMBOL、FUNCTION_GROUP | 左 | - | - | 数据来源：HDOC_REC_DATA_VDA_VARIANTS → HDOC_REC_DATA_KOLA_VARIANT；Symbol前8位，不足左补半角空格；排序：FUNCTION_GROUP左补4位+FAMILY_ID（3位） |
+| 9   | DESCRIPTION | tooltip | - | - | Output | - | 左 | - | - | 作为SYMBOL_STR的鼠标悬停提示信息(Tooltip)显示，数据来源：HDOC_REC_DATA_KOLA_VARIANT.DESCRIPTION |
 | 10  | S-Note NO | label | - | - | Output | - | 左 | - | - | 数据来源：HDOC_REC_DATA_OM.CUSTOMER_ADAP |
 
 ---
@@ -48,8 +48,10 @@
 3. 从HDOC_REC_DATA_OM表中提取Model、Built week等信息。
 4. 从HDOC_REC_DATA_VDA_GENERAL表中提取VIN、Product Type、Country of Operation等信息。
 
-6. 显示S-Note NO信息。
-7. 所有字段以标签形式静态展示，无交互操作。
+5. 从HDOC_REC_DATA_VDA_VARIANTS和HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL_STR和DESCRIPTION。
+6. 页面上显示SYMBOL_STR值，鼠标悬停时以Tooltip形式显示DESCRIPTION。
+7. 显示S-Note NO信息。
+8. 所有字段以标签形式静态展示，SYMBOL_STR具有Tooltip交互（显示DESCRIPTION）。
 
 ---
 
@@ -63,7 +65,7 @@
 - 查询HDOC_REC_DATA_OM获取Model、Build Week等信息
 - 查询HDOC_REC_DATA_VDA_GENERAL获取VIN、Product Type、Country of Operation
 - 查询HDOC_REC_DATA_VDA_VARIANTS获取FAMILY_ID和VARIANT_ID
-- 查询HDOC_REC_DATA_KOLA_VARIANT获取DESCRIPTION
+- 查询HDOC_REC_DATA_KOLA_VARIANT获取SYMBOL_STR和DESCRIPTION（DESCRIPTION作为Tooltip显示）
 - 查询HDOC_REC_DATA_OM获取S-Note NO
 
 #### 空值校验等 (Frontend Check)：
@@ -126,6 +128,7 @@
     },
     "engineInfo": {
       "engineNo": "A01",
+      "symbolStr": "FTLI-150",
       "description": "Front load index: FTLI-150"
     },
     "sNoteNo": "S1610111"
