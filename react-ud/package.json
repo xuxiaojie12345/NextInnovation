@@ -64,6 +64,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/react-router-dom": "^5.3.3",
     "sass": "^1.72.0"
   }
