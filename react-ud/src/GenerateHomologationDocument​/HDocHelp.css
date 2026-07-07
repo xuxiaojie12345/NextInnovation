@@ -1,0 +1,102 @@
+/* ===== HDoc Help 页面 ===== */
+.help-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏（统一风格） ===== */
+.help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.help-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.help-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.help-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.help-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.help-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.help-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.help-body {
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.help-content {
+  width: 100%;
+  max-width: 640px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 28px 32px;
+}
+
+/* ===== 标题 ===== */
+.help-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+/* ===== 帮助内容 ===== */
+.help-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.7;
+}
+
+.help-text p {
+  margin: 0 0 12px 0;
+}
+
+.help-email {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.help-email:hover {
+  color: #004499;
+}

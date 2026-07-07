@@ -1,0 +1,237 @@
+/* ===== Generate Document 页面 ===== */
+.gd-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏（统一风格） ===== */
+.gd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.gd-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.gd-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.gd-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gd-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.gd-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.gd-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.gd-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.gd-content {
+  width: 100%;
+  max-width: 720px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  padding: 24px 28px;
+}
+
+.gd-no-data {
+  color: #888;
+  font-size: 14px;
+}
+
+/* ===== 标题 ===== */
+.gd-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ===== Chassis no ===== */
+.gd-chassis-no {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+/* ===== 信息表格 ===== */
+.gd-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.gd-info-table td {
+  padding: 4px 8px;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+.gd-info-label {
+  color: #555;
+  font-weight: 500;
+  width: 18%;
+  white-space: nowrap;
+}
+
+.gd-info-value {
+  color: #333;
+  width: 32%;
+}
+
+/* ===== Analyze Rules 链接 ===== */
+.gd-analyze-rules {
+  margin-bottom: 12px;
+}
+
+.gd-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.gd-link:hover {
+  color: #004499;
+}
+
+/* ===== Warning ===== */
+.gd-warning {
+  color: #c62828;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+/* ===== Template ===== */
+.gd-template {
+  font-size: 13px;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+/* ===== Section ===== */
+.gd-section {
+  margin-bottom: 16px;
+  border: 1px solid #d0d0d0;
+}
+
+.gd-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.gd-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.gd-btn-start {
+  font-size: 12px;
+  padding: 3px 14px;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0;
+  border-radius: 2px;
+  cursor: pointer;
+  color: #333;
+}
+
+.gd-btn-start:hover {
+  background-color: #f5f5f5;
+}
+
+/* ===== Errors 表格 ===== */
+.gd-errors-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gd-errors-table th {
+  text-align: left;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.gd-errors-table td {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.gd-error-rule {
+  color: #333;
+}
+
+.gd-error-state {
+  color: #c62828;
+}
+
+/* ===== Generated document ===== */
+.gd-generated-doc {
+  padding: 8px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ===== 底部信息 ===== */
+.gd-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 12px;
+  color: #888;
+}
+
+.gd-version {
+  color: #888;
+}

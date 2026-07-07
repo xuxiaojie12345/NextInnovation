@@ -1,0 +1,179 @@
+/* Menu页面整体容器 */
+.menu-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.menu-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+/* ===== 菜单面板 ===== */
+.menu-panel {
+  width: 100%;
+  max-width: 600px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 2px;
+  padding: 0;
+}
+
+.menu-panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #003057;
+  padding: 16px 20px 12px;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ===== 加载中 ===== */
+.menu-loading {
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 错误消息 ===== */
+.menu-error {
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #c62828;
+  background-color: transparent;
+  line-height: 1.5;
+}
+
+/* ===== 菜单导航 ===== */
+.menu-nav {
+  padding: 4px 0;
+}
+
+/* 菜单分类 */
+.menu-category {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.menu-category:last-child {
+  border-bottom: none;
+}
+
+/* 分类标题行 */
+.menu-category-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s;
+}
+
+.menu-category-header:hover {
+  background-color: #f5f5f5;
+}
+
+.menu-category-arrow {
+  font-size: 12px;
+  color: #666;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-category-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #003057;
+}
+
+/* 菜单项列表 */
+.menu-items {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 4px 0;
+}
+
+/* 菜单项 */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 20px 6px 40px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  color: #333;
+}
+
+.menu-item:hover {
+  background-color: #eef3f8;
+}
+
+.menu-item-icon {
+  font-size: 13px;
+  color: #003057;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-item-label {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.4;
+}
