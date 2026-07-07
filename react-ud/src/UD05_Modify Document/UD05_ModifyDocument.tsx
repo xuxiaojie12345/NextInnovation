@@ -161,10 +161,12 @@ const UD05_ModifyDocument: React.FC = () => {
 
       if (response.data.code === 200) {
         // 更新成功，跳转到UD06 Save Modifications画面
+        // 将modifiedItems一并传递，确保UD06能获取所有修改项的完整信息
         navigate("/UD06", {
           state: {
             chassisSerie: chassisSerie,
-            chassisNo: chassisNo
+            chassisNo: chassisNo,
+            modifiedItems: modifiedItems
           }
         });
       } else {
@@ -228,7 +230,7 @@ const UD05_ModifyDocument: React.FC = () => {
     const modifiedItems = variables.filter(item => item.modifiedValue.trim() !== "");
     
     if (modifiedItems.length === 0) {
-      setMessage("没有需要保存的修改");
+      setMessage("NO UNRELEASED VERSION EXISTS! Please input modified value before saving.");
       return;
     }
 

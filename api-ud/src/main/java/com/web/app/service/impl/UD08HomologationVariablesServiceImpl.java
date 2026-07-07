@@ -132,6 +132,27 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 return UD08HomologationVariablesResponse.error(400, validationError);
             }
 
+            // 判断主键是否被更改（从UD09选择记录后，只要主键被改就报冲突）
+            boolean pkChanged = false;
+            if (request.getOriginalProductClass() != null || request.getOriginalNumber() != null
+                    || request.getOriginalMarket() != null) {
+                String origPc = request.getOriginalProductClass() != null ? request.getOriginalProductClass() : "";
+                String origNum = request.getOriginalNumber() != null ? String.valueOf(request.getOriginalNumber()) : "";
+                String origMkt = request.getOriginalMarket() != null ? request.getOriginalMarket() : "";
+                String curPc = request.getProductClass() != null ? request.getProductClass() : "";
+                String curNum = request.getNumber() != null ? String.valueOf(request.getNumber()) : "";
+                String curMkt = request.getMarket() != null ? request.getMarket() : "";
+                pkChanged = !origPc.equals(curPc) || !origNum.equals(curNum) || !origMkt.equals(curMkt);
+            }
+
+            if (pkChanged) {
+                log.warn("UD08更新规则失败 - 主键冲突, 原PK: ({},{},{}), 新PK: ({},{},{})",
+                        request.getOriginalProductClass(), request.getOriginalNumber(), request.getOriginalMarket(),
+                        request.getProductClass(), request.getNumber(), request.getMarket());
+                return UD08HomologationVariablesResponse.error(409,
+                        "Primary key conflict, Please enter the correct content");
+            }
+
             // 检查数据是否存在
             Integer count = ud08Mapper.countUserDefinedRule(
                     request.getProductClass(), request.getNumber(), request.getMarket());

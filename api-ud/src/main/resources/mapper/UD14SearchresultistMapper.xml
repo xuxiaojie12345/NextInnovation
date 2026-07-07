@@ -14,16 +14,6 @@
     </select>
 
     <!--
-        UD14 根据市场查询用户定义规则中的变量列表
-    -->
-    <!-- <select id="selectVariableByMarket" resultType="java.lang.String">
-        SELECT VARIABLE
-        FROM HDOC_USER_DEFINED_RULES
-        WHERE MARKET = #{market}
-        ORDER BY VARIABLE
-    </select> -->
-
-    <!--
         UD14 根据市场和文件名查询用户定义规则中的变量
         SQL条件：MARKET = #{market} AND VAL = CONCAT(#{market}, '/', #{fileName})
     -->

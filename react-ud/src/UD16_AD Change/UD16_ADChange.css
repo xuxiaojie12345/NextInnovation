@@ -37,7 +37,7 @@
   color: #ff4d4f;
   font-size: 13px;
   text-align: left;
-  margin-top: 20px;
+  margin-bottom: 20px;
   padding: 8px 12px;
   background-color: #fff2f0;
   border: 1px solid #ffccc7;
@@ -233,4 +233,81 @@
   .ud16-container .ud16-btn {
     width: 100%;
   }
+}
+
+/* ---------- 弹框遮罩层 ---------- */
+/* 对应设计书 3.1.3 CHECK按钮处理流程 */
+.ud16-container .ud16-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* ---------- 弹框对话框 ---------- */
+.ud16-container .ud16-modal-dialog {
+  background-color: #ffffff;
+  border: 2px solid #9999cc;
+  border-radius: 4px;
+  min-width: 300px;
+  max-width: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- 弹框内容 ---------- */
+.ud16-container .ud16-modal-content {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.ud16-container .ud16-modal-message {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- 弹框底部按钮区域 ---------- */
+.ud16-container .ud16-modal-footer {
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid #e8e8e8;
+}
+
+.ud16-container .ud16-btn-modal-ok {
+  min-width: 80px;
+  padding: 6px 24px;
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+}
+
+.ud16-container .ud16-btn-modal-ok:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud16-container .ud16-btn-modal-cancel {
+  min-width: 80px;
+  padding: 6px 24px;
+  font-size: 13px;
+  border: 1px solid #808080;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  outline: none;
+  margin-left: 10px;
+}
+
+.ud16-container .ud16-btn-modal-cancel:hover {
+  background-color: #e0e0e0;
+  border-color: #000080;
 }

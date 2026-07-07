@@ -153,7 +153,7 @@ const UD04_GenerateDocument: React.FC = () => {
         // API返回失败
         setState(prev => ({
           ...prev,
-          message: 'We can not get the data. Please try again.',
+          message: 'We can not get the OM_data. Please try again.',
           isLoading: false,
         }));
       }
@@ -419,7 +419,8 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* 对应设计文档 2.1 控件属性表 No.13 */}
             {state.replacingParameters && (
               <div className='result-item'>
-                <label className='result-label'>Replacing parameters:</label>
+                <label className='result-label-ReplacingParameters'>Replacing parameters:</label>
+                <br></br>
                 <span className='result-value'>{state.replacingParameters}</span>
               </div>
             )}
@@ -433,7 +434,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* 对应设计文档 2.1 控件属性表 No.14 */}
             <div className='result-item'>
               {/* <label className='result-label'>Generated document:</label> */}
-              <label className='result-value link-blue'
+              <label className='result-value-GeneratedDocument'
                 onClick={handleGeneratedDocClick}
                 style={{ cursor: 'pointer' }}>Generated document:</label>
               {/* <span 

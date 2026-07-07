@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './UD03_GenerateHomologationDocument.css';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/config';
@@ -26,6 +26,11 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
   const [documentTypeOptions, setDocumentTypeOptions] = useState<string[]>([]); // Document type选项列表
   const [message, setMessage] = useState<string>('');                   // 错误消息
   const [isLoading, setIsLoading] = useState<boolean>(false);           // 加载状态标识
+
+  // ==================== Ref 定义 ====================
+  const chassisSeriesRef = useRef<HTMLInputElement>(null);
+  const chassisNoRef = useRef<HTMLInputElement>(null);
+  const documentTypeRef = useRef<HTMLSelectElement>(null);
 
   // ==================== 常量定义 ====================
   // 输入校验正则表达式
@@ -149,19 +154,22 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
     // 对应设计书 3.2 校验詳細規格表 No.1
     if (!trimmedChassisSeries) {
       setMessage('Chassis series is required.');
-      return; // 终止流程
+      chassisSeriesRef.current?.focus();
+      return;
     }
 
     // 对应設計書 3.2 校驗詳細規格表 No.2
     if (!trimmedChassisNo) {
       setMessage('Chassis no is required.');
-      return; // 终止流程
+      chassisNoRef.current?.focus();
+      return;
     }
 
     // 对应設計書 3.2 校驗詳細規格表 No.3
     if (!trimmedDocumentType) {
       setMessage('Document type is required.');
-      return; // 终止流程
+      documentTypeRef.current?.focus();
+      return;
     }
 
     // 3. 結果処理：校驗通過
@@ -227,11 +235,12 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
             <input
               id='chassisSeries'
               type='text'
+              ref={chassisSeriesRef}
               value={chassisSeries}
               onChange={handleChassisSeriesChange}
               placeholder=''
-              disabled={isLoading}                    // ロード中は入力を無効化
-              maxLength={MAX_CHASSIS_SERIES_LENGTH}   // 最大長制限
+              disabled={isLoading}
+              maxLength={MAX_CHASSIS_SERIES_LENGTH}
               className='form-input'
             />
           </div>
@@ -243,11 +252,12 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
             <input
               id='chassisNo'
               type='text'
+              ref={chassisNoRef}
               value={chassisNo}
               onChange={handleChassisNoChange}
               placeholder=''
-              disabled={isLoading}                    // ロード中は入力を無効化
-              maxLength={MAX_CHASSIS_NO_LENGTH}       // 最大長制限
+              disabled={isLoading}
+              maxLength={MAX_CHASSIS_NO_LENGTH}
               className='form-input'
             />
           </div>
@@ -258,9 +268,10 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
             <label htmlFor='documentType'>Document type <span className='required'>*</span></label>
             <select
               id='documentType'
+              ref={documentTypeRef}
               value={documentType}
               onChange={handleDocumentTypeChange}
-              disabled={isLoading}                    // ロード中は選択を無効化
+              disabled={isLoading}
               className='form-select'
             >
               <option value=''>请选择Document type</option>

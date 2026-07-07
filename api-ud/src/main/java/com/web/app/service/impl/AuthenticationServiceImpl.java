@@ -16,52 +16,41 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-    
+
     @Autowired
     private HdocUserInforMapper hdocUserInforMapper;
-    
+
     @Override
     public AuthenticationResponse authentication(AuthenticationRequest request) {
         log.info("开始用户认证，userId: {}", request.getUserId());
-        
+
         AuthenticationResponse response = new AuthenticationResponse();
-        
+
         try {
-            // 参数校验
-            if (!StringUtils.hasText(request.getUserId())) {
-                response.setCode(400);
-                response.setMsg("用户ID不能为空");
-                return response;
-            }
-            
-            // 查询用户信息
+            // 查询用户信息（仅通过userId查询）
             HdocUserInfor user = hdocUserInforMapper.selectByUserId(
-                request.getUserId(), 
-                request.getPassword()
-            );
-            
-            // 判断用户是否存在
+                    request.getUserId(), null);
+
+            // 判断用户是否存在（统一错误消息，不暴露具体是用户名还是密码错误）
             if (user == null) {
-                response.setCode(1001);
-                response.setMsg("账号不存在");
+                response.setCode(401);
+                response.setMsg("We didn't recognize the username or password you entered. Please try again.");
                 log.warn("用户认证失败，账号不存在: {}", request.getUserId());
                 return response;
             }
-            
-            // 如果传入了密码，验证密码
+
+            // 验证密码
             if (StringUtils.hasText(request.getPassword())) {
-                // TODO: 实际项目中应该使用BCrypt等加密方式比对密码
                 if (!request.getPassword().equals(user.getPassword())) {
-                    response.setCode(1002);
-                    response.setMsg("密码不正确");
+                    response.setCode(401);
+                    response.setMsg("We didn't recognize the username or password you entered. Please try again.");
                     log.warn("用户认证失败，密码错误: {}", request.getUserId());
                     return response;
                 }
             }
-            
+
             // 认证成功，构建响应
-            AuthenticationResponse.AuthenticationData data = 
-                new AuthenticationResponse.AuthenticationData();
+            AuthenticationResponse.AuthenticationData data = new AuthenticationResponse.AuthenticationData();
             data.setUserId(user.getUserid());
             data.setUsername(user.getUsername());
             data.setResponsible(user.getResponsible());
@@ -69,19 +58,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             data.setEmail(user.getEmail());
             // TODO: 生成Token
             data.setToken("TODO_GENERATE_TOKEN");
-            
+
             response.setCode(200);
             response.setMsg("登录成功");
             response.setData(data);
-            
+
             log.info("用户认证成功: {}", request.getUserId());
-            
+
         } catch (Exception e) {
             log.error("用户认证异常", e);
             response.setCode(500);
             response.setMsg("服务器内部错误");
         }
-        
+
         return response;
     }
 }

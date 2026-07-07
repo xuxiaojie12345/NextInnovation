@@ -27,14 +27,23 @@
 /* ==================== 错误消息样式 ==================== */
 .ud05-container .ud05-message {
   /* width: 100%; */
-  max-width: 1100px;
+  /* max-width: 1100px;
   background-color: #ff4d4f;
   color: #ffffff;
   padding: 12px 0px;
   border-radius: 4px;
   margin-bottom: 20px;
   font-size: 14px;
-  text-align: center;
+  text-align: center; */
+    background-color: #fff2f0;
+    border-color: #ffccc7;
+    color: #ff4d4f;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    min-height: 20px;
+    border: 1px solid transparent;
 }
 
 /* ==================== 基本信息区域 ==================== */

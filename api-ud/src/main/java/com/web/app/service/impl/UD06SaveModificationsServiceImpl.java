@@ -10,10 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 /**
  * UD06 保存修改内容服务实现类
  *
  * 功能说明：实现UD06保存修改内容查询业务逻辑
+ * 支持按变量名列表过滤，以精确匹配每条修改记录
  *
  * @author Qoder Assistant
  * @version 1.0
@@ -37,12 +40,20 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
                 return UD06SaveModificationsResponse.error(400, validationError);
             }
 
-            UD06SaveModificationsVO vo = ud06Mapper.selectHdocAdcaModification(request.getChassisSerie(), request.getChassisNo());
-            if (vo == null) {
-                log.warn("UD06查询未找到记录，chassisSerie: {}, chassisNo: {}", request.getChassisSerie(), request.getChassisNo());
+            // 查询时传入变量名列表，精确匹配被修改的记录
+            List<UD06SaveModificationsVO> voList = ud06Mapper.selectHdocAdcaModification(
+                    request.getChassisSerie(),
+                    request.getChassisNo(),
+                    request.getVariables());
+
+            if (voList == null || voList.isEmpty()) {
+                log.warn("UD06查询未找到记录，chassisSerie: {}, chassisNo: {}, variables: {}",
+                        request.getChassisSerie(), request.getChassisNo(), request.getVariables());
                 return UD06SaveModificationsResponse.error(404, "Record not found.");
             }
 
+            // 返回第一条记录（所有修改项属于同一文档，Doctype/Version一致）
+            UD06SaveModificationsVO vo = voList.get(0);
             UD06SaveModificationsResponse.DataObject data = new UD06SaveModificationsResponse.DataObject();
             data.setDoctype(vo.getDoctype());
             data.setVers(vo.getVers());

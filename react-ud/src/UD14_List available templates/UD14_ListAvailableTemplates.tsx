@@ -126,10 +126,9 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       });
 
       // 处理成功响应
-      if (response.data && response.data.code === 200 && response.data.data) {
-        // 将API返回的文件列表映射为前端展示格式
-        // 后端FileData包含：filename, isUsed, variable, lastMod, size
-        const files: FileInfo[] = response.data.data.map((item: any) => ({
+      if (response.data && response.data.code === 200) {
+        const data = response.data.data || [];
+        const files: FileInfo[] = data.map((item: any) => ({
           filename: item.filename || '',
           isUsed: item.isUsed || false,
           variable: item.variable || null,
@@ -137,35 +136,21 @@ const UD14_ListAvailableTemplates: React.FC = () => {
           size: item.size || '',
         }));
         setFileList(files);
-        setMessage(''); // 清除旧消息
+        setMessage('');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.3 - 无数据或查询失败
+        // 后端返回错误消息（如 code=404, msg="Market文件夹不存在"）
         setFileList([]);
-        if (response.data && response.data.code === 404) {
-          setMessage('Market文件夹不存在');
-        } else {
-          setMessage('获取文件列表失败');
-        }
+        setMessage(response.data?.msg || '获取文件列表失败');
       }
     } catch (error: any) {
-      // 异常处理
-      // 对应设计书 5. 异常处理
+      // 异常处理（网络错误、超时等HTTP层面的异常）
       console.error('获取文件列表失败:', error);
-      if (error.response) {
-        if (error.response.status === 404) {
-          setFileList([]);
-          setMessage('Market文件夹不存在');
-        } else if (error.response.status >= 500) {
-          setMessage('服务器内部错误，请联系管理员');
-        } else {
-          setMessage('获取文件列表失败');
-        }
-      } else if (error.code === 'ECONNABORTED') {
+      setFileList([]);
+      if (error.code === 'ECONNABORTED') {
         setMessage('请求超时，请稍后重试');
       } else {
         setMessage('获取文件列表失败');
       }
-      setFileList([]);
     } finally {
       setIsLoading(false);
     }

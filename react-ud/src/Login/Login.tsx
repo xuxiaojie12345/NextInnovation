@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/config";
@@ -26,19 +26,19 @@ const Login: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>(""); // 账户锁定等特殊错误消息
   const [isLoading, setIsLoading] = useState<boolean>(false); // 加载状态标识
 
+  // ==================== Ref 定义 ====================
+  const userIDRef = useRef<HTMLInputElement>(null);   // UserID输入框引用
+  const passwordRef = useRef<HTMLInputElement>(null); // Password输入框引用
+
   // ==================== 常量定义 ====================
   // 输入校验正则表达式（可复用）
   const USER_ID_REGEX = /^[a-zA-Z0-9]*$/;                    // 半角英数字
+  // eslint-disable-next-line no-useless-escape
   const PASSWORD_REGEX = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/; // 半角英数字+符号
   
   // 输入长度限制
   const MAX_USER_ID_LENGTH = 10;
   const MAX_PASSWORD_LENGTH = 32;
-
-  // 账户锁定固定提示文字
-  const ACCOUNT_LOCKED_MESSAGE = `If you get error message: "Your account is locked. Please contact your system administrator." 
-Please try this alternative login link before contacting support： Login 
-We are working to find root cause of problem.`;
 
   // ==================== 事件处理函数 ====================
 
@@ -95,9 +95,15 @@ We are working to find root cause of problem.`;
 
     // 2. 空值校验（前端校验）
     // 对应设计书 3.2 校验详细规格表 No.1 和 No.2
-    if (!trimmedUserID || !trimmedPassword) {
+    if (!trimmedUserID) {
       setMessage("Username and password are required.");
-      return; // 终止流程，不调用 API
+      userIDRef.current?.focus(); // 焦点移到UserID
+      return;
+    }
+    if (!trimmedPassword) {
+      setMessage("Username and password are required.");
+      passwordRef.current?.focus(); // 焦点移到Password
+      return;
     }
 
     // 3. API 调用（后端校验）
@@ -145,7 +151,8 @@ We are working to find root cause of problem.`;
       } else {
         // 认证失败（Code != 200 或业务错误）
         // 对应设计书 3.2 校验详细规格表 No.3
-        setMessage(response.data.msg || "We didn't recognize the username or password you entered. Please try again.");
+        // 固定使用英文消息，不显示后端返回的 msg，避免暴露具体错误信息
+        setMessage("We didn't recognize the username or password you entered. Please try again.");
         // 安全策略：清空密码字段
         setPassword("");
       }
@@ -157,19 +164,7 @@ We are working to find root cause of problem.`;
         // 服务器返回错误响应
         const statusCode = error.response.status;
         const errorMsg = error.response.data?.msg;
-        
-        if (statusCode === 400) {
-          // 参数校验失败
-          setMessage(errorMsg || "Invalid input parameters.");
-        } else if (statusCode === 401) {
-          // 认证失败：用户名或密码错误
-          setMessage(errorMsg || "We didn't recognize the username or password you entered. Please try again.");
-          setPassword(""); // 清空密码字段
-        } else if (statusCode === 423) {
-          // 帐户锁定：ISAM返回特定码
-          // 对应设计书 5. 异常处理 - 帐户锁定
-          setErrorMessage(ACCOUNT_LOCKED_MESSAGE);
-        } else if (statusCode >= 500) {
+        if (statusCode >= 500) {
           // 服务器内部错误
           setMessage("System error. Please try again later.");
         } else {
@@ -213,10 +208,11 @@ We are working to find root cause of problem.`;
           {/* UserID 输入框 */}
           {/* 对应设计书 2.1 控件属性表 No.1 UserID */}
           <div className='form-group'>
-            <label htmlFor='userID'>用户ID</label>
+            {/* <label htmlFor='userID'>用户ID</label> */}
             <input
               id='userID'
               type='text'
+              ref={userIDRef}
               value={userID}
               onChange={handleUserIDChange}
               placeholder='请输入用户ID'
@@ -229,10 +225,11 @@ We are working to find root cause of problem.`;
           {/* Password 输入框 */}
           {/* 对应设计书 2.1 控件属性表 No.2 Password */}
           <div className='form-group'>
-            <label htmlFor='password'>密码</label>
+            {/* <label htmlFor='password'>密码</label> */}
             <input
               id='password'
               type='password'                         // 密码掩码显示
+              ref={passwordRef}
               value={password}
               onChange={handlePasswordChange}
               placeholder='请输入密码'
@@ -264,7 +261,7 @@ We are working to find root cause of problem.`;
             className='login-button' 
             disabled={isLoading}                      // 加载期间禁用按钮，防止重复提交
           >
-            {isLoading ? "处理中..." : "登录"}
+            {isLoading ? "处理中..." : "Login"}
           </button>
         </form>
 

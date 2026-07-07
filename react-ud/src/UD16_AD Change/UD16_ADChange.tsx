@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './UD16_ADChange.css';
 import apiClient from '../api/config';
 
@@ -23,6 +23,10 @@ const UD16_ADChange: React.FC = () => {
   const [desc, setDesc] = useState<string>('');             // Desc描述输入值
   const [message, setMessage] = useState<string>('');        // 错误消息
   const [isLoading, setIsLoading] = useState<boolean>(false); // 加载状态标识
+  const [showModal, setShowModal] = useState<boolean>(false); // CHECK弹框显示状态
+  const [modalMessage, setModalMessage] = useState<string>(''); // CHECK弹框消息内容
+  const [showAddModal, setShowAddModal] = useState<boolean>(false); // ADD确认弹框显示状态
+  const addModalResolver = useRef<((value: boolean) => void) | null>(null); // ADD弹框Promise解析器
 
   // ==================== 常量定义 ====================
   const MAX_SERIE_CHNR_LENGTH = 15;    // Serie-Chnr最大长度（对应设计书 2.1 No.1）
@@ -85,16 +89,16 @@ const UD16_ADChange: React.FC = () => {
     }
 
     // 对应设计书 3.2 校验详细规格表 No.2
-    if (trimmedSerieChnr.length > MAX_SERIE_CHNR_LENGTH) {
-      showMessage('Serie-Chnr最大长度为15字符');
-      return; // 终止流程
-    }
+    // if (trimmedSerieChnr.length > MAX_SERIE_CHNR_LENGTH) {
+    //   showMessage('Serie-Chnr最大长度为15字符');
+    //   return; // 终止流程
+    // }
 
     // 对应设计书 3.2 校验详细规格表 No.3
-    if (trimmedDesc.length > MAX_DESC_LENGTH) {
-      showMessage('描述最大长度为4000字符');
-      return; // 终止流程
-    }
+    // if (trimmedDesc.length > MAX_DESC_LENGTH) {
+    //   showMessage('描述最大长度为4000字符');
+    //   return; // 终止流程
+    // }
 
     // 3. 拆分Serie-Chnr
     const { serie, chnr } = splitSerieChnr(trimmedSerieChnr);
@@ -133,9 +137,14 @@ const UD16_ADChange: React.FC = () => {
 
         // 对应设计书 3.2 校验详细规格表 No.4
         // 记录已存在且ACT="U"的情况（HTTP 409 Conflict）
-        if (statusCode === 409 && errorMsg === 'AFTER DEF CHANGE IS NOT ACTIVATED') {
-          // 弹框显示警告消息
-          const userConfirmed = window.confirm('AFTER DEF CHANGE IS NOT ACTIVATED');
+        if (statusCode === 400 && errorMsg === '记录已存在且已激活') {
+          // 对应设计书 3.1.1 ADD按钮处理流程 - 记录已存在且已激活
+          // 弹框显示警告消息，点击确定后终止流程
+          setModalMessage('记录已存在且已激活');
+          setShowModal(true);
+        } else if (statusCode === 409 && errorMsg === 'AFTER DEF CHANGE IS NOT ACTIVATED') {
+          // 弹框显示警告消息，点击确定后继续处理
+          const userConfirmed = await showAddConfirmModal();
           if (userConfirmed) {
             // 用户点击OK后，调用添加API继续（force=true跳过检查，直接更新ACT为"Y"）
             try {
@@ -288,17 +297,21 @@ const UD16_ADChange: React.FC = () => {
         },
       });
 
-      // 5. 结果处理
+      // 5. 结果处理 - 弹框显示查询结果
+      // 对应设计书 3.1.3 CHECK按钮处理流程 和 3.2 校验详细规格表 No.8, No.10
       if (response.data && response.data.code === 200 && response.data.data) {
         if (response.data.data.exists) {
-          // 记录存在
-          showMessage('对应的数据存在');
+          // 记录存在 - 弹框显示
+          setModalMessage('对应的数据存在');
+          setShowModal(true);
         } else {
-          // 对应设计书 3.2 校验详细规格表 No.10
-          showMessage('记录不存在');
+          // 对应设计书 3.2 校验详细规格表 No.10 - 弹框显示
+          setModalMessage('记录不存在');
+          setShowModal(true);
         }
       } else {
-        showMessage('记录不存在');
+        setModalMessage('记录不存在');
+        setShowModal(true);
       }
     } catch (error: any) {
       // 异常处理
@@ -318,6 +331,52 @@ const UD16_ADChange: React.FC = () => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /**
+   * 显示ADD确认弹框 - 返回Promise，用户点击确定时resolve(true)，取消时resolve(false)
+   * 对应设计书 3.2 校验详细规格表 No.4
+   *
+   * @returns {Promise<boolean>} 用户是否点击确定
+   */
+  const showAddConfirmModal = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      addModalResolver.current = resolve;
+      setShowAddModal(true);
+    });
+  };
+
+  /**
+   * 关闭CHECK弹框
+   * 点击弹框中的"确定"按钮时调用，关闭弹框
+   */
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalMessage('');
+  };
+
+  /**
+   * ADD确认弹框 - 点击确定
+   * 关闭弹框，resolve(true) 继续处理
+   */
+  const handleAddModalConfirm = () => {
+    setShowAddModal(false);
+    if (addModalResolver.current) {
+      addModalResolver.current(true);
+      addModalResolver.current = null;
+    }
+  };
+
+  /**
+   * ADD确认弹框 - 点击取消
+   * 关闭弹框，resolve(false) 终止处理
+   */
+  const handleAddModalCancel = () => {
+    setShowAddModal(false);
+    if (addModalResolver.current) {
+      addModalResolver.current(false);
+      addModalResolver.current = null;
     }
   };
 
@@ -361,6 +420,14 @@ const UD16_ADChange: React.FC = () => {
         {/* 页面标题 */}
         <h1 className='ud16-title'>AD Change</h1>
 
+        {/* 错误消息显示区域 */}
+        {/* 对应设计书 2.1 控件属性表 No.3 error message */}
+        {message && (
+          <div className='ud16-message'>
+            {message}
+          </div>
+        )}
+        
         {/* 输入区域 */}
         <div className='ud16-form-section'>
           {/* Serie-Chnr 输入框 */}
@@ -428,14 +495,53 @@ const UD16_ADChange: React.FC = () => {
           </button>
         </div>
 
-        {/* 错误消息显示区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.3 error message */}
-        {message && (
-          <div className='ud16-message'>
-            {message}
-          </div>
-        )}
       </div>
+
+      {/* 弹框遮罩层 - CHECK按钮查询结果显示 */}
+      {/* 对应设计书 3.1.3 CHECK按钮处理流程 和 6.1 状态管理 */}
+      {showModal && (
+        <div className='ud16-modal-overlay' onClick={handleCloseModal}>
+          <div className='ud16-modal-dialog' onClick={(e) => e.stopPropagation()}>
+            <div className='ud16-modal-content'>
+              <p className='ud16-modal-message'>{modalMessage}</p>
+            </div>
+            <div className='ud16-modal-footer'>
+              <button
+                className='ud16-btn ud16-btn-modal-ok'
+                onClick={handleCloseModal}
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 弹框遮罩层 - ADD确认弹框 */}
+      {/* 对应设计书 3.2 校验详细规格表 No.4 - 记录已存在且ACT="U" */}
+      {showAddModal && (
+        <div className='ud16-modal-overlay'>
+          <div className='ud16-modal-dialog'>
+            <div className='ud16-modal-content'>
+              <p className='ud16-modal-message'>AFTER DEF CHANGE IS NOT ACTIVATED</p>
+            </div>
+            <div className='ud16-modal-footer'>
+              <button
+                className='ud16-btn ud16-btn-modal-ok'
+                onClick={handleAddModalConfirm}
+              >
+                确定
+              </button>
+              <button
+                className='ud16-btn ud16-btn-modal-cancel'
+                onClick={handleAddModalCancel}
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

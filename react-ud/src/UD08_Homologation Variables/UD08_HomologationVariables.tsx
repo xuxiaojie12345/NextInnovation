@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/config';
 import './UD08_HomologationVariables.css';
@@ -62,6 +62,13 @@ const UD08_HomologationVariables: React.FC = () => {
   // 加载状态
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // 原始主键值（从UD09 Select返回时的值，用于Update检测主键冲突）
+  const originalPkRef = useRef<{ productClass: string; number: string; market: string }>({
+    productClass: '',
+    number: '',
+    market: '',
+  });
+
   // 操作符选项（固定值）
   // Add和Delete项目后面的下拉框内容为：【=,<,>】（对应设计书 3.1 备注）
   // 值使用 "gt"/"lt" 而非 ">"/"<" 以避免 OGNL 解析问题
@@ -123,9 +130,15 @@ const UD08_HomologationVariables: React.FC = () => {
 
     if (selectedRecord) {
       // === Select 流程：填充选中记录 ===
-      setProductClass({ value: selectedRecord.productClass || '', operator: '=' });
-      setNumber({ value: selectedRecord.number !== undefined ? String(selectedRecord.number) : '', operator: '=' });
-      setMarket({ value: selectedRecord.market || '', operator: '=' });
+      // 保存原始主键值，用于Update时检测主键冲突
+      const origPc = selectedRecord.productClass || '';
+      const origNum = selectedRecord.number !== undefined ? String(selectedRecord.number) : '';
+      const origMkt = selectedRecord.market || '';
+      originalPkRef.current = { productClass: origPc, number: origNum, market: origMkt };
+
+      setProductClass({ value: origPc, operator: '=' });
+      setNumber({ value: origNum, operator: '=' });
+      setMarket({ value: origMkt, operator: '=' });
       setVariable({ value: selectedRecord.variable || '', operator: '=' });
       setValue({ value: selectedRecord.value || '', operator: '=' });
       setVariantString1({ value: selectedRecord.variantString1 || '', operator: '=' });
@@ -521,6 +534,10 @@ const UD08_HomologationVariables: React.FC = () => {
         deleteDate: displayDeleteDate,
         createdByUser: currentUser,
         date: now.toISOString(),
+        // 传递原始主键值，用于后端检测主键冲突
+        originalProductClass: originalPkRef.current.productClass,
+        originalNumber: originalPkRef.current.number ? parseInt(originalPkRef.current.number, 10) : undefined,
+        originalMarket: originalPkRef.current.market,
       };
 
       const response = await apiClient.post('/api/ud08/update', requestBody);

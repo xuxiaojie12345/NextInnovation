@@ -63,23 +63,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     public UD12UploadDeletetemplatResponse uploadFile(MultipartFile file, String market) {
         log.info("开始UD12上传文件, market: {}, fileName: {}", market, file.getOriginalFilename());
         try {
-            // 校验文件是否为空
-            if (file == null || file.isEmpty()) {
-                return UD12UploadDeletetemplatResponse.error(400, "上传文件不能为空");
-            }
-
-            // 校验市场参数
-            if (market == null || market.trim().isEmpty()) {
-                return UD12UploadDeletetemplatResponse.error(400, "市场参数不能为空");
-            }
-
             String originalFilename = file.getOriginalFilename();
-
-            // 校验文件大小（示例限制：10MB）
-            long maxSize = 10 * 1024 * 1024;
-            if (file.getSize() > maxSize) {
-                return UD12UploadDeletetemplatResponse.error(400, "文件大小不能超过10MB");
-            }
 
             // 构建上传目录路径
             String marketDir = uploadFolder + File.separator + market.trim();
@@ -115,13 +99,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     public UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request) {
         log.info("开始UD12删除文件, market: {}, template: {}", request.getMarket(), request.getTemplate());
         try {
-            if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
-                return UD12UploadDeletetemplatResponse.error(400, "市场参数不能为空");
-            }
-            if (request.getTemplate() == null || request.getTemplate().trim().isEmpty()) {
-                return UD12UploadDeletetemplatResponse.error(400, "模板文件名不能为空");
-            }
-
             // 构建文件路径
             String filePath = uploadFolder + File.separator + request.getMarket().trim()
                     + File.separator + request.getTemplate().trim();
@@ -158,10 +135,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     public UD12UploadDeletetemplatResponse getTemplateList(String market) {
         log.info("开始UD12查询模板文件列表, market: {}", market);
         try {
-            if (market == null || market.trim().isEmpty()) {
-                return UD12UploadDeletetemplatResponse.error(400, "市场参数不能为空");
-            }
-
             // 构建market文件夹路径
             String marketDirPath = uploadFolder + File.separator + market.trim();
             File marketDir = new File(marketDirPath);

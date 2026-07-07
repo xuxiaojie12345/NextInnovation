@@ -5,6 +5,7 @@
     <!--
         UD06 保存修改内容查询
         查询 HDOC_ADCA_MODIFICATION 表中DOCTYP、VERS、VARIABLE、NEWVAL
+        支持按变量名列表过滤（从UD05传入），以精确匹配每条修改记录
     -->
     <select id="selectHdocAdcaModification" resultType="com.web.app.entity.UD06SaveModificationsVO">
         SELECT
@@ -15,7 +16,12 @@
         FROM HDOC_ADCA_MODIFICATION
         WHERE SERIE = #{chassisSerie}
           AND CHNO = #{chassisNo}
-        LIMIT 1
+        <if test="variables != null and variables.size() > 0">
+          AND VARIABLE IN
+          <foreach item="variable" collection="variables" open="(" separator="," close=")">
+              #{variable}
+          </foreach>
+        </if>
     </select>
 
 </mapper>

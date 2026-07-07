@@ -175,7 +175,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
       // 校验文件大小
       if (file.size > MAX_FILE_SIZE) {
-        setMessage("文件大小超过限制（最大10MB）");
+        setMessage("The file exceeds 10MB, please select again");
         setMessageType("error");
         setSelectedFile(null);
         e.target.value = "";
@@ -213,7 +213,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     }
 
     if (!uploadMarket) {
-      setMessage("请选择Market");
+      setMessage("Please select a market");
       setMessageType("error");
       return;
     }
@@ -239,9 +239,9 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         const msg = response.data.msg || `TEMPLATE ${selectedFile.name} WAS SUCESSFULLY UPLOADED TO MARKET ${uploadMarket}`;
         setMessage(msg);
         setMessageType("success");
-        // 清空文件选择框，保持Market选择不变
+        // 清空文件选择框和Market选择
         setSelectedFile(null);
-        // 重置文件输入框
+        setUploadMarket("");
         const fileInput = document.getElementById("templateFileInput") as HTMLInputElement;
         if (fileInput) fileInput.value = "";
       } else {
@@ -322,7 +322,8 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         const msg = response.data.msg || `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${deleteMarket}`;
         setMessage(msg);
         setMessageType("success");
-        // 刷新Templates下拉框
+        // 刷新Templates下拉框和Market下拉框
+        setDeleteMarket("");
         setSelectedTemplate("");
         fetchTemplateList(deleteMarket);
       } else {

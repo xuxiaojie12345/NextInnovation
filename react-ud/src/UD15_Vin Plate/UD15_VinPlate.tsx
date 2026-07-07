@@ -474,7 +474,12 @@ const UD15_VinPlate: React.FC = () => {
         )}
 
         {/* 输出区域 - VIN Plate详细信息 */}
-        {/* 对应设计书 6.2 UI细节 - 未检索时隐藏输出区域 */}
+        {/* 对应设计书 6.2 UI细节 - 未检索时显示提示文字 */}
+        {!plateInfo && !isLoading && (
+          <div className='ud15-info-prompt'>
+            Please enter a chassis number
+          </div>
+        )}
         {plateInfo && (
           <div className='ud15-info-panel'>
             {/* 信息列表区域 - 单列布局 */}

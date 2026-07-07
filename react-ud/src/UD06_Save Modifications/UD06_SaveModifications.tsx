@@ -49,6 +49,8 @@ const UD06_SaveModifications: React.FC = () => {
     const routeState = location.state as any;
     const chassisSerie = routeState?.chassisSerie || routeState?.chassisSeries || '';
     const chassisNumber = routeState?.chassisNo || '';
+    // 从UD05传来的modifiedItems中提取变量名列表
+    const modifiedItems: Array<{ variable: string; currentValue: string; modifiedValue: string }> = routeState?.modifiedItems || [];
 
     if (!chassisSerie || !chassisNumber) {
       setState(prev => ({
@@ -66,7 +68,9 @@ const UD06_SaveModifications: React.FC = () => {
       isLoading: true,
     }));
 
-    fetchSaveModificationsData(chassisSerie, chassisNumber);
+    // 将变量名列表传给API，确保能精确查询每条修改记录
+    const variables = modifiedItems.map(item => item.variable);
+    fetchSaveModificationsData(chassisSerie, chassisNumber, variables);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
@@ -78,18 +82,21 @@ const UD06_SaveModifications: React.FC = () => {
    *
    * @param chassisSerie - Chassis series
    * @param chassisNumber - Chassis number
+   * @param variables - 修改的变量名列表（从UD05传入），用于精确查询每条修改记录
    */
-  const fetchSaveModificationsData = async (chassisSerie: string, chassisNumber: string) => {
+  const fetchSaveModificationsData = async (chassisSerie: string, chassisNumber: string, variables?: string[]) => {
     try {
       const response = await apiClient.post('/api/ud06/savemodifications', {
         chassisSerie,
         chassisNo: chassisNumber,
+        variables: variables && variables.length > 0 ? variables : undefined,
       });
 
       if (response.data?.code === 200 && response.data?.data) {
         const data = response.data.data;
-        const storingText = `${data.variable || ''} ${data.newval || ''}`.trim();
-
+        const storingText = `${data.variable || ''} ${data.newVal || data.newval || ''}`.trim();
+        console.log('data:', data);
+        console.log('storingText:', storingText);
         setState(prev => ({
           ...prev,
           doctype: data.doctype || '',

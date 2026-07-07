@@ -13,12 +13,12 @@
 
 .login-box {
   /* 启用背景和 Padding 以符合常规登录框设计 */
-  background: white;
+  /* background: white; */
   padding: 40px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 350px;
   /* 移除 absolute 定位，由父容器 Flex 居中 */
   position: relative;
 }
@@ -41,6 +41,7 @@
   color: #666;
   font-weight: 500;
   font-size: 14px;
+  min-width: 60px;
 }
 
 .form-group input {

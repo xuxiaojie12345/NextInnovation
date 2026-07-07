@@ -116,7 +116,7 @@ const Menu: React.FC = () => {
             if (parent) {
               const textLogo = document.createElement('div');
               textLogo.className = 'text-logo';
-              textLogo.textContent = 'Document Menu';
+              textLogo.textContent = 'VOLVO';
               parent.appendChild(textLogo);
             }
           }}

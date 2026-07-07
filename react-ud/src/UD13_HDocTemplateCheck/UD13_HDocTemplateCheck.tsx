@@ -71,6 +71,13 @@ const UD13_HDocTemplateCheck: React.FC = () => {
         e.target.value = "";
         return;
       }
+      
+      // 1. 空值校验（前端校验）
+      if (!selectedFile) {
+        setMessage("NO FILE UPLOADED");
+        setMessageType("error");
+        return;
+      }
 
       setSelectedFile(file);
       // 重新选择文件后重置检查状态
@@ -89,12 +96,7 @@ const UD13_HDocTemplateCheck: React.FC = () => {
    * 注意：当前版本机能不实装，仅做文件选择校验和占位处理
    */
   const handleCheck = async () => {
-    // 1. 空值校验（前端校验）
-    if (!selectedFile) {
-      setMessage("NO FILE UPLOADED");
-      setMessageType("error");
-      return;
-    }
+   
 
     // 当前版本 Check 机能不实装
     // 对应设计书 3.1.2：机能不实装
@@ -162,7 +164,7 @@ const UD13_HDocTemplateCheck: React.FC = () => {
               <button
                 className="ud13-btn ud13-btn-check"
                 onClick={handleCheck}
-                disabled={isLoading || !selectedFile}
+                disabled={isLoading}
               >
                 {isLoading ? "Checking..." : "Check"}
               </button>

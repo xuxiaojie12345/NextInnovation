@@ -169,6 +169,14 @@
   opacity: 0.6;
 }
 
+/* ---------- 未检索时提示文字 ---------- */
+.ud15-container .ud15-info-prompt {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  padding: 0px 0px 20px;
+}
+
 /* ---------- VIN Plate信息面板 ---------- */
 .ud15-container .ud15-info-panel {
   /* border: 1px solid #9999cc; */

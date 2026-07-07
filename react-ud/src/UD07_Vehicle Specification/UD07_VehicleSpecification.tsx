@@ -60,7 +60,7 @@ const UD07_VehicleSpecification: React.FC = () => {
     if (!chassisSeries || !chassisNo) {
       setState(prev => ({
         ...prev,
-        message: 'We can not get the data. Please try again.',
+        message: 'We can not get the OM_data. Please try again.',
         isLoading: false,
       }));
       return;
@@ -124,7 +124,7 @@ const UD07_VehicleSpecification: React.FC = () => {
       } else {
         setState(prev => ({
           ...prev,
-          message: 'We can not get the data. Please try again.',
+          message: 'We can not get the OM_data. Please try again..',
           isLoading: false,
         }));
       }
@@ -142,6 +142,7 @@ const UD07_VehicleSpecification: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleClose = () => {
     navigate(-1);
   };
@@ -189,27 +190,18 @@ const UD07_VehicleSpecification: React.FC = () => {
         </div>
 
         <div className='ud07-block'>
-          {/* <div className='ud07-block-label'>SYMBOL_STR</div> */}
-          <pre className='ud07-symbol'>{state.symbolStr || '-'}</pre>
-          <pre className='ud07-symbol'>{state.description}</pre>
+          <pre className='ud07-symbol' title={state.description || 'No description available'}>{state.symbolStr || '-'}</pre>
         </div>
-
-        {/* <div className='ud07-description'>
-          <span className='ud07-block-label'>DESCRIPTION</span>
-          <span className='ud07-tooltip' title={state.description || 'No description available'}>
-            {state.description ? 'Hover to view description' : 'No description available'}
-          </span>
-        </div> */}
 
         <div className='ud07-snote'>{state.sNoteNo || '-'}</div>
 
-        <button
+        {/* <button
           className='ud07-close-btn'
           onClick={handleClose}
           disabled={state.isLoading}
         >
           Close
-        </button>
+        </button> */}
       </div>
     </div>
   );

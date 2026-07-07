@@ -63,4 +63,13 @@ public class UD08HomologationVariablesRequest implements Serializable {
 
     @ApiModelProperty(value = "日期", example = "2026-06-24 10:00:00")
     private String date;
+
+    @ApiModelProperty(value = "原始Product class（Update时检测主键冲突用）", example = "01")
+    private String originalProductClass;
+
+    @ApiModelProperty(value = "原始Number（Update时检测主键冲突用）", example = "1")
+    private Integer originalNumber;
+
+    @ApiModelProperty(value = "原始Market（Update时检测主键冲突用）", example = "AUS")
+    private String originalMarket;
 }
