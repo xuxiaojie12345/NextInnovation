@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Login from './Login/Login';
+import PrivateRoute from './PrivateRoute';
 import Menu from './Menu/Menu';
 import GenerateHomologationDoc from './GenerateHomologationDoc/GenerateHomologationDoc';
 import GenerateDocumentResult from './GenerateDocumentResult/GenerateDocumentResult';
@@ -34,7 +35,7 @@ const App: React.FC = () => {
     <div className="App">
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/menu" element={<Menu />}>
+        <Route path="/menu" element={<PrivateRoute><Menu /></PrivateRoute>}>
           <Route path="generate-doc" element={<GenerateHomologationDoc />} />
           <Route path="generate-document/result" element={<GenerateDocumentResult />} />
           <Route path="homologation-variables" element={<HomologationVariables />} />

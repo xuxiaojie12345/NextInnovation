@@ -34,6 +34,7 @@ const ModifyDocument: React.FC = () => {
     }
 
     const fetchVariables = async () => {
+      setErrorMessage(''); 
       setIsLoading(true);
       try {
         const res = await api.post<VariableItem[]>('/modifydocument/select', {

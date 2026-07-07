@@ -16,6 +16,12 @@ const Login: React.FC = () => {
       setMessage('Username and password are required.');
       return;
     }
+
+    // UserID半角英数字校验（仅允许 a-z, A-Z, 0-9）
+    if (!/^[a-zA-Z0-9]+$/.test(userid.trim())) {
+      setMessage('UserID must be alphanumeric characters.');
+      return;
+    }
     
     setIsLoading(true);
     setMessage('');

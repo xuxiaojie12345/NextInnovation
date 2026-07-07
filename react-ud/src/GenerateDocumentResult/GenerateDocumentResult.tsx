@@ -46,6 +46,7 @@ const GenerateDocumentResult: React.FC = () => {
     }
 
     const fetchData = async () => {
+      setErrorMessage('');
       setIsLoading(true);
       try {
         const res = await api.post<GenerateDocData>('/generatedocument', {
