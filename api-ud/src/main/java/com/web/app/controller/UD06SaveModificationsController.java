@@ -36,14 +36,12 @@ public class UD06SaveModificationsController {
     @GetMapping("/savemodifications")
     @ApiOperation(value = "查询保存修改内容", notes = "根据底盘系列和底盘编号查询UD06保存修改内容数据")
     public UD06SaveModificationsResponse getSaveModifications(
-            @ApiParam(value = "底盘系列", required = true, example = "JPCT")
-            @RequestParam("chassisSerie") String chassisSerie,
-            @ApiParam(value = "底盘编号", required = true, example = "028321")
-            @RequestParam("chassisNo") String chassisNo) {
+            @ApiParam(value = "底盘系列", required = true, example = "JPCT") @RequestParam("chassisSerie") String chassisSerie,
+            @ApiParam(value = "底盘编号", required = true, example = "028321") @RequestParam("chassisNo") String chassisNo) {
 
         log.info("收到UD06查询请求(GET)，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
 
-        UD06SaveModificationsRequest request = new UD06SaveModificationsRequest(chassisSerie, chassisNo);
+        final UD06SaveModificationsRequest request = new UD06SaveModificationsRequest();
         UD06SaveModificationsResponse response = ud06Service.UD06SelectHdocAdcaModification(request);
 
         log.info("UD06查询返回，code: {}, msg: {}", response.getCode(), response.getMsg());
