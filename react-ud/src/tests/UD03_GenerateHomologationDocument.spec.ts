@@ -1,6 +1,7 @@
 import { test, expect, Page, Route } from "@playwright/test";
 
 const URL = "/UD03";
+const LOGIN_URL = "/UD01";
 const API_DOC_TYPES = "/api/UD03SelectHdocdocumentlistApi";
 
 async function mockDocTypes(page: Page) {
@@ -18,7 +19,7 @@ async function mockDocTypes(page: Page) {
 }
 
 async function seedSession(page: Page) {
-  await page.addInitScript(() => {
+  await page.evaluate(() => {
     window.localStorage.setItem(
       "user_info",
       JSON.stringify({ userId: "tester", name: "Test User" }),
@@ -29,9 +30,11 @@ async function seedSession(page: Page) {
 
 test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
-    await seedSession(page);
     await mockDocTypes(page);
-    await page.goto(URL);
+    // 先导航到登录页（无重定向），设置 localStorage，再跳转
+    await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+    await seedSession(page);
+    await page.goto(URL, { waitUntil: "networkidle" });
     await page.waitForSelector("#chassis-series", { timeout: 10000 });
   });
 
@@ -111,7 +114,8 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
   });
 
   test("[18] 例外处理-会话过期", async ({ page }: { page: Page }) => {
-    await page.addInitScript(() => window.localStorage.clear());
+    await page.goto("about:blank");
+    await page.evaluate(() => window.localStorage.clear());
     await page.goto(URL);
     await page.waitForURL("**/UD01", { timeout: 10000 });
     await expect(page).toHaveURL(/UD01/);

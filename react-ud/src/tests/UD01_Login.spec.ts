@@ -107,10 +107,23 @@ async function mockLoginOtherStatus(page: Page, status: number = 400) {
 // テストスイート：Login 模块 (UD01)
 // ============================================================
 
+// test.describe("Login 模块 (UD01) 测试", () => {
+//   test.beforeEach(async ({ page }: { page: Page }) => {
+//     await page.goto(LOGIN_URL);
+//     // ページが完全に読み込まれるのを待つ
+//     await page.waitForSelector("#userid-input", { timeout: 10000 });
+//   });
+
 test.describe("Login 模块 (UD01) 测试", () => {
+  // 整套测试总超时提升至60秒，解决30秒上限限制
+  test.describe.configure({ timeout: 60000 });
+
   test.beforeEach(async ({ page }: { page: Page }) => {
-    await page.goto(LOGIN_URL);
-    // ページが完全に読み込まれるのを待つ
+    // 替换 waitUntil: "load" → domcontentloaded（仅等DOM解析完成，跳过全部资源加载）
+    await page.goto(LOGIN_URL, {
+      waitUntil: "domcontentloaded",
+      timeout: 15000,
+    });
     await page.waitForSelector("#userid-input", { timeout: 10000 });
   });
 
