@@ -1,12 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import mysql from "mysql2/promise";
 
-const DB_CONFIG = {
-  host: "localhost",
-  user: "root",
-  password: "1234",
-  database: "react_ud",
-};
 const SCREENSHOT_DIR =
   "E:\\yanwenjing\\git\\NextInnovation\\react-ud\\src\\image\\test\\UD05";
 const APP_URL = "http://localhost:3000";

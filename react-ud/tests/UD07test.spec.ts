@@ -1,15 +1,4 @@
 import { test, expect, Page } from "@playwright/test";
-import mysql from "mysql2/promise";
-
-// ============================================================
-// 数据库配置
-// ============================================================
-const DB_CONFIG = {
-  host: "localhost",
-  user: "root",
-  password: "1234",
-  database: "react_ud",
-};
 
 // ============================================================
 // 截图保存路径

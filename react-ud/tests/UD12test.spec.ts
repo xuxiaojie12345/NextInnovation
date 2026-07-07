@@ -2,6 +2,7 @@ import { test, expect, Page } from "@playwright/test";
 
 const SCREENSHOT_DIR =
   "E:\\yanwenjing\\git\\NextInnovation\\react-ud\\src\\image\\test\\UD12";
+
 const APP_URL = "http://localhost:3000";
 const PAGE_URL = `${APP_URL}/upload-delete-template`;
 
