@@ -1,0 +1,243 @@
+import { test, expect, Page } from "@playwright/test";
+
+const LOGIN_URL = "/UD01";
+const UD22_URL = "/UD22";
+const IMAGE_DIR = "E:/git20260511/NextInnovation/react-ud/Image/UD22";
+let screenshotCounter = 1;
+
+async function takeStepScreenshot(page: Page, testName: string) {
+  const filename = String(screenshotCounter++).padStart(3, "0") + ".jpg";
+  await page.screenshot({
+    path: `${IMAGE_DIR}/${testName}/${filename}`,
+    type: "jpeg",
+    quality: 85,
+    fullPage: true,
+  });
+}
+
+async function seedSession(page: Page) {
+  await page.evaluate(() => {
+    window.localStorage.setItem(
+      "user_info",
+      JSON.stringify({ userId: "tester", name: "Test User" }),
+    );
+    window.localStorage.setItem("auth_token", "test-token");
+  });
+}
+
+async function navigateToUD22(page: Page) {
+  await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded" });
+  await seedSession(page);
+  await page.goto(UD22_URL, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector(".ud22-container", { timeout: 15000 });
+}
+
+test.describe("Document Types (UD22) 测试", () => {
+  test.beforeEach(async () => {
+    screenshotCounter = 1;
+  });
+
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== "passed") {
+      const failedName = testInfo.title.replace(
+        /[\[\]\\\/\:\*\?\"\<\>\|]/g,
+        "_",
+      );
+      await page.screenshot({
+        path: `${IMAGE_DIR}/_FAILED_/${failedName}.jpg`,
+        type: "jpeg",
+        quality: 85,
+        fullPage: true,
+      });
+    }
+  });
+
+  test.describe("画面初始化", () => {
+    test("[1] 画面初始化-正常表示", async ({ page }) => {
+      const t = "画面初始化-正常表示";
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-header")).toBeVisible();
+      await expect(page.locator(".ud22-page-title")).toHaveText(
+        "Document Types",
+      );
+      await expect(page.locator(".ud22-table")).toBeVisible({ timeout: 10000 });
+      const rows = await page.locator(".ud22-table tbody tr").count();
+      expect(rows).toBeGreaterThan(0);
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[2] 画面初始化-加载中状态", async ({ page }) => {
+      const t = "画面初始化-加载中状态";
+      let resolveRoute: (value: unknown) => void;
+      const routePromise = new Promise((r) => {
+        resolveRoute = r;
+      });
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await routePromise;
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 200,
+              data: [{ doctype: "VIN-PLATE", description: "VIN Plate" }],
+            }),
+          });
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-loading")).toBeVisible();
+      resolveRoute!(true);
+      await page.waitForTimeout(2000);
+      await expect(page.locator(".ud22-table")).toBeVisible();
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+
+    test("[3] 画面初始化-空数据表示", async ({ page }) => {
+      const t = "画面初始化-空数据表示";
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 200, data: [] }),
+          });
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      const rows = await page.locator(".ud22-table tbody tr").count();
+      expect(rows).toBe(0);
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+  });
+
+  test.describe("表格表示", () => {
+    test("[4] 表格表示-正常数据显示", async ({ page }) => {
+      const t = "表格表示-正常数据显示";
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-table thead th").nth(0)).toHaveText(
+        "Key",
+      );
+      await expect(page.locator(".ud22-table thead th").nth(1)).toHaveText(
+        "Description",
+      );
+      const rows = await page.locator(".ud22-table tbody tr").count();
+      expect(rows).toBeGreaterThan(0);
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[5] 表格表示-Key列最大长度", async ({ page }) => {
+      const t = "表格表示-Key列最大长度";
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      const cells = page.locator(".ud22-table tbody td").first();
+      const text = await cells.textContent();
+      expect(text).toBeTruthy();
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[6] 表格表示-Description长文本折行", async ({ page }) => {
+      const t = "表格表示-Description长文本折行";
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      const descCells = page.locator(".ud22-table tbody td").nth(1);
+      await expect(descCells).toBeVisible();
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[7] 表格排序-Key列", async ({ page }) => {
+      const t = "表格排序-Key列";
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      const thKey = page.locator(".ud22-table thead th").nth(0);
+      await thKey.click();
+      await page.waitForTimeout(300);
+      await thKey.click();
+      await page.waitForTimeout(300);
+      await takeStepScreenshot(page, t);
+    });
+  });
+
+  test.describe("异常处理", () => {
+    test("[8] 异常处理-API返回错误", async ({ page }) => {
+      const t = "异常处理-API返回错误";
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 400, msg: "查询失败" }),
+          });
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-msg")).toBeVisible();
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+
+    test("[9] 异常处理-服务器500错误", async ({ page }) => {
+      const t = "异常处理-服务器500错误";
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await route.fulfill({
+            status: 500,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 500, msg: "系统繁忙" }),
+          });
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-msg")).toBeVisible();
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+
+    test("[10] 异常处理-网络超时", async ({ page }) => {
+      const t = "异常处理-网络超时";
+      test.setTimeout(60000);
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await new Promise((r) => setTimeout(r, 20000));
+          await route.abort("connectionrefused");
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud22-loading")).toBeVisible();
+      await page.waitForSelector(".ud22-msg", { timeout: 35000 });
+      await expect(page.locator(".ud22-msg")).toBeVisible();
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+
+    test("[11] 异常处理-数据库异常", async ({ page }) => {
+      const t = "异常处理-数据库异常";
+      await page.route(
+        "**/api/UD22DocumentTypesApi/document-types",
+        async (route) => {
+          await route.abort("connectionrefused");
+        },
+      );
+      await navigateToUD22(page);
+      await takeStepScreenshot(page, t);
+      await page.waitForSelector(".ud22-msg", { timeout: 10000 });
+      await expect(page.locator(".ud22-msg")).toBeVisible();
+      await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD22DocumentTypesApi/document-types");
+    });
+  });
+});
