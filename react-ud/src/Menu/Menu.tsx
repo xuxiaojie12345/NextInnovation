@@ -25,7 +25,7 @@ interface MenuSection {
  */
 const Menu: React.FC = () => {
   const navigate = useNavigate();
-
+  
   // ==================== 菜单配置 ====================
   // 对应设计文档 2.1 控件属性表 和 3.2 画面跳转映射表
   const menuSections: MenuSection[] = [
