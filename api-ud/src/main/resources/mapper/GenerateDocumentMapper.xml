@@ -22,15 +22,17 @@
             om.SPEC,
             om.CUSTOMER_ADAP,
             vda.COUNTRY_OF_OPERATION,
-            tire.LOAD_INDEX,
+            (SELECT tire.LOAD_INDEX FROM HDOC_REC_DATA_KOLA_TIRE_MASTER tire WHERE tire.TRANS_TS = vda.TRANS_TS LIMIT 1) AS LOAD_INDEX,
             cha.ACT,
-            admod.VARIABLE
+            (SELECT GROUP_CONCAT(admod.VARIABLE SEPARATOR ',')
+             FROM HDOC_ADCA_MODIFICATION admod
+             WHERE admod.SERIE = vda.SERIE AND admod.CHNO = vda.CHNR AND admod.STA = '0'
+            ) AS VARIABLE
         FROM HDOC_REC_DATA_VDA_GENERAL vda
         INNER JOIN HDOC_REC_DATA_OM om ON vda.SERIE = om.SERIE AND vda.CHNR = om.CHNR
-        INNER JOIN HDOC_REC_DATA_KOLA_TIRE_MASTER tire ON vda.TRANS_TS = tire.TRANS_TS
         LEFT JOIN HDOC_ADCA_CHANGE cha ON vda.SERIE = cha.SERIE AND vda.CHNR = cha.CHNR
-        LEFT JOIN HDOC_ADCA_MODIFICATION admod ON vda.SERIE = admod.SERIE AND vda.CHNR = admod.CHNO AND admod.STA = '0'
         WHERE vda.SERIE = #{serie} AND vda.CHNR = #{chnr}
+        LIMIT 1
     </select>
 
 </mapper>

@@ -10,6 +10,7 @@
         LEFT JOIN HDOC_REC_DATA_VDA_GENERAL ge ON om.SERIE = ge.SERIE AND om.CHNR = ge.CHNR
         LEFT JOIN HDOC_REC_DATA_VDA_VARIANTS ants ON ants.SERIE = ge.SERIE AND ants.CHNR = ge.CHNR
         WHERE om.SERIE = #{serie} AND om.CHNR = #{chno}
+        LIMIT 1
     </select>
 
     <select id="selectKolaList" resultType="map">
