@@ -287,7 +287,7 @@ const UD09 = React.memo(() => {
             <button
               className="ud09-btn ud09-btn-danger"
               onClick={handleDeleteSelected}
-              disabled={isDeleting || selectedKeys.length === 0}
+              disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete Selected"}
             </button>

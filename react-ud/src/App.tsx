@@ -14,7 +14,7 @@ import UD07 from "./VehicleSpecification/UD07";
 import UD08 from "./HomologationVariables/UD08";
 import UD09 from "./HomologationVariablesResultList/UD09";
 import UD10 from "./ExistingHDocVariables/UD10";
-import UD11 from "./ExistingHDocVariablesResult List/UD11";
+import UD11 from "./ExistingHDocVariablesResultList/UD11";
 import UD12 from "./Upload&DeleteTemplate/UD12";
 import UD13 from "./HDocTemplateCheck/UD13";
 import UD14 from "./ListAvailableTemplates/UD14";
