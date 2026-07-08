@@ -16,7 +16,7 @@ interface SearchResultItem {
   variable: string;
   type: string;
   description: string;
-  userid: string;
+  registerUser: string;
   registerDatetime: string;
 }
 
@@ -138,8 +138,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
       variable: record.variable || '',
       type: record.type || '',
       description: record.description || '',
-      userid: record.userid || '',
-      registerDatetime: record.registerDatetime || ''
+      userid: record.registerUser || '',
+      registerDatetime: (record.registerDatetime || '').split(' ')[0].split('T')[0]
     };
     // 导航回前画面，传递选中数据
     navigate('/Menu/ExistingHDocVariables', { state: { selectedRecord: selectedData } });
@@ -185,7 +185,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
       item.variable,
       item.type,
       item.description,
-      item.userid,
+      item.registerUser,
       item.registerDatetime
     ]);
     // 构建 CSV 内容
@@ -264,7 +264,14 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                   onClick={() => handleRowClick(index)}
                 >
                   <td className='ud11-row-indicator'>
-                    {selectedIndex === index && <span className='ud11-check-mark'>&#10003;</span>}
+                    <input
+                      type='radio'
+                      name='ud11-select-radio'
+                      className='ud11-radio'
+                      checked={selectedIndex === index}
+                      onChange={() => handleRowClick(index)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
                   </td>
                   <td>{item.variable}</td>
                   <td>{item.type}</td>
@@ -275,10 +282,10 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         // Created by user 显示为可点击链接，跳转到 EDB User View 页面（UD25）
-                        navigate('/Menu/EDBUserView', { state: { userId: item.userid } });
+                        navigate('/Menu/EDBUserView', { state: { userId: item.registerUser } });
                       }}
                     >
-                      {item.userid}
+                      {item.registerUser}
                     </span>
                   </td>
                   <td>{item.registerDatetime}</td>

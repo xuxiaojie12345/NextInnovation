@@ -121,7 +121,7 @@ const ExistingHDocVariables: React.FC = () => {
         type: cond.type || '',
         description: cond.description || '',
         userid: cond.userid || '',
-        registerDatetime: cond.registerDatetime || ''
+        registerDatetime: (cond.registerDatetime || '').split(' ')[0].split('T')[0]
       }));
       if (cond.variableOp) setOps(prev => ({ ...prev, variable: cond.variableOp }));
       if (cond.typeOp) setOps(prev => ({ ...prev, type: cond.typeOp }));
@@ -140,7 +140,7 @@ const ExistingHDocVariables: React.FC = () => {
         type: rec.type || '',
         description: rec.description || '',
         userid: rec.userid || '',
-        registerDatetime: rec.registerDatetime || ''
+        registerDatetime: (rec.registerDatetime || '').split(' ')[0].split('T')[0]
       }));
       return;
     }

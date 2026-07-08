@@ -244,6 +244,9 @@ const Menu: React.FC = () => {
     const routeMap = buildRouteMap(filteredMenuItems);
     const route = routeMap[info.key];
 
+    // 设置选中状态（即使 route === '#' 也高亮）
+    setSelectedKeys([info.key]);
+
     if (route && route !== '#') {
       navigate(route);
     }

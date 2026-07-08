@@ -89,7 +89,7 @@ const GenerateHomologationDocument: React.FC = () => {
 
       const data: DocumentType[] = await response.json();
       
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         setDocumentTypeList(data);
       } else {
         throw new Error('Failed to get document types');

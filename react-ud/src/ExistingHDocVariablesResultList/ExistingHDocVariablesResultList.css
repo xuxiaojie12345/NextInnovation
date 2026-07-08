@@ -196,11 +196,11 @@
   text-align: center;
 }
 
-/* 选中标记 */
-.ud11-check-mark {
-  color: #1890ff;
-  font-weight: bold;
-  font-size: 14px;
+/* 行选择 Radio Button */
+.ud11-radio {
+  cursor: pointer;
+  margin: 0;
+  accent-color: #003057;
 }
 
 /* 用户链接样式 */

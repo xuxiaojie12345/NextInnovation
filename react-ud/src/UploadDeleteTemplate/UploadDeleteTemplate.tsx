@@ -293,7 +293,7 @@ const UploadDeleteTemplate: React.FC = () => {
             <option value="">-- Select Market --</option>
             {uploadMarketList.map((market) => (
               <option key={market.marketCode} value={market.marketCode}>
-                {market.marketCode} - {market.marketName}
+                {market.marketCode}
               </option>
             ))}
           </select>
@@ -322,7 +322,7 @@ const UploadDeleteTemplate: React.FC = () => {
             <option value="">-- Select Market --</option>
             {deleteMarketList.map((market) => (
               <option key={market.marketCode} value={market.marketCode}>
-                {market.marketCode} - {market.marketName}
+                {market.marketCode}
               </option>
             ))}
           </select>
@@ -335,7 +335,7 @@ const UploadDeleteTemplate: React.FC = () => {
             className="ud12-select"
             value={selectedTemplate}
             onChange={handleTemplateChange}
-            disabled={!selectedDeleteMarket}
+            disabled={false}
           >
             <option value="">-- Select Template --</option>
             {templatesList.length > 0 ? (

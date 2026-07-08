@@ -172,10 +172,7 @@ const ListTemplates: React.FC = () => {
                       <a
                         href="#"
                         className="ud14-file-link"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleFileDownload(file);
-                        }}
+                        onClick={(e) => e.preventDefault()}
                       >
                         {file.filename}
                       </a>

@@ -61,14 +61,14 @@
                 </otherwise>
             </choose>
         </if>
-        <!-- Created by user(userid): 模糊匹配（LIKE 或 NOT LIKE） -->
+        <!-- Created by user(registerUser): 模糊匹配（LIKE 或 NOT LIKE） -->
         <if test="request.userid != null and request.userid != ''">
             <choose>
                 <when test="request.useridOp == '!='">
-                    AND USERID NOT LIKE CONCAT('%', #{request.userid}, '%')
+                    AND REGISTER_USER NOT LIKE CONCAT('%', #{request.userid}, '%')
                 </when>
                 <otherwise>
-                    AND USERID LIKE CONCAT('%', #{request.userid}, '%')
+                    AND REGISTER_USER LIKE CONCAT('%', #{request.userid}, '%')
                 </otherwise>
             </choose>
         </if>
@@ -82,7 +82,7 @@
                     AND REGISTER_DATETIME &lt; #{request.registerDatetime}
                 </when>
                 <otherwise>
-                    AND REGISTER_DATETIME = #{request.registerDatetime}
+                    AND REGISTER_DATETIME LIKE CONCAT('%', #{request.registerDatetime}, '%')
                 </otherwise>
             </choose>
         </if>
