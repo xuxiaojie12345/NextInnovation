@@ -52,6 +52,7 @@ const UD22_DocumentTypes: React.FC = () => {
       // 后端返回格式：{ code: 200, message: "success", data: [{ documentType, ... }] }
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         const data = response.data.data;
+        console.log('获取文档类型列表data成功:', data);
         if (data.length === 0) {
           // 对应设计书 3.1.1 空值校验 - API返回空数组
           setMessage('当前没有可用的文档类型');

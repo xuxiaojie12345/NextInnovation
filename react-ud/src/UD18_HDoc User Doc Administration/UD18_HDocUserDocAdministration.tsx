@@ -179,8 +179,9 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
           displayName = authUserResponse.data.data.name;
         }
       } catch (authErr) {
-        // Saviynt服务不可用时，使用UserID作为显示名
-        console.warn('Saviynt服务不可用，使用UserID作为显示名:', authErr);
+        // 使用UserID作为显示名
+        console.warn('用户名获取失败，使用UserID作为显示名:', authErr);
+        displayName = trimmedUserID;
       }
 
       // 步骤4：调用UD18GetUserDocApi查询用户当前文档权限（返回doctypes列表）

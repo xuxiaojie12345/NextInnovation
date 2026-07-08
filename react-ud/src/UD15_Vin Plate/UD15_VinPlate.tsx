@@ -117,13 +117,6 @@ const UD15_VinPlate: React.FC = () => {
       return; // 终止流程
     }
 
-    // 3. 长度校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.2
-    if (trimmedChassis.length > MAX_CHASSIS_LENGTH) {
-      showMessage('底盘号最大长度为15字符', 'error');
-      return; // 终止流程
-    }
-
     // 4. 拆分底盘号
     const { chassisSerie, chassisNo } = splitChassisNumber(trimmedChassis);
 
@@ -205,7 +198,14 @@ const UD15_VinPlate: React.FC = () => {
     // 1. 前置处理：获取底盘号并去除首尾空格
     const trimmedChassis = chassisNumber.trim();
 
-    // 2. 空值校验（前端校验）
+    // 2. 检查是否已先执行查询
+    // 对应设计书 3.2 校验详细规格表 No.3~No.6
+    if (!plateInfo) {
+      showMessage('请先查询Chassis信息', 'error');
+      return;
+    }
+
+    // 3. 空值校验（前端校验）
     // 对应设计书 3.2 校验详细规格表 No.4, No.6, No.8, No.10
     if (!trimmedChassis) {
       showMessage('请输入底盘号', 'error');
@@ -360,37 +360,6 @@ const UD15_VinPlate: React.FC = () => {
     }
   };
 
-  // ==================== 渲染辅助函数 ====================
-
-  /**
-   * 获取状态显示文本
-   *
-   * @param {string} status - 状态码
-   * @returns {string} 状态显示文本
-   */
-  const getStatusText = (status: string): string => {
-    switch (status) {
-      case '0': return 'REGENERATE';
-      case '1': return 'OK';
-      case '2': return 'SENT';
-      default: return status || '-';
-    }
-  };
-
-  /**
-   * 获取Plate Type显示文本
-   *
-   * @param {string} type - 类型码
-   * @returns {string} 类型显示文本
-   */
-  const getPlateTypeText = (type: string): string => {
-    switch (type) {
-      case '1': return 'Basic';
-      case '2': return 'ADVANCED (with weights)';
-      default: return type || '-';
-    }
-  };
-
   // ==================== 渲染 UI ====================
   return (
     <div className='ud15-container'>
@@ -495,14 +464,21 @@ const UD15_VinPlate: React.FC = () => {
               {/* 对应设计书 2.1 控件属性表 No.9 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Plate type</span>
-                <span className='ud15-info-value'>{getPlateTypeText(plateInfo.plateType)}</span>
+                <span className='ud15-info-value'>{plateInfo.plateType || '-'}</span>
               </div>
 
               {/* Status - 输出 */}
               {/* 对应设计书 2.1 控件属性表 No.10 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Status</span>
-                <span className='ud15-info-value'>{getStatusText(plateInfo.status)}</span>
+                <span className='ud15-info-value'>{plateInfo.status || '-'}</span>
+              </div>
+
+              {/* Error Message - 输出 */}
+              {/* 对应设计书 2.1 控件属性表 No.11 - 从MSG字段获取 */}
+              <div className='ud15-info-row'>
+                <span className='ud15-info-label'>Error Message</span>
+                <span className='ud15-info-value'>{plateInfo.errorMessage || '-'}</span>
               </div>
 
               {/* Def. (Register Datetime) - 输出 */}

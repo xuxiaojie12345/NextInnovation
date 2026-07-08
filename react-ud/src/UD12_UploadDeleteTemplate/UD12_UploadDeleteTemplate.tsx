@@ -369,13 +369,20 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     <div className="ud12-container">
       {/* ==================== 页面标题 ==================== */}
       {/* <h1 className="ud12-page-title">Hdoc Template Upload</h1> */}
-
+    
       <div className="ud12-content-wrapper">
         {/* ==================== 左侧：Upload区域 ==================== */}
         <div className="ud12-upload-section">
           <div className="ud12-section-header">
             <h2 className="ud12-section-title">HDoc Template Upload</h2>
           </div>
+
+      {/* ==================== 消息显示区域 ==================== */}
+      {message && (
+        <div className={`ud12-message ud12-message-${messageType}`}>
+          {message}
+        </div>
+      )}
 
           <div className="ud12-form-body">
             {/* 文件选择 */}
@@ -517,15 +524,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
           </div>
         </div>
 
-     
-
-      {/* ==================== 消息显示区域 ==================== */}
-      {message && (
-        <div className={`ud12-message ud12-message-${messageType}`}>
-          {message}
-        </div>
-      )}
-
+ 
       {/* ==================== 确认删除对话框 ==================== */}
       {showConfirmModal && (
         <div className="ud12-modal-overlay">

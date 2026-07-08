@@ -90,8 +90,12 @@
   font-size: 13px;
   line-height: 1.55;
   overflow-x: auto;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+.ud07-symbol-line {
+  display: block;
+  cursor: default;
 }
 
 .ud07-description {

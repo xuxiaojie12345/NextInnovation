@@ -40,6 +40,14 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // ==================== 初始化 ====================
+  /** 页面加载时设置 Created by user 和 Date 的初始值 */
+  useEffect(() => {
+    const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+    setDisplayCreatedByUser(currentUser);
+    setDisplayDate(new Date().toLocaleString());
+  }, []);
+
   // ==================== 接收UD11传来的数据 ====================
   /**
    * 从UD11返回时，根据返回类型处理数据填充
@@ -99,14 +107,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       params.description = description.trim();
       params.descriptionOp = descriptionOp;
     }
-    if (displayCreatedByUser.trim()) {
-      params.createdByUser = displayCreatedByUser.trim();
-      params.createdByUserOp = createdByUserOp;
-    }
-    if (displayDate.trim()) {
-      params.registerDatetime = displayDate.trim();
-      params.registerDatetimeOp = registerDateOp;
-    }
+    // Created by user 和 Date 不作为检索条件传递给UD11
 
     // 保存当前表单数据，用于UD11点Back返回时恢复输入
     const formData = {

@@ -102,7 +102,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
    */
   const handleClear = useCallback(() => {
     setDocumentType('');
-    setBusinessUnit('');
     setUser('');
     setDate('');
     setCompareDocType('=');

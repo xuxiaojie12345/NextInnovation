@@ -34,15 +34,24 @@
 /* ---------- 错误消息显示区域 ---------- */
 /* 对应设计书 2.1 控件属性表 No.3 error message */
 .ud16-container .ud16-message {
-  color: #ff4d4f;
   font-size: 13px;
   text-align: left;
   margin-bottom: 20px;
   padding: 8px 12px;
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
   border-radius: 4px;
   word-break: break-word;
+}
+
+.ud16-container .ud16-message--error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.ud16-container .ud16-message--success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
 }
 
 /* ---------- 表单区域 ---------- */

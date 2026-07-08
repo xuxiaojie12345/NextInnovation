@@ -18,6 +18,7 @@ import "./UD13_HDocTemplateCheck.css";
 const UD13_HDocTemplateCheck: React.FC = () => {
   // ==================== 状态管理 ====================
   // 对应设计书 6.1 状态管理
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 选择的文件
   const [isChecked, setIsChecked] = useState<boolean>(false);         // 是否已执行检查
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -63,19 +64,21 @@ const UD13_HDocTemplateCheck: React.FC = () => {
         return;
       }
 
+      // 校验文件是否为空（0KB）
+      if (file.size === 0) {
+        setMessage("文件为空，请选择有效的RTF文件");
+        setMessageType("error");
+        setSelectedFile(null);
+        e.target.value = "";
+        return;
+      }
+
       // 校验文件大小
       if (file.size > MAX_FILE_SIZE) {
         setMessage("文件大小超过限制（最大10MB）");
         setMessageType("error");
         setSelectedFile(null);
         e.target.value = "";
-        return;
-      }
-      
-      // 1. 空值校验（前端校验）
-      if (!selectedFile) {
-        setMessage("NO FILE UPLOADED");
-        setMessageType("error");
         return;
       }
 
@@ -111,6 +114,7 @@ const UD13_HDocTemplateCheck: React.FC = () => {
    * 
    * 注意：当前版本机能不实装
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownload = (e: React.MouseEvent) => {
     e.preventDefault();
     // 当前版本 Download 机能不实装
@@ -127,9 +131,14 @@ const UD13_HDocTemplateCheck: React.FC = () => {
       <div className="ud13-content-wrapper">
         {/* ==================== 主区域 ==================== */}
         <div className="ud13-main-section">
-          {/* <div className="ud13-section-header">
-            <h2 className="ud13-section-title">Template File Check</h2>
-          </div> */}
+          
+
+      {/* ==================== 消息显示区域 ==================== */}
+      {message && (
+        <div className={`ud13-message ud13-message-${messageType}`}>
+          {message}
+        </div>
+      )}
 
           <div className="ud13-form-body">
             {/* 文件选择 */}
@@ -173,33 +182,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
         </div>
       </div>
 
-      {/* ==================== Download 区域 ==================== */}
-      <div className="ud13-download-section">
-        <a
-          href="#!"
-          className={`ud13-download-link ${isChecked ? "ud13-download-active" : "ud13-download-disabled"}`}
-          onClick={handleDownload}
-        >
-          Download checked template
-        </a>
-      </div>
-
-      {/* ==================== 消息显示区域 ==================== */}
-      {message && (
-        <div className={`ud13-message ud13-message-${messageType}`}>
-          {message}
-        </div>
-      )}
-
-      {/* ==================== 返回按钮 ==================== */}
-      <div className="ud13-back-section">
-        <button
-          className="ud13-btn ud13-btn-back"
-          onClick={() => window.history.back()}
-        >
-          Back
-        </button>
-      </div>
     </div>
   );
 };

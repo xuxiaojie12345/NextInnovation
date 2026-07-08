@@ -110,6 +110,11 @@ const UD08_HomologationVariables: React.FC = () => {
     };
 
     loadMasterData();
+
+    // 设置 Created by user 和 Date 的初始值（当前用户和当前时间）
+    const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+    setDisplayCreatedByUser(currentUser);
+    setDisplayDate(new Date().toLocaleString());
   }, []);
 
   // ==================== 接收UD09传来的数据 ====================
@@ -282,7 +287,7 @@ const UD08_HomologationVariables: React.FC = () => {
       params.commentsOp = comments.operator;
     }
 
-    // 将信息标签字段也加入检索参数
+    // 将信息标签字段也加入检索参数（Created by user 和 Date 不作为检索条件）
     if (displayAddDate) {
       params.addDate = displayAddDate;
       params.addDateOp = addDateOp;
@@ -290,14 +295,6 @@ const UD08_HomologationVariables: React.FC = () => {
     if (displayDeleteDate) {
       params.deleteDate = displayDeleteDate;
       params.deleteDateOp = deleteDateOp;
-    }
-    if (displayCreatedByUser) {
-      params.createdByUser = displayCreatedByUser;
-      params.createdByUserOp = createdByUserOp;
-    }
-    if (displayDate) {
-      params.registerDatetime = displayDate;
-      params.registerDatetimeOp = registerDatetimeOp;
     }
 
     // 保存当前表单数据，用于UD09点Back返回时恢复输入

@@ -11,7 +11,22 @@
   font-family: Arial, sans-serif;
   box-sizing: border-box;
   border: 1px solid #d0d5dd;
-  width: 900px;
+  /* width: 900px; */
+}
+
+/* ==================== 布局容器 ==================== */
+.ud23-layout {
+  display: flex;
+  gap: 15px;
+}
+
+.ud23-sidebar {
+  flex-shrink: 0;
+}
+
+.ud23-main {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ==================== Back 按钮 ==================== */
@@ -22,9 +37,9 @@
   font-size: 14px;
   cursor: pointer;
   padding: 4px 0;
-  margin-bottom: 8px;
   font-weight: 500;
   text-decoration: underline;
+  white-space: nowrap;
 }
 
 .ud23-back-btn:hover {
@@ -33,13 +48,13 @@
 
 /* ==================== 页面标题 ==================== */
 .ud23-title {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
-  color: #003366;
+  color: #e71111d1;;
   text-align: left;
   border: none;
   padding: 0;
-  margin: 10px 0px 20px;
+  margin: 4px 0px 20px;
 }
 
 /* ==================== 指南区域 ==================== */
@@ -128,17 +143,24 @@
 .ud23-volvo-title {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
+  color: #e71111d1;;
+  margin: 10px 4px;
 }
 
 .ud23-volvo-links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .ud23-volvo-item {
   display: flex;
   align-items: center;
 }
+
+.ud23-volvo-item::before {
+  content: "・";
+  margin-right: 4px;
+  color: #003366;
+}
+

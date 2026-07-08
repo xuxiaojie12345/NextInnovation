@@ -3,6 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/config';
 import './UD07_VehicleSpecification.css';
 
+/** 单条KOLA变体项 */
+interface KolaVariantItem {
+  symbol: string;
+  description: string;
+}
+
 /**
  * 车辆规格页面状态对象
  */
@@ -14,8 +20,8 @@ interface VehicleSpecificationState {
   vin: string;
   engineNo: string;
   countryOfOperation: string;
-  symbolStr: string;
-  description: string;
+  /** 已格式化的一一对应的KOLA变体列表 */
+  kolaItems: KolaVariantItem[];
   sNoteNo: string;
   message: string;
   isLoading: boolean;
@@ -45,8 +51,7 @@ const UD07_VehicleSpecification: React.FC = () => {
     vin: '',
     engineNo: '',
     countryOfOperation: '',
-    symbolStr: '',
-    description: '',
+    kolaItems: [],
     sNoteNo: '',
     message: '',
     isLoading: false,
@@ -56,7 +61,7 @@ const UD07_VehicleSpecification: React.FC = () => {
     const routeState = location.state as any;
     const chassisSeries = routeState?.chassisSeries || routeState?.chassisSerie || '';
     const chassisNo = routeState?.chassisNo || '';
-
+    console.log('UD07车辆规格页面接收参数:', chassisSeries, chassisNo);
     if (!chassisSeries || !chassisNo) {
       setState(prev => ({
         ...prev,
@@ -91,21 +96,17 @@ const UD07_VehicleSpecification: React.FC = () => {
         console.log('UD07车辆规格数据:', data);
 
         const kolaVariants = data.kolaVariants || [];
-        // SYMBOL_STR：取SQL中取得的symbol，保留8字符填充格式，不拼接functionGroup
-        const symbolStr = kolaVariants
+        // 构建一一对应的symbol+description列表
+        const kolaItems: KolaVariantItem[] = kolaVariants
           .map((item: any) => {
             const rawSymbol = String(item.symbol || '');
             // 不足8字符右侧补空格，超过8字符截取前8位
-            return rawSymbol.length >= 8
+            const symbol = rawSymbol.length >= 8
               ? rawSymbol.substring(0, 8)
               : rawSymbol.padEnd(8, ' ');
+            return { symbol, description: item.description || '' };
           })
-          .filter((line: string) => line.trim().length > 0)
-          .join('\n');
-        const description = kolaVariants
-          .map((item: any) => item.description || '')
-          .filter((line: string) => line.length > 0)
-          .join('\n');
+          .filter((item: KolaVariantItem) => item.symbol.trim().length > 0);
 
         setState(prev => ({
           ...prev,
@@ -115,8 +116,7 @@ const UD07_VehicleSpecification: React.FC = () => {
           vin: data.vin || '',
           engineNo: data.engine_no || data.engineNo || '',
           countryOfOperation: data.country_of_operation || data.countryOfOperation || '',
-          symbolStr: symbolStr || '-',
-          description: description || '-',
+          kolaItems,
           sNoteNo: data.customer_adap || data.customerAdap || '',
           message: '',
           isLoading: false,
@@ -190,7 +190,21 @@ const UD07_VehicleSpecification: React.FC = () => {
         </div>
 
         <div className='ud07-block'>
-          <pre className='ud07-symbol' title={state.description || 'No description available'}>{state.symbolStr || '-'}</pre>
+          <div className='ud07-symbol'>
+            {state.kolaItems.length > 0 ? (
+              state.kolaItems.map((item, idx) => (
+                <span
+                  key={idx}
+                  className='ud07-symbol-line'
+                  title={item.description || 'No description available'}
+                >
+                  {item.symbol}
+                </span>
+              ))
+            ) : (
+              <span className='ud07-symbol-line'>-</span>
+            )}
+          </div>
         </div>
 
         <div className='ud07-snote'>{state.sNoteNo || '-'}</div>

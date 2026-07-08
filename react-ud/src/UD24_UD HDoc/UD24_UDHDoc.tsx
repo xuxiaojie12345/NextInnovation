@@ -107,7 +107,7 @@ const UD24_UDHDoc: React.FC = () => {
   return (
     <div className="ud24-container">
       {/* 页面标题 */}
-      <h1 className="ud24-title">User Guide</h1>
+      <h1 className="ud24-title">HDoc Help</h1>
 
       {/* 帮助链接列表 */}
       <div className="ud24-link-list">

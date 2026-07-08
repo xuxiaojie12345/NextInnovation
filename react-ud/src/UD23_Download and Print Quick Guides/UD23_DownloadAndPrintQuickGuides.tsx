@@ -39,14 +39,14 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
 
   /** 活性指南列表 */
   const activeGuides: GuideItem[] = [
-    { id: 'wis', title: 'WIS Quick Guide', imageLabel: 'WIS Quick Guide picture1', linkLabel: 'WIS Quick Guide', linkUrl: '/guides/wis-quick-guide.pdf' },
-    { id: 'perf', title: 'PERF Quick Guide', imageLabel: 'PERF Quick Guide picture', linkLabel: 'PERF Quick Guide', linkUrl: '/guides/perf-quick-guide.pdf' },
-    { id: 'w8', title: 'W8 Quick Guide', imageLabel: 'W8 Quick Guide picture', linkLabel: 'W8 Quick Guide', linkUrl: '/guides/w8-quick-guide.pdf' },
-    { id: 'hdoc', title: 'HDoc Quick Guide', imageLabel: 'HDoc Quick Guide picture', linkLabel: 'HDoc Quick Guide', linkUrl: '/guides/hdoc-quick-guide.pdf' },
-    { id: 'edb', title: 'EDB Quick Guide', imageLabel: 'EDB Quick Guide picture', linkLabel: 'EDB Quick Guide', linkUrl: '/guides/edb-quick-guide.pdf' },
-    { id: 'cos', title: 'COS Quick Guide', imageLabel: 'COS Quick Guide picture', linkLabel: 'COS Quick Guide', linkUrl: '/guides/cos-quick-guide.pdf' },
-    { id: 'vbi1', title: 'VBI Quick Guide(Intranet version)1', imageLabel: 'VBI Quick Guide picture', linkLabel: 'VBI Quick Guide(Intranet version)1', linkUrl: '/guides/vbi-quick-guide-1.pdf', isIntranet: true },
-    { id: 'vbi2', title: 'VBI Quick Guide(Intranet version)2', imageLabel: 'VBI Quick Guide picture', linkLabel: 'VBI Quick Guide(Intranet version)2', linkUrl: '/guides/vbi-quick-guide-2.pdf', isIntranet: true },
+    { id: 'wis', title: 'WIS Quick Guide', imageLabel: '', linkLabel: 'WIS Quick Guide', linkUrl: '/guides/wis-quick-guide.pdf' },
+    { id: 'perf', title: 'PERF Quick Guide', imageLabel: '', linkLabel: 'PERF Quick Guide', linkUrl: '/guides/perf-quick-guide.pdf' },
+    { id: 'w8', title: 'W8 Quick Guide', imageLabel: '', linkLabel: 'W8 Quick Guide', linkUrl: '/guides/w8-quick-guide.pdf' },
+    { id: 'hdoc', title: 'HDoc Quick Guide', imageLabel: '', linkLabel: 'HDoc Quick Guide', linkUrl: '/guides/hdoc-quick-guide.pdf' },
+    { id: 'edb', title: 'EDB Quick Guide', imageLabel: '', linkLabel: 'EDB Quick Guide', linkUrl: '/guides/edb-quick-guide.pdf' },
+    { id: 'cos', title: 'COS Quick Guide', imageLabel: '', linkLabel: 'COS Quick Guide', linkUrl: '/guides/cos-quick-guide.pdf' },
+    { id: 'vbi1', title: 'VBI Quick Guide(Intranet version)1', imageLabel: '', linkLabel: 'VBI Quick Guide(Intranet version)1', linkUrl: '/guides/vbi-quick-guide-1.pdf', isIntranet: true },
+    { id: 'vbi2', title: 'VBI Quick Guide(Intranet version)2', imageLabel: '', linkLabel: 'VBI Quick Guide(Intranet version)2', linkUrl: '/guides/vbi-quick-guide-2.pdf', isIntranet: true },
   ];
 
   /** Volvo 3P 快速指南列表 */
@@ -81,19 +81,24 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
   // ==================== 渲染 ====================
   return (
     <div className="ud23-container">
-      {/* Back 按钮 - 页面顶部 */}
-      {/* 对应设计书 2.1 No.1 Back */}
-      <button className="ud23-back-btn" onClick={handleBack}>
-        « Back
-      </button>
+      <div className="ud23-layout">
+        {/* Back 按钮 - 左侧 */}
+        {/* 对应设计书 2.1 No.1 Back */}
+        <div className="ud23-sidebar">
+          <button className="ud23-back-btn" onClick={handleBack}>
+            « Back
+          </button>
+        </div>
 
-      {/* 页面标题 */}
-      {/* 对应设计书 2.1 No.2 Download and Print Quick Guides */}
-      <div className="ud23-title">Download and Print Quick Guides</div>
+        {/* 主内容区域 - 按钮右侧 */}
+        <div className="ud23-main">
+          {/* 页面标题 */}
+          {/* 对应设计书 2.1 No.2 Download and Print Quick Guides */}
+          <div className="ud23-title">Download and Print Quick Guides</div>
 
-      {/* 活性指南区域 */}
-      <div className="ud23-section">
-        {activeGuides.map((guide) => (
+          {/* 活性指南区域 */}
+          <div className="ud23-section">
+            {activeGuides.map((guide) => (
           <div key={guide.id} className="ud23-guide-item">
             {/* 图片预览区域 */}
             {/* 对应设计书 2.1 No.3/5/7/9/11/13/15/17 Image */}
@@ -123,7 +128,7 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
           </div>
         ))}
       </div>
-
+        <span style = {{fontSize: '12px', color: '#666'}}>(Note that the font Volvo Broad is removed from the Quick Guides because of problems)</span>
       {/* Volvo 3P Quick Guides 区域 */}
       {/* 对应设计书 2.1 No.19 Volvo 3P Quick Guides */}
       <div className="ud23-section ud23-volvo-section">
@@ -139,13 +144,15 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
                   handleDownload(guide.linkUrl, `${guide.id}.pdf`);
                 }}
               >
-                {guide.linkLabel}
+               {guide.linkLabel}
               </a>
             </div>
           ))}
         </div>
+        </div>
       </div>
     </div>
+  </div>
   );
 };
 

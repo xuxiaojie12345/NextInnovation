@@ -21,7 +21,8 @@ const UD16_ADChange: React.FC = () => {
   // 对应设计书 6.1 状态管理
   const [serieChnr, setSerieChnr] = useState<string>('');  // Serie-Chnr输入值
   const [desc, setDesc] = useState<string>('');             // Desc描述输入值
-  const [message, setMessage] = useState<string>('');        // 错误消息
+  const [message, setMessage] = useState<string>('');        // 消息
+  const [messageType, setMessageType] = useState<'success' | 'error'>('error'); // 消息类型
   const [isLoading, setIsLoading] = useState<boolean>(false); // 加载状态标识
   const [showModal, setShowModal] = useState<boolean>(false); // CHECK弹框显示状态
   const [modalMessage, setModalMessage] = useState<string>(''); // CHECK弹框消息内容
@@ -59,8 +60,9 @@ const UD16_ADChange: React.FC = () => {
    *
    * @param {string} msg - 消息内容
    */
-  const showMessage = (msg: string) => {
+  const showMessage = (msg: string, type: 'success' | 'error' = 'error') => {
     setMessage(msg);
+    setMessageType(type);
   };
 
   // ==================== API调用 ====================
@@ -119,7 +121,7 @@ const UD16_ADChange: React.FC = () => {
       // 5. 结果处理
       if (response.data && response.data.code === 200) {
         // 添加成功
-        showMessage('添加成功');
+        showMessage('添加成功', 'success');
         // 清空输入框
         setSerieChnr('');
         setDesc('');
@@ -225,7 +227,7 @@ const UD16_ADChange: React.FC = () => {
       // 5. 结果处理
       if (response.data && response.data.code === 200) {
         // 删除成功
-        showMessage('删除成功');
+        showMessage('删除成功', 'success');
         setSerieChnr('');
         setDesc('');
       } else {
@@ -423,7 +425,7 @@ const UD16_ADChange: React.FC = () => {
         {/* 错误消息显示区域 */}
         {/* 对应设计书 2.1 控件属性表 No.3 error message */}
         {message && (
-          <div className='ud16-message'>
+          <div className={`ud16-message ud16-message--${messageType}`}>
             {message}
           </div>
         )}
