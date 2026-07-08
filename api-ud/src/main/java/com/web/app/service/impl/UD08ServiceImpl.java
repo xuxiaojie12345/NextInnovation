@@ -125,7 +125,24 @@ public class UD08ServiceImpl implements UD08Service {
 
         // 更新HDOC_USER_DEFINED_RULES表
         HdocUserDefinedRules record = buildRecord(pc, num, market, request);
-        record.setUpdateDatetime(LocalDateTime.now());
+        // 使用前端传入的updateDatetime，若为空则使用系统时间
+        String reqDatetime = request.getUpdateDatetime();
+        if (reqDatetime != null && !reqDatetime.trim().isEmpty()) {
+            try {
+                String datetimeStr = reqDatetime.trim();
+                // 前端格式为"yyyy-MM-dd"（10字符）时补全时间部分
+                if (datetimeStr.length() == 10) {
+                    datetimeStr = datetimeStr + " 00:00:00";
+                }
+                record.setUpdateDatetime(LocalDateTime.parse(datetimeStr,
+                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            } catch (Exception e) {
+                logger.warn("UD08Update - Invalid updateDatetime format: {}, use system time", reqDatetime);
+                record.setUpdateDatetime(LocalDateTime.now());
+            }
+        } else {
+            record.setUpdateDatetime(LocalDateTime.now());
+        }
         String updateUser = request.getUpdateUser() != null ? request.getUpdateUser().trim() : null;
         record.setUpdateUser(updateUser);
         record.setUpdateProcess("UD08Update");

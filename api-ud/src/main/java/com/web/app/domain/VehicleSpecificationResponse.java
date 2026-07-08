@@ -1,5 +1,7 @@
 package com.web.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * UD07车辆规格信息响应对象
  * 对应详细设计：DES-VehicleSpecification-001
@@ -33,6 +35,7 @@ public class VehicleSpecificationResponse {
         this.engineInfo = engineInfo;
     }
 
+    @JsonProperty("sNoteNo")
     public String getSNoteNo() {
         return sNoteNo;
     }
@@ -119,6 +122,7 @@ public class VehicleSpecificationResponse {
             this.variantId = variantId;
         }
 
+        @JsonProperty("sNoteNo")
         public String getSNoteNo() {
             return sNoteNo;
         }

@@ -71,6 +71,21 @@
   word-break: break-all;
 }
 
+/* Replacing parameters 区域 - label独占一行，值折行显示 */
+.replacing-params-section .info-item {
+  flex-direction: column;
+}
+.replacing-params-section .info-item label {
+  display: block;
+  width: 100%;
+  margin-bottom: 4px;
+}
+.replacing-params-section .info-item span {
+  display: block;
+  width: 100%;
+  white-space: pre-wrap;
+}
+
 /* Chassis no - 合并显示为一行 */
 .info-item-chassis {
   display: flex;

@@ -10,6 +10,7 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false); // 标记是否有错误，用于输入框样式
+  const [inputKey, setInputKey] = useState<number>(0); // 强制重新挂载输入框（超长截断时用）
 
   // 处理 UserID 输入 - 输入时限制（对应设计书 4.2.1）
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,15 +18,20 @@ const Login: React.FC = () => {
     
     // 只允许半角英数字输入
     if (/^[a-zA-Z0-9]*$/.test(val)) {
-      // 长度限制为10字符以内
       if (val.length <= 10) {
         setUserID(val);
-        // 用户体验优化：用户重新输入时清空错误提示
-        if (message) {
-          setMessage("");
-          setHasError(false);
-        }
+      } else {
+        setUserID(val.slice(0, 10));
+        setInputKey(k => k + 1); // 强制重新挂载 input，DOM 值重置为 state
       }
+      // 用户体验优化：用户重新输入时清空错误提示
+      if (message) {
+        setMessage("");
+        setHasError(false);
+      }
+    } else {
+      setUserID(userID);
+      setInputKey(k => k + 1);
     }
   };
 
@@ -35,14 +41,19 @@ const Login: React.FC = () => {
     
     // 只允许半角英数字+记号输入（ASCII可打印字符 0x20-0x7E）
     if (/^[\x20-\x7E]*$/.test(val)) {
-      // 長度限制为32字符以内
       if (val.length <= 32) {
         setPassword(val);
-        if (message) {
-          setMessage("");
-          setHasError(false);
-        }
+      } else {
+        setPassword(val.slice(0, 32));
+        setInputKey(k => k + 1); // 强制重新挂载 input，DOM 值重置为 state
       }
+      if (message) {
+        setMessage("");
+        setHasError(false);
+      }
+    } else {
+      setPassword(password);
+      setInputKey(k => k + 1);
     }
   };
 
@@ -180,6 +191,7 @@ const Login: React.FC = () => {
             <div className="form-group">
               <input
                 id="username"
+                key={inputKey}
                 type="text"
                 value={userID}
                 onChange={handleUserIDChange}
@@ -194,12 +206,14 @@ const Login: React.FC = () => {
             <div className="form-group">
               <input
                 id="password"
+                key={inputKey + 1}
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
                 placeholder="Password"
                 disabled={isLoading}
                 autoComplete="current-password"
+                maxLength={32}
                 className={hasError ? 'input-error' : ''}
               />
             </div>

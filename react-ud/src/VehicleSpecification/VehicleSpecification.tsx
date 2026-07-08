@@ -194,9 +194,17 @@ const VehicleSpecification: React.FC = () => {
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
             </div>
             <div className="info-field">
-              <span className="info-label">SYMBOL_STR:</span>
+              <span className="info-value" style={{ visibility: 'hidden' }}>-</span>
+            </div>
+          </div>
+
+          {/* SYMBOL_STR - 单独一行显示值 */}
+          <div className="info-row">
+            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
               <Tooltip title={engineInfo?.description || '-'} arrow placement="top">
-                <span className="info-value info-value-tooltip">{engineInfo?.symbolStr || '-'}</span>
+                <span className="info-value info-value-tooltip" style={{ paddingLeft: 20 }}>
+                  {engineInfo?.symbolStr || '-'}
+                </span>
               </Tooltip>
             </div>
           </div>

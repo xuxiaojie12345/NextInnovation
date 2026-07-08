@@ -150,7 +150,7 @@ const GenerateDocument: React.FC = () => {
     return (
       <div className='generate-document-container'>
         <div className='page-header'>
-          <h1 className='page-title'>HDoc - Generate Document</h1>
+          <h1 className='page-title'>Generate Document</h1>
         </div>
         <div className='loading-message'>Loading document data...</div>
       </div>
@@ -161,7 +161,7 @@ const GenerateDocument: React.FC = () => {
     <div className='generate-document-container'>
       {/* 页面标题 */}
       <div className='page-header'>
-        <h1 className='page-title'>HDoc - Generate Document</h1>
+        <h1 className='page-title'>Generate Document</h1>
       </div>
 
       {/* 错误消息区域（对应设计书 2.1 Error message area） */}

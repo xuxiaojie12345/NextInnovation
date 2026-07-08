@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './SaveModifications.css';
 
 /**
@@ -21,8 +22,9 @@ const API_BASE_URL = 'http://localhost:8081';
  *
  * 功能说明：
  * 1. 接收从 ModifyDocument 页面传递的 chassisNo、serie 和 modifiedVariables 参数
- * 2. 展示 Storing（修改变量列表，逗号分隔）
- * 3. 点击 Close 按钮返回前一页面
+ * 2. 调用 UD06SaveModificationsApi 查询 Doctype / Version / FOUND UNRELEASED VERSION
+ * 3. Storing 使用前一页面传递的 modifiedVariables 生成（逗号分隔）
+ * 4. 点击 Close 按钮返回前一页面
  *
  * 对应详细设计：DES-SaveModifications-001
  */
@@ -36,28 +38,74 @@ const SaveModifications: React.FC = () => {
   const serie = state?.serie || '';
   const modifiedVariables = state?.modifiedVariables || [];
 
-  // 生成 Storing 显示文本（逗号分隔）
+  // 生成 Storing 显示文本（逗号分隔）- 保持现有逻辑
   const storingText = modifiedVariables.length > 0
     ? modifiedVariables.map((v) => `${v.variable}=${v.modifiedValue}`).join(', ')
     : '-';
 
-  // 固定显示值
-  const doctype = '-';
-  const version = '-';
-  const foundUnreleasedVersion = '-';
-
   // 页面数据状态
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [doctype, setDoctype] = useState<string>('-');
+  const [version, setVersion] = useState<string>('-');
+  const [foundUnreleasedVersion, setFoundUnreleasedVersion] = useState<string>('-');
 
+  /**
+   * 页面初始化 - 调用 UD06SaveModificationsApi
+   * 对应设计书 3.1.1 页面初始化流程，4.1 UD06SaveModificationsApi
+   */
   useEffect(() => {
-    if (!chassisNo) {
-      setError('缺少必要的底盘信息');
-    }
-  }, [chassisNo]);
+    const fetchModifications = async () => {
+      if (!chassisNo || !serie) {
+        setError('缺少必要的底盘信息');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError('');
+
+        const response = await axios.post(
+          `${API_BASE_URL}/api/ud06/savemodifications/query`,
+          { serie, chno: chassisNo },
+          { timeout: 10000 }
+        );
+
+        if (response.data.code === 200 && response.data.data) {
+          const data = response.data.data;
+          setDoctype(data.doctype || '-');
+          setVersion(data.version || '-');
+          setFoundUnreleasedVersion(data.foundUnreleasedVersion || '-');
+        } else {
+          setError(response.data.message || '未找到该底盘的修改记录');
+        }
+      } catch (err: any) {
+        if (err.code === 'ECONNABORTED') {
+          // 请求超时（对应设计书 6. 异常处理 - API超时）
+          setError('请求超时，请检查网络连接');
+        } else if (err.response) {
+          if (err.response.status === 404) {
+            setError('未找到该底盘的修改记录');
+          } else {
+            setError('系统异常，请联系管理员');
+          }
+        } else if (err.request) {
+          setError('网络连接失败，请稍后重试');
+        } else {
+          setError('系统异常，请联系管理员');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModifications();
+  }, [chassisNo, serie]);
 
   /**
    * 点击 Close 按钮 - 关闭当前页面
-   * 对应设计书 3.1.3 Close按钮点击处理
+   * 对应设计书 3.1.2 Close按钮点击处理
    */
   const handleClose = () => {
     navigate(-1);
@@ -70,14 +118,19 @@ const SaveModifications: React.FC = () => {
         <h1 className='page-title'>HDoc - Save Modifications</h1>
       </div>
 
+      {/* 加载中状态 */}
+      {loading && (
+        <div className='loading-message'>Loading...</div>
+      )}
+
       {/* 错误消息区域 */}
-      {error && (
+      {error && !loading && (
         <div className='error-message-area'>
           <p>{error}</p>
         </div>
       )}
 
-      {!error && (
+      {!error && !loading && (
         <>
           {/* 底盘信息区域（对应设计书 2.1 Chassis serie / Chassis number） */}
           <div className='vehicle-info-section'>

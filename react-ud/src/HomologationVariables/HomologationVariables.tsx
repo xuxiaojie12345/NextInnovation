@@ -121,12 +121,17 @@ const HomologationVariables: React.FC = () => {
         if (state?.selectedRecord) {
           // Select操作：从搜索结果页面选中一条记录返回
           const record = state.selectedRecord as Record<string, string>;
-          setFormData(prev => ({ ...prev, ...record }));
+          // Date字段截取前10位（"yyyy-MM-dd HH:mm:ss" → "yyyy-MM-dd"）
+          const formattedRecord = { ...record };
+          if (formattedRecord.updateDatetime && formattedRecord.updateDatetime.length > 10) {
+            formattedRecord.updateDatetime = formattedRecord.updateDatetime.substring(0, 10);
+          }
+          setFormData(prev => ({ ...prev, ...formattedRecord }));
           // 保存原始主键值（用于Update时主键变更校验）
           setOriginalKeys({
-            productClass: record.productClass || '',
-            number: record.number || '',
-            market: record.market || ''
+            productClass: formattedRecord.productClass || '',
+            number: formattedRecord.number || '',
+            market: formattedRecord.market || ''
           });
         } else if (state?.searchConditions) {
           // Back操作：从搜索结果页面携带搜索条件返回

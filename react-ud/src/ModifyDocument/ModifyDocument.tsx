@@ -253,7 +253,7 @@ const ModifyDocument: React.FC = () => {
     return (
       <div className='modify-document-container'>
         <div className='page-header'>
-          <h1 className='page-title'>HDoc - Modify Document</h1>
+          <h1 className='page-title'>Modify Document</h1>
         </div>
         <div className='loading-message'>加载中...</div>
       </div>
@@ -264,7 +264,7 @@ const ModifyDocument: React.FC = () => {
     <div className='modify-document-container'>
       {/* 页面标题 */}
       <div className='page-header'>
-        <h1 className='page-title'>HDoc - Modify Document</h1>
+        <h1 className='page-title'>Modify Document</h1>
       </div>
 
       {/* 错误消息区域 */}
@@ -304,7 +304,7 @@ const ModifyDocument: React.FC = () => {
         <div className='template-section'>
           <span
             className='template-link'
-            onClick={() => handleTemplateDownload(templateFile)}
+            onClick={handleTemplateDownload}
           >
             {`Template: ${templateFile}`}
           </span>

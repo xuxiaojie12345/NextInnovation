@@ -9,6 +9,7 @@ interface MarketItem {
 }
 
 interface PermissionData {
+  username?: string;
   functions: Array<any>;
   markets: Array<any>;
 }
@@ -100,11 +101,11 @@ const HDocUserAdministration = () => {
         setMarketList(mapped);
         console.log("【marketList】count:", mapped.length);
       } else {
-        setErrorMessage("获取市场列表失败，请联系管理员");
+        setErrorMessage("Failed to fetch market list. Please contact administrator.");
       }
     } catch (error) {
       console.error("Error fetching market list:", error);
-      setErrorMessage("系统内部错误，请联系管理员");
+      setErrorMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +122,7 @@ const HDocUserAdministration = () => {
   // User Info按钮点击 - 查询用户信息
   const handleUserInfo = async () => {
     if (!formData.userId.trim()) {
-      setErrorMessage("请输入UserID");
+      setErrorMessage("Please enter UserID.");
       return;
     }
 
@@ -327,7 +328,7 @@ const HDocUserAdministration = () => {
   // Update Role按钮点击 - 更新用户权限
   const handleUpdateRole = async () => {
     if (!formData.userId.trim()) {
-      setErrorMessage("请先查询用户信息");
+      setErrorMessage("Please search user info first.");
       return;
     }
 
@@ -350,6 +351,7 @@ const HDocUserAdministration = () => {
       if (formData.userAdminChecked) functions.push("User Administrator");
       if (formData.adaptationUserChecked) functions.push("ADAPTATION DOC");
       if (formData.manageVariableListChecked) functions.push("Manage Variable List");
+      if (formData.marketSuperUserMarkets.length > 0) functions.push("Market Super User");
 
       // 收集市场权限
       const roleMap: Array<{ key: string; typeCode: string; markets: string[] }> = [
@@ -387,13 +389,13 @@ const HDocUserAdministration = () => {
       const result = await response.json();
 
       if (result.code === 200 && result.data?.success) {
-        setSuccessMessage("权限更新成功");
+        setSuccessMessage("Role updated successfully.");
       } else {
-        setErrorMessage(result.data?.message || "更新失败，请联系管理员");
+        setErrorMessage(result.data?.message || "Update failed. Please contact administrator.");
       }
     } catch (error) {
       console.error("Error updating role:", error);
-      setErrorMessage("系统内部错误，请联系管理员");
+      setErrorMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -402,12 +404,12 @@ const HDocUserAdministration = () => {
   // Delete Role按钮点击 - 删除用户权限
   const handleDeleteRole = async () => {
     if (!formData.userId.trim()) {
-      setErrorMessage("请先查询用户信息");
+      setErrorMessage("Please search user info first.");
       return;
     }
 
-    // 确认对话框
-    if (!window.confirm("确定要删除该用户的所有权限吗？")) {
+    // Confirm dialog
+    if (!window.confirm("Are you sure you want to delete all permissions for this user?")) {
       return;
     }
 
@@ -439,7 +441,7 @@ const HDocUserAdministration = () => {
       const data = await response.json();
 
       if (data.code === 200) {
-        setSuccessMessage("权限删除成功");
+        setSuccessMessage("Role deleted successfully.");
         // 清空所有表单数据
         setFormData({
           userId: formData.userId,
@@ -459,11 +461,11 @@ const HDocUserAdministration = () => {
           marketSuperUserMarkets: [],
         });
       } else {
-        setErrorMessage("删除失败，请联系管理员");
+        setErrorMessage("Delete failed. Please contact administrator.");
       }
     } catch (error) {
       console.error("Error deleting role:", error);
-      setErrorMessage("系统内部错误，请联系管理员");
+      setErrorMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
