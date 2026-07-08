@@ -43,7 +43,7 @@ const menuItems: MenuItem[] = [
         label: "Admin",
         children: [
           { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
-          { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "/Menu/HomologationVariables" },
+          { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "#" },
           { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
           { key: "UnlockDocument", label: "Unlock Document", route: "#" },
           { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
@@ -267,7 +267,7 @@ const Menu: React.FC = () => {
     <Layout className="menu-layout">
       {/* 左侧菜单区 */}
       <Sider
-        width={340}
+        width={460}
         className="menu-sider"
       >
         {/* 系统标题 */}
