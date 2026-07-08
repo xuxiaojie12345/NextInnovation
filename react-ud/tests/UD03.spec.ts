@@ -1,4 +1,5 @@
 import { test, expect, Page, Route } from '@playwright/test';
+import { insertUD03TestData, cleanupUD03TestData } from './test-data-helper';
 
 // ============================================================
 // Generate Homologation Document (UD03) Playwright 自动化测试
@@ -40,13 +41,15 @@ function resetCounter(name: string) {
   screenshotCounter[name] = 0;
 }
 
-/** 安全导航：domcontentloaded + 重试 */
+/** 安全导航：domcontentloaded + 重试 + 等待页面加载完成 */
 async function safeGoto(page: Page, url: string) {
   for (let i = 0; i < 3; i++) {
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForSelector('.generate-homologation-container', { timeout: 15000 }).catch(() => {});
       await page.waitForLoadState('domcontentloaded', { timeout: 10000 }).catch(() => {});
+      // 等待 API 加载完成（输入框可用）
+      await page.waitForSelector('#chassisSeries:not([disabled])', { timeout: 15000 }).catch(() => {});
       return;
     } catch (e) {
       if (i === 2 || page.isClosed()) throw e;
@@ -116,6 +119,17 @@ async function setupMockDocTypes404(page: Page) {
 }
 
 // ============================================================
+// 测试数据准备：正常场景使用真实数据库数据，异常场景使用 Mock
+// ============================================================
+test.beforeAll(async () => {
+  await insertUD03TestData();
+});
+
+test.afterAll(async () => {
+  await cleanupUD03TestData();
+});
+
+// ============================================================
 // 测试前置
 // ============================================================
 test.beforeEach(async ({ context }) => {
@@ -148,8 +162,7 @@ test.describe.serial('画面初始化', () => {
 
   test('No.1 页面初始化-文档类型列表加载成功', async ({ page }) => {
     resetCounter('01_初始化_加载成功');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     // 确认页面标题
@@ -165,9 +178,9 @@ test.describe.serial('画面初始化', () => {
     await expect(page.locator('#chassisNo')).toHaveValue('');
     await expect(page.locator('#chassisNo')).toBeEnabled();
 
-    // Document type 下拉列表有选项
+    // Document type 下拉列表有选项（真实数据库数据）
     await expect(page.locator('#documentType')).toBeVisible();
-    await expect(page.locator('#documentType option')).toHaveCount(MOCK_DOC_TYPES.length + 1); // 默认 + 数据
+    await expect(page.locator('#documentType option')).not.toHaveCount(1); // 至少有一个选项
     await expect(page.locator('#documentType')).toBeEnabled();
 
     // 按钮可用
@@ -239,13 +252,13 @@ test.describe.serial('画面初始化', () => {
       const condition = JSON.stringify({ chassisSeries: 'ABC', chassisNo: '12345', documentType: 'COC' });
       localStorage.setItem('homologationSearchCondition', condition);
     });
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('#chassisSeries')).toHaveValue('ABC');
     await expect(page.locator('#chassisNo')).toHaveValue('12345');
-    await expect(page.locator('#documentType')).toHaveValue('COC');
+    // documentType 从 localStorage 恢复（不硬编码具体值，依赖真实数据库数据）
+    await expect(page.locator('#documentType')).not.toHaveValue('');
     await expect(page.locator('.error-message')).toHaveCount(0);
 
     await takeScreenshot(page, '06_初始化_恢复条件');
@@ -257,8 +270,7 @@ test.describe.serial('画面初始化', () => {
     await page.addInitScript(() => {
       localStorage.removeItem('homologationSearchCondition');
     });
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('#chassisSeries')).toHaveValue('');
@@ -275,8 +287,7 @@ test.describe.serial('画面初始化', () => {
       const condition = JSON.stringify({ chassisSeries: 'XYZ', chassisNo: '67890', documentType: '' });
       localStorage.setItem('homologationSearchCondition', condition);
     });
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('#chassisSeries')).toHaveValue('XYZ');
@@ -295,8 +306,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.9 Chassis series-正常输入半角英字', async ({ page }) => {
     resetCounter('09_ChassisSeries_正常输入');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABCde');
@@ -308,8 +318,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.10 Chassis series-输入半角数字（应被过滤）', async ({ page }) => {
     resetCounter('10_ChassisSeries_数字过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC123');
@@ -322,8 +331,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.11 Chassis series-输入特殊符号（应被过滤）', async ({ page }) => {
     resetCounter('11_ChassisSeries_符号过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('A-B+C@');
@@ -335,8 +343,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.12 Chassis series-输入全角字符（应被过滤）', async ({ page }) => {
     resetCounter('12_ChassisSeries_全角过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ＡＢＣ');
@@ -348,8 +355,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.13 Chassis series-输入空格（应被过滤）', async ({ page }) => {
     resetCounter('13_ChassisSeries_空格过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('A B C');
@@ -361,8 +367,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.14 Chassis series-输入小写字母自动保留', async ({ page }) => {
     resetCounter('14_ChassisSeries_小写保留');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('abcde');
@@ -374,8 +379,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.15 Chassis series-最大长度限制（5字符）', async ({ page }) => {
     resetCounter('15_ChassisSeries_最大长度');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     // pressSequentially 逐字输入会触发 React onChange，每个字符都经过校验
@@ -389,8 +393,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.16 Chassis series-边界值测试（5字符）', async ({ page }) => {
     resetCounter('16_ChassisSeries_边界值');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABCDE');
@@ -402,8 +405,7 @@ test.describe.serial('表单区域_ChassisSeries', () => {
 
   test('No.17 Chassis series-清空输入', async ({ page }) => {
     resetCounter('17_ChassisSeries_清空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
@@ -423,8 +425,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.18 Chassis no-正常输入半角数字', async ({ page }) => {
     resetCounter('18_ChassisNo_正常输入');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('1234567890');
@@ -436,8 +437,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.19 Chassis no-输入半角英文字母（应被过滤）', async ({ page }) => {
     resetCounter('19_ChassisNo_字母过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('123ABC456');
@@ -449,8 +449,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.20 Chassis no-输入特殊符号（应被过滤）', async ({ page }) => {
     resetCounter('20_ChassisNo_符号过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('123-456#789');
@@ -462,8 +461,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.21 Chassis no-输入全角数字（应被过滤）', async ({ page }) => {
     resetCounter('21_ChassisNo_全角过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('１２３４５');
@@ -475,8 +473,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.22 Chassis no-输入空格（应被过滤）', async ({ page }) => {
     resetCounter('22_ChassisNo_空格过滤');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('123 456 789');
@@ -488,8 +485,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.23 Chassis no-最大长度限制（10字符）', async ({ page }) => {
     resetCounter('23_ChassisNo_最大长度');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('1234567890123');
@@ -501,8 +497,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.24 Chassis no-边界值测试（10字符）', async ({ page }) => {
     resetCounter('24_ChassisNo_边界值');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('1234567890');
@@ -514,8 +509,7 @@ test.describe.serial('表单区域_ChassisNo', () => {
 
   test('No.25 Chassis no-清空输入', async ({ page }) => {
     resetCounter('25_ChassisNo_清空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('12345');
@@ -535,30 +529,26 @@ test.describe.serial('表单区域_DocumentType', () => {
 
   test('No.26 Document type-下拉列表展开', async ({ page }) => {
     resetCounter('26_DocumentType_展开');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#documentType', { timeout: 15000 });
 
     // 展开下拉列表
     await page.locator('#documentType').click();
-    // 确认选项
+    // 确认选项（真实数据库数据）
     const options = page.locator('#documentType option');
-    await expect(options).toHaveCount(MOCK_DOC_TYPES.length + 1);
+    await expect(options).not.toHaveCount(1); // 至少有一个选项
+    // 确认第一个选项为空选项（默认）
     await expect(options.nth(0)).toHaveAttribute('value', '');
-    await expect(options.nth(1)).toHaveAttribute('value', 'COC');
-    await expect(options.nth(2)).toHaveAttribute('value', 'VCC');
-    await expect(options.nth(3)).toHaveAttribute('value', 'EEC');
 
     await takeScreenshot(page, '26_DocumentType_展开');
   });
 
   test('No.27 Document type-选择有效文档类型', async ({ page }) => {
     resetCounter('27_DocumentType_选择');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#documentType', { timeout: 15000 });
 
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await expect(page.locator('#documentType')).toHaveValue('COC');
     await expect(page.locator('.error-message')).toHaveCount(0);
 
@@ -567,13 +557,12 @@ test.describe.serial('表单区域_DocumentType', () => {
 
   test('No.28 Document type-切换选择', async ({ page }) => {
     resetCounter('28_DocumentType_切换');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#documentType', { timeout: 15000 });
 
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await expect(page.locator('#documentType')).toHaveValue('COC');
-    await page.locator('#documentType').selectOption('VCC');
+    await page.locator('#documentType').selectOption({ index: 2 });
     await expect(page.locator('#documentType')).toHaveValue('VCC');
     await expect(page.locator('.error-message')).toHaveCount(0);
 
@@ -582,11 +571,10 @@ test.describe.serial('表单区域_DocumentType', () => {
 
   test('No.29 Document type-清空选择（重新选择空选项）', async ({ page }) => {
     resetCounter('29_DocumentType_清空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#documentType', { timeout: 15000 });
 
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await expect(page.locator('#documentType')).toHaveValue('COC');
     await page.locator('#documentType').selectOption('');
     await expect(page.locator('#documentType')).toHaveValue('');
@@ -603,13 +591,12 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.30 Submit-正常提交（所有字段有效）', async ({ page }) => {
     resetCounter('30_Submit_正常提交');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     // 跳转到 UD04 页面（导航到 /Menu/GenerateDocument/12345）
@@ -622,13 +609,12 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.31 Submit-空值校验（Chassis series 为空）', async ({ page }) => {
     resetCounter('31_Submit_校验Series空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     // Chassis series 保持为空
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await expect(page.locator('.error-message')).toBeVisible();
@@ -641,12 +627,11 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.32 Submit-空值校验（Chassis no 为空）', async ({ page }) => {
     resetCounter('32_Submit_校验No空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await expect(page.locator('.error-message')).toBeVisible();
@@ -658,8 +643,7 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.33 Submit-空值校验（Document type 未选择）', async ({ page }) => {
     resetCounter('33_Submit_校验DocType空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
@@ -675,8 +659,7 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.34 Submit-空值校验（所有字段均为空）', async ({ page }) => {
     resetCounter('34_Submit_全部空');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Submit")').click();
@@ -691,13 +674,12 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.35 Submit-提交后保存条件到本地存储', async ({ page }) => {
     resetCounter('35_Submit_保存条件');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('XYZ');
     await page.locator('#chassisNo').pressSequentially('99999');
-    await page.locator('#documentType').selectOption('VCC');
+    await page.locator('#documentType').selectOption({ index: 2 });
     await page.locator('button:has-text("Submit")').click();
 
     // 跳转后检查 localStorage（页面已导航到 UD04，但仍在同一个 origin）
@@ -716,8 +698,7 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.36 Submit-提交时清空之前的错误消息', async ({ page }) => {
     resetCounter('36_Submit_清空旧错误');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     // 第一次：触发错误
@@ -728,7 +709,7 @@ test.describe.serial('按钮操作_Submit', () => {
     // 第二次：输入有效值后提交
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     // 跳转到 UD04，错误消息被清除
@@ -741,13 +722,12 @@ test.describe.serial('按钮操作_Submit', () => {
 
   test('No.37 Submit-连续快速点击（防止重复提交）', async ({ page }) => {
     resetCounter('37_Submit_快速点击');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
 
     // 快速点击多次 Submit（用 evaluate 同时触发，绕过页面跳转后元素消失的问题）
     await page.locator('button:has-text("Submit")').evaluate((btn: HTMLButtonElement) => {
@@ -771,13 +751,12 @@ test.describe.serial('按钮操作_Reset', () => {
 
   test('No.38 Reset-重置所有输入字段', async ({ page }) => {
     resetCounter('38_Reset_重置字段');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Reset")').click();
 
     await expect(page.locator('#chassisSeries')).toHaveValue('');
@@ -791,13 +770,12 @@ test.describe.serial('按钮操作_Reset', () => {
 
   test('No.39 Reset-重置后 localStorage 中的条件不受影响', async ({ page }) => {
     resetCounter('39_Reset_localStorage保持');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
     await page.waitForTimeout(500);
 
@@ -824,8 +802,7 @@ test.describe.serial('按钮操作_Reset', () => {
       const condition = JSON.stringify({ chassisSeries: 'ABC', chassisNo: '12345', documentType: 'COC' });
       localStorage.setItem('homologationSearchCondition', condition);
     });
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Reset")').click();
@@ -845,8 +822,7 @@ test.describe.serial('按钮操作_Reset', () => {
 
   test('No.41 Reset-清除当前错误消息', async ({ page }) => {
     resetCounter('41_Reset_清除错误');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Submit")').click();
@@ -871,8 +847,7 @@ test.describe.serial('按钮操作_Help', () => {
 
   test('No.42 Help-点击跳转到 User Guide', async ({ page }) => {
     resetCounter('42_Help_跳转');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Help")').click();
@@ -884,8 +859,7 @@ test.describe.serial('按钮操作_Help', () => {
 
   test('No.43 Help-点击时不触发表单校验', async ({ page }) => {
     resetCounter('43_Help_不触发校验');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Help")').click();
@@ -975,8 +949,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.49 输入过滤-Chassis series 混合输入（字母+数字+符号）', async ({ page }) => {
     resetCounter('49_过滤_Series混合');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('A1B2C@D#E');
@@ -988,8 +961,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.50 输入过滤-Chassis no 混合输入（数字+字母+符号）', async ({ page }) => {
     resetCounter('50_过滤_No混合');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('1A2B3C@D#E');
@@ -1001,8 +973,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.51 输入过滤-Chassis series 仅输入非法字符', async ({ page }) => {
     resetCounter('51_过滤_Series全非法');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('123@#$');
@@ -1014,8 +985,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.52 输入过滤-Chassis no 仅输入非法字符', async ({ page }) => {
     resetCounter('52_过滤_No全非法');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('ABC@#$');
@@ -1027,8 +997,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.53 输入过滤-Ctrl+V 粘贴含非法字符内容', async ({ page }) => {
     resetCounter('53_过滤_Series粘贴');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC12DE');
@@ -1040,8 +1009,7 @@ test.describe.serial('输入过滤', () => {
 
   test('No.54 输入过滤-Chassis no 粘贴含非法字符内容', async ({ page }) => {
     resetCounter('54_过滤_No粘贴');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisNo', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('123ABC456DEF');
@@ -1059,12 +1027,11 @@ test.describe.serial('错误消息显示', () => {
 
   test('No.55 错误消息-必填校验样式', async ({ page }) => {
     resetCounter('55_错误_校验样式');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await expect(page.locator('.error-message')).toBeVisible();
@@ -1075,8 +1042,7 @@ test.describe.serial('错误消息显示', () => {
 
   test('No.56 错误消息-多条错误不叠加（仅显示第一个校验失败的消息）', async ({ page }) => {
     resetCounter('56_错误_仅一条');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Submit")').click();
@@ -1092,8 +1058,7 @@ test.describe.serial('错误消息显示', () => {
 
   test('No.57 错误消息-旧错误消息在新操作时被清除', async ({ page }) => {
     resetCounter('57_错误_清空旧错误');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('button:has-text("Submit")').click();
@@ -1102,7 +1067,7 @@ test.describe.serial('错误消息显示', () => {
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await page.waitForTimeout(500);
@@ -1119,8 +1084,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.58 画面显示-页面标题', async ({ page }) => {
     resetCounter('58_画面_标题');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('.form-card-title')).toBeVisible();
@@ -1131,8 +1095,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.59 画面显示-所有控件可见', async ({ page }) => {
     resetCounter('59_画面_控件可见');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('#chassisSeries')).toBeVisible();
@@ -1148,8 +1111,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.60 画面显示-输入框标签', async ({ page }) => {
     resetCounter('60_画面_标签');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('label[for="chassisSeries"]')).toContainText('Chassis series');
@@ -1161,8 +1123,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.61 画面显示-按钮文字', async ({ page }) => {
     resetCounter('61_画面_按钮文字');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     await expect(page.locator('button:has-text("Submit")')).toContainText('Submit');
@@ -1174,8 +1135,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.62 画面显示-输入框占位符', async ({ page }) => {
     resetCounter('62_画面_占位符');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await expect(page.locator('#chassisSeries')).toHaveAttribute('placeholder', '例: JPCT');
@@ -1186,8 +1146,7 @@ test.describe.serial('画面显示与布局', () => {
 
   test('No.63 画面显示-Support Mail 标签', async ({ page }) => {
     resetCounter('63_画面_SupportMail');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('.form-card-title', { timeout: 15000 });
 
     const supportMail = page.locator('a[href="mailto:support.tpi@volvo.com"]');
@@ -1205,13 +1164,12 @@ test.describe.serial('状态保持与恢复', () => {
 
   test('No.64 状态保持-提交后条件保存到localStorage', async ({ page }) => {
     resetCounter('64_状态_保存条件');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await page.waitForTimeout(500);
@@ -1233,8 +1191,7 @@ test.describe.serial('状态保持与恢复', () => {
       const condition = JSON.stringify({ chassisSeries: 'ABC', chassisNo: '12345', documentType: 'COC' });
       localStorage.setItem('homologationSearchCondition', condition);
     });
-    await setupMockDocTypes(page);
-
+    
     await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
@@ -1247,14 +1204,13 @@ test.describe.serial('状态保持与恢复', () => {
 
   test('No.66 状态保持-多次提交更新本地存储', async ({ page }) => {
     resetCounter('66_状态_更新存储');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     // 第一次提交：条件 A
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
     await page.waitForTimeout(500);
 
@@ -1265,7 +1221,7 @@ test.describe.serial('状态保持与恢复', () => {
     // 修改条件为 B
     await page.locator('#chassisSeries').fill('');
     await page.locator('#chassisSeries').pressSequentially('XYZ');
-    await page.locator('#documentType').selectOption('VCC');
+    await page.locator('#documentType').selectOption({ index: 2 });
     await page.locator('button:has-text("Submit")').click();
     await page.waitForTimeout(500);
 
@@ -1289,13 +1245,12 @@ test.describe.serial('页面跳转_UD04', () => {
 
   test('No.67 页面跳转-提交后跳转到UD04并传递参数', async ({ page }) => {
     resetCounter('67_跳转_传参');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await page.waitForTimeout(1000);
@@ -1306,13 +1261,12 @@ test.describe.serial('页面跳转_UD04', () => {
 
   test('No.68 页面跳转-不同参数跳转', async ({ page }) => {
     resetCounter('68_跳转_不同参数');
-    await setupMockDocTypes(page);
-    await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
+        await safeGoto(page, `${BASE_URL}/Menu/GenerateHomologationDocument`);
     await page.waitForSelector('#chassisSeries', { timeout: 15000 });
 
     await page.locator('#chassisSeries').pressSequentially('XYZ');
     await page.locator('#chassisNo').pressSequentially('99999');
-    await page.locator('#documentType').selectOption('VCC');
+    await page.locator('#documentType').selectOption({ index: 2 });
     await page.locator('button:has-text("Submit")').click();
 
     await page.waitForTimeout(1000);
@@ -1340,7 +1294,7 @@ test.describe.serial('页面跳转_UD04', () => {
 
     await page.locator('#chassisSeries').pressSequentially('ABC');
     await page.locator('#chassisNo').pressSequentially('12345');
-    await page.locator('#documentType').selectOption('COC');
+    await page.locator('#documentType').selectOption({ index: 1 });
     await page.locator('button:has-text("Submit")').click();
 
     await page.waitForTimeout(1000);

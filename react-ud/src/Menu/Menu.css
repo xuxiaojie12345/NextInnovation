@@ -14,7 +14,7 @@
 
 /* 菜单头部-系统标题区域 */
 .menu-header {
-  padding: 16px;
+  padding: 10px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
@@ -27,7 +27,7 @@
 }
 
 .menu-user-info {
-  margin-top: 8px;
+  margin-top: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,9 +47,9 @@
   text-overflow: clip;
   white-space: normal;
   height: auto;
-  line-height: 1.5;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  line-height: 1.4;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 .menu-tree .ant-menu-item .ant-menu-title-content,
@@ -77,16 +77,17 @@
 
 /* 一级菜单样式 */
 .menu-tree .ant-menu-submenu-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
 /* 二级菜单样式 */
 .menu-tree .ant-menu-item {
-  font-size: 13px;
-  height: 40px;
-  line-height: 40px;
-  margin: 2px 0;
+  font-size: 12px;
+  height: auto;
+  min-height: 20px;
+  line-height: 20px;
+  margin: 0;
 }
 
 /* 选中菜单项高亮（对应详细设计 6.实现注意事项-UI细节） */
