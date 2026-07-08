@@ -43,11 +43,11 @@ public interface UD16ADChangeMapper {
     Integer updateAdcaChangeActY(@Param("serie") String serie, @Param("chnr") String chnr);
 
     /**
-     * 更新AD/CA变更记录（ACT = 'U'）
+     * 物理删除AD/CA变更记录
      *
      * @param serie 系列
      * @param chnr  底盘号
      * @return 影响行数
      */
-    Integer updateAdcaChangeActU(@Param("serie") String serie, @Param("chnr") String chnr);
+    Integer deleteAdcaChange(@Param("serie") String serie, @Param("chnr") String chnr);
 }

@@ -41,10 +41,22 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
                 return UD07VehicleSpecificationResponse.error(400, validationError);
             }
 
-            UD07VehicleSpecificationVO vo = ud07Mapper.selectVehicleSpecification(request.getSerie(), request.getChno());
-            if (vo == null) {
+            List<UD07VehicleSpecificationVO> voList = ud07Mapper.selectVehicleSpecification(request.getSerie(),
+                    request.getChno());
+            if (voList == null || voList.isEmpty()) {
                 log.warn("UD07查询未找到记录，serie: {}, chno: {}", request.getSerie(), request.getChno());
                 return UD07VehicleSpecificationResponse.error(404, "Record not found.");
+            }
+            // 取第一条数据作为主数据
+            UD07VehicleSpecificationVO vo = voList.get(0);
+            // 收集所有行的CUSTOMER_ADAP，用换行拼接（可能存在多行不同值）
+            String combinedCustomerAdap = voList.stream()
+                    .map(UD07VehicleSpecificationVO::getCustomerAdap)
+                    .filter(adap -> adap != null && !adap.isEmpty())
+                    .distinct()
+                    .collect(java.util.stream.Collectors.joining("\n"));
+            if (combinedCustomerAdap.isEmpty()) {
+                combinedCustomerAdap = vo.getCustomerAdap();
             }
 
             List<UD07KolaVariantVO> variantVOList = ud07Mapper.selectKolaVariants(vo.getFamilyId(), vo.getVariantId());
@@ -75,7 +87,7 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
 
             UD07VehicleSpecificationResponse.VehicleSpecificationData data = new UD07VehicleSpecificationResponse.VehicleSpecificationData();
             data.setModel(vo.getModel());
-            data.setCustomerAdap(vo.getCustomerAdap());
+            data.setCustomerAdap(combinedCustomerAdap);
             data.setBuildWeek(vo.getBuildWeek());
             data.setProductType(vo.getProductType());
             data.setVin(vo.getVin());

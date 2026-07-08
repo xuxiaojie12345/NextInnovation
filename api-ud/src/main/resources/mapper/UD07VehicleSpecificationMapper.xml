@@ -25,14 +25,13 @@
            AND vda.CHNR = variants.CHNR
         WHERE vda.SERIE = #{serie}
           AND vda.CHNR = #{chno}
-        LIMIT 1
     </select>
 
     <!--
         UD07 KOLA 变体列表查询
     -->
     <select id="selectKolaVariants" resultType="com.web.app.entity.UD07KolaVariantVO">
-        SELECT
+        <!-- SELECT
             SYMBOL AS symbol,
             FUNCTION_GROUP AS functionGroup,
             DESCRIPTION AS description,
@@ -40,7 +39,18 @@
         FROM HDOC_REC_DATA_KOLA_VARIANT
         WHERE FAMILY_ID = #{familyId}
           AND VARIANT_ID = #{variantId}
-        ORDER BY  FUNCTION_GROUP
+        ORDER BY  FUNCTION_GROUP -->
+
+        SELECT
+            SYMBOL AS symbol,
+            FUNCTION_GROUP AS functionGroup,
+            DESCRIPTION AS description,
+            FAMILY_ID AS familyId
+        FROM HDOC_REC_DATA_KOLA_VARIANT
+        WHERE 
+        FAMILY_ID LIKE CONCAT('%', #{familyId}, '%')
+          AND VARIANT_ID LIKE CONCAT('%', #{variantId}, '%')
+        ORDER BY  CONCAT(LPAD(FUNCTION_GROUP,4,' '), LPAD(FAMILY_ID,3,'0'))
     </select>
 
 </mapper>

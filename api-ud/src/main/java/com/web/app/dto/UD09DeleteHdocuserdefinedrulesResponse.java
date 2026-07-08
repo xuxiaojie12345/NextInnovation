@@ -63,7 +63,7 @@ public class UD09DeleteHdocuserdefinedrulesResponse implements Serializable {
         @ApiModelProperty(value = "产品类别", example = "A1")
         private String productClass;
         @ApiModelProperty(value = "序号", example = "1")
-        private Integer number;
+        private Long number;
         @ApiModelProperty(value = "市场", example = "JP")
         private String market;
         @ApiModelProperty(value = "变量", example = "VAR001")

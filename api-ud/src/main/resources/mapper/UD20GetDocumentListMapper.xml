@@ -13,7 +13,7 @@
     <select id="selectDocumentList" resultType="com.web.app.dto.UD20GetDocumentListResponse$DocumentData">
         SELECT
             DOCTYPE AS documentType,
-            DESCRIPTION AS businessUnit,
+            DESCRIPTION AS description,
             REGISTER_USER AS registerUser,
             DATE_FORMAT(REGISTER_DATETIME, '%Y-%m-%d %H:%i:%s') AS registerDateTime
         FROM HDOC_DOCUMENT_LIST

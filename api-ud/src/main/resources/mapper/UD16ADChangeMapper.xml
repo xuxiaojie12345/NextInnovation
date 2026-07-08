@@ -40,13 +40,12 @@
     </update>
 
     <!--
-        UD16 DELETE: 更新AD/CA变更记录（ACT = 'U'）
+        UD16 DELETE: 物理删除AD/CA变更记录
     -->
-    <update id="updateAdcaChangeActU">
-        UPDATE HDOC_ADCA_CHANGE
-        SET ACT = 'U'
+    <delete id="deleteAdcaChange">
+        DELETE FROM HDOC_ADCA_CHANGE
         WHERE SERIE = #{serie}
           AND CHNR = #{chnr}
-    </update>
+    </delete>
 
 </mapper>

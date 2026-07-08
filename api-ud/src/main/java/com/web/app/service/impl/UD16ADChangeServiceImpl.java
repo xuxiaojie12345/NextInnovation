@@ -102,8 +102,8 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                 return UD16ADChangeResponse.error(404, "记录不存在");
             }
 
-            // 更新 ACT = 'U'
-            Integer result = ud16Mapper.updateAdcaChangeActU(
+            // 物理删除记录
+            Integer result = ud16Mapper.deleteAdcaChange(
                     request.getSerie().trim(), request.getChnr().trim());
             if (result == null || result == 0) {
                 return UD16ADChangeResponse.error(500, "删除失败");

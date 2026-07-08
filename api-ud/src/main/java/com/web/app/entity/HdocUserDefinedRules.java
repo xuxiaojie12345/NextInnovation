@@ -26,7 +26,7 @@ public class HdocUserDefinedRules implements Serializable {
     private String pc;
 
     /** 序号 */
-    private Integer num;
+    private Long num;
 
     /** 市场 */
     private String market;

@@ -238,7 +238,7 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
     private HdocUserDefinedRules buildRuleFromRequest(UD08HomologationVariablesRequest request) {
         HdocUserDefinedRules rule = new HdocUserDefinedRules();
         rule.setPc(request.getProductClass());
-        rule.setNum(request.getNumber());
+        rule.setNum(request.getNumber() != null ? request.getNumber().longValue() : null);
         rule.setMarket(request.getMarket());
         rule.setVariable(request.getVariable());
         rule.setVal(request.getValue());

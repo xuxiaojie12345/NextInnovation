@@ -68,8 +68,8 @@ public class UD20GetDocumentListResponse implements Serializable {
         @ApiModelProperty(value = "文档类型", example = "Homologation Certificate")
         private String documentType;
 
-        @ApiModelProperty(value = "业务单元", example = "BU")
-        private String businessUnit;
+        @ApiModelProperty(value = "描述", example = "Description text")
+        private String description;
 
         @ApiModelProperty(value = "注册用户", example = "john.doe")
         private String registerUser;
