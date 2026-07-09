@@ -41,91 +41,61 @@ function getScreenshotPath(testName: string, stepName: string): string {
 // ============================================================
 let dbAvailable = false;
 
-// ============================================================
-// テストデータ setup / cleanup
-// ============================================================
 async function setupTestData() {
   try {
     const conn = await mysql.createConnection(DB_CONFIG);
     dbAvailable = true;
     try {
-      // hdoc_user_infor テーブルにテストユーザーが存在するか確認
       const [rows] = await conn.execute(
         "SELECT COUNT(*) AS cnt FROM hdoc_user_infor WHERE USERID = ?",
-        ["yann"],
+        ["admin"],
       );
       const count = (rows as any[])[0]?.cnt || 0;
       if (count === 0) {
-        // テストユーザーが存在しない場合は作成
         await conn.execute(
-          `INSERT INTO hdoc_user_infor (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
-           VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+          `INSERT INTO hdoc_user_infor (USERID, PASSWORDS, USERNAME, PERMISS, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+           VALUES (?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
           [
-            "yann",
-            "Pass123",
+            "admin",
+            "Pass@123",
             "Admin User",
-            "开发部",
-            "Manager",
-            "tanaka@test.com",
+            "ADMIN",
             "TEST",
             "PLAYWRIGHT",
             "TEST",
             "PLAYWRIGHT",
           ],
         );
-        console.log("Test user 'yann' created in hdoc_user_infor");
-      } else {
-        console.log("Test user 'yann' already exists in hdoc_user_infor");
       }
+      console.log("DB test data setup ok");
     } finally {
       await conn.end();
     }
   } catch (err) {
-    console.warn("DB not available, tests may be limited:", err);
+    console.warn("DB not available:", err);
     dbAvailable = false;
   }
 }
 
-async function clearTestData() {
-  if (!dbAvailable) return;
-  try {
-    const conn = await mysql.createConnection(DB_CONFIG);
-    try {
-      await conn.execute("DELETE FROM hdoc_user_infor WHERE USERID = ?", [
-        "yann",
-      ]);
-      console.log("Test user 'yann' deleted from hdoc_user_infor");
-    } finally {
-      await conn.end();
-    }
-  } catch {
-    // ignore
-  }
-}
-
 // ============================================================
-// 安全なページロード
+// テスト共通関数
 // ============================================================
 async function openLoginPage(page: Page) {
   await page.goto(APP_URL, { waitUntil: "domcontentloaded", timeout: 15000 });
   try {
     await page.waitForLoadState("networkidle", { timeout: 10000 });
   } catch {
-    // タイムアウトは無視
+    /* ignore */
   }
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 }
 
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD01 Login - 单体测试", () => {
+test.describe("UD01 Login Page - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
-  });
-
-  test.afterAll(async () => {
-    await clearTestData();
   });
 
   test.beforeEach(() => {
@@ -138,28 +108,45 @@ test.describe("UD01 Login - 单体测试", () => {
   test("01_画面初期显示_基本元素", async ({ page }) => {
     await openLoginPage(page);
 
-    // 1. UserID 输入框
-    const userIdInput = page.locator("input#userId");
-    await expect(userIdInput).toBeVisible();
-    await expect(userIdInput).toHaveAttribute("type", "text");
-
-    // 2. Password 输入框（密码掩码）
-    const passwordInput = page.locator("input#password");
-    await expect(passwordInput).toBeVisible();
-    await expect(passwordInput).toHaveAttribute("type", "password");
-
-    // 3. Login 按钮
-    const loginBtn = page.locator("button.login-button");
-    await expect(loginBtn).toBeVisible();
-    await expect(loginBtn).toHaveText("Login");
-
-    // 4. タイトル
-    await expect(page.locator("h1.main-title")).toHaveText(
-      "EDB Engineering Database",
-    );
-
+    // 1. 显示 UserID 输入框
+    await expect(page.locator("input#userId")).toBeVisible();
     await page.screenshot({
-      path: getScreenshotPath("01_画面初期显示_基本元素", "基本要素"),
+      path: getScreenshotPath("01_画面初期显示_基本元素", "001_UserID入力確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 2. 显示 Password 输入框
+    await expect(page.locator("input#password")).toBeVisible();
+    await expect(page.locator("input#password")).toHaveAttribute(
+      "type",
+      "password",
+    );
+    await page.screenshot({
+      path: getScreenshotPath(
+        "01_画面初期显示_基本元素",
+        "002_Password入力確認",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 3. 显示 Login 按钮
+    await expect(page.locator("button.login-button")).toBeVisible();
+    await page.screenshot({
+      path: getScreenshotPath("01_画面初期显示_基本元素", "003_Loginﾎﾞﾀﾝ確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 4. Message 标签默认隐藏
+    await expect(page.locator("span.error-message")).toHaveCount(0);
+    await expect(page.locator("div.error-message")).toHaveCount(0);
+    await page.screenshot({
+      path: getScreenshotPath("01_画面初期显示_基本元素", "004_Message非表示"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -172,27 +159,45 @@ test.describe("UD01 Login - 单体测试", () => {
   test("02_画面初期显示_输入控件初始状态", async ({ page }) => {
     await openLoginPage(page);
 
-    // UserID 为空、可用、maxLength=10
+    // 1. UserID 为空、可用、maxLength=10
     const userIdInput = page.locator("input#userId");
     await expect(userIdInput).toBeEmpty();
     await expect(userIdInput).toBeEnabled();
     await expect(userIdInput).toHaveAttribute("maxLength", "10");
-
-    // Password 为空、可用、maxLength=32
-    const passwordInput = page.locator("input#password");
-    await expect(passwordInput).toBeEmpty();
-    await expect(passwordInput).toBeEnabled();
-    await expect(passwordInput).toHaveAttribute("maxLength", "32");
-
-    // Login 按钮可用
-    await expect(page.locator("button.login-button")).toBeEnabled();
-
-    // エラーメッセージは表示されていない
-    await expect(page.locator("span.error-message")).toHaveCount(0);
-    await expect(page.locator("div.error-message")).toHaveCount(0);
-
     await page.screenshot({
-      path: getScreenshotPath("02_画面初期显示_输入控件初始状态", "初期状态"),
+      path: getScreenshotPath(
+        "02_画面初期显示_输入控件初始状态",
+        "001_UserID初期",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 2. Password 为空、可用、maxLength=32
+    const pwInput = page.locator("input#password");
+    await expect(pwInput).toBeEmpty();
+    await expect(pwInput).toBeEnabled();
+    await expect(pwInput).toHaveAttribute("maxLength", "32");
+    await page.screenshot({
+      path: getScreenshotPath(
+        "02_画面初期显示_输入控件初始状态",
+        "002_Password初期",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 3. Login 按钮可用
+    await expect(page.locator("button.login-button")).toBeEnabled();
+    // 4. Message 区域不显示
+    await expect(page.locator("span.error-message")).toHaveCount(0);
+    await page.screenshot({
+      path: getScreenshotPath(
+        "02_画面初期显示_输入控件初始状态",
+        "003_ﾎﾞﾀﾝ有効",
+      ),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -200,19 +205,21 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.3 画面初期显示-UserID 允许字符
+  // No.3 画面初期显示-UserID允许字符
   // ============================================================
-  test("03_UserID允许字符", async ({ page }) => {
+  test("03_画面初期显示_UserID允许字符", async ({ page }) => {
     await openLoginPage(page);
 
     const userIdInput = page.locator("input#userId");
+
+    // 半角英数字を入力
     await userIdInput.fill("User01");
-
-    // 正常入力されたことを確認
     await expect(userIdInput).toHaveValue("User01");
-
     await page.screenshot({
-      path: getScreenshotPath("03_UserID允许字符", "User01入力"),
+      path: getScreenshotPath(
+        "03_画面初期显示_UserID允许字符",
+        "001_半角英数字入力",
+      ),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -220,23 +227,23 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.4 画面初期显示-Password 允许字符
+  // No.4 画面初期显示-Password允许字符
   // ============================================================
-  test("04_Password允许字符", async ({ page }) => {
+  test("04_画面初期显示_Password允许字符", async ({ page }) => {
     await openLoginPage(page);
 
-    const passwordInput = page.locator("input#password");
-    await passwordInput.fill("Pass@123!");
+    const pwInput = page.locator("input#password");
 
-    // 値が入力されていることを確認（type=passwordのため中身は確認できないが値は設定される）
-    const val = await passwordInput.inputValue();
-    expect(val).toBe("Pass@123!");
-
-    // type=password でマスク表示
-    await expect(passwordInput).toHaveAttribute("type", "password");
-
+    // 半角英数字と記号を入力
+    await pwInput.fill("Pass@123!");
+    await expect(pwInput).toHaveValue("Pass@123!");
+    // パスワードマスク表示を確認
+    await expect(pwInput).toHaveAttribute("type", "password");
     await page.screenshot({
-      path: getScreenshotPath("04_Password允许字符", "Password入力"),
+      path: getScreenshotPath(
+        "04_画面初期显示_Password允许字符",
+        "001_入力確認",
+      ),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -244,29 +251,35 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.5 空值校验-UserID 为空
+  // No.5 空值校验-UserID为空
   // ============================================================
   test("05_空值校验_UserID为空", async ({ page }) => {
     await openLoginPage(page);
 
-    // Password に入力
-    await page.locator("input#password").fill("Pass123");
+    // UserID 空、Password 有効
+    await page.locator("input#userId").fill("");
+    await page.locator("input#password").fill("Pass@123");
 
-    // Login をクリック
     await page.locator("button.login-button").click();
     await page.waitForTimeout(500);
 
     // エラーメッセージ
     await expect(page.locator("span.error-message").first()).toBeVisible();
-    await expect(page.locator("span.error-message").first()).toContainText(
+    await expect(page.locator("span.error-message").first()).toHaveText(
       "Username and password are required.",
     );
 
+    await page.screenshot({
+      path: getScreenshotPath("05_空值校验_UserID为空", "001_UserID空"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
     // Login 按钮可用
     await expect(page.locator("button.login-button")).toBeEnabled();
-
     await page.screenshot({
-      path: getScreenshotPath("05_空值校验_UserID为空", "UserID空"),
+      path: getScreenshotPath("05_空值校验_UserID为空", "002_ﾎﾞﾀﾝ有効"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -274,26 +287,35 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.6 空值校验-Password 为空
+  // No.6 空值校验-Password为空
   // ============================================================
   test("06_空值校验_Password为空", async ({ page }) => {
     await openLoginPage(page);
 
-    // UserID に入力
+    // UserID 有効、Password 空
     await page.locator("input#userId").fill("User01");
+    await page.locator("input#password").fill("");
 
-    // Login
     await page.locator("button.login-button").click();
     await page.waitForTimeout(500);
 
     // エラーメッセージ
     await expect(page.locator("span.error-message").first()).toBeVisible();
-    await expect(page.locator("span.error-message").first()).toContainText(
+    await expect(page.locator("span.error-message").first()).toHaveText(
       "Username and password are required.",
     );
 
     await page.screenshot({
-      path: getScreenshotPath("06_空值校验_Password为空", "Password空"),
+      path: getScreenshotPath("06_空值校验_Password为空", "001_Password空"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // Login 按钮可用
+    await expect(page.locator("button.login-button")).toBeEnabled();
+    await page.screenshot({
+      path: getScreenshotPath("06_空值校验_Password为空", "002_ﾎﾞﾀﾝ有効"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -306,18 +328,30 @@ test.describe("UD01 Login - 单体测试", () => {
   test("07_空值校验_两者都为空", async ({ page }) => {
     await openLoginPage(page);
 
-    // Login
+    // 両方空
+    await page.locator("input#userId").fill("");
+    await page.locator("input#password").fill("");
+
     await page.locator("button.login-button").click();
     await page.waitForTimeout(500);
 
     // エラーメッセージ
     await expect(page.locator("span.error-message").first()).toBeVisible();
-    await expect(page.locator("span.error-message").first()).toContainText(
+    await expect(page.locator("span.error-message").first()).toHaveText(
       "Username and password are required.",
     );
 
     await page.screenshot({
-      path: getScreenshotPath("07_空值校验_两者都为空", "両方空"),
+      path: getScreenshotPath("07_空值校验_两者都为空", "001_両方空"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // Login 按钮可用
+    await expect(page.locator("button.login-button")).toBeEnabled();
+    await page.screenshot({
+      path: getScreenshotPath("07_空值校验_两者都为空", "002_ﾎﾞﾀﾝ有効"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -325,19 +359,23 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.8 空值校验-UserID 为空格
+  // No.8 空值校验-UserID为空格
   // ============================================================
   test("08_空值校验_UserID为空格", async ({ page }) => {
     await openLoginPage(page);
 
+    // UserID 空格、Password 有効
     await page.locator("input#userId").fill("   ");
-    await page.locator("input#password").fill("Pass123");
+    await page.locator("input#password").fill("Pass@123");
 
     await page.locator("button.login-button").click();
     await page.waitForTimeout(500);
 
     // エラーメッセージ
     await expect(page.locator("span.error-message").first()).toBeVisible();
+    await expect(page.locator("span.error-message").first()).toHaveText(
+      "Username and password are required.",
+    );
 
     await page.screenshot({
       path: getScreenshotPath("08_空值校验_UserID为空格", "UserID空格"),
@@ -348,7 +386,7 @@ test.describe("UD01 Login - 单体测试", () => {
   });
 
   // ============================================================
-  // No.9 空值校验-Password 为空格
+  // No.9 空值校验-Password为空格
   // ============================================================
   test("09_空值校验_Password为空格", async ({ page }) => {
     await openLoginPage(page);

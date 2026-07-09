@@ -171,6 +171,13 @@ async function openPage(page: Page) {
     /* ignore */
   }
   await page.waitForTimeout(1500);
+  // 各テストの初期画面を自動撮影
+  await page.screenshot({
+    path: getScreenshotPath("_init", "初期画面"),
+    type: "jpeg",
+    quality: 80,
+    fullPage: true,
+  });
 }
 
 /** Number入力欄（最初のhv-input-short） */
@@ -192,6 +199,25 @@ function marketSelect(page: Page) {
 /** ボタン */
 function btn(page: Page, name: string) {
   return page.locator("button.hv-btn").filter({ hasText: name });
+}
+/** Product class/Market/Number/Variable を入力 */
+async function fillRequiredFields(page: Page) {
+  const hasOptionZ = await page
+    .locator("select.hv-select")
+    .first()
+    .locator('option[value="Z"]')
+    .count();
+  if (hasOptionZ > 0) {
+    await page.locator("select.hv-select").first().selectOption("Z");
+  }
+  const hasOptionZZZ = await page
+    .locator("select.hv-select-short")
+    .first()
+    .locator('option[value="ZZZ"]')
+    .count();
+  if (hasOptionZZZ > 0) {
+    await page.locator("select.hv-select-short").first().selectOption("ZZZ");
+  }
 }
 
 // ============================================================
@@ -219,6 +245,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     await expect(page.locator("h1.hv-title")).toHaveText(
       "Homologation Variables",
     );
+    await page.screenshot({
+      path: getScreenshotPath("01_画面初期显示_基本元素", "001_タイトル確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(
       page
         .locator("label.hv-label-required")
@@ -262,6 +294,15 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     await openPage(page);
 
     await expect(pcSelect(page)).toBeVisible();
+    await page.screenshot({
+      path: getScreenshotPath(
+        "02_画面初期显示_下拉列表加载",
+        "001_ProductClass選択肢",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const pcOptions = await pcSelect(page).locator("option").allTextContents();
     expect(pcOptions.length).toBeGreaterThan(1);
 
@@ -284,18 +325,46 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("03_画面初期显示_所有字段为空", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath(
+        "03_画面初期显示_所有字段为空",
+        "001_ページ表示後",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(numberInput(page)).toBeVisible();
     await expect(numberInput(page)).toBeEmpty();
     await expect(variableInput(page)).toBeVisible();
     await expect(variableInput(page)).toBeEmpty();
+    await page.screenshot({
+      path: getScreenshotPath(
+        "03_画面初期显示_所有字段为空",
+        "002_入力欄空確認",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(pcSelect(page)).toHaveValue("");
     await expect(marketSelect(page)).toHaveValue("");
+    await page.screenshot({
+      path: getScreenshotPath(
+        "03_画面初期显示_所有字段为空",
+        "003_セレクト空確認",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(page.locator("div.hv-error-message")).toHaveCount(0);
     await expect(page.locator("button.hv-btn").first()).toBeEnabled();
-
     await page.screenshot({
-      path: getScreenshotPath("03_画面初期显示_所有字段为空", "初期状态"),
+      path: getScreenshotPath(
+        "03_画面初期显示_所有字段为空",
+        "004_エラーなし確認",
+      ),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -307,11 +376,16 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("04_画面初期显示_加载状态", async ({ page }) => {
     await openPage(page);
+    await page.screenshot({
+      path: getScreenshotPath("04_画面初期显示_加载状态", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(page.locator("h1.hv-title")).toBeVisible();
     await expect(page.locator("button.hv-btn").first()).toBeEnabled();
-
     await page.screenshot({
-      path: getScreenshotPath("04_画面初期显示_加载状态", "正常表示"),
+      path: getScreenshotPath("04_画面初期显示_加载状态", "002_正常表示確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -366,7 +440,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("06_Search_无条件搜索", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("06_Search_无条件搜索", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Search").click();
     await page.waitForTimeout(1000);
 
@@ -389,7 +468,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("07_Clear_正常清除", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("07_Clear_正常清除", "001_入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -425,15 +509,24 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("08_Clear_空状态清除", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("08_Clear_空状态清除", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Clear").click();
     await page.waitForTimeout(500);
-
+    await page.screenshot({
+      path: getScreenshotPath("08_Clear_空状态清除", "002_Clear後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(numberInput(page)).toBeEmpty();
     await expect(page.locator("div.hv-error-message")).toHaveCount(0);
-
     await page.screenshot({
-      path: getScreenshotPath("08_Clear_空状态清除", "空Clear"),
+      path: getScreenshotPath("08_Clear_空状态清除", "003_エラーなし確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -445,7 +538,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("09_Add_空值检查", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("09_Add_空值检查", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Add").click();
     await page.waitForTimeout(500);
 
@@ -467,7 +565,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("10_Add_TEMPLATE前缀验证失败", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("10_Add_TEMPLATE前缀验证失败", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -504,7 +607,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("11_Add_TEMPLATE前缀验证成功", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("11_Add_TEMPLATE前缀验证成功", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -557,7 +665,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("12_Add_主键冲突检查", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("12_Add_主键冲突检查", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -593,7 +706,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("13_Add_成功", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("13_Add_成功", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -648,7 +766,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("14_Add_API错误", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("14_Add_API错误", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
       .count();
@@ -685,6 +808,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("15_Update_存在性检查", async ({ page }) => {
     await openPage(page);
+    await page.screenshot({
+      path: getScreenshotPath("15_Update_存在性检查", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
 
     const hasOptionZ = await pcSelect(page)
       .locator('option[value="Z"]')
@@ -738,6 +867,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     }
     await variableInput(page).fill("TEMPLATE-UNKNOWN");
 
+    await page.screenshot({
+      path: getScreenshotPath("16_Update_TEMPLATE前缀验证", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Update").click();
     await page.waitForTimeout(1000);
 
@@ -745,9 +880,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     if (await errMsg.isVisible()) {
       console.log("Error:", await errMsg.textContent());
     }
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("16_Update_TEMPLATE前缀验证", "TEMPLATE"),
+      path: getScreenshotPath("16_Update_TEMPLATE前缀验证", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -775,6 +910,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     }
     await variableInput(page).fill("UD08_TEST_VAR");
 
+    await page.screenshot({
+      path: getScreenshotPath("17_Update_成功", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Update").click();
     await page.waitForTimeout(2000);
 
@@ -787,9 +928,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
         console.log("Error:", await errMsg.textContent());
       }
     }
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("17_Update_成功", "Update成功"),
+      path: getScreenshotPath("17_Update_成功", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -816,6 +957,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       await marketSelect(page).selectOption("ZZZ");
     }
 
+    await page.screenshot({
+      path: getScreenshotPath("18_Update_API错误", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Update").click();
     await page.waitForTimeout(2000);
 
@@ -824,9 +971,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       console.log("Error:", await errMsg.textContent());
     }
     await expect(btn(page, "Update")).toBeEnabled();
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("18_Update_API错误", "Update失敗"),
+      path: getScreenshotPath("18_Update_API错误", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -853,6 +1000,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       await marketSelect(page).selectOption("ZZZ");
     }
 
+    await page.screenshot({
+      path: getScreenshotPath("19_Delete_存在性检查", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Delete").click();
     await page.waitForTimeout(2000);
 
@@ -861,9 +1014,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       console.log("Error:", await errMsg.textContent());
     }
     await expect(btn(page, "Delete")).toBeEnabled();
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("19_Delete_存在性检查", "存在確認"),
+      path: getScreenshotPath("19_Delete_存在性检查", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -920,6 +1073,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       await marketSelect(page).selectOption("ZZZ");
     }
 
+    await page.screenshot({
+      path: getScreenshotPath("20_Delete_成功", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Delete").click();
     await page.waitForTimeout(2000);
 
@@ -932,9 +1091,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
         console.log("Error:", await errMsg.textContent());
       }
     }
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("20_Delete_成功", "Delete成功"),
+      path: getScreenshotPath("20_Delete_成功", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -961,6 +1120,12 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       await marketSelect(page).selectOption("ZZZ");
     }
 
+    await page.screenshot({
+      path: getScreenshotPath("21_Delete_API错误", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await btn(page, "Delete").click();
     await page.waitForTimeout(2000);
 
@@ -969,9 +1134,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
       console.log("Error:", await errMsg.textContent());
     }
     await expect(btn(page, "Delete")).toBeEnabled();
-
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: getScreenshotPath("21_Delete_API错误", "Delete失敗"),
+      path: getScreenshotPath("21_Delete_API错误", "002_結果確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1001,13 +1166,18 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   // ============================================================
   test("23_Variable_最大长度20字符", async ({ page }) => {
     await openPage(page);
-
+    await page.screenshot({
+      path: getScreenshotPath("23_Variable_最大长度20字符", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await variableInput(page).fill("A".repeat(21));
+    await page.waitForTimeout(300);
     const val = await variableInput(page).inputValue();
     expect(val.length).toBeLessThanOrEqual(20);
-
     await page.screenshot({
-      path: getScreenshotPath("23_Variable_最大长度20字符", "最大長"),
+      path: getScreenshotPath("23_Variable_最大长度20字符", "002_入力後確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1015,14 +1185,53 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.24 Product class-最大长度2字符
+  // No.24 Value-最大长度200字符
   // ============================================================
-  test("24_ProductClass_最大长度2字符", async ({ page }) => {
+  test("24_Value_最大长度200字符", async ({ page }) => {
     await openPage(page);
+    await page.screenshot({
+      path: getScreenshotPath("24_Value_最大长度200字符", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    // Valueフィールド（最初のhv-input-long）を探す
+    const valueInput = page.locator("input.hv-input-long").first();
+    await expect(valueInput).toBeVisible();
+    await expect(valueInput).toHaveAttribute("maxLength", "200");
+    // 201文字を入力→maxLength=200でカットされる
+    await valueInput.fill("A".repeat(201));
+    await page.waitForTimeout(300);
+    const val = await valueInput.inputValue();
+    expect(val.length).toBeLessThanOrEqual(200);
+    await page.screenshot({
+      path: getScreenshotPath("24_Value_最大长度200字符", "002_201文字入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.25 Product class-最大长度2字符
+  // ============================================================
+  test("25_ProductClass_最大长度2字符", async ({ page }) => {
+    await openPage(page);
+    await page.screenshot({
+      path: getScreenshotPath(
+        "25_ProductClass_最大长度2字符",
+        "001_ページ表示後",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
     await expect(pcSelect(page)).toBeVisible();
-
     await page.screenshot({
-      path: getScreenshotPath("24_ProductClass_最大长度2字符", "最大長"),
+      path: getScreenshotPath(
+        "25_ProductClass_最大长度2字符",
+        "002_セレクト確認",
+      ),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1030,14 +1239,19 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.25 Market-最大长度3字符
+  // No.26 Market-最大长度3字符
   // ============================================================
-  test("25_Market_最大长度3字符", async ({ page }) => {
+  test("26_Market_最大长度3字符", async ({ page }) => {
     await openPage(page);
-    await expect(marketSelect(page)).toBeVisible();
-
     await page.screenshot({
-      path: getScreenshotPath("25_Market_最大长度3字符", "最大長"),
+      path: getScreenshotPath("26_Market_最大长度3字符", "001_ページ表示後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    await expect(marketSelect(page)).toBeVisible();
+    await page.screenshot({
+      path: getScreenshotPath("26_Market_最大长度3字符", "002_セレクト確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1045,9 +1259,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.26 操作中-按钮禁用
+  // No.27 操作中-按钮禁用
   // ============================================================
-  test("26_操作中_按钮禁用", async ({ page }) => {
+  test("27_操作中_按钮禁用", async ({ page }) => {
     await openPage(page);
 
     const hasOptionZ = await pcSelect(page)
@@ -1076,7 +1290,7 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     await page.waitForTimeout(2000);
 
     await page.screenshot({
-      path: getScreenshotPath("26_操作中_按钮禁用", "操作中"),
+      path: getScreenshotPath("27_操作中_按钮禁用", "操作中"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1097,186 +1311,9 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.27 异常处理-API调用失败
+  // No.28 操作中-防止重复提交
   // ============================================================
-  test("27_异常处理_API调用失败", async ({ page }) => {
-    await openPage(page);
-
-    const hasOptionZ = await pcSelect(page)
-      .locator('option[value="Z"]')
-      .count();
-    if (hasOptionZ > 0) {
-      await pcSelect(page).selectOption("Z");
-    }
-    await numberInput(page).fill("111");
-    const hasOptionZZZ = await marketSelect(page)
-      .locator('option[value="ZZZ"]')
-      .count();
-    if (hasOptionZZZ > 0) {
-      await marketSelect(page).selectOption("ZZZ");
-    }
-
-    await btn(page, "Delete").click();
-    await page.waitForTimeout(2000);
-
-    const errMsg = page.locator("div.hv-error-message");
-    if (await errMsg.isVisible()) {
-      console.log("Error:", await errMsg.textContent());
-    }
-    await expect(btn(page, "Delete")).toBeEnabled();
-
-    await page.screenshot({
-      path: getScreenshotPath("27_异常处理_API调用失败", "API失敗"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.28 异常处理-未授权操作
-  // ============================================================
-  test("28_异常处理_未授权操作", async ({ page }) => {
-    await openPage(page);
-
-    const hasOptionZ = await pcSelect(page)
-      .locator('option[value="Z"]')
-      .count();
-    if (hasOptionZ > 0) {
-      await pcSelect(page).selectOption("Z");
-    }
-    await numberInput(page).fill("999");
-    const hasOptionZZZ = await marketSelect(page)
-      .locator('option[value="ZZZ"]')
-      .count();
-    if (hasOptionZZZ > 0) {
-      await marketSelect(page).selectOption("ZZZ");
-    }
-
-    await btn(page, "Add").click();
-    await page.waitForTimeout(2000);
-
-    const errMsg = page.locator("div.hv-error-message");
-    if (await errMsg.isVisible()) {
-      console.log("Error:", await errMsg.textContent());
-    }
-
-    await page.screenshot({
-      path: getScreenshotPath("28_异常处理_未授权操作", "未認可"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.29 异常处理-用户未登录
-  // ============================================================
-  test("29_异常处理_用户未登录", async ({ page }) => {
-    await clearLoginState(page);
-    await page.goto(PAGE_URL);
-    await safeWaitNetworkIdle(page);
-    await page.waitForTimeout(2000);
-
-    const titleEl = page.locator("h1.hv-title");
-    const titleCount = await titleEl.count();
-    if (titleCount > 0) {
-      await expect(titleEl).toBeVisible();
-    }
-
-    await page.screenshot({
-      path: getScreenshotPath("29_异常处理_用户未登录", "未ログイン"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.30 安全性-API请求协议
-  // ============================================================
-  test("30_安全性_API请求协议", async ({ page }) => {
-    await setLoginState(page);
-
-    const requests: string[] = [];
-    page.on("request", (request) => {
-      if (request.url().includes("/api/ud08HomologationVariables")) {
-        requests.push(request.url());
-      }
-    });
-
-    await page.goto(PAGE_URL);
-    await safeWaitNetworkIdle(page);
-    await page.waitForTimeout(2000);
-
-    if (requests.length > 0) {
-      console.log("UD08 API requests:", requests);
-    }
-
-    await page.screenshot({
-      path: getScreenshotPath("30_安全性_API请求协议", "API確認"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.31 安全性-变更记录日志
-  // ============================================================
-  test("31_安全性_变更记录日志", async ({ page }) => {
-    await openPage(page);
-
-    const hasOptionZ = await pcSelect(page)
-      .locator('option[value="Z"]')
-      .count();
-    if (hasOptionZ > 0) {
-      await pcSelect(page).selectOption("Z");
-    }
-    await numberInput(page).fill("999");
-    const hasOptionZZZ = await marketSelect(page)
-      .locator('option[value="ZZZ"]')
-      .count();
-    if (hasOptionZZZ > 0) {
-      await marketSelect(page).selectOption("ZZZ");
-    }
-    await variableInput(page).fill("UD08_TEST_VAR");
-
-    await btn(page, "Update").click();
-    await page.waitForTimeout(2000);
-
-    const scsMsg = page.locator("div.hv-success-message");
-    if (await scsMsg.isVisible()) {
-      console.log("Update success:", await scsMsg.textContent());
-    }
-
-    await page.screenshot({
-      path: getScreenshotPath("31_安全性_变更记录日志", "变更日志"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.32 Value-最大长度200字符
-  // ============================================================
-  test("32_Value_最大长度200字符", async ({ page }) => {
-    await openPage(page);
-    await expect(variableInput(page)).toHaveAttribute("maxLength", "20");
-
-    await page.screenshot({
-      path: getScreenshotPath("32_Value_最大长度200字符", "maxLength"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-  });
-
-  // ============================================================
-  // No.33 操作中-防止重复提交
-  // ============================================================
-  test("33_操作中_防止重复提交", async ({ page }) => {
+  test("28_操作中_防止重复提交", async ({ page }) => {
     await openPage(page);
 
     const hasOptionZ = await pcSelect(page)
@@ -1306,7 +1343,7 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
     await page.waitForTimeout(2000);
 
     await page.screenshot({
-      path: getScreenshotPath("33_操作中_防止重复提交", "防止重複"),
+      path: getScreenshotPath("28_操作中_防止重复提交", "防止重複"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1324,5 +1361,156 @@ test.describe("UD08 Homologation Variables - 单体测试", () => {
         /* ignore */
       }
     }
+  });
+
+  // ============================================================
+  // No.29 异常处理-API调用失败
+  // ============================================================
+  test("29_异常处理_API调用失败", async ({ page }) => {
+    await openPage(page);
+    await fillRequiredFields(page);
+    await numberInput(page).fill("111");
+
+    await btn(page, "Delete").click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({
+      path: getScreenshotPath("29_异常处理_API调用失败", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    const errMsg = page.locator("div.hv-error-message");
+    if (await errMsg.isVisible()) {
+      console.log("Error:", await errMsg.textContent());
+    }
+    await expect(btn(page, "Delete")).toBeEnabled();
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: getScreenshotPath("29_异常处理_API调用失败", "002_結果確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.30 异常处理-未授权操作
+  // ============================================================
+  test("30_异常处理_未授权操作", async ({ page }) => {
+    await openPage(page);
+    await fillRequiredFields(page);
+    await numberInput(page).fill("999");
+    await page.screenshot({
+      path: getScreenshotPath("30_异常处理_未授权操作", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    await btn(page, "Add").click();
+    await page.waitForTimeout(2000);
+
+    const errMsg2 = page.locator("div.hv-error-message");
+    if (await errMsg2.isVisible()) {
+      console.log("Error:", await errMsg2.textContent());
+    }
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: getScreenshotPath("30_异常处理_未授权操作", "002_結果確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.31 异常处理-用户未登录
+  // ============================================================
+  test("31_异常处理_用户未登录", async ({ page }) => {
+    await clearLoginState(page);
+    await page.goto(PAGE_URL);
+    await safeWaitNetworkIdle(page);
+    await page.waitForTimeout(2000);
+
+    const titleEl = page.locator("h1.hv-title");
+    const titleCount = await titleEl.count();
+    if (titleCount > 0) {
+      await expect(titleEl).toBeVisible();
+    }
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: getScreenshotPath("31_异常处理_用户未登录", "001_未ログイン画面"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    await page.screenshot({
+      path: getScreenshotPath("31_异常处理_用户未登录", "002_タイトル確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.32 安全性-API请求协议
+  // ============================================================
+  test("32_安全性_API请求协议", async ({ page }) => {
+    await setLoginState(page);
+    await page.screenshot({
+      path: getScreenshotPath("32_安全性_API请求协议", "001_ログイン後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    const requests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/api/ud08HomologationVariables")) {
+        requests.push(request.url());
+      }
+    });
+
+    await page.goto(PAGE_URL);
+    await safeWaitNetworkIdle(page);
+    await page.waitForTimeout(2000);
+    await page.screenshot({
+      path: getScreenshotPath("32_安全性_API请求协议", "002_API呼出後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    if (requests.length > 0) {
+      console.log("UD08 API requests:", requests);
+    }
+  });
+
+  // ============================================================
+  // No.33 安全性-变更记录日志
+  // ============================================================
+  test("33_安全性_变更记录日志", async ({ page }) => {
+    await openPage(page);
+    await fillRequiredFields(page);
+    await numberInput(page).fill("999");
+    await variableInput(page).fill("UD08_TEST_VAR");
+    await page.screenshot({
+      path: getScreenshotPath("33_安全性_变更记录日志", "001_条件入力後"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+    await btn(page, "Update").click();
+    await page.waitForTimeout(2000);
+
+    const scsMsg2 = page.locator("div.hv-success-message");
+    if (await scsMsg2.isVisible()) {
+      console.log("Update success:", await scsMsg2.textContent());
+    }
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: getScreenshotPath("33_安全性_变更记录日志", "002_結果確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
   });
 });
