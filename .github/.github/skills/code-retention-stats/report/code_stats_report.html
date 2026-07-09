@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代码留用率统计报告 — NextInnovation</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI','Hiragino Sans GB','Microsoft YaHei',sans-serif; background:#f5f7fa; color:#333; padding:20px; }
+.container { max-width:1400px; margin:0 auto; }
+h1 { font-size:28px; margin-bottom:5px; }
+.subtitle { color:#888; margin-bottom:30px; font-size:14px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:30px; }
+.card { background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; }
+.card .num { font-size:32px; font-weight:700; color:#2c3e50; }
+.card .label { font-size:13px; color:#999; margin-top:5px; }
+.card.good .num { color:#27ae60; }
+.card.warn .num { color:#f39c12; }
+.card.bad .num { color:#e74c3c; }
+.charts { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:30px; }
+.chart-box { background:#fff; border-radius:10px; padding:15px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.chart-box.full { grid-column:1/-1; }
+.chart { width:100%; height:350px; }
+table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:30px; }
+th, td { padding:10px 14px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
+th { background:#2c3e50; color:#fff; font-weight:600; }
+.good { color:#27ae60; font-weight:600; }
+.warn { color:#f39c12; font-weight:600; }
+.bad { color:#e74c3c; font-weight:600; }
+pre { background:#f8f9fa; border-radius:4px; padding:6px; font-size:12px; }
+ul { list-style:none; padding:0; }
+li { padding:4px 0; font-size:12px; color:#666; border-bottom:1px solid #f0f0f0; }
+h2 { font-size:20px; margin:24px 0 12px; color:#2c3e50; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📊 代码留用率统计报告</h1>
+<p class="subtitle">NextInnovation 项目 · 生成时间: 2026-07-08 15:18</p>
+
+<div class="cards">
+    <div class="card"><div class="num">0</div><div class="label">总行数</div></div>
+    <div class="card"><div class="num">0</div><div class="label">有效代码行</div></div>
+    <div class="card bad"><div class="num">0.0%</div><div class="label">整体注释率</div></div>
+    <div class="card good"><div class="num">0.0%</div><div class="label">重复代码率</div></div>
+    <div class="card"><div class="num">0</div><div class="label">零注释文件数</div></div>
+    <div class="card"><div class="num">0</div><div class="label">重复代码块组数</div></div>
+</div>
+
+<div class="charts" id="chartContainer">
+    <div class="chart-box"><div class="chart" id="chartPie"></div></div>
+    <div class="chart-box"><div class="chart" id="chartCodeBar"></div></div>
+    <div class="chart-box"><div class="chart" id="chartCommentBar"></div></div>
+    <div class="chart-box"><div class="chart" id="chartMethodBar"></div></div>
+</div>
+
+<h2>📋 各语言详细统计</h2>
+<table>
+    <tr>
+        <th>语言</th><th>文件数</th><th>总行数</th><th>代码行</th><th>注释行</th><th>空行</th>
+        <th>注释率</th><th>文件头注释覆盖率</th><th>方法文档覆盖率</th>
+    </tr>
+    
+</table>
+
+<h2>🔁 重复代码块检测（前20组）</h2>
+<table>
+    <tr><th>#</th><th>出现次数</th><th>行数</th><th>代码片段</th><th>位置</th></tr>
+    <tr><td colspan="5" style="text-align:center;color:#999;">未发现重复代码块 🎉</td></tr>
+</table>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:30px;">
+    <div class="chart-box" style="grid-column:1;">
+        <h3 style="margin-bottom:10px;">📌 最大文件</h3>
+        <p><strong></strong></p>
+        <p>语言:  · 行数: <strong>0</strong></p>
+    </div>
+    <div class="chart-box" style="grid-column:2;">
+        <h3 style="margin-bottom:10px;">🚫 零注释文件（前30个）</h3>
+        <ul></ul>
+    </div>
+</div>
+
+</div>
+<script>
+var charts = {"codeBar": {"title": {"text": "\u5404\u8bed\u8a00\u4ee3\u7801\u884c\u6570", "left": "center"}, "tooltip": {"trigger": "axis"}, "xAxis": {"type": "category", "data": []}, "yAxis": {"type": "value", "name": "\u4ee3\u7801\u884c\u6570"}, "series": [{"type": "bar", "data": [], "itemStyle": {"color": "#5470c6"}}]}, "commentBar": {"title": {"text": "\u5404\u8bed\u8a00\u6ce8\u91ca\u7387 (%)", "left": "center"}, "tooltip": {"trigger": "axis"}, "xAxis": {"type": "category", "data": []}, "yAxis": {"type": "value", "name": "\u6ce8\u91ca\u7387 %", "max": 100}, "series": [{"type": "bar", "data": [], "itemStyle": {"color": {"type": "linear", "x": 0, "y": 0, "x2": 0, "y2": 1, "colorStops": [{"offset": 0, "color": "#ee6666"}, {"offset": 0.5, "color": "#fac858"}, {"offset": 1, "color": "#91cc75"}]}}}]}, "pieChart": {"title": {"text": "\u6574\u4f53\u4ee3\u7801\u6784\u6210", "left": "center"}, "tooltip": {"trigger": "item", "formatter": "{b}: {c} \u884c ({d}%)"}, "series": [{"type": "pie", "radius": ["40%", "70%"], "center": ["50%", "60%"], "data": [{"name": "\u6709\u6548\u4ee3\u7801", "value": 0, "itemStyle": {"color": "#5470c6"}}, {"name": "\u6ce8\u91ca", "value": 0, "itemStyle": {"color": "#91cc75"}}, {"name": "\u7a7a\u884c", "value": 0, "itemStyle": {"color": "#fac858"}}], "label": {"formatter": "{b}\n{c} \u884c ({d}%)"}}]}, "methodBar": {"title": {"text": "\u65b9\u6cd5 JavaDoc/JSDoc \u8986\u76d6\u7387 (%)", "left": "center"}, "tooltip": {"trigger": "axis"}, "xAxis": {"type": "category", "data": []}, "yAxis": {"type": "value", "name": "\u8986\u76d6\u7387 %", "max": 100}, "series": [{"type": "bar", "data": [], "itemStyle": {"color": "#73c0de"}}]}};
+Object.entries({chartPie:charts.pieChart, chartCodeBar:charts.codeBar, chartCommentBar:charts.commentBar, chartMethodBar:charts.methodBar}).forEach(function([id,opt]){echarts.init(document.getElementById(id)).setOption(opt);});
+</script>
+</body>
+</html>
