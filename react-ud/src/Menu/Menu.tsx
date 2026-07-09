@@ -27,32 +27,30 @@ const menuItems: MenuItem[] = [
     key: "GenerateDucument",
     label: "Generate Ducument",
     icon: <FileTextOutlined />,
+  },
+  {
+    key: "subGenerate",
+    label: "Generate",
     children: [
-      {
-        key: "subGenerate",
-        label: "Generate",
-        children: [
-          { key: "GenerateDoc", label: "Generate Doc", route: "/Menu/GenerateHomologationDocument" },
-          { key: "GenerateBatch", label: "Generate in Batch", route: "#" },
-          { key: "RegdataArchive", label: "Regdata Archive", route: "#" },
-          { key: "RegdataBatch", label: "Regdata Batch", route: "#" },
-        ],
-      },
-      {
-        key: "subAdmin",
-        label: "Admin",
-        children: [
-          { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
-          { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "#" },
-          { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
-          { key: "UnlockDocument", label: "Unlock Document", route: "#" },
-          { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
-          { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
-          { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
-          { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
-          { key: "ADCAChange", label: "AD/CA Change", route: "/Menu/ADCAChange" },
-        ],
-      },
+      { key: "GenerateDoc", label: "Generate Doc", route: "/Menu/GenerateHomologationDocument" },
+      { key: "GenerateBatch", label: "Generate in Batch", route: "#" },
+      { key: "RegdataArchive", label: "Regdata Archive", route: "#" },
+      { key: "RegdataBatch", label: "Regdata Batch", route: "#" },
+    ],
+  },
+  {
+    key: "subAdmin",
+    label: "Admin",
+    children: [
+      { key: "UpdateRules", label: "Update user defined variables (rules)", route: "/Menu/HomologationVariables" },
+      { key: "UpdateUnicodeRules", label: "Update user defined variables (UNICODE rules)", route: "#" },
+      { key: "ExistingVariables", label: "Existing HDoc variables", route: "/Menu/ExistingHDocVariables" },
+      { key: "UnlockDocument", label: "Unlock Document", route: "#" },
+      { key: "HDocNumberSeries", label: "HDoc Number Series", route: "#" },
+      { key: "UploadDeleteTemplate", label: "Upload/Delete template", route: "/Menu/UploadDeleteTemplate" },
+      { key: "ListTemplates", label: "List available templates", route: "/Menu/ListTemplates" },
+      { key: "VPPSVinPlate", label: "VPPS Vin plate", route: "/Menu/VinPlate" },
+      { key: "ADCAChange", label: "AD/CA Change", route: "/Menu/ADCAChange" },
     ],
   },
   {
@@ -100,6 +98,7 @@ const getUserPermissions = (): string[] => {
     const userInfo = JSON.parse(userInfoStr);
     // 权限列表存储在 userInfo.permissions 中，若没有则赋予所有权限（开发阶段）
     return userInfo.permissions || [
+      "GenerateDucument",
       "GenerateDoc", "GenerateBatch", "RegdataArchive", "RegdataBatch",
       "UpdateRules", "UpdateUnicodeRules", "ExistingVariables", "UnlockDocument",
       "HDocNumberSeries", "UploadDeleteTemplate", "ListTemplates", "VPPSVinPlate", "ADCAChange",
