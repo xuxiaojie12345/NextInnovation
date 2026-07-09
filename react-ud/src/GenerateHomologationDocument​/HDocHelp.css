@@ -73,12 +73,10 @@
 
 /* ===== 标题 ===== */
 .help-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: #003057;
   margin: 0 0 20px 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #d0d0d0;
 }
 
 /* ===== 帮助内容 ===== */
@@ -99,4 +97,33 @@
 
 .help-email:hover {
   color: #004499;
+}
+
+.help-back {
+  margin-top: 24px;
+}
+
+.help-back-btn {
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.help-back-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.help-text h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #003057;
+  margin: 20px 0 8px 0;
+}
+
+.help-text h3:first-child {
+  margin-top: 0;
 }

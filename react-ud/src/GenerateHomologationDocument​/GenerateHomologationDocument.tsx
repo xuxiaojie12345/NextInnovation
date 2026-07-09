@@ -16,10 +16,10 @@ const GenerateHomologationDocument: React.FC = () => {
 
   // 初始化
   useEffect(() => {
-    const storedUserID = localStorage.getItem("userID");
+    const storedUserID = localStorage.getItem("userID") || "";
     if (!storedUserID) {
-      navigate("/login");
-      return;
+    //   navigate("/login");
+    //   return;
     }
     setUserID(storedUserID);
 

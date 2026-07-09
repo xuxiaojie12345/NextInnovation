@@ -3,7 +3,7 @@ import TestMain from "./Test/Test";
 import Login from "./Login/Login";
 import Menu from "./Menu/Menu";
 import GenerateHomologationDocument from "./GenerateHomologationDocument​/GenerateHomologationDocument";
-import GenerateDocument from "./GenerateHomologationDocument​/GenerateDocument";
+import GenerateDocument from "./GenerateDocument/GenerateDocument";
 import HDocHelp from "./GenerateHomologationDocument​/HDocHelp";
 
 function App() {

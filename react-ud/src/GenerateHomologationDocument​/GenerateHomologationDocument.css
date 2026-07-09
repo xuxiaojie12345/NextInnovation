@@ -63,33 +63,35 @@
   padding: 40px 24px;
 }
 
+/* 白色面板 */
 .ghd-content {
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 28px 32px 32px;
 }
 
 /* ===== 标题 ===== */
 .ghd-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: #003057;
-  margin: 0 0 28px 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #d0d0d0;
+  margin: 0 0 24px 0;
 }
 
 /* ===== 表单 ===== */
 .ghd-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 /* 表单字段 */
 .ghd-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .ghd-label {
@@ -100,15 +102,14 @@
 
 .ghd-input {
   width: 100%;
-  padding: 8px 10px;
+  padding: 7px 10px;
   font-size: 14px;
   color: #333;
   background-color: #ffffff;
-  border: 1px solid #b0b0b0;
-  border-radius: 2px;
+  border: 1px solid #a0a0a0;
+  border-radius: 0;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.2s;
 }
 
 .ghd-input:focus {
@@ -121,15 +122,14 @@
 
 .ghd-select {
   width: 100%;
-  padding: 8px 10px;
+  padding: 7px 10px;
   font-size: 14px;
   color: #333;
   background-color: #ffffff;
-  border: 1px solid #b0b0b0;
-  border-radius: 2px;
+  border: 1px solid #a0a0a0;
+  border-radius: 0;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.2s;
   appearance: auto;
 }
 
@@ -144,25 +144,23 @@
 /* ===== 按钮行 ===== */
 .ghd-buttons {
   display: flex;
-  gap: 10px;
-  margin-top: 4px;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .ghd-btn {
-  padding: 7px 22px;
+  padding: 6px 20px;
   font-size: 13px;
-  font-weight: 500;
-  border: 1px solid #b0b0b0;
-  border-radius: 2px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  border-radius: 0;
   cursor: pointer;
   background-color: #ffffff;
   color: #333;
-  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .ghd-btn:hover:not(:disabled) {
   background-color: #f0f0f0;
-  border-color: #888;
 }
 
 .ghd-btn:disabled {
