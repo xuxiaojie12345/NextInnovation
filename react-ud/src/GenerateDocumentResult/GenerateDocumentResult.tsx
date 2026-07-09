@@ -57,11 +57,6 @@ const GenerateDocumentResult: React.FC = () => {
       setIsLoading(false);
       return;
     }
-    if (!state || !state.serie || !state.chnr) {
-      setErrorMessage('Invalid chassis information.');
-      setIsLoading(false);
-      return;
-    }
 
     const fetchData = async () => {
       setErrorMessage('');
