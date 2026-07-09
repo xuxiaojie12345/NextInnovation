@@ -8,14 +8,14 @@ interface MenuItem {
 }
 
 interface MenuCategory {
-  title: string;
-  items: MenuItem[];
+  groupHeader: string;
+  linkList: MenuItem[];
 }
 
 const MENU_CATEGORIES: MenuCategory[] = [
   {
-    title: 'Generate',
-    items: [
+    groupHeader: 'Generate',
+    linkList: [
       { label: 'Generate Doc', path: '/menu/generate-doc' },
       { label: 'Generate in Batch' },
       { label: 'Regdata Archive' },
@@ -23,8 +23,8 @@ const MENU_CATEGORIES: MenuCategory[] = [
     ],
   },
   {
-    title: 'Admin',
-    items: [
+    groupHeader: 'Admin',
+    linkList: [
       { label: 'Update user defined variables (rules)', path: '/menu/homologation-variables' },
       { label: 'Update user defined variables (UNICODE rules)' },
       { label: 'Existing HDoc variables', path: '/menu/existing-hdoc-vars' },
@@ -37,8 +37,8 @@ const MENU_CATEGORIES: MenuCategory[] = [
     ],
   },
   {
-    title: 'User Administration',
-    items: [
+    groupHeader: 'User Administration',
+    linkList: [
       { label: 'HDoc User Administration', path: '/menu/hdoc-user-admin' },
       { label: 'HDoc User Doc Administration', path: '/menu/hdoc-user-doc-admin' },
       { label: 'Search User', path: '/menu/search-user' },
@@ -47,15 +47,15 @@ const MENU_CATEGORIES: MenuCategory[] = [
     ],
   },
   {
-    title: 'Archive',
-    items: [
+    groupHeader: 'Archive',
+    linkList: [
       { label: 'Search' },
       { label: 'Upload Document' },
     ],
   },
   {
-    title: 'Documentation',
-    items: [
+    groupHeader: 'Documentation',
+    linkList: [
       { label: 'User Guide', path: '/menu/guide-user' },
       { label: 'AD/CA Change Guide' },
       { label: 'Vin plate Guide FM/FH' },
@@ -67,9 +67,21 @@ const MENU_CATEGORIES: MenuCategory[] = [
 
 const Menu: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const username = localStorage.getItem('username') || localStorage.getItem('userId') || 'User';
 
+  // 获取当前用户名
+  const location = useLocation();
+  const usernameVal = localStorage.getItem('username');
+  const userIdVal = localStorage.getItem('userId');
+  let username = "";
+  if(usernameVal && usernameVal.trim()){
+    username = usernameVal;
+  } else if(userIdVal && userIdVal.trim()){
+    username = userIdVal;
+  }else{
+    username = 'User';
+  }
+  
+  // 退出登录
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -77,9 +89,10 @@ const Menu: React.FC = () => {
     navigate('/login', { replace: true });
   };
 
-  const handleItemClick = (item: MenuItem) => {
-    if (item.path) {
-      navigate(item.path);
+  // link压下
+  const handleLinkItemClick = (linkItem: MenuItem) => {
+    if (linkItem.path) {
+      navigate(linkItem.path);
     }
   };
 
@@ -93,18 +106,19 @@ const Menu: React.FC = () => {
           <h2>Generate Document</h2>
         </div>
 
+        {/* 菜单列表 */}
         <nav className="sidebar-nav">
-          {MENU_CATEGORIES.map((cat) => (
-            <div key={cat.title} className="menu-section">
-              <div className="section-title">{cat.title}</div>
-              {cat.items.map((item) => (
+          {MENU_CATEGORIES.map((menu) => (
+            <div key={menu.groupHeader} className="menu-section">
+              <div className="section-title">{menu.groupHeader}</div>
+              {menu.linkList.map((linkItem) => (
                 <div
-                  key={item.label}
-                  className={`menu-item${location.pathname === item.path ? ' active' : ''}${!item.path ? ' disabled' : ''}`}
-                  onClick={() => handleItemClick(item)}
+                  key={linkItem.label}
+                  className={`menu-item${location.pathname === linkItem.path ? ' active' : ''}${!linkItem.path ? ' disabled' : ''}`}
+                  onClick={() => handleLinkItemClick(linkItem)}
                 >
                  <span className="menu-arrow">»</span>
-                 {item.label}
+                 {linkItem.label}
                 </div>
               ))}
             </div>
@@ -112,6 +126,7 @@ const Menu: React.FC = () => {
         </nav>
       </aside>
 
+      {/* 初始主页面 */}
       <main className="menu-main">
         {isRootMenu ? (
           <>

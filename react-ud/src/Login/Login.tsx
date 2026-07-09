@@ -11,14 +11,18 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const useridVal = userid.trim();
+    const passwordVal = password.trim();
+
     // 前端校验
-    if (!userid.trim() || !password.trim()) {
+    if (useridVal.length == 0 || passwordVal.length == 0 ) {
       setMessage('Username and password are required.');
       return;
     }
 
     // UserID半角英数字校验（仅允许 a-z, A-Z, 0-9）
-    if (!/^[a-zA-Z0-9]+$/.test(userid.trim())) {
+    const useridReg = /^[A-Za-z0-9]+$/;
+    if (!useridReg.test(useridVal)) {
       setMessage('UserID must be alphanumeric characters.');
       return;
     }
@@ -28,8 +32,8 @@ const Login: React.FC = () => {
     
     try {
       const loginRequest: LoginRequest = {
-        userid: userid.trim(),
-        password: password.trim()
+        userid: useridVal,
+        password: passwordVal
       };
 
       const response = await fetch('/api/v1/hdoc/login', {
@@ -56,7 +60,8 @@ const Login: React.FC = () => {
         return;
       }
 
-      if (response.ok && result && result.code === 200 && result.data) {
+      const hasValidData = result !== null;
+      if (response.ok && hasValidData && result?.code === 200 && result?.data) {
         // 登录成功，保存token并跳转
         localStorage.setItem('token', result.data.token);
         localStorage.setItem('userId', result.data.userid);
