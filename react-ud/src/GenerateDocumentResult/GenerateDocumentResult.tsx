@@ -33,12 +33,30 @@ const GenerateDocumentResult: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // 固定值
-  const masterMarket = '-EU';
-  const hdocVersion = '4.2.1';
-  const usingTemplate = 'eU/VIN PLATE_UD TRUCKS TSA INDO PHIL.rtf';
-
+  // 统一常量集合
+  const STATIC_CONFIG = {
+    defaultMasterArea: '-EU',
+    systemEdition: '4.2.1',
+    templateFile: 'eU/VIN PLATE_UD TRUCKS TSA INDO PHIL.rtf',
+    createPageRoute: '/menu/generate-doc',
+    specPageUrl: '/menu/vehicle-specification',
+    editDocUrl: '/menu/modify-document',
+  };
+  
   useEffect(() => {
+    // 参数校验
+    if (!state) {
+      setErrorMessage('Invalid chassis information.');
+      setIsLoading(false);
+      return;
+    }
+    const chassisSeries = state.serie?.trim();
+    const chassisNumber = state.chnr?.trim();
+    if (!chassisSeries || !chassisNumber) {
+      setErrorMessage('Invalid chassis information.');
+      setIsLoading(false);
+      return;
+    }
     if (!state || !state.serie || !state.chnr) {
       setErrorMessage('Invalid chassis information.');
       setIsLoading(false);
@@ -57,7 +75,8 @@ const GenerateDocumentResult: React.FC = () => {
         if (res.code === 200 && res.data) {
           setData(res.data);
         } 
-      } catch {
+      } catch (err){
+        console.error('Failed to fetch document data', err);
         setErrorMessage('System error. Please contact administrator.');
       } finally {
         setIsLoading(false);
@@ -86,18 +105,22 @@ const GenerateDocumentResult: React.FC = () => {
     return (
       <div className="gen-doc-result-container">
         <div className="gen-doc-result-error">{errorMessage}</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/menu/generate-doc')}>
+        <button className="btn btn-secondary" onClick={() => navigate(STATIC_CONFIG.createPageRoute)}>
           Back
         </button>
       </div>
     );
   }
 
-  const serie = state?.serie || '';
-  const chnr = state?.chnr || '';
+  let serie = '';
+  let chnr = '';
+  if (state) {
+    serie = state.serie.trim();
+    chnr = state.chnr.trim();
+  }
 
   const handleChassisNoClick = () => {
-    navigate('/menu/vehicle-specification', {
+    navigate(STATIC_CONFIG.specPageUrl, {
       state: {
         serie,
         chnr,
@@ -106,11 +129,11 @@ const GenerateDocumentResult: React.FC = () => {
   };
 
   const handleModifyDocClick = () => {
-    navigate('/menu/modify-document', {
+    navigate(STATIC_CONFIG.editDocUrl, {
       state: {
         serie,
         chnr,
-        market: data?.market || '',
+        market: data?.market ?? '',
         userId: localStorage.getItem('userId'),
       },
     });
@@ -127,33 +150,33 @@ const GenerateDocumentResult: React.FC = () => {
           <span className="info-value">
             <strong>{serie} </strong>
             <span className="link-chassis" onClick={handleChassisNoClick}>
-              {chnr || '-'}
+              {chnr ?? '-'}
             </span>
           </span>
         </div>
         <div className="info-row">
           <span className="info-label">Ordernumber</span>
-          <span className="info-value">{data?.ordernumber || '-'}</span>
+          <span className="info-value">{data?.ordernumber ?? '-'}</span>
         </div>
         <div className="info-row" style={{ marginTop: '10px' }}>
           <span className="info-label">Build week</span>
-          <span className="info-value">{data?.buildWeek || '-'}</span>
+          <span className="info-value">{data?.buildWeek ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Spec week</span>
-          <span className="info-value">{data?.specWeek || '-'}</span>
+          <span className="info-value">{data?.specWeek ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Market</span>
-          <span className="info-value">{data?.market || '-'}</span>
+          <span className="info-value">{data?.market ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Master Market</span>
-          <span className="info-value">{masterMarket}</span>
+          <span className="info-value">{STATIC_CONFIG.defaultMasterArea}</span>
         </div>
         <div className="info-row" style={{ marginTop: '30px' }}>
           <span className="info-label">S-Note NO</span>
-          <span className="info-value">{data?.noteNo || '-'}</span>
+          <span className="info-value">{data?.noteNo ?? '-'}</span>
         </div>
         {data?.noteNo && (
           <div className="s-note-message">
@@ -163,19 +186,19 @@ const GenerateDocumentResult: React.FC = () => {
 
         <div className="info-row" style={{ marginTop: '20px' }}>
           <span className="info-label">Front load index</span>
-          <span className="info-value">FTLI-{data?.frontLoadIndex || data?.loadIndex || '-'}</span>
+          <span className="info-value">FTLI-{data?.frontLoadIndex ?? data?.loadIndex ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Front speed index</span>
-          <span className="info-value">FTSI-{data?.frontSpeedIndex || '-'}</span>
+          <span className="info-value">FTSI-{data?.frontSpeedIndex ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Drive load index</span>
-          <span className="info-value">DTLI-{data?.driveLoadIndex || data?.loadIndex || '-'}</span>
+          <span className="info-value">DTLI-{data?.driveLoadIndex ?? data?.loadIndex ?? '-'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Drive speed index</span>
-          <span className="info-value">DTSI-{data?.driveSpeedIndex || '-'}</span>
+          <span className="info-value">DTSI-{data?.driveSpeedIndex ?? '-'}</span>
         </div>       
       </div>
 
@@ -191,7 +214,8 @@ const GenerateDocumentResult: React.FC = () => {
 
         {data?.modifyDocLink && (
           <div className="info-row">
-            <span className="info-value modify-warning link-like" style={{ textDecorationColor: 'red', color: 'red', marginBottom: '10px', cursor: 'pointer' }} onClick={handleModifyDocClick}>
+            <span className="info-value modify-warning link-like" style={{ textDecorationColor: 'red', color: 'red', marginBottom: '10px', cursor: 'pointer' }}
+             onClick={handleModifyDocClick}>
               After def change detected. Document need to be modified.
             </span>
           </div>
@@ -199,7 +223,7 @@ const GenerateDocumentResult: React.FC = () => {
 
         <div className="info-row">
           <span className="info-label">Using template</span>
-          <span className="info-value">{usingTemplate}</span>
+          <span className="info-value">{STATIC_CONFIG.templateFile}</span>
         </div>
 
         <div className="info-row">
@@ -245,7 +269,7 @@ const GenerateDocumentResult: React.FC = () => {
 
         <div className="info-row">
           <span className="info-label">HDoc version</span>
-          <span className="info-value">{hdocVersion}</span>
+          <span className="info-value">{STATIC_CONFIG.systemEdition}</span>
         </div>
       </div>
 
