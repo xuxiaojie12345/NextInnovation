@@ -35,9 +35,9 @@ const GenerateHomologationDoc: React.FC = () => {
 
   // 恢复上次输入的条件
   useEffect(() => {
-    const savedSeries = localStorage.getItem('generate_chassisSeries');
-    const savedNo = localStorage.getItem('generate_chassisNo');
-    const savedDocType = localStorage.getItem('generate_documentType');
+    const savedSeries = localStorage.getItem('chassisSeries');
+    const savedNo = localStorage.getItem('chassisNo');
+    const savedDocType = localStorage.getItem('documentType');
     if (savedSeries) setChassisSeries(savedSeries);
     if (savedNo) setChassisNo(savedNo);
     if (savedDocType) setDocumentType(savedDocType);
@@ -70,19 +70,20 @@ const GenerateHomologationDoc: React.FC = () => {
 
   // 保存输入条件到 localStorage
   const saveInputs = useCallback(() => {
-    localStorage.setItem('generate_chassisSeries', chassisSeries);
-    localStorage.setItem('generate_chassisNo', chassisNo);
-    localStorage.setItem('generate_documentType', documentType);
+    localStorage.setItem('chassisSeries', chassisSeries);
+    localStorage.setItem('chassisNo', chassisNo);
+    localStorage.setItem('documentType', documentType);
   }, [chassisSeries, chassisNo, documentType]);
 
   const validate = (): boolean => {
     setErrorMessage('');
-
+    const seriesPattern = /^[a-zA-Z]{1,5}$/;
+    const chassisNoPattern = /^[0-9]{1,10}$/;
     if (!chassisSeries.trim()) {
       setErrorMessage('Chassis series is required.');
       return false;
     }
-    if (!/^[a-zA-Z]+$/.test(chassisSeries.trim()) || chassisSeries.trim().length > 5) {
+    if (!seriesPattern.test(chassisSeries.trim())) {
       setErrorMessage('Chassis series must be 5 alphabetic characters.');
       return false;
     }
@@ -90,7 +91,7 @@ const GenerateHomologationDoc: React.FC = () => {
       setErrorMessage('Chassis no is required.');
       return false;
     }
-    if (!/^[0-9]+$/.test(chassisNo.trim()) || chassisNo.trim().length > 10) {
+    if (!chassisNoPattern.test(chassisNo.trim())) {
       setErrorMessage('Chassis no must be up to 10 digits.');
       return false;
     }
@@ -125,7 +126,11 @@ const GenerateHomologationDoc: React.FC = () => {
           },
         });
       } else {
-        setErrorMessage(res.message || 'System error. Please contact administrator.');
+        if (res.message !== null) {
+          setErrorMessage(res.message); 
+        } else {
+          setErrorMessage('System error. Please contact administrator.');
+        }
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');
@@ -139,9 +144,9 @@ const GenerateHomologationDoc: React.FC = () => {
     setChassisNo('');
     setDocumentType('');
     setErrorMessage('');
-    localStorage.removeItem('generate_chassisSeries');
-    localStorage.removeItem('generate_chassisNo');
-    localStorage.removeItem('generate_documentType');
+    localStorage.removeItem('chassisSeries');
+    localStorage.removeItem('chassisNo');
+    localStorage.removeItem('documentType');
   };
 
   return (
@@ -156,7 +161,8 @@ const GenerateHomologationDoc: React.FC = () => {
         {errorMessage && (
           <div className="generate-doc-error">{errorMessage}</div>
         )}
-
+        
+        {/* Chassis series 项目 */}
         <form onSubmit={handleSubmit} className="generate-doc-form">
           <div className="form-row">
             <label className="form-label required">Chassis series</label>
@@ -171,6 +177,7 @@ const GenerateHomologationDoc: React.FC = () => {
             />
           </div>
 
+          {/* Chassis no 项目 */}
           <div className="form-row">
             <label className="form-label required">Chassis no</label>
             <input
@@ -184,6 +191,7 @@ const GenerateHomologationDoc: React.FC = () => {
             />
           </div>
 
+          {/* Document type 项目 */}
           <div className="form-row">
             <label className="form-label required">Document type</label>
             <select
@@ -201,6 +209,7 @@ const GenerateHomologationDoc: React.FC = () => {
             </select>
           </div>
 
+          {/* 底部按钮 */}
           <div className="form-actions-wrapper">
             <div className="form-actions">
               <button
