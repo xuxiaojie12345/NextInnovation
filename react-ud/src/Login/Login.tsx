@@ -88,8 +88,7 @@ const Login: React.FC = () => {
       {/* 左侧标题区域 */}
       <div className="login-left-section">
         <h1 className="login-title">
-          <span className="title-edb">EDB</span>
-          <span className="title-full">Engineering Database</span>
+          <span className="title-full">EDB Engineering Database</span>
         </h1>
         <p className="login-subtitle">Use Outlook id and password</p>
         <p className="login-support">
@@ -123,6 +122,8 @@ const Login: React.FC = () => {
             disabled={isLoading}
             maxLength={32}
           />
+          {/* 错误消息显示区域 */}
+          {message && <div className="login-message">{message}</div>}
           {/* 登录按钮 */}
           <Button
             type="primary"
@@ -134,8 +135,18 @@ const Login: React.FC = () => {
           >
             Login
           </Button>
-          {/* 错误消息显示区域 */}
-          {message && <div className="login-message">{message}</div>}
+          <div className="login-hint">
+            <p>
+              If you get error message. &ldquo;Your account is locked, Please contact yout sysiem
+              administrator&rdquo;
+            </p>
+            <p>
+              Please try this alterative login link before contacting support.{' '}
+              <a href="/login">Login</a>
+            </p>
+            <p>We are working to find root cause of problem.</p>
+            
+          </div>
         </form>
       </div>
     </div>

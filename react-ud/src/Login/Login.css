@@ -15,7 +15,7 @@
 .login-left-section {
   flex: 1;
   padding-left: 120px;
-  max-width: 700px;
+  max-width: 740px;
   z-index: 1;
 }
 
@@ -28,6 +28,7 @@
   letter-spacing: 1px;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .title-edb {
@@ -43,29 +44,29 @@
 .login-subtitle {
   font-size: 18px;
   color: #ffffff;
-  margin-bottom: 24px;
+  margin-top: 18px;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   font-weight: 400;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 /* 支持信息文本 */
 .login-support {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 18px;
+  color: #ffffff;
   line-height: 1.6;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  max-width: 480px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  max-width: 740px;
 }
 
 /* 右侧登录表单区域 */
 .login-right-section {
   width: 440px;
   margin-right: 120px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
   padding: 48px 40px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   z-index: 1;
 }
 
@@ -112,34 +113,58 @@
 .login-button {
   height: 48px !important;
   font-size: 16px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   border-radius: 4px !important;
   border: none !important;
-  background: #1a73e8 !important;
-  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3) !important;
+  background: #ffffff !important;
+  color: #666666 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
   transition: background 0.3s, box-shadow 0.3s !important;
 }
 
 .login-button:hover {
-  background: #1557b0 !important;
-  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4) !important;
+  background: #f0f4ff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
 .login-button:active {
-  background: #0d47a1 !important;
+  background: #d9e6ff !important;
 }
 
 /* 错误消息显示区域 */
 .login-message {
   margin-top: 4px;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 20px;
   line-height: 1.5;
-  color: #ff4d4f;
-  background: #fff2f0;
-  border: 1px solid #ffccc7;
+  color: #BB0503;
+  background: transparent;
+  border: 1px solid #999999;
   border-radius: 4px;
   animation: fadeIn 0.25s ease-in;
+}
+
+/* 登录按钮下方提示文字 */
+.login-hint {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #BB0503;
+  margin-top: 12px;
+  white-space: nowrap;
+}
+
+.login-hint p {
+  margin: 0 0 4px;
+}
+
+.login-hint a {
+  color: #BB0503;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.login-hint a:hover {
+  color: #d9363e;
 }
 
 /* 淡入动画 */
@@ -190,7 +215,7 @@
     font-size: 16px;
   }
   .login-support {
-    font-size: 13px;
+    font-size: 16px;
     max-width: 100%;
   }
   .login-right-section {
@@ -217,7 +242,7 @@
     margin-bottom: 16px;
   }
   .login-support {
-    font-size: 12px;
+    font-size: 14px;
   }
   .login-right-section {
     padding: 24px 20px 20px;

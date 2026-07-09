@@ -1,0 +1,256 @@
+.md-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.md-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.md-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.md-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.md-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 960px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.md-info-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  line-height: 1.6;
+}
+
+.md-info-label {
+  flex: 0 0 120px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+  padding-right: 12px;
+}
+
+.md-info-value {
+  flex: 1;
+  font-size: 13px;
+  color: #333333;
+}
+
+.md-link {
+  color: #1a73e8;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 13px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.md-link:hover {
+  color: #1557b0;
+}
+
+.md-link:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.md-table-wrapper {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.md-th {
+  background-color: #f5f5f5;
+  color: #333333;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid #d0d0d0;
+  white-space: nowrap;
+}
+
+.md-th-variable {
+  width: 18%;
+}
+
+.md-th-desc {
+  width: 30%;
+}
+
+.md-th-current {
+  width: 22%;
+}
+
+.md-th-modified {
+  width: 30%;
+}
+
+.md-td {
+  padding: 8px 12px;
+  border: 1px solid #d0d0d0;
+  color: #333333;
+  vertical-align: middle;
+}
+
+.md-td-variable {
+  font-weight: 600;
+}
+
+.md-td-desc {
+  color: #555555;
+}
+
+.md-td-current {
+  color: #555555;
+}
+
+.md-input {
+  width: 100%;
+}
+
+.md-input.ant-input {
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  height: 32px;
+  font-size: 13px;
+  color: #333333;
+}
+
+.md-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.md-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.md-input.ant-input[disabled] {
+  background-color: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.md-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.md-button {
+  height: 36px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  min-width: 120px;
+}
+
+.md-button-save {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.25) !important;
+}
+
+.md-button-save:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.md-button-save:active {
+  background-color: #0d47a1 !important;
+  border-color: #0d47a1 !important;
+}
+
+.md-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  animation: fadeIn 0.25s ease-in;
+}
+
+.md-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+}
+
+.md-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #003366;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.md-loading-text {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #666666;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.md-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.md-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.md-footer-link:hover {
+  color: #e0e0e0;
+}
