@@ -66,10 +66,10 @@ python scripts/stats.py --offline --since 30d --output ./my_report
 
 | 文件 | 说明 |
 |------|------|
-| `report/adoption_report.html` | HTML 报告（含 ECharts 图表） |
-| `report/adoption_report.json` | JSON 原始数据 |
-| `report/high_churn_files.txt` | 高流失率文件列表 |
-| `report/dev_retention_details.txt` | 各开发者详细留存数据 |
+| `report/adoption_report_YYYYMMDD-HHMM.html` | HTML 报告（含 ECharts 图表） |
+| `report/adoption_report_YYYYMMDD-HHMM.json` | JSON 原始数据 |
+| `report/high_churn_files_YYYYMMDD-HHMM.txt` | 高流失率文件列表 |
+| `report/dev_retention_details_YYYYMMDD-HHMM.txt` | 各开发者详细留存数据 |
 
 ## 执行流程（内部逻辑）
 

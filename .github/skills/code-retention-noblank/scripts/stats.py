@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Git 提交采纳率统计工具 — NextInnovation 项目
+Git 提交采纳率统计工具（排除空行版） — NextInnovation 项目
 基于 Git 历史分析：代码留存率、开发者采纳率、文件稳定度、代码流失趋势。
+空行不计入新增行和存活行的统计。
 """
 import os
 import re
@@ -14,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 
 # ── 配置 ──────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
-REPORT_DIR = PROJECT_ROOT / ".github" / "skills" / "code-retention-stats" / "report"
+REPORT_DIR = PROJECT_ROOT / ".github" / "skills" / "code-retention-noblank" / "report"
 JST = timezone(timedelta(hours=9))
 SOURCE_EXTENSIONS = {".java", ".ts", ".tsx", ".css", ".js", ".xml"}
 SINCE_MAP = {"30d": "2026-06-08", "60d": "2026-05-09", "90d": "2026-04-09", "all": None}
@@ -34,15 +35,12 @@ FIXED_BRANCHES = [
     "origin/user/yanwenjing",
 ]
 
-# 只统计以下作者（排除基础框架提交的贡献者）
 TARGET_AUTHORS = {"yanwenjing", "Awangluxing", "haohetao20240507", "duyage", "wangqun"}
 
 def get_all_branches():
-    """返回固定的远端分支列表"""
     return list(FIXED_BRANCHES)
 
 def get_branch_commits(branch):
-    """获取某个分支上的所有提交哈希集合"""
     cmd = ["git", "log", branch, "--format=%H"]
     result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, encoding="utf-8")
     if result.returncode != 0:
@@ -50,7 +48,6 @@ def get_branch_commits(branch):
     return {h.strip() for h in result.stdout.strip().splitlines() if h.strip()}
 
 def get_branch_source_files(branch):
-    """获取指定分支上属于 src/ 的源文件列表"""
     cmd = ["git", "ls-tree", "-r", branch, "--name-only", "api-ud/src/main", "react-ud/src/"]
     result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, encoding="utf-8")
     if result.returncode != 0:
@@ -100,64 +97,102 @@ def git_log_numstat(since=None):
         commits.append(current)
     return commits
 
-def get_source_files():
-    """获取项目中所有需要跟踪的源文件列表（相对路径）"""
-    cmd = ["git", "ls-files", "api-ud/src/main", "react-ud/src/"]
-    result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, encoding="utf-8")
-    if result.returncode != 0:
-        return []
-    return [f for f in result.stdout.strip().splitlines() if Path(f).suffix.lower() in SOURCE_EXTENSIONS]
-
 def git_blame_surviving_on_branch(branch, source_files, commit_set):
-    """对指定分支运行 git blame，返回 {commit_hash: 存活行数}"""
+    """
+    对指定分支运行 git blame，返回 {commit_hash: 存活行数}。
+    逐行检查内容，空行（content.strip() == ""）不计入存活。
+    同时返回 {fpath: blank_ratio} 供 added 校正使用。
+    """
     if not source_files:
-        return {}
-    line_count = defaultdict(int)
-    total_lines = 0
+        return {}, {}, 0
+    line_count = defaultdict(int)       # 非空行存活 → commit hash
+    total_valid_lines = 0
+    file_blank_ratios = {}               # fpath → blank_ratio
+
     for i, fpath in enumerate(source_files):
         if (i + 1) % 30 == 0:
             print(f"    进度: {i+1}/{len(source_files)}")
+
         cmd = ["git", "blame", "--line-porcelain", branch, "--", fpath]
         result = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if result.returncode != 0:
             continue
+
+        # 对该文件统计空行比例
+        file_total = 0
+        file_blank = 0
+        current_hash = None
+
         for line_blob in result.stdout.split("\n"):
-            line_blob = line_blob.strip()
-            if not line_blob or line_blob.startswith("\t"):
+            line_stripped = line_blob.strip()
+
+            # 内容行：以 tab 开头
+            if line_blob.startswith("\t"):
+                file_total += 1
+                content = line_blob[1:]  # 去掉 tab
+                if content.strip() == "":
+                    file_blank += 1
+                    current_hash = None  # 空行不计数
+                else:
+                    # 非空行：归到 current_hash
+                    if current_hash and current_hash in commit_set:
+                        line_count[current_hash] += 1
+                        total_valid_lines += 1
+                    current_hash = None
                 continue
-            if any(line_blob.startswith(p) for p in [
+
+            if not line_stripped:
+                continue
+
+            # 跳过元数据行
+            if any(line_stripped.startswith(p) for p in [
                 "author ", "committer ", "summary ", "previous ",
                 "boundary", "filename ", "author-mail", "author-time",
                 "author-tz", "committer-mail", "committer-time", "committer-tz"
             ]):
                 continue
-            potential_hash = line_blob.split()[0] if " " in line_blob else line_blob
+
+            # 提交 hash 行
+            potential_hash = line_stripped.split()[0] if " " in line_stripped else line_stripped
             if len(potential_hash) == 40 and all(c in "0123456789abcdef" for c in potential_hash):
-                if potential_hash in commit_set:
-                    line_count[potential_hash] += 1
-                    total_lines += 1
-    return dict(line_count), total_lines
+                current_hash = potential_hash if potential_hash in commit_set else None
+
+        # 保存该文件的空行比例
+        if file_total > 0:
+            file_blank_ratios[fpath] = round(file_blank / file_total, 4)
+        else:
+            file_blank_ratios[fpath] = 0.0
+
+    return dict(line_count), file_blank_ratios, total_valid_lines
+
 
 def git_blame_all_branches(branches, all_commits):
-    """遍历所有固定分支，对每个分支运行 blame，汇总后每个提交取最大存活数"""
+    """
+    遍历所有固定分支，对每个分支运行 blame（排除空行）。
+    返回两个 dict：
+      - surviving: {commit_hash: 最大非空存活行数}
+      - added_corrections: {commit_hash: (raw_added, adjusted_added)}
+    """
     all_commit_hashes = {c["hash"] for c in all_commits}
     per_commit_per_branch = defaultdict(dict)
+    # 收集每个分支上每个文件的空行比例，用于校正 added
+    branch_file_blank_ratios = {}
 
     for b in branches:
         branch_commits = get_branch_commits(b) & all_commit_hashes
         if not branch_commits:
             print(f"  ⏭️  跳过 {b}（无相关提交）")
             continue
-        # 获取该分支独有的源文件列表
         branch_files = get_branch_source_files(b)
         if not branch_files:
             print(f"  ⏭️  跳过 {b}（无源文件）")
             continue
         print(f"  🔍 正在分析分支: {b}（{len(branch_commits)} 个提交，{len(branch_files)} 个文件）...")
-        result, total = git_blame_surviving_on_branch(b, branch_files, branch_commits)
+        result, blank_ratios, total = git_blame_surviving_on_branch(b, branch_files, branch_commits)
         for ch, count in result.items():
             per_commit_per_branch[ch][b] = count
-        print(f"    ✅ 存活 {total} 行，来自 {len(result)} 个提交")
+        branch_file_blank_ratios[b] = blank_ratios
+        print(f"    ✅ 存活 {total} 行（非空行），来自 {len(result)} 个提交")
 
     # 每个 commit 取最大存活数
     surviving = {}
@@ -167,8 +202,138 @@ def git_blame_all_branches(branches, all_commits):
         surviving[ch] = max_val
         total_survived_all += max_val
 
-    print(f"\n  📊 全部分支汇总: {total_survived_all} 行存活代码，来自 {len(surviving)} 个提交")
-    return surviving
+    print(f"\n  📊 全部分支汇总: {total_survived_all} 行存活代码（非空行），来自 {len(surviving)} 个提交")
+    return surviving, branch_file_blank_ratios
+
+
+def apply_blank_correction(commits, branch_file_blank_ratios, branches):
+    """
+    用每个分支上文件的空行比例，校正 commits 中 added 计数。
+    对每个 commit 涉及的每个文件，使用对应分支上的空行比例扣除空行。
+    """
+    # 构建 文件→空行比例 的映射（取各分支均值）
+    file_avg_ratio = defaultdict(list)
+    for b, ratios in branch_file_blank_ratios.items():
+        for fpath, ratio in ratios.items():
+            file_avg_ratio[fpath].append(ratio)
+
+    file_blank_ratio = {}
+    for fpath, ratios in file_avg_ratio.items():
+        file_blank_ratio[fpath] = sum(ratios) / len(ratios)
+
+    for c in commits:
+        for fpath, finfo in c["files"].items():
+            ratio = file_blank_ratio.get(fpath, 0.0)
+            raw_added = finfo["added"]
+            adjusted = max(0, int(round(raw_added * (1 - ratio))))
+            finfo["added_adjusted"] = adjusted
+            # deleted 也做同样校正
+            raw_deleted = finfo["deleted"]
+            finfo["deleted_adjusted"] = max(0, int(round(raw_deleted * (1 - ratio))))
+
+    return commits
+
+
+# ═══════════════════════════════════════════════════════
+#  提交分类
+# ═══════════════════════════════════════════════════════
+def classify_commit(message):
+    msg_lower = message.lower()
+    patterns = {
+        "功能开发": [r"\b(feature|feat|add|new)\b", "新規", "追加"],
+        "缺陷修复": [r"\b(fix|bug|hotfix|correct)\b", "修正", "修復", "バグ"],
+        "重构优化": [r"\b(refactor|optimize|improve|restruct)\b", "重构", "改善", "最適化", "リファクタ"],
+        "文档注释": [r"\b(doc|comment|readme)\b", "ドキュメント", "コメント"],
+        "日常维护": [r"\b(chore|update|upd|merge|clean|remove|delete)\b", "更新", "削除", "マージ"],
+    }
+    for category, pattern_list in patterns.items():
+        for p in pattern_list:
+            if re.search(p, msg_lower):
+                return category
+    return "其他"
+
+
+# ═══════════════════════════════════════════════════════
+#  核心分析（使用校正后的 added_adjusted）
+# ═══════════════════════════════════════════════════════
+def analyze(commits, surviving, file_churn):
+    total_added = 0
+    total_survived = 0
+    commit_details = []
+    for c in commits:
+        added = sum(f.get("added_adjusted", f["added"]) for f in c["files"].values())
+        survived = surviving.get(c["hash"], 0)
+        retention = round(survived / max(added, 1) * 100, 2)
+        total_added += added
+        total_survived += survived
+        commit_details.append({
+            "hash": c["hash"][:8], "full_hash": c["hash"], "date": c["date"],
+            "author": c["author"], "email": c["email"], "message": c["message"],
+            "category": classify_commit(c["message"]),
+            "added": added, "survived": survived, "retention": retention,
+        })
+
+    dev_stats = defaultdict(lambda: {"commits": 0, "added": 0, "survived": 0, "deleted": 0})
+    for c in commits:
+        a = c["author"]
+        added = sum(f.get("added_adjusted", f["added"]) for f in c["files"].values())
+        deleted = sum(f.get("deleted_adjusted", f["deleted"]) for f in c["files"].values())
+        survived = surviving.get(c["hash"], 0)
+        dev_stats[a]["commits"] += 1
+        dev_stats[a]["added"] += added
+        dev_stats[a]["survived"] += survived
+        dev_stats[a]["deleted"] += deleted
+
+    dev_summary = []
+    for author, s in sorted(dev_stats.items(), key=lambda x: -x[1]["added"]):
+        retention = round(s["survived"] / max(s["added"], 1) * 100, 2)
+        churn = round(s["deleted"] / max(s["added"] + s["deleted"], 1) * 100, 2)
+        dev_summary.append({"author": author, "commits": s["commits"], "added": s["added"],
+            "survived": s["survived"], "deleted": s["deleted"], "retention": retention,
+            "churn": churn, "net": s["added"] - s["deleted"]})
+
+    week_trend = defaultdict(lambda: {"added": 0, "survived": 0})
+    for c in commit_details:
+        try:
+            dt = datetime.fromisoformat(c["date"])
+            wk = dt.strftime("%Y-W%V")
+            week_trend[wk]["added"] += c["added"]
+            week_trend[wk]["survived"] += c["survived"]
+        except ValueError:
+            continue
+    trend = [{"week": wk, "added": t["added"], "survived": t["survived"],
+        "retention": round(t["survived"] / max(t["added"], 1) * 100, 2)}
+        for wk, t in sorted(week_trend.items())]
+
+    file_list = []
+    for fpath, s in sorted(file_churn.items(), key=lambda x: -x[1]["commits"]):
+        cr = round(s["deleted"] / max(s["added"], 1) * 100, 2)
+        file_list.append({"file": fpath, "commits": s["commits"], "added": s["added"],
+            "deleted": s["deleted"], "churn_rate": cr})
+    high_churn_files = [f for f in file_list if f["churn_rate"] > 50 and f["added"] > 5]
+
+    category_dist = defaultdict(lambda: {"count": 0, "added": 0, "survived": 0})
+    for c in commit_details:
+        cat = c["category"]
+        category_dist[cat]["count"] += 1
+        category_dist[cat]["added"] += c["added"]
+        category_dist[cat]["survived"] += c["survived"]
+
+    overall_retention = round(total_survived / max(total_added, 1) * 100, 2)
+    return {
+        "overall": {"total_commits": len(commits), "total_added": total_added,
+            "total_survived": total_survived, "overall_retention": overall_retention,
+            "total_developers": len(dev_summary)},
+        "dev_summary": dev_summary, "trend": trend,
+        "file_churn": file_list[:50], "high_churn_files": high_churn_files[:30],
+        "commit_details": commit_details, "category_dist": dict(category_dist),
+    }
+
+
+# ═══════════════════════════════════════════════════════
+#  HTML 报告生成（使用 template + replace）
+# ═══════════════════════════════════════════════════════
+_TEMPLATE = Path(__file__).parent / "report_template.html"
 
 def git_file_churn(since=None):
     """统计每个文件的修改次数和增删行数"""
@@ -189,103 +354,10 @@ def git_file_churn(since=None):
                 file_stats[fpath]["deleted"] += int(dels) if dels != "-" else 0
     return dict(file_stats)
 
-# ═══════════════════════════════════════════════════════
-#  提交分类
-# ═══════════════════════════════════════════════════════
-def classify_commit(message):
-    msg_lower = message.lower()
-    patterns = {
-        "功能开发": [r"\b(feature|feat|add|new)\b", "新規", "追加"],
-        "缺陷修复": [r"\b(fix|bug|hotfix|correct)\b", "修正", "修復", "バグ"],
-        "重构优化": [r"\b(refactor|optimize|improve|restruct)\b", "重构", "改善", "最適化", "リファクタ"],
-        "文档注释": [r"\b(doc|comment|readme)\b", "ドキュメント", "コメント"],
-        "日常维护": [r"\b(chore|update|upd|merge|clean|remove|delete)\b", "更新", "削除", "マージ"],
-    }
-    for category, pattern_list in patterns.items():
-        for p in pattern_list:
-            if re.search(p, msg_lower):
-                return category
-    return "其他"
 
 # ═══════════════════════════════════════════════════════
-#  核心分析
+#  HTML 报告生成（使用 template + replace）
 # ═══════════════════════════════════════════════════════
-def analyze(commits, surviving, file_churn):
-    total_added = 0
-    total_survived = 0
-    commit_details = []
-    for c in commits:
-        added = sum(f["added"] for f in c["files"].values())
-        survived = surviving.get(c["hash"], 0)
-        retention = round(survived / max(added, 1) * 100, 2)
-        total_added += added
-        total_survived += survived
-        commit_details.append({
-            "hash": c["hash"][:8], "full_hash": c["hash"], "date": c["date"],
-            "author": c["author"], "email": c["email"], "message": c["message"],
-            "category": classify_commit(c["message"]),
-            "added": added, "survived": survived, "retention": retention,
-        })
-    # 按开发者聚合
-    dev_stats = defaultdict(lambda: {"commits": 0, "added": 0, "survived": 0, "deleted": 0})
-    for c in commits:
-        a = c["author"]
-        added = sum(f["added"] for f in c["files"].values())
-        deleted = sum(f["deleted"] for f in c["files"].values())
-        survived = surviving.get(c["hash"], 0)
-        dev_stats[a]["commits"] += 1
-        dev_stats[a]["added"] += added
-        dev_stats[a]["survived"] += survived
-        dev_stats[a]["deleted"] += deleted
-    dev_summary = []
-    for author, s in sorted(dev_stats.items(), key=lambda x: -x[1]["added"]):
-        retention = round(s["survived"] / max(s["added"], 1) * 100, 2)
-        churn = round(s["deleted"] / max(s["added"] + s["deleted"], 1) * 100, 2)
-        dev_summary.append({"author": author, "commits": s["commits"], "added": s["added"],
-            "survived": s["survived"], "deleted": s["deleted"], "retention": retention,
-            "churn": churn, "net": s["added"] - s["deleted"]})
-    # 按周聚合
-    week_trend = defaultdict(lambda: {"added": 0, "survived": 0})
-    for c in commit_details:
-        try:
-            dt = datetime.fromisoformat(c["date"])
-            wk = dt.strftime("%Y-W%V")
-            week_trend[wk]["added"] += c["added"]
-            week_trend[wk]["survived"] += c["survived"]
-        except ValueError:
-            continue
-    trend = [{"week": wk, "added": t["added"], "survived": t["survived"],
-        "retention": round(t["survived"] / max(t["added"], 1) * 100, 2)}
-        for wk, t in sorted(week_trend.items())]
-    # 文件统计
-    file_list = []
-    for fpath, s in sorted(file_churn.items(), key=lambda x: -x[1]["commits"]):
-        cr = round(s["deleted"] / max(s["added"], 1) * 100, 2)
-        file_list.append({"file": fpath, "commits": s["commits"], "added": s["added"],
-            "deleted": s["deleted"], "churn_rate": cr})
-    high_churn_files = [f for f in file_list if f["churn_rate"] > 50 and f["added"] > 5]
-    # 提交类型分布
-    category_dist = defaultdict(lambda: {"count": 0, "added": 0, "survived": 0})
-    for c in commit_details:
-        cat = c["category"]
-        category_dist[cat]["count"] += 1
-        category_dist[cat]["added"] += c["added"]
-        category_dist[cat]["survived"] += c["survived"]
-    overall_retention = round(total_survived / max(total_added, 1) * 100, 2)
-    return {
-        "overall": {"total_commits": len(commits), "total_added": total_added,
-            "total_survived": total_survived, "overall_retention": overall_retention,
-            "total_developers": len(dev_summary)},
-        "dev_summary": dev_summary, "trend": trend,
-        "file_churn": file_list[:50], "high_churn_files": high_churn_files[:30],
-        "commit_details": commit_details, "category_dist": dict(category_dist),
-    }
-
-# ═══════════════════════════════════════════════════════
-#  HTML 报告生成（使用 template + replace 避免大括号冲突）
-# ═══════════════════════════════════════════════════════
-_TEMPLATE = Path(__file__).parent / "report_template.html"
-
 def build_html(result):
     o = result["overall"]
     devs = result["dev_summary"]
@@ -296,7 +368,6 @@ def build_html(result):
     def cls(v, t70=70, t40=40):
         return "good" if v >= t70 else "warn" if v >= t40 else "bad"
 
-    # 行模板
     dr = lambda d: (
         f'<tr><td><strong>{d["author"]}</strong></td><td>{d["commits"]}</td>'
         f'<td>{d["added"]}</td><td>{d["survived"]}</td><td>{d["deleted"]}</td>'
@@ -318,9 +389,7 @@ def build_html(result):
         f'<td>{c["added"]}</td><td>{c["survived"]}</td>'
         f'<td class="{cls(c["retention"])}">{c["retention"]}%</td></tr>')
 
-    # 预渲染 JS 数据（避免在 HTML 模板中嵌入 Python 表达式）
     dev_names = json.dumps([d["author"] for d in devs])
-    dev_ret = json.dumps([d["retention"] for d in devs])
     dev_added = json.dumps([d["added"] for d in devs])
     dev_survived = json.dumps([d["survived"] for d in devs])
     cat_names = json.dumps(list(cat_dist.keys()))
@@ -331,17 +400,14 @@ def build_html(result):
     trend_rt = json.dumps([t["retention"] for t in trend])
     trend_ad = json.dumps([t["added"] for t in trend])
 
-    # 开发者采纳率颜色数据
     dev_ret_colored = json.dumps([
         {"value": d["retention"],
          "itemStyle": {"color": "#27ae60" if d["retention"] >= 70 else "#f39c12" if d["retention"] >= 40 else "#e74c3c"}}
         for d in devs
     ])
 
-    # 读模板
     tpl = _TEMPLATE.read_text("utf-8")
 
-    # 替换
     subs = {
         "__NOW__": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "__TOTAL_COMMITS__": str(o["total_commits"]),
@@ -369,11 +435,12 @@ def build_html(result):
         tpl = tpl.replace(k, v)
     return tpl
 
+
 # ═══════════════════════════════════════════════════════
 #  主入口
 # ═══════════════════════════════════════════════════════
 def main():
-    parser = argparse.ArgumentParser(description="Git 提交采纳率统计工具")
+    parser = argparse.ArgumentParser(description="Git 提交采纳率统计工具（排除空行版）")
     parser.add_argument("--since", default="all", help="分析时间范围: 30d / 60d / 90d / all")
     parser.add_argument("--output", default=str(REPORT_DIR), help="报告输出目录")
     parser.add_argument("--offline", action="store_true", help="跳过 git fetch，直接分析本地已缓存的数据")
@@ -384,9 +451,8 @@ def main():
     if not (PROJECT_ROOT / ".git").exists():
         print(f"❌ 不是 Git 仓库: {PROJECT_ROOT}")
         return
-    print(f"📊 Git 提交采纳率统计\n📁 项目: {PROJECT_ROOT}\n📅 时间范围: {args.since} ({since_param or '全部历史'})\n")
+    print(f"📊 Git 提交采纳率统计（排除空行版）\n📁 项目: {PROJECT_ROOT}\n📅 时间范围: {args.since} ({since_param or '全部历史'})\n")
 
-    # 先拉取远端最新数据（除非指定 --offline）
     if args.offline:
         print("⏳ --offline 模式已启用，跳过 git fetch，直接使用本地已缓存的数据\n")
     else:
@@ -414,7 +480,7 @@ def main():
                 print(f"  ✅ 远端已是最新，无需更新")
         except subprocess.TimeoutExpired:
             print(f"\n{'='*55}")
-            print(f"  ❌ git fetch 超时（超过 60 秒无响应）")
+            print(f"  ❌ git fetch 超时（超过 120 秒无响应）")
             print(f"\n  ⚠️  无法连接到远端仓库（网络超时），请检查网络后重试。")
             print(f"{'='*55}\n")
             return
@@ -432,11 +498,11 @@ def main():
     if not commits:
         print("❌ 没有获取到提交数据")
         return
+
     print("⏳ 正在获取全部分支...")
     branches = get_all_branches()
     print(f"  ✅ 共 {len(branches)} 个固定分支: {', '.join(branches)}\n")
 
-    # 只保留属于这5个分支且由目标作者提交的历史
     print("⏳ 正在过滤提交，只保留5个分支上的历史...")
     branch_commit_union = set()
     for b in branches:
@@ -449,9 +515,13 @@ def main():
     commits = [c for c in commits if c["author"] in TARGET_AUTHORS]
     print(f"  ✅ 作者过滤后: {len(commits)}/{before2} 个提交（仅保留 {', '.join(sorted(TARGET_AUTHORS))}）\n")
 
-    print("⏳ 正在遍历所有固定分支，逐个分析代码存活情况（使用各分支独有的文件列表）...")
-    surviving = git_blame_all_branches(branches, commits)
+    print("⏳ 正在遍历所有固定分支，逐个分析代码存活情况（跳过空行）...")
+    surviving, blank_ratios = git_blame_all_branches(branches, commits)
     print()
+
+    print("⏳ 正在应用空行校正到新增行计数...")
+    commits = apply_blank_correction(commits, blank_ratios, branches)
+    print(f"  ✅ 校正完成\n")
 
     print("⏳ 正在统计文件变更情况...")
     file_churn = git_file_churn(since_param)
@@ -460,13 +530,12 @@ def main():
     print("⏳ 正在聚合计算...")
     result = analyze(commits, surviving, file_churn)
     o = result["overall"]
-    print(f"\n{'='*55}\n  📊 整体采纳率:     {o['overall_retention']}%\n  📝 总提交数:       {o['total_commits']}\n  👥 开发者数:       {o['total_developers']}\n  ➕ 历史新增行:     {o['total_added']}\n  💚 当前存活行:     {o['total_survived']}\n")
+    print(f"\n{'='*55}\n  📊 整体采纳率（排除空行）: {o['overall_retention']}%\n  📝 总提交数:       {o['total_commits']}\n  👥 开发者数:       {o['total_developers']}\n  ➕ 历史新增行:     {o['total_added']}\n  💚 当前存活行:     {o['total_survived']}\n")
     print(f"  👨‍💻 开发者采纳率 TOP 3:")
     for d in result["dev_summary"][:3]:
         print(f"    {d['author']:20s}  {d['retention']:6.2f}%  ({d['survived']}/{d['added']})")
     print(f"{'='*55}\n")
 
-    # 生成时间戳后缀 YYYYMMDD-HHMM
     ts = datetime.now(JST).strftime("%Y%m%d-%H%M")
 
     json_path = output_dir / f"adoption_report_{ts}.json"
@@ -489,6 +558,7 @@ def main():
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"✅ HTML 报告: {html_path}\n📊 请在浏览器中打开 HTML 文件查看可视化报告。")
+
 
 if __name__ == "__main__":
     main()
