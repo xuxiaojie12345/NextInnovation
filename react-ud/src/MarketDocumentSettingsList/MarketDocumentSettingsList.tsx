@@ -60,8 +60,8 @@ const MarketDocumentSettingsList: React.FC = () => {
           // 标准化列名（后端返回的列名大小写不确定）
           const list = response.data.data.map((item: Record<string, any>) => ({
             documentType: item.DOCTYPE || item.doctype || item.documentType || "",
-            user: item.REGISTER_USER || item.register_user || item.user || "",
-            date: item.REGISTER_DATETIME || item.register_datetime || item.date || ""
+            user: item.UPDATE_USER || item.update_user || item.user || "",
+            date: item.REGISTER_DATETIME || item.register_datetime || item.UPDATE_DATETIME || item.update_datetime || item.date || ""
           }));
 
           // 按日期降序排序（对应详细设计 6. 实现注意事项 - 排序）

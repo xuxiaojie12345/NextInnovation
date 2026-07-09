@@ -37,10 +37,13 @@ public class UD201ServiceImpl implements UD201Service {
         String updateUser = request.getOrDefault("updateUser", "");
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        // 如果前端传了updateUser则使用，否则使用user字段
-        String finalUpdateUser = updateUser.isEmpty() ? user : updateUser;
+        // user字段 = 表单输入的User值，更新UPDATE_USER
+        // updateUser字段 = 当前登录用户ID（备用）
+        String finalUpdateUser = user.isEmpty() ? updateUser : user;
+        // date字段 = 表单输入的Date值，有值时使用，否则用服务器当前时间
+        String updateDatetime = date.isEmpty() ? now : date;
 
-        ud201Mapper.updateHdocDocumentList(doctype, finalUpdateUser, now);
+        ud201Mapper.updateHdocDocumentList(doctype, finalUpdateUser, updateDatetime);
         logger.info("UD20-1Update success for doctype: {}", doctype);
         return null; // null表示成功
     }

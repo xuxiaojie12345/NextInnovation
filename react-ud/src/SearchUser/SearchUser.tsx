@@ -118,16 +118,16 @@ const SearchUser: React.FC = () => {
       operation: "SEARCH_USER"
     };
 
-    // 优先级：Userid > User > 权限类型（Rule/Template）> Not set（全检索）
+    // Userid、Market、Radio 均为独立条件，输入哪个就加哪个
     if (userid.trim()) {
       params.userid = userid.trim();
-    } else if (user.trim()) {
+    }
+    if (user.trim()) {
       params.user = user.trim();
-    } else if (authType === "Rule" || authType === "Template") {
+    }
+    if (authType === "Rule" || authType === "Template") {
       params.type = authType;
     }
-
-    // 无论哪种搜索方式，只要选择了 Market 就加入参数
     if (market) {
       params.market = market;
     }

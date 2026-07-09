@@ -4,7 +4,7 @@
 
     <!-- UD20GetDocumentListApi: 从HDOC_DOCUMENT_LIST表查询（支持按documentType过滤） -->
     <select id="selectHdocDocumentList" resultType="java.util.LinkedHashMap">
-        SELECT DOCTYPE, REGISTER_USER, REGISTER_DATETIME
+        SELECT DOCTYPE, UPDATE_USER, UPDATE_DATETIME AS REGISTER_DATETIME
         FROM HDOC_DOCUMENT_LIST
         <where>
             <if test="documentType != null and documentType != ''">

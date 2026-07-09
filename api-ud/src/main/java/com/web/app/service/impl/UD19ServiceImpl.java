@@ -45,20 +45,8 @@ public class UD19ServiceImpl implements UD19Service {
         String market = request.getMarket();
         String type = request.getType();
 
-        if (userId != null && !userId.trim().isEmpty()) {
-            // 输入Userid时
-            results = ud19Mapper.searchByUserId(userId.trim(), market);
-        } else if (user != null && !user.trim().isEmpty()) {
-            // 输入User时
-            results = ud19Mapper.searchByUser(user.trim(), market);
-        } else if ("Rule".equals(type)) {
-            results = ud19Mapper.searchByRule(market);
-        } else if ("Template".equals(type)) {
-            results = ud19Mapper.searchByTemplate(market);
-        } else {
-            // Not set - 全用户（带Market过滤）
-            results = ud19Mapper.searchAllUsers(market);
-        }
+        // 所有条件独立传入，由 MyBatis 动态 SQL 组合过滤
+        results = ud19Mapper.searchUsers(userId, user, market, type);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("results", results != null ? results : new ArrayList<>());

@@ -1,24 +1,26 @@
 /* ===== UD17 HDoc User Admin ===== */
-/* 参照 UD17.css (wangluxing) 风格调整 */
+/* 参考 wangluxing UD17.css 风格调整外观 layout */
 
-.hvua-container {
+.ud17-container {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
   padding: 20px 24px;
   background: #f4f6f9;
   min-height: 100vh;
   box-sizing: border-box;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  color: #333;
 }
 
-.hvua-card {
+.ud17-card {
   background: #fff;
+  border: 1px solid #d9d9d9;
   border-radius: 6px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 24px 28px;
   max-width: 1200px;
+  margin: 0;
 }
 
-.hvua-title {
+.ud17-page-title {
   font-size: 20px;
   font-weight: 600;
   color: #003057;
@@ -28,43 +30,40 @@
 }
 
 /* ===== Message ===== */
-.hvua-msg {
+.ud17-msg {
   padding: 10px 14px;
   border-radius: 4px;
   margin-bottom: 16px;
   font-size: 13px;
   line-height: 1.4;
 }
-.hvua-success {
+.ud17-success {
   background: #e6f7ed;
   color: #1a7f42;
   border: 1px solid #b7ebc8;
 }
-.hvua-error {
+.ud17-error {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
 }
 
 /* ===== Section / Row ===== */
-.hvua-section {
-  margin-bottom: 20px;
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+.ud17-sec {
+  margin-bottom: 16px;
 }
-.hvua-row {
+.ud17-row {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
-.hvua-row + .hvua-row {
+.ud17-row + .ud17-row {
   margin-top: 12px;
 }
 
 /* ===== Label ===== */
-.hvua-label {
+.ud17-lbl {
   font-size: 13px;
   font-weight: 500;
   color: #444;
@@ -73,7 +72,7 @@
 }
 
 /* ===== Input ===== */
-.hvua-input {
+.ud17-inp {
   height: 32px;
   padding: 0 10px;
   border: 1px solid #bbb;
@@ -85,18 +84,20 @@
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
-.hvua-input:focus {
+.ud17-inp:focus {
   border-color: #003057;
   box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
 }
-.hvua-input-readonly {
+.ud17-ro {
   background: #f5f5f5;
   color: #555;
   cursor: default;
+  flex: 1;
+  max-width: 300px;
 }
 
 /* ===== Select Multiple ===== */
-.hvua-select-multi {
+.ud17-sel {
   height: 200px;
   width: 90px;
   min-width: 70px;
@@ -110,17 +111,17 @@
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
-.hvua-select-multi:focus {
+.ud17-sel:focus {
   border-color: #003057;
   box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
 }
-.hvua-select-multi:disabled {
+.ud17-sel:disabled {
   background: #f5f5f5;
   color: #999;
 }
 
 /* ===== Checkbox Label ===== */
-.hvua-chk-lbl {
+.ud17-chk-lbl {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -130,20 +131,20 @@
   cursor: pointer;
   min-width: 170px;
 }
-.hvua-chk-lbl input[type="checkbox"] {
+.ud17-chk-lbl input[type="checkbox"] {
   width: 16px;
   height: 16px;
   accent-color: #003057;
   cursor: pointer;
 }
 
-/* ===== Role Grid ===== */
-.hvua-role-grid {
+/* ===== Role Grid (Horizontal) ===== */
+.ud17-role-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
-.hvua-role-item {
+.ud17-role-item {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -155,16 +156,16 @@
   min-width: 140px;
   max-width: 180px;
 }
-.hvua-role-item .hvua-chk-lbl {
+.ud17-role-item .ud17-chk-lbl {
   min-width: auto;
   white-space: nowrap;
 }
-.hvua-role-item .hvua-select-multi {
+.ud17-role-item .ud17-sel {
   min-width: 120px;
 }
 
 /* ===== Button Bar ===== */
-.hvua-btn-bar {
+.ud17-btns {
   margin-top: 20px;
   padding: 14px 16px;
   background: #e8f0f8;
@@ -173,7 +174,7 @@
   gap: 10px;
 }
 
-.hvua-btn {
+.ud17-btn {
   height: 32px;
   padding: 0 18px;
   background: #e8f0f8;
@@ -186,25 +187,58 @@
   white-space: nowrap;
   transition: background 0.2s, color 0.2s;
 }
-.hvua-btn:hover:not(:disabled) {
+.ud17-btn:hover:not(:disabled) {
   background: #003057;
   color: #fff;
 }
-.hvua-btn:disabled {
+.ud17-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-/* ===== Super User Section ===== */
-.hvua-super-section {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+/* ===== Roles Section (Adaptation user / MVL) ===== */
+.ud17-roles-section {
+  display: flex;
+  gap: 12px;
 }
-.hvua-super-title {
+.ud17-roles-label {
+  min-width: 70px;
+  padding-top: 8px;
+}
+.ud17-roles-content {
+  flex: 1;
+}
+.ud17-mvl-chk {
+  width: 16px;
+  height: 16px;
+  accent-color: #003057;
+  cursor: pointer;
+  align-self: center;
+}
+
+/* ===== Super User Section ===== */
+.ud17-super-section {
+  margin-top: 16px;
+}
+.ud17-super-title {
   font-size: 13px;
   font-weight: 600;
   color: #003057;
   margin: 0 0 10px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .ud17-container {
+    padding: 12px;
+  }
+  .ud17-card {
+    padding: 16px;
+  }
+  .ud17-row {
+    gap: 6px;
+  }
+  .ud17-chk-lbl {
+    min-width: 100%;
+  }
 }
