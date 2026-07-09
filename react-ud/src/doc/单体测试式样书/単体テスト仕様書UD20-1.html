@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初期显示-基本元素</td>
 <td style="text-align:left">1. 访问 Market Document Settings 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "HDoc - Market Document Settings"<br>2. 显示 Document type 输入框<br>3. 显示 Market 输入框<br>4. 显示 Setting 下拉列表<br>5. 显示 Bussines unit 输入框（固定显示 "BU"）<br>6. 显示 User 输入框<br>7. 显示 Date 输入框<br>8. 显示 Search、Clear、Back、Update Mode 四个按钮</td>
+<td style="text-align:left">1. 显示标题 "HDoc - Market Document Settings"<br>2. 显示 Document type 输入框<br>3. 显示 Bussines unit 输入框（固定显示 "BU"）<br>4. 显示 User 输入框<br>5. 显示 Date 输入框<br>6. 显示 Search、Clear、Back、Update Mode 四个按钮</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -82,7 +82,7 @@
 <td style="text-align:left">画面初期显示-初期化状态</td>
 <td style="text-align:left">1. 访问页面（初期化场合）<br>2. 确认各字段初始值</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Document type 为空<br>2. Market 为空<br>3. Setting 下拉列表显示初始选项<br>4. Bussines unit 固定显示 "BU"<br>5. User 为空<br>6. Date 为空<br>7. 所有输入框可用（Enabled）<br>8. 四个按钮均可用（Enabled）<br>9. Error message 区域不显示</td>
+<td style="text-align:left">1. Document type 为空<br>2. Bussines unit 固定显示 "BU"<br>3. User 为空<br>4. Date 为空<br>5. 所有输入框可用（Enabled）<br>6. 四个按钮均可用（Enabled）<br>7. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -168,7 +168,7 @@
 <td style="text-align:left">Clear-正常清空</td>
 <td style="text-align:left">1. 输入各字段值<br>2. 点击 Clear 按钮<br>3. 确认各字段状态</td>
 <td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30</code></td>
-<td style="text-align:left">1. Document type 被清空<br>2. Bussines unit 恢复为 "BU"（固定值）<br>3. User 被清空<br>4. Date 被清空<br>5. Market 被清空<br>6. Setting 重置为初始选项<br>7. Error message 区域被清除</td>
+<td style="text-align:left">1. Document type 被清空<br>2. Bussines unit 恢复为 "BU"（固定值）<br>3. User 被清空<br>4. Date 被清空<br>5. Error message 区域被清除</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -234,7 +234,7 @@
 <tr>
 <td style="text-align:center">12</td>
 <td style="text-align:left">Update Mode-更新成功</td>
-<td style="text-align:left">1. Document type 输入有效值<br>2. User 输入有效值<br>3. Date 输入有效值<br>4. Market 输入有效值<br>5. Setting 选择有效值<br>6. 点击 Update Mode 按钮<br>7. 等待 API 响应<br>8. 确认结果</td>
+<td style="text-align:left">1. Document type 输入有效值<br>2. User 输入有效值<br>3. Date 输入有效值<br>4. 点击 Update Mode 按钮<br>5. 等待 API 响应<br>6. 确认结果</td>
 <td style="text-align:left">Document type: <code>VIN_PLATE</code><br>User: <code>admin</code><br>Date: <code>2026-06-30 12:00:00</code><br>Market: <code>JPN</code><br>Setting: <code>option1</code></td>
 <td style="text-align:left">1. 前端校验通过<br>2. 调用 POST <code>/api/ud20-1/UpdateHdocDocumentList</code> API<br>3. 请求体包含操作类型 "UPDATE_HDOC_DOCUMENT_LIST"<br>4. API 返回 code=200<br>5. 显示成功消息："更新成功"<br>6. 类型为 Information</td>
 <td style="text-align:left"></td>

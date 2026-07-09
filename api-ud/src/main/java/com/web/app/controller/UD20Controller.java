@@ -40,17 +40,11 @@ public class UD20Controller {
      */
     @PostMapping("/getdocumentlist")
     public ResponseEntity<ApiResponse<?>> getDocumentList(@RequestBody Map<String, String> request) {
-        log.info("========== UD20 Controller: Get Document List ==========");
 
         String documentType = request.getOrDefault("documentType", "");
         String operator = request.getOrDefault("operator", "=");
 
-        log.info("Search params - documentType: {}, operator: {}", documentType, operator);
-
         ApiResponse<?> response = ud20Service.searchDocumentList(documentType, operator);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD20 Controller: Get Document List completed ==========");
 
         return ResponseEntity.ok(response);
     }

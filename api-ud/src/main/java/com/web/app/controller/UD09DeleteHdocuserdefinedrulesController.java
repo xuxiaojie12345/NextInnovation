@@ -39,17 +39,8 @@ public class UD09DeleteHdocuserdefinedrulesController {
     public ResponseEntity<ApiResponse<?>> searchUserDefinedRules(
             @RequestBody UD09SearchUserDefinedRulesRequest request) {
 
-        log.info("========== UD09 Controller: Search User Defined Rules ==========");
-        log.info("Search params - PC: {}, NUM: {}, MARKET: {}",
-                request.getProductClass(), request.getNumber(), request.getMarket());
-
         // 4.3 调用Service层处理搜索逻辑
         ApiResponse<?> response = ud09DeleteHdocuserdefinedrulesService.searchUserDefinedRules(request);
-
-        log.info("Response code: {}, msg: {}, data size: {}",
-                response.getCode(), response.getMsg(),
-                response.getData() instanceof List ? ((List<?>) response.getData()).size() : "N/A");
-        log.info("========== UD09 Controller: Search completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -65,18 +56,12 @@ public class UD09DeleteHdocuserdefinedrulesController {
     public ResponseEntity<ApiResponse<?>> deleteSelectedUserDefinedRules(
             @RequestBody List<UD09DeleteUserDefinedRulesRequest> deleteRequests) {
 
-        log.info("========== UD09 Controller: Delete Selected User Defined Rules ==========");
-        log.info("Delete requests count: {}", deleteRequests != null ? deleteRequests.size() : 0);
-
         if (deleteRequests == null || deleteRequests.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.error(400, "删除请求参数不能为空"));
         }
 
         // 调用Service层处理删除逻辑
         ApiResponse<?> response = ud09DeleteHdocuserdefinedrulesService.deleteSelectedUserDefinedRules(deleteRequests);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD09 Controller: Delete completed ==========");
 
         return ResponseEntity.ok(response);
     }

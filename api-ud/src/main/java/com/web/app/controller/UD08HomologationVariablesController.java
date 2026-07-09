@@ -182,12 +182,9 @@ public class UD08HomologationVariablesController {
             String currentMonth = monthFormat.format(new java.util.Date());
             data.put("currentMonth", currentMonth);
             
-            log.info("Current user: {}, DateTime: {}, Month: {}", currentUser, currentDateTime, currentMonth);
-            
             return ResponseEntity.ok(ApiResponse.success("获取当前用户信息成功", data));
             
         } catch (Exception e) {
-            log.error("Error getting current user info", e);
             return ResponseEntity.ok(ApiResponse.error(500, "系统内部错误，请联系管理员"));
         }
     }

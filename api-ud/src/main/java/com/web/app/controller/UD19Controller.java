@@ -31,12 +31,8 @@ public class UD19Controller {
      */
     @GetMapping("/getmarketlist")
     public ResponseEntity<ApiResponse<?>> getMarketList() {
-        log.info("========== UD19 Controller: Get Market List ==========");
 
         ApiResponse<?> response = ud19Service.getMarketList();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD19 Controller: Get Market List completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -47,15 +43,8 @@ public class UD19Controller {
      */
     @PostMapping("/searchhdoc")
     public ResponseEntity<ApiResponse<?>> searchHdoc(@RequestBody HdocDocumentList request) {
-        log.info("========== UD19 Controller: Search HDOC User ==========");
-        log.info("userid: {}, searchUser: {}, market: {}, searchType: {}",
-                request.getUserid(), request.getSearchUser(), request.getMarket(), request.getSearchType());
 
         ApiResponse<?> response = ud19Service.searchHdoc(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD19 Controller: Search HDOC User completed ==========");
-
         return ResponseEntity.ok(response);
     }
 }

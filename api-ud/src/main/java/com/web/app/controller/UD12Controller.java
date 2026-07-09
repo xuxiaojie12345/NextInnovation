@@ -41,12 +41,8 @@ public class UD12Controller {
      */
     @GetMapping("/api/ud12UploadDeletetemplat/getMarketList")
     public ResponseEntity<ApiResponse<?>> getMarketList() {
-        log.info("========== UD12 Controller: Get Market List ==========");
 
         ApiResponse<?> response = ud12Service.getMarketList();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD12 Controller: Get Market List completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -60,15 +56,7 @@ public class UD12Controller {
      */
     @GetMapping("/api/template/files/{marketCode}")
     public ResponseEntity<ApiResponse<?>> getTemplateFiles(@PathVariable String marketCode) {
-        log.info("========== UD12 Controller: Get Template Files for market: {} ==========", marketCode);
-
         ApiResponse<?> response = ud12Service.getTemplateFiles(marketCode);
-
-        log.info("Response code: {}, msg: {}, data size: {}",
-                response.getCode(), response.getMsg(),
-                response.getData() instanceof java.util.List ?
-                ((java.util.List<?>) response.getData()).size() : "N/A");
-        log.info("========== UD12 Controller: Get Template Files completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -85,20 +73,12 @@ public class UD12Controller {
     public ResponseEntity<ApiResponse<?>> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("market") String market) {
-        log.info("========== UD12 Controller: Upload File ==========");
-        log.info("File original name: {}, size: {}, market: {}",
-                file != null ? file.getOriginalFilename() : "null",
-                file != null ? file.getSize() : 0,
-                market);
 
         if (file == null || file.isEmpty()) {
             log.warn("File is null or empty in controller!");
         }
 
         ApiResponse<?> response = ud12Service.uploadFile(file, market);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD12 Controller: Upload completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -115,13 +95,7 @@ public class UD12Controller {
         String market = request.get("market");
         String fileName = request.get("fileName");
 
-        log.info("========== UD12 Controller: Delete File ==========");
-        log.info("Market: {}, fileName: {}", market, fileName);
-
         ApiResponse<?> response = ud12Service.deleteFile(market, fileName);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD12 Controller: Delete completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -138,18 +112,12 @@ public class UD12Controller {
     public ResponseEntity<Resource> downloadFile(
             @PathVariable String market,
             @PathVariable String fileName) {
-        log.info("========== UD12 Controller: Download File ==========");
-        log.info("Market: {}, fileName: {}", market, fileName);
-
         try {
             // 获取文件路径
             String uploadDir = ud12Service.getUploadDir();
             File file = new File(new File(uploadDir, market), fileName);
 
-            log.info("File path: {}", file.getAbsolutePath());
-
             if (!file.exists() || !file.isFile()) {
-                log.warn("File not found: {}", file.getAbsolutePath());
                 return ResponseEntity.notFound().build();
             }
 
@@ -166,7 +134,6 @@ public class UD12Controller {
                     .body(resource);
 
         } catch (Exception e) {
-            log.error("Error downloading file", e);
             return ResponseEntity.internalServerError().build();
         }
     }

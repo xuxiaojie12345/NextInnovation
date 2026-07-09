@@ -290,8 +290,48 @@ const HomologationVariables = () => {
     }
   };
 
-  // 处理输入变化
+  // 文字種別バリデーション用の定義
+  const FIELD_VALIDATION: Record<string, { pattern: RegExp; message: string }> =
+    {
+      number: { pattern: /^[0-9]*$/, message: "Number只能输入半角数字" },
+      variable: {
+        pattern: /^[!-~]*$/,
+        message: "Variable只能输入半角英数字+記号",
+      },
+      value: { pattern: /^[!-~]*$/, message: "Value只能输入半角英数字+記号" },
+      variantString1: {
+        pattern: /^[!-~]*$/,
+        message: "Variant string.1只能输入半角英数字+記号",
+      },
+      variantString2: {
+        pattern: /^[!-~]*$/,
+        message: "Variant string.2只能输入半角英数字+記号",
+      },
+      comments: {
+        pattern: /^[!-~]*$/,
+        message: "Comments只能输入半角英数字+記号",
+      },
+      addDate: { pattern: /^[!-~]*$/, message: "Add只能输入半角英数字+記号" },
+      deleteDate: {
+        pattern: /^[!-~]*$/,
+        message: "Delete只能输入半角英数字+記号",
+      },
+    };
+
+  // 处理输入变化（文字種別バリデーション付き）
   const handleInputChange = (field: keyof FormData, value: string) => {
+    // テキストフィールドの文字種別チェック
+    const validation = FIELD_VALIDATION[field as string];
+    if (validation && value.length > 0) {
+      // 空文字でない場合、許可された文字のみで構成されているか確認
+      const invalidChars = value
+        .split("")
+        .filter((ch) => !validation.pattern.test(ch));
+      if (invalidChars.length > 0) {
+        setErrorMessage(validation.message);
+        return; // 値を更新せずエラーメッセージのみ表示
+      }
+    }
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -299,6 +339,48 @@ const HomologationVariables = () => {
     // 清除错误和成功消息
     setErrorMessage("");
     setSuccessMessage("");
+  };
+
+  // バリデーションエラーメッセージ定義（Submit用）
+  const FIELD_VALIDATION_ERRORS: Record<string, string> = {
+    number: "Number只能输入半角数字",
+    variable: "Variable只能输入半角英数字+記号",
+    value: "Value只能输入半角英数字+記号",
+    variantString1: "Variant string.1只能输入半角英数字+記号",
+    variantString2: "Variant string.2只能输入半角英数字+記号",
+    comments: "Comments只能输入半角英数字+記号",
+    addDate: "Add只能输入半角英数字+記号",
+    deleteDate: "Delete只能输入半角英数字+記号",
+  };
+
+  // 文字種別バリデーション（Submit時に全フィールドをチェック）
+  const validateFieldChars = (): boolean => {
+    const fields: Array<keyof FormData> = [
+      "number",
+      "variable",
+      "value",
+      "variantString1",
+      "variantString2",
+      "comments",
+      "addDate",
+      "deleteDate",
+    ];
+    for (const f of fields) {
+      const value = formData[f] as string;
+      if (value.length > 0) {
+        const validation = FIELD_VALIDATION[f as string];
+        if (validation) {
+          const invalidChars = value
+            .split("")
+            .filter((ch) => !validation.pattern.test(ch));
+          if (invalidChars.length > 0) {
+            setErrorMessage(FIELD_VALIDATION_ERRORS[f as string]);
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   };
 
   // 验证必填字段
@@ -333,6 +415,7 @@ const HomologationVariables = () => {
 
   // Search List功能：导航到搜索结果列表页面（UD09）
   const handleSearchList = () => {
+    if (!validateFieldChars()) return;
     if (!formData.productClass || !formData.number || !formData.market) {
       setErrorMessage("Product class、Number、Market为必填项");
       return;
@@ -413,6 +496,7 @@ const HomologationVariables = () => {
 
   // Add功能
   const handleAdd = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     // 验证Variable
@@ -499,6 +583,7 @@ const HomologationVariables = () => {
 
   // Update功能
   const handleUpdate = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     // 验证Variable
@@ -585,6 +670,7 @@ const HomologationVariables = () => {
 
   // Delete功能
   const handleDelete = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     setIsLoading(true);

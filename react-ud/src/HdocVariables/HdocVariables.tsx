@@ -168,8 +168,32 @@ const HdocVariables = () => {
     }
   };
 
-  // 处理输入变化
+  // 文字種別バリデーション用の定義
+  const FIELD_VALIDATION: Record<string, { pattern: RegExp; message: string }> =
+    {
+      variable: {
+        pattern: /^[!-~]*$/,
+        message: "Variable 只能输入半角英数字+記号的字符",
+      },
+      description: {
+        pattern: /^[!-~]*$/,
+        message: "Description 只能输入半角英数字+記号的字符",
+      },
+    };
+
+  // 处理输入变化（文字種別バリデーション付き）
   const handleInputChange = (field: keyof FormData, value: string) => {
+    // テキストフィールドの文字種別チェック
+    const validation = FIELD_VALIDATION[field as string];
+    if (validation && value.length > 0) {
+      const invalidChars = value
+        .split("")
+        .filter((ch) => !validation.pattern.test(ch));
+      if (invalidChars.length > 0) {
+        setErrorMessage(validation.message);
+        return; // 値を更新せずエラーメッセージのみ表示
+      }
+    }
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -177,6 +201,27 @@ const HdocVariables = () => {
     // 清除错误和成功消息
     setErrorMessage("");
     setSuccessMessage("");
+  };
+
+  // 文字種別バリデーション（Submit時用）
+  const validateFieldChars = (): boolean => {
+    const fields: Array<keyof FormData> = ["variable", "description"];
+    for (const f of fields) {
+      const value = formData[f] as string;
+      if (value.length > 0) {
+        const validation = FIELD_VALIDATION[f as string];
+        if (validation) {
+          const invalidChars = value
+            .split("")
+            .filter((ch) => !validation.pattern.test(ch));
+          if (invalidChars.length > 0) {
+            setErrorMessage(validation.message);
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   };
 
   // 验证必填字段
@@ -190,6 +235,7 @@ const HdocVariables = () => {
 
   // Search功能：导航到搜索结果列表页面
   const handleSearch = () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     // 构建搜索条件对象（包含各字段前的操作符）
@@ -241,6 +287,7 @@ const HdocVariables = () => {
 
   // Add功能
   const handleAdd = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     setIsLoading(true);
@@ -310,6 +357,7 @@ const HdocVariables = () => {
 
   // Update功能
   const handleUpdate = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     setIsLoading(true);
@@ -379,6 +427,7 @@ const HdocVariables = () => {
 
   // Delete功能
   const handleDelete = async () => {
+    if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
 
     setIsLoading(true);

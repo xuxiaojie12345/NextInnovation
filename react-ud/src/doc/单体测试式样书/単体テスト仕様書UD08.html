@@ -227,9 +227,9 @@
 <tr>
 <td style="text-align:center">13</td>
 <td style="text-align:left">Add-成功</td>
-<td style="text-align:left">1. 填写所有必填项和可选字段<br>2. 点击 Add 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 填写所有必填项和可选字段<br>2. 点击 Add 按钮<br>3. API 返回成功<br>4. 确认DB登录结果</td>
 <td style="text-align:left">Product class: <code>A</code>、Number: <code>123</code>、Market: <code>JPN</code>、其他字段有效</td>
-<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 新增接口<br>2. API 返回 code=200<br>3. 显示提示："记录添加成功"<br>4. Created by user 和 Date 由系统自动填充</td>
+<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 新增接口<br>2. API 返回 code=200<br>3. 显示提示："记录添加成功"<br>4. DB中登录的数据正确</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -238,7 +238,7 @@
 <td style="text-align:left">Add-失败（API 错误）</td>
 <td style="text-align:left">1. 填写所有必填项<br>2. 点击 Add 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">必填项有效，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Add 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Add 按钮恢复可用状，DB中没有新登录的数据。态</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -288,9 +288,9 @@
 <tr>
 <td style="text-align:center">18</td>
 <td style="text-align:left">Update-成功</td>
-<td style="text-align:left">1. 修改字段内容<br>2. 点击 Update 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 修改字段内容<br>2. 点击 Update 按钮<br>3. API 返回成功<br>4. 确认DB更新结果</td>
 <td style="text-align:left">记录存在，字段修改有效</td>
-<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 更新接口<br>2. API 返回 code=200<br>3. 显示提示："记录更新成功"<br>4. 更新操作人和时间由系统自动填充</td>
+<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 更新接口<br>2. API 返回 code=200<br>3. 显示提示："记录更新成功"<br>4. DB中更新的数据正确</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -299,7 +299,7 @@
 <td style="text-align:left">Update-失败（API 错误）</td>
 <td style="text-align:left">1. 记录存在<br>2. 点击 Update 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">记录存在，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Update 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Update 按钮恢复可用状态，DB中没有更新数据。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -331,9 +331,9 @@
 <tr>
 <td style="text-align:center">21</td>
 <td style="text-align:left">Delete-成功</td>
-<td style="text-align:left">1. 记录存在<br>2. 点击 Delete 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 记录存在<br>2. 点击 Delete 按钮<br>3. API 返回成功<br>4. 确认DB中删除的的数据</td>
 <td style="text-align:left">记录存在</td>
-<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 删除接口<br>2. API 返回 code=200<br>3. 显示提示："记录删除成功"</td>
+<td style="text-align:left">1. 调用 UD08HomologationVariablesApi 删除接口<br>2. API 返回 code=200<br>3. 显示提示："记录删除成功"<br>4. DB中删除的数据不存在。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -342,7 +342,7 @@
 <td style="text-align:left">Delete-失败（API 错误）</td>
 <td style="text-align:left">1. 记录存在<br>2. 点击 Delete 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">记录存在，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Delete 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Delete 按钮恢复可用状态，DB中删除的数据存在。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -407,6 +407,150 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
+<tr>
+<td style="text-align:center">28</td>
+<td style="text-align:left">Number-半角数字入力可能</td>
+<td style="text-align:left">1. 在 Number 输入框中输入半角数字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>12345</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">29</td>
+<td style="text-align:left">Number-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Number 输入框中输入全角数字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>１２３４５</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Number只能入力半角数字</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">30</td>
+<td style="text-align:left">Variable-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Variable 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>ABC123!@#</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">31</td>
+<td style="text-align:left">Variable-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Variable 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>テスト中文ａｂｃ</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Variable只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">32</td>
+<td style="text-align:left">Value-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Value 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>Test_Value!@#</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">33</td>
+<td style="text-align:left">Value-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Value 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>ＶＡＬＵＥテスト</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Value只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">34</td>
+<td style="text-align:left">Variant string.1-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Variant string.1 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>VarStr1_Test!</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">35</td>
+<td style="text-align:left">Variant string.1-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Variant string.1 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>変数文字列１</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Variant string.1只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">36</td>
+<td style="text-align:left">Variant string.2-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Variant string.2 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>VarStr2_Test@</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">37</td>
+<td style="text-align:left">Variant string.2-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Variant string.2 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>変数文字列２</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Variant string.2只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">38</td>
+<td style="text-align:left">Comments-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Comments 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>Comment_123!</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">39</td>
+<td style="text-align:left">Comments-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Comments 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>コメント備考テスト</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Comments只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">40</td>
+<td style="text-align:left">Add-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Add 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>202607</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">41</td>
+<td style="text-align:left">Add-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Add 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>２０２６０７</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Add只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">42</td>
+<td style="text-align:left">Delete-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Delete 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>202608</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">43</td>
+<td style="text-align:left">Delete-全角文字入力時エラー表示</td>
+<td style="text-align:left">1. 在 Delete 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>２０２６０８</code></td>
+<td style="text-align:left">1. 全角文字でも入力できる<br>2. 错误信息表示：Delete只能入力半角英数字+記号</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
 </tbody>
 </table>
 <h3 id="ui-状态-加载中">UI 状态-加载中 </h3>
@@ -424,7 +568,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">28</td>
+<td style="text-align:center">44</td>
 <td style="text-align:left">操作中-按钮禁用</td>
 <td style="text-align:left">1. 执行 Add/Update/Delete 操作<br>2. 在 API 响应前确认按钮状态</td>
 <td style="text-align:left">无</td>
@@ -433,7 +577,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">29</td>
+<td style="text-align:center">45</td>
 <td style="text-align:left">操作中-防止重复提交</td>
 <td style="text-align:left">1. 点击 Add/Update/Delete 按钮<br>2. 在 API 响应前再次点击<br>3. 确认 API 调用次数</td>
 <td style="text-align:left">无</td>
@@ -458,7 +602,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">30</td>
+<td style="text-align:center">46</td>
 <td style="text-align:left">异常处理-API 调用失败</td>
 <td style="text-align:left">1. 执行任意操作时 API 调用失败<br>2. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -467,7 +611,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">31</td>
+<td style="text-align:center">47</td>
 <td style="text-align:left">异常处理-未授权操作</td>
 <td style="text-align:left">1. 以无权限用户登录<br>2. 执行 Add/Update/Delete 操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -492,7 +636,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">32</td>
+<td style="text-align:center">48</td>
 <td style="text-align:left">安全性-API 请求协议</td>
 <td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行任意操作<br>3. 检查网络请求</td>
 <td style="text-align:left">无</td>
@@ -501,7 +645,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">33</td>
+<td style="text-align:center">49</td>
 <td style="text-align:left">安全性-变更记录日志</td>
 <td style="text-align:left">1. 执行 Add/Update/Delete 操作<br>2. 确认后端记录</td>
 <td style="text-align:left">无</td>

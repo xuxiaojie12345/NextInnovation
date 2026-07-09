@@ -82,7 +82,7 @@
 <td style="text-align:left">画面初期显示-输入框和按钮初始状态</td>
 <td style="text-align:left">1. 访问页面<br>2. 确认各控件的初始值</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Chassis series 输入框为空，最大长度 5，可用（Enabled）<br>2. Chassis no 输入框为空，最大长度 10，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
+<td style="text-align:left">1. Chassis series 输入框为空，可用（Enabled）<br>2. Chassis no 输入框为空，可用（Enabled）<br>3. Document type 下拉列表显示 "Please select" 选项，可用（Enabled）<br>4. Submit、Reset、Help 三个按钮均可用（Enabled）<br>5. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -91,7 +91,7 @@
 <td style="text-align:left">画面初期显示-文档类型列表 API 调用成功</td>
 <td style="text-align:left">1. 访问页面<br>2. 等待 API 响应<br>3. 确认 Document type 下拉列表</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 默认选中第一项<br>5. Error message 区域不显示</td>
+<td style="text-align:left">1. 调用 POST <code>/api/ud03/selecthdocdocumentlist</code> API<br>2. API 返回 code=200 且 doctypeList 非空<br>3. Document type 下拉列表显示 API 返回的文档类型选项<br>4. 无默认选中值<br>5. Error message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -303,6 +303,15 @@
 </tr>
 <tr>
 <td style="text-align:center">18</td>
+<td style="text-align:left">Chassis series-半角英文字符以外的字符输入</td>
+<td style="text-align:left">1. 在 Chassis series 输入框中输入半角英文字符以外的字符<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>21くぇ</code></td>
+<td style="text-align:left">错误消息显示<br>“Chassis series 只能输入半角英文字符”</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">19</td>
 <td style="text-align:left">Chassis no-最大长度校验</td>
 <td style="text-align:left">1. 在 Chassis no 输入框中输入 11 个以上字符<br>2. 确认输入结果</td>
 <td style="text-align:left">输入 11 个以上字符</td>
@@ -311,11 +320,20 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">19</td>
+<td style="text-align:center">20</td>
 <td style="text-align:left">Chassis no-半角数字输入</td>
 <td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字<br>2. 确认输入结果</td>
 <td style="text-align:left"><code>1234567890</code></td>
 <td style="text-align:left">1. 正常输入<br>2. 无错误消息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">21</td>
+<td style="text-align:left">Chassis no-半角数字以外的字符输入</td>
+<td style="text-align:left">1. 在 Chassis no 输入框中输入半角数字以外的字符<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>ad１２３</code></td>
+<td style="text-align:left">错误消息显示<br>“Chassis no 只能输入半角数字”</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

@@ -42,16 +42,10 @@ public class UD201Controller {
      */
     @PostMapping("/updatehdocdocumentlist")
     public ResponseEntity<ApiResponse<?>> updateHdocDocumentList(@RequestBody Map<String, String> request) {
-        log.info("========== UD20-1 Controller: Update HDOC_DOCUMENT_LIST ==========");
 
         String doctype = request.get("doctype");
         String user = request.get("user");
         String date = request.get("date");
-        String market = request.get("market");
-        String setting = request.get("setting");
-
-        log.info("Request params - doctype: {}, user: {}, date: {}, market: {}, setting: {}",
-                doctype, user, date, market, setting);
 
         // 校验doctype是否为空
         if (doctype == null || doctype.trim().isEmpty()) {
@@ -59,9 +53,6 @@ public class UD201Controller {
         }
 
         ApiResponse<?> response = ud201Service.updateHdocDocumentList(doctype, user, date);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD20-1 Controller: Update completed ==========");
 
         return ResponseEntity.ok(response);
     }

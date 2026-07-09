@@ -6,7 +6,6 @@ import com.web.app.domain.Entity.MarketMaster;
 import com.web.app.domain.Entity.UserInfo;
 import com.web.app.mapper.HdocDocumentListMapper;
 import com.web.app.service.UD17Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import java.util.*;
  * UD17 Service Implementation
  * 实现HDoc用户管理的业务逻辑
  */
-@Slf4j
 @Service
 public class UD17ServiceImpl implements UD17Service {
 
@@ -25,29 +23,24 @@ public class UD17ServiceImpl implements UD17Service {
 
     @Override
     public ApiResponse<?> getMarketList() {
-        log.info("========== UD17 Service: Get Market List ==========");
 
         try {
             List<MarketMaster> marketList = hdocDocumentListMapper.selectMarketList();
 
             if (marketList == null || marketList.isEmpty()) {
-                log.warn("Market list is empty");
                 return ApiResponse.error(404, "市场列表为空");
             }
 
-            log.info("Market list size: {}", marketList.size());
+
             return ApiResponse.success("获取市场列表成功", marketList);
 
         } catch (Exception e) {
-            log.error("Error getting market list", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> getUserInfo(HdocDocumentList request) {
-        log.info("========== UD17 Service: Get User Info ==========");
-        log.info("userId: {}, userName: {}", request.getUserId(), request.getUserName());
 
         try {
             String userId = request.getUserId() != null ? request.getUserId().trim() : "";
@@ -72,7 +65,6 @@ public class UD17ServiceImpl implements UD17Service {
             );
 
             if (userInfo == null) {
-                log.warn("User not found: userId={}, userName={}", userId, userName);
                 return ApiResponse.error(404, "We didn't recognize the userid you entered. Please try again.");
             }
 
@@ -84,19 +76,16 @@ public class UD17ServiceImpl implements UD17Service {
             data.put("userposition", userInfo.getUserposition());
             data.put("email", userInfo.getEMmail());
 
-            log.info("User found: {}", userInfo.getUserId());
             return ApiResponse.success("获取用户信息成功", data);
 
         } catch (Exception e) {
-            log.error("Error getting user info", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> getUserPermissions(HdocDocumentList request) {
-        log.info("========== UD17 Service: Get User Permissions ==========");
-        log.info("userId: {}", request.getUserId());
 
         try {
             String userId = request.getUserId() != null ? request.getUserId().trim() : "";
@@ -113,7 +102,6 @@ public class UD17ServiceImpl implements UD17Service {
             // 检查用户是否存在
             int userCount = hdocDocumentListMapper.countUserById(userId);
             if (userCount == 0) {
-                log.warn("User not found: userId={}", userId);
                 return ApiResponse.error(404, "We didn't recognize the userid you entered. Please try again.");
             }
 
@@ -134,21 +122,16 @@ public class UD17ServiceImpl implements UD17Service {
             data.put("functions", functions);
             data.put("markets", markets);
 
-            log.info("User permissions found: {} functions, {} markets", functions.size(), markets.size());
             return ApiResponse.success("获取用户权限成功", data);
 
         } catch (Exception e) {
-            log.error("Error getting user permissions", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> updateRole(HdocDocumentList request) {
-        log.info("========== UD17 Service: Update Role ==========");
-        log.info("userId: {}, market: {}, type: {}, bu: {}, function: {}",
-                request.getUserId(), request.getMarket(), request.getType(),
-                request.getBu(), request.getFunction());
 
         try {
             String userId = request.getUserId() != null ? request.getUserId().trim() : "";
@@ -165,7 +148,6 @@ public class UD17ServiceImpl implements UD17Service {
             // 检查用户是否存在
             int userCount = hdocDocumentListMapper.countUserById(userId);
             if (userCount == 0) {
-                log.warn("User not found: userId={}", userId);
                 return ApiResponse.error(404, "We didn't recognize the userid you entered. Please try again.");
             }
 
@@ -192,27 +174,19 @@ public class UD17ServiceImpl implements UD17Service {
             data.put("bu", bu);
             data.put("function", function);
 
-            log.info("Role updated successfully for user: {}", userId);
             return ApiResponse.success("更新用户角色成功", data);
 
         } catch (Exception e) {
-            log.error("Error updating role", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> deleteRole(HdocDocumentList request) {
-        log.info("========== UD17 Service: Delete Role ==========");
-        log.info("userId: {}, market: {}, type: {}, bu: {}, function: {}",
-                request.getUserId(), request.getMarket(), request.getType(),
-                request.getBu(), request.getFunction());
 
         try {
             String userId = request.getUserId() != null ? request.getUserId().trim() : "";
-            String market = request.getMarket() != null ? request.getMarket().trim() : "";
-            String type = request.getType() != null ? request.getType().trim() : "";
-            String bu = request.getBu() != null ? request.getBu().trim() : "";
             String function = request.getFunction() != null ? request.getFunction().trim() : "";
 
             // 参数校验
@@ -220,22 +194,15 @@ public class UD17ServiceImpl implements UD17Service {
                 return ApiResponse.error(400, "USERID不能为空");
             }
 
-            // 删除该用户所有权限记录（全量替换）
-            int deletedMarket = hdocDocumentListMapper.deleteAllMarketAuth(userId);
-            int deletedFunction = hdocDocumentListMapper.deleteAllFunctionAuth(userId);
-            log.info("Deleted all permissions for user {}: {} market records, {} function records",
-                    userId, deletedMarket, deletedFunction);
-
             // 构建返回数据
             Map<String, Object> data = new HashMap<>();
             data.put("userid", userId);
             data.put("function", function);
 
-            log.info("Role deleted successfully for user: {}", userId);
             return ApiResponse.success("删除用户角色成功", data);
 
         } catch (Exception e) {
-            log.error("Error deleting role", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

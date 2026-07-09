@@ -125,10 +125,18 @@ const GenerateHomologationDocument = () => {
       errorMsg = "Chassis series is required.";
       isValid = false;
       console.log("❌ Validation failed: Chassis series is required");
+    } else if (!/^[A-Za-z]+$/.test(chassisSeries.trim())) {
+      errorMsg = "Chassis series 只能输入半角英文字符";
+      isValid = false;
+      console.log("❌ Validation failed: Chassis series invalid chars");
     } else if (!chassisNo.trim()) {
       errorMsg = "Chassis no is required.";
       isValid = false;
       console.log("❌ Validation failed: Chassis no is required");
+    } else if (!/^[0-9]+$/.test(chassisNo.trim())) {
+      errorMsg = "Chassis no 只能输入半角数字";
+      isValid = false;
+      console.log("❌ Validation failed: Chassis no invalid chars");
     } else if (!documentType) {
       errorMsg = "Document type is required. Please select from dropdown.";
       isValid = false;
@@ -230,6 +238,13 @@ const GenerateHomologationDocument = () => {
     const value = e.target.value;
     setChassisSeries(value);
     if (value.trim()) {
+      // 半角英文字（A-Z, a-z）以外の文字が含まれている場合
+      if (!/^[A-Za-z]*$/.test(value)) {
+        setErrorMessage("Chassis series 只能输入半角英文字符");
+      } else {
+        setErrorMessage("");
+      }
+    } else {
       setErrorMessage("");
     }
   };
@@ -238,6 +253,13 @@ const GenerateHomologationDocument = () => {
     const value = e.target.value;
     setChassisNo(value);
     if (value.trim()) {
+      // 半角数字（0-9）以外の文字が含まれている場合
+      if (!/^[0-9]*$/.test(value)) {
+        setErrorMessage("Chassis no 只能输入半角数字");
+      } else {
+        setErrorMessage("");
+      }
+    } else {
       setErrorMessage("");
     }
   };

@@ -34,14 +34,9 @@ public class UD10HdocVariablesController {
      */
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<?>> addVariable(@RequestBody HdocVariables request) {
-        log.info("========== UD10 Controller: Add Variable ==========");
-        log.info("Add request - variable: {}", request.getVariable());
 
         // 4.3 调用Service层处理添加逻辑
         ApiResponse<?> response = ud10HdocVariablesService.addVariable(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD10 Controller: Add completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -55,14 +50,8 @@ public class UD10HdocVariablesController {
      */
     @PutMapping("/update")
     public ResponseEntity<ApiResponse<?>> updateVariable(@RequestBody HdocVariables request) {
-        log.info("========== UD10 Controller: Update Variable ==========");
-        log.info("Update request - variable: {}", request.getVariable());
-
         // 4.3 调用Service层处理更新逻辑
         ApiResponse<?> response = ud10HdocVariablesService.updateVariable(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD10 Controller: Update completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -76,14 +65,8 @@ public class UD10HdocVariablesController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<?>> deleteVariable(@RequestBody HdocVariables request) {
-        log.info("========== UD10 Controller: Delete Variable ==========");
-        log.info("Delete request - variable: {}", request.getVariable());
-
         // 4.3 调用Service层处理删除逻辑
         ApiResponse<?> response = ud10HdocVariablesService.deleteVariable(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD10 Controller: Delete completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -97,18 +80,8 @@ public class UD10HdocVariablesController {
      */
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<?>> searchVariables(@RequestBody HdocVariables request) {
-        log.info("========== UD11 Controller: Search Variables ==========");
-        log.info("Search params - variable: {}, type: {}, description: {}",
-                request.getVariable(), request.getType(), request.getDescription());
-
         // 4.3 调用Service层处理搜索逻辑
         ApiResponse<?> response = ud10HdocVariablesService.searchVariables(request);
-
-        log.info("Response code: {}, msg: {}, data size: {}",
-                response.getCode(), response.getMsg(),
-                response.getData() instanceof java.util.List ?
-                ((java.util.List<?>) response.getData()).size() : "N/A");
-        log.info("========== UD11 Controller: Search completed ==========");
 
         return ResponseEntity.ok(response);
     }

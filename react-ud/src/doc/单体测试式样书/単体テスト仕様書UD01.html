@@ -82,7 +82,7 @@
 <td style="text-align:left">画面初期显示-输入控件初始状态</td>
 <td style="text-align:left">1. 访问登录页面<br>2. 确认各控件的初始值</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. UserID 输入框为空、可用（Enabled）、maxLength=10<br>2. Password 输入框为空、可用（Enabled）、maxLength=32<br>3. Login 按钮可用（Enabled）<br>4. Message 区域不显示</td>
+<td style="text-align:left">1. UserID 输入框为空、可用（Enabled）<br>2. Password 输入框为空、可用（Enabled）<br>3. Login 按钮可用（Enabled）<br>4. Message 区域不显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -91,7 +91,7 @@
 <td style="text-align:left">画面初期显示-UserID 允许字符</td>
 <td style="text-align:left">1. 在 UserID 输入框中输入半角英数字<br>2. 确认输入结果</td>
 <td style="text-align:left"><code>User01</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 不允许输入半角英数字以外的字符（如全角文字、特殊符号）</td>
+<td style="text-align:left">正常显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -100,7 +100,7 @@
 <td style="text-align:left">画面初期显示-Password 允许字符</td>
 <td style="text-align:left">1. 在 Password 输入框中输入半角英数字和符号<br>2. 确认输入结果</td>
 <td style="text-align:left"><code>Pass@123!</code></td>
-<td style="text-align:left">1. 正常输入<br>2. 密码字段显示为掩码（如 <code>●●●●●●●●</code>）<br>3. 不允许输入非 ASCII 可见符号以外的字符</td>
+<td style="text-align:left">正常显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -256,7 +256,7 @@
 <td style="text-align:left">登录成功（API 返回 200）</td>
 <td style="text-align:left">1. 输入正确的 UserID 和 Password<br>2. 点击 Login 按钮<br>3. API 返回成功<br>4. 确认结果</td>
 <td style="text-align:left">UserID: <code>admin</code><br>Password: <code>Pass@123</code></td>
-<td style="text-align:left">1. 调用 AuthenticationApi（POST <code>/api/login</code>）<br>2. API 返回 code=200<br>3. 显示结果："登录成功"<br>4. 保存 token 等用户信息<br>5. 画面跳转到主页面</td>
+<td style="text-align:left">1. 调用 AuthenticationApi（POST <code>/api/login</code>）<br>2. API 返回 code=200<br>3. 显示结果："登录成功"<br>4. 保存 token 等用户信息<br>5. 画面跳转到menu画面</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

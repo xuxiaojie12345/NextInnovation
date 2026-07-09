@@ -6,8 +6,6 @@ import "./MarketDocumentSettings.css";
 interface FormData {
   documentType: string;
   documentTypeOperator: string;
-  market: string;
-  setting: string;
   bussinesUnit: string;
   user: string;
   date: string;
@@ -20,8 +18,6 @@ const MarketDocumentSettings = () => {
   const [formData, setFormData] = useState<FormData>({
     documentType: "",
     documentTypeOperator: "=",
-    market: "",
-    setting: "",
     bussinesUnit: "BU",
     user: "",
     date: "",
@@ -105,8 +101,6 @@ const MarketDocumentSettings = () => {
     setFormData((prev) => ({
       documentType: "",
       documentTypeOperator: "=",
-      market: "",
-      setting: "",
       bussinesUnit: "BU",
       user: prev.user,
       date: prev.date,
@@ -147,8 +141,6 @@ const MarketDocumentSettings = () => {
             doctype: formData.documentType.trim(),
             user: formData.user,
             date: formData.date,
-            market: formData.market,
-            setting: formData.setting,
           }),
         },
       );
@@ -236,40 +228,6 @@ const MarketDocumentSettings = () => {
               maxLength={20}
               className='mds-input-field mds-width-doctype'
             />
-          </div>
-          <div className='mds-form-row'>
-            <label className='mds-label'>Market:</label>
-            <select className='mds-operator-select'>
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
-            </select>
-            <input
-              type='text'
-              value={formData.market}
-              onChange={(e) => handleInputChange("market", e.target.value)}
-              placeholder='Enter market'
-              maxLength={20}
-              className='mds-input-field mds-width-market'
-            />
-          </div>
-          <div className='mds-form-row'>
-            <label className='mds-label'>Setting:</label>
-            <select className='mds-operator-select'>
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
-            </select>
-            <select
-              value={formData.setting}
-              onChange={(e) => handleInputChange("setting", e.target.value)}
-              className='mds-input-field mds-width-setting'
-            >
-              <option value=''>请选择</option>
-              <option value='Option1'>Option1</option>
-              <option value='Option2'>Option2</option>
-              <option value='Option3'>Option3</option>
-            </select>
           </div>
           <div className='mds-form-row'>
             <label className='mds-label'>Bussines unit:</label>

@@ -5,7 +5,6 @@ import com.web.app.domain.Entity.HdocDocumentList;
 import com.web.app.domain.Entity.MarketMaster;
 import com.web.app.mapper.HdocDocumentListMapper;
 import com.web.app.service.UD19Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.*;
  * UD19 Service Implementation
  * 实现HDoc用户搜索的业务逻辑
  */
-@Slf4j
 @Service
 public class UD19ServiceImpl implements UD19Service {
 
@@ -24,30 +22,23 @@ public class UD19ServiceImpl implements UD19Service {
 
     @Override
     public ApiResponse<?> getMarketList() {
-        log.info("========== UD19 Service: Get Market List ==========");
 
         try {
             List<MarketMaster> marketList = hdocDocumentListMapper.selectMarketList();
 
             if (marketList == null || marketList.isEmpty()) {
-                log.warn("Market list is empty");
                 return ApiResponse.error(404, "市场列表为空");
             }
 
-            log.info("Market list size: {}", marketList.size());
             return ApiResponse.success("获取市场列表成功", marketList);
 
         } catch (Exception e) {
-            log.error("Error getting market list", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> searchHdoc(HdocDocumentList request) {
-        log.info("========== UD19 Service: Search HDOC User ==========");
-        log.info("userid: {}, searchUser: {}, market: {}, searchType: {}",
-                request.getUserid(), request.getSearchUser(), request.getMarket(), request.getSearchType());
 
         try {
             String userid = request.getUserid() != null ? request.getUserid().trim() : "";
@@ -108,11 +99,10 @@ public class UD19ServiceImpl implements UD19Service {
             data.put("count", users.size());
             data.put("users", users);
 
-            log.info("Search completed: found {} users", users.size());
             return ApiResponse.success("success", data);
 
         } catch (Exception e) {
-            log.error("Error searching HDOC user", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

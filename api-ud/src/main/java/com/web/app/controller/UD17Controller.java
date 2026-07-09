@@ -31,12 +31,8 @@ public class UD17Controller {
      */
     @GetMapping("/getMarketList")
     public ResponseEntity<ApiResponse<?>> getMarketList() {
-        log.info("========== UD17 Controller: Get Market List ==========");
 
         ApiResponse<?> response = ud17Service.getMarketList();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD17 Controller: Get Market List completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -47,13 +43,8 @@ public class UD17Controller {
      */
     @PostMapping("/getUserInfo")
     public ResponseEntity<ApiResponse<?>> getUserInfo(@RequestBody HdocDocumentList request) {
-        log.info("========== UD17 Controller: Get User Info ==========");
-        log.info("userId: {}, userName: {}", request.getUserId(), request.getUserName());
 
         ApiResponse<?> response = ud17Service.getUserInfo(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD17 Controller: Get User Info completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -64,13 +55,8 @@ public class UD17Controller {
      */
     @PostMapping("/getUserPermissions")
     public ResponseEntity<ApiResponse<?>> getUserPermissions(@RequestBody HdocDocumentList request) {
-        log.info("========== UD17 Controller: Get User Permissions ==========");
-        log.info("userId: {}", request.getUserId());
 
         ApiResponse<?> response = ud17Service.getUserPermissions(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD17 Controller: Get User Permissions completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -81,15 +67,8 @@ public class UD17Controller {
      */
     @PostMapping("/updateRole")
     public ResponseEntity<ApiResponse<?>> updateRole(@RequestBody HdocDocumentList request) {
-        log.info("========== UD17 Controller: Update Role ==========");
-        log.info("userId: {}, market: {}, type: {}, bu: {}, function: {}",
-                request.getUserId(), request.getMarket(), request.getType(),
-                request.getBu(), request.getFunction());
 
         ApiResponse<?> response = ud17Service.updateRole(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD17 Controller: Update Role completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -100,15 +79,8 @@ public class UD17Controller {
      */
     @DeleteMapping("/deleteRole")
     public ResponseEntity<ApiResponse<?>> deleteRole(@RequestBody HdocDocumentList request) {
-        log.info("========== UD17 Controller: Delete Role ==========");
-        log.info("userId: {}, market: {}, type: {}, bu: {}, function: {}",
-                request.getUserId(), request.getMarket(), request.getType(),
-                request.getBu(), request.getFunction());
 
         ApiResponse<?> response = ud17Service.deleteRole(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD17 Controller: Delete Role completed ==========");
 
         return ResponseEntity.ok(response);
     }

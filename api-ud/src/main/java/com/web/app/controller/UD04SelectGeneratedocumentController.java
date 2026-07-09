@@ -34,10 +34,6 @@ public class UD04SelectGeneratedocumentController {
             @RequestParam String chassisSeries,
             @RequestParam String chassisNo) {
         
-        log.info("========== UD04 Controller: Received request ==========");
-        log.info("Chassis series: {}", chassisSeries);
-        log.info("Chassis no: {}", chassisNo);
-        
         // 4.2 封装请求参数
         UD04SelectGeneratedocumentRequest request = new UD04SelectGeneratedocumentRequest();
         request.setChassisSeries(chassisSeries);
@@ -46,9 +42,6 @@ public class UD04SelectGeneratedocumentController {
         // 4.3 调用Service层处理业务逻辑
         ApiResponse<UD04SelectGeneratedocumentResponse> response = 
                 ud04SelectGeneratedocumentService.selectGeneratedocument(request);
-        
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD04 Controller: Request completed ==========");
         
         return ResponseEntity.ok(response);
     }

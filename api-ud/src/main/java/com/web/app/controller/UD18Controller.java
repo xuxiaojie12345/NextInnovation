@@ -31,12 +31,8 @@ public class UD18Controller {
      */
     @GetMapping("/getDocumentList")
     public ResponseEntity<ApiResponse<?>> getDocumentList() {
-        log.info("========== UD18 Controller: Get Document List ==========");
 
         ApiResponse<?> response = ud18Service.getDocumentList();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD18 Controller: Get Document List completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -47,13 +43,8 @@ public class UD18Controller {
      */
     @PostMapping("/getUserFunctionsAndDocuments")
     public ResponseEntity<ApiResponse<?>> getUserFunctionsAndDocuments(@RequestBody HdocDocumentList request) {
-        log.info("========== UD18 Controller: Get User Functions And Documents ==========");
-        log.info("userId: {}", request.getUserId());
 
         ApiResponse<?> response = ud18Service.getUserFunctionsAndDocuments(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD18 Controller: Get User Functions And Documents completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -64,13 +55,8 @@ public class UD18Controller {
      */
     @PostMapping("/updateUserDocuments")
     public ResponseEntity<ApiResponse<?>> updateUserDocuments(@RequestBody HdocDocumentList request) {
-        log.info("========== UD18 Controller: Update User Documents ==========");
-        log.info("userId: {}, documentTypes: {}", request.getUserId(), request.getDocumentTypes());
 
         ApiResponse<?> response = ud18Service.updateUserDocuments(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD18 Controller: Update User Documents completed ==========");
 
         return ResponseEntity.ok(response);
     }

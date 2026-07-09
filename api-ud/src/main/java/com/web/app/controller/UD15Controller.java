@@ -34,13 +34,8 @@ public class UD15Controller {
      */
     @PostMapping("/viewinfo")
     public ResponseEntity<ApiResponse<?>> viewInfo(@RequestBody HdocSendDataVinPlate request) {
-        log.info("========== UD15 Controller: View Info ==========");
-        log.info("Request - chassisNumber: {}", request.getChassisNumber());
 
         ApiResponse<?> response = ud15Service.viewInfo(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD15 Controller: View Info completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -54,13 +49,8 @@ public class UD15Controller {
      */
     @PostMapping("/setregenerate")
     public ResponseEntity<ApiResponse<?>> setRegenerate(@RequestBody HdocSendDataVinPlate request) {
-        log.info("========== UD15 Controller: Set Regenerate ==========");
-        log.info("Request - chassisNumber: {}", request.getChassisNumber());
 
         ApiResponse<?> response = ud15Service.setRegenerate(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD15 Controller: Set Regenerate completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -74,13 +64,8 @@ public class UD15Controller {
      */
     @PostMapping("/setok")
     public ResponseEntity<ApiResponse<?>> setOk(@RequestBody HdocSendDataVinPlate request) {
-        log.info("========== UD15 Controller: Set OK ==========");
-        log.info("Request - chassisNumber: {}", request.getChassisNumber());
 
         ApiResponse<?> response = ud15Service.setOk(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD15 Controller: Set OK completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -94,13 +79,8 @@ public class UD15Controller {
      */
     @PostMapping("/changetobasicinfo")
     public ResponseEntity<ApiResponse<?>> changeToBasicInfo(@RequestBody HdocSendDataVinPlate request) {
-        log.info("========== UD15 Controller: Change to Basic Info ==========");
-        log.info("Request - chassisNumber: {}", request.getChassisNumber());
 
         ApiResponse<?> response = ud15Service.changeToBasicInfo(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD15 Controller: Change to Basic Info completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -114,13 +94,8 @@ public class UD15Controller {
      */
     @PostMapping("/changetoadvancedinfo")
     public ResponseEntity<ApiResponse<?>> changeToAdvancedInfo(@RequestBody HdocSendDataVinPlate request) {
-        log.info("========== UD15 Controller: Change to Advanced Info ==========");
-        log.info("Request - chassisNumber: {}", request.getChassisNumber());
 
         ApiResponse<?> response = ud15Service.changeToAdvancedInfo(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD15 Controller: Change to Advanced Info completed ==========");
 
         return ResponseEntity.ok(response);
     }

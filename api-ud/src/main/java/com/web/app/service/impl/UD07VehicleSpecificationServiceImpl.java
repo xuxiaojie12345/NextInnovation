@@ -6,7 +6,6 @@ import com.web.app.domain.UD07VehicleSpecificationResponse;
 import com.web.app.mapper.HdocRecDataKolaVariantMapper;
 import com.web.app.mapper.HdocRecDataOmMapper;
 import com.web.app.service.UD07VehicleSpecificationService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ import java.util.Map;
  * UD07 Vehicle Specification Service Implementation
  * 车辆规格信息查询服务实现类
  */
-@Slf4j
 @Service
 public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecificationService {
     
@@ -36,13 +34,10 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
      */
     @Override
     public ApiResponse<UD07VehicleSpecificationResponse> getVehicleSpecification(UD07VehicleSpecificationRequest request) {
-        log.info("========== UD07 Vehicle Specification API Call ==========");
-        log.info("Received request - Chassis no: {}", request.getChassisNo());
         
         // 4.4 参数校验
         String validationResult = validateRequest(request);
         if (validationResult != null) {
-            log.warn("Parameter validation failed: {}", validationResult);
             return ApiResponse.error(400, validationResult);
         }
         
@@ -52,23 +47,12 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
             String serie = chassisNo.substring(0, 4);
             String chnr = chassisNo.substring(4).trim();
             
-            log.info("Split chassis no - SERIE: {}, CHNR: {}", serie, chnr);
-            
             // 4.5-4.6 【① 基础车辆信息取得】
             Map<String, Object> vehicleBaseInfo = hdocRecDataOmMapper.selectVehicleBaseInfo(serie, chnr);
             
             if (vehicleBaseInfo == null || vehicleBaseInfo.isEmpty()) {
-                log.warn("No vehicle base info found for SERIE: {}, CHNR: {}", serie, chnr);
                 return ApiResponse.error(404, "未找到对应的车辆信息");
             }
-            
-            log.info("Query successful - Found vehicle base info");
-            log.info("  Model: {}, BuiltWeek: {}, VIN: {}, ProductType: {}, CountryOfOperation: {}",
-                    vehicleBaseInfo.get("model"),
-                    vehicleBaseInfo.get("builtWeek"),
-                    vehicleBaseInfo.get("vin"),
-                    vehicleBaseInfo.get("productType"),
-                    vehicleBaseInfo.get("countryOfOperation"));
             
             // 提取FAMILY_ID和VARIANT_ID
             String familyId = (String) vehicleBaseInfo.get("familyId");
@@ -82,13 +66,8 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
                 variantList = hdocRecDataKolaVariantMapper.selectVariantList(familyId, variantId);
                 
                 if (variantList == null || variantList.isEmpty()) {
-                    log.warn("No variant info found for FAMILY_ID: {}, VARIANT_ID: {}", familyId, variantId);
                     variantList = new ArrayList<>();
-                } else {
-                    log.info("Query successful - Found {} variant records", variantList.size());
                 }
-            } else {
-                log.warn("FAMILY_ID or VARIANT_ID is empty, skip variant query");
             }
             
             // 构建发动机编号（从第一个变体的symbol中获取）
@@ -134,11 +113,9 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
                     .engineNo(engineNo)
                     .build();
             
-            log.info("========== UD07 Vehicle Specification Query Completed ==========");
             return ApiResponse.success(response);
             
         } catch (Exception e) {
-            log.error("System error occurred while querying vehicle specification", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -159,7 +136,7 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
         
         // 检查长度（至少需要4位用于SERIE）
         if (chassisNo.length() < 4) {
-            return "Chassis no长度不足，至少需要4位";
+            return "Chassis no长度不足,至少需要4位";
         }
         
         // 检查格式（前4位应为字母，后面可以包含空格和数字）

@@ -33,12 +33,8 @@ public class UD14Controller {
      */
     @GetMapping("/api/ud14Searchresultist/getmarkets")
     public ResponseEntity<ApiResponse<?>> getMarkets() {
-        log.info("========== UD14 Controller: Get Markets ==========");
 
         ApiResponse<?> response = ud14Service.getMarkets();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD14 Controller: Get Markets completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -58,16 +54,7 @@ public class UD14Controller {
             market = request.get("market");
         }
 
-        log.info("========== UD14 Controller: Get Variables By Market ==========");
-        log.info("Market: {}", market);
-
         ApiResponse<?> response = ud14Service.getVariablesByMarket(market);
-
-        log.info("Response code: {}, msg: {}, data size: {}",
-                response.getCode(), response.getMsg(),
-                response.getData() instanceof java.util.List ?
-                ((java.util.List<?>) response.getData()).size() : "N/A");
-        log.info("========== UD14 Controller: Get Variables By Market completed ==========");
 
         return ResponseEntity.ok(response);
     }

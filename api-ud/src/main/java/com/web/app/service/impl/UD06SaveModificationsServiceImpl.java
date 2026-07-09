@@ -5,7 +5,6 @@ import com.web.app.domain.UD06SaveModificationsRequest;
 import com.web.app.domain.UD06SaveModificationsResponse;
 import com.web.app.mapper.HdocModificationsMapper;
 import com.web.app.service.UD06SaveModificationsService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import java.util.List;
  * UD06 Save Modifications Service Implementation
  * 用于查询和返回最新的Modify情报
  */
-@Slf4j
 @Service
 public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsService {
     
@@ -31,13 +29,10 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
      */
     @Override
     public ApiResponse<UD06SaveModificationsResponse> saveModifications(UD06SaveModificationsRequest request) {
-        log.info("========== UD06 Save Modifications Start ==========");
-        log.info("Request - Chassis serie: {}, Chassis no: {}", request.getChassisSerie(), request.getChassisNo());
         
         // 4.4 参数校验
         String validationResult = validateRequest(request);
         if (validationResult != null) {
-            log.warn("Validation failed: {}", validationResult);
             return ApiResponse.error(400, validationResult);
         }
         
@@ -51,17 +46,7 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
             
             // 4.6 判断查询结果（无数据时返回空列表）
             if (modificationList == null || modificationList.isEmpty()) {
-                log.warn("No modification data found for Chassis serie: {}, Chassis no: {}", 
-                        request.getChassisSerie(), request.getChassisNo());
                 modificationList = Collections.emptyList();
-            } else {
-                log.info("Query successful - Found latest modification record");
-                log.info("  DOCTYPE: {}, VERS: {}, VARIABLE: {}, NEWVAL: {}, UPDATE_DATETIME: {}",
-                        modificationList.get(0).getDOCTYPE(),
-                        modificationList.get(0).getVERS(),
-                        modificationList.get(0).getVARIABLE(),
-                        modificationList.get(0).getNEWVAL(),
-                        modificationList.get(0).getUPDATE_DATETIME());
             }
             
             // 4.7-4.8 封装响应对象
@@ -70,11 +55,9 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
                     .build();
             
             // 记录查询日志
-            log.info("========== UD06 Save Modifications End ==========");
             return ApiResponse.success(response);
             
         } catch (Exception e) {
-            log.error("System error occurred while querying modifications", e);
             return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }

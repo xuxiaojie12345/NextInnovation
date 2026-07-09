@@ -33,9 +33,6 @@ public class UD07VehicleSpecificationController {
     public ApiResponse<UD07VehicleSpecificationResponse> getVehicleSpecification(
             @RequestParam("chassisNo") String chassisNo) {
         
-        log.info("========== UD07 Vehicle Specification API Call ==========");
-        log.info("Received request - Chassis no: {}", chassisNo);
-        
         // 构建请求对象
         UD07VehicleSpecificationRequest request = new UD07VehicleSpecificationRequest();
         request.setChassisNo(chassisNo);

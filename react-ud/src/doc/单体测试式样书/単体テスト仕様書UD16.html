@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初期显示-基本元素</td>
 <td style="text-align:left">1. 访问 AD Change 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示 Serie-Chnr 输入框（最大长度 15）<br>2. 显示 Desc 输入框（最大长度 4000）<br>3. 显示按钮：ADD、DELETE、CHECK<br>4. 所有按钮可用（Enabled）</td>
+<td style="text-align:left">1. 显示 Serie-Chnr 输入框<br>2. 显示 Desc 输入框<br>3. 显示按钮：ADD、DELETE、CHECK<br>4. 所有按钮可用（Enabled）</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -132,9 +132,9 @@
 <tr>
 <td style="text-align:center">6</td>
 <td style="text-align:left">ADD-成功</td>
-<td style="text-align:left">1. 输入有效 Serie-Chnr 和 Desc<br>2. 点击 ADD 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 输入有效 Serie-Chnr 和 Desc<br>2. 点击 ADD 按钮<br>3. API 返回成功<br>4. 确认DB结果</td>
 <td style="text-align:left">Serie-Chnr: <code>JPCT-G28321</code><br>Desc: <code>描述信息</code></td>
-<td style="text-align:left">1. 调用 API（POST <code>/api/ud16/add</code>）<br>2. API 返回 code=200<br>3. 显示成功消息："AD Change记录添加成功"（绿色）<br>4. 输入框被清空（可选）</td>
+<td style="text-align:left">1. 调用 API（POST <code>/api/ud16/add</code>）<br>2. API 返回 code=200<br>3. 显示成功消息："AD Change记录添加成功"（绿色）<br>4. DB 中添加一条记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -152,7 +152,7 @@
 <td style="text-align:left">ADD-失败（API 返回 500）</td>
 <td style="text-align:left">1. 输入有效值<br>2. 点击 ADD 按钮<br>3. API 返回 500<br>4. 确认结果</td>
 <td style="text-align:left">API 返回 500</td>
-<td style="text-align:left">1. 显示错误消息："系统错误，请稍后重试"<br>2. ADD 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统错误，请稍后重试"<br>2. ADD 按钮恢复可用状态,DB中未登录该条记录。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -202,9 +202,9 @@
 <tr>
 <td style="text-align:center">12</td>
 <td style="text-align:left">DELETE-确认对话框-点击确定并成功</td>
-<td style="text-align:left">1. 输入有效 Serie-Chnr<br>2. 点击 DELETE 按钮<br>3. 确认对话框点击确定<br>4. API 返回成功<br>5. 确认结果</td>
+<td style="text-align:left">1. 输入有效 Serie-Chnr<br>2. 点击 DELETE 按钮<br>3. 确认对话框点击确定<br>4. API 返回成功<br>5. 确认DB结果</td>
 <td style="text-align:left">Serie-Chnr: <code>JPCT-G28321</code></td>
-<td style="text-align:left">1. 弹出确认对话框<br>2. 点击确定后调用 API（DELETE <code>/api/ud16/delete</code>）<br>3. API 返回 code=200<br>4. 显示成功消息："AD Change记录删除成功"（绿色）<br>5. Serie-Chnr 输入框被清空</td>
+<td style="text-align:left">1. 弹出确认对话框<br>2. 点击确定后调用 API（DELETE <code>/api/ud16/delete</code>）<br>3. API 返回 code=200<br>4. 显示成功消息："AD Change记录删除成功"（绿色）<br>5. DB 中删除该条记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -220,9 +220,9 @@
 <tr>
 <td style="text-align:center">14</td>
 <td style="text-align:left">DELETE-失败（API 返回 500）</td>
-<td style="text-align:left">1. 输入有效值<br>2. 点击 DELETE 按钮<br>3. 确认对话框点击确定<br>4. API 返回 500<br>5. 确认结果</td>
+<td style="text-align:left">1. 输入有效值<br>2. 点击 DELETE 按钮<br>3. 确认对话框点击确定<br>4. API 返回 500<br>5. 确认DB结果</td>
 <td style="text-align:left">API 返回 500</td>
-<td style="text-align:left">1. 显示错误消息："系统错误，请稍后重试"<br>2. DELETE 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统错误，请稍后重试"<br>2. DELETE 按钮恢复可用状态，DB中存在该条记录。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

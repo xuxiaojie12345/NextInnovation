@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.HdocVariables;
 import com.web.app.mapper.HdocVariablesMapper;
 import com.web.app.service.UD10HdocVariablesService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import java.util.Map;
  * UD10 Hdoc Variables Service Implementation
  * 实现HDOC变量的添加、更新、删除业务逻辑
  */
-@Slf4j
 @Service
 public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
 
@@ -29,9 +27,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
      */
     @Override
     public ApiResponse<?> addVariable(HdocVariables request) {
-        log.info("========== UD10 Service: Add Variable ==========");
-        log.info("Request: variable={}, type={}, description={}",
-                request.getVariable(), request.getType(), request.getDescription());
 
         try {
             // 4.4 参数合法性校验
@@ -55,7 +50,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             // 4.5 检查变量是否已存在
             int count = hdocVariablesMapper.countByVariable(variable);
             if (count > 0) {
-                log.warn("Variable already exists: {}", variable);
                 return ApiResponse.error(400, "变量已存在");
             }
 
@@ -77,7 +71,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             // 执行插入操作
             int result = hdocVariablesMapper.insert(entity);
             if (result > 0) {
-                log.info("Variable added successfully: {}", variable);
 
                 // 4.8 封装响应对象
                 Map<String, Object> data = new HashMap<>();
@@ -89,7 +82,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             }
 
         } catch (Exception e) {
-            log.error("Error adding variable", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -100,9 +92,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
      */
     @Override
     public ApiResponse<?> updateVariable(HdocVariables request) {
-        log.info("========== UD10 Service: Update Variable ==========");
-        log.info("Request: variable={}, type={}, description={}",
-                request.getVariable(), request.getType(), request.getDescription());
 
         try {
             // 4.4 参数合法性校验
@@ -126,7 +115,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             // 4.5 检查记录是否存在
             int count = hdocVariablesMapper.countByVariable(variable);
             if (count == 0) {
-                log.warn("Variable not found: {}", variable);
                 return ApiResponse.error(400, "记录不存在");
             }
 
@@ -146,7 +134,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             // 执行更新操作
             int result = hdocVariablesMapper.update(entity);
             if (result > 0) {
-                log.info("Variable updated successfully: {}", variable);
 
                 // 4.8 封装响应对象
                 Map<String, Object> data = new HashMap<>();
@@ -158,7 +145,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             }
 
         } catch (Exception e) {
-            log.error("Error updating variable", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -169,8 +155,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
      */
     @Override
     public ApiResponse<?> deleteVariable(HdocVariables request) {
-        log.info("========== UD10 Service: Delete Variable ==========");
-        log.info("Request: variable={}", request.getVariable());
 
         try {
             // 4.4 参数合法性校验
@@ -188,14 +172,12 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             // 4.5 检查记录是否存在
             int count = hdocVariablesMapper.countByVariable(variable);
             if (count == 0) {
-                log.warn("Variable not found: {}", variable);
                 return ApiResponse.error(400, "记录不存在");
             }
 
             // 4.7 执行删除操作（物理删除）
             int result = hdocVariablesMapper.deleteByVariable(variable);
             if (result > 0) {
-                log.info("Variable deleted successfully: {}", variable);
 
                 // 4.8 封装响应对象
                 Map<String, Object> data = new HashMap<>();
@@ -207,7 +189,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             }
 
         } catch (Exception e) {
-            log.error("Error deleting variable", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -218,9 +199,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
      */
     @Override
     public ApiResponse<?> searchVariables(HdocVariables request) {
-        log.info("========== UD10 Service: Search Variables ==========");
-        log.info("Search params - variable: {}, type: {}, description: {}",
-                request.getVariable(), request.getType(), request.getDescription());
 
         try {
             // 4.4 参数合法性校验
@@ -258,7 +236,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
                     date, dateOp);
 
             // 4.7 构建响应数据（映射字段名以匹配前端）
-            log.info("Found {} matching variables", variablesList.size());
 
             List<Map<String, Object>> dataList = variablesList.stream().map(v -> {
                 Map<String, Object> item = new HashMap<>();
@@ -274,7 +251,6 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             return ApiResponse.success("搜索变量成功", dataList);
 
         } catch (Exception e) {
-            log.error("Error searching variables", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

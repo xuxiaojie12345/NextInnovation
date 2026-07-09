@@ -281,18 +281,18 @@
 <tr>
 <td style="text-align:center">19</td>
 <td style="text-align:left">Update Role-成功</td>
-<td style="text-align:left">1. 查询用户并配置权限<br>2. 点击 Update Role 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 查询用户并配置权限<br>2. 点击 Update Role 按钮<br>3. API 返回成功<br>4. 确认DB结果</td>
 <td style="text-align:left">有效用户，配置了角色和 Market</td>
-<td style="text-align:left">1. 调用 API（PUT <code>/api/ud17/updaterole</code>）<br>2. 将功能权限更新到 HDOC_FUNCTION_AUTH 表<br>3. 将市场权限更新到 DOC_MARKET_AUTH 表<br>4. 显示成功消息："Role updated successfully."（绿色）</td>
+<td style="text-align:left">1. 调用 API（PUT <code>/api/ud17/updaterole</code>）<br>2. 将功能权限更新到 HDOC_FUNCTION_AUTH 表<br>3. 将市场权限更新到 DOC_MARKET_AUTH 表<br>4. 显示成功消息："Role updated successfully."（绿色），DB中相应的数据更新成功</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">20</td>
 <td style="text-align:left">Update Role-失败（API 500）</td>
-<td style="text-align:left">1. 查询用户并配置权限<br>2. 点击 Update Role 按钮<br>3. API 返回 500<br>4. 确认结果</td>
+<td style="text-align:left">1. 查询用户并配置权限<br>2. 点击 Update Role 按钮<br>3. API 返回 500<br>4. 确认DB结果</td>
 <td style="text-align:left">API 返回 500</td>
-<td style="text-align:left">1. 显示错误消息："更新失败，请联系管理员"<br>2. Update Role 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："更新失败，请联系管理员"<br>2. Update Role 按钮恢复可用状态,DB中相应的数据未更新</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -342,18 +342,18 @@
 <tr>
 <td style="text-align:center">24</td>
 <td style="text-align:left">Delete Role-确认删除成功</td>
-<td style="text-align:left">1. 查询用户后<br>2. 点击 Delete Role 按钮<br>3. 确认对话框点击确定<br>4. API 返回成功<br>5. 确认结果</td>
+<td style="text-align:left">1. 查询用户后<br>2. 点击 Delete Role 按钮<br>3. 确认对话框点击确定<br>4. API 返回成功<br>5. 确认DB结果</td>
 <td style="text-align:left">查询后，确认删除</td>
-<td style="text-align:left">1. 调用 API（DELETE <code>/api/ud17/deleterole</code>）<br>2. 从 HDOC_FUNCTION_AUTH 表和 DOC_MARKET_AUTH 表删除该用户所有权限记录<br>3. 显示成功消息："Role deleted successfully."（绿色）<br>4. 清空所有权限配置</td>
+<td style="text-align:left">1. 调用 API（DELETE <code>/api/ud17/deleterole</code>）<br>2. 从 HDOC_FUNCTION_AUTH 表和 DOC_MARKET_AUTH 表删除该用户所有权限记录<br>3. 显示成功消息："Role deleted successfully."（绿色）<br>4. 清空所有权限配置，DB中相关数据已删除。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">25</td>
 <td style="text-align:left">Delete Role-失败（API 500）</td>
-<td style="text-align:left">1. 查询用户后<br>2. 点击 Delete Role 按钮<br>3. 确认对话框点击确定<br>4. API 返回 500<br>5. 确认结果</td>
+<td style="text-align:left">1. 查询用户后<br>2. 点击 Delete Role 按钮<br>3. 确认对话框点击确定<br>4. API 返回 500<br>5. 确认DB结果</td>
 <td style="text-align:left">API 返回 500</td>
-<td style="text-align:left">1. 显示错误消息："删除失败，请联系管理员"<br>2. Delete Role 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："删除失败，请联系管理员"<br>2. Delete Role 按钮恢复可用状态，DB中相应的数据未删除.</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

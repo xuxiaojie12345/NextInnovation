@@ -5,18 +5,15 @@ import com.web.app.domain.UD05ModifyDocumentResponse;
 import com.web.app.domain.UD05ModifyDocumentSaveRequest;
 import com.web.app.mapper.HdocAdcaModificationMapper;
 import com.web.app.service.UD05ModifyDocumentService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * UD05 Modify Document Service Implementation
  * 实现修改文档的核心业务逻辑
  */
-@Slf4j
 @Service
 public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService {
     
@@ -32,13 +29,10 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
      */
     @Override
     public ApiResponse<UD05ModifyDocumentResponse> getModifyDocument(String chassisSeries, String chassisNo) {
-        log.info("========== UD05 Get Modify Document Start ==========");
-        log.info("Request - Chassis series: {}, Chassis no: {}", chassisSeries, chassisNo);
         
         // 4.4 参数校验
         String validationResult = validateInitialRequest(chassisSeries, chassisNo);
         if (validationResult != null) {
-            log.warn("Validation failed: {}", validationResult);
             return ApiResponse.error(400, validationResult);
         }
         
@@ -49,13 +43,8 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
             
             // 4.6 判断查询结果（无数据时返回空列表，不阻断画面展示）
             if (variables == null || variables.isEmpty()) {
-                log.warn("No variant data found for Chassis series: {}, Chassis no: {}", 
-                        chassisSeries, chassisNo);
                 variables = List.of(); // 返回空列表
             }
-            
-            // 4.7 记录查询日志
-            log.info("Query successful - Found {} variant items", variables.size());
             
             // 封装响应对象（market和template字段保留为空，由前端从URL参数获取或使用默认值）
             UD05ModifyDocumentResponse response = UD05ModifyDocumentResponse.builder()
@@ -65,11 +54,9 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                     .build();
             
             // 返回成功响应
-            log.info("========== UD05 Get Modify Document End ==========");
             return ApiResponse.success(response);
             
         } catch (Exception e) {
-            log.error("System error occurred while querying modify document", e);
             return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }
@@ -82,15 +69,10 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
      */
     @Override
     public ApiResponse<Void> saveModifyDocument(UD05ModifyDocumentSaveRequest request) {
-        log.info("========== UD05 Save Modify Document Start ==========");
-        log.info("Request - Chassis series: {}, Chassis no: {}, Variables count: {}", 
-                request.getChassisSeries(), request.getChassisNo(), 
-                request.getVariables() != null ? request.getVariables().size() : 0);
         
         // 4.4 参数校验
         String validationResult = validateSaveRequest(request);
         if (validationResult != null) {
-            log.warn("Validation failed: {}", validationResult);
             return ApiResponse.error(400, validationResult);
         }
         
@@ -110,23 +92,14 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                     
                     if (result > 0) {
                         updateCount++;
-                        log.info("Updated variable: {} with new value: {}", 
-                                variable.getVariable(), variable.getNewval());
-                    } else {
-                        log.warn("Failed to update variable: {}", variable.getVariable());
                     }
                 }
             }
             
-            // 4.7 记录操作日志
-            log.info("Update completed - Total updated: {} records", updateCount);
-            
             // 返回成功响应
-            log.info("========== UD05 Save Modify Document End ==========");
             return ApiResponse.success("操作成功", null);
             
         } catch (Exception e) {
-            log.error("System error occurred while saving modify document", e);
             return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }

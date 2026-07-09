@@ -29,17 +29,13 @@ public class UD03SelectHdocdocumentlistController {
     @PostMapping("/selectHdocdocumentlist")
     public ResponseEntity<ApiResponse<UD03SelectHdocdocumentlistResponse>> selectHdocdocumentlist() {
         
-        log.info("========== UD03 Controller: Received POST request ==========");
-        
         // 4.3 调用Service层处理业务逻辑
         ApiResponse<UD03SelectHdocdocumentlistResponse> response = 
                 ud03SelectHdocdocumentlistService.selectHdocdocumentlist();
         
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
         if (response.getData() != null && response.getData().getDoctypeList() != null) {
             log.info("Document type count: {}", response.getData().getDoctypeList().size());
         }
-        log.info("========== UD03 Controller: Request completed ==========");
         
         return ResponseEntity.ok(response);
     }

@@ -32,9 +32,6 @@ public class UD06SaveModificationsController {
             @RequestParam("chassisSerie") String chassisSerie,
             @RequestParam("chassisNumber") String chassisNumber) {
         
-        log.info("========== UD06 Save Modifications API Call ==========");
-        log.info("Received request - Chassis serie: {}, Chassis number: {}", chassisSerie, chassisNumber);
-        
         // 构建请求对象（将chassisNumber映射为chassisNo）
         UD06SaveModificationsRequest request = UD06SaveModificationsRequest.builder()
                 .chassisSerie(chassisSerie)

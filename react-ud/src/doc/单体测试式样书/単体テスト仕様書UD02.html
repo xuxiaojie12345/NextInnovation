@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初期显示-基本元素</td>
 <td style="text-align:left">1. 访问 Menu 页面<br>2. 确认页面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示标题 "Generate Document"<br>2. 显示菜单分组：Generate、Admin、User Administration、Documentation<br>3. 各分组显示对应的菜单项链接<br>4. 所有链接显示为活性状态（Enabled）</td>
+<td style="text-align:left">1. 显示标题 "VOLVO"<br>2. 显示菜单分组：Generate、Admin、User Administration、Documentation<br>3. 各分组显示对应的菜单项链接<br>4. 所有链接显示为活性状态（Enabled）</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -221,7 +221,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="权限校验与登录状态">权限校验与登录状态 </h3>
+<h3 id="登录状态确认">登录状态确认 </h3>
 <table>
 <thead>
 <tr>
@@ -253,24 +253,6 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
-<tr>
-<td style="text-align:center">18</td>
-<td style="text-align:left">权限校验-有权限访问</td>
-<td style="text-align:left">1. 以有权限的用户登录<br>2. 点击任意菜单项链接<br>3. 确认跳转</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 成功跳转到目标页面<br>2. 无权限错误消息</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">19</td>
-<td style="text-align:left">权限校验-无权限访问</td>
-<td style="text-align:left">1. 以无权限的用户登录<br>2. 点击需要权限的菜单项<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："您没有权限访问此页面"<br>2. 类型为 Error（红色）<br>3. 不执行页面跳转</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
 </tbody>
 </table>
 <h3 id="异常处理">异常处理 </h3>
@@ -288,7 +270,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">18</td>
 <td style="text-align:left">异常处理-页面跳转失败</td>
 <td style="text-align:left">1. 模拟导航跳转失败（如目标路由不存在）<br>2. 点击任意菜单项链接<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -297,7 +279,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
+<td style="text-align:center">19</td>
 <td style="text-align:left">异常处理-网络连接失败</td>
 <td style="text-align:left">1. 模拟网络断开<br>2. 执行需要网络请求的操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -322,7 +304,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">22</td>
+<td style="text-align:center">20</td>
 <td style="text-align:left">鼠标悬停效果</td>
 <td style="text-align:left">1. 访问 Menu 页面<br>2. 鼠标悬停到任意菜单项上<br>3. 确认样式变化</td>
 <td style="text-align:left">无</td>
@@ -331,7 +313,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">23</td>
+<td style="text-align:center">21</td>
 <td style="text-align:left">链接样式一致性</td>
 <td style="text-align:left">1. 访问 Menu 页面<br>2. 确认所有链接的视觉样式</td>
 <td style="text-align:left">无</td>
@@ -340,7 +322,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">24</td>
+<td style="text-align:center">22</td>
 <td style="text-align:left">连续点击同一链接</td>
 <td style="text-align:left">1. 访问 Menu 页面<br>2. 快速连续点击同一菜单项多次<br>3. 确认画面行为</td>
 <td style="text-align:left">无</td>
@@ -349,7 +331,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">25</td>
+<td style="text-align:center">23</td>
 <td style="text-align:left">浏览器前进后退</td>
 <td style="text-align:left">1. 从 Menu 页面点击链接导航到子页面<br>2. 点击浏览器后退按钮<br>3. 确认画面</td>
 <td style="text-align:left">无</td>
@@ -358,7 +340,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">26</td>
+<td style="text-align:center">24</td>
 <td style="text-align:left">页面刷新</td>
 <td style="text-align:left">1. 访问 Menu 页面<br>2. 刷新页面（F5）<br>3. 确认画面</td>
 <td style="text-align:left">无</td>
@@ -383,7 +365,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">27</td>
+<td style="text-align:center">25</td>
 <td style="text-align:left">安全性-页面加载时验证登录状态</td>
 <td style="text-align:left">1. 未登录状态下直接访问 Menu 页面 URL<br>2. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -392,16 +374,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">28</td>
-<td style="text-align:left">安全性-跳转前检查权限</td>
-<td style="text-align:left">1. 以受限用户登录<br>2. 点击无权限的菜单项<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 跳转前检查用户权限<br>2. 无权限时显示错误消息并阻止跳转</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">29</td>
+<td style="text-align:center">26</td>
 <td style="text-align:left">安全性-API 请求通过 HTTPS</td>
 <td style="text-align:left">1. 打开浏览器开发者工具<br>2. 观察网络请求</td>
 <td style="text-align:left">无</td>

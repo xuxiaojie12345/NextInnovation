@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初期显示-基本元素</td>
 <td style="text-align:left">1. 访问 HDoc User Doc Administration 页面<br>2. 确认画面整体显示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示 UserID 输入框（最大长度 10）<br>2. 显示 User 标签（空）<br>3. 显示 Document 多选列表<br>4. 显示 User Info 和 Update 按钮<br>5. 所有按钮可用（Enabled）</td>
+<td style="text-align:left">1. 显示 UserID 输入框<br>2. 显示 User 标签（空）<br>3. 显示 Document 多选列表<br>4. 显示 User Info 和 Update 按钮<br>5. 所有按钮可用（Enabled）</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -236,7 +236,7 @@
 <tr>
 <td style="text-align:center">14</td>
 <td style="text-align:left">Update-成功</td>
-<td style="text-align:left">1. 查询用户并选择文档权限<br>2. 点击 Update 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 查询用户并选择文档权限<br>2. 点击 Update 按钮<br>3. API 返回成功<br>4. 确认DB结果</td>
 <td style="text-align:left">有效用户，选择了文档权限</td>
 <td style="text-align:left">1. 调用 API（POST <code>/api/ud18/updateuserdocuments</code>）<br>2. 先删除 HDOC_USER_DOC 表中该用户的原有权限<br>3. 再插入新选择的文档权限<br>4. 显示成功消息："文档权限更新成功"（绿色）</td>
 <td style="text-align:left"></td>
@@ -254,9 +254,9 @@
 <tr>
 <td style="text-align:center">16</td>
 <td style="text-align:left">Update-失败（API 500）</td>
-<td style="text-align:left">1. 查询用户并选择文档权限<br>2. 点击 Update 按钮<br>3. API 返回 500<br>4. 确认结果</td>
+<td style="text-align:left">1. 查询用户并选择文档权限<br>2. 点击 Update 按钮<br>3. API 返回 500<br>4. 确认DB结果</td>
 <td style="text-align:left">API 返回 500</td>
-<td style="text-align:left">1. 显示错误消息："更新失败，请联系管理员"<br>2. Update 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："更新失败，请联系管理员"<br>2. Update 按钮恢复可用状态,DB中不存在新登录的该条记录。</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

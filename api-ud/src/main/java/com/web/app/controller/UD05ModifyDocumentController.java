@@ -34,16 +34,9 @@ public class UD05ModifyDocumentController {
             @RequestParam String chassisSeries,
             @RequestParam String chassisNo) {
         
-        log.info("========== UD05 Controller: Received GET request for modifyDocumentUnit ==========");
-        log.info("Chassis series: {}", chassisSeries);
-        log.info("Chassis no: {}", chassisNo);
-        
         // 4.3 调用Service层处理业务逻辑
         ApiResponse<UD05ModifyDocumentResponse> response = 
                 ud05ModifyDocumentService.getModifyDocument(chassisSeries, chassisNo);
-        
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD05 Controller: Request completed ==========");
         
         return ResponseEntity.ok(response);
     }
@@ -58,17 +51,8 @@ public class UD05ModifyDocumentController {
     public ResponseEntity<ApiResponse<Void>> modifyDocumentSave(
             @RequestBody UD05ModifyDocumentSaveRequest request) {
         
-        log.info("========== UD05 Controller: Received POST request for modifyDocumentSave ==========");
-        log.info("Chassis series: {}", request.getChassisSeries());
-        log.info("Chassis no: {}", request.getChassisNo());
-        log.info("Variables count: {}", 
-                request.getVariables() != null ? request.getVariables().size() : 0);
-        
         // 4.3 调用Service层处理业务逻辑
         ApiResponse<Void> response = ud05ModifyDocumentService.saveModifyDocument(request);
-        
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD05 Controller: Request completed ==========");
         
         return ResponseEntity.ok(response);
     }

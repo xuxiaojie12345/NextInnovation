@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.HdocAdcaChange;
 import com.web.app.mapper.UD16Mapper;
 import com.web.app.service.UD16Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.Map;
  * UD16 Service Implementation
  * 实现AD Change的检查、添加、删除业务逻辑
  */
-@Slf4j
 @Service
 public class UD16ServiceImpl implements UD16Service {
 
@@ -36,9 +34,7 @@ public class UD16ServiceImpl implements UD16Service {
 
     @Override
     public ApiResponse<?> checkADChange(HdocAdcaChange request) {
-        log.info("========== UD16 Service: Check AD Change ==========");
         String serieChnr = request.getSerieChnr();
-        log.info("serieChnr: {}", serieChnr);
 
         try {
             if (serieChnr == null || serieChnr.trim().isEmpty()) {
@@ -65,7 +61,6 @@ public class UD16ServiceImpl implements UD16Service {
             HdocAdcaChange record = ud16Mapper.selectByPrimaryKey(serie, chnr);
 
             if (record == null) {
-                log.warn("AD Change record not found: {}-{}", serie, chnr);
                 return ApiResponse.error(404, "记录不存在");
             }
 
@@ -78,22 +73,18 @@ public class UD16ServiceImpl implements UD16Service {
             data.put("reason", record.getReason() != null ? record.getReason() : "");
 
             if ("N".equals(record.getAct())) {
-                log.warn("AD Change record is not activated: {}-{}", serie, chnr);
                 return ApiResponse.success("AFTER DEF CHANGE IS NOT ACTIVATED", data);
             }
 
             return ApiResponse.success("检查AD Change成功", data);
 
         } catch (Exception e) {
-            log.error("Error checking AD Change", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> addADChange(HdocAdcaChange request) {
-        log.info("========== UD16 Service: Add AD Change ==========");
-        log.info("serieChnr: {}, desc: {}", request.getSerieChnr(), request.getDesc());
 
         try {
             String serieChnr = request.getSerieChnr();
@@ -124,7 +115,7 @@ public class UD16ServiceImpl implements UD16Service {
             // 检查是否已存在
             int count = ud16Mapper.countByPrimaryKey(serie, chnr);
             if (count > 0) {
-                log.warn("AD Change record already exists: {}-{}", serie, chnr);
+
 
                 // 检查现有记录状态
                 HdocAdcaChange existing = ud16Mapper.selectByPrimaryKey(serie, chnr);
@@ -152,7 +143,6 @@ public class UD16ServiceImpl implements UD16Service {
 
             int result = ud16Mapper.insert(entity);
             if (result > 0) {
-                log.info("AD Change record added: {}-{}", serie, chnr);
                 Map<String, Object> data = new HashMap<>();
                 data.put("serie", serie);
                 data.put("chnr", chnr);
@@ -162,16 +152,13 @@ public class UD16ServiceImpl implements UD16Service {
             }
 
         } catch (Exception e) {
-            log.error("Error adding AD Change", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> deleteADChange(HdocAdcaChange request) {
-        log.info("========== UD16 Service: Delete AD Change ==========");
         String serieChnr = request.getSerieChnr();
-        log.info("serieChnr: {}", serieChnr);
 
         try {
             if (serieChnr == null || serieChnr.trim().isEmpty()) {
@@ -189,7 +176,6 @@ public class UD16ServiceImpl implements UD16Service {
             // 检查记录是否存在
             int count = ud16Mapper.countByPrimaryKey(serie, chnr);
             if (count == 0) {
-                log.warn("AD Change record not found: {}-{}", serie, chnr);
                 return ApiResponse.error(400, "记录不存在");
             }
 
@@ -200,7 +186,6 @@ public class UD16ServiceImpl implements UD16Service {
             // 物理删除记录
             int result = ud16Mapper.softDelete(serie, chnr, currentUser, "UD16_DELETE");
             if (result > 0) {
-                log.info("AD Change record deleted (physical): {}-{}", serie, chnr);
                 Map<String, Object> data = new HashMap<>();
                 data.put("serie", serie);
                 data.put("chnr", chnr);
@@ -210,7 +195,6 @@ public class UD16ServiceImpl implements UD16Service {
             }
 
         } catch (Exception e) {
-            log.error("Error deleting AD Change", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

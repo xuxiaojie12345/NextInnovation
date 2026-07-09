@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.MarketMaster;
 import com.web.app.mapper.UD12Mapper;
 import com.web.app.service.UD12Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
  * UD12 Service Implementation
  * 实现市场列表获取、模板文件上传/删除业务逻辑
  */
-@Slf4j
 @Service
 public class UD12ServiceImpl implements UD12Service {
 
@@ -34,14 +32,10 @@ public class UD12ServiceImpl implements UD12Service {
 
     @Override
     public ApiResponse<?> getMarketList() {
-        log.info("========== UD12 Service: Get Market List ==========");
 
         try {
             // 查询市场列表
             List<MarketMaster> marketList = ud12Mapper.selectMarketMaster();
-
-            log.info("Found {} markets", marketList.size());
-
             // 只返回 market 字段
             List<Map<String, String>> dataList = marketList.stream().map(m -> {
                 Map<String, String> item = new HashMap<>();
@@ -52,14 +46,12 @@ public class UD12ServiceImpl implements UD12Service {
             return ApiResponse.success("获取市场列表成功", dataList);
 
         } catch (Exception e) {
-            log.error("Error getting market list", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> getTemplateFiles(String marketCode) {
-        log.info("========== UD12 Service: Get Template Files for market: {} ==========", marketCode);
 
         try {
             if (marketCode == null || marketCode.trim().isEmpty()) {
@@ -70,10 +62,9 @@ public class UD12ServiceImpl implements UD12Service {
             File baseDir = new File(uploadDir);
             File marketDir = new File(baseDir, marketCode.trim());
 
-            log.info("Market dir path: {}", marketDir.getAbsolutePath());
 
             if (!marketDir.exists() || !marketDir.isDirectory()) {
-                log.info("Market directory does not exist: {}", marketDir.getAbsolutePath());
+
                 return ApiResponse.success("获取模板文件列表成功", new ArrayList<>());
             }
 
@@ -89,35 +80,20 @@ public class UD12ServiceImpl implements UD12Service {
                 }
             }
 
-            log.info("Found {} template files in market {}", fileList.size(), marketCode);
-
             return ApiResponse.success("获取模板文件列表成功", fileList);
 
         } catch (Exception e) {
-            log.error("Error getting template files", e);
+
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> uploadFile(MultipartFile file, String market) {
-        log.info("========== UD12 Service: Upload File ==========");
-        log.info("Upload dir from config: {}", uploadDir);
 
         try {
-            // 详细记录文件信息
-            log.info("file == null: {}", file == null);
-            if (file != null) {
-                log.info("File name: {}", file.getOriginalFilename());
-                log.info("File size: {}", file.getSize());
-                log.info("File isEmpty: {}", file.isEmpty());
-                log.info("File content type: {}", file.getContentType());
-            }
-            log.info("market: {}", market);
-
             // 验证文件
             if (file == null || file.isEmpty()) {
-                log.warn("File validation failed - null: {}, empty: {}", file == null, file != null && file.isEmpty());
                 return ApiResponse.error(400, "请选择要上传的文件");
             }
 
@@ -143,22 +119,14 @@ public class UD12ServiceImpl implements UD12Service {
             File baseDir = new File(uploadDir);
             File marketDir = new File(baseDir, marketTrimmed);
 
-            log.info("Base dir: {}", baseDir.getAbsolutePath());
-            log.info("Market dir: {}", marketDir.getAbsolutePath());
-            log.info("Market dir exists: {}", marketDir.exists());
-
             // 确保目录存在
             if (!marketDir.exists()) {
-                boolean created = marketDir.mkdirs();
-                log.info("Created market dir: {}", created);
+                marketDir.mkdirs();
             }
 
             // 保存文件
             File targetFile = new File(marketDir, originalFilename);
-            log.info("Target file path: {}", targetFile.getAbsolutePath());
             file.transferTo(targetFile);
-
-            log.info("File uploaded successfully: {}", targetFile.getAbsolutePath());
 
             // 构建响应
             Map<String, Object> data = new HashMap<>();
@@ -170,18 +138,14 @@ public class UD12ServiceImpl implements UD12Service {
             return ApiResponse.success("上传成功", data);
 
         } catch (IOException e) {
-            log.error("Error uploading file", e);
             return ApiResponse.error(500, "文件上传失败: " + e.getMessage());
         } catch (Exception e) {
-            log.error("Error uploading file", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> deleteFile(String market, String fileName) {
-        log.info("========== UD12 Service: Delete File ==========");
-        log.info("Market: {}, fileName: {}", market, fileName);
 
         try {
             // 验证参数
@@ -196,8 +160,6 @@ public class UD12ServiceImpl implements UD12Service {
             File baseDir = new File(uploadDir);
             File marketDir = new File(baseDir, market.trim());
             File targetFile = new File(marketDir, fileName.trim());
-
-            log.info("Target file path: {}", targetFile.getAbsolutePath());
 
             // 验证文件是否存在
             if (!targetFile.exists()) {
@@ -214,8 +176,6 @@ public class UD12ServiceImpl implements UD12Service {
                 return ApiResponse.error(500, "文件删除失败");
             }
 
-            log.info("File deleted successfully: {}", targetFile.getAbsolutePath());
-
             // 构建响应
             Map<String, Object> data = new HashMap<>();
             data.put("fileName", fileName.trim());
@@ -226,7 +186,6 @@ public class UD12ServiceImpl implements UD12Service {
             return ApiResponse.success("删除成功", data);
 
         } catch (Exception e) {
-            log.error("Error deleting file", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

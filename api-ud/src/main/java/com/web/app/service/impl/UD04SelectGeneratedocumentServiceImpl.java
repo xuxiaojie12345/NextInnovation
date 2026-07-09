@@ -5,7 +5,6 @@ import com.web.app.domain.UD04SelectGeneratedocumentRequest;
 import com.web.app.domain.UD04SelectGeneratedocumentResponse;
 import com.web.app.mapper.HdocGeneratedocumentMapper;
 import com.web.app.service.UD04SelectGeneratedocumentService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
  * UD04 Select Generatedocument Service Implementation
  * 实现查询生成文档数据的核心业务逻辑
  */
-@Slf4j
 @Service
 public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGeneratedocumentService {
     
@@ -28,14 +26,10 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
      */
     @Override
     public ApiResponse<UD04SelectGeneratedocumentResponse> selectGeneratedocument(UD04SelectGeneratedocumentRequest request) {
-        log.info("========== UD04 Select Generatedocument Start ==========");
-        log.info("Request - Chassis series: {}, Chassis no: {}", 
-                request.getChassisSeries(), request.getChassisNo());
         
         // 4.4 参数校验
         String validationResult = validateRequest(request);
         if (validationResult != null) {
-            log.warn("Validation failed: {}", validationResult);
             return ApiResponse.error(400, validationResult);
         }
         
@@ -48,21 +42,14 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
             
             // 4.6 判断查询结果
             if (response == null) {
-                log.warn("No data found for Chassis series: {}, Chassis no: {}", 
-                        request.getChassisSeries(), request.getChassisNo());
                 return ApiResponse.error(404, "Chassis not found");
             }
             
-            // 4.7 记录查询日志
-            log.info("Query successful - Chassis series: {}, Chassis no: {}, Order number: {}", 
-                    request.getChassisSeries(), request.getChassisNo(), response.getOrdernumber());
             
             // 4.8 返回成功响应
-            log.info("========== UD04 Select Generatedocument End ==========");
             return ApiResponse.success(response);
             
         } catch (Exception e) {
-            log.error("System error occurred while querying generatedocument", e);
             return ApiResponse.error(500, "System error. Please contact administrator.");
         }
     }

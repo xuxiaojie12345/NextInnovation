@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.MarketMaster;
 import com.web.app.mapper.UD14Mapper;
 import com.web.app.service.UD14Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
  * UD14 Service Implementation
  * 实现市场列表获取、根据市场获取模板文件及使用变量业务逻辑
  */
-@Slf4j
 @Service
 public class UD14ServiceImpl implements UD14Service {
 
@@ -32,13 +30,9 @@ public class UD14ServiceImpl implements UD14Service {
 
     @Override
     public ApiResponse<?> getMarkets() {
-        log.info("========== UD14 Service: Get Markets ==========");
 
         try {
             List<MarketMaster> marketList = ud14Mapper.selectMarketMaster();
-
-            log.info("Found {} markets", marketList.size());
-
             List<Map<String, String>> dataList = marketList.stream().map(m -> {
                 Map<String, String> item = new HashMap<>();
                 item.put("market", m.getMarket());
@@ -48,15 +42,12 @@ public class UD14ServiceImpl implements UD14Service {
             return ApiResponse.success("获取市场列表成功", dataList);
 
         } catch (Exception e) {
-            log.error("Error getting market list", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
 
     @Override
     public ApiResponse<?> getVariablesByMarket(String market) {
-        log.info("========== UD14 Service: Get Variables By Market ==========");
-        log.info("Market: {}", market);
 
         try {
             // 验证参数
@@ -69,8 +60,6 @@ public class UD14ServiceImpl implements UD14Service {
             // 读取该市场文件夹下的所有模板文件
             File baseDir = new File(uploadDir);
             File marketDir = new File(baseDir, marketTrimmed);
-
-            log.info("Reading template files from: {}", marketDir.getAbsolutePath());
 
             List<Map<String, Object>> fileList = new ArrayList<>();
 
@@ -101,12 +90,9 @@ public class UD14ServiceImpl implements UD14Service {
                 }
             }
 
-            log.info("Found {} template files in market {}", fileList.size(), marketTrimmed);
-
             return ApiResponse.success("根据市场获取变量列表成功", fileList);
 
         } catch (Exception e) {
-            log.error("Error getting variables by market", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

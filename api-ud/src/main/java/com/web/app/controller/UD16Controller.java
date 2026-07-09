@@ -31,16 +31,11 @@ public class UD16Controller {
      */
     @GetMapping("/check")
     public ResponseEntity<ApiResponse<?>> checkADChange(@RequestParam String serieChnr) {
-        log.info("========== UD16 Controller: Check AD Change ==========");
-        log.info("serieChnr: {}", serieChnr);
 
         HdocAdcaChange request = new HdocAdcaChange();
         request.setSerieChnr(serieChnr);
 
         ApiResponse<?> response = ud16Service.checkADChange(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD16 Controller: Check completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -51,13 +46,8 @@ public class UD16Controller {
      */
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<?>> addADChange(@RequestBody HdocAdcaChange request) {
-        log.info("========== UD16 Controller: Add AD Change ==========");
-        log.info("serieChnr: {}, desc: {}", request.getSerieChnr(), request.getDesc());
 
         ApiResponse<?> response = ud16Service.addADChange(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD16 Controller: Add completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -68,13 +58,8 @@ public class UD16Controller {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<?>> deleteADChange(@RequestBody HdocAdcaChange request) {
-        log.info("========== UD16 Controller: Delete AD Change ==========");
-        log.info("serieChnr: {}", request.getSerieChnr());
 
         ApiResponse<?> response = ud16Service.deleteADChange(request);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD16 Controller: Delete completed ==========");
 
         return ResponseEntity.ok(response);
     }

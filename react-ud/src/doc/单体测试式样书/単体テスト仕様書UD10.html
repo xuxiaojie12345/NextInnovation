@@ -88,7 +88,7 @@
 </tr>
 <tr>
 <td style="text-align:center">3</td>
-<td style="text-align:left">画面初期显示-所有字段为空</td>
+<td style="text-align:left">画面初期显示-所有字段为空(Created by user，Date两个项目除外)</td>
 <td style="text-align:left">1. 访问页面<br>2. 确认各字段的初始值</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. 所有文本框默认为空<br>2. 下拉列表显示默认空选项<br>3. 按钮可用</td>
@@ -234,9 +234,9 @@
 <tr>
 <td style="text-align:center">12</td>
 <td style="text-align:left">Add-成功</td>
-<td style="text-align:left">1. 填写 Variable（必填）及可选字段<br>2. 点击 Add 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 填写 Variable（必填）及可选字段<br>2. 点击 Add 按钮<br>3. API 返回成功<br>4. 确认DB结果</td>
 <td style="text-align:left">Variable: <code>NEW_VAR</code>、Type: <code>User Defined</code>、Description: <code>Test variable</code></td>
-<td style="text-align:left">1. 调用 UD10HdocvariablesApi 新增接口<br>2. API 返回 code=200<br>3. 显示提示："记录添加成功"<br>4. Created by user 和 Date 由系统自动填充</td>
+<td style="text-align:left">1. 调用 UD10HdocvariablesApi 新增接口<br>2. API 返回 code=200<br>3. 显示提示："记录添加成功"<br>4. DB中添加一条记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -245,7 +245,7 @@
 <td style="text-align:left">Add-失败（API 错误）</td>
 <td style="text-align:left">1. 填写 Variable<br>2. 点击 Add 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">Variable: <code>NEW_VAR</code>，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："Variant already exists. Please enter the correct content" 或 "系统内部错误，请联系管理员"<br>2. Add 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："Variant already exists. Please enter the correct content" 或 "系统内部错误，请联系管理员"<br>2. Add 按钮恢复可用状态，DB中没有新登录的这条数据</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -277,9 +277,9 @@
 <tr>
 <td style="text-align:center">15</td>
 <td style="text-align:left">Update-成功</td>
-<td style="text-align:left">1. Variable 存在<br>2. 修改字段内容<br>3. 点击 Update 按钮<br>4. API 返回成功<br>5. 确认结果</td>
+<td style="text-align:left">1. Variable 存在<br>2. 修改字段内容<br>3. 点击 Update 按钮<br>4. API 返回成功<br>5. 确认DB结果</td>
 <td style="text-align:left">Variable: <code>EXISTING_VAR</code>，修改 Description</td>
-<td style="text-align:left">1. 调用 UD10HdocvariablesApi 更新接口<br>2. API 返回 code=200<br>3. 显示提示："记录更新成功"<br>4. 更新操作人和时间由系统自动填充</td>
+<td style="text-align:left">1. 调用 UD10HdocvariablesApi 更新接口<br>2. API 返回 code=200<br>3. 显示提示："记录更新成功"<br>4. DB中存在更新的该记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -288,7 +288,7 @@
 <td style="text-align:left">Update-失败（API 错误）</td>
 <td style="text-align:left">1. Variable 存在<br>2. 点击 Update 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">Variable 存在，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Update 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Update 按钮恢复可用状态，DB中不存在更新的该记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -320,9 +320,9 @@
 <tr>
 <td style="text-align:center">18</td>
 <td style="text-align:left">Delete-成功</td>
-<td style="text-align:left">1. Variable 存在<br>2. 点击 Delete 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. Variable 存在<br>2. 点击 Delete 按钮<br>3. API 返回成功<br>4. 确认DB结果</td>
 <td style="text-align:left">Variable: <code>EXISTING_VAR</code>（存在）</td>
-<td style="text-align:left">1. 调用 UD10HdocvariablesApi 删除接口<br>2. API 返回 code=200<br>3. 显示提示："记录删除成功"</td>
+<td style="text-align:left">1. 调用 UD10HdocvariablesApi 删除接口<br>2. API 返回 code=200<br>3. 显示提示："记录删除成功" <br>4. DB中不存在该记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -331,7 +331,7 @@
 <td style="text-align:left">Delete-失败（API 错误）</td>
 <td style="text-align:left">1. Variable 存在<br>2. 点击 Delete 按钮<br>3. API 返回错误<br>4. 确认结果</td>
 <td style="text-align:left">Variable 存在，API 返回错误</td>
-<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Delete 按钮恢复可用状态</td>
+<td style="text-align:left">1. 显示错误消息："系统内部错误，请联系管理员"<br>2. Delete 按钮恢复可用状态，DB中存在该记录</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -403,6 +403,42 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:left">Variable-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Variable 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>ABC123!@#</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">25</td>
+<td style="text-align:left">Variable-全角文字</td>
+<td style="text-align:left">1. 在 Variable 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>テスト中文ａｂｃ</code></td>
+<td style="text-align:left">错误信息表示： Variable 只能输入半角英数字+記号的字符</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">26</td>
+<td style="text-align:left">Description-半角英数字+記号入力可能</td>
+<td style="text-align:left">1. 在 Description 输入框中输入半角英数字+記号<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>Test_123!@#</code></td>
+<td style="text-align:left">1. 正常入力できる<br>2. 入力値が正しく表示される</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">27</td>
+<td style="text-align:left">Description-全角文字</td>
+<td style="text-align:left">1. 在 Description 输入框中输入全角文字<br>2. 确认输入结果</td>
+<td style="text-align:left"><code>全角文字テストｂｃ</code></td>
+<td style="text-align:left">错误信息表示： Description 只能输入半角英数字+記号的字符</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
 </tbody>
 </table>
 <h3 id="ui-状态-加载中">UI 状态-加载中 </h3>
@@ -420,7 +456,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">24</td>
+<td style="text-align:center">28</td>
 <td style="text-align:left">操作中-按钮禁用</td>
 <td style="text-align:left">1. 执行 Add/Update/Delete/Search/Excel 操作<br>2. 在 API 响应前确认按钮状态</td>
 <td style="text-align:left">无</td>
@@ -429,7 +465,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">25</td>
+<td style="text-align:center">29</td>
 <td style="text-align:left">操作中-防止重复提交</td>
 <td style="text-align:left">1. 点击 Add/Update/Delete 按钮<br>2. 在 API 响应前再次点击<br>3. 确认 API 调用次数</td>
 <td style="text-align:left">无</td>
@@ -454,7 +490,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">26</td>
+<td style="text-align:center">30</td>
 <td style="text-align:left">异常处理-API 调用失败</td>
 <td style="text-align:left">1. 执行任意操作时 API 调用失败<br>2. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -463,7 +499,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">27</td>
+<td style="text-align:center">31</td>
 <td style="text-align:left">异常处理-未授权操作</td>
 <td style="text-align:left">1. 以无权限用户登录<br>2. 执行 Add/Update/Delete 操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -474,6 +510,39 @@
 </tbody>
 </table>
 <h3 id="安全性">安全性 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预期结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">32</td>
+<td style="text-align:left">安全性-API 请求协议</td>
+<td style="text-align:left">1. 打开浏览器开发者工具<br>2. 执行任意操作<br>3. 检查网络请求</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. API 请求通过 HTTPS 发送<br>2. 请求中不包含明文敏感信息</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">33</td>
+<td style="text-align:left">安全性-变更记录日志</td>
+<td style="text-align:left">1. 执行 Add/Update/Delete 操作<br>2. 确认后端记录</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 所有变更记录操作人与时间<br>2. 日志记录完整可追溯</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
 <table>
 <thead>
 <tr>

@@ -6,7 +6,6 @@ import com.web.app.domain.UD09DeleteUserDefinedRulesRequest;
 import com.web.app.domain.UD09SearchUserDefinedRulesRequest;
 import com.web.app.mapper.HdocUserDefinedRulesMapper;
 import com.web.app.service.UD09DeleteHdocuserdefinedrulesService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
  * UD09 Delete HDOC User Defined Rules Service Implementation
  * 实现用户定义规则的搜索与删除业务逻辑
  */
-@Slf4j
 @Service
 public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdocuserdefinedrulesService {
 
@@ -37,7 +35,6 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
      */
     @Override
     public ApiResponse<?> searchUserDefinedRules(UD09SearchUserDefinedRulesRequest request) {
-        log.info("========== UD09 Service: Search User Defined Rules ==========");
 
         try {
             // 4.4 参数合法性校验
@@ -117,13 +114,9 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
 
             // 4.6 判断查询结果
             if (rulesList == null || rulesList.isEmpty()) {
-                log.info("No matching user defined rules found");
                 // 4.7 返回空列表
                 return ApiResponse.success("搜索用户定义规则成功", rulesList);
             }
-
-            // 4.7 查询成功，构建响应数据
-            log.info("Found {} matching user defined rules", rulesList.size());
 
             // 4.8 封装响应对象，只返回需要的字段
             List<Map<String, Object>> dataList = rulesList.stream().map(rule -> {
@@ -143,11 +136,9 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
                 return item;
             }).collect(Collectors.toList());
 
-            log.info("========== UD09 Service: Search completed ==========");
             return ApiResponse.success("搜索用户定义规则成功", dataList);
 
         } catch (Exception e) {
-            log.error("Error searching user defined rules", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -161,8 +152,6 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
      */
     @Override
     public ApiResponse<?> deleteSelectedUserDefinedRules(List<UD09DeleteUserDefinedRulesRequest> deleteRequests) {
-        log.info("========== UD09 Service: Delete Selected User Defined Rules ==========");
-        log.info("Received {} delete requests", deleteRequests.size());
 
         try {
             int deletedCount = 0;
@@ -179,40 +168,29 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
             for (int i = 0; i < deleteRequests.size(); i++) {
                 UD09DeleteUserDefinedRulesRequest request = deleteRequests.get(i);
 
-                log.info("Processing delete request {}: PC={}, NUM={}, MARKET={}",
-                        i + 1, request.getProductClass(), request.getNumber(), request.getMarket());
-
                 // 4.4 参数合法性校验
                 if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()) {
-                    log.warn("Request {}: productClass is null or empty", i + 1);
                     failedCount++;
                     errorMessages.append("第").append(i + 1).append("条记录: 产品类别不能为空; ");
                     continue;
                 }
                 if (request.getNumber() == null) {
-                    log.warn("Request {}: number is null", i + 1);
                     failedCount++;
                     errorMessages.append("第").append(i + 1).append("条记录: 编号不能为空; ");
                     continue;
                 }
                 if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
-                    log.warn("Request {}: market is null or empty", i + 1);
                     failedCount++;
                     errorMessages.append("第").append(i + 1).append("条记录: 市场不能为空; ");
                     continue;
                 }
 
                 // 4.5 检查记录是否存在
-                log.info("Calling countByPrimaryKey for PC={}, NUM={}, MARKET={}",
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 int count = hdocUserDefinedRulesMapper.countByPrimaryKey(
                         request.getProductClass(), request.getNumber(), request.getMarket());
-                log.info("countByPrimaryKey result: {}", count);
 
                 // 4.6 判断记录是否存在
                 if (count == 0) {
-                    log.warn("Record not found: PC={}, NUM={}, MARKET={}",
-                            request.getProductClass(), request.getNumber(), request.getMarket());
                     failedCount++;
                     errorMessages.append("PC=").append(request.getProductClass())
                             .append(", NUM=").append(request.getNumber())
@@ -222,20 +200,15 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
                 }
 
                 // 4.7 执行软删除操作
-                log.info("Calling softDelete for PC={}, NUM={}, MARKET={}, user={}",
-                        request.getProductClass(), request.getNumber(), request.getMarket(), currentUser);
                 int result = hdocUserDefinedRulesMapper.softDelete(
                         request.getProductClass(),
                         request.getNumber(),
                         request.getMarket(),
                         currentUser
                 );
-                log.info("softDelete result: {}", result);
 
                 if (result > 0) {
                     deletedCount++;
-                    log.info("Deleted record: PC={}, NUM={}, MARKET={}",
-                            request.getProductClass(), request.getNumber(), request.getMarket());
                 } else {
                     failedCount++;
                     errorMessages.append("PC=").append(request.getProductClass())
@@ -250,23 +223,17 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
             data.put("deletedCount", deletedCount);
             data.put("failedCount", failedCount);
 
-            log.info("Delete result - Success: {}, Failed: {}", deletedCount, failedCount);
-
             if (failedCount == 0) {
-                log.info("========== UD09 Service: All records deleted successfully ==========");
                 return ApiResponse.success("删除用户定义规则成功", data);
             } else if (deletedCount > 0) {
-                log.warn("========== UD09 Service: Partial delete completed ==========");
                 return ApiResponse.success(
                         deletedCount + "条记录删除成功，" + failedCount + "条记录删除失败",
                         data);
             } else {
-                log.error("========== UD09 Service: All deletes failed ==========");
                 return ApiResponse.error(500, "删除失败: " + errorMessages.toString());
             }
 
         } catch (Exception e) {
-            log.error("Error batch deleting user defined rules", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }

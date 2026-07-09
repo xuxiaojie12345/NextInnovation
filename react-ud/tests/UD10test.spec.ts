@@ -1163,9 +1163,114 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.24 操作中-按钮禁用
+  // No.24 Variable-半角英数字+記号入力可能
   // ============================================================
-  test("24_操作中_按钮禁用", async ({ page }) => {
+  test("24_Variable_半角英数字記号入力可能", async ({ page }) => {
+    await openPage(page);
+
+    const variableInput = page.locator("input.hv-input-medium");
+
+    // 半角英数字を入力
+    await variableInput.fill("ABCdef123");
+    await expect(variableInput).toHaveValue("ABCdef123");
+    await page.screenshot({
+      path: getScreenshotPath(
+        "24_Variable_半角英数字記号入力可能",
+        "001_半角英数字",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 記号を入力
+    await variableInput.fill("Test@#$");
+    await expect(variableInput).toHaveValue("Test@#$");
+    await page.screenshot({
+      path: getScreenshotPath("24_Variable_半角英数字記号入力可能", "002_記号"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.25 Description-半角英数字+記号入力可能
+  // ============================================================
+  test("25_Description_半角英数字記号入力可能", async ({ page }) => {
+    await openPage(page);
+
+    const descInput = page.locator("input.hv-input-long");
+
+    // 半角英数字を入力
+    await descInput.fill("Test description 123");
+    await expect(descInput).toHaveValue("Test description 123");
+    await page.screenshot({
+      path: getScreenshotPath(
+        "25_Description_半角英数字記号入力可能",
+        "001_半角英数字",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 記号を入力
+    await descInput.fill("Description with @#$% symbols");
+    await expect(descInput).toHaveValue("Description with @#$% symbols");
+    await page.screenshot({
+      path: getScreenshotPath(
+        "25_Description_半角英数字記号入力可能",
+        "002_記号",
+      ),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.26 Variable-全角文字入力エラー
+  // ============================================================
+  test("26_Variable_全角文字入力", async ({ page }) => {
+    await openPage(page);
+
+    const variableInput = page.locator("input.hv-input-medium");
+
+    // 全角文字を入力（前端に入力制限がないため入力可能、API登録時に検証）
+    await variableInput.fill("テスト全角");
+    await page.waitForTimeout(300);
+    await page.screenshot({
+      path: getScreenshotPath("26_Variable_全角文字入力", "001_全角入力"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.27 Description-全角文字入力
+  // ============================================================
+  test("27_Description_全角文字入力", async ({ page }) => {
+    await openPage(page);
+
+    const descInput = page.locator("input.hv-input-long");
+
+    // 全角文字を入力
+    await descInput.fill("テスト全角説明文１２３");
+    await page.waitForTimeout(300);
+    await page.screenshot({
+      path: getScreenshotPath("27_Description_全角文字入力", "001_全角入力"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+  });
+
+  // ============================================================
+  // No.28 操作中-按钮禁用
+  // ============================================================
+  test("28_操作中_按钮禁用", async ({ page }) => {
     await setLoginState(page);
 
     // Mock Add API延迟响应，模拟加载中状态
@@ -1216,9 +1321,9 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.25 操作中-防止重复提交
+  // No.29 操作中-防止重复提交
   // ============================================================
-  test("25_操作中_防止重复提交", async ({ page }) => {
+  test("29_操作中_防止重复提交", async ({ page }) => {
     await setLoginState(page);
 
     // Mock Add API延迟响应
@@ -1276,9 +1381,9 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.26 异常处理-API调用失败
+  // No.30 异常处理-API调用失败
   // ============================================================
-  test("26_异常处理_API调用失败", async ({ page }) => {
+  test("30_异常处理_API调用失败", async ({ page }) => {
     await setLoginState(page);
 
     // Mock Add API网络错误
@@ -1335,9 +1440,9 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.27 异常处理-未授权操作
+  // No.31 异常处理-未授权操作
   // ============================================================
-  test("27_异常处理_未授权操作", async ({ page }) => {
+  test("31_异常处理_未授权操作", async ({ page }) => {
     // 以无权限用户登录
     await setLoginState(page);
     await page.goto(PAGE_URL, {
@@ -1362,7 +1467,7 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
       page.locator("button.hv-btn").filter({ hasText: "Delete" }),
     ).toBeEnabled();
     await page.screenshot({
-      path: getScreenshotPath("27_异常处理_未授权操作", "001_ﾎﾞﾀﾝ確認"),
+      path: getScreenshotPath("31_异常处理_未授权操作", "001_ﾎﾞﾀﾝ確認"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1370,9 +1475,9 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.28 安全性-API请求协议
+  // No.32 安全性-API请求协议
   // ============================================================
-  test("28_安全性_API请求协议", async ({ page }) => {
+  test("32_安全性_API请求协议", async ({ page }) => {
     await openPage(page);
 
     // 确认页面通过 http 加载成功
@@ -1381,7 +1486,7 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
       "Existing HDoc Variables",
     );
     await page.screenshot({
-      path: getScreenshotPath("28_安全性_API请求协议", "001_画面表示"),
+      path: getScreenshotPath("32_安全性_API请求协议", "001_画面表示"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -1389,15 +1494,15 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   });
 
   // ============================================================
-  // No.29 安全性-变更记录日志
+  // No.33 安全性-变更记录日志
   // ============================================================
-  test("29_安全性_变更记录日志", async ({ page }) => {
+  test("33_安全性_变更记录日志", async ({ page }) => {
     await openPage(page);
 
     // 确认页面加载成功
     await expect(page.locator("h1.hv-title")).toBeVisible();
     await page.screenshot({
-      path: getScreenshotPath("29_安全性_变更记录日志", "001_画面表示"),
+      path: getScreenshotPath("33_安全性_变更记录日志", "001_画面表示"),
       type: "jpeg",
       quality: 80,
       fullPage: true,

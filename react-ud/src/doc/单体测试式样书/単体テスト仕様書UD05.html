@@ -132,7 +132,7 @@
 <tr>
 <td style="text-align:center">6</td>
 <td style="text-align:left">API 查询成功-变量列表加载</td>
-<td style="text-align:left">1. API 查询接口返回成功<br>2. 确认表格显示</td>
+<td style="text-align:left">1. 初期表示<br>2. API 查询接口返回成功<br>3. 确认表格显示</td>
 <td style="text-align:left">API 返回 code=200，variables 有值</td>
 <td style="text-align:left">1. 表格显示所有变量行<br>2. 每行显示 Variable 名称<br>3. 每行显示 Description<br>4. 每行显示 Current value<br>5. 每行 Modified value 初始化为空<br>6. Template 文件链接显示</td>
 <td style="text-align:left"></td>
@@ -141,7 +141,7 @@
 <tr>
 <td style="text-align:center">7</td>
 <td style="text-align:left">API 查询成功-含修改记录</td>
-<td style="text-align:left">1. HDOC_ADCA_MODIFICATION 表中存在修改记录<br>2. 确认 Current value 显示</td>
+<td style="text-align:left">1. 画面中有修改记录，点击save按钮<br>2. HDOC_ADCA_MODIFICATION 表中存在修改记录<br>3. 确认 Current value 显示</td>
 <td style="text-align:left">API 返回 newval 有值</td>
 <td style="text-align:left">1. Current value 显示 ADCA_MODIFICATION 中的 NEWVAL 值<br>2. Modified value 初始化为空</td>
 <td style="text-align:left"></td>
@@ -150,7 +150,7 @@
 <tr>
 <td style="text-align:center">8</td>
 <td style="text-align:left">API 查询成功-无修改记录</td>
-<td style="text-align:left">1. HDOC_ADCA_MODIFICATION 表中无修改记录<br>2. 确认 Current value 显示</td>
+<td style="text-align:left">1. 画面中无修改记录，点击save按钮<br>2. HDOC_ADCA_MODIFICATION 表中无修改记录<br>3. 确认 Current value 显示</td>
 <td style="text-align:left">API 返回 currentValue 从 KOLA_VARIANT.SYMBOL 获取</td>
 <td style="text-align:left">1. Current value 显示从 HDOC_REC_DATA_KOLA_VARIANT.SYMBOL 获取的值<br>2. Modified value 初始化为空</td>
 <td style="text-align:left"></td>
@@ -159,7 +159,7 @@
 <tr>
 <td style="text-align:center">9</td>
 <td style="text-align:left">API 查询失败-系统错误</td>
-<td style="text-align:left">1. API 返回 code≠200<br>2. 确认错误消息</td>
+<td style="text-align:left">1. 初期表示<br>2. API 返回 code≠200<br>3. 确认错误消息</td>
 <td style="text-align:left">API 返回错误码</td>
 <td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. 表格不显示变量数据</td>
 <td style="text-align:left"></td>
@@ -168,7 +168,7 @@
 <tr>
 <td style="text-align:center">10</td>
 <td style="text-align:left">API 查询失败-网络错误</td>
-<td style="text-align:left">1. 模拟网络断开<br>2. 访问页面<br>3. 确认结果</td>
+<td style="text-align:left">1. 初期表示<br>2. 模拟网络断开<br>3. 访问页面<br>4. 确认结果</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. 显示错误消息："系统错误。请联系管理员。"<br>2. Error message 区域显示（红色）</td>
 <td style="text-align:left"></td>
@@ -306,18 +306,18 @@
 <tr>
 <td style="text-align:center">20</td>
 <td style="text-align:left">Save-成功（部分 Modified value 有值）</td>
-<td style="text-align:left">1. 部分 Modified value 输入值<br>2. 点击 Save 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 部分 Modified value 输入值<br>2. 点击 Save 按钮<br>3. API 返回成功<br>4. 确认修改结果和DB中更新的记录是否一致</td>
 <td style="text-align:left">行 0: <code>MODIFIED_VALUE_1</code>，其他行为空</td>
-<td style="text-align:left">1. 调用 UD05ModifyDocumentApi 保存接口<br>2. API 返回 code=200<br>3. 显示成功消息："修改保存成功"<br>4. 只发送有值的变量</td>
+<td style="text-align:left">1. 调用 UD05ModifyDocumentApi 保存接口<br>2. API 返回 code=200<br>3. 显示成功消息："修改保存成功"<br>4. 修改了的结果和DB中更新了的记录一致</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:center">21</td>
 <td style="text-align:left">Save-成功（全部 Modified value 有值）</td>
-<td style="text-align:left">1. 所有 Modified value 输入值<br>2. 点击 Save 按钮<br>3. API 返回成功<br>4. 确认结果</td>
+<td style="text-align:left">1. 所有 Modified value 输入值<br>2. 点击 Save 按钮<br>3. API 返回成功<br>4. 确认修改结果和DB中更新的记录是否一致</td>
 <td style="text-align:left">全部行有值</td>
-<td style="text-align:left">1. 调用保存接口<br>2. API 返回 code=200<br>3. 显示成功消息："修改保存成功"<br>4. 包含所有变量的修改值</td>
+<td style="text-align:left">1. 调用保存接口<br>2. API 返回 code=200<br>3. 显示成功消息："修改保存成功"<br>4. 修改了的结果和DB中更新了的记录一致</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>

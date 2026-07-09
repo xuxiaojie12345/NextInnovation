@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.HdocUserDefinedRules;
 import com.web.app.mapper.HdocUserDefinedRulesMapper;
 import com.web.app.service.UD08HomologationVariablesService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ import java.util.Map;
  * UD08 Homologation Variables Service Implementation
  * Homologation Variables业务逻辑实现类
  */
-@Slf4j
 @Service
 public class UD08HomologationVariablesServiceImpl implements UD08HomologationVariablesService {
     
@@ -32,7 +30,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> getProductClassMaster() {
-        log.info("========== UD08: Get Product Class Master ==========");
         
         try {
             // 调用Mapper查询所有产品类别
@@ -41,15 +38,12 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             
             // 验证查询结果
             if (list == null || list.isEmpty()) {
-                log.warn("Product class master data is empty");
                 return ApiResponse.success("获取产品类别主数据成功", list);
             }
             
-            log.info("Found {} product classes", list.size());
             return ApiResponse.success("获取产品类别主数据成功", list);
             
         } catch (Exception e) {
-            log.error("Error getting product class master", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -61,7 +55,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> getMarketMaster() {
-        log.info("========== UD08: Get Market Master ==========");
         
         try {
             // 调用Mapper查询所有市场
@@ -70,15 +63,12 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             
             // 验证查询结果
             if (list == null || list.isEmpty()) {
-                log.warn("Market master data is empty");
+
                 return ApiResponse.success("获取市场主数据成功", list);
             }
-            
-            log.info("Found {} markets", list.size());
             return ApiResponse.success("获取市场主数据成功", list);
             
         } catch (Exception e) {
-            log.error("Error getting market master", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -90,7 +80,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> getHdocVariables() {
-        log.info("========== UD08: Get HDOC Variables ==========");
         
         try {
             // 调用Mapper查询所有HDOC变量
@@ -99,15 +88,12 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             
             // 验证查询结果
             if (list == null || list.isEmpty()) {
-                log.warn("HDOC variables data is empty");
                 return ApiResponse.success("获取HDOC变量信息成功", list);
             }
             
-            log.info("Found {} HDOC variables", list.size());
             return ApiResponse.success("获取HDOC变量信息成功", list);
             
         } catch (Exception e) {
-            log.error("Error getting HDOC variables", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -120,8 +106,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> addUserDefinedRule(HdocUserDefinedRules rules) {
-        log.info("========== UD08: Add User Defined Rule ==========");
-        log.info("PC: {}, NUM: {}, MARKET: {}", rules.getPc(), rules.getNum(), rules.getMarket());
         
         try {
             // 参数校验
@@ -154,8 +138,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 rules.getPc(), rules.getNum(), rules.getMarket());
             
             if (count > 0) {
-                log.warn("Record already exists: PC={}, NUM={}, MARKET={}", 
-                    rules.getPc(), rules.getNum(), rules.getMarket());
                 return ApiResponse.error(409, "Primary key conflict, Please enter the correct content");
             }
             
@@ -176,7 +158,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             int result = hdocUserDefinedRulesMapper.insert(rules);
             
             if (result > 0) {
-                log.info("Successfully added user defined rule");
                 
                 // 构建返回数据
                 Map<String, Object> data = new HashMap<>();
@@ -186,12 +167,10 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 
                 return ApiResponse.success("添加用户定义规则成功", data);
             } else {
-                log.error("Failed to add user defined rule");
                 return ApiResponse.error(500, "添加失败");
             }
             
         } catch (Exception e) {
-            log.error("Error adding user defined rule", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -204,8 +183,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> updateUserDefinedRule(HdocUserDefinedRules rules) {
-        log.info("========== UD08: Update User Defined Rule ==========");
-        log.info("PC: {}, NUM: {}, MARKET: {}", rules.getPc(), rules.getNum(), rules.getMarket());
         
         try {
             // 参数校验
@@ -238,8 +215,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 rules.getPc(), rules.getNum(), rules.getMarket());
             
             if (count == 0) {
-                log.warn("Record not found: PC={}, NUM={}, MARKET={}", 
-                    rules.getPc(), rules.getNum(), rules.getMarket());
                 return ApiResponse.error(404, "Data does not exist, Please enter the correct content");
             }
             
@@ -254,7 +229,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             int result = hdocUserDefinedRulesMapper.update(rules);
             
             if (result > 0) {
-                log.info("Successfully updated user defined rule");
                 
                 // 构建返回数据
                 Map<String, Object> data = new HashMap<>();
@@ -264,12 +238,10 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 
                 return ApiResponse.success("更新用户定义规则成功", data);
             } else {
-                log.error("Failed to update user defined rule");
                 return ApiResponse.error(500, "更新失败");
             }
             
         } catch (Exception e) {
-            log.error("Error updating user defined rule", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
@@ -285,8 +257,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
      */
     @Override
     public ApiResponse<?> deleteUserDefinedRule(String pc, Integer num, String market, String updateUser) {
-        log.info("========== UD08: Delete User Defined Rule ==========");
-        log.info("PC: {}, NUM: {}, MARKET: {}, UPDATE_USER: {}", pc, num, market, updateUser);
         
         try {
             // 参数校验
@@ -307,7 +277,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             int count = hdocUserDefinedRulesMapper.countByPrimaryKey(pc, num, market);
             
             if (count == 0) {
-                log.warn("Record not found: PC={}, NUM={}, MARKET={}", pc, num, market);
                 return ApiResponse.error(404, "Data does not exist, Please enter the correct content");
             }
             
@@ -315,7 +284,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             int result = hdocUserDefinedRulesMapper.softDelete(pc, num, market, currentUser);
             
             if (result > 0) {
-                log.info("Successfully deleted user defined rule");
                 
                 // 构建返回数据
                 Map<String, Object> data = new HashMap<>();
@@ -325,12 +293,10 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 
                 return ApiResponse.success("删除用户定义规则成功", data);
             } else {
-                log.error("Failed to delete user defined rule");
                 return ApiResponse.error(500, "删除失败");
             }
             
         } catch (Exception e) {
-            log.error("Error deleting user defined rule", e);
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
     }
