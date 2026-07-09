@@ -188,89 +188,97 @@ const Login: React.FC = () => {
   // ==================== 渲染 UI ====================
   return (
     <div className='login-container'>
-      <div className='login-box'>
-        {/* 账户锁定等特殊错误消息显示区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.5 StaticMessage */}
-        {errorMessage && (
-          <div className='static-error-message'>
-            {errorMessage}
-          </div>
-        )}
+      {/* 左侧：文言区域 */}
+      <div className='login-left'>
+        <div className='login-title'>
+          <span className='login-title-bold'>EDB</span>
+          <span className='login-title-normal'> Engineering Database</span>
+        </div>
+        <div className='login-subtitle'>Use Outlook id and password</div>
+        <div className='login-support'>
+          <span className='login-title-support'>Support, authorization request or improvement suggestions, send mail to:</span>
+          <span className='login-title-stpi'>Support TPI</span>
+        </div>
+      </div>
 
-        {/* 登录表单 */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault(); // 阻止表单默认提交行为
-            handleLogin();      // 执行登录逻辑
-          }}
-        >
-          {/* UserID 输入框 */}
-          {/* 对应设计书 2.1 控件属性表 No.1 UserID */}
-          <div className='form-group'>
-            {/* <label htmlFor='userID'>用户ID</label> */}
-            <input
-              id='userID'
-              type='text'
-              ref={userIDRef}
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder='请输入用户ID'
-              disabled={isLoading}                    // 加载期间禁用输入
-              autoComplete='username'                 // 启用浏览器自动填充
-              maxLength={MAX_USER_ID_LENGTH}          // 最大长度限制
-            />
-          </div>
-
-          {/* Password 输入框 */}
-          {/* 对应设计书 2.1 控件属性表 No.2 Password */}
-          <div className='form-group'>
-            {/* <label htmlFor='password'>密码</label> */}
-            <input
-              id='password'
-              type='password'                         // 密码掩码显示
-              ref={passwordRef}
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder='请输入密码'
-              disabled={isLoading}                    // 加载期间禁用输入
-              autoComplete='current-password'         // 启用浏览器自动填充
-              maxLength={MAX_PASSWORD_LENGTH}         // 最大长度限制
-            />
-          </div>
-          
-          {/* 普通错误消息显示区域 */}
-          {/* 对应设计书 2.1 控件属性表 No.3 Message */}
-          {message && (
-            <div className='error-message'
-              style={{
-                  color: "#ff4d4f",
-                  textAlign: "left",
-                  marginBottom: "15px",
-                  fontSize: "14px",
-                  wordBreak: "break-word",
-                }}>
-              {message}
+      {/* 右侧：登录表单区域 */}
+      <div className='login-right'>
+        <div className='login-box'>
+          {/* 账户锁定等特殊错误消息显示区域 */}
+          {errorMessage && (
+            <div className='static-error-message'>
+              {errorMessage}
             </div>
           )}
 
-          {/* Login 登录按钮 */}
-          {/* 对应设计书 2.1 控件属性表 No.4 Login */}
-          <button 
-            type='submit' 
-            className='login-button' 
-            disabled={isLoading}                      // 加载期间禁用按钮，防止重复提交
+          {/* 登录表单 */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
           >
-            {isLoading ? "处理中..." : "Login"}
-          </button>
-        </form>
+            {/* UserID 输入框 */}
+            <div className='form-group'>
+              <input
+                id='userID'
+                type='text'
+                ref={userIDRef}
+                value={userID}
+                onChange={handleUserIDChange}
+                placeholder='请输入用户ID'
+                disabled={isLoading}
+                autoComplete='username'
+                maxLength={MAX_USER_ID_LENGTH}
+              />
+            </div>
 
-        {/* StaticMessage 固定提示文字 - 显示在按钮下方 */}
-        {/* 对应设计书 2.1 控件属性表 No.5 StaticMessage - 红色斜体，无边框 */}
-        <div className='static-message'>
-          If you get error message: "Your account is locked. Please contact your system administrator." 
-          Please try this alternative login link before contacting support： Login 
-          We are working to find root cause of problem.
+            {/* Password 输入框 */}
+            <div className='form-group'>
+              <input
+                id='password'
+                type='password'
+                ref={passwordRef}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder='请输入密码'
+                disabled={isLoading}
+                autoComplete='current-password'
+                maxLength={MAX_PASSWORD_LENGTH}
+              />
+            </div>
+
+            {/* 普通错误消息显示区域 */}
+            {message && (
+              <div className='error-message'
+                style={{
+                    color: "#ff4d4f",
+                    textAlign: "left",
+                    marginBottom: "15px",
+                    fontSize: "14px",
+                    wordBreak: "break-word",
+                  }}>
+                {message}
+              </div>
+            )}
+
+            {/* Login 登录按钮 */}
+            <button
+              type='submit'
+              className='login-button'
+              disabled={isLoading}
+            >
+              {isLoading ? "处理中..." : "Login"}
+            </button>
+          </form>
+
         </div>
+        {/* StaticMessage 固定提示文字 */}
+          <div className='static-message'>
+            <span>If you get error message: "Your account is locked. Please contact your system administrator."</span><br />
+            <span>Please try this alternative login link before contacting support: <a href="/" className='static-message-link'>Login</a></span><br />
+            <span>We are working to find root cause of problem.</span><br />
+          </div>
       </div>
     </div>
   );

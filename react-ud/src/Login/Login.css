@@ -5,20 +5,80 @@
   height: 100vh;
   background-color: #f0f2f5;
   background-image: url("/src/fTRYDXFAD.jpeg");
-  /* 建议改为 cover 以适配不同分辨率屏幕 */
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  gap: 50px;
+}
+
+/* 左侧：文言区域 */
+.login-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* width: 580px; */
+  margin-bottom: 120px;
+  margin-left: -300px;
+}
+
+.login-title {
+  font-size: 70px;
+  width: 100%;
+  color: #ffffff; /* 纯白色文字，和图中高亮效果一致 */
+  letter-spacing: 1px; /* 轻微加宽字符间距，提升标题通透感 */
+  line-height: 1.2; /* 紧凑行高，适配大标题排版 */
+}
+
+.login-title-bold {
+  font-weight: bold;
+}
+
+.login-title-normal {
+  font-weight: normal;
+}
+
+.login-subtitle {
+  /* font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 15px;
+  color: #ffffff;
+  width: 100%; */
+
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-weight: 400; /* 常规字重，和大标题形成视觉层级区分 */
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  color: #d0d0d0;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.login-support {
+  font-family: "Helvetica", "Arial", sans-serif;
+  color: #d0d0d0;
+  width: 100%;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+}
+.login-title-support{
+  font-size: 19px;
+}
+
+.login-title-stpi{
+  font-size: 23px;
+}
+
+/* 右侧：登录表单区域 */
+.login-right {
+  flex-shrink: 0;
 }
 
 .login-box {
-  /* 启用背景和 Padding 以符合常规登录框设计 */
-  padding: 40px;
+  /* padding: 40px; */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 350px;
-  /* 移除 absolute 定位，由父容器 Flex 居中 */
   position: relative;
 }
 
@@ -50,7 +110,7 @@
   border-radius: 4px;
   font-size: 14px;
   box-sizing: border-box;
-  text-align: left; /* 输入文字左对齐 */
+  text-align: left; 
 }
 
 .form-group input:focus {
@@ -62,7 +122,6 @@
 .login-button {
   width: 100%;
   padding: 12px;
-  /* 启用按钮背景色 */
   background-color: #1890ff;
   color: white;
   border: none;
@@ -96,4 +155,11 @@
   border: none;
   background-color: transparent;
   animation: fadeIn 0.3s ease-in-out;
+  width: 550px;
+}
+
+.static-message-link {
+  color: #ff4d4f;
+  font-style: italic;
+  text-decoration: underline;
 }
