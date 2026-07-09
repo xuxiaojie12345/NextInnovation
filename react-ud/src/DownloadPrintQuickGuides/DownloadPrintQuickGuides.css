@@ -1,24 +1,192 @@
-/* ========================================
-   DownloadPrintQuickGuides.css - UD23
-   下载打印快速指南页面 样式
-   参照 UD23.css 外观风格
-   ======================================== */
-
-/* ---- 整体容器 ---- */
-.ud23-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  color: #333;
-  padding: 20px 24px;
-  background: #f4f6f9;
+.download-quick-guides-container {
+  background-color: #f5f5f5;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
-/* ---- 主内容区域 ---- */
-.ud23-main {
-  flex: 1;
+/* Main Content */
+.main-content {
+  max-width: 1100px;
+  margin: 0;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 2px solid #b4c7dc;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.header-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  font-family: inherit;
+}
+
+.back-link:hover {
+  color: #0000cc;
+}
+
+.page-title {
+  color: #ff6600;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Quick Guides Grid */
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.guide-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.guide-image-container {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid #cccccc;
+  padding: 5px;
+  background-color: #ffffff;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.guide-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.guide-link:hover {
+  color: #0000cc;
+}
+
+/* Note Section */
+.note-section {
+  margin-bottom: 10px;
+}
+
+.note-text {
+  color: #000000;
+  font-size: 13px;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Volvo 3P Section */
+.volvo-3p-section {
+  margin-top: 20px;
+}
+
+.volvo-3p-title {
+  color: #cc0000;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.volvo-3p-list {
+  list-style-type: disc;
+  margin-left: 20px;
+  padding-left: 0;
+}
+
+.volvo-3p-list li {
+  margin-bottom: 2px;
+}
+
+.volvo-3p-link {
+  color: #0000ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.volvo-3p-link:hover {
+  color: #0000cc;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .guides-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .volvo-header {
+    padding: 8px 15px;
+  }
+
+  .volvo-logo {
+    height: 30px;
+  }
+
+  .main-content {
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .guides-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .guide-link {
+    font-size: 11px;
+  }
+
+  .note-text {
+    font-size: 12px;
+  }
+
+  .volvo-3p-title {
+    font-size: 14px;
+  }
+
+  .volvo-3p-link {
+    font-size: 12px;
+  }
 }
 
 /* ---- 卡片容器 ---- */

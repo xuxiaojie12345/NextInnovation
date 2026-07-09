@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface UD20Service {
-    List<Map<String, Object>> getDocumentList(String documentType);
+    List<Map<String, Object>> getDocumentList(String documentType, String documentTypeOp, String user, String userOp, String date, String dateOp);
 }

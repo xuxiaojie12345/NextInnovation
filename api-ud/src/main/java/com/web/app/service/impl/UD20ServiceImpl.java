@@ -14,7 +14,7 @@ public class UD20ServiceImpl implements UD20Service {
     private UD20Mapper ud20Mapper;
 
     @Override
-    public List<Map<String, Object>> getDocumentList(String documentType) {
-        return ud20Mapper.selectHdocDocumentList(documentType);
+    public List<Map<String, Object>> getDocumentList(String documentType, String documentTypeOp, String user, String userOp, String date, String dateOp) {
+        return ud20Mapper.selectHdocDocumentList(documentType, documentTypeOp, user, userOp, date, dateOp);
     }
 }

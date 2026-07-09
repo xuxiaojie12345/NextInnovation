@@ -45,8 +45,11 @@ public class UD19ServiceImpl implements UD19Service {
         String market = request.getMarket();
         String type = request.getType();
 
-        // 所有条件独立传入，由 MyBatis 动态 SQL 组合过滤
-        results = ud19Mapper.searchUsers(userId, user, market, type);
+        // 在Java层判断type值，传入布尔标记，避免OGNL字符串比较问题
+        boolean isRule = "Rule".equals(type);
+        boolean isTemplate = "Template".equals(type);
+
+        results = ud19Mapper.searchUsers(userId, user, market, isRule, isTemplate);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("results", results != null ? results : new ArrayList<>());

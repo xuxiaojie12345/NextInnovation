@@ -1,112 +1,96 @@
-/**
- * DownloadPrintQuickGuides 组件 - 下载打印快速指南页面（UD23）
- * 功能：展示快速指南链接及打印/折叠操作的指导说明
- * 通过 Checkbox 控制操作说明的展开/隐藏
- * 对应详细设计：详细设计/詳細設計UD23.md
- */
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./DownloadPrintQuickGuides.css";
 
-/**
- * DownloadPrintQuickGuides 组件
- * 展示快速指南链接和打印/折叠操作指导，纯画面展示
- */
+// 安全加载图片，不存在时返回占位图
+const getGuideImage = (filename: string): string => {
+  try {
+    return require(`./image/quick-guides/${filename}`);
+  } catch {
+    return "/image/placeholder-guide.png";
+  }
+};
+
 const DownloadPrintQuickGuides: React.FC = () => {
-  // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
-  const [showPrintGuide, setShowPrintGuide] = useState<boolean>(false);
-  const [showFoldGuide, setShowFoldGuide] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  /**
-   * To print 复选框变化处理（对应详细设计 3.1.4 打印指导功能）
-   */
-  const handlePrintCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShowPrintGuide(e.target.checked);
-  };
+  // 快速指南数据
+  const quickGuides = [
+    { id: "wis", name: "WIS Quick Guide", image: getGuideImage("wis.png") },
+    { id: "perf", name: "PERF Quick Guide", image: getGuideImage("perf.png") },
+    { id: "w8", name: "W8 Quick Guide", image: getGuideImage("w8.png") },
+    { id: "hdoc", name: "HDoc Quick Guide", image: getGuideImage("hdoc.png") },
+    { id: "edb", name: "EDB Quick Guide", image: getGuideImage("edb.png") },
+    { id: "cos", name: "COS Quick Guide", image: getGuideImage("cos.png") },
+    { id: "vbi-intranet", name: "VBI Quick Guide (Intranet version)", image: getGuideImage("vbi-intranet.png") },
+    { id: "vbi-internet", name: "VBI Quick Guide (Internet version)", image: getGuideImage("vbi-internet.png") },
+  ];
 
-  /**
-   * To fold 复选框变化处理（对应详细设计 3.1.5 折叠指导功能）
-   */
-  const handleFoldCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShowFoldGuide(e.target.checked);
+  // Volvo 3P Quick Guides列表
+  const volvo3PGuides = [
+    "EDB Quick Guide", "KRS Quick Guide", "CVM Quick Guide",
+    "AVP Quick Guide", "KAX Quick Guide", "CAE Homepage Quick Guide",
+    "BPP Quick Guide", "SPC Quick Guide", "WebFRAME Quick Guide",
+  ];
+
+  const handleBack = () => {
+    navigate(-1);
   };
 
   return (
-    <div className="ud23-container">
-      <main className="ud23-main">
-        <div className="ud23-card">
-          {/* 页面标题 */}
-          <h1 className="ud23-page-title">Download and Print Quick Guides</h1>
-
-          {/* 快速指南链接区域（仅画面展示，暂不实现下载功能） */}
-          <div className="ud23-section">
-            <h2 className="ud23-section-title">Quick Guides</h2>
-            <div className="ud23-link-list">
-              <div className="ud23-link-item">
-                <span className="ud23-link-text">Download and Print Quick Guides</span>
-              </div>
-              <div className="ud23-link-item">
-                <span className="ud23-link-text">Volvo 3P Quick Guides</span>
-              </div>
-            </div>
-          </div>
-
-          {/* To print 操作说明区域（对应详细设计 3.1.4） */}
-          <div className="ud23-section">
-            <div className="ud23-checkbox-row">
-              <label className="ud23-checkbox-label">
-                <input
-                  type="checkbox"
-                  className="ud23-checkbox"
-                  checked={showPrintGuide}
-                  onChange={handlePrintCheckChange}
-                />
-                To print do the following
-              </label>
-            </div>
-
-            {showPrintGuide && (
-              <div className="ud23-guide-content">
-                <ol className="ud23-guide-list">
-                  <li>Open the downloaded PDF file.</li>
-                  <li>Select "Print" from the File menu or press Ctrl+P.</li>
-                  <li>In the print dialog, select "Actual Size" or "100%" scale.</li>
-                  <li>Select "Auto portrait/landscape" orientation.</li>
-                  <li>Click "Print" to start printing.</li>
-                  <li>Ensure the printed pages are collated correctly.</li>
-                </ol>
-              </div>
-            )}
-          </div>
-
-          {/* To fold 操作说明区域（对应详细设计 3.1.5） */}
-          <div className="ud23-section">
-            <div className="ud23-checkbox-row">
-              <label className="ud23-checkbox-label">
-                <input
-                  type="checkbox"
-                  className="ud23-checkbox"
-                  checked={showFoldGuide}
-                  onChange={handleFoldCheckChange}
-                />
-                To fold do the following
-              </label>
-            </div>
-
-            {showFoldGuide && (
-              <div className="ud23-guide-content">
-                <ol className="ud23-guide-list">
-                  <li>Place the printed page face up on a flat surface.</li>
-                  <li>Fold the page in half lengthwise, matching the edges.</li>
-                  <li>Crease the fold firmly with your fingers.</li>
-                  <li>Fold the page in half widthwise for the final size.</li>
-                  <li>Ensure all panels are aligned correctly.</li>
-                  <li>The guide is now ready for use.</li>
-                </ol>
-              </div>
-            )}
-          </div>
+    <div className='download-quick-guides-container'>
+      {/* Main Content */}
+      <div className='main-content'>
+        {/* Back Link and Title */}
+        <div className='header-section'>
+          <button onClick={handleBack} className='back-link'>
+            Back
+          </button>
+          <h2 className='page-title'>Download and Print Quick Guides</h2>
         </div>
-      </main>
+
+        {/* Quick Guides Grid */}
+        <div className='guides-grid'>
+          {quickGuides.map((guide) => (
+            <div key={guide.id} className='guide-item'>
+              <div className='guide-image-container'>
+                <img
+                  src={guide.image}
+                  alt={guide.name}
+                  className='guide-thumbnail'
+                  onError={(e) => {
+                    e.currentTarget.src = "/image/placeholder-guide.png";
+                  }}
+                />
+              </div>
+              <a href='#' className='guide-link' onClick={(e) => e.preventDefault()}>
+                {guide.name}
+              </a>
+            </div>
+          ))}
+        </div>
+
+        {/* Note Section */}
+        <div className='note-section'>
+          <p className='note-text'>
+            (Note that the font Volvo Broad is removed from the Quick Guides because of problems)
+          </p>
+        </div>
+
+        {/* Volvo 3P Quick Guides Section */}
+        <div className='volvo-3p-section'>
+          <h3 className='volvo-3p-title'>Volvo 3P Quick Guides</h3>
+          <ul className='volvo-3p-list'>
+            {volvo3PGuides.map((guide, index) => (
+              <li key={index}>
+                <a href='#' className='volvo-3p-link' onClick={(e) => e.preventDefault()}>
+                  {guide}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

@@ -87,6 +87,10 @@ const MarketDocumentSettings: React.FC = () => {
     if (documentType.trim()) params.set("documentType", documentType.trim());
     if (user.trim()) params.set("user", user.trim());
     if (date.trim()) params.set("date", date.trim());
+    // 传递运算符
+    params.set("documentTypeOp", ops.documentType);
+    params.set("userOp", ops.user);
+    params.set("dateOp", ops.date);
     navigate(`/Menu/MarketDocumentSettingsList?${params.toString()}`);
   };
 
@@ -108,7 +112,7 @@ const MarketDocumentSettings: React.FC = () => {
    */
   const handleBack = () => {
     clearMessage();
-    navigate('/Menu');
+    navigate('/Menu/UserGuide');
   };
 
   /**

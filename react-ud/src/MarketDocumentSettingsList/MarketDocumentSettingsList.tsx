@@ -50,10 +50,22 @@ const MarketDocumentSettingsList: React.FC = () => {
         // 从URL参数中获取检索条件
         const params = new URLSearchParams(location.search);
         const documentType = params.get("documentType") || "";
+        const userField = params.get("user") || "";
+        const dateField = params.get("date") || "";
+        const documentTypeOp = params.get("documentTypeOp") || "=";
+        const userOp = params.get("userOp") || "=";
+        const dateOp = params.get("dateOp") || "=";
 
         const response = await axios.get(
           `${API_BASE_URL}/api/ud20/marketdocumentsettings`,
-          { params: { documentType: documentType || undefined } }
+          { params: {
+            documentType: documentType || undefined,
+            documentTypeOp: documentTypeOp,
+            user: userField || undefined,
+            userOp: userOp,
+            date: dateField || undefined,
+            dateOp: dateOp
+          } }
         );
 
         if (response.data.code === 200 && Array.isArray(response.data.data)) {

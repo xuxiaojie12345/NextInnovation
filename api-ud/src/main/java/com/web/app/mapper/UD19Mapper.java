@@ -15,6 +15,7 @@ public interface UD19Mapper {
         @Param("userId") String userId,
         @Param("user") String user,
         @Param("market") String market,
-        @Param("type") String type
+        @Param("isRule") boolean isRule,
+        @Param("isTemplate") boolean isTemplate
     );
 }

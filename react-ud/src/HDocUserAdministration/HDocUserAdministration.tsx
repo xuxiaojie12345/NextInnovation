@@ -528,7 +528,9 @@ const HDocUserAdministration = () => {
 
         {/* 角色权限配置区域 - 横向排列 */}
         <div className='ud17-sec'>
-          <div className='ud17-role-grid'>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <label className='ud17-lbl' style={{ minWidth: 100, paddingTop: 210 }}>Roles</label>
+            <div className='ud17-role-grid'>
           {/* Standard User */}
           <div className='ud17-role-item'>
             <label className='ud17-chk-lbl'>
@@ -687,43 +689,46 @@ const HDocUserAdministration = () => {
           </div>
 
         </div>
-      </div>
+        </div>
 
-        {/* Adaptation user - 单独一排 */}
-        <div className='ud17-sec'>
-          <div className='ud17-row'>
-            <label className='ud17-chk-lbl'>
-              <input
-                type='checkbox'
-                id='adaptationUser'
-                checked={formData.adaptationUserChecked}
-                onChange={(e) =>
-                  handleRoleCheckboxChange(
-                    "adaptationUserChecked",
-                    e.target.checked,
-                  )
-                }
-              />
-              Adaptation use
-            </label>
-            <select
-              multiple
-              className='ud17-sel'
-              value={formData.adaptationUserMarkets}
-              onChange={(e) => {
-                const selectedOptions = Array.from(
-                  e.target.selectedOptions,
-                ).map((option) => option.value);
-                handleMarketSelectChange(
-                  "adaptationUserMarkets",
-                  selectedOptions,
-                );
-              }}
-            >
-              <option value='-EU'>-EU</option>
-            </select>
+        {/* Adaptation user */}
+        <div style={{ marginLeft: 260, marginTop: 12 }}>
+          <div className='ud17-role-item' style={{ border: 'none', background: 'transparent', padding: 0, maxWidth: 260 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label className='ud17-chk-lbl'>
+                <input
+                  type='checkbox'
+                  id='adaptationUser'
+                  checked={formData.adaptationUserChecked}
+                  onChange={(e) =>
+                    handleRoleCheckboxChange(
+                      "adaptationUserChecked",
+                      e.target.checked,
+                    )
+                  }
+                />
+                Adaptation use
+              </label>
+              <select
+                multiple
+                className='ud17-sel'
+                value={formData.adaptationUserMarkets}
+                onChange={(e) => {
+                  const selectedOptions = Array.from(
+                    e.target.selectedOptions,
+                  ).map((option) => option.value);
+                  handleMarketSelectChange(
+                    "adaptationUserMarkets",
+                    selectedOptions,
+                  );
+                }}
+              >
+                <option value='-EU'>-EU</option>
+              </select>
+            </div>
           </div>
         </div>
+      </div>
 
         {/* Manage Variable List */}
         <div className='ud17-sec'>
@@ -744,10 +749,11 @@ const HDocUserAdministration = () => {
 
         {/* Market super user */}
         <div className='ud17-super-section'>
-          <p className='ud17-super-title'>Market super user</p>
-          <select
-            multiple
-            className='ud17-sel'
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <p className='ud17-super-title' style={{ margin: 0, whiteSpace: 'nowrap', paddingTop: 90 }}>Market super user</p>
+            <select
+              multiple
+              className='ud17-sel'
             value={formData.marketSuperUserMarkets}
             onChange={(e) => {
               const selectedOptions = Array.from(
@@ -767,6 +773,7 @@ const HDocUserAdministration = () => {
               ),
             )}
           </select>
+          </div>
         </div>
 
         {/* 操作按钮区域 */}

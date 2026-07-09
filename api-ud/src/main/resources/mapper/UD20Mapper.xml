@@ -2,13 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.UD20Mapper">
 
-    <!-- UD20GetDocumentListApi: 从HDOC_DOCUMENT_LIST表查询（支持按documentType过滤） -->
+    <!-- UD20GetDocumentListApi: 从HDOC_DOCUMENT_LIST表查询（支持按documentType/user/date过滤 + 运算符） -->
     <select id="selectHdocDocumentList" resultType="java.util.LinkedHashMap">
         SELECT DOCTYPE, UPDATE_USER, UPDATE_DATETIME AS REGISTER_DATETIME
         FROM HDOC_DOCUMENT_LIST
         <where>
             <if test="documentType != null and documentType != ''">
-                DOCTYPE LIKE CONCAT('%', #{documentType}, '%')
+                <choose>
+                    <when test="documentTypeOp == '!='">
+                       DOCTYPE NOT LIKE CONCAT(#{documentType}, '%')
+                    </when>
+                    <otherwise>
+                       DOCTYPE LIKE CONCAT(#{documentType}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="user != null and user != ''">
+                <choose>
+                    <when test="userOp == '!='">
+                       AND UPDATE_USER NOT LIKE CONCAT(#{user}, '%')
+                    </when>
+                    <otherwise>
+                       AND UPDATE_USER LIKE CONCAT(#{user}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="date != null and date != ''">
+                <choose>
+                    <when test="dateOp == '!='">
+                        AND UPDATE_DATETIME NOT LIKE CONCAT(#{date}, '%')
+                    </when>
+                    <otherwise>
+                        AND UPDATE_DATETIME LIKE CONCAT(#{date}, '%')
+                    </otherwise>
+                </choose>
             </if>
         </where>
         ORDER BY DOCTYPE

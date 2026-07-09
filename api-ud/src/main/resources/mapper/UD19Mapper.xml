@@ -19,16 +19,16 @@
                 AND u.USERID = #{userId}
             </if>
             <if test="user != null and user != ''">
-                AND u.USERID IN (SELECT USERID FROM HDOC_USER_INFOR WHERE USER = #{user})
+                AND u.USERID IN (SELECT USERID FROM HDOC_USER_INFOR WHERE USERNAME = #{user})
             </if>
             <if test="market != null and market != ''">
                 AND a.MARKET = #{market}
             </if>
-            <if test="type == 'Rule'">
-                AND u.USERID IN (SELECT USERID FROM HDOC_FUNCTION_AUTH WHERE `FUNCTION` = 'Rule Admin')
+            <if test="isRule">
+                AND u.USERID IN (SELECT USERID FROM HDOC_FUNCTION_AUTH WHERE `FUNCTION` = 'RULES')
             </if>
-            <if test="type == 'Template'">
-                AND u.USERID IN (SELECT USERID FROM HDOC_FUNCTION_AUTH WHERE `FUNCTION` = 'Template Admin')
+            <if test="isTemplate">
+                AND u.USERID IN (SELECT USERID FROM HDOC_FUNCTION_AUTH WHERE `FUNCTION` = 'TEMPLATE')
             </if>
         </where>
         ORDER BY u.USERID
