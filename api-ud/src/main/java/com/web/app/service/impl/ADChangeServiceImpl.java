@@ -9,29 +9,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class ADChangeServiceImpl implements ADChangeService {
 
-    @Autowired
-    private ADChangeMapper adChangeMapper;
+  @Autowired
+  private ADChangeMapper adChangeMapper;
 
-    @Override
-    public HdocAdcaChange findBySerieAndChnr(String serie, String chnr) {
-        return adChangeMapper.findBySerieAndChnr(serie, chnr);
+  @Override
+  public HdocAdcaChange findBySerieAndChnr(String serie, String chnr) {
+    return adChangeMapper.findBySerieAndChnr(serie, chnr);
+  }
+
+  @Override
+  public int insert(
+      String serie, String chnr, String act, String bu, String reason, String currentUser) {
+    if (currentUser == null || currentUser.trim().isEmpty()) {
+      currentUser = "SYSTEM";
     }
+    return adChangeMapper.insert(serie, chnr, act, bu, reason, currentUser);
+  }
 
-    @Override
-    public int insert(String serie, String chnr, String act, String bu, String reason, String currentUser) {
-        if (currentUser == null || currentUser.trim().isEmpty()) {
-            currentUser = "SYSTEM";
-        }
-        return adChangeMapper.insert(serie, chnr, act, bu, reason, currentUser);
+  @Override
+  public int updateAllActToN(String currentUser) {
+    if (currentUser == null || currentUser.trim().isEmpty()) {
+      currentUser = "SYSTEM";
     }
-
-    @Override
-    public int updateAllActToN(String currentUser) {
-        if (currentUser == null || currentUser.trim().isEmpty()) {
-            currentUser = "SYSTEM";
-        }
-        return adChangeMapper.updateAllActToN(currentUser);
-    }
-
-
+    return adChangeMapper.updateAllActToN(currentUser);
+  }
 }

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { api, API_BASE_URL } from '../services/api';
-import '../common/css/common.css';
-import './ListAvailableTemplates.css';
+import React, { useState, useEffect } from "react";
+import { api, API_BASE_URL } from "../services/api";
+import "../common/css/common.css";
+import "./ListAvailableTemplates.css";
 
 interface TemplateFile {
   filename: string;
-  used: string;  // VARIABLE if registered in HDOC_USER_DEFINED_RULES
+  used: string; // VARIABLE if registered in HDOC_USER_DEFINED_RULES
   lastMod: string;
   size: string;
 }
@@ -18,34 +18,37 @@ interface FileDetail {
 
 const ListAvailableTemplates: React.FC = () => {
   // ── 表单状态 ──
-  const [selectMarket, setSelectMarket] = useState('');
+  const [selectMarket, setSelectMarket] = useState("");
 
   // ── 数据状态 ──
   const [markets, setMarkets] = useState<string[]>([]);
   const [templateList, setTemplateList] = useState<TemplateFile[]>([]);
 
   // ── UI 状态 ──
-  const [message, setMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const clearMessages = () => {
-    setMessage('');
-    setSuccessMessage('');
+    setMessage("");
+    setSuccessMessage("");
   };
 
   // ── 页面初始化：加载 Market 列表 ──
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.post<{ marketList: string[] }>('/ud14/selectMarketmaster', {});
+        const res = await api.post<{ marketList: string[] }>(
+          "/ud14/selectMarketmaster",
+          {},
+        );
         if (res.code === 200 && res.data) {
           setMarkets(res.data.marketList || []);
         } else {
-          setMessage('System error. Please contact administrator.');
+          setMessage("System error. Please contact administrator.");
         }
       } catch {
-        setMessage('System error. Please contact administrator.');
+        setMessage("System error. Please contact administrator.");
       }
     })();
   }, []);
@@ -63,27 +66,33 @@ const ListAvailableTemplates: React.FC = () => {
 
       try {
         // Step 1: 从网络路径读取模板文件列表（含最后修改时间和大小）
-        const listRes = await api.post<{ templateList: FileDetail[] }>('/template/listTemplates', {
-          market: selectMarket,
-        });
+        const listRes = await api.post<{ templateList: FileDetail[] }>(
+          "/template/listTemplates",
+          {
+            market: selectMarket,
+          },
+        );
 
         if (listRes.code === 200 && listRes.data) {
           const fileDetails = listRes.data.templateList || [];
 
           if (fileDetails.length === 0) {
-            setMessage('Market folder not found.');
+            setMessage("Market folder not found.");
             setTemplateList([]);
             return;
           }
 
           // Step 2: 对每个文件检查是否在 HDOC_USER_DEFINED_RULES 中注册（获取 Used 信息）
           const templatePromises = fileDetails.map(async (fileInfo) => {
-            let used = '-';
+            let used = "-";
             try {
-              const usedRes = await api.post<{ variableList: string[] }>('/ud14/selectHdocUserDefinedRules', {
-                market: selectMarket,
-                filename: fileInfo.filename,
-              });
+              const usedRes = await api.post<{ variableList: string[] }>(
+                "/ud14/selectHdocUserDefinedRules",
+                {
+                  market: selectMarket,
+                  filename: fileInfo.filename,
+                },
+              );
               if (usedRes.code === 200 && usedRes.data) {
                 const vars = usedRes.data.variableList || [];
                 if (vars.length > 0) {
@@ -97,19 +106,19 @@ const ListAvailableTemplates: React.FC = () => {
             return {
               filename: fileInfo.filename,
               used,
-              lastMod: fileInfo.lastMod || '-',
-              size: fileInfo.size || '-',
+              lastMod: fileInfo.lastMod || "-",
+              size: fileInfo.size || "-",
             } as TemplateFile;
           });
 
           const templates = await Promise.all(templatePromises);
           setTemplateList(templates);
         } else {
-          setMessage('Market folder not found.');
+          setMessage("Market folder not found.");
           setTemplateList([]);
         }
       } catch {
-        setMessage('Market folder not found.');
+        setMessage("Market folder not found.");
         setTemplateList([]);
       } finally {
         setIsLoading(false);
@@ -122,21 +131,21 @@ const ListAvailableTemplates: React.FC = () => {
     clearMessages();
 
     if (!selectMarket) {
-      setMessage('Please select a market first.');
+      setMessage("Please select a market first.");
       return;
     }
 
     setIsLoading(true);
     try {
       // Use POST to download endpoint (backend returns file as blob in response)
-      const token = localStorage.getItem('token') || '';
+      const token = localStorage.getItem("token") || "";
       const url = `${API_BASE_URL}/template/download`;
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
+          "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify({
           market: selectMarket,
@@ -145,22 +154,22 @@ const ListAvailableTemplates: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error("Download failed");
       }
 
       // Try to get as blob (file), fallback to JSON
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
         const json = await response.json();
         if (json.code !== 200) {
-          setMessage(json.message || 'File not found.');
+          setMessage(json.message || "File not found.");
           return;
         }
       }
 
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = filename;
       document.body.appendChild(a);
@@ -170,7 +179,7 @@ const ListAvailableTemplates: React.FC = () => {
 
       setSuccessMessage(`File "${filename}" downloaded successfully.`);
     } catch {
-      setMessage('File not found.');
+      setMessage("File not found.");
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +206,9 @@ const ListAvailableTemplates: React.FC = () => {
           >
             <option value="">-- Select --</option>
             {markets.map((m) => (
-              <option key={m} value={m}>{m}</option>
+              <option key={m} value={m}>
+                {m}
+              </option>
             ))}
           </select>
         </div>
@@ -230,14 +241,16 @@ const ListAvailableTemplates: React.FC = () => {
                       {item.filename}
                     </span>
                   </td>
-                  <td>{item.used || '-'}</td>
+                  <td>{item.used || "-"}</td>
                   <td>{item.lastMod}</td>
                   <td>{item.size}</td>
                 </tr>
               ))
             ) : selectMarket && !isLoading ? (
               <tr>
-                <td colSpan={5} className="lat-empty-cell">No templates found for the selected market.</td>
+                <td colSpan={5} className="lat-empty-cell">
+                  No templates found for the selected market.
+                </td>
               </tr>
             ) : null}
           </tbody>

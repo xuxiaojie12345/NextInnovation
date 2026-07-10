@@ -7,7 +7,7 @@
 .homologation-vars-container {
   width: 800px;
   padding: 0;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   border: 2px solid #acb7ee;
 }
 
@@ -63,7 +63,7 @@
   padding: 3px 0;
 }
 
-                /* 项目名标签（加粗） */
+/* 项目名标签（加粗） */
 .hv-cond-label {
   white-space: nowrap;
   font-size: 12px;
@@ -74,7 +74,7 @@
 }
 
 .hv-cond-label.required::after {
-  content: ' *';
+  content: " *";
   color: #e53935;
   font-weight: 700;
 }
@@ -104,8 +104,6 @@
   background-color: #f0f0f0;
   cursor: not-allowed;
 }
-
-
 
 /* ── 条件值控件（输入框/下拉框，根据内容自适应） ── */
 .hv-cond-input {
@@ -240,5 +238,3 @@
   font-size: 12px;
   margin-bottom: 6px;
 }
-
-

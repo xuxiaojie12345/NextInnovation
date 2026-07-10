@@ -69,6 +69,7 @@
     "http-proxy-middleware": "^2.0.9",
     "mysql2": "^3.22.5",
     "playwright": "^1.61.1",
+    "prettier": "^3.9.5",
     "sass": "^1.72.0"
   }
 }

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './ExistingHDocVariablesResultList.css';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./ExistingHDocVariablesResultList.css";
 
 /**
  * 查询结果记录的数据结构
@@ -35,11 +35,11 @@ interface RawRecord {
  * 将后端返回的原始记录（大写字段）映射为驼峰命名
  */
 const toCamelCase = (raw: RawRecord): VariableRecord => ({
-  variable: raw.VARIABLE ?? '',
-  type: raw.TYPE ?? '',
-  description: raw.DESCRIPTION ?? '',
-  registerUser: raw.REGISTER_USER ?? '',
-  registerDatetime: raw.REGISTER_DATETIME ? String(raw.REGISTER_DATETIME) : '',
+  variable: raw.VARIABLE ?? "",
+  type: raw.TYPE ?? "",
+  description: raw.DESCRIPTION ?? "",
+  registerUser: raw.REGISTER_USER ?? "",
+  registerDatetime: raw.REGISTER_DATETIME ? String(raw.REGISTER_DATETIME) : "",
 });
 
 /**
@@ -59,12 +59,14 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const searchState = location.state as { conditions?: Record<string, string> } | null;
+  const searchState = location.state as {
+    conditions?: Record<string, string>;
+  } | null;
   const searchConditions = searchState?.conditions ?? null;
 
   const [results, setResults] = useState<VariableRecord[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number>(-1);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   /**
@@ -78,28 +80,28 @@ const ExistingHDocVariablesResultList: React.FC = () => {
         return;
       }
       setIsLoading(true);
-      setErrorMessage('');
+      setErrorMessage("");
       try {
-        const res = await api.post<{ list: RawRecord[] }>('/variables/search', {
-          variable: searchConditions.variable ?? '',
-          variableOp: searchConditions.variableOp ?? '=',
-          type: searchConditions.type ?? '',
-          typeOp: searchConditions.typeOp ?? '=',
-          description: searchConditions.description ?? '',
-          descriptionOp: searchConditions.descriptionOp ?? '=',
-          registerUser: searchConditions.createdByUser ?? '',
-          registerUserOp: searchConditions.createdByUserOp ?? '=',
-          registerDatetime: searchConditions.date ?? '',
-          registerDatetimeOp: searchConditions.dateOp ?? '=',
+        const res = await api.post<{ list: RawRecord[] }>("/variables/search", {
+          variable: searchConditions.variable ?? "",
+          variableOp: searchConditions.variableOp ?? "=",
+          type: searchConditions.type ?? "",
+          typeOp: searchConditions.typeOp ?? "=",
+          description: searchConditions.description ?? "",
+          descriptionOp: searchConditions.descriptionOp ?? "=",
+          registerUser: searchConditions.createdByUser ?? "",
+          registerUserOp: searchConditions.createdByUserOp ?? "=",
+          registerDatetime: searchConditions.date ?? "",
+          registerDatetimeOp: searchConditions.dateOp ?? "=",
         });
         if (res.code === 200 && res.data) {
           const mapped = (res.data.list || []).map(toCamelCase);
           setResults(mapped);
         } else {
-          setErrorMessage(res.message || 'Failed to fetch results.');
+          setErrorMessage(res.message || "Failed to fetch results.");
         }
       } catch {
-        setErrorMessage('System error. Please contact administrator.');
+        setErrorMessage("System error. Please contact administrator.");
       } finally {
         setIsLoading(false);
       }
@@ -113,17 +115,19 @@ const ExistingHDocVariablesResultList: React.FC = () => {
 
   const handleSelect = () => {
     if (selectedIdx < 0) {
-      setErrorMessage('Please select a record first.');
+      setErrorMessage("Please select a record first.");
       return;
     }
     // Return selected records to previous page
     const selectedRecords = [results[selectedIdx]];
-    navigate('/menu/existing-hdoc-vars', { state: { selectedRecords } });
+    navigate("/menu/existing-hdoc-vars", { state: { selectedRecords } });
   };
 
   const handleBack = () => {
     // 将查询条件带回前页面
-    navigate('/menu/existing-hdoc-vars', { state: { conditions: searchConditions } });
+    navigate("/menu/existing-hdoc-vars", {
+      state: { conditions: searchConditions },
+    });
   };
 
   const handlePrint = () => {
@@ -134,29 +138,42 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Down 操作：跳转到 Homologation Variables 页面并携带选中记录的 Variable
    */
   const handleDown = () => {
-    window.alert('暂定不实装');
+    window.alert("暂定不实装");
   };
 
   /**
    * CSV 导出（纯前端）：将查询结果导出为 CSV 文件
    */
   const handleExcel = () => {
-    setErrorMessage('');
-    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    setErrorMessage("");
+    const now = new Date();
+    const today = now
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[-:]/g, "")
+      .replace("T", "");
     const fileName = `ExistingHDocVariablesResultList_${today}.csv`;
 
-    const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
-    const csvRows = results.map(r =>
+    const headers = [
+      "Variable",
+      "Type",
+      "Description",
+      "Created by user",
+      "Date",
+    ];
+    const csvRows = results.map((r) =>
       [r.variable, r.type, r.description, r.registerUser, r.registerDatetime]
-        .map(cell => `"${(cell || '').replace(/"/g, '""')}"`)
-        .join(',')
+        .map((cell) => `"${(cell || "").replace(/"/g, '""')}"`)
+        .join(","),
     );
-    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
 
-    const bom = '\uFEFF';
-    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
     document.body.appendChild(a);
@@ -166,7 +183,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   };
 
   const handleUserViewClick = (userid: string) => {
-    navigate('/menu/edb-user-view', { state: { userid } });
+    navigate("/menu/edb-user-view", { state: { userid } });
   };
 
   return (
@@ -215,14 +232,18 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                 <th className="th-check ehvr-th-noborder"></th>
                 <th className="ehvr-th-underline ehvr-th-noborder">Variable</th>
                 <th className="ehvr-th-underline ehvr-th-noborder">Type</th>
-                <th className="ehvr-th-underline ehvr-th-noborder">Description</th>
-                <th className="ehvr-th-underline ehvr-th-noborder">Created by user</th>
+                <th className="ehvr-th-underline ehvr-th-noborder">
+                  Description
+                </th>
+                <th className="ehvr-th-underline ehvr-th-noborder">
+                  Created by user
+                </th>
                 <th className="ehvr-th-underline ehvr-th-noborder">Date</th>
               </tr>
             </thead>
             <tbody>
               {results.map((row, idx) => (
-                <tr key={idx} className={selectedIdx === idx ? 'selected' : ''}>
+                <tr key={idx} className={selectedIdx === idx ? "selected" : ""}>
                   <td className="td-check">
                     <input
                       type="radio"
@@ -242,7 +263,11 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                       {row.registerUser}
                     </span>
                   </td>
-                  <td>{row.registerDatetime ? row.registerDatetime.substring(0, 10) : ''}</td>
+                  <td>
+                    {row.registerDatetime
+                      ? row.registerDatetime.substring(0, 10)
+                      : ""}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -250,7 +275,9 @@ const ExistingHDocVariablesResultList: React.FC = () => {
         </div>
       ) : (
         <div className="ehvr-empty">
-          <p>No results found. Please go back and try different search criteria.</p>
+          <p>
+            No results found. Please go back and try different search criteria.
+          </p>
         </div>
       )}
 

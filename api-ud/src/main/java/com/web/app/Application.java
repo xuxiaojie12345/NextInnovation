@@ -1,17 +1,16 @@
 package com.web.app;
 
+import javax.servlet.ServletException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
-import javax.servlet.ServletException;
-
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @MapperScan(basePackages = "com.web.app.mapper") // 扫描mapper包
 @SpringBootApplication

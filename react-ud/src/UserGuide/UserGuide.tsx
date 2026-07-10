@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './UserGuide.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./UserGuide.css";
 
 interface HelpLink {
   label: string;
@@ -11,11 +11,14 @@ interface HelpLink {
 }
 
 const HELP_LINKS: HelpLink[] = [
-  { label: 'HDoc Quick Guide', path: '/menu/quick-guides' },
-  { label: 'List of document types.', path: '/menu/document-types' },
-  { label: 'Markets in Hdoc', path: '/menu/markets-in-hdoc' },
-  { label: 'HDoc - Market Document Setting', path: '/menu/market-document-setting' },
-  { label: 'Describation', externalUrl: '#description' },
+  { label: "HDoc Quick Guide", path: "/menu/quick-guides" },
+  { label: "List of document types.", path: "/menu/document-types" },
+  { label: "Markets in Hdoc", path: "/menu/markets-in-hdoc" },
+  {
+    label: "HDoc - Market Document Setting",
+    path: "/menu/market-document-setting",
+  },
+  { label: "Describation", externalUrl: "#description" },
 ];
 
 const UserGuide: React.FC = () => {
@@ -28,11 +31,11 @@ const UserGuide: React.FC = () => {
     if (link.path) {
       navigate(link.path);
     } else if (link.externalUrl) {
-      if (link.externalUrl.startsWith('#')) {
+      if (link.externalUrl.startsWith("#")) {
         // 锚点或内部操作，暂不实现
         return;
       }
-      window.open(link.externalUrl, '_blank', 'noopener,noreferrer');
+      window.open(link.externalUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -44,9 +47,9 @@ const UserGuide: React.FC = () => {
         {HELP_LINKS.map((link) => (
           <div
             key={link.label}
-            className={`help-link-item${link.disabled ? ' disabled' : ''}`}
+            className={`help-link-item${link.disabled ? " disabled" : ""}`}
             onClick={() => handleLinkClick(link)}
-            title={link.disabled ? link.tooltip : ''}
+            title={link.disabled ? link.tooltip : ""}
           >
             <span className="help-link-arrow">•</span>
             <span className="help-link-text">{link.label}</span>
@@ -69,13 +72,16 @@ const UserGuide: React.FC = () => {
       {/* 额外信息区域 */}
       {otherInfo && (
         <div className="other-info-panel">
-          <p>Additional reference materials and documentation can be found in the system documentation section.</p>
+          <p>
+            Additional reference materials and documentation can be found in the
+            system documentation section.
+          </p>
         </div>
       )}
 
       <div className="user-guide-footer">
         <p>
-          For further assistance, please contact:{' '}
+          For further assistance, please contact:{" "}
           <a href="mailto:support.tpi@123.com">support.tpi@123.com</a>
         </p>
       </div>

@@ -4,5 +4,5 @@ import com.web.app.dto.GenerateDocumentRequest;
 import com.web.app.dto.GenerateDocumentResponse;
 
 public interface GenerateDocumentService {
-    GenerateDocumentResponse getGeneratedocument(GenerateDocumentRequest request);
+  GenerateDocumentResponse getGeneratedocument(GenerateDocumentRequest request);
 }

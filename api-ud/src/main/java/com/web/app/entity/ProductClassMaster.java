@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ProductClassMaster {
-    private String pc;
-    private String description;
+  private String pc;
+  private String description;
 }

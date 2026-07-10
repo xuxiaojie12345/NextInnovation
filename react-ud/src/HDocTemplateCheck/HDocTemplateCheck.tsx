@@ -1,10 +1,10 @@
-import React from 'react';
-import '../common/css/common.css';
-import './HDocTemplateCheck.css';
+import React from "react";
+import "../common/css/common.css";
+import "./HDocTemplateCheck.css";
 
 const HDocTemplateCheck: React.FC = () => {
   const handleCheck = () => {
-    alert('机能未实装');
+    alert("机能未实装");
   };
 
   return (

@@ -1,106 +1,106 @@
 package com.web.app.controller;
 
 import com.web.app.dto.ApiResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.UUID;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/hdoc/template")
 @CrossOrigin(origins = "*")
 public class TemplateCheckController {
 
-    private static final String CHECK_RESULT_DIR = "//172.17.0.63/hdoc/template/check_result";
+  private static final String CHECK_RESULT_DIR = "//172.17.0.63/hdoc/template/check_result";
 
-    @PostMapping("/check")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> checkTemplate(
-            @RequestParam("file") MultipartFile file) {
-        try {
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(400, "ERROR: Unable to access file!"));
-            }
+  @PostMapping("/check")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> checkTemplate(
+      @RequestParam("file") MultipartFile file) {
+    try {
+      if (file.isEmpty()) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "ERROR: Unable to access file!"));
+      }
 
-            // 读取文件内容
-            String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+      // 读取文件内容
+      String content = new String(file.getBytes(), StandardCharsets.UTF_8);
 
-            // 解析 $变量名$ 格式的变量
-            Pattern pattern = Pattern.compile("\\$([^\\$]+)\\$");
-            Matcher matcher = pattern.matcher(content);
-            List<String> variables = new ArrayList<>();
-            while (matcher.find()) {
-                String varName = matcher.group(1).trim();
-                if (!varName.isEmpty() && !variables.contains(varName)) {
-                    variables.add(varName);
-                }
-            }
-
-            int variableCount = variables.size();
-
-            if (variableCount == 0) {
-                return ResponseEntity.status(422)
-                    .body(ApiResponse.error(422, "ERROR: The file content is incorrect!"));
-            }
-
-            // 生成校验结果文件
-            String resultId = UUID.randomUUID().toString().replace("-", "");
-            String downloadUrl = "/api/v1/hdoc/template/check/result/" + resultId;
-
-            // 保存校验结果到文件
-            File dir = new File(CHECK_RESULT_DIR);
-            if (!dir.exists()) dir.mkdirs();
-
-            Path resultPath = Paths.get(CHECK_RESULT_DIR, resultId + ".csv");
-            try (BufferedWriter writer = Files.newBufferedWriter(resultPath, StandardCharsets.UTF_8)) {
-                writer.write("Variable Count: " + variableCount + "\n");
-                writer.write("Variable Name\n");
-                for (String var : variables) {
-                    writer.write(var + "\n");
-                }
-            }
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("variableCount", variableCount);
-            data.put("variables", variables);
-            data.put("downloadUrl", downloadUrl);
-
-            return ResponseEntity.ok(ApiResponse.success(data));
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      // 解析 $变量名$ 格式的变量
+      Pattern pattern = Pattern.compile("\\$([^\\$]+)\\$");
+      Matcher matcher = pattern.matcher(content);
+      List<String> variables = new ArrayList<>();
+      while (matcher.find()) {
+        String varName = matcher.group(1).trim();
+        if (!varName.isEmpty() && !variables.contains(varName)) {
+          variables.add(varName);
         }
-    }
+      }
 
-    @GetMapping("/check/result/{id}")
-    public ResponseEntity<?> downloadCheckResult(@PathVariable("id") String id) {
-        try {
-            Path filePath = Paths.get(CHECK_RESULT_DIR, id + ".csv");
-            if (!Files.exists(filePath)) {
-                return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, "Result file not found."));
-            }
+      int variableCount = variables.size();
 
-            byte[] content = Files.readAllBytes(filePath);
-            String fileName = "template_check_result_" +
-                new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".csv";
+      if (variableCount == 0) {
+        return ResponseEntity.status(422)
+            .body(ApiResponse.error(422, "ERROR: The file content is incorrect!"));
+      }
 
-            return ResponseEntity.ok()
-                .header("Content-Type", "text/csv; charset=UTF-8")
-                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-                .body(content);
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      // 生成校验结果文件
+      String resultId = UUID.randomUUID().toString().replace("-", "");
+      String downloadUrl = "/api/v1/hdoc/template/check/result/" + resultId;
+
+      // 保存校验结果到文件
+      File dir = new File(CHECK_RESULT_DIR);
+      if (!dir.exists()) dir.mkdirs();
+
+      Path resultPath = Paths.get(CHECK_RESULT_DIR, resultId + ".csv");
+      try (BufferedWriter writer = Files.newBufferedWriter(resultPath, StandardCharsets.UTF_8)) {
+        writer.write("Variable Count: " + variableCount + "\n");
+        writer.write("Variable Name\n");
+        for (String var : variables) {
+          writer.write(var + "\n");
         }
+      }
+
+      Map<String, Object> data = new HashMap<>();
+      data.put("variableCount", variableCount);
+      data.put("variables", variables);
+      data.put("downloadUrl", downloadUrl);
+
+      return ResponseEntity.ok(ApiResponse.success(data));
+    } catch (Exception e) {
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
+  }
+
+  @GetMapping("/check/result/{id}")
+  public ResponseEntity<?> downloadCheckResult(@PathVariable("id") String id) {
+    try {
+      Path filePath = Paths.get(CHECK_RESULT_DIR, id + ".csv");
+      if (!Files.exists(filePath)) {
+        return ResponseEntity.status(404).body(ApiResponse.error(404, "Result file not found."));
+      }
+
+      byte[] content = Files.readAllBytes(filePath);
+      String fileName =
+          "template_check_result_"
+              + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+              + ".csv";
+
+      return ResponseEntity.ok()
+          .header("Content-Type", "text/csv; charset=UTF-8")
+          .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+          .body(content);
+    } catch (Exception e) {
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+    }
+  }
 }

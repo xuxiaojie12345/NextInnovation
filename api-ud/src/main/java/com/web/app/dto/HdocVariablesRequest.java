@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class HdocVariablesRequest {
-    private String variable;
-    private String type;
-    private String description;
+  private String variable;
+  private String type;
+  private String description;
 }

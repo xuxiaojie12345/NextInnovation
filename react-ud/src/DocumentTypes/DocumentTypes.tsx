@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './DocumentTypes.css';
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./DocumentTypes.css";
 
 interface DocumentType {
   doctype: string;
@@ -10,21 +10,21 @@ interface DocumentType {
 
 const DocumentTypes: React.FC = () => {
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       try {
-        const res = await api.get<DocumentType[]>('/document/types');
+        const res = await api.get<DocumentType[]>("/document/types");
         if (res.code === 200 && res.data) {
           setDocumentTypes(res.data);
         } else {
-          setMessage('无法获取文档类型信息');
+          setMessage("无法获取文档类型信息");
         }
       } catch {
-        setMessage('系统暂时不可用，请稍后重试');
+        setMessage("系统暂时不可用，请稍后重试");
       } finally {
         setIsLoading(false);
       }

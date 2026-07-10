@@ -5,7 +5,7 @@
 .udt-container {
   width: 700px;
   padding: 20px;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   border: 2px solid #acb7ee;
 }
 
@@ -143,5 +143,4 @@
   color: #333;
   line-height: 1.6;
   text-align: left;
-
 }

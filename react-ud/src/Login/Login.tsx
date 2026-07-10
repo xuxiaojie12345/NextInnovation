@@ -1,61 +1,66 @@
-import React, { useState } from 'react';
-import './Login.css';
-import { LoginRequest, LoginResponse } from './Login.types';
+import React, { useState } from "react";
+import "./Login.css";
+import { LoginRequest, LoginResponse } from "./Login.types";
 
 const Login: React.FC = () => {
-  const [userid, setUserid] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [userid, setUserid] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const useridVal = userid.trim();
     const passwordVal = password.trim();
 
     // 前端校验
-    if (useridVal.length == 0 || passwordVal.length == 0 ) {
-      setMessage('Username and password are required.');
+    if (useridVal.length == 0 || passwordVal.length == 0) {
+      setMessage("Username and password are required.");
       return;
     }
 
     // UserID半角英数字校验（仅允许 a-z, A-Z, 0-9）
     const useridReg = /^[A-Za-z0-9]+$/;
     if (!useridReg.test(useridVal)) {
-      setMessage('UserID must be alphanumeric characters.');
+      setMessage("UserID must be alphanumeric characters.");
       return;
     }
-    
+
     setIsLoading(true);
-    setMessage('');
-    
+    setMessage("");
+
     try {
       const loginRequest: LoginRequest = {
         userid: useridVal,
-        password: passwordVal
+        password: passwordVal,
       };
 
-      const response = await fetch('/api/v1/hdoc/login', {
-        method: 'POST',
+      const response = await fetch("/api/v1/hdoc/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(loginRequest),
       });
 
-      const contentType = response.headers.get('content-type') || '';
+      const contentType = response.headers.get("content-type") || "";
       let result: LoginResponse | null = null;
 
-      if (contentType.includes('application/json')) {
+      if (contentType.includes("application/json")) {
         try {
           result = await response.json();
         } catch (e) {
-          console.error('Failed parsing JSON login response:', e);
+          console.error("Failed parsing JSON login response:", e);
         }
       } else {
         const text = await response.text();
-        console.error('Non-JSON login response:', response.status, response.statusText, text);
+        console.error(
+          "Non-JSON login response:",
+          response.status,
+          response.statusText,
+          text,
+        );
         setMessage(`Login failed: ${response.status} ${response.statusText}`);
         return;
       }
@@ -63,19 +68,27 @@ const Login: React.FC = () => {
       const hasValidData = result !== null;
       if (response.ok && hasValidData && result?.code === 200 && result?.data) {
         // 登录成功，保存token并跳转
-        localStorage.setItem('token', result.data.token);
-        localStorage.setItem('userId', result.data.userid);
-        localStorage.setItem('username', result.data.username);
-        window.location.href = '/menu';
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("userId", result.data.userid);
+        localStorage.setItem("username", result.data.username);
+        window.location.href = "/menu";
       } else {
         // 登录失败
-        const serverMsg = result && result.message ? result.message : `Login failed: ${response.status} ${response.statusText}`;
-        console.warn('Login failed response:', response.status, serverMsg, result);
-        setMessage(serverMsg || 'Login failed. Please try again.');
+        const serverMsg =
+          result && result.message
+            ? result.message
+            : `Login failed: ${response.status} ${response.statusText}`;
+        console.warn(
+          "Login failed response:",
+          response.status,
+          serverMsg,
+          result,
+        );
+        setMessage(serverMsg || "Login failed. Please try again.");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setMessage('System error. Please contact administrator.');
+      console.error("Login error:", error);
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -85,14 +98,17 @@ const Login: React.FC = () => {
     <div className="login-container">
       <div className="login-info-panel">
         <div className="left-content">
-          <h1><strong>EDB</strong> Engineering Database</h1>
+          <h1>
+            <strong>EDB</strong> Engineering Database
+          </h1>
           <p>Use Outlook id and password</p>
           <p>
-            Support, authorization request or improvement suggestions, send mail to: Support TPI
+            Support, authorization request or improvement suggestions, send mail
+            to: Support TPI
           </p>
         </div>
       </div>
-      
+
       <div className="login-form-panel">
         <div className="login-form">
           <form onSubmit={handleSubmit}>
@@ -117,18 +133,19 @@ const Login: React.FC = () => {
               />
             </div>
             {message && <div className="error-message">{message}</div>}
-            <button 
-              type="submit" 
-              className="login-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging in...' : 'Login'}
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
-          
+
           <div className="alternative-login-info">
-            <p>If you get error message: "Your account is locked. Please contact your system administrator."</p>
-            <p>Please try this alternative login link before contacting support.</p>
+            <p>
+              If you get error message: "Your account is locked. Please contact
+              your system administrator."
+            </p>
+            <p>
+              Please try this alternative login link before contacting support.
+            </p>
             <p>We are working to find root cause of problem.</p>
           </div>
         </div>

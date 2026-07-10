@@ -7,5 +7,6 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface GenerateDocumentMapper {
 
-    GenerateDocumentResponse findGenerateDocumentData(@Param("serie") String serie, @Param("chnr") String chnr);
+  GenerateDocumentResponse findGenerateDocumentData(
+      @Param("serie") String serie, @Param("chnr") String chnr);
 }

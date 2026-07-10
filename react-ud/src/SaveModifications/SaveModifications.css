@@ -120,8 +120,13 @@
   background-color: #f5f7ff;
 }
 
-.td-var { font-weight: 500; color: #002182; }
-.td-val { color: #333; }
+.td-var {
+  font-weight: 500;
+  color: #002182;
+}
+.td-val {
+  color: #333;
+}
 
 /* ── VERSION IS RELEASED（背景色 #008000） ── */
 .save-mod-message {
@@ -141,4 +146,3 @@
   display: flex;
   gap: 10px;
 }
-

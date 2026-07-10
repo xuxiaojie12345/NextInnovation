@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './SearchUser.css';
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./SearchUser.css";
 
 interface UserRecord {
   userid: string;
@@ -10,19 +10,20 @@ interface UserRecord {
   market: string;
 }
 
-type PermissionFilter = '' | 'R' | 'T';
+type PermissionFilter = "" | "R" | "T";
 
 const SearchUser: React.FC = () => {
   const location = useLocation();
   const state = location.state as { userid?: string } | null;
 
-  const [userid, setUserid] = useState(state?.userid || '');
-  const [username, setUsername] = useState('');
-  const [market, setMarket] = useState('');
-  const [permissionFilter, setPermissionFilter] = useState<PermissionFilter>('');
+  const [userid, setUserid] = useState(state?.userid || "");
+  const [username, setUsername] = useState("");
+  const [market, setMarket] = useState("");
+  const [permissionFilter, setPermissionFilter] =
+    useState<PermissionFilter>("");
   const [markets, setMarkets] = useState<string[]>([]);
   const [results, setResults] = useState<UserRecord[]>([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const marketRef = useRef<HTMLSelectElement>(null);
 
@@ -30,14 +31,17 @@ const SearchUser: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.post<{ marketList: string[] }>('/ud19/selectMarketMaster', {});
+        const res = await api.post<{ marketList: string[] }>(
+          "/ud19/selectMarketMaster",
+          {},
+        );
         if (res.code === 200 && res.data) {
           setMarkets(res.data.marketList || []);
         } else {
-          setMessage('System error. Please contact administrator.');
+          setMessage("System error. Please contact administrator.");
         }
       } catch {
-        setMessage('System error. Please contact administrator.');
+        setMessage("System error. Please contact administrator.");
       }
     })();
   }, []);
@@ -57,7 +61,7 @@ const SearchUser: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.userid]);
 
-  const clearMessages = () => setMessage('');
+  const clearMessages = () => setMessage("");
 
   const handleSearch = async () => {
     clearMessages();
@@ -66,29 +70,32 @@ const SearchUser: React.FC = () => {
     const trimmedUsername = username.trim();
 
     if (!trimmedUserid && !trimmedUsername && !market && !permissionFilter) {
-      setMessage('请输入至少一个查询条件');
+      setMessage("请输入至少一个查询条件");
       return;
     }
 
     // 半角英数字校验
     const alphanumericRegex = /^[a-zA-Z0-9]*$/;
     if (trimmedUserid && !alphanumericRegex.test(trimmedUserid)) {
-      setMessage('Userid must be alphanumeric.');
+      setMessage("Userid must be alphanumeric.");
       return;
     }
     if (trimmedUsername && !alphanumericRegex.test(trimmedUsername)) {
-      setMessage('User must be alphanumeric.');
+      setMessage("User must be alphanumeric.");
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ hdocList: UserRecord[] }>('/ud19/searchHdoc', {
-        userid: trimmedUserid,
-        user: trimmedUsername,
-        check: permissionFilter,
-        market: market,
-      });
+      const res = await api.post<{ hdocList: UserRecord[] }>(
+        "/ud19/searchHdoc",
+        {
+          userid: trimmedUserid,
+          user: trimmedUsername,
+          check: permissionFilter,
+          market: market,
+        },
+      );
 
       if (res.code === 200 && res.data) {
         const list = res.data.hdocList || [];
@@ -103,13 +110,13 @@ const SearchUser: React.FC = () => {
             setUserid(list[0].userid);
           }
         } else {
-          setMessage('没有找到匹配的用户');
+          setMessage("没有找到匹配的用户");
         }
       } else {
-        setMessage('没有找到匹配的用户');
+        setMessage("没有找到匹配的用户");
       }
     } catch {
-      setMessage('系统暂时不可用，请稍后重试');
+      setMessage("系统暂时不可用，请稍后重试");
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +166,9 @@ const SearchUser: React.FC = () => {
               disabled={isLoading}
             >
               {markets.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
           </div>
@@ -169,8 +178,8 @@ const SearchUser: React.FC = () => {
                 <input
                   type="radio"
                   name="permission"
-                  checked={permissionFilter === ''}
-                  onChange={() => setPermissionFilter('')}
+                  checked={permissionFilter === ""}
+                  onChange={() => setPermissionFilter("")}
                   disabled={isLoading}
                 />
                 <span>Not set</span>
@@ -179,8 +188,8 @@ const SearchUser: React.FC = () => {
                 <input
                   type="radio"
                   name="permission"
-                  checked={permissionFilter === 'R'}
-                  onChange={() => setPermissionFilter('R')}
+                  checked={permissionFilter === "R"}
+                  onChange={() => setPermissionFilter("R")}
                   disabled={isLoading}
                 />
                 <span>Rule</span>
@@ -189,8 +198,8 @@ const SearchUser: React.FC = () => {
                 <input
                   type="radio"
                   name="permission"
-                  checked={permissionFilter === 'T'}
-                  onChange={() => setPermissionFilter('T')}
+                  checked={permissionFilter === "T"}
+                  onChange={() => setPermissionFilter("T")}
                   disabled={isLoading}
                 />
                 <span>Template</span>
@@ -199,7 +208,9 @@ const SearchUser: React.FC = () => {
           </div>
         </div>
         <div className="su-btn-row">
-          <button className="btn" onClick={handleSearch} disabled={isLoading}>Search</button>
+          <button className="btn" onClick={handleSearch} disabled={isLoading}>
+            Search
+          </button>
         </div>
       </div>
 

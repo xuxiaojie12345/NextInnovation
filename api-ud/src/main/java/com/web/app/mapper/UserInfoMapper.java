@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserInfoMapper {
-    
-    UserInfo findByUseridAndPassword(@Param("userid") String userid, @Param("password") String password);
+
+  UserInfo findByUseridAndPassword(
+      @Param("userid") String userid, @Param("password") String password);
 }

@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../common/css/common.css';
-import './DownloadAndPrintQuickGuides.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../common/css/common.css";
+import "./DownloadAndPrintQuickGuides.css";
 
 const QUICK_GUIDES = [
-  'WIS Quick Guide',
-  'PERF Quick Guide',
-  'W8-Calc Quick Guide',
-  'HDoc Quick Guide',
-  'EDB Quick Guide',
-  'COS Quick Guide',
-  'VBI Quick Guide (Intranet version)',
-  'VBI Quick Guide (Internet version)',
+  "WIS Quick Guide",
+  "PERF Quick Guide",
+  "W8-Calc Quick Guide",
+  "HDoc Quick Guide",
+  "EDB Quick Guide",
+  "COS Quick Guide",
+  "VBI Quick Guide (Intranet version)",
+  "VBI Quick Guide (Internet version)",
 ];
 
 const VOLVO_3P_GUIDES = [
-  'Volvo 3P Quick Guides',
-  'KBS Quick Guide',
-  'CVM Quick Guide',
-  'AVP Quick Guide',
-  'KAX Quick Guide',
-  'C&E Homepage Quick Guide',
-  'RPD Quick Guide',
-  'SPC Quick Guide',
-  'WebFRAME Quick Guide',
+  "Volvo 3P Quick Guides",
+  "KBS Quick Guide",
+  "CVM Quick Guide",
+  "AVP Quick Guide",
+  "KAX Quick Guide",
+  "C&E Homepage Quick Guide",
+  "RPD Quick Guide",
+  "SPC Quick Guide",
+  "WebFRAME Quick Guide",
 ];
 
 const DownloadAndPrintQuickGuides: React.FC = () => {
@@ -32,7 +32,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
   const [isFoldChecked, setIsFoldChecked] = useState(false);
 
   const handleBack = () => {
-    navigate('/menu/guide-user');
+    navigate("/menu/guide-user");
   };
 
   return (
@@ -55,10 +55,16 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             {/* Quick Guides 卡片展示区（上部） */}
             <div className="dpg-link-section">
               <div className="dpg-link-item">
-                <span className="dpg-link">Download and Print Quick Guides</span>
+                <span className="dpg-link">
+                  Download and Print Quick Guides
+                </span>
               </div>
               {QUICK_GUIDES.map((name) => (
-                <div className="dpg-link-item" key={name}>
+                <div
+                  className="dpg-link-item"
+                  key={name}
+                  onClick={() => alert('暂时不支持文件下载')}
+                >
                   <span className="dpg-link-arrow">•</span>
                   <span className="dpg-link">{name}</span>
                 </div>
@@ -68,7 +74,11 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             {/* Volvo 3P Quick Guides 链接列表（下部） */}
             <div className="dpg-link-section dpg-volvo-section">
               {VOLVO_3P_GUIDES.map((name) => (
-                <div className="dpg-link-item" key={name}>
+                <div
+                  className="dpg-link-item"
+                  key={name}
+                  onClick={() => alert('暂时不支持文件下载')}
+                >
                   <span className="dpg-link-arrow">•</span>
                   <span className="dpg-link">{name}</span>
                 </div>
@@ -125,7 +135,6 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             </ol>
           </div>
         )}
-
       </div>
     </div>
   );

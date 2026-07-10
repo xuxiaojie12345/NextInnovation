@@ -124,9 +124,16 @@
   background-color: #e0e8ff;
 }
 
-.td-var { font-weight: 500; color: #002182; }
-.td-desc { font-weight: 500 }
-.td-current { font-weight: 500 }
+.td-var {
+  font-weight: 500;
+  color: #002182;
+}
+.td-desc {
+  font-weight: 500;
+}
+.td-current {
+  font-weight: 500;
+}
 
 .modify-input {
   width: 100%;
@@ -163,4 +170,3 @@
   margin-left: 4px;
   cursor: pointer;
 }
-

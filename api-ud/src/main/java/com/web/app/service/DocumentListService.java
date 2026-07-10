@@ -4,5 +4,5 @@ import com.web.app.dto.DocumentTypeListResponse;
 import java.util.List;
 
 public interface DocumentListService {
-    List<DocumentTypeListResponse> getHdocdocumentlist();
+  List<DocumentTypeListResponse> getHdocdocumentlist();
 }

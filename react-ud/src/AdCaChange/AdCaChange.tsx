@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './AdCaChange.css';
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./AdCaChange.css";
 
 const AdCaChange: React.FC = () => {
   // ── 表单状态 ──
-  const [serieChnr, setSerieChnr] = useState('');
-  const [desc, setDesc] = useState('');
+  const [serieChnr, setSerieChnr] = useState("");
+  const [desc, setDesc] = useState("");
 
   // ── UI 状态 ──
-  const [message, setMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const clearMessages = () => {
-    setMessage('');
-    setSuccessMessage('');
+    setMessage("");
+    setSuccessMessage("");
   };
 
   // ── 解析 Serie-Chnr ──
   const parseSerieChnr = (value: string): { serie: string; chnr: string } => {
     const trimmed = value.trim();
-    const parts = trimmed.split('-');
+    const parts = trimmed.split("-");
     if (parts.length >= 2) {
-      return { serie: parts[0].trim(), chnr: parts.slice(1).join('-').trim() };
+      return { serie: parts[0].trim(), chnr: parts.slice(1).join("-").trim() };
     }
     // If no dash, treat entire input as serie
-    return { serie: trimmed, chnr: '' };
+    return { serie: trimmed, chnr: "" };
   };
 
   // ── ADD ──
@@ -45,7 +45,12 @@ const AdCaChange: React.FC = () => {
     setIsLoading(true);
     try {
       // Step 1: Check existence
-      const checkRes = await api.post<{ serie: string; chnr: string; count: string; act: string }>('/adca/select', {
+      const checkRes = await api.post<{
+        serie: string;
+        chnr: string;
+        count: string;
+        act: string;
+      }>("/adca/select", {
         serie,
         chnr,
       });
@@ -54,31 +59,31 @@ const AdCaChange: React.FC = () => {
         const count = parseInt(checkRes.data.count, 10);
         if (count > 0) {
           // 已存在 → 不允许新增（无论活性状态）
-          setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+          setMessage("AFTER DEF CHANGE IS NOT ACTIVATED");
           setIsLoading(false);
           return;
         }
       }
 
       // Step 2: Insert (BU fixed as "UD", ACT = 'Y' for active)
-      const updateUser = localStorage.getItem('userId') || '';
-      const res = await api.post('/adca/insert', {
+      const updateUser = localStorage.getItem("userId") || "";
+      const res = await api.post("/adca/insert", {
         serie,
         chnr,
-        act: 'Y',
-        bu: 'UD',
+        act: "Y",
+        bu: "UD",
         updateUser,
       });
 
       if (res.code === 200) {
-        setSuccessMessage('Record added successfully.');
-        setSerieChnr('');
-        setDesc('');
+        setSuccessMessage("Record added successfully.");
+        setSerieChnr("");
+        setDesc("");
       } else {
-        setMessage(res.message || 'Failed to add record.');
+        setMessage(res.message || "Failed to add record.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -98,17 +103,17 @@ const AdCaChange: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const updateUser = localStorage.getItem('userId') || '';
-      const res = await api.post('/adca/update', { updateUser });
+      const updateUser = localStorage.getItem("userId") || "";
+      const res = await api.post("/adca/update", { updateUser });
 
       if (res.code === 200) {
-        setSuccessMessage('Record updated/deleted successfully.');
-        setSerieChnr('');
+        setSuccessMessage("Record updated/deleted successfully.");
+        setSerieChnr("");
       } else {
-        setMessage(res.message || 'Failed to delete record.');
+        setMessage(res.message || "Failed to delete record.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +133,12 @@ const AdCaChange: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await api.post<{ serie: string; chnr: string; count: string; act: string }>('/adca/select', {
+      const res = await api.post<{
+        serie: string;
+        chnr: string;
+        count: string;
+        act: string;
+      }>("/adca/select", {
         serie,
         chnr,
       });
@@ -137,19 +147,19 @@ const AdCaChange: React.FC = () => {
         const count = parseInt(res.data.count, 10);
         const act = res.data.act;
         if (count > 0) {
-          if (act === 'Y') {
-            setMessage('Record found and activated.');
+          if (act === "Y") {
+            setMessage("Record found and activated.");
           } else {
-            setMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+            setMessage("AFTER DEF CHANGE IS NOT ACTIVATED");
           }
         } else {
-          setMessage('Record not found.');
+          setMessage("Record not found.");
         }
       } else {
-        setMessage('Record not found.');
+        setMessage("Record not found.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -196,9 +206,15 @@ const AdCaChange: React.FC = () => {
 
         {/* Buttons */}
         <div className="adca-btn-row">
-          <button className="btn" onClick={handleAdd} disabled={isLoading}>ADD</button>
-          <button className="btn" onClick={handleDelete} disabled={isLoading}>DELETE</button>
-          <button className="btn" onClick={handleCheck} disabled={isLoading}>CHECK</button>
+          <button className="btn" onClick={handleAdd} disabled={isLoading}>
+            ADD
+          </button>
+          <button className="btn" onClick={handleDelete} disabled={isLoading}>
+            DELETE
+          </button>
+          <button className="btn" onClick={handleCheck} disabled={isLoading}>
+            CHECK
+          </button>
         </div>
       </div>
     </div>

@@ -1,54 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './ExistingHDocVariables.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./ExistingHDocVariables.css";
 
-type Operator = '=' | '!=' | '>' | '<';
+type Operator = "=" | "!=" | ">" | "<";
 
-const STORAGE_KEY = 'ehv_conditions';
+const STORAGE_KEY = "ehv_conditions";
 
 const ExistingHDocVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // ── 表单状态 ──
-  const [variable, setVariable] = useState('');
-  const [variableOp, setVariableOp] = useState<Operator>('=');
-  const [type, setType] = useState('');
-  const [typeOp, setTypeOp] = useState<Operator>('=');
-  const [description, setDescription] = useState('');
-  const [descriptionOp, setDescriptionOp] = useState<Operator>('=');
-  const [createdByUser, setCreatedByUser] = useState('');
-  const [createdByUserOp, setCreatedByUserOp] = useState<Operator>('=');
-  const [date, setDate] = useState('');
-  const [dateOp, setDateOp] = useState<Operator>('=');
+  const [variable, setVariable] = useState("");
+  const [variableOp, setVariableOp] = useState<Operator>("=");
+  const [type, setType] = useState("");
+  const [typeOp, setTypeOp] = useState<Operator>("=");
+  const [description, setDescription] = useState("");
+  const [descriptionOp, setDescriptionOp] = useState<Operator>("=");
+  const [createdByUser, setCreatedByUser] = useState("");
+  const [createdByUserOp, setCreatedByUserOp] = useState<Operator>("=");
+  const [date, setDate] = useState("");
+  const [dateOp, setDateOp] = useState<Operator>("=");
 
   // ── UI 状态 ──
-  const [message, setMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // ── 从 Result List 返回时恢复条件或选中记录 ──
   useEffect(() => {
-    const st = location.state as
-      | { conditions?: Record<string, string>; selectedRecords?: any[] }
-      | null;
+    const st = location.state as {
+      conditions?: Record<string, string>;
+      selectedRecords?: any[];
+    } | null;
 
     // Select 返回：选中记录填充到表单
     if (st?.selectedRecords?.length) {
       const rec = st.selectedRecords[0];
-      const toStr = (v: any): string => (v == null ? '' : String(v));
+      const toStr = (v: any): string => (v == null ? "" : String(v));
       setVariable(toStr(rec.variable));
-      setVariableOp('=');
+      setVariableOp("=");
       setType(toStr(rec.type));
-      setTypeOp('=');
+      setTypeOp("=");
       setDescription(toStr(rec.description));
-      setDescriptionOp('=');
+      setDescriptionOp("=");
       setCreatedByUser(toStr(rec.registerUser));
-      setCreatedByUserOp('=');
+      setCreatedByUserOp("=");
       setDate(toStr(rec.registerDatetime).substring(0, 10));
-      setDateOp('=');
+      setDateOp("=");
       window.history.replaceState({}, document.title);
       return;
     }
@@ -56,16 +57,16 @@ const ExistingHDocVariables: React.FC = () => {
     // Back 返回：从 location.state 恢复条件
     if (st?.conditions) {
       const c = st.conditions;
-      setVariable(c.variable ?? '');
-      setVariableOp((c.variableOp as Operator) ?? '=');
-      setType(c.type ?? '');
-      setTypeOp((c.typeOp as Operator) ?? '=');
-      setDescription(c.description ?? '');
-      setDescriptionOp((c.descriptionOp as Operator) ?? '=');
-      setCreatedByUser(c.createdByUser ?? '');
-      setCreatedByUserOp((c.createdByUserOp as Operator) ?? '=');
-      setDate(c.date ?? '');
-      setDateOp((c.dateOp as Operator) ?? '=');
+      setVariable(c.variable ?? "");
+      setVariableOp((c.variableOp as Operator) ?? "=");
+      setType(c.type ?? "");
+      setTypeOp((c.typeOp as Operator) ?? "=");
+      setDescription(c.description ?? "");
+      setDescriptionOp((c.descriptionOp as Operator) ?? "=");
+      setCreatedByUser(c.createdByUser ?? "");
+      setCreatedByUserOp((c.createdByUserOp as Operator) ?? "=");
+      setDate(c.date ?? "");
+      setDateOp((c.dateOp as Operator) ?? "=");
       window.history.replaceState({}, document.title);
       return;
     }
@@ -75,35 +76,40 @@ const ExistingHDocVariables: React.FC = () => {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const c = JSON.parse(saved);
-        setVariable(c.variable ?? '');
-        setVariableOp(c.variableOp ?? '=');
-        setType(c.type ?? '');
-        setTypeOp(c.typeOp ?? '=');
-        setDescription(c.description ?? '');
-        setDescriptionOp(c.descriptionOp ?? '=');
-        setCreatedByUser(c.createdByUser ?? '');
-        setCreatedByUserOp(c.createdByUserOp ?? '=');
-        setDate(c.date ?? '');
-        setDateOp(c.dateOp ?? '=');
+        setVariable(c.variable ?? "");
+        setVariableOp(c.variableOp ?? "=");
+        setType(c.type ?? "");
+        setTypeOp(c.typeOp ?? "=");
+        setDescription(c.description ?? "");
+        setDescriptionOp(c.descriptionOp ?? "=");
+        setCreatedByUser(c.createdByUser ?? "");
+        setCreatedByUserOp(c.createdByUserOp ?? "=");
+        setDate(c.date ?? "");
+        setDateOp(c.dateOp ?? "=");
         sessionStorage.removeItem(STORAGE_KEY);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [location.state]);
 
   // ── 消息 ──
-  const clearMessages = () => { setMessage(''); setSuccessMessage(''); };
+  const clearMessages = () => {
+    setMessage("");
+    setSuccessMessage("");
+  };
 
   const clearForm = (keepSuccess = false) => {
-    setVariable('');
-    setVariableOp('=');
-    setType('');
-    setTypeOp('=');
-    setDescription('');
-    setDescriptionOp('=');
-    setCreatedByUser('');
-    setCreatedByUserOp('=');
-    setDate('');
-    setDateOp('=');
+    setVariable("");
+    setVariableOp("=");
+    setType("");
+    setTypeOp("=");
+    setDescription("");
+    setDescriptionOp("=");
+    setCreatedByUser("");
+    setCreatedByUserOp("=");
+    setDate("");
+    setDateOp("=");
     sessionStorage.removeItem(STORAGE_KEY);
     if (!keepSuccess) clearMessages();
   };
@@ -113,19 +119,24 @@ const ExistingHDocVariables: React.FC = () => {
     clearMessages();
 
     if (!variable && !type && !description && !createdByUser && !date) {
-      setMessage('请输入至少一个搜索条件');
+      setMessage("请输入至少一个搜索条件");
       return;
     }
 
     const conditions = {
-      variable, variableOp,
-      type, typeOp,
-      description, descriptionOp,
-      createdByUser, createdByUserOp,
-      date, dateOp,
+      variable,
+      variableOp,
+      type,
+      typeOp,
+      description,
+      descriptionOp,
+      createdByUser,
+      createdByUserOp,
+      date,
+      dateOp,
     };
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(conditions));
-    navigate('/menu/existing-hdoc-vars/result', { state: { conditions } });
+    navigate("/menu/existing-hdoc-vars/result", { state: { conditions } });
   };
 
   // ── 新增 ──
@@ -133,53 +144,60 @@ const ExistingHDocVariables: React.FC = () => {
     clearMessages();
 
     if (!variable.trim()) {
-      setMessage('Variable为必填项');
+      setMessage("Variable为必填项");
       return;
     }
     if (variable.length > 30) {
-      setMessage('Variable长度不能超过30字符');
+      setMessage("Variable长度不能超过30字符");
       return;
     }
     if (!/^[\x20-\x7E]*$/.test(variable)) {
-      setMessage('Variable只能包含半角英数字和记号');
+      setMessage("Variable只能包含半角英数字和记号");
       return;
     }
     if (!type) {
-      setMessage('请选择变量类型');
+      setMessage("请选择变量类型");
       return;
     }
 
     // Variable 存在性校验
     try {
-      const checkRes = await api.post<{ exists: boolean }>('/ud08/checkVariable', {
-        variable: variable.trim(),
-      });
+      const checkRes = await api.post<{ exists: boolean }>(
+        "/ud08/checkVariable",
+        {
+          variable: variable.trim(),
+        },
+      );
       if (checkRes.code === 200 && checkRes.data?.exists) {
-        setMessage('Variant already exists. Please enter the correct content');
+        setMessage("Variant already exists. Please enter the correct content");
         return;
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
       return;
     }
 
-    const currentUser = createdByUser.trim() || localStorage.getItem('userId') || '';
+    const currentUser =
+      createdByUser.trim() || localStorage.getItem("userId") || "";
     setIsLoading(true);
     try {
-      const res = await api.post('/variables/add', {
+      const res = await api.post("/variables/add", {
         variable: variable.trim(),
         type,
         description: description.trim(),
         currentUser,
       });
       if (res.code === 200) {
-        setSuccessMessage('变量添加成功');
+        setSuccessMessage("变量添加成功");
         clearForm(true);
       } else {
-        setMessage(res.message || 'Variant already exists. Please enter the correct content');
+        setMessage(
+          res.message ||
+            "Variant already exists. Please enter the correct content",
+        );
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -190,40 +208,47 @@ const ExistingHDocVariables: React.FC = () => {
     clearMessages();
 
     if (!variable.trim()) {
-      setMessage('Variable为必填项');
+      setMessage("Variable为必填项");
       return;
     }
 
     // Variable 存在性校验
     try {
-      const checkRes = await api.post<{ exists: boolean }>('/ud08/checkVariable', {
-        variable: variable.trim(),
-      });
+      const checkRes = await api.post<{ exists: boolean }>(
+        "/ud08/checkVariable",
+        {
+          variable: variable.trim(),
+        },
+      );
       if (checkRes.code === 200 && !checkRes.data?.exists) {
-        setMessage('Variant does not exists. Please enter the correct content');
+        setMessage("Variant does not exists. Please enter the correct content");
         return;
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
       return;
     }
 
-    const currentUser = createdByUser.trim() || localStorage.getItem('userId') || '';
+    const currentUser =
+      createdByUser.trim() || localStorage.getItem("userId") || "";
     setIsLoading(true);
     try {
-      const res = await api.post('/variables/update', {
+      const res = await api.post("/variables/update", {
         variable: variable.trim(),
         type,
         description: description.trim(),
         currentUser,
       });
       if (res.code === 200) {
-        setSuccessMessage('变量更新成功');
+        setSuccessMessage("变量更新成功");
       } else {
-        setMessage(res.message || 'Variant does not exists. Please enter the correct content');
+        setMessage(
+          res.message ||
+            "Variant does not exists. Please enter the correct content",
+        );
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -234,27 +259,30 @@ const ExistingHDocVariables: React.FC = () => {
     clearMessages();
 
     if (!variable.trim()) {
-      setMessage('Variable为必填项');
+      setMessage("Variable为必填项");
       return;
     }
 
-    if (!window.confirm('Do you really want to delete this variant?')) {
+    if (!window.confirm("Do you really want to delete this variant?")) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await api.post('/variables/delete', {
+      const res = await api.post("/variables/delete", {
         variable: variable.trim(),
       });
       if (res.code === 200) {
-        setSuccessMessage('变量删除成功');
+        setSuccessMessage("变量删除成功");
         clearForm(true);
       } else {
-        setMessage(res.message || 'Variant does not exists. Please enter the correct content');
+        setMessage(
+          res.message ||
+            "Variant does not exists. Please enter the correct content",
+        );
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -262,46 +290,73 @@ const ExistingHDocVariables: React.FC = () => {
 
   // ── 返回 ──
   const handleBack = () => {
-    navigate('/menu');
+    navigate("/menu");
   };
 
   // ── CSV 导出（纯前端） ──
   const handleExcel = () => {
     clearMessages();
-    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const now = new Date();
+    const today = now
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[-:]/g, "")
+      .replace("T", "");
     const fileName = `ExistingHDocVariables_${today}.csv`;
 
-    const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
+    const headers = [
+      "Variable",
+      "Type",
+      "Description",
+      "Created by user",
+      "Date",
+    ];
     const row = [variable, type, description, createdByUser, date];
-    const csvContent = [headers.join(','), row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')].join('\n');
+    const csvContent = [
+      headers.join(","),
+      row.map((cell) => `"${(cell || "").replace(/"/g, '""')}"`).join(","),
+    ].join("\n");
 
-    const bom = '\uFEFF';
-    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-    setSuccessMessage('CSV文件导出成功');
+    setSuccessMessage("CSV文件导出成功");
   };
 
   // ── 辅助函数 ──
   const isNumericField = (field: string): boolean => {
-    return field === 'Date';
+    return field === "Date";
   };
 
-  const renderOpSelect = (field: string, op: Operator, onChange: (v: Operator) => void) => {
-    const numericOps = ['=', '>', '<'] as Operator[];
-    const nonNumericOps = ['=', '!='] as Operator[];
+  const renderOpSelect = (
+    field: string,
+    op: Operator,
+    onChange: (v: Operator) => void,
+  ) => {
+    const numericOps = ["=", ">", "<"] as Operator[];
+    const nonNumericOps = ["=", "!="] as Operator[];
     const ops = isNumericField(field) ? numericOps : nonNumericOps;
-    const currentOp = ops.includes(op) ? op : '=';
+    const currentOp = ops.includes(op) ? op : "=";
     return (
-      <select className="ehv-op-select" value={currentOp} onChange={(e) => onChange(e.target.value as Operator)} disabled={isLoading}>
+      <select
+        className="ehv-op-select"
+        value={currentOp}
+        onChange={(e) => onChange(e.target.value as Operator)}
+        disabled={isLoading}
+      >
         {ops.map((o) => (
-          <option key={o} value={o}>{o}</option>
+          <option key={o} value={o}>
+            {o}
+          </option>
         ))}
       </select>
     );
@@ -318,13 +373,47 @@ const ExistingHDocVariables: React.FC = () => {
         <tbody>
           <tr>
             <td className="ehv-btn-cell">
-              <button className="btn btn-primary" onClick={handleSearch} disabled={isLoading}>Search</button>
-              <button className="btn" onClick={() => clearForm()} disabled={isLoading}>Clear</button>
-              <button className="btn" onClick={handleBack} disabled={isLoading}>Back</button>
-              <button className="btn" onClick={handleAdd} disabled={isLoading}>Add</button>
-              <button className="btn" onClick={handleUpdate} disabled={isLoading}>Update</button>
-              <button className="btn" onClick={handleDelete} disabled={isLoading}>Delete</button>
-              <button className="btn" onClick={handleExcel} disabled={isLoading}>Excel</button>
+              <button
+                className="btn btn-primary"
+                onClick={handleSearch}
+                disabled={isLoading}
+              >
+                Search
+              </button>
+              <button
+                className="btn"
+                onClick={() => clearForm()}
+                disabled={isLoading}
+              >
+                Clear
+              </button>
+              <button className="btn" onClick={handleBack} disabled={isLoading}>
+                Back
+              </button>
+              <button className="btn" onClick={handleAdd} disabled={isLoading}>
+                Add
+              </button>
+              <button
+                className="btn"
+                onClick={handleUpdate}
+                disabled={isLoading}
+              >
+                Update
+              </button>
+              <button
+                className="btn"
+                onClick={handleDelete}
+                disabled={isLoading}
+              >
+                Delete
+              </button>
+              <button
+                className="btn"
+                onClick={handleExcel}
+                disabled={isLoading}
+              >
+                Excel
+              </button>
             </td>
           </tr>
         </tbody>
@@ -337,7 +426,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Variable */}
         <div className="ehv-row">
           <span className="ehv-label required">Variable</span>
-          {renderOpSelect('Variable', variableOp, setVariableOp)}
+          {renderOpSelect("Variable", variableOp, setVariableOp)}
           <input
             type="text"
             className="ehv-input ehv-input-variable"
@@ -351,7 +440,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Type */}
         <div className="ehv-row">
           <span className="ehv-label required">Type</span>
-          {renderOpSelect('Type', typeOp, setTypeOp)}
+          {renderOpSelect("Type", typeOp, setTypeOp)}
           <select
             className="ehv-input ehv-select"
             value={type}
@@ -367,7 +456,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Description */}
         <div className="ehv-row ehv-row-description">
           <span className="ehv-label">Description</span>
-          {renderOpSelect('Description', descriptionOp, setDescriptionOp)}
+          {renderOpSelect("Description", descriptionOp, setDescriptionOp)}
           <input
             type="text"
             className="ehv-input ehv-input-description"
@@ -381,7 +470,11 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Created by user */}
         <div className="ehv-row">
           <span className="ehv-label">Created by user</span>
-          {renderOpSelect('Created by user', createdByUserOp, setCreatedByUserOp)}
+          {renderOpSelect(
+            "Created by user",
+            createdByUserOp,
+            setCreatedByUserOp,
+          )}
           <input
             type="text"
             className="ehv-input ehv-input-created-by"
@@ -395,7 +488,7 @@ const ExistingHDocVariables: React.FC = () => {
         {/* Date */}
         <div className="ehv-row">
           <span className="ehv-label">Date</span>
-          {renderOpSelect('Date', dateOp, setDateOp)}
+          {renderOpSelect("Date", dateOp, setDateOp)}
           <input
             type="text"
             className="ehv-input ehv-input-date"

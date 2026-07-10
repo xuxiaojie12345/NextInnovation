@@ -59,7 +59,7 @@
 }
 
 .info-row .info-label::after {
-  content: '：';
+  content: "：";
 }
 
 .info-row .info-value {
@@ -90,7 +90,7 @@
   /* background-color: #fff7e6;
   border: 1px solid #ffe58f;
   border-radius: 4px; */
-  color:red;
+  color: red;
   font-size: 13px;
   font-weight: 500;
   text-align: left;
@@ -146,7 +146,3 @@
   display: flex;
   gap: 12px;
 }
-
-
-
-

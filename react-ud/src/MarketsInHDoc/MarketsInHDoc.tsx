@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './MarketsInHDoc.css';
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./MarketsInHDoc.css";
 
 interface MarketItem {
   market: string;
@@ -10,21 +10,24 @@ interface MarketItem {
 
 const MarketsInHDoc: React.FC = () => {
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       try {
-        const res = await api.post<{ marketList: MarketItem[] }>('/ud21/markets', {});
+        const res = await api.post<{ marketList: MarketItem[] }>(
+          "/ud21/markets",
+          {},
+        );
         if (res.code === 200 && res.data) {
           setMarketList(res.data.marketList || []);
         } else {
-          setMessage('无法获取市场信息');
+          setMessage("无法获取市场信息");
         }
       } catch {
-        setMessage('系统暂时不可用，请稍后重试');
+        setMessage("系统暂时不可用，请稍后重试");
       } finally {
         setIsLoading(false);
       }

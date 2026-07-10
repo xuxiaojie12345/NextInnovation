@@ -13,33 +13,37 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
 public class LoginController {
-    
-    @Autowired
-    private UserService userService;
-    
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse.LoginData>> login(@RequestBody LoginRequest request) {
-        try {
-            // 验证请求参数
-            if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error(401, "Username and password are required."));
-            }
-            
-            // 认证用户
-            LoginResponse.LoginData loginData = userService.authenticate(request);
-            
-            if (loginData != null) {
-                ApiResponse<LoginResponse.LoginData> response = ApiResponse.success(loginData);
-                response.setMessage("登录成功");
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error(401, "We didn't recognize the username or password you entered. Please try again."));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(500, "System error. Please contact administrator."));
-        }
+
+  @Autowired
+  private UserService userService;
+
+  @PostMapping("/login")
+  public ResponseEntity<ApiResponse<LoginResponse.LoginData>> login(
+      @RequestBody LoginRequest request) {
+    try {
+      // 验证请求参数
+      if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.error(401, "Username and password are required."));
+      }
+
+      // 认证用户
+      LoginResponse.LoginData loginData = userService.authenticate(request);
+
+      if (loginData != null) {
+        ApiResponse<LoginResponse.LoginData> response = ApiResponse.success(loginData);
+        response.setMessage("登录成功");
+        return ResponseEntity.ok(response);
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(
+                ApiResponse.error(
+                    401,
+                    "We didn't recognize the username or password you entered. Please try again."));
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
+  }
 }

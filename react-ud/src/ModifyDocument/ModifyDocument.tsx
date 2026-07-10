@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './ModifyDocument.css';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./ModifyDocument.css";
 
 interface VariableItem {
   variable: string;
@@ -13,30 +13,36 @@ interface VariableItem {
 const ModifyDocument: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { serie: string; chnr: string; market?: string } | null;
+  const state = location.state as {
+    serie: string;
+    chnr: string;
+    market?: string;
+  } | null;
 
   const [variables, setVariables] = useState<VariableItem[]>([]);
-  const [modifiedValues, setModifiedValues] = useState<Record<string, string>>({});
-  const [errorMessage, setErrorMessage] = useState('');
+  const [modifiedValues, setModifiedValues] = useState<Record<string, string>>(
+    {},
+  );
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const serie = state?.serie || '';
-  const chnr = state?.chnr || '';
-  const market = state?.market || '';
+  const serie = state?.serie || "";
+  const chnr = state?.chnr || "";
+  const market = state?.market || "";
 
   useEffect(() => {
     if (!serie || !chnr) {
-      setErrorMessage('Invalid chassis information.');
+      setErrorMessage("Invalid chassis information.");
       setIsLoading(false);
       return;
     }
 
     const fetchVariables = async () => {
-      setErrorMessage(''); 
+      setErrorMessage("");
       setIsLoading(true);
       try {
-        const res = await api.post<VariableItem[]>('/modifydocument/select', {
+        const res = await api.post<VariableItem[]>("/modifydocument/select", {
           serie,
           chnr,
         });
@@ -45,14 +51,14 @@ const ModifyDocument: React.FC = () => {
           // Initialize modified values as empty
           const initial: Record<string, string> = {};
           res.data.forEach((v) => {
-            initial[v.variable] = '';
+            initial[v.variable] = "";
           });
           setModifiedValues(initial);
         } else {
-          setErrorMessage(res.message || 'Vehicle data not found.');
+          setErrorMessage(res.message || "Vehicle data not found.");
         }
       } catch {
-        setErrorMessage('System error. Please contact administrator.');
+        setErrorMessage("System error. Please contact administrator.");
       } finally {
         setIsLoading(false);
       }
@@ -75,23 +81,22 @@ const ModifyDocument: React.FC = () => {
       }));
 
     if (modifications.length === 0) {
-      setErrorMessage('NO UNRELEASED VERSION EXISTS!');
+      setErrorMessage("NO UNRELEASED VERSION EXISTS!");
       return;
     }
 
     setIsSaving(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
-
-      const res = await api.post('/modifydocument/update', {
+      const res = await api.post("/modifydocument/update", {
         serie,
         chnr,
         modifications,
       });
 
       if (res.code === 200) {
-        navigate('/menu/save-modifications', {
+        navigate("/menu/save-modifications", {
           state: {
             serie,
             chnr,
@@ -104,12 +109,12 @@ const ModifyDocument: React.FC = () => {
         if (res.message) {
           msg = res.message;
         } else {
-          msg = 'Failed to save modifications. Please try again.';
+          msg = "Failed to save modifications. Please try again.";
         }
         setErrorMessage(msg);
       }
     } catch {
-      setErrorMessage('System error. Please contact administrator.');
+      setErrorMessage("System error. Please contact administrator.");
     } finally {
       setIsSaving(false);
     }
@@ -123,7 +128,9 @@ const ModifyDocument: React.FC = () => {
     return (
       <div className="modify-doc-container">
         <div className="modify-doc-error">{errorMessage}</div>
-        <button className="btn btn-secondary" onClick={() => navigate(-1)}>Back</button>
+        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+          Back
+        </button>
       </div>
     );
   }
@@ -139,18 +146,34 @@ const ModifyDocument: React.FC = () => {
             <strong>{serie}</strong>
             <strong
               className="modify-doc-chassis-link"
-              onClick={() => navigate('/menu/vehicle-specification', { state: { serie, chnr } })}
-            >{chnr}</strong>
+              onClick={() =>
+                navigate("/menu/vehicle-specification", {
+                  state: { serie, chnr },
+                })
+              }
+            >
+              {chnr}
+            </strong>
           </span>
         </div>
         <div className="modify-doc-info-item">
-          <span className="info-label" style={{ fontWeight: 500 }}>Market:</span>
-          <span className="info-value" style={{ color: '#66707b', fontWeight: 500 }}>{market || '-'}</span>
+          <span className="info-label" style={{ fontWeight: 500 }}>
+            Market:
+          </span>
+          <span
+            className="info-value"
+            style={{ color: "#66707b", fontWeight: 500 }}
+          >
+            {market || "-"}
+          </span>
         </div>
       </div>
 
       <div className="modify-doc-template">
-        <span className="modify-doc-template-link" onClick={() => alert('Template download not implemented.')}>
+        <span
+          className="modify-doc-template-link"
+          onClick={() => alert("Template download not implemented.")}
+        >
           Template:aus/Download Template File
         </span>
       </div>
@@ -160,8 +183,12 @@ const ModifyDocument: React.FC = () => {
       {variables.length > 0 ? (
         <React.Fragment>
           <div className="modify-doc-save-bar">
-            <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save'}
+            <button
+              className="btn btn-primary"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save"}
             </button>
           </div>
 
@@ -180,13 +207,15 @@ const ModifyDocument: React.FC = () => {
                   <tr key={va.variable}>
                     <td className="td-desc">{va.variable}</td>
                     <td className="td-desc">{va.description}</td>
-                    <td className="td-current">{va.newVal || '-'}</td>
+                    <td className="td-current">{va.newVal || "-"}</td>
                     <td className="td-modified">
                       <input
                         type="text"
                         className="modify-input"
-                        value={modifiedValues[va.variable] || ''}
-                        onChange={(e) => handleValueChange(va.variable, e.target.value)}
+                        value={modifiedValues[va.variable] || ""}
+                        onChange={(e) =>
+                          handleValueChange(va.variable, e.target.value)
+                        }
                         maxLength={500}
                         disabled={isSaving}
                       />

@@ -7,7 +7,7 @@
 .hv-result-container {
   width: 1400px;
   padding: 0;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   border: 2px solid #8698e6;
 }
 
@@ -96,7 +96,7 @@
 
 /* 必须字段 * 标记 */
 .hv-th-required::before {
-  content: '*';
+  content: "*";
   color: #e53935;
   font-weight: 700;
   margin-right: 1px;
@@ -249,5 +249,3 @@
   padding: 8px 10px;
   text-align: left;
 }
-
-

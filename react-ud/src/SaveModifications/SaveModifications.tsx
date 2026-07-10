@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './SaveModifications.css';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./SaveModifications.css";
 
 interface SaveModMeta {
   doctype: string;
@@ -20,25 +20,28 @@ const SaveModifications: React.FC = () => {
     modifications?: { variable: string; val: string }[];
   } | null;
 
-  const serie = state?.serie || '';
-  const chnr = state?.chnr || '';
-  const market = state?.market || '';
+  const serie = state?.serie || "";
+  const chnr = state?.chnr || "";
+  const market = state?.market || "";
   const modifications = state?.modifications || [];
 
   const [meta, setMeta] = useState<SaveModMeta | null>(null);
-  const [, setErrorMessage] = useState('');
+  const [, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!serie || !chnr) {
-      setErrorMessage('Invalid chassis information.');
+      setErrorMessage("Invalid chassis information.");
       setIsLoading(false);
       return;
     }
     const fetchMeta = async () => {
       try {
-        const [s, c] = chnr.includes('-') ? chnr.split('-') : [serie, chnr];
-        const res = await api.post<SaveModMeta>('/adcamodification', { serie: s, chno: c });
+        const [s, c] = chnr.includes("-") ? chnr.split("-") : [serie, chnr];
+        const res = await api.post<SaveModMeta>("/adcamodification", {
+          serie: s,
+          chno: c,
+        });
         if (res.code === 200 && res.data) {
           setMeta(res.data);
         }
@@ -52,7 +55,7 @@ const SaveModifications: React.FC = () => {
   }, [serie, chnr]);
 
   const handleClose = () => {
-    navigate('/menu/modify-document', {
+    navigate("/menu/modify-document", {
       state: { serie, chnr, market },
     });
   };
@@ -61,7 +64,9 @@ const SaveModifications: React.FC = () => {
     return (
       <div className="save-mod-container">
         <div className="save-mod-error">Invalid chassis information.</div>
-        <button className="btn btn-secondary" onClick={handleClose}>Close</button>
+        <button className="btn btn-secondary" onClick={handleClose}>
+          Close
+        </button>
       </div>
     );
   }
@@ -93,7 +98,7 @@ const SaveModifications: React.FC = () => {
               <span className="info-label">Doctype:</span>
               <span className="info-value">{meta.doctype}</span>
             </div>
-            <div className="save-mod-info-row" style={{ marginTop: '30px' }}>
+            <div className="save-mod-info-row" style={{ marginTop: "30px" }}>
               <span className="info-label">Version:</span>
               <span className="info-value">{meta.version}</span>
             </div>
@@ -105,20 +110,25 @@ const SaveModifications: React.FC = () => {
         <span className="info-label">Storing:</span>
         <span className="info-value">
           {modifications.map((mod, idx) => (
-            <span key={idx}>{mod.variable} {mod.val}{idx < modifications.length - 1 ? ', ' : ''}</span>
+            <span key={idx}>
+              {mod.variable} {mod.val}
+              {idx < modifications.length - 1 ? ", " : ""}
+            </span>
           ))}
         </span>
       </div>
 
       <div className="save-mod-info-row">
         <span className="info-label">FOUND UNRELEASED VERSION:</span>
-        <span className="info-value">{meta?.version || ''}</span>
+        <span className="info-value">{meta?.version || ""}</span>
       </div>
 
       <div className="save-mod-message">VERSION IS RELEASED</div>
 
-      <div className="save-mod-actions" style={{ marginTop: '20px' }}>
-        <button className="btn btn-primary" onClick={handleClose}>Close</button>
+      <div className="save-mod-actions" style={{ marginTop: "20px" }}>
+        <button className="btn btn-primary" onClick={handleClose}>
+          Close
+        </button>
       </div>
     </div>
   );

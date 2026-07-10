@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Tooltip } from 'antd';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './VehicleSpecification.css';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Tooltip } from "antd";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./VehicleSpecification.css";
 
 interface KolaItem {
   symbol: string;
@@ -29,34 +29,39 @@ const VehicleSpecification: React.FC = () => {
   const state = location.state as { serie: string; chnr: string } | null;
 
   const [data, setData] = useState<VehicleSpecData | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const serie = state?.serie || '';
-  const chnr = state?.chnr || '';
+  const serie = state?.serie || "";
+  const chnr = state?.chnr || "";
 
   useEffect(() => {
     if (!serie || !chnr) {
-      setErrorMessage('Chassis no is required. Please return to the previous page.');
+      setErrorMessage(
+        "Chassis no is required. Please return to the previous page.",
+      );
       setIsLoading(false);
       return;
     }
 
     const fetchData = async () => {
-      setErrorMessage('');
+      setErrorMessage("");
       setIsLoading(true);
       try {
-        const res = await api.post<VehicleSpecData>('/vehiclespecification', {
+        const res = await api.post<VehicleSpecData>("/vehiclespecification", {
           serie,
           chno: chnr,
         });
         if (res.code === 200 && res.data) {
           setData(res.data);
         } else {
-          setErrorMessage(res.message || 'No vehicle data found for the given chassis number.');
+          setErrorMessage(
+            res.message ||
+              "No vehicle data found for the given chassis number.",
+          );
         }
       } catch {
-        setErrorMessage('System error. Please contact administrator.');
+        setErrorMessage("System error. Please contact administrator.");
       } finally {
         setIsLoading(false);
       }
@@ -73,7 +78,12 @@ const VehicleSpecification: React.FC = () => {
     return (
       <div className="vs-container">
         <div className="vs-error">{errorMessage}</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/menu/generate-doc')}>Back</button>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/menu/generate-doc")}
+        >
+          Back
+        </button>
       </div>
     );
   }
@@ -81,8 +91,15 @@ const VehicleSpecification: React.FC = () => {
   if (!data) {
     return (
       <div className="vs-container">
-        <div className="vs-error">No vehicle data found for the given chassis number.</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/menu/generate-doc')}>Back</button>
+        <div className="vs-error">
+          No vehicle data found for the given chassis number.
+        </div>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/menu/generate-doc")}
+        >
+          Back
+        </button>
       </div>
     );
   }
@@ -97,34 +114,56 @@ const VehicleSpecification: React.FC = () => {
       <table className="vs-info-table">
         <tbody>
           <tr>
-            <td className="info-label"><strong>Chassis no:</strong></td>
-            <td className="info-value">{serie} {chnr}</td>
-            <td className="info-label"><strong>Model:</strong></td>
-            <td className="info-value">{data.model || '-'}</td>
+            <td className="info-label">
+              <strong>Chassis no:</strong>
+            </td>
+            <td className="info-value">
+              {serie} {chnr}
+            </td>
+            <td className="info-label">
+              <strong>Model:</strong>
+            </td>
+            <td className="info-value">{data.model || "-"}</td>
           </tr>
           <tr>
-            <td className="info-label"><strong>Built week:</strong></td>
-            <td className="info-value">{data.build || '-'}</td>
-            <td className="info-label"><strong>Product type:</strong></td>
-            <td className="info-value">{data.productType || '-'}</td>
+            <td className="info-label">
+              <strong>Built week:</strong>
+            </td>
+            <td className="info-value">{data.build || "-"}</td>
+            <td className="info-label">
+              <strong>Product type:</strong>
+            </td>
+            <td className="info-value">{data.productType || "-"}</td>
           </tr>
           <tr>
-            <td className="info-label"><strong>VIN:</strong></td>
-            <td className="info-value">{data.vin || '-'}</td>
-            <td className="info-label"><strong>Engine no:</strong></td>
-            <td className="info-value">{data.kolaList && data.kolaList.length > 0 ? data.kolaList[0].symbol : '-'}</td>
+            <td className="info-label">
+              <strong>VIN:</strong>
+            </td>
+            <td className="info-value">{data.vin || "-"}</td>
+            <td className="info-label">
+              <strong>Engine no:</strong>
+            </td>
+            <td className="info-value">
+              {data.kolaList && data.kolaList.length > 0
+                ? data.kolaList[0].symbol
+                : "-"}
+            </td>
           </tr>
           <tr>
-            <td className="info-label"><strong>Country of Operation:</strong></td>
-            <td className="info-value">{data.countryOfOperation || '-'}</td>
-            <td className="info-label"><strong>Symbol:</strong></td>
-            <td className="info-value">{data.symbolStr || '-'}</td>
+            <td className="info-label">
+              <strong>Country of Operation:</strong>
+            </td>
+            <td className="info-value">{data.countryOfOperation || "-"}</td>
+            <td className="info-label">
+              <strong>Symbol:</strong>
+            </td>
+            <td className="info-value">{data.symbolStr || "-"}</td>
           </tr>
         </tbody>
       </table>
 
       {/* 间隔 30px */}
-      <div style={{ height: '30px' }} />
+      <div style={{ height: "30px" }} />
 
       {/* KOLA Configuration 左对齐 */}
 
@@ -132,7 +171,7 @@ const VehicleSpecification: React.FC = () => {
         <div className="vs-symbol-list">
           {data.kolaList.map((kola, idx) => (
             <div key={idx} className="vs-symbol-item">
-              <Tooltip title={kola.description} placement="bottom" >
+              <Tooltip title={kola.description} placement="bottom">
                 <span className="td-symbol">{kola.symbol}</span>
               </Tooltip>
             </div>
@@ -143,12 +182,13 @@ const VehicleSpecification: React.FC = () => {
       )}
 
       {/* 画面底部：S-Note NO */}
-      <div style={{ height: '30px'}}/>
+      <div style={{ height: "30px" }} />
       <div className="vs-footer">
         <strong>S-Note NO: </strong>
-        <span className="vs-link-text" onClick={() => {}}>{data.customerAdap || '-'}</span>
+        <span className="vs-link-text" onClick={() => {}}>
+          {data.customerAdap || "-"}
+        </span>
       </div>
-
     </div>
   );
 };

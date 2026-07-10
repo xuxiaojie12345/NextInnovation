@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './GenerateDocumentResult.css';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./GenerateDocumentResult.css";
 
 interface GenerateDocData {
   ordernumber: string;
@@ -27,52 +27,56 @@ interface GenerateDocData {
 const GenerateDocumentResult: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { serie: string; chnr: string; doctype: string } | null;
+  const state = location.state as {
+    serie: string;
+    chnr: string;
+    doctype: string;
+  } | null;
 
   const [data, setData] = useState<GenerateDocData | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // 统一常量集合
   const STATIC_CONFIG = {
-    defaultMasterArea: '-EU',
-    systemEdition: '4.2.1',
-    templateFile: 'eU/VIN PLATE_UD TRUCKS TSA INDO PHIL.rtf',
-    createPageRoute: '/menu/generate-doc',
-    specPageUrl: '/menu/vehicle-specification',
-    editDocUrl: '/menu/modify-document',
+    defaultMasterArea: "-EU",
+    systemEdition: "4.2.1",
+    templateFile: "eU/VIN PLATE_UD TRUCKS TSA INDO PHIL.rtf",
+    createPageRoute: "/menu/generate-doc",
+    specPageUrl: "/menu/vehicle-specification",
+    editDocUrl: "/menu/modify-document",
   };
-  
+
   useEffect(() => {
     // 参数校验
     if (!state) {
-      setErrorMessage('Invalid chassis information.');
+      setErrorMessage("Invalid chassis information.");
       setIsLoading(false);
       return;
     }
     const chassisSeries = state.serie?.trim();
     const chassisNumber = state.chnr?.trim();
     if (!chassisSeries || !chassisNumber) {
-      setErrorMessage('Invalid chassis information.');
+      setErrorMessage("Invalid chassis information.");
       setIsLoading(false);
       return;
     }
 
     const fetchData = async () => {
-      setErrorMessage('');
+      setErrorMessage("");
       setIsLoading(true);
       try {
-        const res = await api.post<GenerateDocData>('/generatedocument', {
+        const res = await api.post<GenerateDocData>("/generatedocument", {
           serie: state.serie,
           chnr: state.chnr,
         });
 
         if (res.code === 200 && res.data) {
           setData(res.data);
-        } 
-      } catch (err){
-        console.error('Failed to fetch document data', err);
-        setErrorMessage('System error. Please contact administrator.');
+        }
+      } catch (err) {
+        console.error("Failed to fetch document data", err);
+        setErrorMessage("System error. Please contact administrator.");
       } finally {
         setIsLoading(false);
       }
@@ -84,11 +88,11 @@ const GenerateDocumentResult: React.FC = () => {
   const formatDateTime = () => {
     const now = new Date();
     const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    const h = String(now.getHours()).padStart(2, '0');
-    const min = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const h = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
     return `${y}-${m}-${d} ${h}:${min}:${s}`;
   };
 
@@ -100,15 +104,18 @@ const GenerateDocumentResult: React.FC = () => {
     return (
       <div className="gen-doc-result-container">
         <div className="gen-doc-result-error">{errorMessage}</div>
-        <button className="btn btn-secondary" onClick={() => navigate(STATIC_CONFIG.createPageRoute)}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate(STATIC_CONFIG.createPageRoute)}
+        >
           Back
         </button>
       </div>
     );
   }
 
-  let serie = '';
-  let chnr = '';
+  let serie = "";
+  let chnr = "";
   if (state) {
     serie = state.serie.trim();
     chnr = state.chnr.trim();
@@ -128,8 +135,8 @@ const GenerateDocumentResult: React.FC = () => {
       state: {
         serie,
         chnr,
-        market: data?.market ?? '',
-        userId: localStorage.getItem('userId'),
+        market: data?.market ?? "",
+        userId: localStorage.getItem("userId"),
       },
     });
   };
@@ -141,37 +148,39 @@ const GenerateDocumentResult: React.FC = () => {
       {/* 信息列表 */}
       <div className="info-list">
         <div className="info-row">
-          <span className="info-label"><strong>Chassis no</strong></span>
+          <span className="info-label">
+            <strong>Chassis no</strong>
+          </span>
           <span className="info-value">
             <strong>{serie} </strong>
             <span className="link-chassis" onClick={handleChassisNoClick}>
-              {chnr ?? '-'}
+              {chnr ?? "-"}
             </span>
           </span>
         </div>
         <div className="info-row">
           <span className="info-label">Ordernumber</span>
-          <span className="info-value">{data?.ordernumber ?? '-'}</span>
+          <span className="info-value">{data?.ordernumber ?? "-"}</span>
         </div>
-        <div className="info-row" style={{ marginTop: '10px' }}>
+        <div className="info-row" style={{ marginTop: "10px" }}>
           <span className="info-label">Build week</span>
-          <span className="info-value">{data?.buildWeek ?? '-'}</span>
+          <span className="info-value">{data?.buildWeek ?? "-"}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Spec week</span>
-          <span className="info-value">{data?.specWeek ?? '-'}</span>
+          <span className="info-value">{data?.specWeek ?? "-"}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Market</span>
-          <span className="info-value">{data?.market ?? '-'}</span>
+          <span className="info-value">{data?.market ?? "-"}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Master Market</span>
           <span className="info-value">{STATIC_CONFIG.defaultMasterArea}</span>
         </div>
-        <div className="info-row" style={{ marginTop: '30px' }}>
+        <div className="info-row" style={{ marginTop: "30px" }}>
           <span className="info-label">S-Note NO</span>
-          <span className="info-value">{data?.noteNo ?? '-'}</span>
+          <span className="info-value">{data?.noteNo ?? "-"}</span>
         </div>
         {data?.noteNo && (
           <div className="s-note-message">
@@ -179,29 +188,43 @@ const GenerateDocumentResult: React.FC = () => {
           </div>
         )}
 
-        <div className="info-row" style={{ marginTop: '20px' }}>
+        <div className="info-row" style={{ marginTop: "20px" }}>
           <span className="info-label">Front load index</span>
-          <span className="info-value">FTLI-{data?.frontLoadIndex ?? data?.loadIndex ?? '-'}</span>
+          <span className="info-value">
+            FTLI-{data?.frontLoadIndex ?? data?.loadIndex ?? "-"}
+          </span>
         </div>
         <div className="info-row">
           <span className="info-label">Front speed index</span>
-          <span className="info-value">FTSI-{data?.frontSpeedIndex ?? '-'}</span>
+          <span className="info-value">
+            FTSI-{data?.frontSpeedIndex ?? "-"}
+          </span>
         </div>
         <div className="info-row">
           <span className="info-label">Drive load index</span>
-          <span className="info-value">DTLI-{data?.driveLoadIndex ?? data?.loadIndex ?? '-'}</span>
+          <span className="info-value">
+            DTLI-{data?.driveLoadIndex ?? data?.loadIndex ?? "-"}
+          </span>
         </div>
         <div className="info-row">
           <span className="info-label">Drive speed index</span>
-          <span className="info-value">DTSI-{data?.driveSpeedIndex ?? '-'}</span>
-        </div>       
+          <span className="info-value">
+            DTSI-{data?.driveSpeedIndex ?? "-"}
+          </span>
+        </div>
       </div>
 
       {/* 文档信息 */}
       <div className="doc-section">
-        <div className="info-row" style={{ marginTop: '25px',marginBottom: '10px' }}>
+        <div
+          className="info-row"
+          style={{ marginTop: "25px", marginBottom: "10px" }}
+        >
           <span className="info-value">
-            <span className="link-like" onClick={() => alert('Analyze Rules clicked')}>
+            <span
+              className="link-like"
+              onClick={() => alert("Analyze Rules clicked")}
+            >
               Analyze Rules
             </span>
           </span>
@@ -209,8 +232,16 @@ const GenerateDocumentResult: React.FC = () => {
 
         {data?.modifyDocLink && (
           <div className="info-row">
-            <span className="info-value modify-warning link-like" style={{ textDecorationColor: 'red', color: 'red', marginBottom: '10px', cursor: 'pointer' }}
-             onClick={handleModifyDocClick}>
+            <span
+              className="info-value modify-warning link-like"
+              style={{
+                textDecorationColor: "red",
+                color: "red",
+                marginBottom: "10px",
+                cursor: "pointer",
+              }}
+              onClick={handleModifyDocClick}
+            >
               After def change detected. Document need to be modified.
             </span>
           </div>
@@ -228,18 +259,24 @@ const GenerateDocumentResult: React.FC = () => {
         <div className="info-row">
           <span className="info-label">AD Change. Modifying</span>
           <span className="info-value">
-            {data?.replacingParameters?.variable || '-'}
+            {data?.replacingParameters?.variable || "-"}
           </span>
         </div>
 
-        <div className="info-row" style={{ marginTop: '30px',marginBottom: '30px' }}>
+        <div
+          className="info-row"
+          style={{ marginTop: "30px", marginBottom: "30px" }}
+        >
           <span className="info-value">
-            <span className="link-like" style={{ textDecorationColor: '#000d72', color: '#000d72'}} onClick={() => alert('Generated document clicked')}>
+            <span
+              className="link-like"
+              style={{ textDecorationColor: "#000d72", color: "#000d72" }}
+              onClick={() => alert("Generated document clicked")}
+            >
               <strong>Generated document</strong>
             </span>
           </span>
         </div>
-
 
         {data?.informationParameter && (
           <div className="info-row">
@@ -252,12 +289,14 @@ const GenerateDocumentResult: React.FC = () => {
         {data?.errors && data.errors.length > 0 && (
           <div className="error-log">
             {data.errors.map((err, idx) => (
-              <div key={idx} className="error-log-line">{err}</div>
+              <div key={idx} className="error-log-line">
+                {err}
+              </div>
             ))}
           </div>
         )}
 
-        <div className="info-row" style={{ marginTop: '50px' }}>
+        <div className="info-row" style={{ marginTop: "50px" }}>
           <span className="info-label">Date</span>
           <span className="info-value">{formatDateTime()}</span>
         </div>
@@ -267,7 +306,6 @@ const GenerateDocumentResult: React.FC = () => {
           <span className="info-value">{STATIC_CONFIG.systemEdition}</span>
         </div>
       </div>
-
     </div>
   );
 };

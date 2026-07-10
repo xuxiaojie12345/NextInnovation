@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './VinPlate.css';
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./VinPlate.css";
 
 interface VinPlateInfo {
   type: string;
@@ -25,7 +25,7 @@ interface VpDataItem {
 
 const VinPlate: React.FC = () => {
   // ── 表单状态 ──
-  const [chassisNumber, setChassisNumber] = useState('');
+  const [chassisNumber, setChassisNumber] = useState("");
 
   // ── 显示数据状态 ──
   const [vinPlateInfo, setVinPlateInfo] = useState<VinPlateInfo | null>(null);
@@ -33,14 +33,14 @@ const VinPlate: React.FC = () => {
   const [vpData, setVpData] = useState<VpDataItem[]>([]);
 
   // ── UI 状态 ──
-  const [message, setMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   const clearMessages = () => {
-    setMessage('');
-    setSuccessMessage('');
+    setMessage("");
+    setSuccessMessage("");
   };
 
   // ── 解析 Chassis number 为 serie 和 chnr ──
@@ -48,14 +48,14 @@ const VinPlate: React.FC = () => {
     const trimmed = value.trim();
     const parts = trimmed.split(/\s+/);
     if (parts.length >= 2) {
-      return { serie: parts[0], chnr: parts.slice(1).join(' ') };
+      return { serie: parts[0], chnr: parts.slice(1).join(" ") };
     }
     // If only one part, try splitting by dash
-    const dashParts = trimmed.split('-');
+    const dashParts = trimmed.split("-");
     if (dashParts.length >= 2) {
-      return { serie: dashParts[0], chnr: dashParts.slice(1).join('-') };
+      return { serie: dashParts[0], chnr: dashParts.slice(1).join("-") };
     }
-    return { serie: trimmed, chnr: '' };
+    return { serie: trimmed, chnr: "" };
   };
 
   // ── 解析 XML_DOC（JSON / XML 両対応） ──
@@ -68,21 +68,21 @@ const VinPlate: React.FC = () => {
       const json = JSON.parse(rawStr);
 
       // Parse "Print items" array
-      if (json['Print items'] && Array.isArray(json['Print items'])) {
-        json['Print items'].forEach((pi: any) => {
+      if (json["Print items"] && Array.isArray(json["Print items"])) {
+        json["Print items"].forEach((pi: any) => {
           items.push({
-            name: pi.PrintItemName || '',
-            value: pi.value || '',
+            name: pi.PrintItemName || "",
+            value: pi.value || "",
           });
         });
       }
 
       // Parse "VP Data" object
-      if (json['VP Data']) {
-        Object.entries(json['VP Data']).forEach(([key, val]) => {
+      if (json["VP Data"]) {
+        Object.entries(json["VP Data"]).forEach(([key, val]) => {
           vpDataItems.push({
             variantName: key,
-            value: String(val ?? ''),
+            value: String(val ?? ""),
           });
         });
       }
@@ -90,27 +90,27 @@ const VinPlate: React.FC = () => {
       // Fallback: try XML parse
       try {
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(rawStr, 'text/xml');
+        const xmlDoc = parser.parseFromString(rawStr, "text/xml");
 
-        const printItemElements = xmlDoc.getElementsByTagName('PrintItemName');
+        const printItemElements = xmlDoc.getElementsByTagName("PrintItemName");
         for (let i = 0; i < printItemElements.length; i++) {
           const el = printItemElements[i];
           items.push({
-            name: el.textContent || '',
-            value: el.getAttribute('value') || '',
+            name: el.textContent || "",
+            value: el.getAttribute("value") || "",
           });
         }
 
-        const variantElements = xmlDoc.getElementsByTagName('Variant');
+        const variantElements = xmlDoc.getElementsByTagName("Variant");
         for (let i = 0; i < variantElements.length; i++) {
           const el = variantElements[i];
           vpDataItems.push({
-            variantName: el.getAttribute('name') || '',
-            value: el.textContent || '',
+            variantName: el.getAttribute("name") || "",
+            value: el.textContent || "",
           });
         }
       } catch {
-        items.push({ name: 'Raw Data', value: rawStr });
+        items.push({ name: "Raw Data", value: rawStr });
       }
     }
 
@@ -123,7 +123,7 @@ const VinPlate: React.FC = () => {
     clearMessages();
 
     if (!chassisNumber.trim()) {
-      setMessage('Chassis number is required.');
+      setMessage("Chassis number is required.");
       return;
     }
 
@@ -136,7 +136,7 @@ const VinPlate: React.FC = () => {
     setVpData([]);
 
     try {
-      const res = await api.post<VinPlateInfo>('/ud15/viewInfo', {
+      const res = await api.post<VinPlateInfo>("/ud15/viewInfo", {
         serie,
         chnr,
       });
@@ -148,12 +148,12 @@ const VinPlate: React.FC = () => {
           parseXmlDoc(res.data.xmlDoc);
         }
       } else if (res.code === 500) {
-        setMessage('System error. Please contact administrator.');
+        setMessage("System error. Please contact administrator.");
       } else {
         setMessage(`Chassis number ${chassisNumber.trim()} not found.`);
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -164,12 +164,12 @@ const VinPlate: React.FC = () => {
     clearMessages();
 
     if (!chassisNumber.trim()) {
-      setMessage('Chassis number is required.');
+      setMessage("Chassis number is required.");
       return;
     }
 
     const { serie, chnr } = parseChassis(chassisNumber);
-    const currentUser = localStorage.getItem('userId') || '';
+    const currentUser = localStorage.getItem("userId") || "";
 
     setIsLoading(true);
     try {
@@ -180,19 +180,26 @@ const VinPlate: React.FC = () => {
         // Refresh info after action
         await handleViewInfo();
       } else {
-        setMessage(res.message || 'Operation failed.');
+        setMessage(res.message || "Operation failed.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSetRegenerate = () => executeAction('/ud15/setRegenerate', 'Status updated to regenerate.');
-  const handleSetOk = () => executeAction('/ud15/setOK', 'Status updated to OK.');
-  const handleChangeToBasic = () => executeAction('/ud15/changeToBasicInfo', 'Type changed to Basic Info.');
-  const handleChangeToAdvanced = () => executeAction('/ud15/changeToAdvancedInfo', 'Type changed to Advanced Info.');
+  const handleSetRegenerate = () =>
+    executeAction("/ud15/setRegenerate", "Status updated to regenerate.");
+  const handleSetOk = () =>
+    executeAction("/ud15/setOK", "Status updated to OK.");
+  const handleChangeToBasic = () =>
+    executeAction("/ud15/changeToBasicInfo", "Type changed to Basic Info.");
+  const handleChangeToAdvanced = () =>
+    executeAction(
+      "/ud15/changeToAdvancedInfo",
+      "Type changed to Advanced Info.",
+    );
 
   return (
     <div className="vp-container">
@@ -219,11 +226,33 @@ const VinPlate: React.FC = () => {
         </div>
 
         <div className="vp-btn-row">
-          <button className="btn" onClick={handleViewInfo} disabled={isLoading}>View Info</button>
-          <button className="btn" onClick={handleSetRegenerate} disabled={isLoading}>Set Regenerate</button>
-          <button className="btn" onClick={handleSetOk} disabled={isLoading}>Set OK</button>
-          <button className="btn" onClick={handleChangeToBasic} disabled={isLoading}>Change to Basic Info</button>
-          <button className="btn" onClick={handleChangeToAdvanced} disabled={isLoading}>Change to Advanced Info</button>
+          <button className="btn" onClick={handleViewInfo} disabled={isLoading}>
+            View Info
+          </button>
+          <button
+            className="btn"
+            onClick={handleSetRegenerate}
+            disabled={isLoading}
+          >
+            Set Regenerate
+          </button>
+          <button className="btn" onClick={handleSetOk} disabled={isLoading}>
+            Set OK
+          </button>
+          <button
+            className="btn"
+            onClick={handleChangeToBasic}
+            disabled={isLoading}
+          >
+            Change to Basic Info
+          </button>
+          <button
+            className="btn"
+            onClick={handleChangeToAdvanced}
+            disabled={isLoading}
+          >
+            Change to Advanced Info
+          </button>
         </div>
       </div>
 
@@ -238,27 +267,41 @@ const VinPlate: React.FC = () => {
               </tr>
               <tr>
                 <td className="vp-info-label">Plate type</td>
-                <td className="vp-info-value">{vinPlateInfo.type != null ? String(vinPlateInfo.type) : '-'}</td>
+                <td className="vp-info-value">
+                  {vinPlateInfo.type != null ? String(vinPlateInfo.type) : "-"}
+                </td>
               </tr>
               <tr>
                 <td className="vp-info-label">Status</td>
-                <td className="vp-info-value">{vinPlateInfo.status != null ? String(vinPlateInfo.status) : '-'}</td>
+                <td className="vp-info-value">
+                  {vinPlateInfo.status != null
+                    ? String(vinPlateInfo.status)
+                    : "-"}
+                </td>
               </tr>
               <tr>
                 <td className="vp-info-label">Error Message</td>
-                <td className="vp-info-value">{vinPlateInfo.msg || '-'}</td>
+                <td className="vp-info-value">{vinPlateInfo.msg || "-"}</td>
               </tr>
               <tr>
                 <td className="vp-info-label">Def.</td>
-                <td className="vp-info-value">{vinPlateInfo.registerDatetime || '-'}</td>
+                <td className="vp-info-value">
+                  {vinPlateInfo.registerDatetime
+                    ? vinPlateInfo.registerDatetime
+                        .replace("T", " ")
+                        .substring(0, 16)
+                    : "-"}
+                </td>
               </tr>
               <tr>
                 <td className="vp-info-label">Data ready</td>
-                <td className="vp-info-value">{vinPlateInfo.docReady || '-'}</td>
+                <td className="vp-info-value">
+                  {vinPlateInfo.docReady || "-"}
+                </td>
               </tr>
               <tr>
                 <td className="vp-info-label">Sent to CAB factory</td>
-                <td className="vp-info-value">{vinPlateInfo.docSent || '-'}</td>
+                <td className="vp-info-value">{vinPlateInfo.docSent || "-"}</td>
               </tr>
             </tbody>
           </table>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import './Menu.css';
+import React from "react";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import "./Menu.css";
 
 interface MenuItem {
   label: string;
@@ -14,53 +14,56 @@ interface MenuCategory {
 
 const MENU_CATEGORIES: MenuCategory[] = [
   {
-    groupHeader: 'Generate',
+    groupHeader: "Generate",
     linkList: [
-      { label: 'Generate Doc', path: '/menu/generate-doc' },
-      { label: 'Generate in Batch' },
-      { label: 'Regdata Archive' },
-      { label: 'Regdata Batch' },
+      { label: "Generate Doc", path: "/menu/generate-doc" },
+      { label: "Generate in Batch" },
+      { label: "Regdata Archive" },
+      { label: "Regdata Batch" },
     ],
   },
   {
-    groupHeader: 'Admin',
+    groupHeader: "Admin",
     linkList: [
-      { label: 'Update user defined variables (rules)', path: '/menu/homologation-variables' },
-      { label: 'Update user defined variables (UNICODE rules)' },
-      { label: 'Existing HDoc variables', path: '/menu/existing-hdoc-vars' },
-      { label: 'Unlock Document' },
-      { label: 'HDoc Number Series' },
-      { label: 'Upload/Delete template', path: '/menu/upload-delete-template' },
-      { label: 'List available templates', path: '/menu/list-templates' },
-      { label: 'VPPS Vin plate', path: '/menu/vin-plate' },
-      { label: 'AD/CA Change', path: '/menu/ad-ca-change' },
+      {
+        label: "Update user defined variables (rules)",
+        path: "/menu/homologation-variables",
+      },
+      { label: "Update user defined variables (UNICODE rules)" },
+      { label: "Existing HDoc variables", path: "/menu/existing-hdoc-vars" },
+      { label: "Unlock Document" },
+      { label: "HDoc Number Series" },
+      { label: "Upload/Delete template", path: "/menu/upload-delete-template" },
+      { label: "List available templates", path: "/menu/list-templates" },
+      { label: "VPPS Vin plate", path: "/menu/vin-plate" },
+      { label: "AD/CA Change", path: "/menu/ad-ca-change" },
     ],
   },
   {
-    groupHeader: 'User Administration',
+    groupHeader: "User Administration",
     linkList: [
-      { label: 'HDoc User Administration', path: '/menu/hdoc-user-admin' },
-      { label: 'HDoc User Doc Administration', path: '/menu/hdoc-user-doc-admin' },
-      { label: 'Search User', path: '/menu/search-user' },
-      { label: 'Change Password' },
-      { label: 'User Position' },
+      { label: "HDoc User Administration", path: "/menu/hdoc-user-admin" },
+      {
+        label: "HDoc User Doc Administration",
+        path: "/menu/hdoc-user-doc-admin",
+      },
+      { label: "Search User", path: "/menu/search-user" },
+      { label: "Change Password" },
+      { label: "User Position" },
     ],
   },
   {
-    groupHeader: 'Archive',
-    linkList: [
-      { label: 'Search' },
-      { label: 'Upload Document' },
-    ],
+    groupHeader: "Archive",
+    linkList: [{ label: "Search" }, { label: "Upload Document" }],
   },
   {
-    groupHeader: 'Documentation',
+    groupHeader: "Documentation",
     linkList: [
-      { label: 'User Guide', path: '/menu/guide-user' },
-      { label: 'AD/CA Change Guide' },
-      { label: 'Vin plate Guide FM/FH' },
-      { label: 'Archive Guide' },
-      { label: 'Privacy' },
+      { label: "User Guide", path: "/menu/guide-user" },
+      { label: "AD/CA Change Guide" },
+      { label: "Vin plate Guide FM/FH" },
+      { label: "Archive Guide" },
+      { label: "Privacy" },
     ],
   },
 ];
@@ -70,23 +73,23 @@ const Menu: React.FC = () => {
 
   // 获取当前用户名
   const location = useLocation();
-  const usernameVal = localStorage.getItem('username');
-  const userIdVal = localStorage.getItem('userId');
+  const usernameVal = localStorage.getItem("username");
+  const userIdVal = localStorage.getItem("userId");
   let username = "";
-  if(usernameVal && usernameVal.trim()){
+  if (usernameVal && usernameVal.trim()) {
     username = usernameVal;
-  } else if(userIdVal && userIdVal.trim()){
+  } else if (userIdVal && userIdVal.trim()) {
     username = userIdVal;
-  }else{
-    username = 'User';
+  } else {
+    username = "User";
   }
-  
+
   // 退出登录
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    navigate('/login', { replace: true });
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    navigate("/login", { replace: true });
   };
 
   // link压下
@@ -97,7 +100,7 @@ const Menu: React.FC = () => {
   };
 
   // 当前路径是否为菜单根路径（无子路由选中）
-  const isRootMenu = location.pathname === '/menu';
+  const isRootMenu = location.pathname === "/menu";
 
   return (
     <div className="menu-root">
@@ -114,11 +117,11 @@ const Menu: React.FC = () => {
               {menu.linkList.map((linkItem) => (
                 <div
                   key={linkItem.label}
-                  className={`menu-item${location.pathname === linkItem.path ? ' active' : ''}${!linkItem.path ? ' disabled' : ''}`}
+                  className={`menu-item${location.pathname === linkItem.path ? " active" : ""}${!linkItem.path ? " disabled" : ""}`}
                   onClick={() => handleLinkItemClick(linkItem)}
                 >
-                 <span className="menu-arrow">»</span>
-                 {linkItem.label}
+                  <span className="menu-arrow">»</span>
+                  {linkItem.label}
                 </div>
               ))}
             </div>
@@ -130,8 +133,11 @@ const Menu: React.FC = () => {
       <main className="menu-main">
         {isRootMenu ? (
           <>
-            <h2 style={{ marginTop: '40px', textAlign: 'left', color: '#1c2771' }}>
-              Welcome to the HDoc system. Please select an option from the menu on the left.
+            <h2
+              style={{ marginTop: "40px", textAlign: "left", color: "#1c2771" }}
+            >
+              Welcome to the HDoc system. Please select an option from the menu
+              on the left.
             </h2>
           </>
         ) : (
@@ -144,7 +150,9 @@ const Menu: React.FC = () => {
           <span className="user-icon">👤</span>
           <span className="user-name">{username}</span>
         </div>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </div>
   );

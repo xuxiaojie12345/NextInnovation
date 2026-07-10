@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import '../common/css/common.css';
-import './UploadDeleteTemplate.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import "../common/css/common.css";
+import "./UploadDeleteTemplate.css";
 
 interface TemplateFile {
   filename: string;
@@ -15,29 +15,32 @@ const UploadDeleteTemplate: React.FC = () => {
 
   // ── Upload 区域状态 ──
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadMarket, setUploadMarket] = useState('');
+  const [uploadMarket, setUploadMarket] = useState("");
 
   // ── Delete 区域状态 ──
-  const [deleteMarket, setDeleteMarket] = useState('');
+  const [deleteMarket, setDeleteMarket] = useState("");
   const [templates, setTemplates] = useState<TemplateFile[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState("");
 
   // ── 共用状态 ──
   const [markets, setMarkets] = useState<string[]>([]);
-  const [message, setMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // ── 加载 Market 下拉数据 ──
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.post<{ marketList: string[] }>('/template/selectMarket', {});
+        const res = await api.post<{ marketList: string[] }>(
+          "/template/selectMarket",
+          {},
+        );
         if (res.code === 200 && res.data) {
           setMarkets(res.data.marketList || []);
         }
       } catch {
-        setMessage('System error. Please contact administrator.');
+        setMessage("System error. Please contact administrator.");
       }
     })();
   }, []);
@@ -46,18 +49,21 @@ const UploadDeleteTemplate: React.FC = () => {
   useEffect(() => {
     if (!deleteMarket) {
       setTemplates([]);
-      setSelectedTemplate('');
+      setSelectedTemplate("");
       return;
     }
     (async () => {
       try {
-        const res = await api.post<{ templateList: TemplateFile[] }>('/template/listTemplates', {
-          market: deleteMarket,
-        });
+        const res = await api.post<{ templateList: TemplateFile[] }>(
+          "/template/listTemplates",
+          {
+            market: deleteMarket,
+          },
+        );
         if (res.code === 200 && res.data) {
           setTemplates(res.data.templateList || []);
         }
-        setSelectedTemplate('');
+        setSelectedTemplate("");
       } catch {
         setTemplates([]);
       }
@@ -65,7 +71,10 @@ const UploadDeleteTemplate: React.FC = () => {
   }, [deleteMarket]);
 
   // ── 消息 ──
-  const clearMessages = () => { setMessage(''); setSuccessMessage(''); };
+  const clearMessages = () => {
+    setMessage("");
+    setSuccessMessage("");
+  };
 
   // ── 文件选择 ──
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,40 +86,44 @@ const UploadDeleteTemplate: React.FC = () => {
     clearMessages();
 
     if (!selectedFile) {
-      setMessage('NO FILE UPLOADED');
+      setMessage("NO FILE UPLOADED");
       return;
     }
     if (!uploadMarket) {
-      setMessage('NO Market UPLOADED');
+      setMessage("NO Market UPLOADED");
       return;
     }
 
     // 文件大小校验（10MB）
     const maxSize = 10 * 1024 * 1024;
     if (selectedFile.size > maxSize) {
-      setMessage('File size exceeds 10MB limit. Please select a smaller file.');
+      setMessage("File size exceeds 10MB limit. Please select a smaller file.");
       return;
     }
 
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('market', uploadMarket);
+      formData.append("file", selectedFile);
+      formData.append("market", uploadMarket);
 
-      const res = await api.uploadFile('/template/upload', formData);
+      const res = await api.uploadFile("/template/upload", formData);
       if (res.code === 200) {
         const fileName = selectedFile.name;
-        setSuccessMessage(`TEMPLATE ${fileName} WAS SUCCESSFULLY UPLOADED TO MARKET ${uploadMarket}`);
+        setSuccessMessage(
+          `TEMPLATE ${fileName} WAS SUCCESSFULLY UPLOADED TO MARKET ${uploadMarket}`,
+        );
         setSelectedFile(null);
         // 重置文件输入框
-        const fileInput = document.getElementById('templateFile') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
+        const fileInput = document.getElementById(
+          "templateFile",
+        ) as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
       } else {
-        setMessage(res.message || 'File upload failed. Please try again.');
+        setMessage(res.message || "File upload failed. Please try again.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -121,35 +134,40 @@ const UploadDeleteTemplate: React.FC = () => {
     clearMessages();
 
     if (!deleteMarket || !selectedTemplate) {
-      setMessage('Please select both market and template.');
+      setMessage("Please select both market and template.");
       return;
     }
 
-    if (!window.confirm('Do you really want to delete template?')) {
+    if (!window.confirm("Do you really want to delete template?")) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await api.post('/template/delete', {
+      const res = await api.post("/template/delete", {
         fileName: selectedTemplate,
         market: deleteMarket,
       });
       if (res.code === 200) {
-        setSuccessMessage(`TEMPLATE ${selectedTemplate} WAS SUCCESSFULLY DELETED FROM MARKET ${deleteMarket}`);
-        setSelectedTemplate('');
+        setSuccessMessage(
+          `TEMPLATE ${selectedTemplate} WAS SUCCESSFULLY DELETED FROM MARKET ${deleteMarket}`,
+        );
+        setSelectedTemplate("");
         // 刷新模板列表
-        const listRes = await api.post<{ templateList: TemplateFile[] }>('/template/listTemplates', {
-          market: deleteMarket,
-        });
+        const listRes = await api.post<{ templateList: TemplateFile[] }>(
+          "/template/listTemplates",
+          {
+            market: deleteMarket,
+          },
+        );
         if (listRes.code === 200 && listRes.data) {
           setTemplates(listRes.data.templateList || []);
         }
       } else {
-        setMessage(res.message || 'File deletion failed. Please try again.');
+        setMessage(res.message || "File deletion failed. Please try again.");
       }
     } catch {
-      setMessage('System error. Please contact administrator.');
+      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }
@@ -157,12 +175,11 @@ const UploadDeleteTemplate: React.FC = () => {
 
   // ── 跳转到 HDoc Template Check 页面 ──
   const handleCheckTemplate = () => {
-    navigate('/menu/hdoc-template-check');
+    navigate("/menu/hdoc-template-check");
   };
 
   return (
     <div className="udt-container">
-      
       {message && <div className="udt-error">{message}</div>}
       {successMessage && <div className="udt-success">{successMessage}</div>}
 
@@ -193,14 +210,20 @@ const UploadDeleteTemplate: React.FC = () => {
                 >
                   <option value=""></option>
                   {markets.map((m) => (
-                    <option key={m} value={m}>{m}</option>
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
                   ))}
                 </select>
               </td>
             </tr>
             <tr className="udt-btn-row">
               <td className="udt-value">
-                <button className="btn" onClick={handleUpload} disabled={isLoading}>
+                <button
+                  className="btn"
+                  onClick={handleUpload}
+                  disabled={isLoading}
+                >
                   Upload file
                 </button>
               </td>
@@ -216,7 +239,7 @@ const UploadDeleteTemplate: React.FC = () => {
         to make sure that the connection to the cab factory will work.
       </div>
 
-      <div style={{ height: '60px' }}></div>
+      <div style={{ height: "60px" }}></div>
 
       {/* ═══════ Delete 区域 ═══════ */}
       <div className="udt-section">
@@ -234,7 +257,9 @@ const UploadDeleteTemplate: React.FC = () => {
                 >
                   <option value=""></option>
                   {markets.map((m) => (
-                    <option key={m} value={m}>{m}</option>
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
                   ))}
                 </select>
               </td>
@@ -247,15 +272,22 @@ const UploadDeleteTemplate: React.FC = () => {
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
                 >
+                  <option value=""></option>
                   {templates.map((t) => (
-                    <option key={t.filename} value={t.filename}>{t.filename}</option>
+                    <option key={t.filename} value={t.filename}>
+                      {t.filename}
+                    </option>
                   ))}
                 </select>
               </td>
             </tr>
             <tr className="udt-btn-row">
               <td className="udt-value">
-                <button className="btn" onClick={handleDelete} disabled={isLoading}>
+                <button
+                  className="btn"
+                  onClick={handleDelete}
+                  disabled={isLoading}
+                >
                   Delete
                 </button>
               </td>
@@ -269,9 +301,11 @@ const UploadDeleteTemplate: React.FC = () => {
       <div className="udt-check-info">
         <p>Check your rtf template</p>
         <p>
-          In case you have a rtf template you should run a check on it before uploading it.
+          In case you have a rtf template you should run a check on it before
+          uploading it.
           <br />
-          After check download the template to your desktop and then upload it to your template directory.
+          After check download the template to your desktop and then upload it
+          to your template directory.
           <br />
           Use the link bellow.
         </p>
