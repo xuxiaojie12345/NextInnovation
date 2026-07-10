@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Menu from "../UD02Menu/Menu";
+import Menu from "../UD02Menu/UD02Menu";
 import "./Layout.css";
 
 const Layout: React.FC = () => {

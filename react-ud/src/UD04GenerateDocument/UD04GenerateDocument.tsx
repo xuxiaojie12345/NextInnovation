@@ -1,7 +1,7 @@
 // GenerateDocument.tsx - UD04模块
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./GenerateDocument.css";
+import "./UD04GenerateDocument.css";
 
 interface DocumentData {
   serie: string; // Chassis series

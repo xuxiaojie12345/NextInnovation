@@ -1,7 +1,7 @@
 // src/components/NavigationMenu/NavigationMenu.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Menu.css";
+import "./UD02Menu.css";
 
 const Menu: React.FC = () => {
   const navigate = useNavigate();

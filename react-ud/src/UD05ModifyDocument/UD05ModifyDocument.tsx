@@ -1,7 +1,7 @@
 // ModifyDocument.tsx - UD05模块
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "./ModifyDocument.css";
+import "./UD05ModifyDocument.css";
 
 interface VariableData {
   variable: string;

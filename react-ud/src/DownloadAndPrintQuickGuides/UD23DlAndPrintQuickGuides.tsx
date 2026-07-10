@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./DownloadAndPrintQuickGuides.css";
+import "./UD23DlAndPrintQuickGuides.css";
 
 // 安全加载图片，不存在时返回占位图
 const getGuideImage = (filename: string): string => {
