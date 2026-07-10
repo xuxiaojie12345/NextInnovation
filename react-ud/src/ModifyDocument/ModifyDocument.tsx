@@ -24,7 +24,6 @@ const ModifyDocument: React.FC = () => {
   const serie = state?.serie || '';
   const chnr = state?.chnr || '';
   const market = state?.market || '';
-  const chassisDisplay = `${serie} ${chnr}`;
 
   useEffect(() => {
     if (!serie || !chnr) {
@@ -69,10 +68,10 @@ const ModifyDocument: React.FC = () => {
   const handleSave = async () => {
     // Collect only rows where the user actually entered a value
     const modifications = variables
-      .filter((v) => modifiedValues[v.variable]?.trim())
-      .map((v) => ({
-        variable: v.variable,
-        val: modifiedValues[v.variable],
+      .filter((va) => modifiedValues[va.variable]?.trim())
+      .map((va) => ({
+        variable: va.variable,
+        val: modifiedValues[va.variable],
       }));
 
     if (modifications.length === 0) {
@@ -101,7 +100,13 @@ const ModifyDocument: React.FC = () => {
           },
         });
       } else {
-        setErrorMessage(res.message || 'Failed to save modifications. Please try again.');
+        let msg;
+        if (res.message) {
+          msg = res.message;
+        } else {
+          msg = 'Failed to save modifications. Please try again.';
+        }
+        setErrorMessage(msg);
       }
     } catch {
       setErrorMessage('System error. Please contact administrator.');
@@ -133,7 +138,7 @@ const ModifyDocument: React.FC = () => {
           <span className="info-value">
             <strong>{serie}</strong>
             <strong
-              style={{ textDecoration: 'underline', color: '#66707b', marginLeft: 4, cursor: 'pointer' }}
+              className="modify-doc-chassis-link"
               onClick={() => navigate('/menu/vehicle-specification', { state: { serie, chnr } })}
             >{chnr}</strong>
           </span>
@@ -153,14 +158,11 @@ const ModifyDocument: React.FC = () => {
       <div className="modify-doc-error">{errorMessage}</div>
 
       {variables.length > 0 ? (
-        <>
+        <React.Fragment>
           <div className="modify-doc-save-bar">
             <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save'}
             </button>
-            {/* <button className="btn btn-secondary" onClick={handleCancel} disabled={isSaving}>
-              Cancel
-            </button> */}
           </div>
 
           <div className="modify-doc-table-wrapper">
@@ -174,17 +176,17 @@ const ModifyDocument: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {variables.map((v) => (
-                  <tr key={v.variable}>
-                    <td className="td-desc">{v.variable}</td>
-                    <td className="td-desc">{v.description}</td>
-                    <td className="td-current">{v.newVal || '-'}</td>
+                {variables.map((va) => (
+                  <tr key={va.variable}>
+                    <td className="td-desc">{va.variable}</td>
+                    <td className="td-desc">{va.description}</td>
+                    <td className="td-current">{va.newVal || '-'}</td>
                     <td className="td-modified">
                       <input
                         type="text"
                         className="modify-input"
-                        value={modifiedValues[v.variable] || ''}
-                        onChange={(e) => handleValueChange(v.variable, e.target.value)}
+                        value={modifiedValues[va.variable] || ''}
+                        onChange={(e) => handleValueChange(va.variable, e.target.value)}
                         maxLength={500}
                         disabled={isSaving}
                       />
@@ -194,7 +196,7 @@ const ModifyDocument: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </>
+        </React.Fragment>
       ) : (
         <div className="modify-doc-empty">No variables found.</div>
       )}

@@ -77,8 +77,11 @@ const GenerateHomologationDoc: React.FC = () => {
 
   const validate = (): boolean => {
     setErrorMessage('');
+    
+    // 数据类型check
     const seriesPattern = /^[a-zA-Z]{1,5}$/;
     const chassisNoPattern = /^[0-9]{1,10}$/;
+    
     if (!chassisSeries.trim()) {
       setErrorMessage('Chassis series is required.');
       return false;
@@ -199,9 +202,9 @@ const GenerateHomologationDoc: React.FC = () => {
               disabled={isLoading || isDocTypesLoading}
             >
               <option value="">-- Select Document Type --</option>
-              {documentTypes.map((dt) => (
-                <option key={dt.doctype} value={dt.doctype}>
-                  {dt.description}
+              {documentTypes.map((documentType) => (
+                <option key={documentType.doctype} value={documentType.doctype}>
+                  {documentType.description}
                 </option>
               ))}
             </select>
