@@ -404,7 +404,6 @@ def main():
                 print(f"  ❌ git fetch 失败 (exit code {result.returncode})")
                 print(f"     错误信息: {stderr_preview}")
                 print(f"\n  ⚠️  无法连接到远端仓库，请检查网络后重试。")
-                print(f"  💡 如需跳过网络检查直接分析本地已缓存的数据，可添加 --offline 参数。")
                 print(f"{'='*55}\n")
                 return
             output = result.stdout.strip()
@@ -417,14 +416,12 @@ def main():
             print(f"\n{'='*55}")
             print(f"  ❌ git fetch 超时（超过 60 秒无响应）")
             print(f"\n  ⚠️  无法连接到远端仓库（网络超时），请检查网络后重试。")
-            print(f"  💡 如需跳过网络检查直接分析本地已缓存的数据，可添加 --offline 参数。")
             print(f"{'='*55}\n")
             return
         except Exception as e:
             print(f"\n{'='*55}")
             print(f"  ❌ git fetch 发生未知错误: {e}")
             print(f"\n  ⚠️  请检查网络后重试。")
-            print(f"  💡 如需跳过网络检查直接分析本地已缓存的数据，可添加 --offline 参数。")
             print(f"{'='*55}\n")
             return
         print()

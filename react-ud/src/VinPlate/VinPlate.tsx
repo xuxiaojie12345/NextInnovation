@@ -143,12 +143,12 @@ const VinPlate: React.FC = () => {
 
       if (res.code === 200 && res.data) {
         setVinPlateInfo(res.data);
-
         // Parse XML_DOC if present
         if (res.data.xmlDoc) {
           parseXmlDoc(res.data.xmlDoc);
         }
-
+      } else if (res.code === 500) {
+        setMessage('System error. Please contact administrator.');
       } else {
         setMessage(`Chassis number ${chassisNumber.trim()} not found.`);
       }

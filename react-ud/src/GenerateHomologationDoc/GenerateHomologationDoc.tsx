@@ -52,15 +52,15 @@ const GenerateHomologationDoc: React.FC = () => {
         if (res.code === 200 && res.data) {
           if (res.data.length === 0) {
             setDocumentTypes([]);
-            setErrorMessage('Failed to load document types. Please try again.');
+            setErrorMessage('System error. Please contact administrator.');
           } else {
             setDocumentTypes(res.data);
           }
         } else {
-          setErrorMessage('Failed to load document types. Please try again.');
+          setErrorMessage('System error. Please contact administrator.');
         }
       } catch {
-        setErrorMessage('Failed to load document types. Please try again.');
+        setErrorMessage('System error. Please contact administrator.');
       } finally {
         setIsDocTypesLoading(false);
       }
@@ -172,7 +172,6 @@ const GenerateHomologationDoc: React.FC = () => {
               value={chassisSeries}
               onChange={(e) => setChassisSeries(e.target.value)}
               maxLength={5}
-              placeholder="e.g. ABCDE"
               disabled={isLoading}
             />
           </div>
@@ -186,7 +185,6 @@ const GenerateHomologationDoc: React.FC = () => {
               value={chassisNo}
               onChange={(e) => setChassisNo(e.target.value)}
               maxLength={10}
-              placeholder="e.g. 1234567890"
               disabled={isLoading}
             />
           </div>
