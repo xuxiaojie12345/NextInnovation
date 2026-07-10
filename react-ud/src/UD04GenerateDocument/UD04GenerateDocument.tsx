@@ -67,15 +67,10 @@ const GenerateDocument = () => {
       // 设置完整的底盘号到 Chassis no 字段
       setChassisNo(fullChassisNo);
 
-      console.log("Full chassis number:", fullChassisNo);
-
       // 拆分完整的底盘号为 Chassis series 和 Chassis no
       // 假设 Chassis series 是前4个字符，Chassis no 是剩余部分
       const chassisSeries = fullChassisNo.substring(0, 4);
       const chassisNoPart = fullChassisNo.substring(4);
-
-      console.log("Chassis series:", chassisSeries);
-      console.log("Chassis no part:", chassisNoPart);
 
       // 调用UD04 API（分开传递两个参数）
       const API_BASE_URL = "http://localhost:8081";
@@ -105,7 +100,6 @@ const GenerateDocument = () => {
         throw new Error(data.msg || "Failed to load document data");
       }
     } catch (error) {
-      console.error("Fetch document data error:", error);
       if (error instanceof Error) {
         if (error.message === "Chassis not found") {
           setErrorMessage("Chassis not found");
@@ -148,7 +142,6 @@ const GenerateDocument = () => {
       // 释放 blob URL
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Download error:", error);
       setErrorMessage("Document file not found");
     }
   };
@@ -161,13 +154,6 @@ const GenerateDocument = () => {
 
       // 获取market値（从UD04返回的countryOfOperation字段）
       const market = documentData.countryOfOperation || "";
-
-      console.log(
-        "Navigating to Modify Document with chassis no:",
-        fullChassisNo,
-      );
-      console.log("Market value from UD04:", market);
-
       // 传递chassisNo和market参数
       navigate(
         `/modify-document?chassisNo=${encodeURIComponent(fullChassisNo)}&market=${encodeURIComponent(market)}`,
@@ -210,10 +196,6 @@ const GenerateDocument = () => {
               onClick={(e) => {
                 e.preventDefault(); // 阻止默认行为
                 if (chassisNo && chassisNo !== "-") {
-                  console.log(
-                    "Navigating to Vehicle Specification with chassis no:",
-                    chassisNo,
-                  );
                   navigate(
                     `/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`,
                   );

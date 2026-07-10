@@ -37,9 +37,6 @@ const SaveModifications = () => {
       const chassisSerieParam = searchParams.get("chassisSerie");
       const chassisNumberParam = searchParams.get("chassisNumber");
 
-      console.log("Chassis serie:", chassisSerieParam);
-      console.log("Chassis number:", chassisNumberParam);
-
       // 前端校验：检查参数是否为空
       if (!chassisSerieParam || chassisSerieParam.trim() === "") {
         setErrorMessage("Chassis serie不能为空");
@@ -59,7 +56,6 @@ const SaveModifications = () => {
           | { savedVariables?: Array<{ variable: string; newval: string }> }
           | undefined
       )?.savedVariables;
-      console.log("Saved variables from state:", savedVars);
 
       // 使用URL参数设置基本信息
       const modificationInfo: ModificationData = {
@@ -93,16 +89,9 @@ const SaveModifications = () => {
       }
 
       const data = await response.json();
-      console.log("========== API Response Debug ==========");
-      console.log("Full response:", JSON.stringify(data, null, 2));
-      console.log("data.code:", data.code);
-      console.log("data.data:", data.data);
-      console.log("data.data.modificationList:", data.data?.modificationList);
-      console.log("========================================");
 
       if (data.code === 200 && data.data) {
         const list = data.data.modificationList || [];
-        console.log("modificationList length:", list.length);
 
         if (list.length > 0) {
           const firstRecord = list[0];
@@ -116,9 +105,6 @@ const SaveModifications = () => {
           // Storing列表：优先使用location state中的变量（从ModifyDocument画面传递过来的）
           // 这样只显示本次修改的记录，而非数据库中的所有记录
           if (savedVars && savedVars.length > 0) {
-            console.log(
-              "Using saved variables from location state for Storing",
-            );
             modificationInfo.storingList = savedVars.map(
               (v) => `${v.variable} ${v.newval}`,
             );
@@ -129,7 +115,6 @@ const SaveModifications = () => {
                 `${record.variable ?? record.VARIABLE ?? "-"} ${record.newval ?? record.NEWVAL ?? "-"}`,
             );
           }
-          console.log("Final storingList:", modificationInfo.storingList);
         } else {
           console.warn("No modification records found for this chassis");
         }
@@ -139,7 +124,6 @@ const SaveModifications = () => {
 
       setModificationData(modificationInfo);
     } catch (error) {
-      console.error("Fetch modification data error:", error);
       if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {

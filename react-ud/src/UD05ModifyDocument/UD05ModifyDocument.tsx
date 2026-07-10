@@ -32,7 +32,6 @@ const ModifyDocument = () => {
       // 如果URL中有market参数，直接使用；否则从API获取
       if (marketParam) {
         setMarket(marketParam);
-        console.log("Market value from URL:", marketParam);
       }
 
       fetchDocumentData(chassisNoParam, marketParam || "");
@@ -54,16 +53,9 @@ const ModifyDocument = () => {
       // 拆分完整的底盘号为 Chassis series 和 Chassis no
       const chassisSeries = chassisNo.substring(0, 4);
       const chassisNoPart = chassisNo.substring(4);
-
-      console.log("Full chassis number:", chassisNo);
-      console.log("Chassis series:", chassisSeries);
-      console.log("Chassis no part:", chassisNoPart);
-      console.log("Market from URL:", marketFromUrl);
-
       const API_BASE_URL = "http://localhost:8081";
 
       // 先调用UD04 API获取generatedFilePath（用于下载template）
-      console.log("Fetching document data from UD04...");
       const ud04Response = await fetch(
         `${API_BASE_URL}/api/UD04/selectGeneratedocument?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
         {
@@ -78,10 +70,6 @@ const ModifyDocument = () => {
         const ud04Data = await ud04Response.json();
         if (ud04Data.code === 200 && ud04Data.data) {
           setDocumentData(ud04Data.data);
-          console.log(
-            "UD04 data loaded, generatedFilePath:",
-            ud04Data.data.generatedFilePath,
-          );
         }
       } else {
         console.warn(
@@ -90,7 +78,6 @@ const ModifyDocument = () => {
       }
 
       // 调用UD05 API - 初期表示（只获取variables，不获取market和template）
-      console.log("Fetching variables from UD05...");
       const response = await fetch(
         `${API_BASE_URL}/api/UD05/modifyDocumentUnit?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
         {
@@ -110,7 +97,6 @@ const ModifyDocument = () => {
       }
 
       const data = await response.json();
-      console.log("UD05 API response:", data);
 
       if (data.code === 200 && data.data) {
         // 使用从URL传递过来的market值，而不是从后端获取
@@ -138,7 +124,6 @@ const ModifyDocument = () => {
         throw new Error(data.msg || "Failed to load document data");
       }
     } catch (error) {
-      console.error("Fetch document data error:", error);
       if (error instanceof Error) {
         if (error.message === "Chassis not found") {
           setErrorMessage("Chassis not found");
@@ -195,8 +180,6 @@ const ModifyDocument = () => {
           })),
       };
 
-      console.log("Save request body:", requestBody);
-
       const API_BASE_URL = "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD05/modifyDocumentSave`,
@@ -214,7 +197,6 @@ const ModifyDocument = () => {
       }
 
       const data = await response.json();
-      console.log("Save response:", data);
 
       if (data.code === 200) {
         alert("Document updated successfully!");
@@ -222,10 +204,6 @@ const ModifyDocument = () => {
         // 拆分完整的底盘号为 Chassis series 和 Chassis no
         const chassisSeries = chassisNo.substring(0, 4);
         const chassisNoPart = chassisNo.substring(4);
-
-        console.log("Navigating to Save Modifications with:");
-        console.log("  Chassis serie:", chassisSeries);
-        console.log("  Chassis number:", chassisNoPart);
 
         // 跳转到UD06 Save Modifications页面，传递Chassis serie、Chassis number和修改的变量
         navigate(
@@ -236,7 +214,6 @@ const ModifyDocument = () => {
         throw new Error(data.msg || "Failed to update document");
       }
     } catch (error) {
-      console.error("Save error:", error);
       setErrorMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
@@ -247,7 +224,6 @@ const ModifyDocument = () => {
   const handleDownloadTemplate = () => {
     if (!documentData?.generatedFilePath) {
       setErrorMessage("Document file not found. Please try again later.");
-      console.error("No generatedFilePath available in documentData");
       return;
     }
 
@@ -258,9 +234,6 @@ const ModifyDocument = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    console.log("Downloading template file:", documentData.generatedFilePath);
-    console.log("Downloaded filename:", `VIN_PLATE_${chassisNo}.trf`);
   };
 
   if (isLoading) {
@@ -289,10 +262,6 @@ const ModifyDocument = () => {
               onClick={(e) => {
                 e.preventDefault(); // 阻止默认行为
                 if (chassisNo && chassisNo !== "-") {
-                  console.log(
-                    "Navigating to Vehicle Specification with chassis no:",
-                    chassisNo,
-                  );
                   navigate(
                     `/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`,
                   );

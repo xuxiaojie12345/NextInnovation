@@ -1,6 +1,6 @@
 // VehicleSpecification.tsx - UD07模块
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import "./VehicleSpecification.css";
 
 interface VehicleInfo {
@@ -43,8 +43,6 @@ const VehicleSpecification = () => {
       // 从URL参数获取Chassis no
       const chassisNoParam = searchParams.get("chassisNo");
 
-      console.log("Chassis no:", chassisNoParam);
-
       // 前端校验：检查参数是否为空
       if (!chassisNoParam || chassisNoParam.trim() === "") {
         setErrorMessage("未指定Chassis编号");
@@ -75,7 +73,6 @@ const VehicleSpecification = () => {
       }
 
       const data = await response.json();
-      console.log("API response:", data);
 
       if (data.code === 200 && data.data) {
         // 设置车辆基本信息
@@ -98,7 +95,6 @@ const VehicleSpecification = () => {
         throw new Error(data.msg || "Failed to load vehicle data");
       }
     } catch (error) {
-      console.error("Fetch vehicle data error:", error);
       if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {

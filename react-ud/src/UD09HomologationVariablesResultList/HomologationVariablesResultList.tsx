@@ -72,7 +72,6 @@ const HomologationVariablesResultList = () => {
         setCount(0);
       }
     } catch (error: any) {
-      console.error("Error fetching search results:", error);
       setErrorMessage(
         error.message || "System error. Please contact administrator.",
       );
@@ -204,7 +203,6 @@ const HomologationVariablesResultList = () => {
         );
       }
     } catch (error: any) {
-      console.error("Error deleting records:", error);
       setErrorMessage(
         error.message || "System error. Please contact administrator.",
       );

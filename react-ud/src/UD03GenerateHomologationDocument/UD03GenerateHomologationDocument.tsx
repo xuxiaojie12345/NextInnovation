@@ -41,7 +41,6 @@ const GenerateHomologationDocument = () => {
   // 获取文档类型列表
   const fetchDocumentTypeList = async () => {
     try {
-      console.log("Fetching document type list...");
       const API_BASE_URL = "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD03/selectHdocdocumentlist`,
@@ -53,17 +52,13 @@ const GenerateHomologationDocument = () => {
         },
       );
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("API response data:", data);
 
       if (data.code === 200 && data.data?.doctypeList) {
-        console.log("Document type list:", data.data.doctypeList);
         const options = data.data.doctypeList.map((type: string) => ({
           value: type,
           label: type,
@@ -73,15 +68,12 @@ const GenerateHomologationDocument = () => {
         // 默认选中第一个选项（仅当当前没有选择值时）
         if (options.length > 0 && !documentType) {
           setDocumentType(options[0].value);
-          console.log("Set default document type:", options[0].value);
         }
       } else {
-        console.warn("Invalid API response format:", data);
         // 使用备用数据
         setFallbackDocumentTypes();
       }
     } catch (error) {
-      console.error("Failed to fetch document type list:", error);
       setErrorMessage("Failed to load document types. Please try again.");
       // API调用失败时，使用备用数据
       setFallbackDocumentTypes();
@@ -90,7 +82,6 @@ const GenerateHomologationDocument = () => {
 
   // 备用文档类型数据（当API调用失败时使用）
   const setFallbackDocumentTypes = () => {
-    console.log("Using fallback document types");
     const fallbackTypes = [
       "VIN_PLATE",
       "COC",
@@ -116,33 +107,21 @@ const GenerateHomologationDocument = () => {
     let isValid = true;
     let errorMsg = "";
 
-    console.log("Validating form...");
-    console.log("chassisSeries trimmed:", chassisSeries.trim());
-    console.log("chassisNo trimmed:", chassisNo.trim());
-    console.log("documentType:", documentType);
-
     if (!chassisSeries.trim()) {
       errorMsg = "Chassis series is required.";
       isValid = false;
-      console.log("❌ Validation failed: Chassis series is required");
     } else if (!/^[A-Za-z]+$/.test(chassisSeries.trim())) {
       errorMsg = "Chassis series 只能输入半角英文字符";
       isValid = false;
-      console.log("❌ Validation failed: Chassis series invalid chars");
     } else if (!chassisNo.trim()) {
       errorMsg = "Chassis no is required.";
       isValid = false;
-      console.log("❌ Validation failed: Chassis no is required");
     } else if (!/^[0-9]+$/.test(chassisNo.trim())) {
       errorMsg = "Chassis no 只能输入半角数字";
       isValid = false;
-      console.log("❌ Validation failed: Chassis no invalid chars");
     } else if (!documentType) {
       errorMsg = "Document type is required. Please select from dropdown.";
       isValid = false;
-      console.log("❌ Validation failed: Document type is required");
-    } else {
-      console.log("✅ Validation passed!");
     }
 
     setErrorMessage(errorMsg);
@@ -157,23 +136,10 @@ const GenerateHomologationDocument = () => {
       e.preventDefault();
     }
 
-    console.log("========================================");
-    console.log("handleSubmit called");
-    console.log("========================================");
-    console.log("chassisSeries:", chassisSeries);
-    console.log("chassisNo:", chassisNo);
-    console.log("documentType:", documentType);
-    console.log("isLoading:", isLoading);
-    console.log("========================================");
-
     // 验证表单
     if (!validateForm()) {
-      console.log("❌ Validation failed - Form submission stopped");
-      console.log("========================================");
       return;
     }
-
-    console.log("✅ Validation passed, proceeding with submit...");
     setIsLoading(true);
     setErrorMessage("");
 
@@ -189,32 +155,21 @@ const GenerateHomologationDocument = () => {
         JSON.stringify(searchConditions),
       );
 
-      console.log(" Saved to localStorage:", searchConditions);
-
       // 跳转到"Generate document"画面，并传递底盘号参数
       const combinedChassisNo = `${chassisSeries}${chassisNo}`;
       const targetUrl = `/generate-document?chassisNo=${encodeURIComponent(combinedChassisNo)}`;
-      console.log("🚀 Navigating to:", targetUrl);
-      console.log("Combined chassis number:", combinedChassisNo);
 
       // 使用React Router的navigate进行页面跳转
       try {
-        console.log("📍 Calling navigate...");
         navigate(targetUrl);
-        console.log("✅ Navigate called successfully");
       } catch (navError) {
-        console.error("❌ Navigate error:", navError);
         // 如果navigate失败，尝试使用window.location.href作为备用方案
-        console.log("🔄 Falling back to window.location.href");
         window.location.href = targetUrl;
       }
     } catch (error) {
-      console.error("❌ Submit error:", error);
       setErrorMessage("System error. Please contact administrator.");
       setIsLoading(false);
     }
-
-    console.log("========================================");
   };
 
   // Reset按钮处理
