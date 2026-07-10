@@ -5,11 +5,8 @@
  * 对应详细设计：详细设计/詳細設計UD22.md
  */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api, { API_BASE_URL } from "../config/api";
 import "./DocumentTypes.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 文档类型数据类型 */
 interface DocTypeItem {
@@ -35,8 +32,8 @@ const DocumentTypes: React.FC = () => {
     const fetchDocTypes = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/ud22/getdocumenttypes`
+        const response = await api.get(
+          '/api/ud22/getdocumenttypes'
         );
 
         if (response.data.code === 200 && Array.isArray(response.data.data)) {

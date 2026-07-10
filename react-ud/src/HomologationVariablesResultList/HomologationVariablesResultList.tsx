@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import './HomologationVariablesResultList.css';
 
 /**
@@ -38,8 +38,6 @@ interface BatchDeleteResponse {
   failedCount: number;
   message: string;
 }
-
-const API_BASE_URL = 'http://localhost:8081';
 
 /**
  * HomologationVariablesResultList 组件 - 认证变量搜索结果列表页面（UD09）
@@ -82,7 +80,7 @@ const HomologationVariablesResultList: React.FC = () => {
       setLoading(true);
       setMessage('');
       try {
-        const res = await axios.post(`${API_BASE_URL}/api/ud09/search`, searchState);
+        const res = await api.post(`/api/ud09/search`, searchState);
         if (res.data.code === 200 && Array.isArray(res.data.data)) {
           setDataList(res.data.data);
         } else {
@@ -213,8 +211,8 @@ const HomologationVariablesResultList: React.FC = () => {
 
     try {
       const deleteItems = getSelectedPrimaryKeys();
-      const res = await axios.post(
-        `${API_BASE_URL}/api/ud09/deletehdocuserdefinedrules`,
+      const res = await api.post(
+        `/api/ud09/deletehdocuserdefinedrules`,
         deleteItems
       );
 
@@ -233,7 +231,7 @@ const HomologationVariablesResultList: React.FC = () => {
         // 清空选中状态
         setSelectedKeys(new Set());
         // 重新调用 UD08Search API 刷新列表数据
-        const searchRes = await axios.post(`${API_BASE_URL}/api/ud09/search`, searchState);
+        const searchRes = await api.post(`/api/ud09/search`, searchState);
         if (searchRes.data.code === 200 && Array.isArray(searchRes.data.data)) {
           setDataList(searchRes.data.data);
         } else {

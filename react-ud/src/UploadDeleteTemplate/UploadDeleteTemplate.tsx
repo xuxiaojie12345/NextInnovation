@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
 import "./UploadDeleteTemplate.css";
 
 /**
@@ -25,9 +25,6 @@ interface TemplateFile {
   fileName: string;
   filePath: string;
 }
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /**
  * UploadDeleteTemplate 组件
@@ -68,7 +65,7 @@ const UploadDeleteTemplate: React.FC = () => {
       setError("");
       setSuccessMessage("");
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket`);
+        const response = await api.get(`/api/ud12/selectmarket`);
         const data: Market[] = response.data.data || [];
         // 填充Upload和Delete两个区域的Market下拉列表
         setUploadMarketList(data);
@@ -108,7 +105,7 @@ const UploadDeleteTemplate: React.FC = () => {
     if (marketCode) {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket/${marketCode}`);
+        const response = await api.get(`/api/ud12/selectmarket/${marketCode}`);
         const data: TemplateFile[] = response.data.data || [];
         setTemplatesList(data);
       } catch (err) {
@@ -179,8 +176,8 @@ const UploadDeleteTemplate: React.FC = () => {
       formData.append("market", selectedUploadMarket);
 
       // 注意：不要手动设置 Content-Type，axios 会自动设置 multipart boundary
-      const response = await axios.post(
-        `${API_BASE_URL}/api/ud12/upload`,
+      const response = await api.post(
+        `/api/ud12/upload`,
         formData
       );
 
@@ -223,7 +220,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/ud12/delete`, {
+      const response = await api.post(`/api/ud12/delete`, {
         market: selectedDeleteMarket,
         fileName: selectedTemplate
       });
@@ -233,7 +230,7 @@ const UploadDeleteTemplate: React.FC = () => {
           `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${selectedDeleteMarket}`
         );
         // 刷新模板列表
-        const marketRes = await axios.get(`${API_BASE_URL}/api/ud12/selectmarket/${selectedDeleteMarket}`);
+        const marketRes = await api.get(`/api/ud12/selectmarket/${selectedDeleteMarket}`);
         setTemplatesList(marketRes.data.data || []);
         setSelectedTemplate("");
       } else if (response.data.code === 404) {

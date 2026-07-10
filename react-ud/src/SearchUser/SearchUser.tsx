@@ -5,10 +5,8 @@
  */
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import api from "../config/api";
 import "./SearchUser.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 市场选项数据类型 */
 interface MarketItem {
@@ -52,8 +50,8 @@ const SearchUser: React.FC = () => {
   useEffect(() => {
     const fetchMarketList = async () => {
       try {
-        const response = await axios.post(
-          `${API_BASE_URL}/api/ud19/UD19SearchResultListApi`,
+        const response = await api.post(
+          `/api/ud19/UD19SearchResultListApi`,
           { operation: "GET_MARKET_LIST" }
         );
         if (response.data.code === 200 && response.data.data?.markets) {
@@ -149,8 +147,8 @@ const SearchUser: React.FC = () => {
     try {
       // 步骤1：当输入 Userid 时，先调用 Saviynt 验证用户是否存在
       if (userid.trim()) {
-        const saviyntResponse = await axios.get(
-          `${API_BASE_URL}/api/authentication/userinfo`,
+        const saviyntResponse = await api.get(
+          `/api/authentication/userinfo`,
           { params: { userId: userid.trim() } }
         );
 
@@ -167,8 +165,8 @@ const SearchUser: React.FC = () => {
 
       // 步骤2：执行搜索
       const params = buildSearchParams();
-      const response = await axios.post(
-        `${API_BASE_URL}/api/ud19/UD19SearchResultListApi`,
+      const response = await api.post(
+        `/api/ud19/UD19SearchResultListApi`,
         params
       );
 

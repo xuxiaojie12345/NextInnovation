@@ -5,11 +5,8 @@
  * 对应详细设计：详细设计/詳細設計UD21.md
  */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../config/api";
 import "./MarketsInHDoc.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 市场数据类型 */
 interface MarketItem {
@@ -36,8 +33,8 @@ const MarketsInHDoc: React.FC = () => {
     const fetchMarkets = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.post(
-          `${API_BASE_URL}/api/ud19/UD19SearchResultListApi`,
+        const response = await api.post(
+          `/api/ud19/UD19SearchResultListApi`,
           { operation: "GET_MARKET_LIST" }
         );
 

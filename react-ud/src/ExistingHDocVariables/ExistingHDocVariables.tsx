@@ -5,7 +5,9 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
+import OperatorSelect, { CompareOperatorSelect } from '../components/OperatorSelect';
+import type { Operator, CompareOperator } from '../components/OperatorSelect';
 import './ExistingHDocVariables.css';
 
 /**
@@ -39,12 +41,6 @@ interface ApiResponse<T> {
   data: T;
 }
 
-const API_BASE_URL = 'http://localhost:8081';
-
-type Operator = '=' | '!=';
-/** 日期字段专用运算符：支持 = > < 三种比较 */
-type CompareOperator = '=' | 'GT' | 'LT';
-
 /**
  * ExistingHDocVariables 组件
  * 提供HDOC_VARIABLES表的CRUD操作及CSV导出功能
@@ -70,19 +66,12 @@ const ExistingHDocVariables: React.FC = () => {
    * 参照 UD08 页面风格
    */
   const renderOp = (field: string) => (
-    <select value={ops[field]} onChange={e => setOp(field, e.target.value as Operator)} className='existing-hdoc-operator-select'>
-      <option value='='>=</option>
-      <option value='!='>!=</option>
-    </select>
+    <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='existing-hdoc-operator-select' />
   );
 
   /** Date字段专用运算符下拉框（支持 < > = 三种比较） */
   const renderCompareOp = (field: string) => (
-    <select value={compareOps[field]} onChange={e => setCompareOp(field, e.target.value as CompareOperator)} className='existing-hdoc-operator-select'>
-      <option value='='>=</option>
-      <option value='GT'>&gt;</option>
-      <option value='LT'>&lt;</option>
-    </select>
+    <CompareOperatorSelect value={compareOps[field]} onChange={(v) => setCompareOp(field, v)} className='existing-hdoc-operator-select' />
   );
 
   // 表单数据状态
@@ -267,8 +256,8 @@ const ExistingHDocVariables: React.FC = () => {
       if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
         submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
       }
-      const res = await axios.post<ApiResponse<string>>(
-        `${API_BASE_URL}/api/ud10/add`,
+      const res = await api.post<ApiResponse<string>>(
+        '/api/ud10/add',
         submitData
       );
       if (res.data.code === 200) {
@@ -313,8 +302,8 @@ const ExistingHDocVariables: React.FC = () => {
       if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
         submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
       }
-      const res = await axios.post<ApiResponse<string>>(
-        `${API_BASE_URL}/api/ud10/update`,
+      const res = await api.post<ApiResponse<string>>(
+        '/api/ud10/update',
         submitData
       );
       if (res.data.code === 200) {
@@ -354,8 +343,8 @@ const ExistingHDocVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
-      const res = await axios.post<ApiResponse<string>>(
-        `${API_BASE_URL}/api/ud10/delete`,
+      const res = await api.post<ApiResponse<string>>(
+        '/api/ud10/delete',
         { variable: formData.variable }
       );
       if (res.data.code === 200) {

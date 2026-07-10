@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import './GenerateDocument.css';
 
 // 接收从GenerateHomologationDocument传递的参数
@@ -9,9 +9,6 @@ interface LocationState {
   chassisNo: string;
   documentType: string;
 }
-
-// 后端API基础地址
-const API_BASE_URL = 'http://localhost:8081';
 
 /**
  * GenerateDocument 组件 - 文档生成页面（UD04）
@@ -62,7 +59,7 @@ const GenerateDocument: React.FC = () => {
         // 步骤3：调用 UD04SelectGeneratedocumentApi（POST）
         // 对应设计书 4.1 接口定义
         // 请求参数包含 chassisSeries、chassisNo 和 documentType
-        const response = await axios.post(`${API_BASE_URL}/api/ud04/selectgenerateddocument`, {
+        const response = await api.post(`/api/ud04/selectgenerateddocument`, {
           chassisSeries: currentChassisSeries,
           chassisNo: currentChassisNo,
           documentType: currentDocumentType

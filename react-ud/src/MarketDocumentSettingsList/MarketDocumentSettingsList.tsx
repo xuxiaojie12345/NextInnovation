@@ -5,11 +5,8 @@
  */
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
 import "./MarketDocumentSettingsList.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 文档列表项数据类型 */
 interface DocumentListItem {
@@ -56,8 +53,8 @@ const MarketDocumentSettingsList: React.FC = () => {
         const userOp = params.get("userOp") || "=";
         const dateOp = params.get("dateOp") || "=";
 
-        const response = await axios.get(
-          `${API_BASE_URL}/api/ud20/marketdocumentsettings`,
+        const response = await api.get(
+          `/api/ud20/marketdocumentsettings`,
           { params: {
             documentType: documentType || undefined,
             documentTypeOp: documentTypeOp,

@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
 import "./EDBUserView.css";
 
 /**
@@ -18,9 +18,6 @@ interface UserInfo {
   userPosition: string;
   email: string;
 }
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /**
  * EDBUserView 组件
@@ -71,8 +68,8 @@ const EDBUserView: React.FC = () => {
       try {
         // 调用 UD25AuthenticationApi（GET /api/authentication/userinfo）
         // 传递userId作为请求参数
-        const response = await axios.get(
-          `${API_BASE_URL}/api/authentication/userinfo`,
+        const response = await api.get(
+          `/api/authentication/userinfo`,
           {
             params: { userId }
           }

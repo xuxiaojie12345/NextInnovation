@@ -1,0 +1,972 @@
+{
+  "overall": {
+    "total_commits": 29,
+    "total_added": 16122,
+    "total_survived": 14463,
+    "overall_retention": 89.71,
+    "total_developers": 1
+  },
+  "dev_summary": [
+    {
+      "author": "haohetao20240507",
+      "commits": 29,
+      "added": 16122,
+      "survived": 14463,
+      "deleted": 2253,
+      "retention": 89.71,
+      "churn": 12.26,
+      "net": 13869
+    }
+  ],
+  "trend": [
+    {
+      "week": "2026-W26",
+      "added": 14379,
+      "survived": 12767,
+      "retention": 88.79
+    },
+    {
+      "week": "2026-W27",
+      "added": 1582,
+      "survived": 1536,
+      "retention": 97.09
+    },
+    {
+      "week": "2026-W28",
+      "added": 161,
+      "survived": 160,
+      "retention": 99.38
+    }
+  ],
+  "file_churn": [
+    {
+      "file": "react-ud/src/App.tsx",
+      "commits": 52,
+      "added": 776,
+      "deleted": 194,
+      "churn_rate": 25.0
+    },
+    {
+      "file": "react-ud/src/Menu/Menu.tsx",
+      "commits": 45,
+      "added": 2332,
+      "deleted": 1334,
+      "churn_rate": 57.2
+    },
+    {
+      "file": "react-ud/src/Login/Login.tsx",
+      "commits": 33,
+      "added": 2324,
+      "deleted": 1910,
+      "churn_rate": 82.19
+    },
+    {
+      "file": "react-ud/src/Login/Login.css",
+      "commits": 27,
+      "added": 2101,
+      "deleted": 859,
+      "churn_rate": 40.89
+    },
+    {
+      "file": "react-ud/src/Menu/Menu.css",
+      "commits": 23,
+      "added": 1354,
+      "deleted": 617,
+      "churn_rate": 45.57
+    },
+    {
+      "file": "react-ud/src/ModifyDocument/ModifyDocument.tsx",
+      "commits": 20,
+      "added": 1708,
+      "deleted": 260,
+      "churn_rate": 15.22
+    },
+    {
+      "file": "react-ud/src/VehicleSpecification/VehicleSpecification.tsx",
+      "commits": 16,
+      "added": 1053,
+      "deleted": 139,
+      "churn_rate": 13.2
+    },
+    {
+      "file": "react-ud/src/UploadDeleteTemplate/UploadDeleteTemplate.tsx",
+      "commits": 15,
+      "added": 2076,
+      "deleted": 365,
+      "churn_rate": 17.58
+    },
+    {
+      "file": "react-ud/src/HomologationVariables/HomologationVariables.tsx",
+      "commits": 15,
+      "added": 2868,
+      "deleted": 157,
+      "churn_rate": 5.47
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettingsList/MarketDocumentSettingsList.tsx",
+      "commits": 14,
+      "added": 1021,
+      "deleted": 111,
+      "churn_rate": 10.87
+    },
+    {
+      "file": "react-ud/src/HomologationVariablesResultList/HomologationVariablesResultList.tsx",
+      "commits": 14,
+      "added": 1525,
+      "deleted": 214,
+      "churn_rate": 14.03
+    },
+    {
+      "file": "react-ud/src/Login/Login.test.tsx",
+      "commits": 14,
+      "added": 654,
+      "deleted": 4482,
+      "churn_rate": 685.32
+    },
+    {
+      "file": "react-ud/src/VehicleSpecification/VehicleSpecification.css",
+      "commits": 13,
+      "added": 744,
+      "deleted": 24,
+      "churn_rate": 3.23
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocDocumentListMapper.xml",
+      "commits": 13,
+      "added": 449,
+      "deleted": 36,
+      "churn_rate": 8.02
+    },
+    {
+      "file": "react-ud/src/HDocUserAdministration/HDocUserAdministration.tsx",
+      "commits": 12,
+      "added": 2712,
+      "deleted": 522,
+      "churn_rate": 19.25
+    },
+    {
+      "file": "react-ud/src/SearchUser/SearchUser.tsx",
+      "commits": 12,
+      "added": 1538,
+      "deleted": 243,
+      "churn_rate": 15.8
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariables/ExistingHDocVariables.tsx",
+      "commits": 12,
+      "added": 1417,
+      "deleted": 101,
+      "churn_rate": 7.13
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD08HomologationVariablesServiceImpl.java",
+      "commits": 12,
+      "added": 1310,
+      "deleted": 28,
+      "churn_rate": 2.14
+    },
+    {
+      "file": "react-ud/src/SaveModifications/SaveModifications.tsx",
+      "commits": 12,
+      "added": 996,
+      "deleted": 280,
+      "churn_rate": 28.11
+    },
+    {
+      "file": "react-ud/src/UploadDeleteTemplate/UploadDeleteTemplate.css",
+      "commits": 12,
+      "added": 1173,
+      "deleted": 186,
+      "churn_rate": 15.86
+    },
+    {
+      "file": "react-ud/src/VinPlate/VinPlate.tsx",
+      "commits": 12,
+      "added": 1619,
+      "deleted": 201,
+      "churn_rate": 12.42
+    },
+    {
+      "file": "react-ud/src/ModifyDocument/ModifyDocument.css",
+      "commits": 11,
+      "added": 1253,
+      "deleted": 121,
+      "churn_rate": 9.66
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/HdocDocumentListMapper.java",
+      "commits": 11,
+      "added": 302,
+      "deleted": 2,
+      "churn_rate": 0.66
+    },
+    {
+      "file": "react-ud/src/GenerateDocument/GenerateDocument.tsx",
+      "commits": 10,
+      "added": 1064,
+      "deleted": 47,
+      "churn_rate": 4.42
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettings/MarketDocumentSettings.tsx",
+      "commits": 10,
+      "added": 1000,
+      "deleted": 68,
+      "churn_rate": 6.8
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/HdocVariablesMapper.java",
+      "commits": 10,
+      "added": 253,
+      "deleted": 4,
+      "churn_rate": 1.58
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocVariablesMapper.xml",
+      "commits": 10,
+      "added": 462,
+      "deleted": 11,
+      "churn_rate": 2.38
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettingsList/MarketDocumentSettingsList.css",
+      "commits": 10,
+      "added": 780,
+      "deleted": 10,
+      "churn_rate": 1.28
+    },
+    {
+      "file": "react-ud/src/SearchUser/SearchUser.css",
+      "commits": 10,
+      "added": 1365,
+      "deleted": 188,
+      "churn_rate": 13.77
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocUserDefinedRulesMapper.xml",
+      "commits": 10,
+      "added": 618,
+      "deleted": 38,
+      "churn_rate": 6.15
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD08HomologationVariablesController.java",
+      "commits": 10,
+      "added": 1008,
+      "deleted": 116,
+      "churn_rate": 11.51
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResultList/ExistingHDocVariablesResultList.tsx",
+      "commits": 9,
+      "added": 674,
+      "deleted": 100,
+      "churn_rate": 14.84
+    },
+    {
+      "file": "react-ud/src/react-app-env.d.ts",
+      "commits": 9,
+      "added": 106,
+      "deleted": 1,
+      "churn_rate": 0.94
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD12UploadDeletetemplatServiceImpl.java",
+      "commits": 9,
+      "added": 611,
+      "deleted": 29,
+      "churn_rate": 4.75
+    },
+    {
+      "file": "react-ud/src/HomologationVariablesResultList/HomologationVariablesResultList.css",
+      "commits": 9,
+      "added": 1165,
+      "deleted": 196,
+      "churn_rate": 16.82
+    },
+    {
+      "file": "react-ud/src/services/api.ts",
+      "commits": 9,
+      "added": 554,
+      "deleted": 21,
+      "churn_rate": 3.79
+    },
+    {
+      "file": "react-ud/src/HDocUserDocAdministration/HDocUserDocAdministration.tsx",
+      "commits": 9,
+      "added": 1270,
+      "deleted": 105,
+      "churn_rate": 8.27
+    },
+    {
+      "file": "react-ud/src/ListAvailableTemplates/ListAvailableTemplates.tsx",
+      "commits": 9,
+      "added": 814,
+      "deleted": 106,
+      "churn_rate": 13.02
+    },
+    {
+      "file": "react-ud/src/SaveModifications/SaveModifications.css",
+      "commits": 9,
+      "added": 637,
+      "deleted": 13,
+      "churn_rate": 2.04
+    },
+    {
+      "file": "react-ud/src/VinPlate/VinPlate.css",
+      "commits": 9,
+      "added": 928,
+      "deleted": 30,
+      "churn_rate": 3.23
+    },
+    {
+      "file": "react-ud/src/DocumentTypes/DocumentTypes.css",
+      "commits": 9,
+      "added": 445,
+      "deleted": 10,
+      "churn_rate": 2.25
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD20MarketDocumentSettingsController.java",
+      "commits": 9,
+      "added": 289,
+      "deleted": 95,
+      "churn_rate": 32.87
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/dto/LoginRequest.java",
+      "commits": 9,
+      "added": 181,
+      "deleted": 2,
+      "churn_rate": 1.1
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD05ModifyDocumentController.java",
+      "commits": 9,
+      "added": 429,
+      "deleted": 62,
+      "churn_rate": 14.45
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/AuthenticationController.java",
+      "commits": 9,
+      "added": 262,
+      "deleted": 10,
+      "churn_rate": 3.82
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD03SelectHdocdocumentlistController.java",
+      "commits": 9,
+      "added": 295,
+      "deleted": 36,
+      "churn_rate": 12.2
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/UD19Mapper.xml",
+      "commits": 8,
+      "added": 112,
+      "deleted": 55,
+      "churn_rate": 49.11
+    },
+    {
+      "file": "react-ud/src/GenerateDocument/GenerateDocument.css",
+      "commits": 8,
+      "added": 714,
+      "deleted": 3,
+      "churn_rate": 0.42
+    },
+    {
+      "file": "react-ud/src/GenerateHomologationDocument/GenerateHomologationDocument.tsx",
+      "commits": 8,
+      "added": 1125,
+      "deleted": 106,
+      "churn_rate": 9.42
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD07VehicleSpecificationServiceImpl.java",
+      "commits": 8,
+      "added": 618,
+      "deleted": 10,
+      "churn_rate": 1.62
+    }
+  ],
+  "high_churn_files": [
+    {
+      "file": "react-ud/src/Menu/Menu.tsx",
+      "commits": 45,
+      "added": 2332,
+      "deleted": 1334,
+      "churn_rate": 57.2
+    },
+    {
+      "file": "react-ud/src/Login/Login.tsx",
+      "commits": 33,
+      "added": 2324,
+      "deleted": 1910,
+      "churn_rate": 82.19
+    },
+    {
+      "file": "react-ud/src/Login/Login.test.tsx",
+      "commits": 14,
+      "added": 654,
+      "deleted": 4482,
+      "churn_rate": 685.32
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/config/SimpleCORSFilter.java",
+      "commits": 8,
+      "added": 111,
+      "deleted": 69,
+      "churn_rate": 62.16
+    },
+    {
+      "file": "api-ud/src/main/resources/log4j2-dev.xml",
+      "commits": 6,
+      "added": 197,
+      "deleted": 100,
+      "churn_rate": 50.76
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResult List/UD11.tsx",
+      "commits": 4,
+      "added": 285,
+      "deleted": 285,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Test/Test.tsx",
+      "commits": 4,
+      "added": 11,
+      "deleted": 33,
+      "churn_rate": 300.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/config/SwaggerAutoConfiguration.java",
+      "commits": 4,
+      "added": 194,
+      "deleted": 194,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/config/SwaggerProperties.java",
+      "commits": 4,
+      "added": 180,
+      "deleted": 180,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/resources/log4j2-prod.xml",
+      "commits": 4,
+      "added": 196,
+      "deleted": 99,
+      "churn_rate": 50.51
+    },
+    {
+      "file": "api-ud/src/main/resources/log4j2-test.xml",
+      "commits": 4,
+      "added": 196,
+      "deleted": 99,
+      "churn_rate": 50.51
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResult List/UD11.css",
+      "commits": 3,
+      "added": 207,
+      "deleted": 207,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/HDocTemplateCheck/HDocTemplateCheck.tsx",
+      "commits": 3,
+      "added": 291,
+      "deleted": 184,
+      "churn_rate": 63.23
+    },
+    {
+      "file": "react-ud/src/index.tsx",
+      "commits": 3,
+      "added": 27,
+      "deleted": 24,
+      "churn_rate": 88.89
+    },
+    {
+      "file": "react-ud/src/App.css",
+      "commits": 3,
+      "added": 46,
+      "deleted": 38,
+      "churn_rate": 82.61
+    },
+    {
+      "file": "react-ud/src/UD22/UD22.css",
+      "commits": 3,
+      "added": 281,
+      "deleted": 168,
+      "churn_rate": 59.79
+    },
+    {
+      "file": "react-ud/src/GenerateDocument/GenerateDocument.test.tsx",
+      "commits": 2,
+      "added": 239,
+      "deleted": 239,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD201UpdateHdocDocumentController.java",
+      "commits": 2,
+      "added": 36,
+      "deleted": 36,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/dto/UD201UpdateHdocDocumentResponse.java",
+      "commits": 2,
+      "added": 54,
+      "deleted": 54,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/UD201UpdateHdocDocumentMapper.java",
+      "commits": 2,
+      "added": 30,
+      "deleted": 30,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/UD201UpdateHdocDocumentService.java",
+      "commits": 2,
+      "added": 24,
+      "deleted": 24,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD201UpdateHdocDocumentServiceImpl.java",
+      "commits": 2,
+      "added": 54,
+      "deleted": 54,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/UD201UpdateHdocDocumentMapper.xml",
+      "commits": 2,
+      "added": 15,
+      "deleted": 15,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Login_x/LoginPage.css",
+      "commits": 2,
+      "added": 227,
+      "deleted": 227,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Login_x/LoginPage.tsx",
+      "commits": 2,
+      "added": 264,
+      "deleted": 264,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/HdocApplication.java",
+      "commits": 2,
+      "added": 11,
+      "deleted": 11,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/App.test.tsx",
+      "commits": 2,
+      "added": 9,
+      "deleted": 9,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/index.css",
+      "commits": 2,
+      "added": 13,
+      "deleted": 13,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/reportWebVitals.ts",
+      "commits": 2,
+      "added": 15,
+      "deleted": 15,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/UD23_Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides.tsx",
+      "commits": 1,
+      "added": 28,
+      "deleted": 21,
+      "churn_rate": 75.0
+    }
+  ],
+  "commit_details": [
+    {
+      "hash": "e314cc3f",
+      "full_hash": "e314cc3ffd633bd38dcae19982d2ba1ba2bd4d63",
+      "date": "2026-07-09 14:11:01 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 50,
+      "survived": 50,
+      "retention": 100.0
+    },
+    {
+      "hash": "5ac3e01f",
+      "full_hash": "5ac3e01fcfcea0dfe9e29c70cd01df3e35bf87ef",
+      "date": "2026-07-09 11:30:45 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 23,
+      "survived": 23,
+      "retention": 100.0
+    },
+    {
+      "hash": "7db9efe1",
+      "full_hash": "7db9efe1df32a9019c3546275eb19832ef4f9f40",
+      "date": "2026-07-09 10:35:31 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 50,
+      "survived": 50,
+      "retention": 100.0
+    },
+    {
+      "hash": "4827424a",
+      "full_hash": "4827424a7474170e0d98e8f5b7c5834226f9227d",
+      "date": "2026-07-08 18:32:46 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0708-01",
+      "category": "其他",
+      "added": 9,
+      "survived": 9,
+      "retention": 100.0
+    },
+    {
+      "hash": "58e4e5e3",
+      "full_hash": "58e4e5e3b47d6b2255d1b53fac3005381f1751cd",
+      "date": "2026-07-07 17:45:25 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0707-01",
+      "category": "其他",
+      "added": 29,
+      "survived": 28,
+      "retention": 96.55
+    },
+    {
+      "hash": "2b11ee88",
+      "full_hash": "2b11ee887dfec29a06fa56016886666521554b92",
+      "date": "2026-07-03 17:26:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 10,
+      "survived": 10,
+      "retention": 100.0
+    },
+    {
+      "hash": "1ec9b854",
+      "full_hash": "1ec9b85452774c897d2faf81ba3e351df9d7a56c",
+      "date": "2026-07-03 16:12:05 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 21,
+      "survived": 21,
+      "retention": 100.0
+    },
+    {
+      "hash": "5f0c434c",
+      "full_hash": "5f0c434c9c89bda674087caa5591636c176d0ce1",
+      "date": "2026-07-03 16:00:56 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 2,
+      "survived": 2,
+      "retention": 100.0
+    },
+    {
+      "hash": "8e8890bb",
+      "full_hash": "8e8890bb585b91147d12bf59055412c422752f36",
+      "date": "2026-07-03 15:22:15 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 26,
+      "survived": 26,
+      "retention": 100.0
+    },
+    {
+      "hash": "cbc49df7",
+      "full_hash": "cbc49df738cb11e8dfbba8d2f5aff093d1aa6a8b",
+      "date": "2026-07-03 12:30:38 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "f31c83ac",
+      "full_hash": "f31c83ac87255fe35acc655c528babca86bbcf18",
+      "date": "2026-07-03 12:24:59 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 4,
+      "survived": 4,
+      "retention": 100.0
+    },
+    {
+      "hash": "1d64f03f",
+      "full_hash": "1d64f03ffb94b63c5cb1cb561c70ad088dde32dc",
+      "date": "2026-07-03 12:16:20 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "38b77d31",
+      "full_hash": "38b77d31e5da02b30fc4132cc2e0e449e19f836d",
+      "date": "2026-07-03 10:13:04 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-1",
+      "category": "其他",
+      "added": 604,
+      "survived": 591,
+      "retention": 97.85
+    },
+    {
+      "hash": "6b6eecb4",
+      "full_hash": "6b6eecb40a0fbc260c23c28fc7447c6e3e2cb879",
+      "date": "2026-07-01 14:45:03 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0701-02",
+      "category": "其他",
+      "added": 55,
+      "survived": 49,
+      "retention": 89.09
+    },
+    {
+      "hash": "928d8a5e",
+      "full_hash": "928d8a5ed8ad7323088cec8f7c1d16bf15ebb3d1",
+      "date": "2026-07-01 11:54:43 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0701-01",
+      "category": "其他",
+      "added": 196,
+      "survived": 192,
+      "retention": 97.96
+    },
+    {
+      "hash": "b17f4ee9",
+      "full_hash": "b17f4ee96e2900faf692712650fc62e51d16bb92",
+      "date": "2026-06-30 18:32:47 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "c0d8f9d1",
+      "full_hash": "c0d8f9d1285b827de436af3bf22710dd77dd7655",
+      "date": "2026-06-30 17:30:27 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update063001",
+      "category": "其他",
+      "added": 10,
+      "survived": 5,
+      "retention": 50.0
+    },
+    {
+      "hash": "c45f3280",
+      "full_hash": "c45f32807d98b3d790bb190499b9b8a4ce8de7e4",
+      "date": "2026-06-30 12:11:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "2f1ab054",
+      "full_hash": "2f1ab0545a9d1cec3d5f46b8dcfd1a7ac6c8f53e",
+      "date": "2026-06-30 11:47:49 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 329,
+      "survived": 324,
+      "retention": 98.48
+    },
+    {
+      "hash": "862fe94b",
+      "full_hash": "862fe94bbc54f97f3ea8a5e1de96798b2dc224b6",
+      "date": "2026-06-29 14:56:07 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update-0629-end",
+      "category": "日常维护",
+      "added": 321,
+      "survived": 308,
+      "retention": 95.95
+    },
+    {
+      "hash": "481e40bd",
+      "full_hash": "481e40bd8e3e005423e64bca3eac661c15095f69",
+      "date": "2026-06-26 17:55:14 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "delete doc",
+      "category": "文档注释",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "a5c2e1f1",
+      "full_hash": "a5c2e1f10d9dea021f21e675f3b79891fc115009",
+      "date": "2026-06-26 17:37:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "Merge branch 'user/haohetao' of https://github.com/xuxiaojie12345/NextInnovation into user/haohetao",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "9ab3e723",
+      "full_hash": "9ab3e723ac2f60a0fd588fb09ae6059529d8f9c5",
+      "date": "2026-06-26 17:36:37 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update062601",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "15d6f456",
+      "full_hash": "15d6f456432ea89dd00163bae9f2e98dd38b0e04",
+      "date": "2026-06-26 11:58:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0626",
+      "category": "其他",
+      "added": 624,
+      "survived": 502,
+      "retention": 80.45
+    },
+    {
+      "hash": "1a4a0ba7",
+      "full_hash": "1a4a0ba784733c89029f4112fe31ecfd2649df90",
+      "date": "2026-06-26 11:58:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0626",
+      "category": "其他",
+      "added": 117,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "8c4db9c6",
+      "full_hash": "8c4db9c613dfb1bfc00ca7c755201f8d031e5c1e",
+      "date": "2026-06-26 10:56:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update 0626",
+      "category": "日常维护",
+      "added": 173,
+      "survived": 115,
+      "retention": 66.47
+    },
+    {
+      "hash": "6fc07054",
+      "full_hash": "6fc070546c4ab122bb7975bcbcde3e783c4edd5d",
+      "date": "2026-06-23 16:43:31 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 2,
+      "survived": 1,
+      "retention": 50.0
+    },
+    {
+      "hash": "ef4b6426",
+      "full_hash": "ef4b64261ff8b67e4fd4c3dafeb108475d282d0a",
+      "date": "2026-06-23 16:35:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 7,
+      "survived": 1,
+      "retention": 14.29
+    },
+    {
+      "hash": "f5cfd010",
+      "full_hash": "f5cfd01079b9896006976888039f672db0200eb0",
+      "date": "2026-06-22 12:15:18 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "第一版代码提交",
+      "category": "其他",
+      "added": 13456,
+      "survived": 12148,
+      "retention": 90.28
+    }
+  ],
+  "category_dist": {
+    "其他": {
+      "count": 20,
+      "added": 15288,
+      "survived": 13712
+    },
+    "日常维护": {
+      "count": 8,
+      "added": 834,
+      "survived": 751
+    },
+    "文档注释": {
+      "count": 1,
+      "added": 0,
+      "survived": 0
+    }
+  }
+}

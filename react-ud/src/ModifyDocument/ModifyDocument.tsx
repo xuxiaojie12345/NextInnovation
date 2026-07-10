@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import './ModifyDocument.css';
 
 /**
@@ -23,11 +23,6 @@ interface LocationState {
   serie: string;
   market: string;
 }
-
-/**
- * 后端API基础地址
- */
-const API_BASE_URL = 'http://localhost:8081';
 
 /**
  * ModifyDocument 组件 - 文档修改页面（UD05）
@@ -77,8 +72,8 @@ const ModifyDocument: React.FC = () => {
 
         // 调用 UD05SelectVariableModificationApi（POST）
         // 对应设计书 4.1 接口定义
-        const response = await axios.post(
-          `${API_BASE_URL}/api/ud05/modifydocument/query`,
+        const response = await api.post(
+          `/api/ud05/modifydocument/query`,
           {
             serie: serie,
             chno: chassisNo
@@ -188,7 +183,7 @@ const ModifyDocument: React.FC = () => {
       const updatePromises = variables
         .filter((row) => row.modifiedValue && row.modifiedValue.trim() !== '')
         .map((row) =>
-          axios.post(`${API_BASE_URL}/api/ud05/modifydocument/update`, {
+          api.post(`/api/ud05/modifydocument/update`, {
             serie: serie,
             chno: chassisNo,
             variable: row.variable,

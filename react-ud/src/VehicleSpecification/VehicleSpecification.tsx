@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
 import { Tooltip } from "@mui/material";
 import "./VehicleSpecification.css";
 
@@ -28,9 +28,6 @@ interface VehicleSpecificationData {
   engineInfo: EngineInfo;
   sNoteNo: string;
 }
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /**
  * VehicleSpecification 组件 - 车辆规格信息展示页面（UD07）
@@ -73,8 +70,8 @@ const VehicleSpecification: React.FC = () => {
 
         // API调用：获取车辆规格信息
         // 对应详细设计 4.1 UD07VehicleSpecificationApi
-        const response = await axios.get(
-          `${API_BASE_URL}/api/v1/ud07/vehiclespecification`,
+        const response = await api.get(
+          `/api/v1/ud07/vehiclespecification`,
           {
             params: { chassisNo },
           }

@@ -4,7 +4,7 @@
  * 参照 UD12 风格实现
  */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api, { API_BASE_URL } from "../config/api";
 import "./ListTemplates.css";
 
 /** 市场数据类型 */
@@ -33,9 +33,6 @@ interface FileListResponse {
   totalCount: number;
 }
 
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
-
 /**
  * ListTemplates 组件
  * 选择Market后显示该市场文件夹下的模板文件列表
@@ -60,8 +57,8 @@ const ListTemplates: React.FC = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/ud14/UD14SelectMarketmaster`
+        const response = await api.get(
+          `/api/ud14/UD14SelectMarketmaster`
         );
         if (response.data.code === 200 && response.data.data) {
           const data: MarketListResponse = response.data.data;
@@ -93,8 +90,8 @@ const ListTemplates: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/ud14/UD14SelectHdocuserdefinedrules`,
+      const response = await api.get(
+        `/api/ud14/UD14SelectHdocuserdefinedrules`,
         { params: { market } }
       );
       if (response.data.code === 200 && response.data.data) {

@@ -5,11 +5,9 @@
  */
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
+import OperatorSelect from '../components/OperatorSelect';
 import "./MarketDocumentSettings.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 设置选项列表 */
 const SETTING_OPTIONS = ["Option 1", "Option 2", "Option 3", "Option 4"];
@@ -46,10 +44,7 @@ const MarketDocumentSettings: React.FC = () => {
 
   /** 渲染运算符下拉框 */
   const renderOp = (field: string) => (
-    <select value={ops[field]} onChange={(e) => setOp(field, e.target.value as Operator)} className="operator-select">
-      <option value="=">=</option>
-      <option value="!=">!=</option>
-    </select>
+    <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='operator-select' />
   );
 
   const clearMessage = () => setMessage("");
@@ -138,8 +133,8 @@ const MarketDocumentSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/ud20-1/UpdateHdocDocumentList`,
+      const response = await api.post(
+        `/api/ud20-1/UpdateHdocDocumentList`,
         {
           operation: "UPDATE_HDOC_DOCUMENT_LIST",
           doctype: documentType.trim(),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import './SaveModifications.css';
 
 /**
@@ -11,11 +11,6 @@ interface LocationState {
   serie: string;
   modifiedVariables?: { variable: string; modifiedValue: string }[];
 }
-
-/**
- * 后端API基础地址
- */
-const API_BASE_URL = 'http://localhost:8081';
 
 /**
  * SaveModifications 组件 - 保存修改页面（UD06）
@@ -66,8 +61,8 @@ const SaveModifications: React.FC = () => {
         setLoading(true);
         setError('');
 
-        const response = await axios.post(
-          `${API_BASE_URL}/api/ud06/savemodifications/query`,
+        const response = await api.post(
+          `/api/ud06/savemodifications/query`,
           { serie, chno: chassisNo },
           { timeout: 10000 }
         );

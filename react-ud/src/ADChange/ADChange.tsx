@@ -4,11 +4,8 @@
  * 对应详细设计：详细设计/詳細設計UD16.md
  */
 import React, { useState } from "react";
-import axios from "axios";
+import api, { API_BASE_URL } from "../config/api";
 import "./ADChange.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /**
  * CHECK查询结果数据类型
@@ -84,8 +81,8 @@ const ADChange: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/adchange/process`,
+      const response = await api.post(
+        '/api/adchange/process',
         {
           operation: "ADD",
           serieChnr: serieChnr.trim(),
@@ -132,8 +129,8 @@ const ADChange: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/adchange/process`,
+      const response = await api.post(
+        '/api/adchange/process',
         {
           operation: "DELETE",
           serieChnr: serieChnr.trim(),
@@ -176,8 +173,8 @@ const ADChange: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/adchange/process`,
+      const response = await api.post(
+        '/api/adchange/process',
         {
           operation: "CHECK",
           serieChnr: serieChnr.trim()

@@ -6,7 +6,7 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import './ExistingHDocVariablesResultList.css';
 
 /**
@@ -28,8 +28,6 @@ interface ApiResponse<T> {
   message: string;
   data: T;
 }
-
-const API_BASE_URL = 'http://localhost:8081';
 
 /**
  * ExistingHDocVariablesResultList 组件
@@ -78,8 +76,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           useridOp: searchState.useridOp || '=',
           registerDatetimeOp: searchState.registerDatetimeOp || '='
         };
-        const res = await axios.post<ApiResponse<SearchResultItem[]>>(
-          `${API_BASE_URL}/api/ud11/search`,
+        const res = await api.post<ApiResponse<SearchResultItem[]>>(
+          `/api/ud11/search`,
           searchParams
         );
         if (res.data.code === 200 && Array.isArray(res.data.data)) {

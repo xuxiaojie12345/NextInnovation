@@ -4,7 +4,7 @@
  * 对应详细设计：详细设计/詳細設計UD15.md
  */
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../config/api";
 import "./VinPlate.css";
 
 /**
@@ -22,9 +22,6 @@ interface VinPlateInfo {
   printItems: string;
   vpData: string;
 }
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /**
  * VinPlate 组件
@@ -70,8 +67,8 @@ const VinPlate: React.FC = () => {
         }
       } catch { /* ignore */ }
 
-      const response = await axios.post(
-        `${API_BASE_URL}/api/ud15/UD15SelecthdocsenddatavinplateApi`,
+      const response = await api.post(
+        `/api/ud15/UD15SelecthdocsenddatavinplateApi`,
         {
           chassisNumber: chassisNumber.trim(),
           operation,

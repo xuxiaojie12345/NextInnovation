@@ -4,11 +4,8 @@
  * 对应详细设计：详细设计/詳細設計UD18.md
  */
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../config/api";
 import "./HDocUserDocAdministration.css";
-
-/** 后端API基础地址 */
-const API_BASE_URL = "http://localhost:8081";
 
 /** 文档类型数据类型（来自后端 UD20 API，列名为大写） */
 interface DocTypeItem {
@@ -42,8 +39,8 @@ const HDocUserDocAdministration: React.FC = () => {
   useEffect(() => {
     const fetchDocTypes = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/ud20/marketdocumentsettings`
+        const response = await api.get(
+          `/api/ud20/marketdocumentsettings`
         );
         if (response.data.code === 200 && Array.isArray(response.data.data)) {
           // 后端MyBatis返回的列名大小写不确定（取决于JDBC驱动），统一标准化
@@ -130,8 +127,8 @@ const HDocUserDocAdministration: React.FC = () => {
 
     try {
       // 存在性检查：调用checkAuth（对应详细设计 3.1.2 步骤3）
-      const authResponse = await axios.post(
-        `${API_BASE_URL}/api/ud18/UD18HDocUserDocAdministrationApi`,
+      const authResponse = await api.post(
+        `/api/ud18/UD18HDocUserDocAdministrationApi`,
         {
           userid: userid.trim(),
           operation: "checkAuth"
@@ -152,8 +149,8 @@ const HDocUserDocAdministration: React.FC = () => {
       }
 
       // 查询用户信息和文档权限（对应详细设计 3.1.2 步骤4）
-      const selectResponse = await axios.post(
-        `${API_BASE_URL}/api/ud18/UD18HDocUserDocAdministrationApi`,
+      const selectResponse = await api.post(
+        `/api/ud18/UD18HDocUserDocAdministrationApi`,
         {
           userid: userid.trim(),
           operation: "select"
@@ -202,8 +199,8 @@ const HDocUserDocAdministration: React.FC = () => {
 
     try {
       // 存在性检查：先验证用户是否存在（对应详细设计 3.1.3 步骤3）
-      const authResponse = await axios.post(
-        `${API_BASE_URL}/api/ud18/UD18HDocUserDocAdministrationApi`,
+      const authResponse = await api.post(
+        `/api/ud18/UD18HDocUserDocAdministrationApi`,
         {
           userid: userid.trim(),
           operation: "checkAuth"
@@ -224,8 +221,8 @@ const HDocUserDocAdministration: React.FC = () => {
       }
 
       // 先删除旧权限（对应详细设计 3.1.3 步骤4）
-      await axios.post(
-        `${API_BASE_URL}/api/ud18/UD18HDocUserDocAdministrationApi`,
+      await api.post(
+        `/api/ud18/UD18HDocUserDocAdministrationApi`,
         {
           userid: userid.trim(),
           operation: "delete"
@@ -233,8 +230,8 @@ const HDocUserDocAdministration: React.FC = () => {
       );
 
       // 再创建新权限（对应详细设计 3.1.3 步骤5）
-      const createResponse = await axios.post(
-        `${API_BASE_URL}/api/ud18/UD18HDocUserDocAdministrationApi`,
+      const createResponse = await api.post(
+        `/api/ud18/UD18HDocUserDocAdministrationApi`,
         {
           userid: userid.trim(),
           operation: "create",

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
+import OperatorSelect, { CompareOperatorSelect } from '../components/OperatorSelect';
+import type { Operator, CompareOperator } from '../components/OperatorSelect';
 import './HomologationVariables.css';
 
 /**
@@ -44,12 +46,6 @@ interface FormData {
   updateDatetime: string;
 }
 
-const API_BASE_URL = 'http://localhost:8081';
-
-type Operator = '=' | '!=';
-/** 数值/日期字段专用运算符：仅支持 < > = 三种比较 */
-type CompareOperator = '=' | 'GT' | 'LT';
-
 /**
  * HomologationVariables 组件 - 认证变量管理页面（UD08）
  */
@@ -72,19 +68,12 @@ const HomologationVariables: React.FC = () => {
   const setCompareOp = (field: string, v: CompareOperator) => setCompareOps(prev => ({ ...prev, [field]: v }));
 
   const renderOp = (field: string) => (
-    <select value={ops[field]} onChange={e => setOp(field, e.target.value as Operator)} className='operator-select'>
-      <option value='='>=</option>
-      <option value='!='>!=</option>
-    </select>
+    <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='operator-select' />
   );
 
   /** 数值/日期字段专用运算符下拉框（仅支持 < > = 三种比较） */
   const renderCompareOp = (field: string) => (
-    <select value={compareOps[field]} onChange={e => setCompareOp(field, e.target.value as CompareOperator)} className='operator-select'>
-      <option value='='>=</option>
-      <option value='GT'>&gt;</option>
-      <option value='LT'>&lt;</option>
-    </select>
+    <CompareOperatorSelect value={compareOps[field]} onChange={(v) => setCompareOp(field, v)} className='operator-select' />
   );
 
   const [productClassList, setProductClassList] = useState<ProductClassOption[]>([]);
@@ -106,9 +95,9 @@ const HomologationVariables: React.FC = () => {
       try {
         setLoading(true);
         const [pcRes, mktRes, varRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/api/ud08/selectproductclassmaster`),
-          axios.get(`${API_BASE_URL}/api/ud08/selectmarketmaster`),
-          axios.get(`${API_BASE_URL}/api/ud08/selecthdocvariables`)
+          api.get('/api/ud08/selectproductclassmaster'),
+          api.get('/api/ud08/selectmarketmaster'),
+          api.get('/api/ud08/selecthdocvariables')
         ]);
         if (Array.isArray(pcRes.data)) setProductClassList(pcRes.data);
         if (Array.isArray(mktRes.data)) setMarketList(mktRes.data);
@@ -215,7 +204,7 @@ const HomologationVariables: React.FC = () => {
     if (err) { setMessage(err); setHasError(true); return; }
     setIsOperating(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/ud08/add`, formData);
+      const res = await api.post('/api/ud08/add', formData);
       if (res.data.code === 200) { setMessage('Record added successfully.'); setHasError(false); }
       else if (res.data.code === 409) { setMessage('Primary key conflict, Please enter the correct content'); setHasError(true); }
       else { setMessage(res.data.message || 'System error. Please contact administrator.'); setHasError(true); }
@@ -244,7 +233,7 @@ const HomologationVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/ud08/update`, formData);
+      const res = await api.post('/api/ud08/update', formData);
       if (res.data.code === 200) { setMessage('Record updated successfully.'); setHasError(false); }
       else if (res.data.code === 404) { setMessage('Data does not exist, Please enter the correct content'); setHasError(true); }
       else if (res.data.code === 409) { setMessage('Primary key conflict, Please enter the correct content'); setHasError(true); }
@@ -266,7 +255,7 @@ const HomologationVariables: React.FC = () => {
     if (!market) { setMessage('Market is required.'); setHasError(true); return; }
     setIsOperating(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/ud08/delete`, { productClass, number, market });
+      const res = await api.post('/api/ud08/delete', { productClass, number, market });
       if (res.data.code === 200) {
         setMessage('Record deleted successfully.'); setHasError(false);
         handleClear();
