@@ -728,14 +728,14 @@ const HomologationVariables: React.FC = () => {
         </tbody>
       </table>
 
+      {errorMessage && <div className="hv-error msg-error">{errorMessage}</div>}
+      {successMessage && <div className="hv-success msg-success">{successMessage}</div>}
+
       <div className="hv-cond-list">
         {conditions.slice(0, 5).map((cond, i) => renderSimpleRow(cond, i))}
         {renderVariantRow()}
         {conditions.slice(5).map((cond, i) => renderSimpleRow(cond, i + 5))}
       </div>
-
-      {errorMessage && <div className="hv-error">{errorMessage}</div>}
-      {successMessage && <div className="hv-success">{successMessage}</div>}
     </div>
   );
 };

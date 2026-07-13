@@ -164,3 +164,25 @@
 .panel-w1000 { width: 1000px; }
 .panel-w1100 { width: 1100px; }
 .panel-w1400 { width: 1400px; }
+
+/* ═══════════════════════════════════════════
+   共通メッセージ — エラー / 成功
+   各画面の .xxx-error / .xxx-success を集約
+   ═══════════════════════════════════════════ */
+.msg-error {
+  padding: 6px 10px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #e53935;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.msg-success {
+  padding: 6px 10px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  font-size: 12px;
+  margin-bottom: 6px;
+}

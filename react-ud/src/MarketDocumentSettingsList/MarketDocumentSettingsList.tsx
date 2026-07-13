@@ -146,8 +146,8 @@ const MarketDocumentSettingsList: React.FC = () => {
         <h1>HDoc - Market Document Setting</h1>
       </div>
 
-      {message && <div className="mdsl-error">{message}</div>}
-      {successMessage && <div className="mdsl-success">{successMessage}</div>}
+      {message && <div className="mdsl-error msg-error">{message}</div>}
+      {successMessage && <div className="mdsl-success msg-success">{successMessage}</div>}
 
       <div className="mdsl-bordered">
         {/* 按钮区域：在上方，有背景色 */}

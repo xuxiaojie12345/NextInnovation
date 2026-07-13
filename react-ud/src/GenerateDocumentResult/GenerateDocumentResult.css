@@ -107,12 +107,6 @@
   color: #aca4a0;
 }
 
-. {
-  color: #aca4a0;
-  font-weight: bold; /* 粗体 */
-  text-decoration: underline; /* 下划线 */
-}
-
 /* 可选：hover 保持样式不变 */
 .custom-link:hover {
   color: #aca4a0;

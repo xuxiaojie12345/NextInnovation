@@ -179,7 +179,7 @@ const HomologationVariablesResultList: React.FC = () => {
         <h1>Homologation Variables</h1>
       </div>
 
-      {errorMessage && <div className="hv-result-error">{errorMessage}</div>}
+      {errorMessage && <div className="hv-result-error msg-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
       <table className="hv-result-btn-table no-print">

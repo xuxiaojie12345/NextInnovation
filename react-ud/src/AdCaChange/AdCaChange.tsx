@@ -172,8 +172,8 @@ const AdCaChange: React.FC = () => {
       </div>
 
       <div className="adca-body">
-        {message && <div className="adca-error">{message}</div>}
-        {successMessage && <div className="adca-success">{successMessage}</div>}
+        {message && <div className="adca-error msg-error">{message}</div>}
+        {successMessage && <div className="adca-success msg-success">{successMessage}</div>}
 
         <div className="adca-form">
           {/* Serie-Chnr */}

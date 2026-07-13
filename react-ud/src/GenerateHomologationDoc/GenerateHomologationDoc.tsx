@@ -162,7 +162,7 @@ const GenerateHomologationDoc: React.FC = () => {
       <div className="generate-doc-container">
         {/* 错误信息 */}
         {errorMessage && (
-          <div className="generate-doc-error">{errorMessage}</div>
+          <div className="msg-error" style={{marginTop:"-24px", marginLeft:"-24px" , marginRight:"-24px"}}>{errorMessage}</div>
         )}
         
         {/* Chassis series 项目 */}

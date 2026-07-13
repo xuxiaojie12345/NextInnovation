@@ -419,8 +419,8 @@ const ExistingHDocVariables: React.FC = () => {
         </tbody>
       </table>
 
-      {message && <div className="ehv-error">{message}</div>}
-      {successMessage && <div className="ehv-success">{successMessage}</div>}
+      {message && <div className="ehv-error msg-error">{message}</div>}
+      {successMessage && <div className="ehv-success msg-success">{successMessage}</div>}
 
       <div className="ehv-form">
         {/* Variable */}

@@ -7,15 +7,6 @@
   box-sizing: border-box;
 }
 
-.edb-error {
-  padding: 6px 10px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  color: #e53935;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
 .edb-filters {
   padding: 8px 10px;
 }

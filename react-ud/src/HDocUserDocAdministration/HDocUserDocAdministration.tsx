@@ -181,8 +181,8 @@ const HDocUserDocAdministration: React.FC = () => {
         <h1>HDoc User Doc Administration</h1>
       </div>
 
-      {message && <div className="huda-error">{message}</div>}
-      {successMessage && <div className="huda-success">{successMessage}</div>}
+      {message && <div className="huda-error msg-error">{message}</div>}
+      {successMessage && <div className="huda-success msg-success">{successMessage}</div>}
 
       {/* ── UserID / User 输入区域 ── */}
       <table className="huda-input-table">

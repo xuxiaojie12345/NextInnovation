@@ -121,7 +121,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
         <h1 className="print-header-sm">HDoc - Market Document Setting</h1>
       </div>
 
-      {message && <div className="mdsr-error no-print">{message}</div>}
+      {message && <div className="mdsr-error msg-error no-print">{message}</div>}
 
       <table className="mdsr-btn-table no-print">
         <tbody>

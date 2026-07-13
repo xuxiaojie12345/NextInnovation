@@ -196,7 +196,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
         <h1>Existing HDoc Variables</h1>
       </div>
 
-      {errorMessage && <div className="ehvr-error">{errorMessage}</div>}
+      {errorMessage && <div className="ehvr-error msg-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
       <table className="ehvr-btn-table no-print">

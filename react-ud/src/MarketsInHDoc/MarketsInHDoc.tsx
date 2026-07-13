@@ -40,7 +40,7 @@ const MarketsInHDoc: React.FC = () => {
         <h1>Markets in HDoc</h1>
       </div>
 
-      {message && <div className="mh-error">{message}</div>}
+      {message && <div className="mh-error msg-error">{message}</div>}
 
       {isLoading ? (
         <div className="mh-loading">Loading...</div>

@@ -191,8 +191,8 @@ const ListAvailableTemplates: React.FC = () => {
         <h1>List Templates</h1>
       </div>
 
-      {message && <div className="lat-error">{message}</div>}
-      {successMessage && <div className="lat-success">{successMessage}</div>}
+      {message && <div className="lat-error msg-error">{message}</div>}
+      {successMessage && <div className="lat-success msg-success">{successMessage}</div>}
 
       {/* ── Market 选择 ── */}
       <div className="lat-form">

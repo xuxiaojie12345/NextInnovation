@@ -6,24 +6,6 @@
   width: 1000px;
 }
 
-.hua-error {
-  padding: 6px 10px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  color: #e53935;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
-.hua-success {
-  padding: 6px 10px;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  color: #389e0d;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
 /* ── 输入区域表格 ── */
 .hua-input-table {
   width: auto;

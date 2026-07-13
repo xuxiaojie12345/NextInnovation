@@ -320,8 +320,8 @@ const HDocUserAdministration: React.FC = () => {
         <h1>HDoc User Admin</h1>
       </div>
       <div className="hua-container panel panel-w1000">
-        {message && <div className="hua-error">{message}</div>}
-        {successMessage && <div className="hua-success">{successMessage}</div>}
+        {message && <div className="hua-error msg-error">{message}</div>}
+        {successMessage && <div className="hua-success msg-success">{successMessage}</div>}
 
         {/* ── UserID / User / Password 输入 ── */}
         <table className="hua-input-table">

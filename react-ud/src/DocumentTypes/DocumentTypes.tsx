@@ -37,7 +37,7 @@ const DocumentTypes: React.FC = () => {
         <h1>Document Types</h1>
       </div>
 
-      {message && <div className="dt-error">{message}</div>}
+      {message && <div className="dt-error msg-error">{message}</div>}
 
       {isLoading ? (
         <div className="dt-loading">Loading...</div>

@@ -128,7 +128,7 @@ const SearchUser: React.FC = () => {
         <h1>Search User</h1>
       </div>
 
-      {message && <div className="su-error">{message}</div>}
+      {message && <div className="su-error msg-error">{message}</div>}
 
       {/* Search form */}
       <div className="su-form">

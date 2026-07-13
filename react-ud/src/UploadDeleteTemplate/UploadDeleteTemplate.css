@@ -4,10 +4,13 @@
 
 .udt-container {
   width: 700px;
-  padding: 20px;
 }
 
 /* ── Section ── */
+.udt-section {
+  padding: 0 20px;
+}
+
 .udt-section-title {
   font-size: 13px;
   font-weight: 700;
@@ -20,9 +23,7 @@
 .udt-form-table {
   border-collapse: collapse;
   width: 100%;
-  border-left: none;
-  border-right: none;
-  border: 2px solid #acb7ee;
+  border: 1px solid #acb7ee;
 }
 
 .udt-form-table td {
@@ -46,7 +47,7 @@
 /* ── 按钮行：背景色 + 边框 ── */
 .udt-btn-row {
   background-color: #f1f3ff;
-  border-top: 2px solid #acb7ee;
+  border-top: 1px solid #acb7ee;
   width: 100%;
 }
 
@@ -69,13 +70,13 @@
 
 /* ── Link Area ── */
 .udt-link-area {
-  padding: 10px 0;
+  padding: 10px 20px;
   text-align: left;
 }
 
 /* ── 模板检查提示 ── */
 .udt-check-info {
-  padding: 8px 16px 0 0;
+  padding: 8px 20px 0;
   font-size: 12px;
   color: #333;
   line-height: 1.6;
@@ -102,28 +103,10 @@
   color: #86759b;
 }
 
-/* ── Messages ── */
-.udt-error {
-  padding: 6px 10px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  color: #e53935;
-  font-size: 12px;
-  margin: 6px 10px;
-}
-
-.udt-success {
-  padding: 6px 10px;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  color: #389e0d;
-  font-size: 12px;
-  margin: 6px 10px;
-}
 
 /* ── 提示信息 ── */
 .udt-notice {
-  padding: 10px 0px;
+  padding: 10px 20px;
   font-size: 14px;
   color: #333;
   line-height: 1.6;

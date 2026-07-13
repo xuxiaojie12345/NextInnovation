@@ -6,15 +6,6 @@
   width: 800px;
 }
 
-.mh-error {
-  padding: 6px 10px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  color: #e53935;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
 .mh-loading {
   padding: 30px 20px;
   text-align: center;

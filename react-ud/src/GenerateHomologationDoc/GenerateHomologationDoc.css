@@ -36,18 +36,6 @@
   box-sizing: border-box;
 }
 
-/* ── 错误信息 ── */
-.generate-doc-error {
-  padding: 10px 14px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
-  color: #e53935;
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
 /* ── 表单 ── */
 .generate-doc-form {
   display: flex;

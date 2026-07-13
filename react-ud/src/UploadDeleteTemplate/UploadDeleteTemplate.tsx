@@ -179,9 +179,9 @@ const UploadDeleteTemplate: React.FC = () => {
   };
 
   return (
-    <div className="udt-container">
-      {message && <div className="udt-error">{message}</div>}
-      {successMessage && <div className="udt-success">{successMessage}</div>}
+    <div className="udt-container panel panel-w700">
+      {message && <div className="udt-error msg-error">{message}</div>}
+      {successMessage && <div className="udt-success msg-success">{successMessage}</div>}
 
       {/* ═══════ Upload 区域 ═══════ */}
       <div className="udt-section">

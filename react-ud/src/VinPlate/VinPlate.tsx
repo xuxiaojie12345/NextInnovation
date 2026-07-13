@@ -176,9 +176,9 @@ const VinPlate: React.FC = () => {
       const res = await api.post(endpoint, { serie, chnr, currentUser });
 
       if (res.code === 200) {
-        setSuccessMessage(successMsg);
-        // Refresh info after action
         await handleViewInfo();
+        setSuccessMessage(successMsg);
+
       } else {
         setMessage(res.message || "Operation failed.");
       }
@@ -207,8 +207,8 @@ const VinPlate: React.FC = () => {
         <h1>Vin Plate</h1>
       </div>
 
-      {message && <div className="vp-error">{message}</div>}
-      {successMessage && <div className="vp-success">{successMessage}</div>}
+      {message && <div className="vp-error msg-error">{message}</div>}
+      {successMessage && <div className="vp-success msg-success">{successMessage}</div>}
 
       {/* ── 输入区域 ── */}
       <div className="vp-input-section">
