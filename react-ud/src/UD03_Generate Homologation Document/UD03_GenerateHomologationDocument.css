@@ -29,11 +29,25 @@
 
 /* ==================== 错误消息区域 ==================== */
 .ud03-container .error-message-area {
-  color: #ff0000; /* 红色 */
+  color: #cf1322;
   font-size: 12px;
   text-align: left;
   margin-bottom: 10px;
   min-height: 15px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 错误消息为空时隐藏边框背景 */
+.ud03-container .error-message-area:empty {
+  border: none;
+  background-color: transparent;
+  padding: 0;
 }
 
 /* ==================== 表单区域 ==================== */

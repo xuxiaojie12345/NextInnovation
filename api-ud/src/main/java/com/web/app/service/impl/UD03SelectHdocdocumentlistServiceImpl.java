@@ -49,14 +49,11 @@ public class UD03SelectHdocdocumentlistServiceImpl implements UD03SelectHdocdocu
                 // 返回空列表，而不是错误
                 return UD03SelectHdocdocumentlistResponse.success(doctypeList);
             }
-
-            log.info("查询成功，共找到 {} 个文档类型", doctypeList.size());
-
             // 4.6 封装响应对象
             return UD03SelectHdocdocumentlistResponse.success(doctypeList);
 
         } catch (Exception e) {
-            log.error("查询文档类型列表失败", e);
+            log.error("查询文档类型列表异常", e);
             // 返回错误响应
             return UD03SelectHdocdocumentlistResponse.error(500, "System error. Please try again later.");
         }

@@ -22,7 +22,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authentication(AuthenticationRequest request) {
-        log.info("开始用户认证，userId: {}", request.getUserId());
 
         AuthenticationResponse response = new AuthenticationResponse();
 
@@ -35,7 +34,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if (user == null) {
                 response.setCode(401);
                 response.setMsg("We didn't recognize the username or password you entered. Please try again.");
-                log.warn("用户认证失败，账号不存在: {}", request.getUserId());
                 return response;
             }
 
@@ -44,7 +42,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 if (!request.getPassword().equals(user.getPassword())) {
                     response.setCode(401);
                     response.setMsg("We didn't recognize the username or password you entered. Please try again.");
-                    log.warn("用户认证失败，密码错误: {}", request.getUserId());
                     return response;
                 }
             }
@@ -63,10 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             response.setMsg("登录成功");
             response.setData(data);
 
-            log.info("用户认证成功: {}", request.getUserId());
-
         } catch (Exception e) {
-            log.error("用户认证异常", e);
             response.setCode(500);
             response.setMsg("服务器内部错误");
         }

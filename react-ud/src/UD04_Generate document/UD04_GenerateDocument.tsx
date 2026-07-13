@@ -76,6 +76,13 @@ const UD04_GenerateDocument: React.FC = () => {
    * 2. 调用API获取文档生成结果数据
    */
   useEffect(() => {
+    // 对应设计书 5. 异常处理 - 用户未登录
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+      return;
+    }
+
     // 从路由state获取前画面传来的参数
     const stateData = location.state as any;
     if (stateData && stateData.chassisSeries && stateData.chassisNo) {
@@ -88,10 +95,10 @@ const UD04_GenerateDocument: React.FC = () => {
       // 如果没有参数，显示错误消息
       setState(prev => ({
         ...prev,
-        message: '未找到相关数据',
+        message: 'We can not get the data. Please try again.',
       }));
     }
-  }, [location.state]);
+  }, [navigate, location.state]);
 
   // ==================== API调用 ====================
 
@@ -150,35 +157,40 @@ const UD04_GenerateDocument: React.FC = () => {
           isLoading: false,
         }));
       } else {
-        // API返回失败
+        // 对应设计书 5. 异常处理 - 数据不存在 / 业务错误
+        // 服务器返回了业务错误（code != 200），记录服务器返回的错误详情
+        console.error('API业务错误:', response.data?.messageList || response.data);
         setState(prev => ({
           ...prev,
-          message: 'We can not get the OM_data. Please try again.',
+          message: 'We can not get the data. Please try again.',
           isLoading: false,
         }));
       }
     } catch (error: any) {
+      // ==================== 5. 异常处理 ====================
+      // 对应设计书 5. 异常处理表
       console.error('获取文档数据失败:', error);
       
-      // 错误处理：根据错误类型显示不同的消息
-      let errorMessage = 'System error. Please try again later.';
+      let errorMessage: string;
       
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            errorMessage = '未授权，请重新登录';
-            break;
-          case 404:
-            errorMessage = '请求的资源不存在';
-            break;
-          case 500:
-            errorMessage = '服务器内部错误';
-            break;
-          default:
-            errorMessage = `请求失败: ${error.response.status}`;
-        }
-      } else if (error.code === 'ECONNABORTED') {
+      if (error.code === 'ECONNABORTED') {
+        // 请求超时 — 超时异常
+        console.error('请求超时');
         errorMessage = 'Request timeout. Please check your network.';
+      } else if (error.response) {
+        // 服务器返回了错误状态码（4xx, 5xx）
+        const status = error.response.status;
+        console.error('服务器返回错误状态:', status, error.response.data);
+        // 服务器内部错误(500)、未授权(401)等统一显示 System error
+        errorMessage = 'System error. Please try again later.';
+      } else if (error.request) {
+        // 请求已发出但没有收到响应 — 网络异常
+        console.error('网络异常: 未收到服务器响应');
+        errorMessage = 'System error. Please try again later.';
+      } else {
+        // API取得异常等其他异常
+        console.error('API取得异常:', error.message);
+        errorMessage = 'System error. Please try again later.';
       }
       
       setState(prev => ({
@@ -204,14 +216,23 @@ const UD04_GenerateDocument: React.FC = () => {
     // 从路由state获取参数
     const stateData = location.state as any;
     if (stateData) {
-      // 跳转到UD05 Modify Document画面，传递必要参数
-      navigate('/UD05', {
-        state: {
-          chassisSeries: stateData.chassisSeries,
-          chassisNo: stateData.chassisNo,
-          market: state.market,
-        },
-      });
+      try {
+        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        navigate('/UD05', {
+          state: {
+            chassisSeries: stateData.chassisSeries,
+            chassisNo: stateData.chassisNo,
+            market: state.market,
+          },
+        });
+      } catch (error) {
+        // 对应设计书 5. 异常处理 - 画面迁移异常
+        console.error('UD05跳转失败:', error);
+        setState(prev => ({
+          ...prev,
+          message: 'System error. Please try again later.',
+        }));
+      }
     }
   };
 
@@ -228,13 +249,22 @@ const UD04_GenerateDocument: React.FC = () => {
     // 从路由state获取参数
     const stateData = location.state as any;
     if (stateData) {
-      // 跳转到UD07 VDA - Vehicle Specification画面
-      navigate('/UD07', {
-        state: {
-          chassisSeries: stateData.chassisSeries,
-          chassisNo: stateData.chassisNo,
-        },
-      });
+      try {
+        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        navigate('/UD07', {
+          state: {
+            chassisSeries: stateData.chassisSeries,
+            chassisNo: stateData.chassisNo,
+          },
+        });
+      } catch (error) {
+        // 对应设计书 5. 异常处理 - 画面迁移异常
+        console.error('UD07跳转失败:', error);
+        setState(prev => ({
+          ...prev,
+          message: 'System error. Please try again later.',
+        }));
+      }
     }
   };
 

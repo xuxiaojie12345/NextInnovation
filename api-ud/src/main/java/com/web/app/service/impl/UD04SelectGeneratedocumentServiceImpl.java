@@ -58,7 +58,7 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
             if (documentData == null) {
                 log.warn("未找到匹配的文档数据，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
                 // 无匹配结果时返回友好提示
-                return UD04SelectGeneratedocumentResponse.error(404, "Chassis no is not exists.");
+                return UD04SelectGeneratedocumentResponse.error(404, "We can not get the data. Please try again.");
             }
 
             log.info("查询成功，找到文档数据");

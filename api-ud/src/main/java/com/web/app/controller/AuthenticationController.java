@@ -34,7 +34,6 @@ public class AuthenticationController {
     public AuthenticationResponse authentication(
             @RequestParam String userId,
             @RequestParam(required = false) String password) {
-        log.info("收到登录请求: userId={}", userId);
 
         // 构建请求对象
         AuthenticationRequest request = new AuthenticationRequest();

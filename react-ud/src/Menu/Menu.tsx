@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 
@@ -25,7 +25,20 @@ interface MenuSection {
  */
 const Menu: React.FC = () => {
   const navigate = useNavigate();
-  
+
+  // ==================== 状态管理 ====================
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // ==================== 画面初始化 ====================
+  // 对应设计书 3.1.1 初始显示流程 - 验证用户登录状态
+  // 对应设计书 5. 异常处理 - 用户未登录
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 菜单配置 ====================
   // 对应设计文档 2.1 控件属性表 和 3.2 画面跳转映射表
   const menuSections: MenuSection[] = [
@@ -93,13 +106,17 @@ const Menu: React.FC = () => {
    * @param {MenuItem} item - 被点击的菜单项
    */
   const handleMenuItemClick = (item: MenuItem) => {
+    // 清除之前的错误消息
+    setErrorMessage('');
+
     if (item.path) {
-      // 有path配置，执行路由跳转
-      console.log('跳转到:', item.label, '路径:', item.path);
-      navigate(item.path);
-    } else {
-      // 无path配置，功能待开发
-      console.log('功能待开发:', item.label);
+      try {
+        // 有path配置，执行路由跳转
+        navigate(item.path);
+      } catch (error) {
+        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        setErrorMessage('页面跳转失败，请稍后重试');
+      }
     }
   };
 
@@ -122,6 +139,14 @@ const Menu: React.FC = () => {
           }}
         />
       </div>
+
+      {/* 错误消息显示区域 */}
+      {errorMessage && (
+        <div className="menu-error">
+          <span className="menu-error-icon">⚠</span>
+          <span className="menu-error-text">{errorMessage}</span>
+        </div>
+      )}
 
       <div className="menu-content">
         {menuSections.map((section, index) => (

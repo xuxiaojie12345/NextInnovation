@@ -19,7 +19,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
   const navigate = useNavigate();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [chassisSeries, setChassisSeries] = useState<string>('');       // Chassis series输入值
   const [chassisNo, setChassisNo] = useState<string>('');               // Chassis no输入值
   const [documentType, setDocumentType] = useState<string>('');         // Document type选择值
@@ -49,6 +48,13 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    * 2. 调用API获取Document type列表
    */
   useEffect(() => {
+    // 对应设计书 5. 异常处理 - 用户未登录
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+      return;
+    }
+
     // 从localStorage读取上次输入的条件
     const lastChassisSeries = localStorage.getItem('lastChassisSeries');
     const lastChassisNo = localStorage.getItem('lastChassisNo');
@@ -60,7 +66,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
     
     // 调用API获取Document type列表
     fetchDocumentTypeList();
-  }, []);
+  }, [navigate]);
 
   // ==================== API调用 ====================
 
@@ -81,8 +87,13 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
         setMessage('We can not get the data. Please try again.');
       }
     } catch (error: any) {
-      console.error('获取Document type列表失败:', error);
-      setMessage('System error. Please try again later.');
+      if (error.code === 'ECONNABORTED') {
+        // 请求超时
+        setMessage('Request timeout. Please check your network.');
+      } else {
+        // 网络异常/API服务不可用/服务器内部错误
+        setMessage('System error. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -99,8 +110,8 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    */
   const handleChassisSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角英字，且不超过最大长度
-    if (CHASSIS_SERIES_REGEX.test(val) && val.length <= MAX_CHASSIS_SERIES_LENGTH) {
+    // 正则校验：只允许半角英字（maxLength已在HTML控件中控制）
+    if (CHASSIS_SERIES_REGEX.test(val)) {
       setChassisSeries(val);
       // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage('');
@@ -116,10 +127,9 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    */
   const handleChassisNoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角数字，且不超过最大长度
-    if (CHASSIS_NO_REGEX.test(val) && val.length <= MAX_CHASSIS_NO_LENGTH) {
+    // 正则校验：只允许半角数字
+    if (CHASSIS_NO_REGEX.test(val)) {
       setChassisNo(val);
-      // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage('');
     }
   };
@@ -138,57 +148,47 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
   /**
    * 点击 Submit 按钮提交流程
    * 对应设计书 3.1.2 Submit 按钮处理流程
-   * 
-   * 处理流程：
-   * 1. 前置处理：获取输入值并去除首尾空格
-   * 2. 空值校验（前端校验）
-   * 3. 结果处理：校验通过则缓存数据并跳转，校验失败显示错误
    */
   const handleSubmit = () => {
-    // 1. 前置处理：获取输入值并去除首尾空格
-    const trimmedChassisSeries = chassisSeries.trim();
-    const trimmedChassisNo = chassisNo.trim();
-    const trimmedDocumentType = documentType.trim();
-
+    // 1. 前置处理（正则已禁止输入空格，无需trim）
     // 2. 空値校验（前端校验）
-    // 对应设计书 3.2 校验詳細規格表 No.1
-    if (!trimmedChassisSeries) {
+    if (!chassisSeries) {
       setMessage('Chassis series is required.');
       chassisSeriesRef.current?.focus();
       return;
     }
 
-    // 对应設計書 3.2 校驗詳細規格表 No.2
-    if (!trimmedChassisNo) {
+    if (!chassisNo) {
       setMessage('Chassis no is required.');
       chassisNoRef.current?.focus();
       return;
     }
 
-    // 对应設計書 3.2 校驗詳細規格表 No.3
-    if (!trimmedDocumentType) {
+    if (!documentType) {
       setMessage('Document type is required.');
       documentTypeRef.current?.focus();
       return;
     }
 
-    // 3. 結果処理：校驗通過
+    // 3. 結果処理
     // キャッシュ入力の検索条件をlocalStorage
-    localStorage.setItem('lastChassisSeries', trimmedChassisSeries);
-    localStorage.setItem('lastChassisNo', trimmedChassisNo);
-    localStorage.setItem('lastDocumentType', trimmedDocumentType);
-    
-    // クリアメッセージ提示
+    localStorage.setItem('lastChassisSeries', chassisSeries);
+    localStorage.setItem('lastChassisNo', chassisNo);
+    localStorage.setItem('lastDocumentType', documentType);
     setMessage('');
     
-    // 画面遷移：UD04 Generate document 画面へ遷移し、パラメータを渡す
-    navigate('/UD04', {
-      state: {
-        chassisSeries: trimmedChassisSeries,
-        chassisNo: trimmedChassisNo,
-        documentType: trimmedDocumentType,
-      },
-    });
+    try {
+      navigate('/UD04', {
+        state: {
+          chassisSeries: chassisSeries,
+          chassisNo: chassisNo,
+          documentType: documentType,
+        },
+      });
+    } catch (error) {
+      console.error('UD04画面跳转失败:', error);
+      setMessage('页面跳转失败，请稍后重试');
+    }
   };
 
   /**
@@ -210,8 +210,14 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    * 对应设计书 3.1.4 Help 按钮处理流程
    */
   const handleHelp = () => {
-    // 画面遷移：UD24 HDoc Help 画面へ遷移
-    navigate('/UD24');
+    try {
+      // 画面遷移：UD24 HDoc Help 画面へ遷移
+      // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+      navigate('/UD24');
+    } catch (error) {
+      console.error('UD24画面跳转失败:', error);
+      setMessage('页面跳转失败，请稍后重试');
+    }
   };
 
   // ==================== 渲染 UI ====================
@@ -274,7 +280,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
               disabled={isLoading}
               className='form-select'
             >
-              <option value=''>请选择Document type</option>
+              <option value=''></option>
               {documentTypeOptions.map((option, index) => (
                 <option key={index} value={option}>
                   {option}

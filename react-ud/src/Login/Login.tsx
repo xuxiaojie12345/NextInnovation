@@ -23,7 +23,6 @@ const Login: React.FC = () => {
   const [userID, setUserID] = useState<string>("");           // 用户ID输入值
   const [password, setPassword] = useState<string>("");       // 密码输入值
   const [message, setMessage] = useState<string>("");         // 普通错误消息
-  const [errorMessage, setErrorMessage] = useState<string>(""); // 账户锁定等特殊错误消息
   const [isLoading, setIsLoading] = useState<boolean>(false); // 加载状态标识
 
   // ==================== Ref 定义 ====================
@@ -50,12 +49,11 @@ const Login: React.FC = () => {
    */
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角英数字，且不超过最大长度
-    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
+    // 正则校验：只允许半角英数字（maxLength 已在 HTML 控件中控制）
+    if (USER_ID_REGEX.test(val)) {
       setUserID(val);
       // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage("");
-      if (errorMessage) setErrorMessage("");
     }
   };
 
@@ -68,12 +66,11 @@ const Login: React.FC = () => {
    */
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：允许半角英数字及常见 ASCII 符号，且不超过最大长度
-    if (PASSWORD_REGEX.test(val) && val.length <= MAX_PASSWORD_LENGTH) {
+    // 正则校验：允许半角英数字及常见 ASCII 符号（maxLength 已在 HTML 控件中控制）
+    if (PASSWORD_REGEX.test(val)) {
       setPassword(val);
       // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage("");
-      if (errorMessage) setErrorMessage("");
     }
   };
 
@@ -88,18 +85,17 @@ const Login: React.FC = () => {
    * 4. 结果处理：认证成功跳转，认证失败显示错误
    */
   const handleLogin = async () => {
-    // 1. 前置处理：获取输入值并去除首尾空格
-    const trimmedUserID = userID.trim();
-    const trimmedPassword = password.trim();
+    // 1. 前置处理
+    // （正则已禁止输入空格，无需 trim）
 
     // 2. 空值校验（前端校验）
     // 对应设计书 3.2 校验详细规格表 No.1 和 No.2
-    if (!trimmedUserID) {
+    if (!userID) {
       setMessage("Username and password are required.");
       userIDRef.current?.focus(); // 焦点移到UserID
       return;
     }
-    if (!trimmedPassword) {
+    if (!password) {
       setMessage("Username and password are required.");
       passwordRef.current?.focus(); // 焦点移到Password
       return;
@@ -109,7 +105,6 @@ const Login: React.FC = () => {
     // 对应设计书 4.1 AuthenticationApi
     setIsLoading(true);
     setMessage("");      // 清除旧消息
-    setErrorMessage(""); // 清除特殊错误消息
 
     try {
       // 调用真实 API 接口进行身份验证
@@ -117,8 +112,8 @@ const Login: React.FC = () => {
       // 使用GET请求，通过URL参数传递userId和password
       const response = await apiClient.get("/api/ud01/authentication", {
         params: {
-          userId: trimmedUserID,
-          password: trimmedPassword,
+          userId: userID,
+          password: password,
         },
       });
 
@@ -129,7 +124,7 @@ const Login: React.FC = () => {
         // 对应设计书 3.1.1 登录处理流程 - 认证成功分支
         
         // 缓存 UserID 到 localStorage（用于后续会话管理）
-        localStorage.setItem("userID", trimmedUserID);
+        localStorage.setItem("userID", userID);
         
         // 保存用户信息到 localStorage
         if (response.data.data) {
@@ -143,39 +138,36 @@ const Login: React.FC = () => {
         
         // 清空消息提示
         setMessage("");
-        setErrorMessage("");
         
         // 画面迁移：跳转到 Menu 画面 (UD02)
         navigate("/Menu");
       } else {
         // 认证失败（Code != 200 或业务错误）
         // 对应设计书 3.2 校验详细规格表 No.3
-        // 固定使用英文消息，不显示后端返回的 msg，避免暴露具体错误信息
-        setMessage("We didn't recognize the username or password you entered. Please try again.");
+        // 根据后端返回的 business code 区分处理
+        const businessCode = response.data.code;
+        if (businessCode === 500) {
+          // 服务器内部错误
+          setMessage("System error. Please try again later.");
+        } else {
+          // 认证失败（401等），固定使用英文消息，不暴露具体是用户名还是密码错误
+          setMessage("We didn't recognize the username or password you entered. Please try again.");
+        }
         // 安全策略：清空密码字段
         setPassword("");
       }
     } catch (error: any) {
-      // 异常处理
+      // 异常处理 - 网络异常/超时/后端不可达
       // 对应设计书 5. 异常处理
+      // 注：后端永远返回 HTTP 200 + body.code，业务错误已在 try 块中处理
+      // 此 catch 块仅处理真正的异常（网络断开、超时等）
       
-      if (error.response) {
-        // 服务器返回错误响应
-        const statusCode = error.response.status;
-        const errorMsg = error.response.data?.msg;
-        if (statusCode >= 500) {
-          // 服务器内部错误
-          setMessage("System error. Please try again later.");
-        } else {
-          // 其他服务器错误
-          setMessage(errorMsg || "System error. Please try again later.");
-        }
-      } else if (error.code === "ECONNABORTED") {
+      if (error.code === "ECONNABORTED") {
         // 请求超时
         // 对应设计书 5. 异常处理 - 请求超时
         setMessage("Request timeout. Please check your network connection.");
       } else {
-        // 网络异常或其他错误
+        // 网络异常或其他错误（后端不可达、ISAM服务不可用等）
         // 对应设计书 5. 异常处理 - 网络异常、ISAM服务不可用
         setMessage("System error. Please try again later.");
       }
@@ -204,13 +196,6 @@ const Login: React.FC = () => {
       {/* 右侧：登录表单区域 */}
       <div className='login-right'>
         <div className='login-box'>
-          {/* 账户锁定等特殊错误消息显示区域 */}
-          {errorMessage && (
-            <div className='static-error-message'>
-              {errorMessage}
-            </div>
-          )}
-
           {/* 登录表单 */}
           <form
             onSubmit={(e) => {

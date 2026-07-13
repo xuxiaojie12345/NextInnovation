@@ -75,3 +75,26 @@
 .menu-label {
   flex: 1;
 }
+
+/* ==================== 错误消息区域 ==================== */
+.menu-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
+  margin: 0;
+  background-color: #fff2f0;
+  border-bottom: 1px solid #ffccc7;
+  color: #cf1322;
+  font-size: 13px;
+}
+
+.menu-error-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.menu-error-text {
+  flex: 1;
+  line-height: 1.4;
+}
