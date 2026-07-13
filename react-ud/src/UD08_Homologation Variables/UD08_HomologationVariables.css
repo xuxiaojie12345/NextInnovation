@@ -268,3 +268,11 @@
     flex-wrap: wrap;
   }
 }
+
+.ud08-suffix {
+  margin-left: auto;
+  font-size: 12px;
+  color: #333;
+  white-space: nowrap;
+  padding-right: 10px;
+}

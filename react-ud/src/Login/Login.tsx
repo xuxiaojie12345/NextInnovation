@@ -76,13 +76,6 @@ const Login: React.FC = () => {
 
   /**
    * 点击 Login 按钮触发登录流程
-   * 对应设计书 3. 业务逻辑与校验规则
-   * 
-   * 处理流程：
-   * 1. 前置处理：去除首尾空格
-   * 2. 空值校验（前端校验）
-   * 3. API 调用（后端校验）
-   * 4. 结果处理：认证成功跳转，认证失败显示错误
    */
   const handleLogin = async () => {
     // 1. 前置处理
@@ -121,8 +114,6 @@ const Login: React.FC = () => {
       // 后端返回格式：{ code: 200, msg: "登录成功", data: { ... } }
       if (response.data.code === 200) {
         // 认证成功（Code 200）
-        // 对应设计书 3.1.1 登录处理流程 - 认证成功分支
-        
         // 缓存 UserID 到 localStorage（用于后续会话管理）
         localStorage.setItem("userID", userID);
         
@@ -158,10 +149,6 @@ const Login: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理 - 网络异常/超时/后端不可达
-      // 对应设计书 5. 异常处理
-      // 注：后端永远返回 HTTP 200 + body.code，业务错误已在 try 块中处理
-      // 此 catch 块仅处理真正的异常（网络断开、超时等）
-      
       if (error.code === "ECONNABORTED") {
         // 请求超时
         // 对应设计书 5. 异常处理 - 请求超时

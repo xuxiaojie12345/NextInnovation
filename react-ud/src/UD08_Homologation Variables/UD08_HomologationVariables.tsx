@@ -70,11 +70,9 @@ const UD08_HomologationVariables: React.FC = () => {
   });
 
   // 操作符选项（固定值）
-  // Add和Delete项目后面的下拉框内容为：【=,<,>】（对应设计书 3.1 备注）
-  // 值使用 "gt"/"lt" 而非 ">"/"<" 以避免 OGNL 解析问题
-  const OPERATOR_OPTIONS_DATE = ['=', 'lt', 'gt'];
-  // 其他项目后的下拉框内容为：【=,≠】（对应设计书 3.1 备注）
-  // 值使用 "!=" 而非 "≠" 以避免 URL/XML 编码问题
+  // Number, Add, Delete, Date 项目后面的下拉框内容为：【=,<,>】
+  const OPERATOR_OPTIONS_DATE = ['=', '<', '>'];
+  // 其他项目后的下拉框内容为：【=,!=】
   const OPERATOR_OPTIONS_DEFAULT = ['=', '!='];
 
   // ==================== 初始数据加载 ====================
@@ -112,10 +110,20 @@ const UD08_HomologationVariables: React.FC = () => {
     loadMasterData();
 
     // 设置 Created by user 和 Date 的初始值（当前用户和当前时间）
-    const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+    const currentUser = localStorage.getItem('userID') || 'SYSTEM';
     setDisplayCreatedByUser(currentUser);
-    setDisplayDate(new Date().toLocaleString());
+    setDisplayDate(formatDate(new Date()));
   }, []);
+
+  /**
+   * 格式化日期为 yyyy-MM-DD 格式
+   */
+  const formatDate = (date: Date): string => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
 
   // ==================== 接收UD09传来的数据 ====================
   /**
@@ -238,6 +246,8 @@ const UD08_HomologationVariables: React.FC = () => {
     setDeleteDateOp('=');
     setCreatedByUserOp('=');
     setRegisterDatetimeOp('=');
+    // 清空后画面UD09传来的原始主键值
+    originalPkRef.current = { productClass: '', number: '', market: '' };
     setMessage('');
     setMessageType('info');
   }, []);
@@ -437,7 +447,7 @@ const UD08_HomologationVariables: React.FC = () => {
       }
 
       // 步骤3：调用新增API
-      const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+      const currentUser = localStorage.getItem('userID') || 'SYSTEM';
       const now = new Date();
       const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
@@ -462,10 +472,8 @@ const UD08_HomologationVariables: React.FC = () => {
       if (response.data.code === 200) {
         setMessage('数据添加成功');
         setMessageType('success');
-        // 自动填充信息标签
-        setDisplayAddDate(dateStr);
         setDisplayCreatedByUser(currentUser);
-        setDisplayDate(now.toLocaleString());
+        setDisplayDate(formatDate(now));
         // 清空输入表单（保留主键字段以便查看）
         setVariable({ value: '', operator: '=' });
         setValue({ value: '', operator: '=' });
@@ -515,9 +523,8 @@ const UD08_HomologationVariables: React.FC = () => {
       }
 
       // 步骤3：调用更新API
-      const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+      const currentUser = localStorage.getItem('userID') || 'SYSTEM';
       const now = new Date();
-
       const requestBody = {
         productClass: productClass.value.trim(),
         number: parseInt(number.value.trim(), 10),
@@ -543,7 +550,15 @@ const UD08_HomologationVariables: React.FC = () => {
       if (response.data.code === 200) {
         setMessage('数据更新成功');
         setMessageType('success');
-        setDisplayDate(now.toLocaleString());
+
+        setDisplayCreatedByUser(currentUser);
+        setDisplayDate(formatDate(now));
+        // 更新成功后，将当前主键值设为新的原始主键，后续Update不再与旧值比较
+        // originalPkRef.current = {
+        //   productClass: productClass.value.trim(),
+        //   number: number.value.trim(),
+        //   market: market.value.trim(),
+        // };
       } else {
         setMessage(response.data.message || '操作失败');
         setMessageType('error');
@@ -602,10 +617,10 @@ const UD08_HomologationVariables: React.FC = () => {
 
       // 步骤3：结果处理
       if (response.data.code === 200) {
+        // 先清空输入表单，再显示成功消息（避免 handleClear 清空 message）
+        handleClear();
         setMessage('数据删除成功');
         setMessageType('success');
-        // 清空输入表单
-        handleClear();
       } else {
         setMessage(response.data.message || '操作失败');
         setMessageType('error');
@@ -651,6 +666,8 @@ const UD08_HomologationVariables: React.FC = () => {
     placeholder?: string,
     /** 运算符下拉选项，默认使用【=,≠】 */
     operatorOptions?: string[],
+    /** 控件后的固定文字显示 */
+    suffixText?: string,
   ) => (
     <div className="ud08-search-row">
       <span className="ud08-label">
@@ -670,7 +687,7 @@ const UD08_HomologationVariables: React.FC = () => {
       >
         {(operatorOptions || OPERATOR_OPTIONS_DEFAULT).map((op) => (
           <option key={op} value={op}>
-            {op === '!=' ? '≠' : op === 'gt' ? '>' : op === 'lt' ? '<' : op}
+            {op}
           </option>
         ))}
       </select>
@@ -680,7 +697,7 @@ const UD08_HomologationVariables: React.FC = () => {
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
         >
-          <option value="">-- 请选择 --</option>
+          <option value=""></option>
           {(options || []).map((opt) => (
             <option key={opt} value={opt}>{opt}</option>
           ))}
@@ -695,10 +712,11 @@ const UD08_HomologationVariables: React.FC = () => {
             if (maxLength && val.length > maxLength) return;
             onValueChange(val);
           }}
-          placeholder={placeholder || `请输入${label}`}
+          placeholder={placeholder || ``}
           maxLength={maxLength}
         />
       )}
+      {suffixText && <span className="ud08-suffix">{suffixText}</span>}
     </div>
   );
 
@@ -769,7 +787,8 @@ const UD08_HomologationVariables: React.FC = () => {
           number.value, number.operator,
           (val) => handleFieldValueChange(setNumber, val),
           (op) => handleOperatorChange(setNumber, op),
-          undefined, 10, '请输入Number'
+          undefined, 10, '',
+          OPERATOR_OPTIONS_DATE
         )}
 
         {renderFieldRow(
@@ -785,7 +804,7 @@ const UD08_HomologationVariables: React.FC = () => {
           variable.value, variable.operator,
           (val) => handleFieldValueChange(setVariable, val),
           (op) => handleOperatorChange(setVariable, op),
-          undefined, 20, '请输入Variable'
+          undefined, 20, ''
         )}
 
         {renderFieldRow(
@@ -793,7 +812,7 @@ const UD08_HomologationVariables: React.FC = () => {
           value.value, value.operator,
           (val) => handleFieldValueChange(setValue, val),
           (op) => handleOperatorChange(setValue, op),
-          undefined, 200, '请输入Value'
+          undefined, 200, ''
         )}
 
         {renderFieldRow(
@@ -801,7 +820,7 @@ const UD08_HomologationVariables: React.FC = () => {
           variantString1.value, variantString1.operator,
           (val) => handleFieldValueChange(setVariantString1, val),
           (op) => handleOperatorChange(setVariantString1, op),
-          undefined, 100, '请输入Variant string.1'
+          undefined, 100, ''
         )}
 
         {renderFieldRow(
@@ -809,7 +828,7 @@ const UD08_HomologationVariables: React.FC = () => {
           variantString2.value, variantString2.operator,
           (val) => handleFieldValueChange(setVariantString2, val),
           (op) => handleOperatorChange(setVariantString2, op),
-          undefined, 100, '请输入Variant string.2'
+          undefined, 100, ''
         )}
 
         {renderFieldRow(
@@ -817,7 +836,7 @@ const UD08_HomologationVariables: React.FC = () => {
           comments.value, comments.operator,
           (val) => handleFieldValueChange(setComments, val),
           (op) => handleOperatorChange(setComments, op),
-          undefined, 100, '请输入Comments'
+          undefined, 100, ''
         )}
 
         {/* 信息标签字段（与检索字段样式统一） */}
@@ -828,7 +847,8 @@ const UD08_HomologationVariables: React.FC = () => {
           (val) => setDisplayAddDate(val),
           (op) => setAddDateOp(op),
           undefined, 6, undefined,
-          OPERATOR_OPTIONS_DATE
+          OPERATOR_OPTIONS_DATE,
+          'YYYYWW'
         )}
 
         {renderFieldRow(
@@ -837,7 +857,8 @@ const UD08_HomologationVariables: React.FC = () => {
           (val) => setDisplayDeleteDate(val),
           (op) => setDeleteDateOp(op),
           undefined, 6, undefined,
-          OPERATOR_OPTIONS_DATE
+          OPERATOR_OPTIONS_DATE,
+          'YYYYWW'
         )}
 
         {/* 其他项目后的下拉框内容为：【=,≠】（对应设计书 3.1 备注） */}
@@ -846,7 +867,9 @@ const UD08_HomologationVariables: React.FC = () => {
           displayCreatedByUser, createdByUserOp,
           (val) => setDisplayCreatedByUser(val),
           (op) => setCreatedByUserOp(op),
-          undefined, 16
+          undefined, 16,
+          undefined, undefined,
+          'Automatic'
         )}
 
         {renderFieldRow(
@@ -855,7 +878,8 @@ const UD08_HomologationVariables: React.FC = () => {
           (val) => setDisplayDate(val),
           (op) => setRegisterDatetimeOp(op),
           undefined, undefined, undefined,
-          OPERATOR_OPTIONS_DATE
+          OPERATOR_OPTIONS_DATE,
+          'Automatic'
         )}
       </div>
     </div>

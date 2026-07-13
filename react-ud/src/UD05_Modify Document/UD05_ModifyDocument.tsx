@@ -71,7 +71,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
     // 调用API获取数据
     if (series && state?.chassisNo) {
-      console.log("组件加载，获取修改文档数据，参数:", series, state.chassisNo);
       fetchModifyDocumentData(series, state.chassisNo);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,7 +99,6 @@ const UD05_ModifyDocument: React.FC = () => {
       });
 
       if (response.data.code === 200 && response.data.data) {
-        console.log("获取修改文档数据成功:", response.data);
         // 解析返回数据，填充DataTable，支持多条记录
         const rows = Array.isArray(response.data.data)
           ? response.data.data
@@ -119,9 +117,7 @@ const UD05_ModifyDocument: React.FC = () => {
         setMessage("We can not get the data. Please try again.");
         setVariables([]);
       }
-    } catch (error: any) {
-      console.error("获取修改文档数据失败:", error);
-      
+    } catch (error: any) {      
       // 根据错误类型显示不同的消息
       if (error.code === "E001") {
         setMessage("We can not get the OM_data. Please try again.");
@@ -152,11 +148,15 @@ const UD05_ModifyDocument: React.FC = () => {
     setIsLoading(true);
     setMessage("");
     
+    // 从 localStorage 获取登录用户ID
+    const userID = localStorage.getItem("userID") || "";
+    
     try {
       const response = await apiClient.post("/api/ud05/updatemodifydocument", {
         chassisSerie: chassisSerie,
         chassisNo: chassisNo,
-        modifiedItems: modifiedItems
+        modifiedItems: modifiedItems,
+        userId: userID
       });
 
       if (response.data.code === 200) {
@@ -174,8 +174,6 @@ const UD05_ModifyDocument: React.FC = () => {
         setMessage("数据更新失败，请稍后重试");
       }
     } catch (error: any) {
-      console.error("更新修改文档数据失败:", error);
-      
       // 根据错误类型显示不同的消息
       if (error.code === "E001") {
         setMessage("We can not get the OM_data. Please try again.");
@@ -197,17 +195,10 @@ const UD05_ModifyDocument: React.FC = () => {
    * @param index - 变量索引
    * @param value - 输入值
    */
-  const handleModifiedValueChange = (index: number, value: string) => {
-    // 长度校验
-    if (value.length > MAX_MODIFIED_VALUE_LENGTH) {
-      return;
-    }
-    
+  const handleModifiedValueChange = (index: number, value: string) => {    
     const newVariables = [...variables];
     newVariables[index].modifiedValue = value;
     setVariables(newVariables);
-    
-    // 用户体验优化：用户重新输入时清空错误提示
     if (message) setMessage("");
   };
 
@@ -259,14 +250,11 @@ const UD05_ModifyDocument: React.FC = () => {
   const handleTemplateClick = () => {
     // TODO: 实现文件下载逻辑
     // 这里需要根据实际后端API来实现
-    console.log("下载模板文件:", TEMPLATE_FILENAME);
-    
     // 临时实现：创建一个虚拟下载链接
     const link = document.createElement("a");
     link.href = "#"; // 实际应该是后端提供的下载URL
     link.download = TEMPLATE_FILENAME;
     link.click();
-    
     setMessage("模板文件下载功能待实现");
   };
 

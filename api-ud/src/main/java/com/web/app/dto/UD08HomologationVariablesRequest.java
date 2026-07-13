@@ -32,7 +32,7 @@ public class UD08HomologationVariablesRequest implements Serializable {
     private String productClass;
 
     @ApiModelProperty(value = "序号", example = "1")
-    private Integer number;
+    private Long number;
 
     @ApiModelProperty(value = "市场", example = "JP")
     private String market;
@@ -68,7 +68,7 @@ public class UD08HomologationVariablesRequest implements Serializable {
     private String originalProductClass;
 
     @ApiModelProperty(value = "原始Number（Update时检测主键冲突用）", example = "1")
-    private Integer originalNumber;
+    private Long originalNumber;
 
     @ApiModelProperty(value = "原始Market（Update时检测主键冲突用）", example = "AUS")
     private String originalMarket;

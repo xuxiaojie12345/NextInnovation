@@ -19,14 +19,14 @@ public interface UD08HomologationVariablesService {
      *
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse selectProductClassMaster();
+    UD08HomologationVariablesResponse UD08SelectProductclassmaster();
 
     /**
      * 获取市场列表
      *
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse selectMarketMaster();
+    UD08HomologationVariablesResponse UD08SelectMarketmaster();
 
     /**
      * 检查HDOC变量是否存在
@@ -34,7 +34,7 @@ public interface UD08HomologationVariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse selectHdocVariables(UD08HomologationVariablesRequest request);
+    UD08HomologationVariablesResponse UD08SelectHdocvariables(UD08HomologationVariablesRequest request);
 
     /**
      * 新增规则
@@ -42,7 +42,7 @@ public interface UD08HomologationVariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse addRule(UD08HomologationVariablesRequest request);
+    UD08HomologationVariablesResponse UD08Add(UD08HomologationVariablesRequest request);
 
     /**
      * 更新规则
@@ -50,7 +50,7 @@ public interface UD08HomologationVariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse updateRule(UD08HomologationVariablesRequest request);
+    UD08HomologationVariablesResponse UD08Update(UD08HomologationVariablesRequest request);
 
     /**
      * 删除规则
@@ -58,5 +58,5 @@ public interface UD08HomologationVariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD08HomologationVariablesResponse deleteRule(UD08HomologationVariablesRequest request);
+    UD08HomologationVariablesResponse UD08Delete(UD08HomologationVariablesRequest request);
 }

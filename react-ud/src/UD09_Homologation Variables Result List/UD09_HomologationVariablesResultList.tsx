@@ -50,6 +50,19 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [isLoading, setIsLoading] = useState<boolean>(false);  // 加载状态
 
+  /**
+   * 将 API 返回的日期字符串格式化为 yyyy-MM-DD
+   * 处理 ISO 格式 (2026-07-13T12:00:00.000Z) 和已有格式
+   */
+  const formatDateStr = (dateStr: string): string => {
+    if (!dateStr) return '';
+    // ISO 格式: 取 T 前面的日期部分
+    if (dateStr.includes('T')) {
+      return dateStr.split('T')[0];
+    }
+    return dateStr;
+  };
+
   // ==================== 初始数据加载 ====================
   useEffect(() => {
     /**
@@ -94,7 +107,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
             addDate: item.addDate || '',
             deleteDate: item.deleteDate || '',
             createdByUser: item.createdByUser || item.registerUser || '',
-            date: item.date || item.registerDatetime || '',
+            date: formatDateStr(item.date || item.registerDatetime || ''),
           }));
 
           // 按照 Product Class, Market, Number 排序（对应设计书 2.1 备注）
@@ -285,7 +298,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
           addDate: item.addDate || '',
           deleteDate: item.deleteDate || '',
           createdByUser: item.createdByUser || item.registerUser || '',
-          date: item.date || item.registerDatetime || '',
+          date: formatDateStr(item.date || item.registerDatetime || ''),
         }));
 
         mappedResults.sort((a: ResultRecord, b: ResultRecord) => {
@@ -413,7 +426,8 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
                           name="ud09-selection"
                           className="ud09-radio"
                           checked={selectedIndex === index}
-                          onChange={() => handleRadioChange(index)}
+                          onClick={() => handleRadioChange(index)}
+                          readOnly
                         />
                       </td>
                       <td>{record.productClass}</td>

@@ -43,9 +43,11 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
-            List<UD05ModifyDocumentVO> voList = ud05Mapper.selectVariableModification(request.getChassisSerie(), request.getChassisNo());
+            List<UD05ModifyDocumentVO> voList = ud05Mapper.selectVariableModification(request.getChassisSerie(),
+                    request.getChassisNo());
             if (voList == null || voList.isEmpty()) {
-                log.warn("UD05查询未找到记录，chassisSerie: {}, chassisNo: {}", request.getChassisSerie(), request.getChassisNo());
+                log.warn("UD05查询未找到记录，chassisSerie: {}, chassisNo: {}", request.getChassisSerie(),
+                        request.getChassisNo());
                 return UD05ModifyDocumentResponse.error(404, "Record not found.");
             }
 
@@ -89,8 +91,15 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 String currentValue = item.getCurrentValue();
                 String modifiedValue = item.getModifiedValue();
 
+                // 获取登录用户ID，用于记录更新人
+                String user = request.getUserId();
+                if (!StringUtils.hasText(user)) {
+                    log.warn("UD05更新缺少userId");
+                    return UD05ModifyDocumentResponse.error(400, "User ID is required.");
+                }
+
                 int updatedRows = ud05Mapper.updateHdocAdcaModificationByVariable(
-                        request.getChassisSerie(), request.getChassisNo(), variable, currentValue, modifiedValue);
+                        request.getChassisSerie(), request.getChassisNo(), variable, currentValue, modifiedValue, user);
                 if (updatedRows <= 0) {
                     log.warn("UD05更新未修改任何记录，chassisSerie: {}, chassisNo: {}, variable: {}, currentValue: {}",
                             request.getChassisSerie(), request.getChassisNo(), variable, currentValue);
@@ -139,7 +148,8 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
         if (request == null) {
             return "Request is required.";
         }
-        String baseError = validateSelectRequest(new UD05ModifyDocumentRequest(request.getChassisSerie(), request.getChassisNo()));
+        String baseError = validateSelectRequest(
+                new UD05ModifyDocumentRequest(request.getChassisSerie(), request.getChassisNo()));
         if (baseError != null) {
             return baseError;
         }

@@ -32,14 +32,14 @@ public class UD08HomologationVariablesController {
     @ApiOperation(value = "获取产品类别列表", notes = "查询所有产品类别PC列表")
     public UD08HomologationVariablesResponse selectProductClassMaster() {
         log.info("收到UD08查询产品类别列表请求");
-        return ud08Service.selectProductClassMaster();
+        return ud08Service.UD08SelectProductclassmaster();
     }
 
     @GetMapping("/selectmarketmaster")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD08HomologationVariablesResponse selectMarketMaster() {
         log.info("收到UD08查询市场列表请求");
-        return ud08Service.selectMarketMaster();
+        return ud08Service.UD08SelectMarketmaster();
     }
 
     @GetMapping("/selecthdocvariables")
@@ -49,27 +49,27 @@ public class UD08HomologationVariablesController {
         log.info("收到UD08检查HDOC变量请求, variables: {}", variables);
         UD08HomologationVariablesRequest request = new UD08HomologationVariablesRequest();
         request.setVariables(variables);
-        return ud08Service.selectHdocVariables(request);
+        return ud08Service.UD08SelectHdocvariables(request);
     }
 
     @PostMapping("/add")
     @ApiOperation(value = "新增规则", notes = "向HDOC_USER_DEFINED_RULES表新增一条规则")
     public UD08HomologationVariablesResponse addRule(@RequestBody UD08HomologationVariablesRequest request) {
         log.info("收到UD08新增规则请求, request: {}", request);
-        return ud08Service.addRule(request);
+        return ud08Service.UD08Add(request);
     }
 
     @PostMapping("/update")
     @ApiOperation(value = "更新规则", notes = "更新HDOC_USER_DEFINED_RULES表中的规则数据")
     public UD08HomologationVariablesResponse updateRule(@RequestBody UD08HomologationVariablesRequest request) {
         log.info("收到UD08更新规则请求, request: {}", request);
-        return ud08Service.updateRule(request);
+        return ud08Service.UD08Update(request);
     }
 
     @PostMapping("/delete")
     @ApiOperation(value = "删除规则", notes = "根据PC、NUM、MARKET删除HDOC_USER_DEFINED_RULES表中的规则")
     public UD08HomologationVariablesResponse deleteRule(@RequestBody UD08HomologationVariablesRequest request) {
         log.info("收到UD08删除规则请求, request: {}", request);
-        return ud08Service.deleteRule(request);
+        return ud08Service.UD08Delete(request);
     }
 }

@@ -67,7 +67,6 @@ const UD06_SaveModifications: React.FC = () => {
       message: '',
       isLoading: true,
     }));
-
     // 将变量名列表传给API，确保能精确查询每条修改记录
     const variables = modifiedItems.map(item => item.variable);
     fetchSaveModificationsData(chassisSerie, chassisNumber, variables);
@@ -95,8 +94,6 @@ const UD06_SaveModifications: React.FC = () => {
       if (response.data?.code === 200 && response.data?.data) {
         const data = response.data.data;
         const storingText = `${data.variable || ''} ${data.newVal || data.newval || ''}`.trim();
-        console.log('data:', data);
-        console.log('storingText:', storingText);
         setState(prev => ({
           ...prev,
           doctype: data.doctype || '',
@@ -118,9 +115,7 @@ const UD06_SaveModifications: React.FC = () => {
         }));
       }
     } catch (error: any) {
-      console.error('获取 UD06 Save Modifications 数据失败:', error);
       let errorMessage = 'System error. Please try again later.';
-
       if (error.response) {
         if (error.response.status === 401) {
           errorMessage = 'We can not get the data. Please try again.';

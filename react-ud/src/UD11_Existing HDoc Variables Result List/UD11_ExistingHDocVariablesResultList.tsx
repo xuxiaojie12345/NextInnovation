@@ -38,11 +38,21 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  /**
+   * 将 API 返回的日期字符串格式化为 yyyy-MM-DD
+   */
+  const formatDateStr = (dateStr: string): string => {
+    if (!dateStr) return '';
+    if (dateStr.includes('T')) {
+      return dateStr.split('T')[0];
+    }
+    return dateStr;
+  };
+
   // ==================== 初始数据加载 ====================
   useEffect(() => {
     /**
      * 画面加载时执行检索
-     * 对应设计书 3.1.1 初始显示流程
      *
      * 1. 从UD10传递的location.state中获取检索条件
      * 2. 调用API查询HDOC_VARIABLES表
@@ -51,7 +61,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
       setIsLoading(true);
       try {
         const searchParams = (location.state as any)?.searchParams || {};
-
         const response = await apiClient.get('/api/ud11/search', {
           params: searchParams,
         });
@@ -63,7 +72,7 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
             type: item.type || '',
             description: item.description || '',
             createdByUser: item.registerUser || item.createdByUser || '',
-            registerDatetime: item.registerDatetime || '',
+            registerDatetime: formatDateStr(item.registerDatetime || ''),
           }));
 
           setResults(mappedResults);

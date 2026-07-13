@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;import java.util.List;
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * UD05 修改文档变量更新请求对象
  *
@@ -28,6 +30,9 @@ public class UD05ModifyDocumentUpdateRequest implements Serializable {
 
     @ApiModelProperty(value = "底盘编号", required = true, example = "1234567890", notes = "必填，最大10字符，半角数字")
     private String chassisNo;
+
+    @ApiModelProperty(value = "用户ID", required = true, example = "duyage", notes = "登录用户ID，用于记录更新人")
+    private String userId;
 
     @ApiModelProperty(value = "修改项列表", required = true, notes = "包含需要更新的变量、当前值和修改后的值")
     private List<ModifyItem> modifiedItems;

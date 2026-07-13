@@ -35,6 +35,12 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   // Type下拉框固定选项（对应设计书 2.1 备注）
   const TYPE_OPTIONS = ['VDA', 'User Defined'];
 
+  // 操作符选项（固定值）
+  // Date 项目后面的下拉框内容为：【=,<,>】
+  const OPERATOR_OPTIONS_DATE = ['=', '<', '>'];
+  // 其他项目后的下拉框内容为：【=,!=】
+  const OPERATOR_OPTIONS_DEFAULT = ['=', '!='];
+
   // 消息状态
   const [message, setMessage] = useState<string>('');
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
@@ -43,10 +49,20 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   // ==================== 初始化 ====================
   /** 页面加载时设置 Created by user 和 Date 的初始值 */
   useEffect(() => {
-    const currentUser = localStorage.getItem('userId') || 'SYSTEM';
+    const currentUser = localStorage.getItem('userID') || 'SYSTEM';
     setDisplayCreatedByUser(currentUser);
-    setDisplayDate(new Date().toLocaleString());
+    setDisplayDate(formatDate(new Date()));
   }, []);
+
+  /**
+   * 格式化日期为 yyyy-MM-DD 格式
+   */
+  const formatDate = (date: Date): string => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
 
   // ==================== 接收UD11传来的数据 ====================
   /**
@@ -188,7 +204,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         setMessage('添加成功');
         setMessageType('success');
         setDisplayCreatedByUser(currentUser);
-        setDisplayDate(now.toLocaleString());
+        setDisplayDate(formatDate(now));
         setVariable('');
         setType('');
         setDescription('');
@@ -228,7 +244,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       if (response.data && response.data.code === 200) {
         setMessage('更新成功');
         setMessageType('success');
-        setDisplayDate(now.toLocaleString());
+        setDisplayDate(formatDate(now));
       } else {
         setMessage(response.data?.message || '更新失败');
         setMessageType('error');
@@ -344,8 +360,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         <div className="ud10-row">
           <span className="ud10-label">*Variable</span>
           <select className="ud10-compare-select" value={variableOp} onChange={(e) => setVariableOp(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">≠</option>
+            {OPERATOR_OPTIONS_DEFAULT.map((op) => (
+              <option key={op} value={op}>{op}</option>
+            ))}
           </select>
           <input
             className="ud10-input"
@@ -366,15 +383,16 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         <div className="ud10-row">
           <span className="ud10-label">Type</span>
           <select className="ud10-compare-select" value={typeOp} onChange={(e) => setTypeOp(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">≠</option>
+            {OPERATOR_OPTIONS_DEFAULT.map((op) => (
+              <option key={op} value={op}>{op}</option>
+            ))}
           </select>
           <select
             className="ud10-select"
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
-            <option value="">-- 请选择 --</option>
+            <option value=""></option>
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>{opt}</option>
             ))}
@@ -385,8 +403,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         <div className="ud10-row">
           <span className="ud10-label">Description</span>
           <select className="ud10-compare-select" value={descriptionOp} onChange={(e) => setDescriptionOp(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">≠</option>
+            {OPERATOR_OPTIONS_DEFAULT.map((op) => (
+              <option key={op} value={op}>{op}</option>
+            ))}
           </select>
           <input
             className="ud10-input"
@@ -406,8 +425,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         <div className="ud10-row">
           <span className="ud10-label">Created by user</span>
           <select className="ud10-compare-select" value={createdByUserOp} onChange={(e) => setCreatedByUserOp(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">≠</option>
+            {OPERATOR_OPTIONS_DEFAULT.map((op) => (
+              <option key={op} value={op}>{op}</option>
+            ))}
           </select>
           <input
             className="ud10-input"
@@ -422,9 +442,9 @@ const UD10_ExistingHDocVariables: React.FC = () => {
         <div className="ud10-row">
           <span className="ud10-label">Date</span>
           <select className="ud10-compare-select" value={registerDateOp} onChange={(e) => setRegisterDateOp(e.target.value)}>
-            <option value="=">=</option>
-            <option value="lt">&lt;</option>
-            <option value="gt">&gt;</option>
+            {OPERATOR_OPTIONS_DATE.map((op) => (
+              <option key={op} value={op}>{op}</option>
+            ))}
           </select>
           <input
             className="ud10-input"

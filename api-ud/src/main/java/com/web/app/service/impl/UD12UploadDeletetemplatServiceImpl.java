@@ -40,6 +40,50 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     @Value("${file.marketFolder}")
     private String uploadFolder;
 
+    @Value("${file.fileServerUsername}")
+    private String fileServerUsername;
+
+    @Value("${file.fileServerPassword}")
+    private String fileServerPassword;
+
+    /** 认证是否已成功的标记 */
+    private boolean authenticated = false;
+
+    /**
+     * 认证文件服务器共享路径（懒加载，首次操作时调用）
+     * 通过 net use 建立 UNC 路径的认证会话
+     */
+    private synchronized void authenticateIfNeeded() {
+        if (authenticated)
+            return;
+        try {
+            // 从 uploadFolder 中提取 UNC 根路径
+            String normalized = uploadFolder.replace('\\', '/');
+            String[] parts = normalized.split("/");
+            String serverShare = "\\\\" + parts[2] + "\\" + parts[3];
+
+            // 先尝试断开已有连接
+            new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
+                    .start().waitFor();
+
+            // 建立新的认证连接
+            Process process = new ProcessBuilder("cmd.exe", "/c",
+                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
+                    .start();
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                authenticated = true;
+                log.info("UD12文件服务器认证成功: {}", serverShare);
+            } else {
+                String errorMsg = new String(process.getErrorStream().readAllBytes());
+                log.warn("UD12文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
+            }
+        } catch (Exception e) {
+            log.error("UD12文件服务器认证失败", e);
+        }
+    }
+
     @Override
     public UD12UploadDeletetemplatResponse selectMarket() {
         log.info("开始UD12查询市场列表");
@@ -61,6 +105,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
     @Override
     public UD12UploadDeletetemplatResponse uploadFile(MultipartFile file, String market) {
+        authenticateIfNeeded();
         log.info("开始UD12上传文件, market: {}, fileName: {}", market, file.getOriginalFilename());
         try {
             String originalFilename = file.getOriginalFilename();
@@ -69,7 +114,18 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             String marketDir = uploadFolder + File.separator + market.trim();
             File directory = new File(marketDir);
             if (!directory.exists()) {
-                directory.mkdirs();
+                boolean created = directory.mkdirs();
+                if (!created) {
+                    log.error("UD12上传文件失败 - 无法创建目录: {}", marketDir);
+                    return UD12UploadDeletetemplatResponse.error(500,
+                            "无法创建目录，请确认服务器共享路径可访问: " + marketDir);
+                }
+            }
+            // 确认目录有写权限
+            if (!directory.canWrite()) {
+                log.error("UD12上传文件失败 - 目录无写入权限: {}", marketDir);
+                return UD12UploadDeletetemplatResponse.error(500,
+                        "目录无写入权限，请检查共享路径权限: " + marketDir);
             }
 
             // 保存文件
@@ -97,6 +153,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
     @Override
     public UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request) {
+        authenticateIfNeeded();
         log.info("开始UD12删除文件, market: {}, template: {}", request.getMarket(), request.getTemplate());
         try {
             // 构建文件路径
@@ -133,6 +190,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
     @Override
     public UD12UploadDeletetemplatResponse getTemplateList(String market) {
+        authenticateIfNeeded();
         log.info("开始UD12查询模板文件列表, market: {}", market);
         try {
             // 构建market文件夹路径
