@@ -12,8 +12,7 @@
             a.CHNO AS chassisNo,
             a.VARIABLE AS variable,
             b.DESCRIPTION AS description,
-            a.NEWVAL AS newVal,
-            a.STA AS sta
+            a.NEWVAL AS newVal
         FROM HDOC_ADCA_MODIFICATION a 
         LEFT JOIN HDOC_VARIABLES b 
             ON a.VARIABLE = b.VARIABLE
@@ -21,43 +20,15 @@
           AND a.CHNO = #{chassisNo}
     </select>
 
-    <!--
-        UD05 修改文档变量更新
-        更新 HDOC_ADCA_MODIFICATION.NEWVAL 字段
-    -->
-    <update id="updateHdocAdcaModification">
-        UPDATE HDOC_ADCA_MODIFICATION
-        SET NEWVAL = #{modifiedValue}
-        WHERE SERIE = #{chassisSerie}
-          AND CHNO = #{chassisNo}
-          AND STA = '0'
-          AND NEWVAL = #{currentValue}
-    </update>
-
     <update id="updateHdocAdcaModificationByVariable">
         UPDATE HDOC_ADCA_MODIFICATION
-        SET NEWVAL = #{modifiedValue}
+        SET NEWVAL = #{modifiedValue},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{user},
+            UPDATE_PROCESS = 'UD05ModifyDocumentApi'
         WHERE SERIE = #{chassisSerie}
           AND CHNO = #{chassisNo}
           AND VARIABLE = #{variable}
-          AND STA = '0'
-          AND NEWVAL = #{currentValue}
     </update>
-
-        <!-- 根据当前 newVal 查询单条记录 -->
-        <select id="selectVariableModificationByCurrentValue" resultType="com.web.app.entity.UD05ModifyDocumentVO">
-            SELECT 
-                a.SERIE AS chassisSerie,
-                a.CHNO AS chassisNo,
-                a.VARIABLE AS variable,
-                b.DESCRIPTION AS description,
-                a.NEWVAL AS newVal,
-                a.STA AS sta
-            FROM HDOC_ADCA_MODIFICATION a
-            LEFT JOIN HDOC_VARIABLES b ON a.VARIABLE = b.VARIABLE
-            WHERE a.SERIE = #{chassisSerie}
-              AND a.CHNO = #{chassisNo}
-              AND a.NEWVAL = #{currentValue}
-        </select>
 
 </mapper>

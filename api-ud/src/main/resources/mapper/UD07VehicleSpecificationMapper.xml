@@ -2,10 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.UD07VehicleSpecificationMapper">
 
-    <!--
-        UD07 车辆规格主数据查询
-        关联 HDOC_REC_DATA_VDA_GENERAL、HDOC_REC_DATA_OM 和 HDOC_REC_DATA_VDA_VARIANTS
-    -->
     <select id="selectVehicleSpecification" resultType="com.web.app.entity.UD07VehicleSpecificationVO">
         SELECT
             om.MODEL AS model,
@@ -27,11 +23,8 @@
           AND vda.CHNR = #{chno}
     </select>
 
-    <!--
-        UD07 KOLA 变体列表查询
-    -->
     <select id="selectKolaVariants" resultType="com.web.app.entity.UD07KolaVariantVO">
-        <!-- SELECT
+        SELECT
             SYMBOL AS symbol,
             FUNCTION_GROUP AS functionGroup,
             DESCRIPTION AS description,
@@ -39,17 +32,6 @@
         FROM HDOC_REC_DATA_KOLA_VARIANT
         WHERE FAMILY_ID = #{familyId}
           AND VARIANT_ID = #{variantId}
-        ORDER BY  FUNCTION_GROUP -->
-
-        SELECT
-            SYMBOL AS symbol,
-            FUNCTION_GROUP AS functionGroup,
-            DESCRIPTION AS description,
-            FAMILY_ID AS familyId
-        FROM HDOC_REC_DATA_KOLA_VARIANT
-        WHERE 
-        FAMILY_ID LIKE CONCAT('%', #{familyId}, '%')
-          AND VARIANT_ID LIKE CONCAT('%', #{variantId}, '%')
         ORDER BY  CONCAT(LPAD(FUNCTION_GROUP,4,' '), LPAD(FAMILY_ID,3,'0'))
     </select>
 
