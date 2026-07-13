@@ -60,7 +60,6 @@ const MarketDocumentSettingsList = () => {
         setErrorMessage("No data found");
       }
     } catch (error: any) {
-      console.error("Error fetching document list:", error);
       setErrorMessage(error.message || "No data found");
       setDocuments([]);
     } finally {

@@ -67,7 +67,6 @@ const EdbUserView: React.FC = () => {
         setUserInfo(null);
       }
     } catch (error) {
-      console.error("Error fetching user info:", error);
       // 网络异常或系统调用失败，字段显示为空
       setUserInfo(null);
     } finally {

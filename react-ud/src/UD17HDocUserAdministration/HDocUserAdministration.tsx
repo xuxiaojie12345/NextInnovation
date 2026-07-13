@@ -87,15 +87,12 @@ const HDocUserAdministration = () => {
       }
 
       const data = await response.json();
-      console.log("【marketList】response:", JSON.stringify(data));
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
-        console.log("【marketList】count:", data.data.length);
       } else {
         setErrorMessage("获取市场列表失败，请联系管理员");
       }
     } catch (error) {
-      console.error("Error fetching market list:", error);
       setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -157,7 +154,6 @@ const HDocUserAdministration = () => {
         );
       }
     } catch (error) {
-      console.error("Error fetching user info:", error);
       setErrorMessage(
         "We didn't recognize the userid you entered. Please try again.",
       );
@@ -295,18 +291,9 @@ const HDocUserAdministration = () => {
           });
         }
 
-        console.log("【formData result】selected markets:", {
-          standardUser: updatedFormData.standardUserMarkets,
-          ruleAdmin: updatedFormData.ruleAdminMarkets,
-          templateAdmin: updatedFormData.templateAdminMarkets,
-          docAuthAdmin: updatedFormData.documentAuthAdminMarkets,
-          adaptationUser: updatedFormData.adaptationUserMarkets,
-          marketSuperUser: updatedFormData.marketSuperUserMarkets,
-        });
         setFormData(updatedFormData);
       }
     } catch (error) {
-      console.error("Error fetching user permissions:", error);
       setErrorMessage("获取用户权限失败，请联系管理员");
     }
   };
@@ -520,7 +507,6 @@ const HDocUserAdministration = () => {
         setErrorMessage("部分权限更新失败，请联系管理员");
       }
     } catch (error) {
-      console.error("Error updating role:", error);
       setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -591,7 +577,6 @@ const HDocUserAdministration = () => {
         setErrorMessage("删除失败，请联系管理员");
       }
     } catch (error) {
-      console.error("Error deleting role:", error);
       setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);

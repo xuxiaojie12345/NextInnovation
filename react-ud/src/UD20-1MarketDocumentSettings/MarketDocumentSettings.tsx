@@ -161,7 +161,6 @@ const MarketDocumentSettings = () => {
         setErrorMessage(result.msg || "更新失败");
       }
     } catch (error) {
-      console.error("Update Mode error:", error);
       setErrorMessage("更新失败");
     } finally {
       setIsLoading(false);

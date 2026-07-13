@@ -69,8 +69,6 @@ const HdocTemplateCheck = () => {
     setCheckedFileUrl(null);
 
     try {
-      console.log("Checking template file:", selectedFile.name);
-
       // 读取文件内容
       const reader = new FileReader();
 
@@ -84,12 +82,8 @@ const HdocTemplateCheck = () => {
             return;
           }
 
-          console.log("File content length:", content.length);
-
           // 解析变量
           const extractedVariables = parseRtfContent(content);
-
-          console.log("Extracted variables:", extractedVariables);
 
           if (extractedVariables.length === 0) {
             // 没有找到任何变量
@@ -107,7 +101,6 @@ const HdocTemplateCheck = () => {
             setCheckedFileUrl(url);
           }
         } catch (error) {
-          console.error("Parse error:", error);
           setErrorMessage("ERROR: Unable to access file!");
         } finally {
           setIsLoading(false);
@@ -115,7 +108,6 @@ const HdocTemplateCheck = () => {
       };
 
       reader.onerror = () => {
-        console.error("File read error");
         setErrorMessage("ERROR: Unable to access file!");
         setIsLoading(false);
       };
@@ -123,7 +115,6 @@ const HdocTemplateCheck = () => {
       // 以文本方式读取文件
       reader.readAsText(selectedFile);
     } catch (error) {
-      console.error("Check error:", error);
       setErrorMessage(
         error instanceof Error
           ? error.message

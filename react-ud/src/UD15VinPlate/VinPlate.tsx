@@ -56,15 +56,6 @@ const VinPlate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Fetching VIN Plate info for:",
-        chassisNumber,
-        "→ serie:",
-        serie,
-        "chnr:",
-        chnr,
-      );
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(`${API_BASE_URL}/api/ud15/viewinfo`, {
@@ -80,7 +71,6 @@ const VinPlate = () => {
       }
 
       const result = await response.json();
-      console.log("VIN Plate info response:", result);
 
       if (result.code === 200 && result.data) {
         setVinPlateData(result.data);
@@ -88,7 +78,6 @@ const VinPlate = () => {
         setErrorMessage(result.msg || "Chassis number not found.");
       }
     } catch (error: any) {
-      console.error("Error fetching VIN Plate info:", error);
       setErrorMessage(
         error.message || "System error. Please contact administrator.",
       );
@@ -118,15 +107,6 @@ const VinPlate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Setting regenerate for:",
-        chassisNumber,
-        "→ serie:",
-        serie,
-        "chnr:",
-        chnr,
-      );
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(`${API_BASE_URL}/api/ud15/setregenerate`, {
@@ -142,7 +122,6 @@ const VinPlate = () => {
       }
 
       const result = await response.json();
-      console.log("Set regenerate response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("设置重新生成成功");
@@ -151,7 +130,6 @@ const VinPlate = () => {
         setErrorMessage(result.msg || "更新失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error setting regenerate:", error);
       setErrorMessage(error.message || "更新失败，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -179,15 +157,6 @@ const VinPlate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Setting OK for:",
-        chassisNumber,
-        "→ serie:",
-        serie,
-        "chnr:",
-        chnr,
-      );
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(`${API_BASE_URL}/api/ud15/setok`, {
@@ -203,7 +172,6 @@ const VinPlate = () => {
       }
 
       const result = await response.json();
-      console.log("Set OK response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("设置OK成功");
@@ -212,7 +180,6 @@ const VinPlate = () => {
         setErrorMessage(result.msg || "更新失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error setting OK:", error);
       setErrorMessage(error.message || "更新失败，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -240,15 +207,6 @@ const VinPlate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Changing to basic info for:",
-        chassisNumber,
-        "→ serie:",
-        serie,
-        "chnr:",
-        chnr,
-      );
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(
@@ -267,7 +225,6 @@ const VinPlate = () => {
       }
 
       const result = await response.json();
-      console.log("Change to basic response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("切换到基础信息成功");
@@ -276,7 +233,6 @@ const VinPlate = () => {
         setErrorMessage(result.msg || "更新失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error changing to basic:", error);
       setErrorMessage(error.message || "更新失败，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -304,15 +260,6 @@ const VinPlate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Changing to advanced info for:",
-        chassisNumber,
-        "→ serie:",
-        serie,
-        "chnr:",
-        chnr,
-      );
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(
@@ -331,7 +278,6 @@ const VinPlate = () => {
       }
 
       const result = await response.json();
-      console.log("Change to advanced response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("切换到高级信息成功");
@@ -340,7 +286,6 @@ const VinPlate = () => {
         setErrorMessage(result.msg || "更新失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error changing to advanced:", error);
       setErrorMessage(error.message || "更新失败，请联系管理员");
     } finally {
       setIsLoading(false);

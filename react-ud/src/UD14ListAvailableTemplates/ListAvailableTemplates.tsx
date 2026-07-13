@@ -36,11 +36,6 @@ const ListAvailableTemplates = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Fetching market list from:",
-        `${API_BASE_URL}/api/ud14Searchresultist/getmarkets`,
-      );
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud14Searchresultist/getmarkets`,
       );
@@ -50,7 +45,6 @@ const ListAvailableTemplates = () => {
       }
 
       const data = await response.json();
-      console.log("Market list response:", data);
 
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
@@ -58,7 +52,6 @@ const ListAvailableTemplates = () => {
         setErrorMessage(data.msg || "Failed to load market list");
       }
     } catch (error) {
-      console.error("Fetch market list error:", error);
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -86,14 +79,10 @@ const ListAvailableTemplates = () => {
       setIsLoading(true);
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Fetching template files for market:", marketCode);
-
       // 构建请求参数
       const requestBody = {
         Market: marketCode,
       };
-
-      console.log("Request body:", requestBody);
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud14Searchresultist/getvariablesbymarket`,
@@ -111,7 +100,6 @@ const ListAvailableTemplates = () => {
       }
 
       const result = await response.json();
-      console.log("Template files response:", result);
 
       if (result.code === 200 && Array.isArray(result.data)) {
         // 将返回的数据转换为TemplateFile格式
@@ -127,7 +115,6 @@ const ListAvailableTemplates = () => {
         setTemplateFiles([]);
       }
     } catch (error) {
-      console.error("Fetch template files error:", error);
       setTemplateFiles([]);
       setErrorMessage(
         error instanceof Error
@@ -151,8 +138,6 @@ const ListAvailableTemplates = () => {
       const API_BASE_URL = "http://localhost:8081";
       const downloadUrl = `${API_BASE_URL}/api/template/download/${selectedMarket}/${encodeURIComponent(filename)}`;
 
-      console.log("Downloading file:", downloadUrl);
-
       const response = await fetch(downloadUrl);
 
       if (!response.ok) {
@@ -172,7 +157,6 @@ const ListAvailableTemplates = () => {
 
       setSuccessMessage(`File ${filename} downloaded successfully.`);
     } catch (error) {
-      console.error("Download error:", error);
       setErrorMessage(
         error instanceof Error ? error.message : "Failed to download file.",
       );

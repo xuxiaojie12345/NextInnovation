@@ -42,16 +42,13 @@ const HDocUserDocAdministration = () => {
       }
 
       const data = await response.json();
-      console.log("【fetchDocumentList】response:", JSON.stringify(data));
 
       if (data.code === 200 && data.data) {
         setDocumentList(data.data);
-        console.log("【fetchDocumentList】count:", data.data.length);
       } else {
         setErrorMessage("获取文档列表失败，请联系管理员");
       }
     } catch (error) {
-      console.error("Error fetching document list:", error);
       setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -92,7 +89,6 @@ const HDocUserDocAdministration = () => {
       }
 
       const data = await response.json();
-      console.log("【getUserInfo】response:", JSON.stringify(data));
 
       if (data.code === 200 && data.data) {
         // 设置用户名
@@ -125,8 +121,6 @@ const HDocUserDocAdministration = () => {
         setHasQueried(false);
       }
     } catch (error: any) {
-      console.error("Error fetching user info:", error);
-
       // 判断是否是网络错误
       if (error.message === "Failed to fetch") {
         setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
@@ -177,7 +171,6 @@ const HDocUserDocAdministration = () => {
       }
 
       const data = await response.json();
-      console.log("【updateUserDocuments】response:", JSON.stringify(data));
 
       if (data.code === 200) {
         setSuccessMessage("文档权限更新成功");
@@ -193,8 +186,6 @@ const HDocUserDocAdministration = () => {
         }
       }
     } catch (error: any) {
-      console.error("Error updating user documents:", error);
-
       // 判断是否是网络错误
       if (error.message === "Failed to fetch") {
         setErrorMessage("无法连接到后端服务，请确认后端服务已启动");

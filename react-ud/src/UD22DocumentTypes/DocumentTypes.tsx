@@ -24,8 +24,6 @@ const DocumentTypes: React.FC = () => {
       setIsLoading(true);
       setErrorMessage("");
 
-      console.log("开始获取文档类型列表...");
-
       const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
         method: "POST",
         headers: {
@@ -39,7 +37,6 @@ const DocumentTypes: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log("API响应:", result);
 
       if (result.code === 200 && result.data) {
         // 按Key（doctype）字母顺序排序
@@ -52,7 +49,6 @@ const DocumentTypes: React.FC = () => {
         setErrorMessage(result.msg || "无法获取文档类型信息");
       }
     } catch (error) {
-      console.error("获取文档类型失败:", error);
       setErrorMessage("系统错误，请稍后重试");
     } finally {
       setIsLoading(false);

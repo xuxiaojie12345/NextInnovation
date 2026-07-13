@@ -34,11 +34,6 @@ const UploadDeleteTemplate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Fetching market list from:",
-        `${API_BASE_URL}/api/ud12UploadDeletetemplat/getMarketList`,
-      );
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud12UploadDeletetemplat/getMarketList`,
       );
@@ -48,7 +43,6 @@ const UploadDeleteTemplate = () => {
       }
 
       const data = await response.json();
-      console.log("Market list response:", data);
 
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
@@ -56,7 +50,6 @@ const UploadDeleteTemplate = () => {
         setErrorMessage(data.msg || "Failed to load market list");
       }
     } catch (error) {
-      console.error("Fetch market list error:", error);
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -93,8 +86,6 @@ const UploadDeleteTemplate = () => {
       setIsLoading(true);
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Fetching template files for market:", marketCode);
-
       const response = await fetch(
         `${API_BASE_URL}/api/template/files/${marketCode}`,
       );
@@ -104,7 +95,6 @@ const UploadDeleteTemplate = () => {
       }
 
       const result = await response.json();
-      console.log("Template files response:", result);
 
       if (result.code === 200 && Array.isArray(result.data)) {
         setTemplates(result.data);
@@ -112,7 +102,6 @@ const UploadDeleteTemplate = () => {
         setTemplates([]);
       }
     } catch (error) {
-      console.error("Fetch template files error:", error);
       setTemplates([]);
       setErrorMessage(
         error instanceof Error
@@ -160,32 +149,10 @@ const UploadDeleteTemplate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Uploading file to:", `${API_BASE_URL}/api/template/upload`);
-      console.log(
-        "Selected file:",
-        selectedFile.name,
-        "size:",
-        selectedFile.size,
-        "type:",
-        selectedFile.type,
-      );
-      console.log("Target market:", uploadMarket);
-
       // 构建FormData（确保使用file对象的原始数据）
       const formData = new FormData();
       formData.append("file", selectedFile, selectedFile.name);
       formData.append("market", uploadMarket);
-
-      // 检查FormData内容
-      for (const pair of (formData as any).entries()) {
-        console.log(
-          "FormData entry:",
-          pair[0],
-          pair[1] instanceof File
-            ? `File(${pair[1].name}, ${pair[1].size} bytes)`
-            : pair[1],
-        );
-      }
 
       const response = await fetch(`${API_BASE_URL}/api/template/upload`, {
         method: "POST",
@@ -198,7 +165,6 @@ const UploadDeleteTemplate = () => {
       }
 
       const data = await response.json();
-      console.log("Upload response:", data);
 
       if (data.code === 200 && data.data) {
         const result = data.data;
@@ -218,7 +184,6 @@ const UploadDeleteTemplate = () => {
         setErrorMessage(data.msg || "Upload failed");
       }
     } catch (error) {
-      console.error("Upload error:", error);
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
           "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
@@ -256,10 +221,6 @@ const UploadDeleteTemplate = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Deleting template:", `${API_BASE_URL}/api/template/delete`);
-      console.log("Market:", deleteMarket);
-      console.log("Template:", selectedTemplate);
-
       const response = await fetch(`${API_BASE_URL}/api/template/delete`, {
         method: "POST",
         headers: {
@@ -277,7 +238,6 @@ const UploadDeleteTemplate = () => {
       }
 
       const data = await response.json();
-      console.log("Delete response:", data);
 
       if (data.code === 200 && data.data) {
         const result = data.data;
@@ -292,7 +252,6 @@ const UploadDeleteTemplate = () => {
         setErrorMessage(data.msg || "Delete failed");
       }
     } catch (error) {
-      console.error("Delete error:", error);
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
           "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",

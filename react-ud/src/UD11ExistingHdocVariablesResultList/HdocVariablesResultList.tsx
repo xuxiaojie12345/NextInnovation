@@ -40,12 +40,6 @@ const HdocVariablesResultList = () => {
 
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Sending search request to:",
-        `${API_BASE_URL}/api/ud10Hdocvariables/search`,
-      );
-      console.log("Search criteria:", searchCriteria);
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/search`,
         {
@@ -62,7 +56,6 @@ const HdocVariablesResultList = () => {
       }
 
       const result = await response.json();
-      console.log("Search result:", result);
 
       if (result.code === 200 && result.data) {
         setSearchResults(result.data);
@@ -72,7 +65,6 @@ const HdocVariablesResultList = () => {
         setCount(0);
       }
     } catch (error: any) {
-      console.error("Error fetching search results:", error);
       setErrorMessage(
         error.message || "System error. Please contact administrator.",
       );
@@ -194,7 +186,6 @@ const HdocVariablesResultList = () => {
 
       setSuccessMessage("File downloaded successfully.");
     } catch (error: any) {
-      console.error("Error exporting data:", error);
       setErrorMessage(error.message || "Failed to export data.");
     }
   };

@@ -46,16 +46,13 @@ const SearchUser = () => {
       }
 
       const data = await response.json();
-      console.log("【fetchMarketList】response:", JSON.stringify(data));
 
       if (data.code === 200 && data.data) {
         setMarketList(data.data);
-        console.log("【fetchMarketList】count:", data.data.length);
       } else {
         setErrorMessage("获取Market列表失败，请联系管理员");
       }
     } catch (error) {
-      console.error("Error fetching market list:", error);
       setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);
@@ -141,7 +138,6 @@ const SearchUser = () => {
         }
 
         const data = await response.json();
-        console.log("【searchUsers by UserId】response:", JSON.stringify(data));
 
         if (data.code === 200 && data.data) {
           setSearchResults(data.data.users || []);
@@ -154,8 +150,6 @@ const SearchUser = () => {
           }
         }
       } catch (error: any) {
-        console.error("Error searching users:", error);
-
         // 判断是否是网络错误
         if (error.message === "Failed to fetch") {
           setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
@@ -192,10 +186,6 @@ const SearchUser = () => {
         }
 
         const data = await response.json();
-        console.log(
-          "【searchUsers by UserName】response:",
-          JSON.stringify(data),
-        );
 
         if (data.code === 200 && data.data) {
           setSearchResults(data.data.users || []);
@@ -209,8 +199,6 @@ const SearchUser = () => {
           }
         }
       } catch (error: any) {
-        console.error("Error searching users:", error);
-
         // 判断是否是网络错误
         if (error.message === "Failed to fetch") {
           setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
@@ -243,7 +231,6 @@ const SearchUser = () => {
         }
 
         const data = await response.json();
-        console.log("【searchUsers by Type】response:", JSON.stringify(data));
 
         if (data.code === 200 && data.data) {
           setSearchResults(data.data.users || []);
@@ -251,8 +238,6 @@ const SearchUser = () => {
           setErrorMessage(data.msg || data.message || "搜索失败，请联系管理员");
         }
       } catch (error: any) {
-        console.error("Error searching users:", error);
-
         // 判断是否是网络错误
         if (error.message === "Failed to fetch") {
           setErrorMessage("无法连接到后端服务，请确认后端服务已启动");

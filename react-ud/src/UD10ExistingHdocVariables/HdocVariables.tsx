@@ -101,8 +101,6 @@ const HdocVariables = () => {
       // 从 localStorage 获取登录用户 ID
       const loggedInUser = localStorage.getItem("currentUser");
 
-      console.log("Logged in user from localStorage:", loggedInUser);
-
       if (loggedInUser) {
         // 使用登录的用户 ID
         const now = new Date();
@@ -113,19 +111,9 @@ const HdocVariables = () => {
           createdByUser: loggedInUser,
           date: dateTime,
         }));
-
-        console.log("Auto-filled form data with logged-in user:", {
-          createdByUser: loggedInUser,
-          date: dateTime,
-        });
       } else {
         // 如果没有登录用户，尝试从后端 API 获取
         const API_BASE_URL = "http://localhost:8081";
-
-        console.log(
-          "Fetching current user info from:",
-          `${API_BASE_URL}/api/ud10Hdocvariables/getCurrentUserInfo`,
-        );
 
         const response = await fetch(
           `${API_BASE_URL}/api/ud10Hdocvariables/getCurrentUserInfo`,
@@ -133,7 +121,6 @@ const HdocVariables = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Current user info response:", data);
 
           if (data.code === 200 && data.data) {
             setFormData((prev) => ({
@@ -141,21 +128,10 @@ const HdocVariables = () => {
               createdByUser: data.data.currentUser || "",
               date: data.data.currentDateTime || "",
             }));
-
-            console.log("Auto-filled form data:", {
-              createdByUser: data.data.currentUser,
-              date: data.data.currentDateTime,
-            });
           }
-        } else {
-          console.warn(
-            "Failed to fetch current user info, status:",
-            response.status,
-          );
         }
       }
     } catch (error) {
-      console.error("Fetch current user info error:", error);
       // 如果获取失败，使用默认值
       const now = new Date();
       const dateTime = now.toISOString().slice(0, 19).replace("T", " ");
@@ -250,8 +226,6 @@ const HdocVariables = () => {
       descriptionOperator: formData.descriptionOperator,
     };
 
-    console.log("Navigating to result list with criteria:", searchCriteria);
-
     // 导航到搜索结果列表页面
     navigate("/hdoc-variables-result-list", {
       state: {
@@ -297,12 +271,6 @@ const HdocVariables = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Sending add request to:",
-        `${API_BASE_URL}/api/ud10Hdocvariables/add`,
-      );
-      console.log("Request data:", formData);
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/add`,
         {
@@ -320,19 +288,14 @@ const HdocVariables = () => {
         },
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(
           `HTTP error! status: ${response.status}, message: ${errorText}`,
         );
       }
 
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (data.code === 200) {
         setSuccessMessage("记录添加成功");
@@ -340,7 +303,6 @@ const HdocVariables = () => {
         setErrorMessage(data.msg || "添加失败");
       }
     } catch (error) {
-      console.error("Add error:", error);
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
           "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
@@ -367,12 +329,6 @@ const HdocVariables = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Sending update request to:",
-        `${API_BASE_URL}/api/ud10Hdocvariables/update`,
-      );
-      console.log("Request data:", formData);
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/update`,
         {
@@ -390,19 +346,14 @@ const HdocVariables = () => {
         },
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(
           `HTTP error! status: ${response.status}, message: ${errorText}`,
         );
       }
 
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (data.code === 200) {
         setSuccessMessage("记录更新成功");
@@ -410,7 +361,6 @@ const HdocVariables = () => {
         setErrorMessage(data.msg || "更新失败");
       }
     } catch (error) {
-      console.error("Update error:", error);
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
           "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
@@ -437,12 +387,6 @@ const HdocVariables = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log(
-        "Sending delete request to:",
-        `${API_BASE_URL}/api/ud10Hdocvariables/delete`,
-      );
-      console.log("Request data:", formData);
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/delete`,
         {
@@ -456,19 +400,14 @@ const HdocVariables = () => {
         },
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(
           `HTTP error! status: ${response.status}, message: ${errorText}`,
         );
       }
 
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (data.code === 200) {
         setSuccessMessage("记录删除成功");
@@ -476,7 +415,6 @@ const HdocVariables = () => {
         setErrorMessage(data.msg || "删除失败");
       }
     } catch (error) {
-      console.error("Delete error:", error);
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
           "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
@@ -568,7 +506,6 @@ const HdocVariables = () => {
 
       setSuccessMessage("导出成功");
     } catch (error) {
-      console.error("Export error:", error);
       setErrorMessage("导出失败，请重试");
     }
   };

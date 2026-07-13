@@ -50,8 +50,6 @@ const ADChange = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Adding AD Change:", { serieChnr, desc });
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(`${API_BASE_URL}/api/ud16/add`, {
@@ -67,7 +65,6 @@ const ADChange = () => {
       }
 
       const result = await response.json();
-      console.log("Add AD Change response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("AD Change记录添加成功");
@@ -83,7 +80,6 @@ const ADChange = () => {
         }
       }
     } catch (error: any) {
-      console.error("Error adding AD Change:", error);
       setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);
@@ -113,8 +109,6 @@ const ADChange = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Deleting AD Change:", serieChnr);
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(`${API_BASE_URL}/api/ud16/delete`, {
@@ -130,7 +124,6 @@ const ADChange = () => {
       }
 
       const result = await response.json();
-      console.log("Delete AD Change response:", result);
 
       if (result.code === 200) {
         setSuccessMessage("AD Change记录删除成功");
@@ -140,7 +133,6 @@ const ADChange = () => {
         setErrorMessage(result.msg || "删除失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error deleting AD Change:", error);
       setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);
@@ -162,8 +154,6 @@ const ADChange = () => {
     try {
       const API_BASE_URL = "http://localhost:8081";
 
-      console.log("Checking AD Change:", serieChnr);
-
       const response = await fetch(
         `${API_BASE_URL}/api/ud16/check?serieChnr=${encodeURIComponent(serieChnr)}`,
         {
@@ -179,7 +169,6 @@ const ADChange = () => {
       }
 
       const result = await response.json();
-      console.log("Check AD Change response:", result);
 
       if (result.code === 200) {
         // 检查是否有警告消息
@@ -194,7 +183,6 @@ const ADChange = () => {
         setErrorMessage(result.msg || "检查失败，请联系管理员");
       }
     } catch (error: any) {
-      console.error("Error checking AD Change:", error);
       setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);

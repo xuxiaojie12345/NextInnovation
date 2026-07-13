@@ -74,7 +74,6 @@ const Login = () => {
         }));
       }
     } catch (error) {
-      console.error("Login error:", error);
       setErrors((prev) => ({
         ...prev,
         authentication:
