@@ -86,9 +86,8 @@ const Menu: React.FC = () => {
 
   // 退出登录
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/login", { replace: true });
   };
 

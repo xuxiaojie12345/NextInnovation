@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Login.css";
 import { LoginRequest, LoginResponse } from "./Login.types";
 
@@ -7,6 +7,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // 画面マウント時にフォームを強制クリア
+  useEffect(() => {
+    setUserid("");
+    setPassword("");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +117,7 @@ const Login: React.FC = () => {
 
       <div className="login-form-panel">
         <div className="login-form">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} autoComplete="off">
             <div className="form-group">
               <input
                 type="text"
@@ -120,6 +126,7 @@ const Login: React.FC = () => {
                 placeholder="UserID"
                 maxLength={10}
                 disabled={isLoading}
+                autoComplete="off"
               />
             </div>
             <div className="form-group">
@@ -130,6 +137,7 @@ const Login: React.FC = () => {
                 placeholder="Password"
                 maxLength={32}
                 disabled={isLoading}
+                autoComplete="new-password"
               />
             </div>
             {message && <div className="error-message">{message}</div>}
