@@ -6,23 +6,7 @@
 /* ── 外层容器 ── */
 .ehvr-container {
   width: 1100px;
-  padding: 0;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   border: 2px solid #8698e6;
-}
-
-/* ── 标题区域 ── */
-.ehvr-header {
-  padding: 6px 16px;
-  margin-bottom: 0;
-  text-align: left;
-}
-
-.ehvr-header h1 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
 }
 
 /* ── 件数表示（表格下方） ── */
@@ -53,13 +37,14 @@
 
 /* ── 按钮 Table ── */
 .ehvr-btn-table {
-  width: calc(100% - 20px);
+  width: 100%;
   border-collapse: collapse;
   border: 2px solid #acb7ee;
   border-left: none;
   border-right: none;
   background-color: #f1f3ff;
   margin: 10px;
+  margin-left: 0px;
 }
 
 .ehvr-btn-cell {
@@ -186,41 +171,4 @@
   color: #001a4d;
 }
 
-/* ═══════════════════════════════════════════
-   印刷用スタイル
-   ═══════════════════════════════════════════ */
-@media print {
-  .ehvr-btn-table,
-  .ehvr-count,
-  .th-check,
-  .td-check {
-    display: none !important;
-  }
 
-  .ehvr-container {
-    width: 100% !important;
-    border: none !important;
-  }
-
-  .ehvr-table-wrapper {
-    overflow-x: visible !important;
-    margin: 0 !important;
-  }
-
-  .ehvr-table {
-    width: 100% !important;
-    font-size: 9px !important;
-    table-layout: fixed !important;
-  }
-
-  .ehvr-table th,
-  .ehvr-table td {
-    padding: 3px 4px !important;
-    font-size: 9px !important;
-    word-break: break-all !important;
-  }
-
-  .ehvr-table th {
-    min-width: auto !important;
-  }
-}

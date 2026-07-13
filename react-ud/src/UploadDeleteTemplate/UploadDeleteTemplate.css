@@ -5,21 +5,6 @@
 .udt-container {
   width: 700px;
   padding: 20px;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  border: 2px solid #acb7ee;
-}
-
-.udt-header {
-  padding: 6px 16px;
-  margin-bottom: 0;
-  text-align: left;
-}
-
-.udt-header h1 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
 }
 
 /* ── Section ── */

@@ -8,8 +8,8 @@ const HDocTemplateCheck: React.FC = () => {
   };
 
   return (
-    <div className="htc-container">
-      <div className="htc-header">
+    <div className="htc-container panel panel-w600">
+      <div className="htc-header panel-header">
         <h1>HDoc Template Check</h1>
       </div>
 

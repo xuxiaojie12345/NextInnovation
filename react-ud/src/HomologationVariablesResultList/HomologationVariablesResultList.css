@@ -6,24 +6,7 @@
 /* ── 外层容器 ── */
 .hv-result-container {
   width: 1400px;
-  padding: 0;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   border: 2px solid #8698e6;
-}
-
-/* ── 标题区域 ── */
-.hv-result-header {
-  padding: 6px 16px;
-  margin-bottom: 0;
-  text-align: left;
-}
-
-.hv-result-title {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-  letter-spacing: 0.3px;
 }
 
 /* ── 件数表示（表格下方） ── */
@@ -194,45 +177,7 @@
   color: #001a4d;
 }
 
-/* ═══════════════════════════════════════════
-   印刷用スタイル
-   ═══════════════════════════════════════════ */
-@media print {
-  /* ボタン・チェックボックスを非表示 */
-  .hv-result-btn-table,
-  .hv-result-count,
-  .th-check,
-  .td-check {
-    display: none !important;
-  }
 
-  .hv-result-container {
-    width: 100% !important;
-    border: none !important;
-  }
-
-  .hv-result-table-wrapper {
-    overflow-x: visible !important;
-    margin: 0 !important;
-  }
-
-  .hv-result-table {
-    width: 100% !important;
-    font-size: 9px !important;
-    table-layout: fixed !important;
-  }
-
-  .hv-result-table th,
-  .hv-result-table td {
-    padding: 3px 4px !important;
-    font-size: 9px !important;
-    word-break: break-all !important;
-  }
-
-  .hv-result-table th {
-    min-width: auto !important;
-  }
-}
 
 /* ── ボタンエリア ── */
 .hv-result-btn-table {

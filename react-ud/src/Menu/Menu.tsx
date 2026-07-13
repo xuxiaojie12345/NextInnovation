@@ -104,7 +104,7 @@ const Menu: React.FC = () => {
 
   return (
     <div className="menu-root">
-      <aside className="menu-sidebar">
+      <aside className="menu-sidebar print-hide-sidebar">
         <div className="sidebar-header">
           <h2>Generate Document</h2>
         </div>
@@ -145,7 +145,7 @@ const Menu: React.FC = () => {
         )}
       </main>
 
-      <div className="sidebar-footer">
+      <div className="sidebar-footer print-hide-sidebar">
         <div className="user-info">
           <span className="user-icon">👤</span>
           <span className="user-name">{username}</span>

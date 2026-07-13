@@ -683,8 +683,8 @@ const HomologationVariables: React.FC = () => {
 
   // ── JSX ──
   return (
-    <div className="homologation-vars-container">
-      <div className="homologation-vars-header">
+    <div className="homologation-vars-container panel panel-w800">
+      <div className="homologation-vars-header panel-header">
         <h1>Homologation Variables</h1>
       </div>
 

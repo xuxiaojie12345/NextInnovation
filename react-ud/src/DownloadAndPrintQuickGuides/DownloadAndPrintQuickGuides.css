@@ -4,22 +4,6 @@
 
 .dpg-container {
   width: 700px;
-  padding: 0;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  border: 2px solid #acb7ee;
-}
-
-.dpg-header {
-  padding: 6px 16px;
-  margin-bottom: 0;
-  text-align: left;
-}
-
-.dpg-header h1 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
 }
 
 .dpg-content {

@@ -123,8 +123,8 @@ const SearchUser: React.FC = () => {
   };
 
   return (
-    <div className="su-container">
-      <div className="su-header">
+    <div className="su-container panel panel-w900">
+      <div className="su-header panel-header">
         <h1>Search User</h1>
       </div>
 

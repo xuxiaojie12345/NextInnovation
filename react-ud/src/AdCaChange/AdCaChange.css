@@ -5,21 +5,10 @@
 .adca-container {
   width: 600px;
   padding: 4px;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  border: 2px solid #acb7ee;
-}
-
-.adca-header {
-  padding: 6px 16px;
-  margin-bottom: 0;
-  text-align: left;
 }
 
 .adca-header h1 {
   margin: 0 0 4px 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
 }
 
 /* ── 除标题外的边框包裹 ── */

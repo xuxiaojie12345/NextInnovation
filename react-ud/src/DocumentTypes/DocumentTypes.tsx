@@ -32,8 +32,8 @@ const DocumentTypes: React.FC = () => {
   }, []);
 
   return (
-    <div className="dt-container">
-      <div className="dt-header">
+    <div className="dt-container panel panel-w800">
+      <div className="dt-header panel-header">
         <h1>Document Types</h1>
       </div>
 

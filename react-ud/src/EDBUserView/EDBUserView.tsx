@@ -74,8 +74,8 @@ const EDBUserView: React.FC = () => {
   };
 
   return (
-    <div className="edb-container">
-      <div className="edb-header">
+    <div className="edb-container panel panel-w700">
+      <div className="edb-header panel-header">
         <h1>EDB User View</h1>
       </div>
 

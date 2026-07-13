@@ -43,10 +43,6 @@
 }
 
 /* ── セクション ── */
-.menu-section {
-  /* 各セクションは連続して表示 */
-}
-
 .section-title {
   padding: 6px 16px 4px;
   font-size: 11px;
@@ -114,16 +110,6 @@
 
 .user-icon {
   font-size: 16px;
-}
-
-/* ── 印刷時：メニューを非表示 ── */
-@media print {
-  .menu-sidebar {
-    display: none !important;
-  }
-  .sidebar-footer {
-    display: none !important;
-  }
 }
 
 .user-name {

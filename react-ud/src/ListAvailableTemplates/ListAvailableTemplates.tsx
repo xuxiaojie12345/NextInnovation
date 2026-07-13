@@ -186,8 +186,8 @@ const ListAvailableTemplates: React.FC = () => {
   };
 
   return (
-    <div className="lat-container">
-      <div className="lat-header">
+    <div className="lat-container panel panel-w1000">
+      <div className="lat-header panel-header">
         <h1>List Templates</h1>
       </div>
 

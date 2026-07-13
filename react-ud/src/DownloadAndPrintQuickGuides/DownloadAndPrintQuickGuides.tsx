@@ -36,8 +36,8 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
   };
 
   return (
-    <div className="dpg-container">
-      <div className="dpg-header">
+    <div className="dpg-container panel panel-w700">
+      <div className="dpg-header panel-header">
         <h1>Download and Print Quick Guides</h1>
       </div>
 

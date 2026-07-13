@@ -141,8 +141,8 @@ const MarketDocumentSettingsList: React.FC = () => {
   };
 
   return (
-    <div className="mdsl-container">
-      <div className="mdsl-header">
+    <div className="mdsl-container panel panel-w600">
+      <div className="mdsl-header panel-header">
         <h1>HDoc - Market Document Setting</h1>
       </div>
 

@@ -202,8 +202,8 @@ const VinPlate: React.FC = () => {
     );
 
   return (
-    <div className="vp-container">
-      <div className="vp-header">
+    <div className="vp-container panel panel-w900">
+      <div className="vp-header panel-header">
         <h1>Vin Plate</h1>
       </div>
 

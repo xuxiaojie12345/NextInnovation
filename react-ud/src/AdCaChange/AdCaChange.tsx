@@ -166,8 +166,8 @@ const AdCaChange: React.FC = () => {
   };
 
   return (
-    <div className="adca-container">
-      <div className="adca-header">
+    <div className="adca-container panel panel-w600">
+      <div className="adca-header panel-header">
         <h1>AD/CA Change</h1>
       </div>
 

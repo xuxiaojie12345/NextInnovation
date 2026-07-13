@@ -129,7 +129,10 @@ const HomologationVariablesResultList: React.FC = () => {
   };
 
   const handlePrint = () => {
+    const prevTitle = document.title;
+    document.title = "HomologationVariablesResultList";
     window.print();
+    document.title = prevTitle;
   };
 
   const handleDeleteSelected = async () => {
@@ -170,16 +173,16 @@ const HomologationVariablesResultList: React.FC = () => {
   };
 
   return (
-    <div className="hv-result-container">
+    <div className="hv-result-container panel panel-w1400 print-container">
       {/* 顶部深蓝色标题栏 */}
-      <div className="hv-result-header">
+      <div className="hv-result-header panel-header">
         <h1>Homologation Variables</h1>
       </div>
 
       {errorMessage && <div className="hv-result-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
-      <table className="hv-result-btn-table">
+      <table className="hv-result-btn-table no-print">
         <tbody>
           <tr>
             <td className="hv-result-btn-cell">
@@ -221,11 +224,11 @@ const HomologationVariablesResultList: React.FC = () => {
           <p>Loading...</p>
         </div>
       ) : results.length > 0 ? (
-        <div className="hv-result-table-wrapper">
-          <table className="hv-result-table">
+        <div className="hv-result-table-wrapper print-wrapper">
+          <table className="hv-result-table print-table">
             <thead>
               <tr>
-                <th className="th-check hv-th-noborder"></th>
+                <th className="th-check hv-th-noborder no-print"></th>
                 <th className="hv-th-required hv-th-underline hv-th-noborder">
                   Product class
                 </th>
@@ -262,7 +265,7 @@ const HomologationVariablesResultList: React.FC = () => {
                   key={idx}
                   className={selectedIds.has(idx) ? "selected" : ""}
                 >
-                  <td className="td-check">
+                  <td className="td-check no-print">
                     <input
                       type="radio"
                       name="selectedRow"
@@ -307,7 +310,7 @@ const HomologationVariablesResultList: React.FC = () => {
         </div>
       )}
 
-      <div className="hv-result-count">
+      <div className="hv-result-count no-print">
         Number of lines found: {results.length}
       </div>
     </div>

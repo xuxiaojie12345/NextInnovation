@@ -105,7 +105,10 @@ const MarketDocumentSettingsResultList: React.FC = () => {
   };
 
   const handlePrint = () => {
+    const prevTitle = document.title;
+    document.title = "MarketDocumentSettingsList";
     window.print();
+    document.title = prevTitle;
   };
 
   const handleUserClick = (userId: string) => {
@@ -113,14 +116,14 @@ const MarketDocumentSettingsResultList: React.FC = () => {
   };
 
   return (
-    <div className="mdsr-container">
-      <div className="mdsr-header">
-        <h1>HDoc - Market Document Setting</h1>
+    <div className="mdsr-container panel panel-w1100 print-container">
+      <div className="mdsr-header panel-header">
+        <h1 className="print-header-sm">HDoc - Market Document Setting</h1>
       </div>
 
-      {message && <div className="mdsr-error">{message}</div>}
+      {message && <div className="mdsr-error no-print">{message}</div>}
 
-      <table className="mdsr-btn-table">
+      <table className="mdsr-btn-table no-print">
         <tbody>
           <tr>
             <td className="mdsr-btn-cell">
@@ -145,11 +148,11 @@ const MarketDocumentSettingsResultList: React.FC = () => {
       {isLoading ? (
         <div className="mdsr-loading">Loading...</div>
       ) : results.length > 0 ? (
-        <div className="mdsr-table-wrapper">
-          <table className="mdsr-table">
+        <div className="mdsr-table-wrapper print-wrapper">
+          <table className="mdsr-table print-table">
             <thead>
               <tr>
-                <th className="mdsr-th-check"></th>
+                <th className="mdsr-th-check no-print"></th>
                 <th>Document type</th>
                 <th>Business unit</th>
                 <th>User</th>
@@ -159,7 +162,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
             <tbody>
               {results.map((row, idx) => (
                 <tr key={idx} className={selectedIdx === idx ? "selected" : ""}>
-                  <td className="mdsr-td-check">
+                  <td className="mdsr-td-check no-print">
                     <input
                       type="radio"
                       name="selectedRow"
@@ -171,7 +174,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
                   <td>{row.businessUnit}</td>
                   <td>
                     <span
-                      className="mdsr-link-user"
+                      className="mdsr-link-user print-link-plain"
                       onClick={() => handleUserClick(row.registerUser)}
                     >
                       {row.registerUser}

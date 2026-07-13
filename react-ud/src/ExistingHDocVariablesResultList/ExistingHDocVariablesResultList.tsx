@@ -131,7 +131,10 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   };
 
   const handlePrint = () => {
+    const prevTitle = document.title;
+    document.title = "ExistingHDocVariablesResultList";
     window.print();
+    document.title = prevTitle;
   };
 
   /**
@@ -187,16 +190,16 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   };
 
   return (
-    <div className="ehvr-container">
+    <div className="ehvr-container panel panel-w1100 print-container">
       {/* 顶部标题栏 */}
-      <div className="ehvr-header">
+      <div className="ehvr-header panel-header">
         <h1>Existing HDoc Variables</h1>
       </div>
 
       {errorMessage && <div className="ehvr-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
-      <table className="ehvr-btn-table">
+      <table className="ehvr-btn-table no-print">
         <tbody>
           <tr>
             <td className="ehvr-btn-cell">
@@ -225,11 +228,11 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           <p>Loading...</p>
         </div>
       ) : results.length > 0 ? (
-        <div className="ehvr-table-wrapper">
-          <table className="ehvr-table">
+        <div className="ehvr-table-wrapper print-wrapper">
+          <table className="ehvr-table print-table">
             <thead>
               <tr>
-                <th className="th-check ehvr-th-noborder"></th>
+                <th className="th-check ehvr-th-noborder no-print"></th>
                 <th className="ehvr-th-underline ehvr-th-noborder">Variable</th>
                 <th className="ehvr-th-underline ehvr-th-noborder">Type</th>
                 <th className="ehvr-th-underline ehvr-th-noborder">
@@ -244,7 +247,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
             <tbody>
               {results.map((row, idx) => (
                 <tr key={idx} className={selectedIdx === idx ? "selected" : ""}>
-                  <td className="td-check">
+                  <td className="td-check no-print">
                     <input
                       type="radio"
                       name="selectedRow"
@@ -281,7 +284,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
         </div>
       )}
 
-      <div className="ehvr-count">Number of lines found: {results.length}</div>
+      <div className="ehvr-count no-print">Number of lines found: {results.length}</div>
     </div>
   );
 };

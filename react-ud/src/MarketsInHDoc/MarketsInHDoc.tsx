@@ -35,8 +35,8 @@ const MarketsInHDoc: React.FC = () => {
   }, []);
 
   return (
-    <div className="mh-container">
-      <div className="mh-header">
+    <div className="mh-container panel panel-w800">
+      <div className="mh-header panel-header">
         <h1>Markets in HDoc</h1>
       </div>
 

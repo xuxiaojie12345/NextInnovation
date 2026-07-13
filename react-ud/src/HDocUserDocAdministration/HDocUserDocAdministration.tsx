@@ -176,8 +176,8 @@ const HDocUserDocAdministration: React.FC = () => {
   };
 
   return (
-    <div className="huda-container">
-      <div className="huda-header">
+    <div className="huda-container panel panel-w600">
+      <div className="huda-header panel-header">
         <h1>HDoc User Doc Administration</h1>
       </div>
 

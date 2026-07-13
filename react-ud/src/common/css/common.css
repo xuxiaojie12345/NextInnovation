@@ -38,4 +38,129 @@
   cursor: not-allowed !important;
 }
 
+/* ═══════════════════════════════════════════
+   印刷用共通ユーティリティクラス
+   各画面の @media print をここに集約
+   使い方: TSX の className に追加するだけ
+   ═══════════════════════════════════════════ */
+@media print {
+  /* ボタン・操作系・カウント等を非表示 */
+  .no-print {
+    display: none !important;
+  }
 
+  /* 印刷時にサイドバーを非表示 */
+  .print-hide-sidebar {
+    display: none !important;
+  }
+
+  /* コンテナを全幅・無枠に */
+  .print-container {
+    width: 100% !important;
+    border: none !important;
+  }
+
+  /* テーブルラッパー：はみ出しを許可 */
+  .print-wrapper {
+    overflow-x: visible !important;
+    margin: 0 !important;
+  }
+
+  /* データテーブル：小さく固定レイアウト */
+  .print-table {
+    width: 100% !important;
+    font-size: 9px !important;
+    table-layout: fixed !important;
+  }
+
+  .print-table th,
+  .print-table td {
+    padding: 3px 4px !important;
+    font-size: 9px !important;
+    word-break: break-all !important;
+  }
+
+  .print-table th {
+    min-width: auto !important;
+    position: static !important;
+  }
+
+  /* テーブル行のページ分割を防止（一行が途中で切れないように） */
+  .print-table tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ヘッダー固定行の sticky を解除 */
+  .ehvr-table th,
+  .hv-result-table th,
+  .mdsr-table th,
+  .lat-table th,
+  .su-table th {
+    position: static !important;
+  }
+
+  /* 印刷時にリンクをプレーン表示 */
+  .print-link-plain {
+    text-decoration: none !important;
+    color: #333 !important;
+  }
+
+  /* 印刷時に見出しを小さく */
+  .print-header-sm {
+    font-size: 12px !important;
+  }
+
+  /* ── 全体レイアウトの overflow 制限を解除（多ページ印刷のため） ── */
+  .menu-root {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .menu-sidebar,
+  .sidebar-footer {
+    display: none !important;
+  }
+
+  .menu-main {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .menu-main h1 {
+    margin: 0 0 10px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   共通 Panel — 容器 + 标题 + H1
+   各画面の .xxx-container / .xxx-header / h1 を集約
+   ═══════════════════════════════════════════ */
+.panel {
+  padding: 0;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  border: 2px solid #acb7ee;
+}
+.panel-header {
+  padding: 6px 16px;
+  margin-bottom: 0;
+  text-align: left;
+}
+.panel-header h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 宽度变体 */
+.panel-w600  { width: 600px; }
+.panel-w700  { width: 700px; }
+.panel-w800  { width: 800px; }
+.panel-w900  { width: 900px; }
+.panel-w1000 { width: 1000px; }
+.panel-w1100 { width: 1100px; }
+.panel-w1400 { width: 1400px; }

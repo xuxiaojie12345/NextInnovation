@@ -364,8 +364,8 @@ const ExistingHDocVariables: React.FC = () => {
 
   // ── JSX ──
   return (
-    <div className="ehv-container">
-      <div className="ehv-header">
+    <div className="ehv-container panel panel-w800">
+      <div className="ehv-header panel-header">
         <h1>Existing HDoc Variables</h1>
       </div>
 
