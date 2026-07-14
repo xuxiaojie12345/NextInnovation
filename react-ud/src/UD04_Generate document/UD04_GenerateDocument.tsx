@@ -313,7 +313,6 @@ const UD04_GenerateDocument: React.FC = () => {
         {!state.isLoading && (
           <div className='result-section'>
             {/* Chassis no */}
-            {/* 对应设计文档 2.1 控件属性表 No.1 */}
             <div className='result-item'>
               <label className='result-label-chassisNo'>Chassis no:</label>
               <span 
@@ -326,7 +325,6 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
 
             {/* Ordernumber */}
-            {/* 对应设计文档 2.1 控件属性表 No.2 */}
             <div className='result-item'>
               <label className='result-label'>Ordernumber:</label>
               <span className='result-value'>{state.ordernumber || '-'}</span>
@@ -338,28 +336,24 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
 
             {/* Build week */}
-            {/* 对应设计文档 2.1 控件属性表 No.3 */}
             <div className='result-item'>
               <label className='result-label'>Build week:</label>
               <span className='result-value'>{state.buildWeek || '-'}</span>
             </div>
 
             {/* Spec week */}
-            {/* 对应设计文档 2.1 控件属性表 No.4 */}
             <div className='result-item'>
               <label className='result-label'>Spec week:</label>
               <span className='result-value'>{state.specWeek || '-'}</span>
             </div>
 
             {/* Market */}
-            {/* 对应设计文档 2.1 控件属性表 No.5 */}
             <div className='result-item'>
               <label className='result-label'>Market:</label>
               <span className='result-value'>{state.market || '-'}</span>
             </div>
 
             {/* Master Market */}
-            {/* 对应设计文档 2.1 控件属性表 No.6 */}
             <div className='result-item'>
               <label className='result-label'>Master Market:</label>
               <span className='result-value'>{state.masterMarket}</span>
@@ -371,7 +365,6 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
 
             {/* S-Note NO */}
-            {/* 对应设计文档 2.1 控件属性表 No.7 */}
             {state.sNoteNo && (
               <div className='result-item'>
                 <label className='result-value'>{state.sNoteNo}</label>
@@ -379,7 +372,6 @@ const UD04_GenerateDocument: React.FC = () => {
             )}
 
             {/* S-Note Message */}
-            {/* 对应设计文档 2.1 控件属性表 No.8 - 条件显示 */}
             {state.sNoteMessage && (
               <div className='result-item s-note-message'>
                 <span className='result-value'>{state.sNoteMessage}</span>
@@ -392,7 +384,6 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
             
             {/* Load Index */}
-            {/* 对应设计文档 2.1 控件属性表 No.9 */}
             <div className='result-item'>
               <label className='result-label'>Load Index:</label>
               <span className='result-value'>{state.loadIndex || '-'}</span>
@@ -404,7 +395,6 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
 
             {/* Analyze Rules */}
-            {/* 对应设计文档 2.1 控件属性表 No.10 */}
             <div className='result-item'>
               <label className='result-label'>Analyze Rules:</label>
               <span 
@@ -422,7 +412,6 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
 
             {/* Modify Doc Link */}
-            {/* 对应设计文档 2.1 控件属性表 No.11 - 条件显示（仅当ACT="Y"时显示） */}
             {state.act === 'Y' && (
               <div className='result-item'>
                 <label className='result-label'>Modify Doc:</label>
@@ -437,14 +426,12 @@ const UD04_GenerateDocument: React.FC = () => {
             )}
 
             {/* Using template */}
-            {/* 对应设计文档 2.1 控件属性表 No.12 */}
             <div className='result-item'>
               <label className='result-label'>Using template:</label>
               <span className='result-value'>{state.usingTemplate}</span>
             </div>
 
             {/* Replacing parameters */}
-            {/* 对应设计文档 2.1 控件属性表 No.13 */}
             {state.replacingParameters && (
               <div className='result-item'>
                 <label className='result-label-ReplacingParameters'>Replacing parameters:</label>
@@ -459,19 +446,11 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
             
             {/* Generated document */}
-            {/* 对应设计文档 2.1 控件属性表 No.14 */}
             <div className='result-item'>
-              {/* <label className='result-label'>Generated document:</label> */}
               <label className='result-value-GeneratedDocument'
                 onClick={handleGeneratedDocClick}
                 style={{ cursor: 'pointer' }}>Generated document:</label>
-              {/* <span 
-                className='result-value link-blue'
-                onClick={handleGeneratedDocClick}
-                style={{ cursor: 'pointer' }}
-              >
-                Download/View Document
-              </span> */}
+              
             </div>
 
             {/* 空白行 */}
@@ -485,14 +464,12 @@ const UD04_GenerateDocument: React.FC = () => {
             </div>
             
             {/* Date */}
-            {/* 对应设计文档 2.1 控件属性表 No.15 */}
             <div className='result-item'>
               <label className='result-label'>Date:</label>
               <span className='result-value'>{state.date}</span>
             </div>
 
             {/* HDoc version */}
-            {/* 对应设计文档 2.1 控件属性表 No.16 */}
             <div className='result-item'>
               <label className='result-label'>HDoc version:</label>
               <span className='result-value'>{state.hdocVersion}</span>

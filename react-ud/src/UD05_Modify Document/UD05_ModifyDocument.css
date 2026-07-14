@@ -23,19 +23,6 @@
   text-align: left;
 }
 
-/* ==================== 错误消息样式 ==================== */
-.ud05-container .ud05-message {
-    background-color: #fff2f0;
-    border-color: #ffccc7;
-    color: #ff4d4f;
-    padding: 10px 15px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    font-size: 13px;
-    min-height: 20px;
-    border: 1px solid transparent;
-}
-
 /* ==================== 基本信息区域 ==================== */
 .ud05-container .ud05-info-section {
   width: 100%;
@@ -99,6 +86,19 @@
   color: #0050b3;
 }
 
+/* ==================== 错误消息样式 ==================== */
+.ud05-container .ud05-message {
+    background-color: #fff2f0;
+    border-color: #ffccc7;
+    color: #ff4d4f;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    min-height: 20px;
+    border: 1px solid transparent;
+}
+
 /* ==================== DataTable区域 ==================== */
 .ud05-container .ud05-table-section {
   width: 100%;
@@ -143,6 +143,14 @@
   vertical-align: middle;
 }
 
+/* 空数据提示 */
+.ud05-container .ud05-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: #999999;
+  font-size: 14px;
+}
+
 /* 修改行高亮样式 */
 .ud05-container .ud05-modified-row {
   background-color: #f4f9ff;
@@ -160,12 +168,27 @@
   background-color: #fbfdff;
 }
 
-/* 空数据提示 */
-.ud05-container .ud05-empty {
-  text-align: center;
-  padding: 40px 16px;
-  color: #999999;
-  font-size: 14px;
+/* ==================== 按钮区域 ==================== */
+.ud05-container .ud05-button-section {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+  
+}
+
+/* Save按钮样式 */
+.ud05-container .ud05-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0; /* 浅紫色背景 */
+  cursor: pointer;
+  outline: none;
+  margin-left: 10px;
+  transition: all 0.15s ease;
+ 
 }
 
 /* ==================== 输入框样式 ==================== */
@@ -195,29 +218,6 @@
   color: #bfbfbf;
 }
 
-/* ==================== 按钮区域 ==================== */
-.ud05-container .ud05-button-section {
-  display: flex;
-  justify-content: flex-start;
-  gap: 12px;
-  margin-bottom: 8px;
-  
-}
-
-/* Save按钮样式 */
-.ud05-container .ud05-btn {
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: normal;
-  border: 1px solid #808080;
-  background-color: #d0d0f0; /* 浅紫色背景 */
-  cursor: pointer;
-  outline: none;
-  margin-left: 10px;
-  transition: all 0.15s ease;
- 
-}
-
 
 .ud05-container .ud05-btn-save:hover:not(:disabled) {
   background-color: #f3f7ff;
@@ -236,127 +236,5 @@
   opacity: 0.6;
 }
 
-/* ==================== 响应式设计 ==================== */
 
-/* 平板设备 (768px - 1024px) */
-@media screen and (max-width: 1024px) {
-  .ud05-container {
-    padding: 30px 15px;
-  }
 
-  .ud05-container .ud05-title {
-    font-size: 24px;
-    margin-bottom: 25px;
-  }
-
-  .ud05-container .ud05-info-section,
-  .ud05-container .ud05-table-section {
-    max-width: 900px;
-  }
-
-  .ud05-container .ud05-info-label {
-    min-width: 120px;
-    font-size: 14px;
-  }
-
-  .ud05-container .ud05-info-value {
-    font-size: 14px;
-  }
-
-  .ud05-container .ud05-th,
-  .ud05-container .ud05-td {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-}
-
-/* 手机设备 (< 768px) */
-@media screen and (max-width: 768px) {
-  .ud05-container {
-    padding: 20px 10px;
-  }
-
-  .ud05-container .ud05-title {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  .ud05-container .ud05-info-section,
-  .ud05-container .ud05-table-section {
-    max-width: 100%;
-    padding: 15px;
-  }
-
-  .ud05-container .ud05-info-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .ud05-container .ud05-info-label {
-    min-width: auto;
-    margin-bottom: 5px;
-    font-size: 13px;
-  }
-
-  .ud05-container .ud05-info-value {
-    font-size: 13px;
-  }
-
-  .ud05-container .ud05-table {
-    font-size: 12px;
-  }
-
-  .ud05-container .ud05-th,
-  .ud05-container .ud05-td {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-
-  .ud05-container .ud05-input {
-    padding: 6px 10px;
-    font-size: 13px;
-  }
-
-  .ud05-container .ud05-btn {
-    padding: 10px 30px;
-    font-size: 14px;
-  }
-}
-
-/* 小屏手机设备 (< 480px) */
-@media screen and (max-width: 480px) {
-  .ud05-container {
-    padding: 15px 8px;
-  }
-
-  .ud05-container .ud05-title {
-    font-size: 20px;
-    margin-bottom: 15px;
-  }
-
-  .ud05-container .ud05-info-section,
-  .ud05-container .ud05-table-section {
-    padding: 12px;
-  }
-
-  .ud05-container .ud05-message {
-    padding: 10px 15px;
-    font-size: 13px;
-  }
-
-  .ud05-container .ud05-th,
-  .ud05-container .ud05-td {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-
-  .ud05-container .ud05-input {
-    padding: 5px 8px;
-    font-size: 12px;
-  }
-
-  .ud05-container .ud05-btn {
-    padding: 8px 25px;
-    font-size: 13px;
-  }
-}

@@ -30,6 +30,56 @@
   border-bottom: 2px solid #003366;
 }
 
+
+/* ==================== 链接样式 ==================== */
+.ud04-container .result-value.link-blue {
+  color: #1890ff;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.ud04-container .result-value-GeneratedDocument{
+  font-weight: bold;
+  font-size: 14px;
+  color: #1890ff;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.ud04-container .link-blue:hover {
+  color: #40a9ff;
+}
+
+.ud04-container .result-value.link-red {
+  color: #ff4d4f;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.ud04-container .link-red:hover {
+  color: #ff7875;
+}
+
+/* ==================== S-Note 消息特殊样式 ==================== */
+.ud04-container .s-note-message {
+  background-color: transparent;
+  border-left: none;
+  margin: 2px 0;
+}
+
+.ud04-container .s-note-message .result-value {
+  color: #ff4d4f;
+  font-style: normal;
+}
+
+/* ==================== 页脚支持信息 ==================== */
+.ud04-container .support-info {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
 /* ==================== 错误消息区域 ==================== */
 .ud04-container .error-message-area {
   background-color: #fff2f0;
@@ -90,80 +140,3 @@
   word-break: break-word;
 }
 
-/* ==================== 链接样式 ==================== */
-.ud04-container .link-blue {
-  
-  color: #1890ff;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-.ud04-container .result-value-GeneratedDocument{
-  font-weight: bold;
-  font-size: 14px;
-  color: #1890ff;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-.ud04-container .link-blue:hover {
-  color: #40a9ff;
-}
-
-.ud04-container .link-red {
-  color: #ff4d4f;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-.ud04-container .link-red:hover {
-  color: #ff7875;
-}
-
-/* ==================== S-Note 消息特殊样式 ==================== */
-.ud04-container .s-note-message {
-  background-color: transparent;
-  border-left: none;
-  margin: 2px 0;
-}
-
-.ud04-container .s-note-message .result-value {
-  color: #ff4d4f;
-  font-style: normal;
-}
-
-/* ==================== 页脚支持信息 ==================== */
-.ud04-container .support-info {
-  margin-top: 30px;
-  padding-top: 15px;
-  border-top: 1px solid #ddd;
-  text-align: center;
-  color: #999;
-  font-size: 12px;
-}
-
-/* ==================== 响应式设计 ==================== */
-@media (max-width: 768px) {
-  .ud04-container {
-    padding: 10px;
-  }
-
-  .ud04-content {
-    padding: 20px;
-  }
-
-  .ud04-container .page-title {
-    font-size: 20px;
-  }
-
-  .ud04-container .result-item {
-    flex-direction: column;
-  }
-
-  .ud04-container .result-label {
-    flex: 0 0 auto;
-    margin-bottom: 5px;
-  }
-
-  .ud04-container .result-value {
-    flex: 1;
-  }
-}

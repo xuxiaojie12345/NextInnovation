@@ -204,12 +204,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 点击 Save 按钮
-   * 对应设计书 3.1.2 Save按钮处理流程
-   * 
-   * 处理流程：
-   * 1. 收集所有Modified value的值
-   * 2. 调用API更新数据
-   * 3. 成功后跳转到UD06画面
    */
   const handleSaveClick = () => {
     if (!chassisSerie || !chassisNo) {
@@ -241,16 +235,8 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 点击 Templateファイル Link
-   * 对应设计书 3.1.3 Templateファイル Link点击流程
-   * 
-   * 处理流程：
-   * 1. 下载前画面生成的Templateファイル
-   * 2. 保存到本地
    */
   const handleTemplateClick = () => {
-    // TODO: 实现文件下载逻辑
-    // 这里需要根据实际后端API来实现
-    // 临时实现：创建一个虚拟下载链接
     const link = document.createElement("a");
     link.href = "#"; // 实际应该是后端提供的下载URL
     link.download = TEMPLATE_FILENAME;
@@ -260,11 +246,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 点击 Chassis no Link
-   * 对应设计书 3.1.4 Chassis no Link点击流程
-   * 
-   * 处理流程：
-   * 1. 将Chassis no作为参数传给下个画面
-   * 2. 打开UD07 VDA - Vehicle Specification画面
    */
   const handleChassisNoClick = () => {
     navigate("/UD07", {
@@ -375,8 +356,6 @@ const UD05_ModifyDocument: React.FC = () => {
           </tbody>
         </table>
       </div>
-
-      {/* 按钮区域（移动到表格上方以贴近原始页面样式） */}
     </div>
   );
 };

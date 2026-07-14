@@ -55,7 +55,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
       return;
     }
 
-    // 从localStorage读取上次输入的条件
+    //访问画面时自动回填上次输入的条件
     const lastChassisSeries = localStorage.getItem('lastChassisSeries');
     const lastChassisNo = localStorage.getItem('lastChassisNo');
     const lastDocumentType = localStorage.getItem('lastDocumentType');
@@ -193,13 +193,12 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
       return;
     }
 
-    // 4. 結果処理
-    // キャッシュ入力の検索条件をlocalStorage
+    //4.结果处理 缓存到localStorage
     localStorage.setItem('lastChassisSeries', chassisSeries);
     localStorage.setItem('lastChassisNo', chassisNo);
     localStorage.setItem('lastDocumentType', documentType);
+
     setIsLoading(false);
-    
     try {
       navigate('/UD04', {
         state: {
