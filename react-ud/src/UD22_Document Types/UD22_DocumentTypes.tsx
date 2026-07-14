@@ -5,12 +5,6 @@ import './UD22_DocumentTypes.css';
 /**
  * UD22_DocumentTypes 文档类型列表展示页面组件
  *
- * 功能说明：
- * - 从HDOC_DOCUMENT_LIST表获取所有可用文档类型
- * - 以链接列表形式展示Key（文档类型）和Description（描述）
- * - 每个文档类型可点击跳转到对应的详情页面
- * - 数据为空时显示友好的空状态提示
- *
  * @component
  * @returns {JSX.Element} 文档类型列表页面元素
  */
@@ -35,11 +29,6 @@ const UD22_DocumentTypes: React.FC = () => {
 
   /**
    * 获取文档类型列表
-   *
-   * 处理流程：
-   * 1. 调用API获取文档类型列表
-   * 2. 若返回空数据，显示空状态提示
-   * 3. 若成功则渲染链接列表
    */
   const fetchDocTypes = async () => {
     setIsLoading(true);

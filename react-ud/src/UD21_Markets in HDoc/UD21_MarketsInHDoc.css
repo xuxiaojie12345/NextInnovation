@@ -25,25 +25,6 @@
   margin: 15px 0px 15px;
 }
 
-/* ==================== 消息显示区域 ==================== */
-.ud21-message {
-  color: #ff4d4f;
-  font-size: 13px;
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
-  word-break: break-word;
-}
-
-.ud21-message-success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-}
 
 /* ==================== 主内容区域 ==================== */
 .ud21-content {
@@ -130,4 +111,24 @@
   padding: 30px 0;
   color: #999;
   font-size: 14px;
+}
+
+/* ==================== 消息显示区域 ==================== */
+.ud21-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud21-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
 }

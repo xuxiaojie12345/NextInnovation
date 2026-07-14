@@ -11,15 +11,6 @@
   max-width: 800px;
 }
 
-
-/* ===== 内容区域（Upload + Delete 上下排列） ===== */
-.ud12-content-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  border: 1px solid #d0d5dd;
-}
-
 /* ===== Upload区域和Delete区域公用样式 ===== */
 .ud12-upload-section,
 .ud12-delete-section {
@@ -32,6 +23,13 @@
   width: 600px;
 }
 
+/* ===== 内容区域（Upload + Delete 上下排列） ===== */
+.ud12-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border: 1px solid #d0d5dd;
+}
 
 /* ===== 区域标题栏 ===== */
 .ud12-section-header {
@@ -86,12 +84,6 @@
   display: inline-block;
   flex: none;
   max-width: none;
-}
-
-/* ===== 蓝色边框盒子 ===== */
-
-.ud12-btn-box {
-  display: inline-block;
 }
 
 /* ===== 文件选择框 ===== */
@@ -234,13 +226,6 @@
   margin: 0 0 8px 0;
 }
 
-.ud12-check-description {
-  font-size: 15px;
-  color: #666666;
-  margin: 0 0 8px 0;
-  line-height: 1.5;
-}
-
 .ud12-check-link {
   color: #1890ff;
   font-size: 13px;
@@ -258,6 +243,13 @@
   color: #40a9ff;
 }
 
+.ud12-check-description {
+  font-size: 15px;
+  color: #666666;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
 /* ===== 消息显示区域 ===== */
 .ud12-message {
   padding: 10px 16px;
@@ -269,13 +261,6 @@
   animation: ud12FadeIn 0.3s ease-in-out;
 }
 
-/* 消息级别：成功（绿色） */
-.ud12-message-success {
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  color: #52c41a;
-}
-
 /* 消息级别：错误（红色） */
 .ud12-message-error {
   background-color: #fff2f0;
@@ -283,11 +268,11 @@
   color: #ff4d4f;
 }
 
-/* 消息级别：警告（橙色） */
-.ud12-message-warning {
-  background-color: #fffbe6;
-  border: 1px solid #ffe58f;
-  color: #faad14;
+/* 消息级别：成功（绿色） */
+.ud12-message-success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
 }
 
 /* ===== 模态框覆盖层 ===== */
@@ -354,44 +339,4 @@
   justify-content: flex-end;
   gap: 12px;
   border-top: 1px solid #f0f0f0;
-}
-
-/* ===== 动画 ===== */
-@keyframes ud12FadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes ud12SlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== 响应式设计 ===== */
-@media (max-width: 768px) {
-  .ud12-container {
-    padding: 20px 15px;
-  }
-
-  .ud12-page-title {
-    font-size: 22px;
-  }
-
-  .ud12-section-title {
-    font-size: 16px;
-  }
-
-  .ud12-btn {
-    width: 100%;
-  }
 }

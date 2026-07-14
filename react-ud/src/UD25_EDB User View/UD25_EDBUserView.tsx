@@ -31,11 +31,6 @@ const UD25_EDBUserView: React.FC = () => {
   useEffect(() => {
     /**
      * 页面加载时执行用户信息获取
-     *
-     * 处理流程：
-     * 1. 从location.state中获取userId参数
-     * 2. 调用AuthenticationApi获取用户信息
-     * 3. 将数据显示在对应的TextField控件中
      */
     const fetchUserInfo = async () => {
       // 获取前画面传递的userId
@@ -85,9 +80,6 @@ const UD25_EDBUserView: React.FC = () => {
 
   /**
    * 处理 Clear 按钮点击
-   * 处理流程：
-   * 1. 清空所有TextField控件的值
-   * 2. 清除消息显示
    */
   const handleClear = useCallback(() => {
     setUserid('');
@@ -123,22 +115,12 @@ const UD25_EDBUserView: React.FC = () => {
       {/* 主内容区域 */}
       <div className="ud25-content">
 
-
-
         {/* 按钮区域 */}
         <div className="ud25-button-row">
-          <button
-            className="ud25-btn ud25-btn--default"
-            onClick={handleClear}
-            disabled={isLoading}
-          >
+          <button className="ud25-btn ud25-btn--default" onClick={handleClear} disabled={isLoading} >
             Clear
           </button>
-          <button
-            className="ud25-btn ud25-btn--primary"
-            onClick={handleBack}
-            disabled={isLoading}
-          >
+          <button className="ud25-btn ud25-btn--primary" onClick={handleBack} disabled={isLoading} >
             Back
           </button>
         </div>
@@ -150,10 +132,7 @@ const UD25_EDBUserView: React.FC = () => {
             <option value="=">=</option>
             <option value="≠">≠</option>
           </select>
-          <input
-            type="text"
-            value={userid}
-            readOnly
+          <input type="text" value={userid} readOnly
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -165,10 +144,7 @@ const UD25_EDBUserView: React.FC = () => {
             <option value="=">=</option>
             <option value="≠">≠</option>
           </select>
-          <input
-            type="text"
-            value={responsible}
-            readOnly
+          <input type="text" value={responsible} readOnly
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -180,10 +156,7 @@ const UD25_EDBUserView: React.FC = () => {
             <option value="=">=</option>
             <option value="≠">≠</option>
           </select>
-          <input
-            type="text"
-            value={userPosition}
-            readOnly
+          <input type="text" value={userPosition} readOnly
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>
@@ -195,10 +168,7 @@ const UD25_EDBUserView: React.FC = () => {
             <option value="=">=</option>
             <option value="≠">≠</option>
           </select>
-          <input
-            type="text"
-            value={email}
-            readOnly
+          <input type="text" value={email} readOnly
             placeholder={isLoading ? '加载中...' : ''}
           />
         </div>

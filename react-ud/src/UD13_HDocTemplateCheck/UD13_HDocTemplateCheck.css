@@ -256,28 +256,3 @@
   margin-top: 16px;
   padding-top: 16px;
 }
-
-/* ===== 动画 ===== */
-@keyframes ud13FadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ===== 响应式设计 ===== */
-@media (max-width: 768px) {
-  .ud13-container {
-    padding: 20px 15px;
-  }
-
-  .ud13-page-title {
-    font-size: 20px;
-  }
-
-  .ud13-btn {
-    width: 100%;
-  }
-}

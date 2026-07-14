@@ -6,12 +6,6 @@ import './UD20_MarketDocumentSettingsList.css';
 /**
  * UD20_MarketDocumentSettingsList 市场文档设置列表页面组件
  *
- * 功能说明：
- * - 从HDOC_DOCUMENT_LIST表获取文档设置列表数据
- * - 以表格形式展示文档类型、业务单元、注册用户、注册时间
- * - 提供Select（选择）、Back（返回）、Print（打印）操作按钮
- * - User列可点击链接，跳转到UD25_EDBUserView用户信息画面
- *
  * @component
  * @returns {JSX.Element} 市场文档设置列表页面元素
  */
@@ -183,24 +177,19 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
                 </tr>
               ) : (
                 documents.map((doc) => (
-                  <tr
-                    key={doc.documentType}
+                  <tr key={doc.documentType}
                     className={`ud20-row ${selectedDocType === doc.documentType ? 'ud20-row-selected' : ''}`}
                     onClick={() => handleRowSelect(doc.documentType)}
                   >
                     <td className="ud20-col-select">
-                      <input
-                        type="radio"
-                        name="docSelect"
-                        checked={selectedDocType === doc.documentType}
+                      <input type="radio" name="docSelect" checked={selectedDocType === doc.documentType}
                         readOnly
                       />
                     </td>
                     <td className="ud20-col-doctype">{doc.documentType}</td>
                     <td className="ud20-col-bu">BU</td>
                     <td className="ud20-col-user">
-                      <span
-                        className="ud20-user-link"
+                      <span className="ud20-user-link"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleUserClick(doc.registerUser);

@@ -5,7 +5,7 @@
    对应详细设计：DES-UD18-001
    ============================================================ */
 
-/* ==================== 页面主容器（参照UD17） ==================== */
+/* ==================== 页面主容器 ==================== */
 .ud18-container {
   background-color: white;
   padding: 5px 10px;
@@ -15,7 +15,7 @@
   width: 900px;
 }
 
-/* ==================== 页面标题（参照UD17） ==================== */
+/* ==================== 页面标题 ==================== */
 .ud18-title {
   font-size: 20px;
   font-weight: bold;
@@ -26,7 +26,7 @@
   margin: 15px 0px 15px;
 }
 
-/* ==================== 表单区域（参照UD17） ==================== */
+/* ==================== 表单区域 ==================== */
 .ud18-form-section {
   border: 1px solid #9999cc;
   padding: 20px;
@@ -72,7 +72,7 @@
   border-color: #6666aa;
 }
 
-/* User Info 查询按钮（参照UD17） */
+/* User Info 查询按钮 */
 .ud18-btn-info {
   padding: 4px 14px;
   background-color: #d0d0f0;
@@ -98,7 +98,42 @@
   cursor: not-allowed;
 }
 
-/* ==================== User 标签行（参照UD17） ==================== */
+/* ==================== 操作按钮区域 ==================== */
+.ud18-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  border: 1px solid #9999cc; /* 与form-section相同的边框 */
+  border-top: none; /* 去掉上边框，与form-section连接 */
+}
+
+/* Update 按钮 */
+.ud18-btn-update {
+  color: black;
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud18-btn-update:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud18-btn-update:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* ==================== User 标签行 ==================== */
 .ud18-user-row {
   display: flex;
   align-items: center;
@@ -198,39 +233,4 @@
   color: #389e0d;
   background-color: #f6ffed;
   border: 1px solid #b7eb8f;
-}
-
-/* ==================== 操作按钮区域 ==================== */
-.ud18-actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  padding: 10px;
-  background-color: #e8e8ff; /* 浅蓝色背景 */
-  border: 1px solid #9999cc; /* 与form-section相同的边框 */
-  border-top: none; /* 去掉上边框，与form-section连接 */
-}
-
-/* Update 按钮（参照UD17） */
-.ud18-btn-update {
-  color: black;
-  padding: 4px 20px;
-  font-size: 12px;
-  font-weight: normal;
-  border: 1px solid #808080;
-  background-color: #d0d0f0;
-  cursor: pointer;
-  outline: none;
-  min-width: 80px;
-}
-
-.ud18-btn-update:hover {
-  background-color: #c0c0e0;
-  border-color: #000080;
-}
-
-.ud18-btn-update:disabled {
-  background-color: #cccccc;
-  border-color: #cccccc;
-  cursor: not-allowed;
 }

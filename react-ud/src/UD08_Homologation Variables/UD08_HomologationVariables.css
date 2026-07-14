@@ -175,46 +175,6 @@
   cursor: not-allowed;
 }
 
-/* Search - 深蓝色 */
-
-/* Clear - 浅灰色 */
-
-/* Add - 绿色 */
-
-/* Update - 橙色 */
-
-/* Delete - 红色 */
-
-/* ---------- 响应式 ---------- */
-@media screen and (max-width: 768px) {
-  .ud08-container {
-    padding: 12px 16px;
-  }
-
-  .ud08-search-row {
-    flex-wrap: wrap;
-  }
-
-  .ud08-search-row .ud08-label {
-    min-width: 100px;
-    font-size: 12px;
-  }
-
-  .ud08-search-row .ud08-operator {
-    width: 60px;
-  }
-
-  .ud08-search-row .ud08-input,
-  .ud08-search-row .ud08-select {
-    max-width: 100%;
-  }
-
-  .ud08-button-row,
-  .ud08-action-row {
-    flex-wrap: wrap;
-  }
-}
-
 .ud08-suffix {
   margin-left: auto;
   font-size: 12px;

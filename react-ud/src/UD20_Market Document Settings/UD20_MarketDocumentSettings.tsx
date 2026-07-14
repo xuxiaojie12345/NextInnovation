@@ -6,12 +6,6 @@ import './UD20_MarketDocumentSettings.css';
 /**
  * UD20-1_MarketDocumentSettings 市场文档设置更新页面组件
  *
- * 功能说明：
- * - 维护HDOC_DOCUMENT_LIST表中的文档设置信息
- * - 提供Document type、Bussines unit(BU固定)、User、Date字段
- * - Search按钮跳转到UD20选择记录，返回后回填数据
- * - Update Mode按钮更新数据库记录
- *
  * @component
  * @returns {JSX.Element} 市场文档设置页面元素
  */
@@ -71,9 +65,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
   /**
    * 处理 Search 按钮点击
-   * 处理流程：
-   * 1. 保存当前输入条件
-   * 2. 跳转到UD20画面供用户选择记录
    */
   const handleSearch = useCallback(() => {
     const params: Record<string, string> = {};
@@ -136,11 +127,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
   /**
    * 处理 Update Mode 按钮点击更新HDOC_DOCUMENT_LIST表
-   *
-   * 处理流程：
-   * 1. 前端校验：Document type不能为空
-   * 2. 查询Document type是否存在
-   * 3. 调用API更新
    */
   const handleUpdateMode = useCallback(async () => {
     // 对应设计书 3.2 校验详细规格表 No.1
@@ -220,10 +206,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
-          <input
-            className="ud201-input"
-            type="text"
-            value={documentType}
+          <input className="ud201-input" type="text" value={documentType}
             onChange={(e) => {
               if (e.target.value.length <= 20) {
                 setDocumentType(e.target.value);
@@ -242,10 +225,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
-          <input
-            className="ud201-input"
-            type="text"
-            value={market}
+          <input className="ud201-input" type="text" value={market}
             onChange={(e) => setMarket(e.target.value)}
             placeholder=""
           />
@@ -258,9 +238,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
-          <select
-            className="ud201-input"
-            value={setting}
+          <select className="ud201-input" value={setting}
             onChange={(e) => setSetting(e.target.value)}
           >
             <option value=""></option>
@@ -274,10 +252,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
-          <input
-            className="ud201-input"
-            type="text"
-            value={businessUnit}
+          <input className="ud201-input" type="text" value={businessUnit}
             onChange={(e) => setBusinessUnit(e.target.value)}
           />
         </div>
@@ -289,11 +264,8 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
-          <input
-            className="ud201-input"
-            type="text"
-            value={user}
-            onChange={(e) => {
+          <input className="ud201-input" type="text" value={user}
+              onChange={(e) => {
               if (e.target.value.length <= 16) {
                 setUser(e.target.value);
               }
@@ -311,10 +283,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             <option value="lt">&lt;</option>
             <option value="gt">&gt;</option>
           </select>
-          <input
-            className="ud201-input"
-            type="text"
-            value={date}
+          <input className="ud201-input" type="text" value={date}
             onChange={(e) => setDate(e.target.value)}
             placeholder=""
           />

@@ -5,7 +5,7 @@
    对应设计书：DES-UD19-001
    ============================================================ */
 
-/* ==================== 页面主容器（参照UD18） ==================== */
+/* ==================== 页面主容器 ==================== */
 .ud19-container {
   background-color: white;
   padding: 5px 10px;
@@ -15,7 +15,7 @@
   width: 900px;
 }
 
-/* ==================== 页面标题（参照UD18） ==================== */
+/* ==================== 页面标题 ==================== */
 .ud19-title {
   font-size: 20px;
   font-weight: bold;
@@ -26,11 +26,108 @@
   margin: 15px 0px 15px;
 }
 
-/* ==================== 表单区域（参照UD18） ==================== */
+/* ==================== 表单区域 ==================== */
 .ud19-form-section {
   border: 1px solid #9999cc;
   padding: 20px 20px 16px 20px;
   background-color: #ffffff;
+}
+
+
+/* ==================== 消息显示区域 ==================== */
+.ud19-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.ud19-message-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.ud19-message-error {
+  color: #cf1322;
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+}
+
+/* ==================== 搜索结果区域 ==================== */
+.ud19-result-section {
+  margin-top: 8px;
+}
+
+/* 结果计数 */
+.ud19-result-count {
+  font-size: 13px;
+  color: #888888;
+  margin-bottom: 8px;
+}
+
+/* DataTable - 紧凑样式 */
+.ud19-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #e0e0e0;
+}
+
+.ud19-table thead {
+  background-color: #f5f5f5;
+}
+
+.ud19-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #333333;
+  border-bottom: 1px solid #d0d0d0;
+  border-right: 1px solid #e8e8e8;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.ud19-table th:last-child {
+  border-right: none;
+}
+
+.ud19-table td {
+  padding: 7px 10px;
+  color: #444444;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.ud19-table td:last-child {
+  border-right: none;
+}
+
+.ud19-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.ud19-table tbody tr:hover {
+  background-color: #e6f7ff;
+}
+
+.ud19-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 空数据提示 */
+.ud19-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #999999;
+  font-size: 14px;
 }
 
 /* ==================== 字段行：label + input/dropdown 同行 ==================== */
@@ -165,100 +262,4 @@
   background-color: #cccccc;
   border-color: #cccccc;
   cursor: not-allowed;
-}
-
-/* ==================== 消息显示区域 ==================== */
-.ud19-message {
-  color: #ff4d4f;
-  font-size: 13px;
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
-  word-break: break-word;
-}
-
-.ud19-message-success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-}
-
-.ud19-message-error {
-  color: #cf1322;
-  background-color: #fff1f0;
-  border: 1px solid #ffa39e;
-}
-
-/* ==================== 搜索结果区域 ==================== */
-.ud19-result-section {
-  margin-top: 8px;
-}
-
-/* 结果计数 */
-.ud19-result-count {
-  font-size: 13px;
-  color: #888888;
-  margin-bottom: 8px;
-}
-
-/* DataTable - 紧凑样式 */
-.ud19-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  border: 1px solid #e0e0e0;
-}
-
-.ud19-table thead {
-  background-color: #f5f5f5;
-}
-
-.ud19-table th {
-  padding: 8px 10px;
-  text-align: left;
-  font-weight: 600;
-  color: #333333;
-  border-bottom: 1px solid #d0d0d0;
-  border-right: 1px solid #e8e8e8;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-.ud19-table th:last-child {
-  border-right: none;
-}
-
-.ud19-table td {
-  padding: 7px 10px;
-  color: #444444;
-  border-bottom: 1px solid #f0f0f0;
-  border-right: 1px solid #f0f0f0;
-}
-
-.ud19-table td:last-child {
-  border-right: none;
-}
-
-.ud19-table tbody tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-.ud19-table tbody tr:hover {
-  background-color: #e6f7ff;
-}
-
-.ud19-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* 空数据提示 */
-.ud19-empty {
-  text-align: center;
-  padding: 40px 0;
-  color: #999999;
-  font-size: 14px;
 }

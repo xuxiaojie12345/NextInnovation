@@ -241,25 +241,15 @@ const UD19_SearchUser: React.FC = () => {
         {/* UserID：label + input 同行 */}
         <div className='ud19-field-row'>
           <label htmlFor='ud19-userid'>Userid</label>
-          <input
-            id='ud19-userid'
-            type='text'
-            value={userId}
-            onChange={handleUserIdChange}
-            placeholder=''
-            disabled={isLoading}
-            maxLength={MAX_USER_ID_LENGTH}
-            className='ud19-input'
+          <input id='ud19-userid' type='text' value={userId} onChange={handleUserIdChange} placeholder=''
+            disabled={isLoading} maxLength={MAX_USER_ID_LENGTH} className='ud19-input'
           />
         </div>
 
         {/* User：label + input 同行 */}
         <div className='ud19-field-row'>
           <label htmlFor='ud19-user'>User</label>
-          <input
-            id='ud19-user'
-            type='text'
-            value={username}
+          <input id='ud19-user' type='text' value={username}
             onChange={handleUsernameChange}
             placeholder=''
             disabled={isLoading}
@@ -271,10 +261,7 @@ const UD19_SearchUser: React.FC = () => {
         {/* Market：label + dropdown + Radio 按钮 */}
         <div className='ud19-market-row'>
           <label htmlFor='ud19-market'>Market</label>
-          <select
-            id='ud19-market'
-            className='ud19-select'
-            value={selectedMarket}
+          <select id='ud19-market' className='ud19-select' value={selectedMarket}
             onChange={handleMarketChange}
             disabled={isLoading}
             size={10}
@@ -288,30 +275,21 @@ const UD19_SearchUser: React.FC = () => {
           </select>
           <div className='ud19-radio-group'>
             <label className='ud19-radio-item'>
-              <input
-                type='radio'
-                name='searchType'
-                checked={searchType === 'notSet'}
+              <input type='radio' name='searchType' checked={searchType === 'notSet'}
                 onChange={() => handleSearchTypeChange('notSet')}
                 disabled={isLoading}
               />
               Not set
             </label>
             <label className='ud19-radio-item'>
-              <input
-                type='radio'
-                name='searchType'
-                checked={searchType === 'rule'}
+              <input type='radio' name='searchType' checked={searchType === 'rule'}
                 onChange={() => handleSearchTypeChange('rule')}
                 disabled={isLoading}
               />
               Rule
             </label>
             <label className='ud19-radio-item'>
-              <input
-                type='radio'
-                name='searchType'
-                checked={searchType === 'template'}
+              <input type='radio' name='searchType' checked={searchType === 'template'}
                 onChange={() => handleSearchTypeChange('template')}
                 disabled={isLoading}
               />
@@ -323,18 +301,13 @@ const UD19_SearchUser: React.FC = () => {
 
         {/* Search 按钮 */}
         <div className='ud19-action-area'>
-          <button
-            className='ud19-btn-search'
-            onClick={handleSearch}
-            disabled={isLoading}
-          >
+          <button className='ud19-btn-search' onClick={handleSearch} disabled={isLoading} >
             {isLoading ? '处理中...' : 'Search'}
           </button>
         </div>
 
       {/* 搜索结果区域 */}
       <div className='ud19-result-section'>
-
           {hasSearched && searchResults.length > 0 ? (
             <table className='ud19-table'>
               <thead>

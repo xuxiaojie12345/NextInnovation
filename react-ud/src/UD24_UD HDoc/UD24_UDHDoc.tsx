@@ -5,11 +5,6 @@ import "./UD24_UDHDoc.css";
 /**
  * UD24 用户指南页面组件
  * 
- * 功能说明：
- * - HDoc系统的帮助导航主页，提供通往各个帮助子模块的入口
- * - 包含快速指南下载、文档类型列表、市场信息、市场文档设置等链接
- * - 帮助用户快速定位所需的信息和支持资源
- * 
  * @component
  * @returns {JSX.Element} 用户指南页面元素
  */
@@ -20,9 +15,6 @@ const UD24_UDHDoc: React.FC = () => {
 
   /**
    * 点击「HDoc Quick Guide」链接
-   * 处理流程：
-   * 1. 执行路由跳转
-   * 2. 跳转到UD23「Download and Print Quick Guides」画面
    */
   const handleQuickGuideClick = () => {
     try {
@@ -35,9 +27,6 @@ const UD24_UDHDoc: React.FC = () => {
 
   /**
    * 点击「List of document types.」链接
-   * 处理流程：
-   * 1. 执行路由跳转
-   * 2. 跳转到UD22「Document Types」画面
    */
   const handleDocumentTypesClick = () => {
     try {
@@ -50,9 +39,6 @@ const UD24_UDHDoc: React.FC = () => {
 
   /**
    * 点击「Markets in HDoc」链接
-   * 处理流程：
-   * 1. 执行路由跳转
-   * 2. 跳转到UD21「Markets in HDoc」画面
    */
   const handleMarketsClick = () => {
     try {
@@ -65,9 +51,6 @@ const UD24_UDHDoc: React.FC = () => {
 
   /**
    * 点击「HDoc - Market Document Settings」链接
-   * 处理流程：
-   * 1. 执行路由跳转
-   * 2. 跳转到UD20「HDoc - Market Document Settings」画面
    */
   const handleMarketSettingsClick = () => {
     try {

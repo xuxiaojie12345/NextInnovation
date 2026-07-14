@@ -4,7 +4,7 @@
    参照UD16样式统一风格
    ============================================================ */
 
-/* ==================== 页面主容器（参照UD16） ==================== */
+/* ==================== 页面主容器==================== */
 .ud17-container {
   background-color: white;
   padding: 5px 10px;
@@ -14,7 +14,7 @@
   width: 900px;
 }
 
-/* ==================== 页面标题（参照UD16） ==================== */
+/* ==================== 页面标题==================== */
 .ud17-title {
   font-size: 20px;
   font-weight: bold;
@@ -25,7 +25,7 @@
   margin: 15px 0px 15px;
 }
 
-/* ==================== 表单区域（参照UD16） ==================== */
+/* ==================== 表单区域 ==================== */
 .ud17-form-section {
   border: 1px solid #9999cc;
   padding: 20px;
@@ -86,6 +86,41 @@
 }
 
 .ud17-btn-info:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== 操作按钮区域 ==================== */
+.ud17-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background-color: #e8e8ff; /* 浅蓝色背景 */
+  border: 1px solid #9999cc; /* 与form-section相同的边框 */
+  border-top: none; /* 去掉上边框，与form-section连接 */
+}
+
+.ud17-btn-update,
+.ud17-btn-delete {
+  padding: 4px 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border: 1px solid #808080;
+  background-color: #d0d0f0;
+  cursor: pointer;
+  outline: none;
+  min-width: 80px;
+}
+
+.ud17-btn-update:hover,
+.ud17-btn-delete:hover {
+  background-color: #c0c0e0;
+  border-color: #000080;
+}
+
+.ud17-btn-update:disabled,
+.ud17-btn-delete:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -229,40 +264,5 @@
 
 .ud17-market-select:disabled {
   background-color: #f0f0f0;
-  cursor: not-allowed;
-}
-
-/* ==================== 操作按钮区域 ==================== */
-.ud17-actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  padding: 10px;
-  background-color: #e8e8ff; /* 浅蓝色背景 */
-  border: 1px solid #9999cc; /* 与form-section相同的边框 */
-  border-top: none; /* 去掉上边框，与form-section连接 */
-}
-
-.ud17-btn-update,
-.ud17-btn-delete {
-  padding: 4px 20px;
-  font-size: 12px;
-  font-weight: normal;
-  border: 1px solid #808080;
-  background-color: #d0d0f0;
-  cursor: pointer;
-  outline: none;
-  min-width: 80px;
-}
-
-.ud17-btn-update:hover,
-.ud17-btn-delete:hover {
-  background-color: #c0c0e0;
-  border-color: #000080;
-}
-
-.ud17-btn-update:disabled,
-.ud17-btn-delete:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
 }

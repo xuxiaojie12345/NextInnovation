@@ -5,12 +5,6 @@ import './UD23_DownloadAndPrintQuickGuides.css';
 /**
  * UD23_DownloadAndPrintQuickGuides 下载和打印快速指南页面组件
  *
- * 功能说明：
- * - 展示多个Quick Guide的图片预览和下载链接
- * - 区分可用指南（活性）和不可用指南（非活性）
- * - 提供Back按钮返回上一级画面
- * - 无需调用后端API，为静态页面
- *
  * @component
  * @returns {JSX.Element} 下载和打印快速指南页面元素
  */

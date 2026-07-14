@@ -30,6 +30,14 @@
     
 }
 
+/* ---------- 加载状态提示 ---------- */
+.ud14-container .ud14-loading {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
 /* ---------- 错误消息显示区域 ---------- */
 .ud14-container .ud14-message {
   padding: 10px 15px;
@@ -44,14 +52,6 @@
   background-color: #fff2f0;
   border-color: #ffccc7;
   color: #ff4d4f;
-}
-
-/* ---------- 加载状态提示 ---------- */
-.ud14-container .ud14-loading {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 10px;
-  padding: 6px 0;
 }
 
 /* ---------- 内容容器（查询条件 + 表格合并） ---------- */
@@ -84,6 +84,11 @@
   white-space: nowrap;
 }
 
+/* ---------- 表格容器 ---------- */
+.ud14-container .ud14-table-wrapper {
+  overflow-x: auto;
+}
+
 /* ---------- 下拉框样式 ---------- */
 .ud14-container .ud14-select {
   width: 120px;
@@ -105,11 +110,6 @@
   background-color: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.6;
-}
-
-/* ---------- 表格容器 ---------- */
-.ud14-container .ud14-table-wrapper {
-  overflow-x: auto;
 }
 
 /* ---------- 数据表格 ---------- */
@@ -139,15 +139,6 @@
   text-align: left;
 }
 
-/* 表格行交替背景色 */
-.ud14-container .ud14-table tbody tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-/* 表格行悬停效果 */
-.ud14-container .ud14-table tbody tr:hover {
-  background-color: #e6f7ff;
-}
 
 /* ---------- 文件链接样式 ---------- */
 .ud14-container .ud14-file-link {
@@ -170,44 +161,12 @@
   font-size: 14px;
 }
 
-/* ---------- 响应式设计 ---------- */
-
-/* 平板设备 */
-@media (max-width: 768px) {
-  .ud14-container {
-    padding: 15px;
-  }
-
-  .ud14-container .ud14-title {
-    font-size: 18px;
-  }
-
-  .ud14-container .ud14-search-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .ud14-container .ud14-select {
-    width: 100%;
-  }
+/* 表格行交替背景色 */
+.ud14-container .ud14-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
 }
 
-/* 手机设备 */
-@media (max-width: 480px) {
-  .ud14-container {
-    padding: 10px;
-  }
-
-  .ud14-container .ud14-title {
-    font-size: 16px;
-  }
-
-  .ud14-container .ud14-table {
-    font-size: 12px;
-  }
-
-  .ud14-container .ud14-table th,
-  .ud14-container .ud14-table td {
-    padding: 5px 8px;
-  }
+/* 表格行悬停效果 */
+.ud14-container .ud14-table tbody tr:hover {
+  background-color: #e6f7ff;
 }

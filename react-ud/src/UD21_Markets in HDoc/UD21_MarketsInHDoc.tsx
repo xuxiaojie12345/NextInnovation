@@ -5,17 +5,11 @@ import './UD21_MarketsInHDoc.css';
 /**
  * UD21_MarketsInHDoc 市场列表展示页面组件
  *
- * 功能说明：
- * - 从MARKET_MASTER表获取所有可用市场列表
- * - 以表格形式展示Market、Description、Weights from Hdoc信息
- * - 数据为空时显示友好的空状态提示
- *
  * @component
  * @returns {JSX.Element} 市场列表页面元素
  */
 const UD21_MarketsInHDoc: React.FC = () => {
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表
   const [marketList, setMarketList] = useState<MarketItem[]>([]);  // 市场列表数据
   const [message, setMessage] = useState<string>('');               // 消息内容
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
@@ -28,20 +22,12 @@ const UD21_MarketsInHDoc: React.FC = () => {
   }
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 市场列表展示
   useEffect(() => {
     fetchMarketList();
   }, []);
 
   /**
    * 获取市场列表数据
-   * 对应设计书 4.1 UD19SearchResultListApi - UD19SelectMarketMaster()
-   * GET /api/ud19/getmarket
-   *
-   * 处理流程：
-   * 1. 调用API获取市场列表
-   * 2. 若返回空数据，显示空状态提示
-   * 3. 若成功则渲染表格
    */
   const fetchMarketList = async () => {
     setIsLoading(true);

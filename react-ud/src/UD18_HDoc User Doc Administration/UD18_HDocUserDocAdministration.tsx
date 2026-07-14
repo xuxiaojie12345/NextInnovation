@@ -374,10 +374,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
         <div className='ud18-search-row'>
           <div className='ud18-search-group'>
             <label htmlFor='ud18-userid'>UserID:</label>
-            <input
-              id='ud18-userid'
-              type='text'
-              value={userID}
+            <input id='ud18-userid' type='text' value={userID}
               onChange={handleUserIDChange}
               placeholder=''
               disabled={isLoading}
@@ -405,9 +402,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
         {/* Document 多选下拉框 */}
         <div className='ud18-doc-section'>
-          <select
-            id='ud18-document'
-            className='ud18-document-select'
+          <select id='ud18-document' className='ud18-document-select'
             multiple
             value={selectedDocs}
             onChange={handleDocumentChange}
@@ -424,16 +419,10 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
             ))}
           </select>
         </div>
-
       </div>
-      
         {/* 操作按钮区域 */}
         <div className='ud18-actions'>
-          <button
-            className='ud18-btn-update'
-            onClick={handleUpdate}
-            disabled={isLoading}
-          >
+          <button className='ud18-btn-update' onClick={handleUpdate} disabled={isLoading} >
             {isLoading ? '处理中...' : 'Update'}
           </button>
         </div>

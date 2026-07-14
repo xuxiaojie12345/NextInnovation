@@ -21,6 +21,13 @@
   padding-bottom: 12px;
 }
 
+.ud07-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 18px 28px;
+  margin-bottom: 26px;
+}
+
 .ud07-error {
   margin-bottom: 16px;
   padding: 12px 14px;
@@ -31,24 +38,17 @@
   font-size: 14px;
 }
 
-.ud07-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
-  gap: 18px 28px;
-  margin-bottom: 26px;
+.ud07-label {
+  min-width: 160px;
+  color: #000000;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .ud07-item {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-}
-
-.ud07-label {
-  min-width: 160px;
-  color: #000000;
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .ud07-value {
@@ -58,16 +58,16 @@
   word-break: break-word;
 }
 
-.ud07-block {
-  margin-bottom: 18px;
-}
-
 .ud07-block-label {
   display: inline-block;
   margin-bottom: 10px;
   color: #000000;
   font-size: 15px;
   font-weight: 700;
+}
+
+.ud07-block {
+  margin-bottom: 18px;
 }
 
 .ud07-symbol {
@@ -86,6 +86,17 @@
   cursor: default;
 }
 
+.ud07-tooltip {
+  display: inline-block;
+  color: #1f427a;
+  font-size: 14px;
+  background-color: #ffffff;
+  border: 1px dashed #9aaed5;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: help;
+}
+
 .ud07-description {
   display: flex;
   align-items: center;
@@ -98,15 +109,15 @@
   margin-bottom: 26px;
 }
 
-.ud07-tooltip {
-  display: inline-block;
-  color: #1f427a;
-  font-size: 14px;
-  background-color: #ffffff;
-  border: 1px dashed #9aaed5;
-  border-radius: 6px;
-  padding: 10px 12px;
-  cursor: help;
+
+.ud07-close-btn:hover:not(:disabled) {
+  background-color: #2d5fa3;
+  color: #ffffff;
+}
+
+.ud07-close-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .ud07-snote {
@@ -119,7 +130,6 @@
 }
 
 .ud07-close-btn {
-
   padding: 4px 12px;
   font-size: 12px;
   font-weight: normal;
@@ -127,45 +137,8 @@
   background-color: #d0d0f0; /* 浅紫色背景 */
   cursor: pointer;
   outline: none;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.ud07-close-btn:hover:not(:disabled) {
-  background-color: #2d5fa3;
-  color: #ffffff;
-}
-
-.ud07-close-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-@media (max-width: 760px) {
-  .ud07-card {
-    padding: 22px 20px;
-  }
-
-  .ud07-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ud07-item {
-    min-width: 0;
-  }
-
-  .ud07-label {
-    min-width: 110px;
-    width: 100%;
-    margin-bottom: 6px;
-  }
-
-  .ud07-description {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }

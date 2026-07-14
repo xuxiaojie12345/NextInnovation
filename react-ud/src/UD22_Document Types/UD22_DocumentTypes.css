@@ -14,17 +14,6 @@
   width: 900px;
 }
 
-/* ==================== 页面标题 ==================== */
-.ud22-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #003366;
-  text-align: left;
-  border: none;
-  padding: 0;
-  margin: 15px 0px 15px;
-}
-
 /* ==================== 消息显示区域 ==================== */
 .ud22-message {
   color: #ff4d4f;
@@ -126,4 +115,15 @@
   padding: 30px 0;
   color: #999;
   font-size: 14px;
+}
+
+/* ==================== 页面标题 ==================== */
+.ud22-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #003366;
+  text-align: left;
+  border: none;
+  padding: 0;
+  margin: 15px 0px 15px;
 }
