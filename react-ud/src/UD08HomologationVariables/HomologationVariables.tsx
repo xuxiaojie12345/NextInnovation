@@ -659,69 +659,69 @@ const HomologationVariables: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className='hv-container'>
-        <div className='hv-loading'>Loading...</div>
+      <div className="hv-container">
+        <div className="hv-loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className='hv-container'>
+    <div className="hv-container">
       {/* 标题 */}
-      <h1 className='hv-title'>Homologation Variables</h1>
+      <h1 className="hv-title">Homologation Variables</h1>
 
       {/* 边框容器 - 包含按钮和表单 */}
-      <div className='hv-border-box'>
+      <div className="hv-border-box">
         {/* 错误消息显示 */}
-        {errorMessage && <div className='hv-error-message'>{errorMessage}</div>}
+        {errorMessage && <div className="hv-error-message">{errorMessage}</div>}
 
         {/* 成功消息显示 */}
         {successMessage && (
-          <div className='hv-success-message'>{successMessage}</div>
+          <div className="hv-success-message">{successMessage}</div>
         )}
 
         {/* 按钮区域 */}
-        <div className='hv-button-bar'>
-          <button className='hv-btn' onClick={handleSearchList}>
+        <div className="hv-button-bar">
+          <button className="hv-btn" onClick={handleSearchList}>
             Search
           </button>
-          <button className='hv-btn' onClick={handleClear}>
+          <button className="hv-btn" onClick={handleClear}>
             Clear
           </button>
-          <button className='hv-btn' onClick={handleAdd}>
+          <button className="hv-btn" onClick={handleAdd}>
             Add
           </button>
-          <button className='hv-btn' onClick={handleUpdate}>
+          <button className="hv-btn" onClick={handleUpdate}>
             Update
           </button>
-          <button className='hv-btn' onClick={handleDelete}>
+          <button className="hv-btn" onClick={handleDelete}>
             Delete
           </button>
         </div>
 
         {/* 表单区域 */}
-        <div className='hv-form-section'>
+        <div className="hv-form-section">
           {/* Product class */}
-          <div className='hv-form-row'>
-            <label className='hv-label-required'>*Product class</label>
+          <div className="hv-form-row">
+            <label className="hv-label-required">*Product class</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.productClassOperator}
               onChange={(e) =>
                 handleInputChange("productClassOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <select
-              className='hv-select'
+              className="hv-select"
               value={formData.productClass}
               onChange={(e) =>
                 handleInputChange("productClass", e.target.value)
               }
             >
-              <option value=''>请选择</option>
+              <option value="">请选择</option>
               {productClassList.map((item, index) => (
                 <option key={index} value={item.pc}>
                   {item.pc}
@@ -731,22 +731,22 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Number */}
-          <div className='hv-form-row'>
-            <label className='hv-label-required'>*Number</label>
+          <div className="hv-form-row">
+            <label className="hv-label-required">*Number</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.numberOperator}
               onChange={(e) =>
                 handleInputChange("numberOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='>'>&gt;</option>
-              <option value='<'>&lt;</option>
+              <option value="=">=</option>
+              <option value=">">&gt;</option>
+              <option value="<">&lt;</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.number}
               onChange={(e) => handleInputChange("number", e.target.value)}
               maxLength={10}
@@ -754,24 +754,24 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Market */}
-          <div className='hv-form-row'>
-            <label className='hv-label-required'>*Market</label>
+          <div className="hv-form-row">
+            <label className="hv-label-required">*Market</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.marketOperator}
               onChange={(e) =>
                 handleInputChange("marketOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <select
-              className='hv-select-short'
+              className="hv-select-short"
               value={formData.market}
               onChange={(e) => handleInputChange("market", e.target.value)}
             >
-              <option value=''>请选择</option>
+              <option value="">请选择</option>
               {marketList.map((item, index) => (
                 <option key={index} value={item.market}>
                   {item.market}
@@ -781,21 +781,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variable */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Variable</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Variable</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.variableOperator}
               onChange={(e) =>
                 handleInputChange("variableOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-medium'
+              type="text"
+              className="hv-input-medium"
               value={formData.variable}
               onChange={(e) => handleInputChange("variable", e.target.value)}
               maxLength={20}
@@ -803,21 +803,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Value */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Value</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Value</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.valueOperator}
               onChange={(e) =>
                 handleInputChange("valueOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-long'
+              type="text"
+              className="hv-input-long"
               value={formData.value}
               onChange={(e) => handleInputChange("value", e.target.value)}
               maxLength={200}
@@ -825,21 +825,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variant string.1 */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Variant string.</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Variant string.</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.variantString1Operator}
               onChange={(e) =>
                 handleInputChange("variantString1Operator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-long'
+              type="text"
+              className="hv-input-long"
               value={formData.variantString1}
               onChange={(e) =>
                 handleInputChange("variantString1", e.target.value)
@@ -849,21 +849,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variant string.2 */}
-          <div className='hv-form-row'>
-            <label className='hv-label'></label>
+          <div className="hv-form-row">
+            <label className="hv-label"></label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.variantString2Operator}
               onChange={(e) =>
                 handleInputChange("variantString2Operator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-long'
+              type="text"
+              className="hv-input-long"
               value={formData.variantString2}
               onChange={(e) =>
                 handleInputChange("variantString2", e.target.value)
@@ -873,21 +873,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Comments */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Comments</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Comments</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.commentsOperator}
               onChange={(e) =>
                 handleInputChange("commentsOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-long'
+              type="text"
+              className="hv-input-long"
               value={formData.comments}
               onChange={(e) => handleInputChange("comments", e.target.value)}
               maxLength={100}
@@ -895,69 +895,69 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Add */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Add</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Add</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.addDateOperator}
               onChange={(e) =>
                 handleInputChange("addDateOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.addDate}
               onChange={(e) => handleInputChange("addDate", e.target.value)}
               maxLength={6}
-              placeholder='YYYYMM'
+              placeholder="YYYYMM"
             />
-            <span className='hv-auto-text'>YYYYWW</span>
+            <span className="hv-auto-text">YYYYWW</span>
           </div>
 
           {/* Delete */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Delete</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Delete</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.deleteDateOperator}
               onChange={(e) =>
                 handleInputChange("deleteDateOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.deleteDate}
               onChange={(e) => handleInputChange("deleteDate", e.target.value)}
               maxLength={6}
-              placeholder='YYYYMM'
+              placeholder="YYYYMM"
             />
-            <span className='hv-auto-text'>YYYYWW</span>
+            <span className="hv-auto-text">YYYYWW</span>
           </div>
 
           {/* Created by user */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Created by user</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Created by user</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.createdByUserOperator}
               onChange={(e) =>
                 handleInputChange("createdByUserOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-medium'
+              type="text"
+              className="hv-input-medium"
               value={formData.createdByUser}
               onChange={(e) =>
                 handleInputChange("createdByUser", e.target.value)
@@ -965,31 +965,31 @@ const HomologationVariables: React.FC = () => {
               maxLength={16}
               readOnly
             />
-            <span className='hv-auto-text'>Automatic</span>
+            <span className="hv-auto-text">Automatic</span>
           </div>
 
           {/* Date */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Date</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Date</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.dateOperator}
               onChange={(e) =>
                 handleInputChange("dateOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='>'>&gt;</option>
-              <option value='<'>&lt;</option>
+              <option value="=">=</option>
+              <option value=">">&gt;</option>
+              <option value="<">&lt;</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.date}
               onChange={(e) => handleInputChange("date", e.target.value)}
               readOnly
             />
-            <span className='hv-auto-text'>Automatic</span>
+            <span className="hv-auto-text">Automatic</span>
           </div>
         </div>
       </div>

@@ -54,14 +54,14 @@ const HdocTemplateCheck: React.FC = () => {
   };
 
   return (
-    <div className='htc-container'>
+    <div className="htc-container">
       {/* 消息显示 */}
-      {errorMessage && <div className='htc-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="htc-error-message">{errorMessage}</div>}
       {successMessage && (
-        <div className='htc-success-message'>
+        <div className="htc-success-message">
           {successMessage}
           {variables.length > 0 && (
-            <div className='htc-variables-list'>
+            <div className="htc-variables-list">
               <strong>Variables found:</strong>
               <ul>
                 {variables.map((variable, index) => (
@@ -76,22 +76,22 @@ const HdocTemplateCheck: React.FC = () => {
       )}
 
       {/* HDoc Template Check区域 */}
-      <div className='htc-section'>
-        <h2 className='htc-section-title'>HDoc Template Check</h2>
+      <div className="htc-section">
+        <h2 className="htc-section-title">HDoc Template Check</h2>
 
-        <div className='htc-form-group'>
-          <label className='htc-label'>Template File:</label>
+        <div className="htc-form-group">
+          <label className="htc-label">Template File:</label>
           <input
-            id='template-file-input'
-            type='file'
-            className='htc-file-input'
+            id="template-file-input"
+            type="file"
+            className="htc-file-input"
             onChange={handleFileSelect}
-            accept='.rtf'
+            accept=".rtf"
           />
         </div>
 
-        <div className='htc-button-row'>
-          <button className='htc-btn' disabled={isLoading}>
+        <div className="htc-button-row">
+          <button className="htc-btn" disabled={isLoading}>
             Check
           </button>
         </div>
@@ -99,8 +99,8 @@ const HdocTemplateCheck: React.FC = () => {
 
       {/* 下载链接显示 */}
       {checkedFileUrl && (
-        <div className='htc-download-row'>
-          <span className='htc-link' style={{ cursor: "pointer" }}>
+        <div className="htc-download-row">
+          <span className="htc-link" style={{ cursor: "pointer" }}>
             Download checked template
           </span>
         </div>

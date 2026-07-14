@@ -192,60 +192,60 @@ const ADChange: React.FC = () => {
   };
 
   return (
-    <div className='adc-container'>
+    <div className="adc-container">
       {/* 消息显示 */}
       {successMessage && (
-        <div className='adc-success-message'>{successMessage}</div>
+        <div className="adc-success-message">{successMessage}</div>
       )}
-      {errorMessage && <div className='adc-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="adc-error-message">{errorMessage}</div>}
 
       {/* 画面标题 */}
-      <h2 className='adc-section-title'>AD Change</h2>
+      <h2 className="adc-section-title">AD Change</h2>
 
       {/* 输入区域 */}
-      <div className='adc-section'>
+      <div className="adc-section">
         {/* Serie-Chnr输入 */}
-        <div className='adc-form-group'>
-          <label className='adc-label'>Serie-Chnr</label>
+        <div className="adc-form-group">
+          <label className="adc-label">Serie-Chnr</label>
           <input
-            type='text'
-            className='adc-input'
+            type="text"
+            className="adc-input"
             value={serieChnr}
             onChange={(e) => handleSerieChnrChange(e.target.value)}
-            placeholder='Enter Serie-Chnr'
+            placeholder="Enter Serie-Chnr"
             disabled={isLoading}
             maxLength={15}
           />
         </div>
 
         {/* Desc输入 */}
-        <div className='adc-form-group'>
-          <label className='adc-label'>Desc</label>
+        <div className="adc-form-group">
+          <label className="adc-label">Desc</label>
           <input
-            type='text'
-            className='adc-input-desc'
+            type="text"
+            className="adc-input-desc"
             value={desc}
             onChange={(e) => handleDescChange(e.target.value)}
-            placeholder='Enter description'
+            placeholder="Enter description"
             disabled={isLoading}
             maxLength={4000}
           />
         </div>
 
         {/* 按钮行 */}
-        <div className='adc-button-row'>
-          <button className='adc-btn' onClick={handleAdd} disabled={isLoading}>
+        <div className="adc-button-row">
+          <button className="adc-btn" onClick={handleAdd} disabled={isLoading}>
             ADD
           </button>
           <button
-            className='adc-btn'
+            className="adc-btn"
             onClick={handleDelete}
             disabled={isLoading}
           >
             DELETE
           </button>
           <button
-            className='adc-btn'
+            className="adc-btn"
             onClick={handleCheck}
             disabled={isLoading}
           >
@@ -256,7 +256,7 @@ const ADChange: React.FC = () => {
 
       {/* 初始提示信息 */}
       {!errorMessage && !successMessage && !isLoading && (
-        <p className='adc-initial-message'>
+        <p className="adc-initial-message">
           Please enter a Serie-Chnr to add, delete or check an AD Change record.
         </p>
       )}

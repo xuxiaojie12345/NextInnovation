@@ -277,41 +277,41 @@ const UploadDeleteTemplate: React.FC = () => {
   };
 
   return (
-    <div className='udt-container'>
+    <div className="udt-container">
       {isLoading && (
-        <div className='udt-loading-overlay'>
-          <div className='udt-loading'>Uploading...</div>
+        <div className="udt-loading-overlay">
+          <div className="udt-loading">Uploading...</div>
         </div>
       )}
       {/* 消息显示 */}
-      {errorMessage && <div className='udt-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="udt-error-message">{errorMessage}</div>}
       {successMessage && (
-        <div className='udt-success-message'>{successMessage}</div>
+        <div className="udt-success-message">{successMessage}</div>
       )}
 
       {/* HDoc Template Upload区域 */}
-      <div className='udt-section'>
-        <h2 className='udt-section-title'>HDoc Template Upload</h2>
+      <div className="udt-section">
+        <h2 className="udt-section-title">HDoc Template Upload</h2>
 
-        <div className='udt-form-group'>
-          <label className='udt-label'>Template File:</label>
+        <div className="udt-form-group">
+          <label className="udt-label">Template File:</label>
           <input
-            id='template-file-input'
-            type='file'
-            className='udt-file-input'
+            id="template-file-input"
+            type="file"
+            className="udt-file-input"
             onChange={handleFileSelect}
-            accept='.rtf,.docx,.doc,.xlsx,.xls'
+            accept=".rtf,.docx,.doc,.xlsx,.xls"
           />
         </div>
 
-        <div className='udt-form-group'>
-          <label className='udt-label'>Market:</label>
+        <div className="udt-form-group">
+          <label className="udt-label">Market:</label>
           <select
-            className='udt-select'
+            className="udt-select"
             value={uploadMarket}
             onChange={(e) => handleUploadMarketChange(e.target.value)}
           >
-            <option value=''>请选择</option>
+            <option value="">请选择</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -320,9 +320,9 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className='udt-button-row'>
+        <div className="udt-button-row">
           <button
-            className='udt-btn'
+            className="udt-btn"
             onClick={handleUpload}
             disabled={isLoading}
           >
@@ -331,7 +331,7 @@ const UploadDeleteTemplate: React.FC = () => {
         </div>
 
         {/* 提示信息 */}
-        <div className='udt-info-text'>
+        <div className="udt-info-text">
           Before uploading new VIN plate templates, inform
           support.tpi@volvo.com, to make sure that the connection to the cab
           factory will work.
@@ -339,17 +339,17 @@ const UploadDeleteTemplate: React.FC = () => {
       </div>
 
       {/* HDoc Template Delete/Archive区域 */}
-      <div className='udt-section'>
-        <h2 className='udt-section-title'>HDoc Template Delete/Archive</h2>
+      <div className="udt-section">
+        <h2 className="udt-section-title">HDoc Template Delete/Archive</h2>
 
-        <div className='udt-form-group'>
-          <label className='udt-label'>Market:</label>
+        <div className="udt-form-group">
+          <label className="udt-label">Market:</label>
           <select
-            className='udt-select'
+            className="udt-select"
             value={deleteMarket}
             onChange={(e) => handleDeleteMarketChange(e.target.value)}
           >
-            <option value=''>请选择</option>
+            <option value="">请选择</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -358,15 +358,15 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className='udt-form-group'>
-          <label className='udt-label'>Templates:</label>
+        <div className="udt-form-group">
+          <label className="udt-label">Templates:</label>
           <select
-            className='udt-select'
+            className="udt-select"
             value={selectedTemplate}
             onChange={(e) => handleTemplateSelect(e.target.value)}
             disabled={!deleteMarket || isLoading}
           >
-            <option value=''>请选择</option>
+            <option value="">请选择</option>
             {templates.map((item, index) => (
               <option key={index} value={item.fileName}>
                 {item.fileName}
@@ -375,9 +375,9 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className='udt-button-row'>
+        <div className="udt-button-row">
           <button
-            className='udt-btn'
+            className="udt-btn"
             onClick={handleDelete}
             disabled={isLoading}
           >
@@ -387,19 +387,19 @@ const UploadDeleteTemplate: React.FC = () => {
       </div>
 
       {/* Check your rtf template区域 */}
-      <div className='udt-section'>
-        <h3 className='udt-subsection-title'>Check your rtf template</h3>
+      <div className="udt-section">
+        <h3 className="udt-subsection-title">Check your rtf template</h3>
 
-        <div className='udt-description'>
+        <div className="udt-description">
           In case you have a rtf template you should run a check on it before
           uploading it. After check download the template to your desktop and
           then upload it to your template directory. Use the link below.
         </div>
 
-        <div className='udt-link-row'>
+        <div className="udt-link-row">
           <a
-            href='#'
-            className='udt-link'
+            href="#"
+            className="udt-link"
             onClick={(e) => {
               e.preventDefault();
               handleCheckTemplate();

@@ -59,36 +59,36 @@ const DocumentTypes: React.FC = () => {
   }, []);
 
   return (
-    <div className='document-types-container'>
-      <h2 className='page-title'>Document Types</h2>
+    <div className="document-types-container">
+      <h2 className="page-title">Document Types</h2>
 
       {/* 错误消息 */}
-      {errorMessage && <div className='error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
 
       {/* 加载状态 */}
       {isLoading ? (
-        <div className='loading-message'>加载中...</div>
+        <div className="loading-message">加载中...</div>
       ) : (
         /* 数据表格 */
-        <div className='table-container'>
-          <table className='document-types-table'>
+        <div className="table-container">
+          <table className="document-types-table">
             <thead>
               <tr>
-                <th className='key-column'>Key</th>
-                <th className='description-column'>Description</th>
+                <th className="key-column">Key</th>
+                <th className="description-column">Description</th>
               </tr>
             </thead>
             <tbody>
               {documentTypes.length > 0 ? (
                 documentTypes.map((doc, index) => (
                   <tr key={index}>
-                    <td className='key-cell'>{doc.doctype}</td>
-                    <td className='description-cell'>{doc.description}</td>
+                    <td className="key-cell">{doc.doctype}</td>
+                    <td className="description-cell">{doc.description}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={2} className='no-data-cell'>
+                  <td colSpan={2} className="no-data-cell">
                     暂无数据
                   </td>
                 </tr>

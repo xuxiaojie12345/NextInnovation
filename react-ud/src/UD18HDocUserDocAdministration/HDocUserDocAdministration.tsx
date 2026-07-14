@@ -206,25 +206,25 @@ const HDocUserDocAdministration: React.FC = () => {
   };
 
   return (
-    <div className='hudua-container'>
+    <div className="hudua-container">
       {/* 标题 */}
-      <h1 className='hudua-title'>HDoc Document Authorization</h1>
+      <h1 className="hudua-title">HDoc Document Authorization</h1>
 
       {/* 边框容器 */}
-      <div className='hudua-border-box'>
+      <div className="hudua-border-box">
         {/* UserID和User Info区域 */}
-        <div className='hudua-userid-section'>
-          <label className='hudua-label'>Userid:</label>
+        <div className="hudua-userid-section">
+          <label className="hudua-label">Userid:</label>
           <input
-            type='text'
-            className='hudua-input-userid'
+            type="text"
+            className="hudua-input-userid"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             maxLength={10}
             disabled={isLoading}
           />
           <button
-            className='hudua-button'
+            className="hudua-button"
             onClick={handleUserInfo}
             disabled={isLoading}
           >
@@ -233,15 +233,15 @@ const HDocUserDocAdministration: React.FC = () => {
         </div>
 
         {/* User显示区域 */}
-        <div className='hudua-user-section'>
-          <label className='hudua-label'>User:</label>
-          <span className='hudua-user-name'>{userName}</span>
+        <div className="hudua-user-section">
+          <label className="hudua-label">User:</label>
+          <span className="hudua-user-name">{userName}</span>
         </div>
 
         {/* Document多选列表区域 */}
-        <div className='hudua-document-section'>
+        <div className="hudua-document-section">
           <select
-            className='hudua-document-list'
+            className="hudua-document-list"
             multiple
             value={authorizedDocuments}
             onChange={handleDocumentChange}
@@ -257,9 +257,9 @@ const HDocUserDocAdministration: React.FC = () => {
         </div>
 
         {/* Update按钮区域 */}
-        <div className='hudua-update-section'>
+        <div className="hudua-update-section">
           <button
-            className='hudua-button-update'
+            className="hudua-button-update"
             onClick={handleUpdate}
             disabled={isLoading}
           >
@@ -269,12 +269,12 @@ const HDocUserDocAdministration: React.FC = () => {
 
         {/* 错误消息显示 */}
         {errorMessage && (
-          <div className='hudua-error-message'>{errorMessage}</div>
+          <div className="hudua-error-message">{errorMessage}</div>
         )}
 
         {/* 成功消息显示 */}
         {successMessage && (
-          <div className='hudua-success-message'>{successMessage}</div>
+          <div className="hudua-success-message">{successMessage}</div>
         )}
       </div>
     </div>

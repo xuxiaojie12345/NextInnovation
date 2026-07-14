@@ -251,20 +251,20 @@ const SearchUser: React.FC = () => {
   };
 
   return (
-    <div className='su-container'>
+    <div className="su-container">
       {/* 标题 */}
-      <h1 className='su-title'>Search HDoc User</h1>
+      <h1 className="su-title">Search HDoc User</h1>
 
       {/* 边框容器 */}
-      <div className='su-border-box'>
+      <div className="su-border-box">
         {/* 搜索条件区域 */}
-        <div className='su-search-section'>
+        <div className="su-search-section">
           {/* UserID */}
-          <div className='su-form-row'>
-            <label className='su-label'>Userid</label>
+          <div className="su-form-row">
+            <label className="su-label">Userid</label>
             <input
-              type='text'
-              className='su-input'
+              type="text"
+              className="su-input"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               maxLength={10}
@@ -273,11 +273,11 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* User */}
-          <div className='su-form-row'>
-            <label className='su-label'>User</label>
+          <div className="su-form-row">
+            <label className="su-label">User</label>
             <input
-              type='text'
-              className='su-input'
+              type="text"
+              className="su-input"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               maxLength={32}
@@ -286,11 +286,11 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* Market下拉列表 + 权限类型单选框 */}
-          <div className='su-form-row'>
-            <label className='su-label'>Market</label>
-            <div className='su-market-permission-wrapper'>
+          <div className="su-form-row">
+            <label className="su-label">Market</label>
+            <div className="su-market-permission-wrapper">
               <select
-                className='su-select'
+                className="su-select"
                 value={market}
                 onChange={(e) => setMarket(e.target.value)}
                 disabled={isLoading}
@@ -298,7 +298,7 @@ const SearchUser: React.FC = () => {
               >
                 {marketList.length > 0 ? (
                   <>
-                    <option value=''>&nbsp;</option>
+                    <option value="">&nbsp;</option>
                     {marketList.map((item, index) => (
                       <option key={index} value={item.market}>
                         {item.market}
@@ -306,51 +306,51 @@ const SearchUser: React.FC = () => {
                     ))}
                   </>
                 ) : (
-                  <option value='' disabled>
+                  <option value="" disabled>
                     加载中...
                   </option>
                 )}
               </select>
-              <div className='su-permission-inline'>
-                <div className='su-radio-group-inline'>
+              <div className="su-permission-inline">
+                <div className="su-radio-group-inline">
                   <input
-                    type='radio'
-                    id='not-set'
-                    name='permissionType'
-                    value='NOT_SET'
+                    type="radio"
+                    id="not-set"
+                    name="permissionType"
+                    value="NOT_SET"
                     checked={permissionType === "NOT_SET"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor='not-set' className='su-radio-label'>
+                  <label htmlFor="not-set" className="su-radio-label">
                     Not set
                   </label>
                 </div>
-                <div className='su-radio-group-inline'>
+                <div className="su-radio-group-inline">
                   <input
-                    type='radio'
-                    id='rule'
-                    name='permissionType'
-                    value='RULE'
+                    type="radio"
+                    id="rule"
+                    name="permissionType"
+                    value="RULE"
                     checked={permissionType === "RULE"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor='rule' className='su-radio-label'>
+                  <label htmlFor="rule" className="su-radio-label">
                     Rule
                   </label>
                 </div>
-                <div className='su-radio-group-inline'>
+                <div className="su-radio-group-inline">
                   <input
-                    type='radio'
-                    id='template'
-                    name='permissionType'
-                    value='TEMPLATE'
+                    type="radio"
+                    id="template"
+                    name="permissionType"
+                    value="TEMPLATE"
                     checked={permissionType === "TEMPLATE"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor='template' className='su-radio-label'>
+                  <label htmlFor="template" className="su-radio-label">
                     Template
                   </label>
                 </div>
@@ -359,9 +359,9 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* Search按钮 */}
-          <div className='su-button-section'>
+          <div className="su-button-section">
             <button
-              className='su-button'
+              className="su-button"
               onClick={handleSearch}
               disabled={isLoading}
             >
@@ -372,13 +372,13 @@ const SearchUser: React.FC = () => {
 
         {/* 搜索结果表格 */}
         {searchResults.length > 0 && (
-          <div className='su-result-section'>
-            <table className='su-table'>
+          <div className="su-result-section">
+            <table className="su-table">
               <thead>
                 <tr>
-                  <th className='su-th'>Userid</th>
-                  <th className='su-th'>User</th>
-                  <th className='su-th'>Market</th>
+                  <th className="su-th">Userid</th>
+                  <th className="su-th">User</th>
+                  <th className="su-th">Market</th>
                 </tr>
               </thead>
               <tbody>
@@ -387,9 +387,9 @@ const SearchUser: React.FC = () => {
                     key={index}
                     className={index % 2 === 0 ? "su-tr-even" : "su-tr-odd"}
                   >
-                    <td className='su-td'>{result.userid}</td>
-                    <td className='su-td'>{result.user}</td>
-                    <td className='su-td'>{result.market}</td>
+                    <td className="su-td">{result.userid}</td>
+                    <td className="su-td">{result.user}</td>
+                    <td className="su-td">{result.market}</td>
                   </tr>
                 ))}
               </tbody>
@@ -398,7 +398,7 @@ const SearchUser: React.FC = () => {
         )}
 
         {/* 错误消息显示 */}
-        {errorMessage && <div className='su-error-message'>{errorMessage}</div>}
+        {errorMessage && <div className="su-error-message">{errorMessage}</div>}
       </div>
     </div>
   );

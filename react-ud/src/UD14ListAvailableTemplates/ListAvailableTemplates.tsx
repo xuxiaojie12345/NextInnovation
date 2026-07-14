@@ -163,25 +163,25 @@ const ListAvailableTemplates: React.FC = () => {
   };
 
   return (
-    <div className='lat-container'>
+    <div className="lat-container">
       {/* 消息显示 */}
-      {errorMessage && <div className='lat-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="lat-error-message">{errorMessage}</div>}
       {successMessage && (
-        <div className='lat-success-message'>{successMessage}</div>
+        <div className="lat-success-message">{successMessage}</div>
       )}
 
       {/* List Templates区域 */}
-      <div className='lat-section'>
-        <h2 className='lat-section-title'>List Templates</h2>
+      <div className="lat-section">
+        <h2 className="lat-section-title">List Templates</h2>
 
-        <div className='lat-form-group'>
-          <label className='lat-label'>Select Market:</label>
+        <div className="lat-form-group">
+          <label className="lat-label">Select Market:</label>
           <select
-            className='lat-select'
+            className="lat-select"
             value={selectedMarket}
             onChange={(e) => handleMarketChange(e.target.value)}
           >
-            <option value='-'>-</option>
+            <option value="-">-</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -191,21 +191,21 @@ const ListAvailableTemplates: React.FC = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className='lat-table-wrapper'>
-          <table className='lat-table'>
+        <div className="lat-table-wrapper">
+          <table className="lat-table">
             <thead>
               <tr>
-                <th className='lat-th-icon'></th>
-                <th className='lat-th-filename'>Filename</th>
-                <th className='lat-th-used'>Used</th>
-                <th className='lat-th-lastmod'>Last Mod,</th>
-                <th className='lat-th-size'>Size</th>
+                <th className="lat-th-icon"></th>
+                <th className="lat-th-filename">Filename</th>
+                <th className="lat-th-used">Used</th>
+                <th className="lat-th-lastmod">Last Mod,</th>
+                <th className="lat-th-size">Size</th>
               </tr>
             </thead>
             <tbody>
               {templateFiles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className='lat-empty-row'>
+                  <td colSpan={5} className="lat-empty-row">
                     &nbsp;
                   </td>
                 </tr>
@@ -215,13 +215,13 @@ const ListAvailableTemplates: React.FC = () => {
                     key={index}
                     className={index % 2 === 0 ? "lat-even-row" : "lat-odd-row"}
                   >
-                    <td className='lat-td-icon'>
+                    <td className="lat-td-icon">
                       {/* 文件图标占位符 */}
-                      <span className='lat-file-icon'>📄</span>
+                      <span className="lat-file-icon">📄</span>
                     </td>
-                    <td className='lat-td-filename'>
+                    <td className="lat-td-filename">
                       <span
-                        className='lat-filename-link'
+                        className="lat-filename-link"
                         onClick={() => handleDownload(file.filename)}
                         style={{
                           cursor: "pointer",
@@ -232,9 +232,9 @@ const ListAvailableTemplates: React.FC = () => {
                         {file.filename}
                       </span>
                     </td>
-                    <td className='lat-td-used'>{file.used}</td>
-                    <td className='lat-td-lastmod'>{file.lastMod}</td>
-                    <td className='lat-td-size'>{file.size}</td>
+                    <td className="lat-td-used">{file.used}</td>
+                    <td className="lat-td-lastmod">{file.lastMod}</td>
+                    <td className="lat-td-size">{file.size}</td>
                   </tr>
                 ))
               )}

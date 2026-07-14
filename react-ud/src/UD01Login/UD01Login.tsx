@@ -129,74 +129,74 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='login-container'>
+    <div className="login-container">
       {/* 左侧内容 */}
-      <div className='left-content'>
-        <h1 className='main-title'>EDB Engineering Database</h1>
-        <p className='sub-title'>Use Outlook id and password</p>
-        <p className='support-text'>
+      <div className="left-content">
+        <h1 className="main-title">EDB Engineering Database</h1>
+        <p className="sub-title">Use Outlook id and password</p>
+        <p className="support-text">
           Support, authorization request or improvement suggestions, send mail
           to Support.TPI
         </p>
       </div>
 
       {/* 右侧表单 */}
-      <div className='right-form'>
-        <form onSubmit={handleLogin} className='login-form'>
+      <div className="right-form">
+        <form onSubmit={handleLogin} className="login-form">
           {/* 用户ID输入框 */}
-          <div className='input-group'>
+          <div className="input-group">
             <input
-              type='text'
-              id='userId'
-              name='userId'
+              type="text"
+              id="userId"
+              name="userId"
               value={userId}
               onChange={handleUserIdChange}
-              placeholder='Enter your user ID'
+              placeholder="Enter your user ID"
               maxLength={10}
               disabled={isLoading}
               className={`input-field ${errors.userId ? "error" : ""}`}
             />
             {errors.userId && (
-              <span className='error-message'>{errors.userId}</span>
+              <span className="error-message">{errors.userId}</span>
             )}
           </div>
 
           {/* 密码输入框 */}
-          <div className='input-group'>
+          <div className="input-group">
             <input
-              type='password'
-              id='password'
-              name='password'
+              type="password"
+              id="password"
+              name="password"
               value={password}
               onChange={handlePasswordChange}
-              placeholder='Enter your password'
+              placeholder="Enter your password"
               maxLength={32}
               disabled={isLoading}
               className={`input-field ${errors.password ? "error" : ""}`}
             />
             {errors.password && (
-              <span className='error-message'>{errors.password}</span>
+              <span className="error-message">{errors.password}</span>
             )}
           </div>
 
           {/* 登录按钮 */}
-          <button type='submit' disabled={isLoading} className='login-button'>
+          <button type="submit" disabled={isLoading} className="login-button">
             {isLoading ? "Logging in..." : "Login"}
           </button>
 
           {/* 错误提示 */}
           {errors.authentication && (
-            <div className='error-message'>{errors.authentication}</div>
+            <div className="error-message">{errors.authentication}</div>
           )}
         </form>
 
         {/* 新增：登录按钮下方的红色提示信息 - 单独显示 */}
-        <div className='login-help-text'>
+        <div className="login-help-text">
           If you get error message: "Your account is locked. Please contact your
           system administrator"
           <br />
           Please try this alternative login link before contacting support:{" "}
-          <a href='/alternative-login' style={{ color: "red" }}>
+          <a href="/alternative-login" style={{ color: "red" }}>
             Login
           </a>
           <br />

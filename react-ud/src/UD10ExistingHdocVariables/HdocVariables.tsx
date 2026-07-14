@@ -509,70 +509,70 @@ const HdocVariables: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className='hv-container'>
-        <div className='hv-loading'>Loading...</div>
+      <div className="hv-container">
+        <div className="hv-loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className='hv-container'>
+    <div className="hv-container">
       {/* 标题 */}
-      <h1 className='hv-title'>Existing HDoc Variables</h1>
+      <h1 className="hv-title">Existing HDoc Variables</h1>
 
       {/* 边框容器 - 包含按钮和表单 */}
-      <div className='hv-border-box'>
+      <div className="hv-border-box">
         {/* 错误消息显示 */}
-        {errorMessage && <div className='hv-error-message'>{errorMessage}</div>}
+        {errorMessage && <div className="hv-error-message">{errorMessage}</div>}
 
         {/* 成功消息显示 */}
         {successMessage && (
-          <div className='hv-success-message'>{successMessage}</div>
+          <div className="hv-success-message">{successMessage}</div>
         )}
 
         {/* 按钮区域 */}
-        <div className='hv-button-bar'>
-          <button className='hv-btn' onClick={handleSearch}>
+        <div className="hv-button-bar">
+          <button className="hv-btn" onClick={handleSearch}>
             Search
           </button>
-          <button className='hv-btn' onClick={handleClear}>
+          <button className="hv-btn" onClick={handleClear}>
             Clear
           </button>
-          <button className='hv-btn' onClick={handleBack}>
+          <button className="hv-btn" onClick={handleBack}>
             Back
           </button>
-          <button className='hv-btn' onClick={handleAdd}>
+          <button className="hv-btn" onClick={handleAdd}>
             Add
           </button>
-          <button className='hv-btn' onClick={handleUpdate}>
+          <button className="hv-btn" onClick={handleUpdate}>
             Update
           </button>
-          <button className='hv-btn' onClick={handleDelete}>
+          <button className="hv-btn" onClick={handleDelete}>
             Delete
           </button>
-          <button className='hv-btn' onClick={handleExcel}>
+          <button className="hv-btn" onClick={handleExcel}>
             Excel
           </button>
         </div>
 
         {/* 表单区域 */}
-        <div className='hv-form-section'>
+        <div className="hv-form-section">
           {/* Variable */}
-          <div className='hv-form-row'>
-            <label className='hv-label-required'>*Variable</label>
+          <div className="hv-form-row">
+            <label className="hv-label-required">*Variable</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.variableOperator}
               onChange={(e) =>
                 handleInputChange("variableOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-medium'
+              type="text"
+              className="hv-input-medium"
               value={formData.variable}
               onChange={(e) => handleInputChange("variable", e.target.value)}
               maxLength={30}
@@ -580,24 +580,24 @@ const HdocVariables: React.FC = () => {
           </div>
 
           {/* Type */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Type</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Type</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.typeOperator}
               onChange={(e) =>
                 handleInputChange("typeOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <select
-              className='hv-select-short'
+              className="hv-select-short"
               value={formData.type}
               onChange={(e) => handleInputChange("type", e.target.value)}
             >
-              <option value=''>请选择</option>
+              <option value="">请选择</option>
               {typeOptions.map((item, index) => (
                 <option key={index} value={item}>
                   {item}
@@ -607,21 +607,21 @@ const HdocVariables: React.FC = () => {
           </div>
 
           {/* Description */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Description</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Description</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.descriptionOperator}
               onChange={(e) =>
                 handleInputChange("descriptionOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-long'
+              type="text"
+              className="hv-input-long"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               maxLength={100}
@@ -629,51 +629,51 @@ const HdocVariables: React.FC = () => {
           </div>
 
           {/* Created by user */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Created by user</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Created by user</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.createdByUserOperator}
               onChange={(e) =>
                 handleInputChange("createdByUserOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.createdByUser}
               onChange={(e) =>
                 handleInputChange("createdByUser", e.target.value)
               }
               readOnly
             />
-            <span className='hv-auto-text'>Automatic</span>
+            <span className="hv-auto-text">Automatic</span>
           </div>
 
           {/* Date */}
-          <div className='hv-form-row'>
-            <label className='hv-label'>Date</label>
+          <div className="hv-form-row">
+            <label className="hv-label">Date</label>
             <select
-              className='hv-operator-select'
+              className="hv-operator-select"
               value={formData.dateOperator}
               onChange={(e) =>
                 handleInputChange("dateOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='!='>≠</option>
+              <option value="=">=</option>
+              <option value="!=">≠</option>
             </select>
             <input
-              type='text'
-              className='hv-input-short'
+              type="text"
+              className="hv-input-short"
               value={formData.date}
               onChange={(e) => handleInputChange("date", e.target.value)}
               readOnly
             />
-            <span className='hv-auto-text'>Automatic</span>
+            <span className="hv-auto-text">Automatic</span>
           </div>
         </div>
       </div>

@@ -168,33 +168,33 @@ const MarketDocumentSettings: React.FC = () => {
   };
 
   return (
-    <div className='mds-container'>
+    <div className="mds-container">
       {/* 标题 */}
-      <h1 className='mds-title'>HDoc - Market Document Settings</h1>
+      <h1 className="mds-title">HDoc - Market Document Settings</h1>
 
       {/* 错误消息 */}
-      {errorMessage && <div className='mds-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="mds-error-message">{errorMessage}</div>}
 
       {/* 成功消息 */}
       {successMessage && (
-        <div className='mds-success-message'>{successMessage}</div>
+        <div className="mds-success-message">{successMessage}</div>
       )}
 
       {/* 边框容器 */}
-      <div className='mds-border-box'>
+      <div className="mds-border-box">
         {/* 按钮区域 - 放在表单上方 */}
-        <div className='mds-button-bar'>
-          <button className='mds-btn' onClick={handleSearch}>
+        <div className="mds-button-bar">
+          <button className="mds-btn" onClick={handleSearch}>
             Search
           </button>
-          <button className='mds-btn' onClick={handleClear}>
+          <button className="mds-btn" onClick={handleClear}>
             Clear
           </button>
-          <button className='mds-btn' onClick={handleBack}>
+          <button className="mds-btn" onClick={handleBack}>
             Back
           </button>
           <button
-            className='mds-btn'
+            className="mds-btn"
             onClick={handleUpdateMode}
             disabled={isLoading}
           >
@@ -203,78 +203,78 @@ const MarketDocumentSettings: React.FC = () => {
         </div>
 
         {/* 表单区域 */}
-        <div className='mds-form-section'>
-          <div className='mds-form-row'>
-            <label className='mds-label'>Document type:</label>
+        <div className="mds-form-section">
+          <div className="mds-form-row">
+            <label className="mds-label">Document type:</label>
             <select
-              className='mds-operator-select'
+              className="mds-operator-select"
               value={formData.documentTypeOperator}
               onChange={(e) =>
                 handleInputChange("documentTypeOperator", e.target.value)
               }
             >
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
+              <option value="=">=</option>
+              <option value="<">&lt;</option>
+              <option value=">">&gt;</option>
             </select>
             <input
-              type='text'
+              type="text"
               value={formData.documentType}
               onChange={(e) =>
                 handleInputChange("documentType", e.target.value)
               }
-              placeholder='Enter document type'
+              placeholder="Enter document type"
               maxLength={20}
-              className='mds-input-field mds-width-doctype'
+              className="mds-input-field mds-width-doctype"
             />
           </div>
-          <div className='mds-form-row'>
-            <label className='mds-label'>Bussines unit:</label>
-            <select className='mds-operator-select'>
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
+          <div className="mds-form-row">
+            <label className="mds-label">Bussines unit:</label>
+            <select className="mds-operator-select">
+              <option value="=">=</option>
+              <option value="<">&lt;</option>
+              <option value=">">&gt;</option>
             </select>
             <input
-              type='text'
+              type="text"
               value={formData.bussinesUnit}
               onChange={(e) =>
                 handleInputChange("bussinesUnit", e.target.value)
               }
-              placeholder='BU'
+              placeholder="BU"
               maxLength={20}
-              className='mds-input-field mds-width-bu'
+              className="mds-input-field mds-width-bu"
             />
           </div>
-          <div className='mds-form-row'>
-            <label className='mds-label'>User:</label>
-            <select className='mds-operator-select'>
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
+          <div className="mds-form-row">
+            <label className="mds-label">User:</label>
+            <select className="mds-operator-select">
+              <option value="=">=</option>
+              <option value="<">&lt;</option>
+              <option value=">">&gt;</option>
             </select>
             <input
-              type='text'
+              type="text"
               value={formData.user}
               readOnly
-              className='mds-input-field mds-input-readonly mds-width-user'
+              className="mds-input-field mds-input-readonly mds-width-user"
             />
-            <span className='mds-auto-text'>Automatic</span>
+            <span className="mds-auto-text">Automatic</span>
           </div>
-          <div className='mds-form-row'>
-            <label className='mds-label'>Date:</label>
-            <select className='mds-operator-select'>
-              <option value='='>=</option>
-              <option value='<'>&lt;</option>
-              <option value='>'>&gt;</option>
+          <div className="mds-form-row">
+            <label className="mds-label">Date:</label>
+            <select className="mds-operator-select">
+              <option value="=">=</option>
+              <option value="<">&lt;</option>
+              <option value=">">&gt;</option>
             </select>
             <input
-              type='text'
+              type="text"
               value={formData.date}
               readOnly
-              className='mds-input-field mds-input-readonly mds-width-date'
+              className="mds-input-field mds-input-readonly mds-width-date"
             />
-            <span className='mds-auto-text'>Automatic</span>
+            <span className="mds-auto-text">Automatic</span>
           </div>
         </div>
       </div>

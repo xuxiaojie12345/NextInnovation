@@ -245,24 +245,24 @@ const ModifyDocument: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className='md-container'>
-        <div className='md-loading'>Loading...</div>
+      <div className="md-container">
+        <div className="md-loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className='md-container'>
+    <div className="md-container">
       {/* 标题区域 */}
-      <div className='md-header'>
-        <h1 className='md-title'>Modify Document</h1>
+      <div className="md-header">
+        <h1 className="md-title">Modify Document</h1>
       </div>
 
       {/* 基本信息区域 */}
-      <div className='md-info-section'>
-        <div className='md-info-group'>
-          <span className='md-label'>Chassis no:</span>
-          <span className='md-value md-chassis-no'>
+      <div className="md-info-section">
+        <div className="md-info-group">
+          <span className="md-label">Chassis no:</span>
+          <span className="md-value md-chassis-no">
             {chassisNo.substring(0, 4)}
             <span
               onClick={() => {
@@ -272,7 +272,7 @@ const ModifyDocument: React.FC = () => {
                   );
                 }
               }}
-              className='md-link'
+              className="md-link"
               style={{
                 cursor: "pointer",
                 color: "#0000ff",
@@ -283,14 +283,14 @@ const ModifyDocument: React.FC = () => {
             </span>
           </span>
         </div>
-        <div className='md-info-group'>
-          <span className='md-label'>Market:</span>
-          <span className='md-value'>{market}</span>
+        <div className="md-info-group">
+          <span className="md-label">Market:</span>
+          <span className="md-value">{market}</span>
         </div>
-        <div className='md-info-group'>
-          <span className='md-label'>Template:</span>
+        <div className="md-info-group">
+          <span className="md-label">Template:</span>
           <span
-            className='md-link'
+            className="md-link"
             onClick={handleDownloadTemplate}
             style={{ cursor: "pointer" }}
           >
@@ -300,30 +300,30 @@ const ModifyDocument: React.FC = () => {
       </div>
 
       {/* 错误消息显示 */}
-      {errorMessage && <div className='md-error-message'>{errorMessage}</div>}
+      {errorMessage && <div className="md-error-message">{errorMessage}</div>}
 
       {/* 表格区域 */}
-      <div className='md-table-container'>
+      <div className="md-table-container">
         {/* Save按钮 */}
-        <div className='md-button-bar'>
+        <div className="md-button-bar">
           <button
-            type='button'
+            type="button"
             onClick={handleSave}
             disabled={isLoading}
-            className='md-save-btn'
+            className="md-save-btn"
           >
             Save
           </button>
         </div>
 
         {/* 数据表格 */}
-        <table className='md-table'>
+        <table className="md-table">
           <thead>
             <tr>
-              <th className='md-th'>Variable</th>
-              <th className='md-th'>Description</th>
-              <th className='md-th'>Current value</th>
-              <th className='md-th'>Modified value</th>
+              <th className="md-th">Variable</th>
+              <th className="md-th">Description</th>
+              <th className="md-th">Current value</th>
+              <th className="md-th">Modified value</th>
             </tr>
           </thead>
           <tbody>
@@ -332,18 +332,18 @@ const ModifyDocument: React.FC = () => {
                 key={index}
                 className={index % 2 === 0 ? "md-tr-even" : "md-tr-odd"}
               >
-                <td className='md-td'>{variable.variable}</td>
-                <td className='md-td'>{variable.description}</td>
-                <td className='md-td'>{variable.currentValue}</td>
-                <td className='md-td'>
+                <td className="md-td">{variable.variable}</td>
+                <td className="md-td">{variable.description}</td>
+                <td className="md-td">{variable.currentValue}</td>
+                <td className="md-td">
                   <input
-                    type='text'
+                    type="text"
                     value={variable.modifiedValue}
                     onChange={(e) =>
                       handleModifiedValueChange(index, e.target.value)
                     }
-                    className='md-input'
-                    placeholder=''
+                    className="md-input"
+                    placeholder=""
                     maxLength={500}
                   />
                 </td>

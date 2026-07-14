@@ -154,74 +154,74 @@ const SaveModifications: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className='sm-container'>
-        <div className='sm-loading'>Loading...</div>
+      <div className="sm-container">
+        <div className="sm-loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className='sm-container'>
+    <div className="sm-container">
       {/* 边框容器 */}
-      <div className='sm-border-box'>
+      <div className="sm-border-box">
         {/* 标题 */}
-        <h1 className='sm-title'>Save Modifications</h1>
+        <h1 className="sm-title">Save Modifications</h1>
 
         {/* 基本信息区域 */}
-        <div className='sm-info-section'>
-          <div className='sm-info-row'>
-            <span className='sm-label'>Chassis serie:</span>
-            <span className='sm-value'>{modificationData?.chassisSerie}</span>
+        <div className="sm-info-section">
+          <div className="sm-info-row">
+            <span className="sm-label">Chassis serie:</span>
+            <span className="sm-value">{modificationData?.chassisSerie}</span>
           </div>
-          <div className='sm-info-row'>
-            <span className='sm-label'>Chassis number:</span>
-            <span className='sm-value'>{modificationData?.chassisNumber}</span>
+          <div className="sm-info-row">
+            <span className="sm-label">Chassis number:</span>
+            <span className="sm-value">{modificationData?.chassisNumber}</span>
           </div>
-          <div className='sm-info-row'>
-            <span className='sm-label'>Doctype:</span>
-            <span className='sm-value'>{modificationData?.doctype}</span>
+          <div className="sm-info-row">
+            <span className="sm-label">Doctype:</span>
+            <span className="sm-value">{modificationData?.doctype}</span>
           </div>
-          <div className='sm-info-row'>
-            <span className='sm-label'>Version:</span>
-            <span className='sm-value'>{modificationData?.version}</span>
+          <div className="sm-info-row">
+            <span className="sm-label">Version:</span>
+            <span className="sm-value">{modificationData?.version}</span>
           </div>
-          <div className='sm-info-row sm-spacer'></div>
-          <div className='sm-info-row'>
-            <span className='sm-label'>Storing:</span>
-            <span className='sm-value sm-storing-list'>
+          <div className="sm-info-row sm-spacer"></div>
+          <div className="sm-info-row">
+            <span className="sm-label">Storing:</span>
+            <span className="sm-value sm-storing-list">
               {modificationData?.storingList &&
               modificationData.storingList.length > 0
                 ? modificationData.storingList.map((item, idx) => (
-                    <div key={idx} className='sm-storing-item'>
+                    <div key={idx} className="sm-storing-item">
                       {item}
                     </div>
                   ))
                 : "-"}
             </span>
           </div>
-          <div className='sm-info-row'>
-            <span className='sm-label'>FOUND UNRELEASED VERSION:</span>
-            <span className='sm-value'>
+          <div className="sm-info-row">
+            <span className="sm-label">FOUND UNRELEASED VERSION:</span>
+            <span className="sm-value">
               {modificationData?.foundUnreleasedVersion}
             </span>
           </div>
-          <div className='sm-info-row'>
-            <span className='sm-message-highlight'>
+          <div className="sm-info-row">
+            <span className="sm-message-highlight">
               {modificationData?.message}
             </span>
           </div>
         </div>
 
         {/* 错误消息显示 */}
-        {errorMessage && <div className='sm-error-message'>{errorMessage}</div>}
+        {errorMessage && <div className="sm-error-message">{errorMessage}</div>}
 
         {/* Close按钮 */}
-        <div className='sm-button-bar'>
+        <div className="sm-button-bar">
           <button
-            type='button'
+            type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className='sm-close-btn'
+            className="sm-close-btn"
           >
             Close
           </button>
