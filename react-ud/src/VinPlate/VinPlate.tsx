@@ -225,10 +225,13 @@ const VinPlate: React.FC = () => {
         </button>
       </div>
 
+      {!vinInfo && !loading && !message && (
+        <p className="ud15-hint-text">Please enter a chassis number.</p>
+      )}
+
       {/* VIN Plate详细信息 - ViewInfo成功后显示 */}
       {vinInfo && !loading && (
         <div className="ud15-info-section">
-          <h2 className="ud15-info-title">VIN Plate Information</h2>
           <table className="ud15-info-table">
             <tbody>
               <tr>

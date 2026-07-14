@@ -291,7 +291,7 @@ const ADChange: React.FC = () => {
   return (
     <div className="ud16-container">
       {/* ── 页面标题 ── */}
-      <h1 className="ud16-title">EDB Engineering Database - AD Change</h1>
+      <h1 className="ud16-title">AD Change</h1>
 
       {/* 
         ── 加载中遮罩 ──

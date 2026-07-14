@@ -21,8 +21,8 @@
   margin-bottom: 12px;
 }
 
-.page-title {
-  color: #000;
+h1.page-title {
+  color: #003087 !important;
   font-size: 24px;
   font-weight: bold;
   margin: 0 0 4px 0;
@@ -37,11 +37,6 @@
 /* ========== 信息区块 ========== */
 .info-section {
   border: 1px solid #d9d9d9;
-}
-
-/* 区块内容区域 */
-.section-content {
-  padding: 0;
 }
 
 /* 区块内容区域 */
@@ -64,13 +59,14 @@
   box-sizing: border-box;
 }
 
-/* 信息标签 - 固定宽度左对齐 */
+/* 信息标签 - 固定宽度左对齐，不折行 */
 .info-label {
-  width: 130px;
+  width: 160px;
   font-size: 13px;
   color: #333333;
   font-weight: bold;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* 信息值 - 占据剩余空间 */
@@ -80,9 +76,30 @@
   word-break: break-all;
 }
 
-/* 带Tooltip的信息值 - 鼠标悬停时显示下划线光标提示 */
+/* 全宽字段容器 */
+.info-field-full {
+  width: 100% !important;
+  padding: 12px 6px;
+}
+
+/* 信息值左内边距 */
+.info-value-padded {
+  padding-left: 20px;
+}
+
+/* 信息值换行（S-Note多条数据） */
+.info-value-wrap {
+  padding-left: 20px;
+  white-space: pre-wrap;
+}
+
+/* 隐藏占位 */
+.info-value-hidden {
+  visibility: hidden;
+}
+
+/* 带Tooltip的信息值 */
 .info-value-tooltip {
-  border-bottom: 1px dashed #999;
   cursor: help;
 }
 

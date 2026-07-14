@@ -52,16 +52,18 @@ const MarketDocumentSettings: React.FC = () => {
   /**
    * 页面初始化处理（对应详细设计 3.1.1 初期表示流程）
    * 判断是从后画面（MarketDocumentSettingsList）返回还是首次加载
+   * 优先处理selectedData（Select返回），其次是URL参数（Back返回）
    */
   useEffect(() => {
-    // 从后画面的Select返回时，接收选中数据
+    // 从后画面的Select返回时，接收选中数据（优先处理）
     const selectedData = (location.state as Record<string, any>)?.selectedData;
     if (selectedData) {
       setDocumentType(selectedData.documentType || "");
       setUser(selectedData.user || "");
-      setDate(selectedData.date || "");
+      setDate((selectedData.date || "").split('T')[0].split(' ')[0]);
+      return; // 选中数据优先，不再处理URL参数
     }
-    // 从URL参数接收检索条件（Search跳转时带入）
+    // 从URL参数接收检索条件（Back返回或首次加载带入）
     const params = new URLSearchParams(location.search);
     if (params.get("documentType")) setDocumentType(params.get("documentType") || "");
     if (params.get("user")) setUser(params.get("user") || "");
@@ -172,7 +174,7 @@ const MarketDocumentSettings: React.FC = () => {
   return (
     <div className="ud20-1-container">
       {/* 页面标题 */}
-      <h1 className="ud20-1-title">HDoc - Market Document Settings</h1>
+      <h1 className="ud20-1-title">Market Document Settings</h1>
 
       {/* 工具栏按钮组 */}
       <div className="ud20-1-btn-group">

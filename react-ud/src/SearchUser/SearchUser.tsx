@@ -248,7 +248,7 @@ const SearchUser: React.FC = () => {
               onKeyDown={handleKeyDown}
               disabled={isLoading}
               maxLength={10}
-              placeholder="Enter User ID"
+
             />
           </div>
 
@@ -263,7 +263,7 @@ const SearchUser: React.FC = () => {
               onKeyDown={handleKeyDown}
               disabled={isLoading}
               maxLength={32}
-              placeholder="Enter User Name"
+
             />
           </div>
 

@@ -76,17 +76,9 @@ const SaveModifications: React.FC = () => {
           setError(response.data.message || '未找到该底盘的修改记录');
         }
       } catch (err: any) {
+        // 后端始终返回 HTTP 200，业务错误在 response.data.code 中处理
         if (err.code === 'ECONNABORTED') {
-          // 请求超时（对应设计书 6. 异常处理 - API超时）
           setError('请求超时，请检查网络连接');
-        } else if (err.response) {
-          if (err.response.status === 404) {
-            setError('未找到该底盘的修改记录');
-          } else {
-            setError('系统异常，请联系管理员');
-          }
-        } else if (err.request) {
-          setError('网络连接失败，请稍后重试');
         } else {
           setError('系统异常，请联系管理员');
         }
@@ -110,7 +102,7 @@ const SaveModifications: React.FC = () => {
     <div className='save-modifications-container'>
       {/* 页面标题 */}
       <div className='page-header'>
-        <h1 className='page-title'>HDoc - Save Modifications</h1>
+        <h1 className='page-title'>Save Modifications</h1>
       </div>
 
       {/* 加载中状态 */}

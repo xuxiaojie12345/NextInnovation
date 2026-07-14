@@ -67,6 +67,45 @@ html, body {
   margin-left: -300px;
 }
 
+/* 中等屏幕：缩小重叠偏移量 */
+@media (max-width: 1399px) {
+  .login-form-panel {
+    margin-left: -150px;
+  }
+}
+
+/* 小屏幕：取消重叠，左右面板自适应 */
+@media (max-width: 1023px) {
+  .login-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-info-panel {
+    padding: 40px 40px;
+    padding-top: 60px;
+  }
+
+  .login-info-panel h1 {
+    font-size: 36px;
+  }
+
+  .login-info-panel p {
+    font-size: 16px;
+    white-space: normal;
+  }
+
+  .left-content {
+    white-space: normal;
+  }
+
+  .login-form-panel {
+    margin-left: 0;
+    padding: 40px;
+  }
+}
+
 .login-form {
   width: 100%;
   max-width: 480px;
@@ -74,14 +113,6 @@ html, body {
 
 .form-group {
   margin-bottom: 25px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
-  font-size: 14px;
 }
 
 .form-group input {

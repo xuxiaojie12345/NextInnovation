@@ -144,6 +144,9 @@ public class UD14ServiceImpl implements UD14Service {
                     int refCount = ud14Mapper.countByMarketAndFileName(market, market + "/" + file.getName());
                     item.put("used", refCount > 0 ? "TEMPLATE-VIN-PLATE" : "");
 
+                    // 下载URL
+                    item.put("downloadUrl", "/download/templates/" + market + "/" + file.getName());
+
                     fileList.add(item);
                 }
 
@@ -168,5 +171,21 @@ public class UD14ServiceImpl implements UD14Service {
         if (bytes < 1024) return bytes + " B";
         if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
         return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
+    }
+
+    @Override
+    public org.springframework.core.io.Resource loadFileAsResource(String market, String filename) {
+        try {
+            Path filePath = Paths.get(templateRoot, market, filename);
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File not found or not readable: " + filePath);
+            }
+        } catch (Exception e) {
+            logger.error("UD14 - Failed to load file: market={}, filename={}", market, filename, e);
+            throw new RuntimeException("Failed to load file: " + filename, e);
+        }
     }
 }

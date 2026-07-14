@@ -72,21 +72,9 @@ const GenerateDocument: React.FC = () => {
           setError('Chassis not found');
         }
       } catch (err: any) {
-        if (err.response) {
-          if (err.response.status === 401) {
-            // 会话过期（对应设计书 5. 异常处理 - 用户未登录）
-            setError('Please login first');
-            navigate('/');
-          } else if (err.response.status === 404) {
-            setError('Chassis not found');
-          } else {
-            setError('System error. Please contact administrator.');
-          }
-        } else if (err.request) {
-          setError('System error. Please contact administrator.');
-        } else {
-          setError('System error. Please contact administrator.');
-        }
+        // 后端始终返回 HTTP 200，认证/业务错误在 response.data.code 中处理
+        // 此处只处理网络/服务器异常
+        setError('System error. Please contact administrator.');
       } finally {
         setLoading(false);
       }
@@ -147,7 +135,7 @@ const GenerateDocument: React.FC = () => {
     return (
       <div className='generate-document-container'>
         <div className='page-header'>
-          <h1 className='page-title'>Generate Document</h1>
+          <h1 className='page-title'>Generate document</h1>
         </div>
         <div className='loading-message'>Loading document data...</div>
       </div>
@@ -158,7 +146,7 @@ const GenerateDocument: React.FC = () => {
     <div className='generate-document-container'>
       {/* 页面标题 */}
       <div className='page-header'>
-        <h1 className='page-title'>Generate Document</h1>
+        <h1 className='page-title'>Generate document</h1>
       </div>
 
       {/* 错误消息区域（对应设计书 2.1 Error message area） */}
@@ -252,7 +240,15 @@ const GenerateDocument: React.FC = () => {
         <div className='replacing-params-section'>
           <div className='info-item'>
             <label>Replacing parameters:</label>
-            <span>{documentData?.replacingParameters || ''}</span>
+            <span>
+              {(documentData?.replacingParameters || '')
+                .split('; ')
+                .map((item: string, i: number) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <br />}{item}
+                  </React.Fragment>
+                ))}
+            </span>
           </div>
         </div>
       )}

@@ -86,10 +86,6 @@ const HDocUserAdministration = () => {
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch market list");
-      }
-
       const data = await response.json();
       console.log("【marketList】response:", JSON.stringify(data));
       if (data.code === 200 && data.data) {
@@ -147,10 +143,6 @@ const HDocUserAdministration = () => {
           }),
         },
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user info");
-      }
 
       const data = await response.json();
 
@@ -434,10 +426,6 @@ const HDocUserAdministration = () => {
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to delete role");
-      }
-
       const data = await response.json();
 
       if (data.code === 200) {
@@ -484,7 +472,7 @@ const HDocUserAdministration = () => {
   };
 
   if (isLoading) {
-    return <div className='ud17-loading' style={{padding:20,color:'#666',fontSize:13}}>Loading...</div>;
+    return <div className='ud17-loading'>Loading...</div>;
   }
 
   return (
@@ -528,8 +516,8 @@ const HDocUserAdministration = () => {
 
         {/* 角色权限配置区域 - 横向排列 */}
         <div className='ud17-sec'>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <label className='ud17-lbl' style={{ minWidth: 100, paddingTop: 210 }}>Roles</label>
+          <div className='ud17-roles-header'>
+            <label className='ud17-lbl ud17-roles-label-offset'>Roles</label>
             <div className='ud17-role-grid'>
           {/* Standard User */}
           <div className='ud17-role-item'>
@@ -692,9 +680,9 @@ const HDocUserAdministration = () => {
         </div>
 
         {/* Adaptation user */}
-        <div style={{ marginLeft: 260, marginTop: 12 }}>
-          <div className='ud17-role-item' style={{ border: 'none', background: 'transparent', padding: 0, maxWidth: 260 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className='ud17-adapt-section'>
+          <div className='ud17-role-item ud17-adapt-item'>
+            <div className='ud17-adapt-column'>
               <label className='ud17-chk-lbl'>
                 <input
                   type='checkbox'
@@ -749,8 +737,8 @@ const HDocUserAdministration = () => {
 
         {/* Market super user */}
         <div className='ud17-super-section'>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <p className='ud17-super-title' style={{ margin: 0, whiteSpace: 'nowrap', paddingTop: 90 }}>Market super user</p>
+          <div className='ud17-super-flex'>
+            <p className='ud17-super-title ud17-super-title-offset'>Market super user</p>
             <select
               multiple
               className='ud17-sel'

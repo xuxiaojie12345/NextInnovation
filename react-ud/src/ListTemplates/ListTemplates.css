@@ -51,17 +51,6 @@
   max-width: 800px;
 }
 
-/* 区块标题 - 参照UD12 */
-.ud14-section-title {
-  color: #2c3e50;
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0 -20px 15px -20px;
-  padding: 12px 20px;
-  background-color: #e8f0fe;
-  border-bottom: 1px solid #b0c4de;
-}
-
 /* 表单组 - 参照UD12 */
 .ud14-form-group {
   display: flex;
@@ -127,10 +116,23 @@
   background-color: #f0f5ff;
 }
 
+/* 文件图标列 */
+.ud14-icon-col {
+  width: 32px;
+  text-align: center;
+}
+
+/* 文件图标 */
+.ud14-file-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
 /* 文件下载链接 */
 .ud14-file-link {
   color: #3498db;
   text-decoration: none;
+  vertical-align: middle;
 }
 
 .ud14-file-link:hover {

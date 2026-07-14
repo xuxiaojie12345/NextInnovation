@@ -22,8 +22,8 @@
   margin-bottom: 20px;
 }
 
-.page-title {
-  color: #003087;
+h1.page-title {
+  color: #003087 !important;
   font-size: 24px;
   font-weight: bold;
   margin: 0;

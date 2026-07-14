@@ -53,16 +53,6 @@
   border: 1px solid #cfc;
 }
 
-/* 按钮栏 - 浅蓝背景工具栏 */
-.ud18-btn-group {
-  display: flex;
-  gap: 5px;
-  padding: 8px 20px;
-  margin: 0 0 15px 0;
-  background-color: #e8f0fe;
-  border-bottom: 1px solid #b0c4de;
-}
-
 /* 通用按钮样式 */
 .ud18-btn {
   padding: 4px 12px;
@@ -184,7 +174,16 @@
   color: #000000;
 }
 
+/* 多选容器 - 占满剩余空间 */
+.ud18-select-wrapper {
+  flex: 1;
+}
 
+/* 已分配文档选项 - 高亮加粗 */
+.ud18-option-assigned {
+  font-weight: bold;
+  background-color: #e8f4e8;
+}
 
 /* 响应式适配 */
 @media (max-width: 600px) {

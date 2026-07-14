@@ -89,23 +89,13 @@ const VehicleSpecification: React.FC = () => {
           setSNoteNo('');
         }
       } catch (err: any) {
-        // 异常处理：API返回异常时不清除页面结构，数据字段显示"-"
+        // 后端始终返回 HTTP 200，业务错误在 response.data.code 中处理
+        // 此处只处理网络/服务器异常
         console.error("UD07 API error:", err);
         setChassisInfo(null);
         setEngineInfo(null);
         setSNoteNo('');
-        if (err.response) {
-          if (err.response.status === 400) {
-            // 无数据时不是错误，页面显示空字段
-            console.warn("No data found for chassisNo:", chassisNo);
-          } else {
-            setError("系统内部错误，请联系管理员");
-          }
-        } else if (err.request) {
-          setError("网络连接失败，请检查网络设置");
-        } else {
-          setError("系统内部错误，请联系管理员");
-        }
+        setError("系统内部错误，请联系管理员");
       } finally {
         setLoading(false);
       }
@@ -191,25 +181,25 @@ const VehicleSpecification: React.FC = () => {
               <span className="info-value">{chassisInfo?.countryOfOperation || '-'}</span>
             </div>
             <div className="info-field">
-              <span className="info-value" style={{ visibility: 'hidden' }}>-</span>
+              <span className="info-value info-value-hidden">-</span>
             </div>
           </div>
 
           {/* SYMBOL_STR - 单独一行显示值 */}
           <div className="info-row">
-            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
+            <div className="info-field info-field-full">
               <Tooltip title={engineInfo?.description || '-'} arrow placement="top">
-                <span className="info-value info-value-tooltip" style={{ paddingLeft: 20 }}>
+                <span className="info-value info-value-tooltip info-value-padded">
                   {engineInfo?.symbolStr || '-'}
                 </span>
               </Tooltip>
             </div>
           </div>
 
-          {/* S-Note NO - 仅显示值，无值显示中划线 */}
+          {/* S-Note NO - 多条数据时换行表示 */}
           <div className="info-row">
-            <div className="info-field" style={{ width: '100%', padding: '12px 6px' }}>
-              <span className="info-value" style={{ paddingLeft: 20 }}>
+            <div className="info-field info-field-full">
+              <span className="info-value info-value-wrap">
                 {sNoteNo || '-'}
               </span>
             </div>

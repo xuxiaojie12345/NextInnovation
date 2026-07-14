@@ -43,7 +43,7 @@ const HDocTemplateCheck: React.FC = () => {
           {/* Template File */}
           <div className="ud13-section">
             <div className="ud13-field-row">
-              <label className="ud13-label">Template File</label>
+              <label className="ud13-label">Template File:</label>
               <input
                 id="ud13-file-input"
                 type="file"

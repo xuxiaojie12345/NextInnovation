@@ -22,4 +22,12 @@ public interface UD14Service {
      * @return { files: [{filename, used, lastModified, size, downloadUrl}], totalCount: N }
      */
     Map<String, Object> selectHdocUserDefinedRules(String market);
+
+    /**
+     * 加载文件为Resource供下载
+     * @param market 市场代码
+     * @param filename 文件名
+     * @return Resource
+     */
+    org.springframework.core.io.Resource loadFileAsResource(String market, String filename);
 }

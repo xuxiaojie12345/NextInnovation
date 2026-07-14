@@ -25,35 +25,11 @@
   text-align: left;
 }
 
-/* 副标题 */
-.existing-hdoc-subtitle {
-  font-size: 12px;
-  color: #999999;
-  text-align: center;
-  margin: 0 0 16px 0;
-}
-
 /* 标题下方分割线 */
 .existing-hdoc-divider {
   border: none;
   border-top: 1px solid #e8e8e8;
   margin: 0 0 16px 0;
-}
-
-/* 支持信息区域 */
-.existing-hdoc-support-info {
-  background-color: #fafafa;
-  border: 1px solid #e8e8e8;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  border-radius: 4px;
-}
-
-.existing-hdoc-support-info p {
-  font-size: 12px;
-  color: #666666;
-  margin: 0;
-  line-height: 1.5;
 }
 
 /* 消息区域 */
@@ -167,6 +143,16 @@
   flex-shrink: 0;
 }
 
+/* 表单标签注释文字 - 靠右显示 */
+.existing-hdoc-annotation-right {
+  font-weight: normal;
+  font-size: 11px;
+  color: #888;
+  margin-left: auto;
+  padding-right: 8px;
+  white-space: nowrap;
+}
+
 /* 必填标记 - 黑色星号放在标签前 */
 .existing-hdoc-form-label.required::before {
   content: '* ';
@@ -215,50 +201,6 @@
 .existing-hdoc-select:focus {
   border-color: #1890ff;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-}
-
-/* 搜索结果计数 */
-.existing-hdoc-count {
-  font-size: 13px;
-  color: #666666;
-  margin-bottom: 10px;
-  padding: 6px 0;
-}
-
-/* 表格包装 */
-.existing-hdoc-table-wrapper {
-  margin-top: 10px;
-}
-
-/* 数据表格 */
-.existing-hdoc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  border: 1px solid #e8e8e8;
-}
-
-.existing-hdoc-table th {
-  background-color: #fafafa;
-  color: #333333;
-  font-weight: bold;
-  padding: 8px 10px;
-  text-align: left;
-  border-bottom: 2px solid #e8e8e8;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-.existing-hdoc-table td {
-  padding: 7px 10px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #333333;
-  vertical-align: top;
-}
-
-.existing-hdoc-table tr:hover {
-  background-color: #e6f7ff;
-  cursor: pointer;
 }
 
 /* 响应式 */

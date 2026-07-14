@@ -197,6 +197,41 @@ class UD08ServiceImplTest {
             assertNull(result);
             verify(ud08Mapper, times(1)).insert(any(HdocUserDefinedRules.class));
         }
+
+        @Test
+        @DisplayName("添加时TEMPLATE-后缀为空串跳过变量检查")
+        void testAddWithEmptyTemplateSuffix() {
+            UD08AddRequest request = new UD08AddRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("TEMPLATE-");
+            request.setUpdateUser("USER1");
+
+            when(ud08Mapper.countByPrimaryKey("PC1", "100", "JPN")).thenReturn(0);
+
+            String result = ud08Service.UD08Add(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).insert(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("添加时updateUser为null时三元表达式走null分支")
+        void testAddWithNullUpdateUser() {
+            UD08AddRequest request = new UD08AddRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("VAR1");
+
+            when(ud08Mapper.countByPrimaryKey("PC1", "100", "JPN")).thenReturn(0);
+
+            String result = ud08Service.UD08Add(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).insert(any(HdocUserDefinedRules.class));
+        }
     }
 
     @Nested
@@ -305,6 +340,175 @@ class UD08ServiceImplTest {
             request.setVariable("VAR1");
             request.setUpdateDatetime("bad-date");
             request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时updateDatetime为空串使用系统时间")
+        void testUpdateWithEmptyDatetime() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("VAR1");
+            request.setUpdateDatetime("");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时TEMPLATE-后缀为空串跳过变量检查")
+        void testUpdateWithEmptyTemplateSuffix() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("TEMPLATE-");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时TEMPLATE-变量后缀存在则通过校验")
+        void testUpdateTemplateVariableExists() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("TEMPLATE-EXIST_VAR");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+            when(ud08Mapper.countByVariable("EXIST_VAR")).thenReturn(1);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时variable为null但value有值时通过无字段检查")
+        void testUpdateWithNullVariableButValueSet() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable(null);
+            request.setValue("SOME_VALUE");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时仅comments非空短路径到L107")
+        void testUpdateWithOnlyCommentsSet() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable(null);
+            request.setValue(null);
+            request.setVs(null);
+            request.setVs2(null);
+            request.setComments("SOME_COMMENT");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时仅deleteDate非空短路径到L108")
+        void testUpdateWithOnlyDeleteDateSet() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable(null);
+            request.setValue(null);
+            request.setVs(null);
+            request.setVs2(null);
+            request.setComments(null);
+            request.setAddDate(null);
+            request.setDeleteDate("2024-06-15");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时仅updateDatetime非空短路径到L109")
+        void testUpdateWithOnlyUpdateDatetimeSet() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable(null);
+            request.setValue(null);
+            request.setVs(null);
+            request.setVs2(null);
+            request.setComments(null);
+            request.setAddDate(null);
+            request.setDeleteDate(null);
+            request.setUpdateUser(null);
+            request.setUpdateDatetime("2024-06-15 10:00:00");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            String result = ud08Service.UD08Update(request);
+
+            assertNull(result);
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any(HdocUserDefinedRules.class));
+        }
+
+        @Test
+        @DisplayName("更新时updateUser为null三元走null分支")
+        void testUpdateWithNullUpdateUser() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVariable("VAR1");
 
             HdocUserDefinedRules existing = new HdocUserDefinedRules();
             when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);

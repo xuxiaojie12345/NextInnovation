@@ -1,0 +1,2387 @@
+{
+  "overall": {
+    "total_commits": 146,
+    "total_added": 118673,
+    "total_survived": 91903,
+    "overall_retention": 77.44,
+    "total_developers": 5
+  },
+  "dev_summary": [
+    {
+      "author": "Awangluxing",
+      "commits": 26,
+      "added": 34310,
+      "survived": 19696,
+      "deleted": 6424,
+      "retention": 57.41,
+      "churn": 15.77,
+      "net": 27886
+    },
+    {
+      "author": "duyage",
+      "commits": 23,
+      "added": 25175,
+      "survived": 22172,
+      "deleted": 2693,
+      "retention": 88.07,
+      "churn": 9.66,
+      "net": 22482
+    },
+    {
+      "author": "wangqun",
+      "commits": 21,
+      "added": 23015,
+      "survived": 19001,
+      "deleted": 3910,
+      "retention": 82.56,
+      "churn": 14.52,
+      "net": 19105
+    },
+    {
+      "author": "yanwenjing",
+      "commits": 43,
+      "added": 22171,
+      "survived": 18543,
+      "deleted": 3972,
+      "retention": 83.64,
+      "churn": 15.19,
+      "net": 18199
+    },
+    {
+      "author": "haohetao20240507",
+      "commits": 33,
+      "added": 14002,
+      "survived": 12491,
+      "deleted": 2098,
+      "retention": 89.21,
+      "churn": 13.03,
+      "net": 11904
+    }
+  ],
+  "trend": [
+    {
+      "week": "2026-W21",
+      "added": 958,
+      "survived": 3,
+      "retention": 0.31
+    },
+    {
+      "week": "2026-W24",
+      "added": 12405,
+      "survived": 5904,
+      "retention": 47.59
+    },
+    {
+      "week": "2026-W25",
+      "added": 10898,
+      "survived": 9971,
+      "retention": 91.49
+    },
+    {
+      "week": "2026-W26",
+      "added": 78628,
+      "survived": 60481,
+      "retention": 76.92
+    },
+    {
+      "week": "2026-W27",
+      "added": 9007,
+      "survived": 8789,
+      "retention": 97.58
+    },
+    {
+      "week": "2026-W28",
+      "added": 6629,
+      "survived": 6593,
+      "retention": 99.46
+    },
+    {
+      "week": "2026-W29",
+      "added": 148,
+      "survived": 162,
+      "retention": 109.46
+    }
+  ],
+  "file_churn": [
+    {
+      "file": "react-ud/src/App.tsx",
+      "commits": 52,
+      "added": 781,
+      "deleted": 177,
+      "churn_rate": 22.66
+    },
+    {
+      "file": "react-ud/src/Menu/Menu.tsx",
+      "commits": 44,
+      "added": 2332,
+      "deleted": 1218,
+      "churn_rate": 52.23
+    },
+    {
+      "file": "react-ud/src/Login/Login.tsx",
+      "commits": 33,
+      "added": 2408,
+      "deleted": 1827,
+      "churn_rate": 75.87
+    },
+    {
+      "file": "react-ud/src/Login/Login.css",
+      "commits": 27,
+      "added": 2173,
+      "deleted": 781,
+      "churn_rate": 35.94
+    },
+    {
+      "file": "react-ud/src/ModifyDocument/ModifyDocument.tsx",
+      "commits": 22,
+      "added": 1733,
+      "deleted": 288,
+      "churn_rate": 16.62
+    },
+    {
+      "file": "react-ud/src/Menu/Menu.css",
+      "commits": 22,
+      "added": 1354,
+      "deleted": 541,
+      "churn_rate": 39.96
+    },
+    {
+      "file": "react-ud/src/HomologationVariables/HomologationVariables.tsx",
+      "commits": 17,
+      "added": 2966,
+      "deleted": 180,
+      "churn_rate": 6.07
+    },
+    {
+      "file": "react-ud/src/VehicleSpecification/VehicleSpecification.tsx",
+      "commits": 17,
+      "added": 1056,
+      "deleted": 145,
+      "churn_rate": 13.73
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettingsList/MarketDocumentSettingsList.tsx",
+      "commits": 16,
+      "added": 1037,
+      "deleted": 118,
+      "churn_rate": 11.38
+    },
+    {
+      "file": "react-ud/src/UploadDeleteTemplate/UploadDeleteTemplate.tsx",
+      "commits": 16,
+      "added": 2083,
+      "deleted": 375,
+      "churn_rate": 18.0
+    },
+    {
+      "file": "react-ud/src/HomologationVariablesResultList/HomologationVariablesResultList.tsx",
+      "commits": 15,
+      "added": 1530,
+      "deleted": 221,
+      "churn_rate": 14.44
+    },
+    {
+      "file": "react-ud/src/VinPlate/VinPlate.tsx",
+      "commits": 14,
+      "added": 1624,
+      "deleted": 209,
+      "churn_rate": 12.87
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariables/ExistingHDocVariables.tsx",
+      "commits": 13,
+      "added": 1428,
+      "deleted": 123,
+      "churn_rate": 8.61
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettings/MarketDocumentSettings.tsx",
+      "commits": 13,
+      "added": 1010,
+      "deleted": 121,
+      "churn_rate": 11.98
+    },
+    {
+      "file": "react-ud/src/SaveModifications/SaveModifications.tsx",
+      "commits": 13,
+      "added": 999,
+      "deleted": 288,
+      "churn_rate": 28.83
+    },
+    {
+      "file": "react-ud/src/SearchUser/SearchUser.tsx",
+      "commits": 13,
+      "added": 1545,
+      "deleted": 252,
+      "churn_rate": 16.31
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD08HomologationVariablesServiceImpl.java",
+      "commits": 13,
+      "added": 1311,
+      "deleted": 63,
+      "churn_rate": 4.81
+    },
+    {
+      "file": "react-ud/src/HDocUserAdministration/HDocUserAdministration.tsx",
+      "commits": 13,
+      "added": 2758,
+      "deleted": 561,
+      "churn_rate": 20.34
+    },
+    {
+      "file": "react-ud/src/VehicleSpecification/VehicleSpecification.css",
+      "commits": 13,
+      "added": 744,
+      "deleted": 24,
+      "churn_rate": 3.23
+    },
+    {
+      "file": "react-ud/src/Login/Login.test.tsx",
+      "commits": 13,
+      "added": 654,
+      "deleted": 4133,
+      "churn_rate": 631.96
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocDocumentListMapper.xml",
+      "commits": 13,
+      "added": 449,
+      "deleted": 36,
+      "churn_rate": 8.02
+    },
+    {
+      "file": "react-ud/src/ModifyDocument/ModifyDocument.css",
+      "commits": 12,
+      "added": 1261,
+      "deleted": 121,
+      "churn_rate": 9.6
+    },
+    {
+      "file": "react-ud/src/UploadDeleteTemplate/UploadDeleteTemplate.css",
+      "commits": 12,
+      "added": 1173,
+      "deleted": 186,
+      "churn_rate": 15.86
+    },
+    {
+      "file": "react-ud/src/GenerateDocument/GenerateDocument.tsx",
+      "commits": 11,
+      "added": 1066,
+      "deleted": 52,
+      "churn_rate": 4.88
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD08HomologationVariablesController.java",
+      "commits": 11,
+      "added": 1008,
+      "deleted": 119,
+      "churn_rate": 11.81
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/HdocDocumentListMapper.java",
+      "commits": 11,
+      "added": 302,
+      "deleted": 2,
+      "churn_rate": 0.66
+    },
+    {
+      "file": "react-ud/src/GenerateHomologationDocument/GenerateHomologationDocument.tsx",
+      "commits": 10,
+      "added": 1148,
+      "deleted": 107,
+      "churn_rate": 9.32
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResultList/ExistingHDocVariablesResultList.tsx",
+      "commits": 10,
+      "added": 677,
+      "deleted": 105,
+      "churn_rate": 15.51
+    },
+    {
+      "file": "react-ud/src/HDocUserDocAdministration/HDocUserDocAdministration.tsx",
+      "commits": 10,
+      "added": 1283,
+      "deleted": 121,
+      "churn_rate": 9.43
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD03SelectHdocdocumentlistController.java",
+      "commits": 10,
+      "added": 295,
+      "deleted": 40,
+      "churn_rate": 13.56
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD05ModifyDocumentController.java",
+      "commits": 10,
+      "added": 429,
+      "deleted": 78,
+      "churn_rate": 18.18
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/HdocVariablesMapper.java",
+      "commits": 10,
+      "added": 253,
+      "deleted": 4,
+      "churn_rate": 1.58
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocVariablesMapper.xml",
+      "commits": 10,
+      "added": 462,
+      "deleted": 11,
+      "churn_rate": 2.38
+    },
+    {
+      "file": "react-ud/src/MarketDocumentSettingsList/MarketDocumentSettingsList.css",
+      "commits": 10,
+      "added": 780,
+      "deleted": 10,
+      "churn_rate": 1.28
+    },
+    {
+      "file": "react-ud/src/SearchUser/SearchUser.css",
+      "commits": 10,
+      "added": 1365,
+      "deleted": 188,
+      "churn_rate": 13.77
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/HdocUserDefinedRulesMapper.xml",
+      "commits": 10,
+      "added": 618,
+      "deleted": 38,
+      "churn_rate": 6.15
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD06SaveModificationsController.java",
+      "commits": 9,
+      "added": 271,
+      "deleted": 48,
+      "churn_rate": 17.71
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD09DeleteHdocuserdefinedrulesController.java",
+      "commits": 9,
+      "added": 395,
+      "deleted": 77,
+      "churn_rate": 19.49
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD07VehicleSpecificationServiceImpl.java",
+      "commits": 9,
+      "added": 619,
+      "deleted": 34,
+      "churn_rate": 5.49
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/UD19Mapper.xml",
+      "commits": 9,
+      "added": 117,
+      "deleted": 60,
+      "churn_rate": 51.28
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD12UploadDeletetemplatServiceImpl.java",
+      "commits": 9,
+      "added": 611,
+      "deleted": 29,
+      "churn_rate": 4.75
+    },
+    {
+      "file": "react-ud/src/HomologationVariablesResultList/HomologationVariablesResultList.css",
+      "commits": 9,
+      "added": 1165,
+      "deleted": 196,
+      "churn_rate": 16.82
+    },
+    {
+      "file": "react-ud/src/services/api.ts",
+      "commits": 9,
+      "added": 554,
+      "deleted": 21,
+      "churn_rate": 3.79
+    },
+    {
+      "file": "react-ud/src/ListAvailableTemplates/ListAvailableTemplates.tsx",
+      "commits": 9,
+      "added": 814,
+      "deleted": 106,
+      "churn_rate": 13.02
+    },
+    {
+      "file": "react-ud/src/SaveModifications/SaveModifications.css",
+      "commits": 9,
+      "added": 637,
+      "deleted": 13,
+      "churn_rate": 2.04
+    },
+    {
+      "file": "react-ud/src/VinPlate/VinPlate.css",
+      "commits": 9,
+      "added": 928,
+      "deleted": 30,
+      "churn_rate": 3.23
+    },
+    {
+      "file": "react-ud/src/DocumentTypes/DocumentTypes.css",
+      "commits": 9,
+      "added": 445,
+      "deleted": 10,
+      "churn_rate": 2.25
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD20MarketDocumentSettingsController.java",
+      "commits": 9,
+      "added": 289,
+      "deleted": 95,
+      "churn_rate": 32.87
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/dto/LoginRequest.java",
+      "commits": 9,
+      "added": 181,
+      "deleted": 2,
+      "churn_rate": 1.1
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/AuthenticationController.java",
+      "commits": 9,
+      "added": 262,
+      "deleted": 10,
+      "churn_rate": 3.82
+    }
+  ],
+  "high_churn_files": [
+    {
+      "file": "react-ud/src/Menu/Menu.tsx",
+      "commits": 44,
+      "added": 2332,
+      "deleted": 1218,
+      "churn_rate": 52.23
+    },
+    {
+      "file": "react-ud/src/Login/Login.tsx",
+      "commits": 33,
+      "added": 2408,
+      "deleted": 1827,
+      "churn_rate": 75.87
+    },
+    {
+      "file": "react-ud/src/Login/Login.test.tsx",
+      "commits": 13,
+      "added": 654,
+      "deleted": 4133,
+      "churn_rate": 631.96
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/UD19Mapper.xml",
+      "commits": 9,
+      "added": 117,
+      "deleted": 60,
+      "churn_rate": 51.28
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResult List/UD11.tsx",
+      "commits": 4,
+      "added": 285,
+      "deleted": 285,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/DownloadPrintQuickGuides/DownloadPrintQuickGuides.tsx",
+      "commits": 3,
+      "added": 256,
+      "deleted": 158,
+      "churn_rate": 61.72
+    },
+    {
+      "file": "react-ud/src/ExistingHDocVariablesResult List/UD11.css",
+      "commits": 3,
+      "added": 207,
+      "deleted": 207,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Test/Test.tsx",
+      "commits": 3,
+      "added": 11,
+      "deleted": 22,
+      "churn_rate": 200.0
+    },
+    {
+      "file": "react-ud/src/HDocTemplateCheck/HDocTemplateCheck.tsx",
+      "commits": 3,
+      "added": 291,
+      "deleted": 184,
+      "churn_rate": 63.23
+    },
+    {
+      "file": "react-ud/src/UD22/UD22.css",
+      "commits": 3,
+      "added": 281,
+      "deleted": 168,
+      "churn_rate": 59.79
+    },
+    {
+      "file": "react-ud/src/GenerateDocument/GenerateDocument.test.tsx",
+      "commits": 2,
+      "added": 239,
+      "deleted": 239,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/controller/UD201UpdateHdocDocumentController.java",
+      "commits": 2,
+      "added": 36,
+      "deleted": 36,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/dto/UD201UpdateHdocDocumentResponse.java",
+      "commits": 2,
+      "added": 54,
+      "deleted": 54,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/mapper/UD201UpdateHdocDocumentMapper.java",
+      "commits": 2,
+      "added": 30,
+      "deleted": 30,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/UD201UpdateHdocDocumentService.java",
+      "commits": 2,
+      "added": 24,
+      "deleted": 24,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/service/impl/UD201UpdateHdocDocumentServiceImpl.java",
+      "commits": 2,
+      "added": 54,
+      "deleted": 54,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/resources/mapper/UD201UpdateHdocDocumentMapper.xml",
+      "commits": 2,
+      "added": 15,
+      "deleted": 15,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Login_x/LoginPage.css",
+      "commits": 2,
+      "added": 227,
+      "deleted": 227,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/Login_x/LoginPage.tsx",
+      "commits": 2,
+      "added": 264,
+      "deleted": 264,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "api-ud/src/main/java/com/web/app/HdocApplication.java",
+      "commits": 2,
+      "added": 11,
+      "deleted": 11,
+      "churn_rate": 100.0
+    },
+    {
+      "file": "react-ud/src/UD23_Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides.tsx",
+      "commits": 1,
+      "added": 28,
+      "deleted": 21,
+      "churn_rate": 75.0
+    }
+  ],
+  "commit_details": [
+    {
+      "hash": "8ff841b6",
+      "full_hash": "8ff841b664de2715dd546e43c4b7bc40d5055d97",
+      "date": "2026-07-14 11:49:13 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "updateJunitTest",
+      "category": "其他",
+      "added": 148,
+      "survived": 162,
+      "retention": 109.46
+    },
+    {
+      "hash": "3c25f80f",
+      "full_hash": "3c25f80f23e1772b77634b6469273fe15bec75ef",
+      "date": "2026-07-10 12:31:55 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 159,
+      "survived": 165,
+      "retention": 103.77
+    },
+    {
+      "hash": "82733d10",
+      "full_hash": "82733d1014b0345a1711958e1117c542aaf51e9f",
+      "date": "2026-07-10 10:19:50 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 6,
+      "survived": 6,
+      "retention": 100.0
+    },
+    {
+      "hash": "7fbd4170",
+      "full_hash": "7fbd4170381bfce5a61c25a145fb6751ba15885a",
+      "date": "2026-07-10 10:59:33 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0710-01",
+      "category": "其他",
+      "added": 31,
+      "survived": 32,
+      "retention": 103.23
+    },
+    {
+      "hash": "e0fa40c6",
+      "full_hash": "e0fa40c667f044719743c480501f096411241dac",
+      "date": "2026-07-10 09:44:35 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "e9c915f5",
+      "full_hash": "e9c915f54b6963b0328b925649924872aa7cb4c9",
+      "date": "2026-07-10 09:49:14 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0710-01",
+      "category": "其他",
+      "added": 5,
+      "survived": 5,
+      "retention": 100.0
+    },
+    {
+      "hash": "b4deca14",
+      "full_hash": "b4deca14178eb1e7bccf8f45b012a3dc1021a53c",
+      "date": "2026-07-09 17:32:45 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 165,
+      "survived": 158,
+      "retention": 95.76
+    },
+    {
+      "hash": "316787d5",
+      "full_hash": "316787d54335777e87418560b9fcee805d70a498",
+      "date": "2026-07-09 17:24:08 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0709",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "dc4b9b07",
+      "full_hash": "dc4b9b07c284ff6053193dd4e45003e9ae7dcd0e",
+      "date": "2026-07-09 18:08:20 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 342,
+      "survived": 355,
+      "retention": 103.8
+    },
+    {
+      "hash": "db2d8544",
+      "full_hash": "db2d854480acb6ebd5d290bd6830cbfff28abedc",
+      "date": "2026-07-09 17:09:18 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "指摘对应",
+      "category": "其他",
+      "added": 139,
+      "survived": 143,
+      "retention": 102.88
+    },
+    {
+      "hash": "2fffca50",
+      "full_hash": "2fffca5049f09ea9ae86fa8d02d1ff9ff990caee",
+      "date": "2026-07-09 15:55:30 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "拉取user/xuxiaojie12345分支.github配置文件",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "699d0e50",
+      "full_hash": "699d0e50f7c082ad4fafb4cccb0c1d104513bbf8",
+      "date": "2026-07-09 15:12:08 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 22,
+      "survived": 24,
+      "retention": 109.09
+    },
+    {
+      "hash": "6ccdbc8b",
+      "full_hash": "6ccdbc8be242f96002bb99f5b277e98b2b69e27b",
+      "date": "2026-07-09 14:42:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "e314cc3f",
+      "full_hash": "e314cc3ffd633bd38dcae19982d2ba1ba2bd4d63",
+      "date": "2026-07-09 14:11:01 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 45,
+      "survived": 49,
+      "retention": 108.89
+    },
+    {
+      "hash": "8bd7a5a9",
+      "full_hash": "8bd7a5a9c54fa400252961ca932067989f0cb464",
+      "date": "2026-07-09 11:51:09 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0709",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "a13bf37f",
+      "full_hash": "a13bf37f8127a309396f7f71ee4ab2315f6a8ec4",
+      "date": "2026-07-09 12:39:04 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 142,
+      "survived": 141,
+      "retention": 99.3
+    },
+    {
+      "hash": "5ac3e01f",
+      "full_hash": "5ac3e01fcfcea0dfe9e29c70cd01df3e35bf87ef",
+      "date": "2026-07-09 11:30:45 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 21,
+      "survived": 22,
+      "retention": 104.76
+    },
+    {
+      "hash": "64cc5cdf",
+      "full_hash": "64cc5cdf8d0b4bfd7d607fa3f752b65554e1f1f9",
+      "date": "2026-07-09 09:58:58 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "7db9efe1",
+      "full_hash": "7db9efe1df32a9019c3546275eb19832ef4f9f40",
+      "date": "2026-07-09 10:35:31 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0709-01",
+      "category": "其他",
+      "added": 46,
+      "survived": 48,
+      "retention": 104.35
+    },
+    {
+      "hash": "4827424a",
+      "full_hash": "4827424a7474170e0d98e8f5b7c5834226f9227d",
+      "date": "2026-07-08 18:32:46 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0708-01",
+      "category": "其他",
+      "added": 9,
+      "survived": 9,
+      "retention": 100.0
+    },
+    {
+      "hash": "0f2f90ed",
+      "full_hash": "0f2f90edb02d06f08054e0d69b900792e85b0835",
+      "date": "2026-07-08 17:12:48 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0708",
+      "category": "其他",
+      "added": 437,
+      "survived": 437,
+      "retention": 100.0
+    },
+    {
+      "hash": "8e30386b",
+      "full_hash": "8e30386be7703ed2868e013b5b62758fe3f81abd",
+      "date": "2026-07-08 17:12:17 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0708",
+      "category": "其他",
+      "added": 2,
+      "survived": 2,
+      "retention": 100.0
+    },
+    {
+      "hash": "5ae32533",
+      "full_hash": "5ae32533cf2ca16ab0a983d888dba220973fe198",
+      "date": "2026-07-08 16:50:18 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 9,
+      "survived": 11,
+      "retention": 122.22
+    },
+    {
+      "hash": "98848c6d",
+      "full_hash": "98848c6d3d047370007f7f261561493b8024ccd6",
+      "date": "2026-07-08 16:07:45 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 5,
+      "survived": 4,
+      "retention": 80.0
+    },
+    {
+      "hash": "db4dfa92",
+      "full_hash": "db4dfa923839de884ca7418b74640b7a72cb5293",
+      "date": "2026-07-08 15:59:01 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 35,
+      "survived": 36,
+      "retention": 102.86
+    },
+    {
+      "hash": "922bea55",
+      "full_hash": "922bea55e048b58c87f0f0516faef8f23366523e",
+      "date": "2026-07-08 15:46:28 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "指摘对应",
+      "category": "其他",
+      "added": 2,
+      "survived": 1,
+      "retention": 50.0
+    },
+    {
+      "hash": "daef6cd6",
+      "full_hash": "daef6cd632813c320643fe9a0fd8f11ff558e72a",
+      "date": "2026-07-08 15:43:51 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "指摘对应",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "2cce066d",
+      "full_hash": "2cce066d37bec5d3493f0283483a5a939697f66e",
+      "date": "2026-07-08 15:35:08 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "指摘对应",
+      "category": "其他",
+      "added": 57,
+      "survived": 61,
+      "retention": 107.02
+    },
+    {
+      "hash": "838c09fb",
+      "full_hash": "838c09fb0175a4879e53f6df9ef490a98b784e44",
+      "date": "2026-07-08 15:26:25 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "前台指摘对应",
+      "category": "其他",
+      "added": 161,
+      "survived": 160,
+      "retention": 99.38
+    },
+    {
+      "hash": "5df4e019",
+      "full_hash": "5df4e019aea7ec8f7e1109494c4556ea7a5fedf2",
+      "date": "2026-07-08 14:40:37 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 162,
+      "survived": 170,
+      "retention": 104.94
+    },
+    {
+      "hash": "92196c47",
+      "full_hash": "92196c47fab1d13acdf0ce2dff39f1ce69448f2c",
+      "date": "2026-07-07 17:38:36 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0707",
+      "category": "其他",
+      "added": 20,
+      "survived": 21,
+      "retention": 105.0
+    },
+    {
+      "hash": "afdf5090",
+      "full_hash": "afdf5090ac1896fac00074120147134d7c141712",
+      "date": "2026-07-07 17:17:43 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "58e4e5e3",
+      "full_hash": "58e4e5e3b47d6b2255d1b53fac3005381f1751cd",
+      "date": "2026-07-07 17:45:25 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0707-01",
+      "category": "其他",
+      "added": 23,
+      "survived": 22,
+      "retention": 95.65
+    },
+    {
+      "hash": "47f777e7",
+      "full_hash": "47f777e74ce6652e773af8b7f3d8cb7ca774d0bb",
+      "date": "2026-07-07 15:04:40 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "UD06",
+      "category": "其他",
+      "added": 3,
+      "survived": 3,
+      "retention": 100.0
+    },
+    {
+      "hash": "8f74c75e",
+      "full_hash": "8f74c75e093440cbdd98d8311db03d6fd314dc79",
+      "date": "2026-07-07 12:20:51 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "更新",
+      "category": "日常维护",
+      "added": 404,
+      "survived": 401,
+      "retention": 99.26
+    },
+    {
+      "hash": "39be1701",
+      "full_hash": "39be1701c5fc1b98a6b6501404d078d6c908f037",
+      "date": "2026-07-07 11:56:23 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 429,
+      "survived": 391,
+      "retention": 91.14
+    },
+    {
+      "hash": "1b4e9331",
+      "full_hash": "1b4e93318029017e36f27b03016af4d097164d93",
+      "date": "2026-07-07 10:41:01 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "4a119cec",
+      "full_hash": "4a119cec8643c62d1a49992d4771d2e8439b5fbe",
+      "date": "2026-07-07 10:13:02 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 475,
+      "survived": 448,
+      "retention": 94.32
+    },
+    {
+      "hash": "a8d9c7ad",
+      "full_hash": "a8d9c7ad7555fd94d4b24d1576c93dd7cf5943fa",
+      "date": "2026-07-07 09:09:49 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0707",
+      "category": "其他",
+      "added": 3253,
+      "survived": 3247,
+      "retention": 99.82
+    },
+    {
+      "hash": "499db98c",
+      "full_hash": "499db98c027d004c400e4d413a4d361be01289f9",
+      "date": "2026-07-06 11:03:07 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "fix",
+      "category": "缺陷修复",
+      "added": 20,
+      "survived": 21,
+      "retention": 105.0
+    },
+    {
+      "hash": "06e284a8",
+      "full_hash": "06e284a8db261413a11de084a48be384a66faf73",
+      "date": "2026-07-03 16:45:57 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "2b11ee88",
+      "full_hash": "2b11ee887dfec29a06fa56016886666521554b92",
+      "date": "2026-07-03 17:26:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 9,
+      "survived": 10,
+      "retention": 111.11
+    },
+    {
+      "hash": "f6b52402",
+      "full_hash": "f6b5240271988440bf54c8292839ab866521318a",
+      "date": "2026-07-03 15:29:25 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0703",
+      "category": "其他",
+      "added": 237,
+      "survived": 242,
+      "retention": 102.11
+    },
+    {
+      "hash": "1ec9b854",
+      "full_hash": "1ec9b85452774c897d2faf81ba3e351df9d7a56c",
+      "date": "2026-07-03 16:12:05 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 18,
+      "survived": 21,
+      "retention": 116.67
+    },
+    {
+      "hash": "5f0c434c",
+      "full_hash": "5f0c434c9c89bda674087caa5591636c176d0ce1",
+      "date": "2026-07-03 16:00:56 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 2,
+      "survived": 2,
+      "retention": 100.0
+    },
+    {
+      "hash": "8e8890bb",
+      "full_hash": "8e8890bb585b91147d12bf59055412c422752f36",
+      "date": "2026-07-03 15:22:15 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 24,
+      "survived": 24,
+      "retention": 100.0
+    },
+    {
+      "hash": "cbc49df7",
+      "full_hash": "cbc49df738cb11e8dfbba8d2f5aff093d1aa6a8b",
+      "date": "2026-07-03 12:30:38 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "f31c83ac",
+      "full_hash": "f31c83ac87255fe35acc655c528babca86bbcf18",
+      "date": "2026-07-03 12:24:59 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 4,
+      "survived": 3,
+      "retention": 75.0
+    },
+    {
+      "hash": "1d64f03f",
+      "full_hash": "1d64f03ffb94b63c5cb1cb561c70ad088dde32dc",
+      "date": "2026-07-03 12:16:20 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-02",
+      "category": "其他",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "38b77d31",
+      "full_hash": "38b77d31e5da02b30fc4132cc2e0e449e19f836d",
+      "date": "2026-07-03 10:13:04 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0703-1",
+      "category": "其他",
+      "added": 536,
+      "survived": 544,
+      "retention": 101.49
+    },
+    {
+      "hash": "7c164882",
+      "full_hash": "7c16488216b01b320672b82df0ddab0259b02407",
+      "date": "2026-07-02 17:06:12 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 63,
+      "survived": 68,
+      "retention": 107.94
+    },
+    {
+      "hash": "ac83e26d",
+      "full_hash": "ac83e26d82cfab58181f8c2e37d94e0e2cbf0d9e",
+      "date": "2026-07-02 14:59:32 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 42,
+      "survived": 42,
+      "retention": 100.0
+    },
+    {
+      "hash": "00fb332c",
+      "full_hash": "00fb332c5d4fe5db10b960f6cc949818362b38f6",
+      "date": "2026-07-02 13:35:54 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 78,
+      "survived": 78,
+      "retention": 100.0
+    },
+    {
+      "hash": "6b0c7956",
+      "full_hash": "6b0c79568e1304960dbace987b4853ccdd9114bf",
+      "date": "2026-07-02 12:25:59 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 182,
+      "survived": 188,
+      "retention": 103.3
+    },
+    {
+      "hash": "5100750b",
+      "full_hash": "5100750bf91908edd82a91b480986faa8d8a98b2",
+      "date": "2026-07-02 10:40:06 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 20,
+      "survived": 19,
+      "retention": 95.0
+    },
+    {
+      "hash": "dbaf0019",
+      "full_hash": "dbaf0019f33430d6cd17edd3a2bc337b889a5cec",
+      "date": "2026-07-02 10:38:05 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 5,
+      "survived": 6,
+      "retention": 120.0
+    },
+    {
+      "hash": "cb36780f",
+      "full_hash": "cb36780f7d1430909481ea1e96e65473e6bc14db",
+      "date": "2026-07-02 10:32:11 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "81470baf",
+      "full_hash": "81470baf7d16c01ea45233f1ebc482f4a0a60677",
+      "date": "2026-07-02 10:20:19 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 4,
+      "survived": 4,
+      "retention": 100.0
+    },
+    {
+      "hash": "fc75f7fa",
+      "full_hash": "fc75f7fa78c4b0f0cd1361ab1f6e00ce1575c45d",
+      "date": "2026-07-02 10:08:50 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "8e2e1bf8",
+      "full_hash": "8e2e1bf8e0ed3d2b7817e828d4102a8678fa0837",
+      "date": "2026-07-02 10:04:31 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "d66691a6",
+      "full_hash": "d66691a6eaf94addc6d91dc7af43102d7a62545c",
+      "date": "2026-07-02 09:57:56 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0702",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "7a66e155",
+      "full_hash": "7a66e1556a29823b8802c89690ed7911c4087f2e",
+      "date": "2026-07-02 09:57:46 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 69,
+      "survived": 71,
+      "retention": 102.9
+    },
+    {
+      "hash": "5f2859c5",
+      "full_hash": "5f2859c59716454aa5aa833a71ee36769ffb11f5",
+      "date": "2026-07-02 09:42:17 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 66,
+      "survived": 61,
+      "retention": 92.42
+    },
+    {
+      "hash": "5219bbc8",
+      "full_hash": "5219bbc8cea6de4030d39774cdb4137a1cfcccd9",
+      "date": "2026-07-01 18:16:32 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "Merge branch 'user/duyage' of https://github.com/xuxiaojie12345/NextInnovation into user/duyage",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "a2f7e650",
+      "full_hash": "a2f7e650f83305c896e467a6f696bda4b0cfda6e",
+      "date": "2026-07-01 18:14:56 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 2,
+      "survived": 2,
+      "retention": 100.0
+    },
+    {
+      "hash": "1107adf8",
+      "full_hash": "1107adf8ea9a87b049f092e56fa777fa6efd4802",
+      "date": "2026-07-01 18:08:15 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 84,
+      "survived": 85,
+      "retention": 101.19
+    },
+    {
+      "hash": "95276b95",
+      "full_hash": "95276b952dc2e765180f77bc86d8003b08a5bc12",
+      "date": "2026-07-01 17:15:28 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 912,
+      "survived": 878,
+      "retention": 96.27
+    },
+    {
+      "hash": "6b6eecb4",
+      "full_hash": "6b6eecb40a0fbc260c23c28fc7447c6e3e2cb879",
+      "date": "2026-07-01 14:45:03 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0701-02",
+      "category": "其他",
+      "added": 49,
+      "survived": 43,
+      "retention": 87.76
+    },
+    {
+      "hash": "86667a49",
+      "full_hash": "86667a493670a27886398da2450bd9a1bd388eb6",
+      "date": "2026-07-01 11:49:37 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0701",
+      "category": "其他",
+      "added": 45,
+      "survived": 35,
+      "retention": 77.78
+    },
+    {
+      "hash": "928d8a5e",
+      "full_hash": "928d8a5ed8ad7323088cec8f7c1d16bf15ebb3d1",
+      "date": "2026-07-01 11:54:43 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0701-01",
+      "category": "其他",
+      "added": 176,
+      "survived": 183,
+      "retention": 103.98
+    },
+    {
+      "hash": "c12ab18e",
+      "full_hash": "c12ab18e6170c1fd4e05c17f86ae11bc6727a3eb",
+      "date": "2026-07-01 10:00:54 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 4,
+      "survived": 3,
+      "retention": 75.0
+    },
+    {
+      "hash": "07d6f67b",
+      "full_hash": "07d6f67b49a12a0ab939f526f77a330c70df23fb",
+      "date": "2026-07-01 09:48:10 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 15,
+      "survived": 16,
+      "retention": 106.67
+    },
+    {
+      "hash": "04ffb3a5",
+      "full_hash": "04ffb3a5faab66b9c6177cac09427607f63e7af3",
+      "date": "2026-07-01 10:28:43 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update UD22,23",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "b825dad7",
+      "full_hash": "b825dad7659947974a2d0a546ee887e2bcb873d0",
+      "date": "2026-07-01 09:13:13 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "94002045",
+      "full_hash": "940020453cb673cd6a2a564908341e80db6b0c86",
+      "date": "2026-06-30 19:00:25 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "UD20,21,22,23",
+      "category": "其他",
+      "added": 1602,
+      "survived": 1475,
+      "retention": 92.07
+    },
+    {
+      "hash": "7ff13eff",
+      "full_hash": "7ff13effc3c35409dd018e4db1834ed7059fbd69",
+      "date": "2026-06-30 18:42:35 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 76,
+      "survived": 50,
+      "retention": 65.79
+    },
+    {
+      "hash": "b17f4ee9",
+      "full_hash": "b17f4ee96e2900faf692712650fc62e51d16bb92",
+      "date": "2026-06-30 18:32:47 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "c0d8f9d1",
+      "full_hash": "c0d8f9d1285b827de436af3bf22710dd77dd7655",
+      "date": "2026-06-30 17:30:27 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update063001",
+      "category": "其他",
+      "added": 9,
+      "survived": 5,
+      "retention": 55.56
+    },
+    {
+      "hash": "2bca0ec4",
+      "full_hash": "2bca0ec4e16881b21bf1409073e45d7d798bc5e9",
+      "date": "2026-06-30 16:26:31 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update App.tsx",
+      "category": "日常维护",
+      "added": 11,
+      "survived": 9,
+      "retention": 81.82
+    },
+    {
+      "hash": "c30fc9ba",
+      "full_hash": "c30fc9ba23a40e2d3b973d942fcfc0575be6ed7e",
+      "date": "2026-06-30 16:25:21 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "add DU17,18,19",
+      "category": "功能开发",
+      "added": 2558,
+      "survived": 2597,
+      "retention": 101.52
+    },
+    {
+      "hash": "a27295c4",
+      "full_hash": "a27295c4d8aa0ae55da5cc5be51879fcc239d236",
+      "date": "2026-06-30 16:22:25 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "delhtml",
+      "category": "其他",
+      "added": 254,
+      "survived": 251,
+      "retention": 98.82
+    },
+    {
+      "hash": "25405f6b",
+      "full_hash": "25405f6b79e7f3867af7c6ee4281b5fe0dbee19d",
+      "date": "2026-06-30 15:08:46 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "delhtml",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "c6728eb6",
+      "full_hash": "c6728eb69d60b5578e13bb6c759f3cce1fa6c523",
+      "date": "2026-06-30 15:01:10 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 1056,
+      "survived": 1024,
+      "retention": 96.97
+    },
+    {
+      "hash": "875e2275",
+      "full_hash": "875e2275a0d53dc83fe5ef0cf186a44ca83354e5",
+      "date": "2026-06-30 13:41:52 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 2,
+      "survived": 2,
+      "retention": 100.0
+    },
+    {
+      "hash": "c45f3280",
+      "full_hash": "c45f32807d98b3d790bb190499b9b8a4ce8de7e4",
+      "date": "2026-06-30 12:11:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "2f1ab054",
+      "full_hash": "2f1ab0545a9d1cec3d5f46b8dcfd1a7ac6c8f53e",
+      "date": "2026-06-30 11:47:49 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 114,
+      "survived": 116,
+      "retention": 101.75
+    },
+    {
+      "hash": "862fe94b",
+      "full_hash": "862fe94bbc54f97f3ea8a5e1de96798b2dc224b6",
+      "date": "2026-06-29 14:56:07 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update-0629-end",
+      "category": "日常维护",
+      "added": 286,
+      "survived": 290,
+      "retention": 101.4
+    },
+    {
+      "hash": "9d371c5a",
+      "full_hash": "9d371c5a5a75c8e6f929da0d096dd3ab7412f877",
+      "date": "2026-06-29 10:33:32 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0629",
+      "category": "其他",
+      "added": 361,
+      "survived": 319,
+      "retention": 88.37
+    },
+    {
+      "hash": "4a0f01ad",
+      "full_hash": "4a0f01ad9c9480d241b0e577b964396a40e23eb8",
+      "date": "2026-06-29 09:59:27 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update UD16",
+      "category": "日常维护",
+      "added": 26,
+      "survived": 17,
+      "retention": 65.38
+    },
+    {
+      "hash": "4180bfa9",
+      "full_hash": "4180bfa908ec5d92f856b96b294a2b7324c1673c",
+      "date": "2026-06-26 19:37:13 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 338,
+      "survived": 343,
+      "retention": 101.48
+    },
+    {
+      "hash": "1d4a0512",
+      "full_hash": "1d4a0512b3f9df2545aa8ebe0eacf6c7266ede89",
+      "date": "2026-06-26 19:23:11 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 244,
+      "survived": 254,
+      "retention": 104.1
+    },
+    {
+      "hash": "481e40bd",
+      "full_hash": "481e40bd8e3e005423e64bca3eac661c15095f69",
+      "date": "2026-06-26 17:55:14 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "delete doc",
+      "category": "文档注释",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "a5c2e1f1",
+      "full_hash": "a5c2e1f10d9dea021f21e675f3b79891fc115009",
+      "date": "2026-06-26 17:37:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "Merge branch 'user/haohetao' of https://github.com/xuxiaojie12345/NextInnovation into user/haohetao",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "9ab3e723",
+      "full_hash": "9ab3e723ac2f60a0fd588fb09ae6059529d8f9c5",
+      "date": "2026-06-26 17:36:37 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update062601",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "15d6f456",
+      "full_hash": "15d6f456432ea89dd00163bae9f2e98dd38b0e04",
+      "date": "2026-06-26 11:58:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0626",
+      "category": "其他",
+      "added": 552,
+      "survived": 461,
+      "retention": 83.51
+    },
+    {
+      "hash": "b9def337",
+      "full_hash": "b9def3376a89b4f1ae6987ae07b9b2fde473456c",
+      "date": "2026-06-26 14:26:40 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "c5ce33c8",
+      "full_hash": "c5ce33c8e8913106634b56738f70d04457536692",
+      "date": "2026-06-26 11:27:50 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 87,
+      "survived": 86,
+      "retention": 98.85
+    },
+    {
+      "hash": "1a4a0ba7",
+      "full_hash": "1a4a0ba784733c89029f4112fe31ecfd2649df90",
+      "date": "2026-06-26 11:58:09 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update0626",
+      "category": "其他",
+      "added": 101,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "938d719e",
+      "full_hash": "938d719e283ed08dde6285bf62150b7631962904",
+      "date": "2026-06-26 10:56:47 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 257,
+      "survived": 242,
+      "retention": 94.16
+    },
+    {
+      "hash": "9fcc18a4",
+      "full_hash": "9fcc18a4997c8b6dc2f5aaccbd1c8a6e486372b5",
+      "date": "2026-06-26 11:56:22 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "提交",
+      "category": "其他",
+      "added": 7379,
+      "survived": 5578,
+      "retention": 75.59
+    },
+    {
+      "hash": "9f953fe1",
+      "full_hash": "9f953fe1eda6fe0e2c5d4a4771b478517f4725bc",
+      "date": "2026-06-26 10:25:01 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 84,
+      "survived": 80,
+      "retention": 95.24
+    },
+    {
+      "hash": "30e98594",
+      "full_hash": "30e98594ffa5224bcc80e707c81cf7e506e743bb",
+      "date": "2026-06-26 09:58:41 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0626",
+      "category": "其他",
+      "added": 10604,
+      "survived": 9823,
+      "retention": 92.63
+    },
+    {
+      "hash": "8c4db9c6",
+      "full_hash": "8c4db9c613dfb1bfc00ca7c755201f8d031e5c1e",
+      "date": "2026-06-26 10:56:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update 0626",
+      "category": "日常维护",
+      "added": 158,
+      "survived": 109,
+      "retention": 68.99
+    },
+    {
+      "hash": "2fadc1e6",
+      "full_hash": "2fadc1e67ea0b46a8fc653cbae185b2663b92aa2",
+      "date": "2026-06-25 18:51:03 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 3999,
+      "survived": 3145,
+      "retention": 78.64
+    },
+    {
+      "hash": "16423557",
+      "full_hash": "16423557b25a0021b3a3050dc54edf2eef90f08a",
+      "date": "2026-06-25 13:42:02 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 11,
+      "survived": 11,
+      "retention": 100.0
+    },
+    {
+      "hash": "f2a8b803",
+      "full_hash": "f2a8b8031385c6e285ee9efdcd71b4aca153d789",
+      "date": "2026-06-25 10:59:34 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 42,
+      "survived": 42,
+      "retention": 100.0
+    },
+    {
+      "hash": "7639bc92",
+      "full_hash": "7639bc9218ae49f294f691700c8edc9fbc1b797d",
+      "date": "2026-06-25 10:32:23 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "fc5963f3",
+      "full_hash": "fc5963f3d71e21673e54e8db9ecf9a1e28815d9c",
+      "date": "2026-06-24 18:23:53 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "提交",
+      "category": "其他",
+      "added": 193,
+      "survived": 182,
+      "retention": 94.3
+    },
+    {
+      "hash": "41aae63f",
+      "full_hash": "41aae63fccf1aac6e1c7cd1017f0fc29c7299b91",
+      "date": "2026-06-24 17:06:56 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "2e687ae3",
+      "full_hash": "2e687ae38c53af2a72d2e79cef54a180bbe80bc4",
+      "date": "2026-06-24 17:42:55 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "UD08,09,10,11,25",
+      "category": "其他",
+      "added": 4804,
+      "survived": 4743,
+      "retention": 98.73
+    },
+    {
+      "hash": "0c9b2587",
+      "full_hash": "0c9b258722452fa948599676fa3870f68d9b980b",
+      "date": "2026-06-24 16:21:53 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0624",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "6dfc8134",
+      "full_hash": "6dfc81346a3113cbc4fa5f20f7906a6a8a954099",
+      "date": "2026-06-24 10:59:15 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 4800,
+      "survived": 4071,
+      "retention": 84.81
+    },
+    {
+      "hash": "3091aeb6",
+      "full_hash": "3091aeb6dc0e121a20e9e46c1d10fec2b5ec5ca9",
+      "date": "2026-06-24 09:21:46 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0624",
+      "category": "其他",
+      "added": 5031,
+      "survived": 594,
+      "retention": 11.81
+    },
+    {
+      "hash": "e86bf96a",
+      "full_hash": "e86bf96ab85fe597152afe9155449b053c988cce",
+      "date": "2026-06-23 16:59:56 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 292,
+      "survived": 267,
+      "retention": 91.44
+    },
+    {
+      "hash": "2010e27e",
+      "full_hash": "2010e27e6f77d598ad99be9ceca6ed6291dce88d",
+      "date": "2026-06-23 16:28:18 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "merge: resolve App.tsx conflict (EdbUserView + MarketDocumentSettings)",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "6fc07054",
+      "full_hash": "6fc070546c4ab122bb7975bcbcde3e783c4edd5d",
+      "date": "2026-06-23 16:43:31 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 2,
+      "survived": 1,
+      "retention": 50.0
+    },
+    {
+      "hash": "ef4b6426",
+      "full_hash": "ef4b64261ff8b67e4fd4c3dafeb108475d282d0a",
+      "date": "2026-06-23 16:35:19 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "update",
+      "category": "日常维护",
+      "added": 7,
+      "survived": 1,
+      "retention": 14.29
+    },
+    {
+      "hash": "ca1697bf",
+      "full_hash": "ca1697bf951e413c5d8742476c5e99dd1fea9cb1",
+      "date": "2026-06-23 15:17:27 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 324,
+      "survived": 320,
+      "retention": 98.77
+    },
+    {
+      "hash": "3ecfe93b",
+      "full_hash": "3ecfe93b3208e3107ed6044fdbfa75c525e09f19",
+      "date": "2026-06-23 13:52:46 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 225,
+      "survived": 223,
+      "retention": 99.11
+    },
+    {
+      "hash": "164e71b9",
+      "full_hash": "164e71b9b0a43c331fe1cb8302979c1b12f100da",
+      "date": "2026-06-23 11:17:54 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "e111a489",
+      "full_hash": "e111a48982ed748c2e3e73265bd21d71ec88dc76",
+      "date": "2026-06-23 11:12:38 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 299,
+      "survived": 268,
+      "retention": 89.63
+    },
+    {
+      "hash": "71ebf476",
+      "full_hash": "71ebf476745e8b7275738bfaf513a516532ee936",
+      "date": "2026-06-23 12:04:33 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "add UD06、UD07，更新",
+      "category": "功能开发",
+      "added": 1743,
+      "survived": 1653,
+      "retention": 94.84
+    },
+    {
+      "hash": "058bf27a",
+      "full_hash": "058bf27a2769d99ca70621d0413141885126f110",
+      "date": "2026-06-23 10:52:22 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 516,
+      "survived": 326,
+      "retention": 63.18
+    },
+    {
+      "hash": "f4a563ae",
+      "full_hash": "f4a563aebe8094cb7e7a6c93687d29e7884f48b3",
+      "date": "2026-06-23 10:16:34 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 184,
+      "survived": 168,
+      "retention": 91.3
+    },
+    {
+      "hash": "1f35a72a",
+      "full_hash": "1f35a72ae559bcae96efc2dbaeced2eea471f12a",
+      "date": "2026-06-22 17:15:06 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 4,
+      "survived": 4,
+      "retention": 100.0
+    },
+    {
+      "hash": "df1f3f68",
+      "full_hash": "df1f3f6807dd182adb1c482ccee758a4e56ef7d5",
+      "date": "2026-06-22 16:24:12 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 888,
+      "survived": 861,
+      "retention": 96.96
+    },
+    {
+      "hash": "e9e22d52",
+      "full_hash": "e9e22d52fb51b793ee8232e69ceb09328a335331",
+      "date": "2026-06-22 15:37:46 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "移除api提示词文件夹并加入gitignore",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "ab0d2121",
+      "full_hash": "ab0d2121802425012b1a037e136f5a9cd105a95a",
+      "date": "2026-06-22 14:09:07 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 1026,
+      "survived": 987,
+      "retention": 96.2
+    },
+    {
+      "hash": "f5cfd010",
+      "full_hash": "f5cfd01079b9896006976888039f672db0200eb0",
+      "date": "2026-06-22 12:15:18 +0900",
+      "author": "haohetao20240507",
+      "email": "hao.hetao@trans-cosmos.com.cn",
+      "message": "第一版代码提交",
+      "category": "其他",
+      "added": 11771,
+      "survived": 10487,
+      "retention": 89.09
+    },
+    {
+      "hash": "b8df7c7e",
+      "full_hash": "b8df7c7e89579ae8054548886216b7494d475e38",
+      "date": "2026-06-22 12:04:23 +0900",
+      "author": "duyage",
+      "email": "duyage@jntci.com.cn",
+      "message": "提交",
+      "category": "其他",
+      "added": 4513,
+      "survived": 3587,
+      "retention": 79.48
+    },
+    {
+      "hash": "37324397",
+      "full_hash": "373243977e2a32e1a61e037d64cf38b7ff967891",
+      "date": "2026-06-22 11:00:27 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0622",
+      "category": "其他",
+      "added": 7428,
+      "survived": 3203,
+      "retention": 43.12
+    },
+    {
+      "hash": "e5b4d11c",
+      "full_hash": "e5b4d11c218f044d063984314f42e2cfdae533b2",
+      "date": "2026-06-22 11:58:27 +0900",
+      "author": "wangqun",
+      "email": "wangqun@jntci.com.cn",
+      "message": "up",
+      "category": "其他",
+      "added": 10700,
+      "survived": 8344,
+      "retention": 77.98
+    },
+    {
+      "hash": "2ca77032",
+      "full_hash": "2ca77032b929140bd8a31665ad6f56bab99dd398",
+      "date": "2026-06-22 09:40:08 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 22,
+      "survived": 17,
+      "retention": 77.27
+    },
+    {
+      "hash": "89992495",
+      "full_hash": "89992495003b58138c6b14df59b54daec3e4afa7",
+      "date": "2026-06-18 15:41:04 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 2394,
+      "survived": 1980,
+      "retention": 82.71
+    },
+    {
+      "hash": "8a1a2b46",
+      "full_hash": "8a1a2b46a14afef7bed43c6f9a7eb58a0159a288",
+      "date": "2026-06-17 15:18:32 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "UPD",
+      "category": "日常维护",
+      "added": 2285,
+      "survived": 2138,
+      "retention": 93.57
+    },
+    {
+      "hash": "771537ca",
+      "full_hash": "771537ca8f2e002b72d425dccb537f0a5b8748e9",
+      "date": "2026-06-16 15:04:12 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 1000,
+      "survived": 907,
+      "retention": 90.7
+    },
+    {
+      "hash": "5e78d7c0",
+      "full_hash": "5e78d7c027b2794baa08b4cfede7e965bab53820",
+      "date": "2026-06-16 10:17:20 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 1,
+      "survived": 1,
+      "retention": 100.0
+    },
+    {
+      "hash": "ba391c6f",
+      "full_hash": "ba391c6f74207ed0347ab7e7a3a492ea4da5a088",
+      "date": "2026-06-15 16:34:36 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 767,
+      "survived": 764,
+      "retention": 99.61
+    },
+    {
+      "hash": "69cdeb13",
+      "full_hash": "69cdeb134c3b26a6cb97c2e802ee49cbc3e92903",
+      "date": "2026-06-15 15:27:44 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "upd",
+      "category": "日常维护",
+      "added": 4451,
+      "survived": 4181,
+      "retention": 93.93
+    },
+    {
+      "hash": "1dcdcf0c",
+      "full_hash": "1dcdcf0c59b69f3694782aa5725b7cd769295853",
+      "date": "2026-06-12 16:22:40 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0612",
+      "category": "其他",
+      "added": 1030,
+      "survived": 553,
+      "retention": 53.69
+    },
+    {
+      "hash": "9e0abe89",
+      "full_hash": "9e0abe8967ea6c86ffb8524598b2ef79a84ec853",
+      "date": "2026-06-12 13:17:23 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0612",
+      "category": "其他",
+      "added": 12,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "9c61e214",
+      "full_hash": "9c61e2144c3e63bd7dca37c98e4d2edf3faaa15b",
+      "date": "2026-06-12 11:29:15 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0612",
+      "category": "其他",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "60af7e24",
+      "full_hash": "60af7e24ff2f0841d8766f7ecf7b2d368fd50d7b",
+      "date": "2026-06-12 11:20:00 +0800",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "0612",
+      "category": "其他",
+      "added": 4762,
+      "survived": 1083,
+      "retention": 22.74
+    },
+    {
+      "hash": "eaf136b5",
+      "full_hash": "eaf136b5e96c1190bc4acf80ab261964430e3888",
+      "date": "2026-06-10 14:10:19 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "06/10 add",
+      "category": "功能开发",
+      "added": 6601,
+      "survived": 4268,
+      "retention": 64.66
+    },
+    {
+      "hash": "8b60dfd3",
+      "full_hash": "8b60dfd30139f0e27ece6a3192a79c6e5ba5a2e1",
+      "date": "2026-06-10 14:02:22 +0800",
+      "author": "yanwenjing",
+      "email": "yan.wenjing@trans-cosmos.com.cn",
+      "message": "add",
+      "category": "功能开发",
+      "added": 0,
+      "survived": 0,
+      "retention": 0.0
+    },
+    {
+      "hash": "8edbeba9",
+      "full_hash": "8edbeba9285035831df6ea72e58f0d28358b06b3",
+      "date": "2026-05-19 17:42:22 +0900",
+      "author": "Awangluxing",
+      "email": "wang.luxing@trans-cosmos.com.cn",
+      "message": "01",
+      "category": "其他",
+      "added": 958,
+      "survived": 3,
+      "retention": 0.31
+    }
+  ],
+  "category_dist": {
+    "其他": {
+      "count": 71,
+      "added": 83013,
+      "survived": 60767
+    },
+    "缺陷修复": {
+      "count": 11,
+      "added": 1800,
+      "survived": 1766
+    },
+    "日常维护": {
+      "count": 59,
+      "added": 22958,
+      "survived": 20852
+    },
+    "功能开发": {
+      "count": 4,
+      "added": 10902,
+      "survived": 8518
+    },
+    "文档注释": {
+      "count": 1,
+      "added": 0,
+      "survived": 0
+    }
+  }
+}

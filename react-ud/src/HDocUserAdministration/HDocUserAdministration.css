@@ -29,6 +29,13 @@
   border-bottom: 2px solid #003057;
 }
 
+/* ===== Loading ===== */
+.ud17-loading {
+  padding: 20px;
+  color: #666;
+  font-size: 13px;
+}
+
 /* ===== Message ===== */
 .ud17-msg {
   padding: 10px 14px;
@@ -196,26 +203,6 @@
   cursor: not-allowed;
 }
 
-/* ===== Roles Section (Adaptation user / MVL) ===== */
-.ud17-roles-section {
-  display: flex;
-  gap: 12px;
-}
-.ud17-roles-label {
-  min-width: 70px;
-  padding-top: 8px;
-}
-.ud17-roles-content {
-  flex: 1;
-}
-.ud17-mvl-chk {
-  width: 16px;
-  height: 16px;
-  accent-color: #003057;
-  cursor: pointer;
-  align-self: center;
-}
-
 /* ===== Super User Section ===== */
 .ud17-super-section {
   margin-top: 16px;
@@ -225,6 +212,49 @@
   font-weight: 600;
   color: #003057;
   margin: 0 0 10px;
+}
+
+/* ===== Roles Header ===== */
+.ud17-roles-header {
+  display: flex;
+  align-items: center;
+}
+
+.ud17-roles-label-offset {
+  min-width: 100px;
+  padding-top: 210px;
+}
+
+/* ===== Adaptation User ===== */
+.ud17-adapt-section {
+  margin-left: 260px;
+  margin-top: 12px;
+}
+
+.ud17-adapt-item {
+  border: none;
+  background: transparent;
+  padding: 0;
+  max-width: 260px;
+}
+
+.ud17-adapt-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===== Market Super User ===== */
+.ud17-super-flex {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ud17-super-title-offset {
+  margin: 0;
+  white-space: nowrap;
+  padding-top: 90px;
 }
 
 /* ===== Responsive ===== */

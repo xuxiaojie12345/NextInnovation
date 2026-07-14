@@ -70,7 +70,7 @@ const MarketDocumentSettingsList: React.FC = () => {
           const list = response.data.data.map((item: Record<string, any>) => ({
             documentType: item.DOCTYPE || item.doctype || item.documentType || "",
             user: item.UPDATE_USER || item.update_user || item.user || "",
-            date: item.REGISTER_DATETIME || item.register_datetime || item.UPDATE_DATETIME || item.update_datetime || item.date || ""
+            date: (item.REGISTER_DATETIME || item.register_datetime || item.UPDATE_DATETIME || item.update_datetime || item.date || "").split(' ')[0].split('T')[0]
           }));
 
           // 按日期降序排序（对应详细设计 6. 实现注意事项 - 排序）
@@ -176,7 +176,7 @@ const MarketDocumentSettingsList: React.FC = () => {
   return (
     <div className="ud20-container">
       {/* 页面标题 */}
-      <h1 className="ud20-title">HDoc - Market Document Settings</h1>
+      <h1 className="ud20-title">Market Document Settings</h1>
 
       {/* 工具栏按钮组 */}
       <div className="ud20-btn-group">

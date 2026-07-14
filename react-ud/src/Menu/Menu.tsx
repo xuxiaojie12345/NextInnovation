@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Layout, Menu as AntMenu, Typography } from "antd";
-import {
-  FileTextOutlined,
-  UserOutlined,
-  FolderOpenOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
 import "./Menu.css";
 
-const { Sider, Content, Header } = Layout;
+const { Sider, Content } = Layout;
 const { Text } = Typography;
 
 // 菜单项类型定义
@@ -26,7 +20,6 @@ const menuItems: MenuItem[] = [
   {
     key: "GenerateDucument",
     label: "Generate Ducument",
-    icon: <FileTextOutlined />,
   },
   {
     key: "subGenerate",
@@ -56,7 +49,6 @@ const menuItems: MenuItem[] = [
   {
     key: "UserAdmin",
     label: "User Administration",
-    icon: <UserOutlined />,
     children: [
       { key: "HDocUserAdmin", label: "HDoc User Administration", route: "/Menu/HDocUserAdministration" },
       { key: "HDocUserDocAdmin", label: "HDoc User Doc Administration", route: "/Menu/HDocUserDocAdministration" },
@@ -68,7 +60,6 @@ const menuItems: MenuItem[] = [
   {
     key: "Archive",
     label: "Archive",
-    icon: <FolderOpenOutlined />,
     children: [
       { key: "ArchiveSearch", label: "Search", route: "#" },
       { key: "UploadDocument", label: "Upload Document", route: "#" },
@@ -77,7 +68,6 @@ const menuItems: MenuItem[] = [
   {
     key: "Documentation",
     label: "Documentation",
-    icon: <BookOutlined />,
     children: [
       { key: "UserGuide", label: "User Guide", route: "/Menu/UserGuide" },
       { key: "ADCAChangeGuide", label: "AD/CA Change Guide", route: "#" },
@@ -175,7 +165,6 @@ const getLeafKeys = (items: MenuItem[]): string[] => {
 const Menu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentUser, setCurrentUser] = useState<string>("");
   const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
@@ -189,7 +178,6 @@ const Menu: React.FC = () => {
     }
     try {
       const userInfo = JSON.parse(userInfoStr);
-      setCurrentUser(userInfo.username || userInfo.userid || "");
     } catch {
       navigate("/");
       return;
@@ -275,14 +263,7 @@ const Menu: React.FC = () => {
             <Text strong style={{ color: "#fff", fontSize: 16 }}>
               EDB Engineering Database
             </Text>
-            {currentUser && (
-              <div className="menu-user-info">
-                <UserOutlined style={{ marginRight: 4 }} />
-                <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>
-                  {currentUser}
-                </Text>
-              </div>
-            )}
+
           </div>
         </div>
 
@@ -303,22 +284,7 @@ const Menu: React.FC = () => {
 
       {/* 右侧内容区 */}
       <Layout className="menu-content-layout">
-        <Header className="menu-content-header">
-          <div className="header-left">
-            <Text className="header-title">EDB Engineering Database</Text>
-          </div>
-          <div className="header-right">
-            <Text
-              className="header-logout"
-              onClick={() => {
-                localStorage.removeItem("userInfo");
-                navigate("/");
-              }}
-            >
-              Logout
-            </Text>
-          </div>
-        </Header>
+
         <Content className="menu-content">
           {/* 使用 Outlet 动态加载子路由内容（对应详细设计2.2 右侧内容区） */}
           <Outlet />

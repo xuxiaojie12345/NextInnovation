@@ -65,7 +65,7 @@ public class UD08ServiceImpl implements UD08Service {
         // 检查2：Variable以"TEMPLATE-"开头时，剩余部分必须在HDOC_VARIABLES中存在
         if (variable != null && variable.startsWith("TEMPLATE-")) {
             String suffix = variable.substring(9);
-            if (suffix != null && !suffix.isEmpty()) {
+            if (!suffix.isEmpty()) {
                 int varCount = ud08Mapper.countByVariable(suffix);
                 if (varCount == 0) {
                     logger.warn("UD08Add - Variant does not exist: {}", suffix);
@@ -114,7 +114,7 @@ public class UD08ServiceImpl implements UD08Service {
         // 检查3：Variable以"TEMPLATE-"开头时，剩余部分必须在HDOC_VARIABLES中存在
         if (variable != null && variable.startsWith("TEMPLATE-")) {
             String suffix = variable.substring(9);
-            if (suffix != null && !suffix.isEmpty()) {
+            if (!suffix.isEmpty()) {
                 int varCount = ud08Mapper.countByVariable(suffix);
                 if (varCount == 0) {
                     logger.warn("UD08Update - Variant does not exist: {}", suffix);
@@ -189,7 +189,7 @@ public class UD08ServiceImpl implements UD08Service {
             record.setComments(req.getComments());
             record.setAddDate(req.getAddDate());
             record.setDeleteDate(req.getDeleteDate());
-        } else if (request instanceof UD08UpdateRequest) {
+        } else {
             UD08UpdateRequest req = (UD08UpdateRequest) request;
             record.setVariable(req.getVariable());
             record.setVal(req.getValue());

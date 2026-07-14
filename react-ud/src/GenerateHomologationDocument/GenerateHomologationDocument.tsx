@@ -264,7 +264,7 @@ const GenerateHomologationDocument: React.FC = () => {
         <div className='form-card'>
           {/* 表单标题 */}
           <h1 className='form-card-title'>
-            HDoc - Generate Homologation Document
+            Generate Homologation Document
           </h1>
 
           {/* 错误消息 */}
@@ -288,7 +288,6 @@ const GenerateHomologationDocument: React.FC = () => {
                 maxLength={5}
                 disabled={isLoading}
                 className={errorFields.has('chassisSeries') ? 'input-error' : ''}
-                placeholder='例: JPCT'
               />
             </div>
           </div>
@@ -307,7 +306,6 @@ const GenerateHomologationDocument: React.FC = () => {
                 maxLength={10}
                 disabled={isLoading}
                 className={errorFields.has('chassisNo') ? 'input-error' : ''}
-                placeholder='例: 028321'
               />
             </div>
           </div>
@@ -330,7 +328,6 @@ const GenerateHomologationDocument: React.FC = () => {
                   .map((doc) => (
                     <option key={doc.doctype} value={doc.doctype}>
                       {doc.doctype}
-                      {doc.description ? ` - ${doc.description}` : ""}
                     </option>
                   ))}
               </select>

@@ -4,7 +4,9 @@ import com.web.app.mapper.UD15Mapper;
 import com.web.app.service.UD15Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -45,11 +47,18 @@ public class UD15ServiceImpl implements UD15Service {
         result.put("plateType", info.getOrDefault("TYPE", ""));
         result.put("status", info.getOrDefault("STATUS", ""));
         result.put("errorMessage", info.getOrDefault("MSG", ""));
-        result.put("def", info.getOrDefault("REGISTER_DATETIME", ""));
+        // def只保留日期部分（T之前）
+        String regDatetime = (String) info.getOrDefault("REGISTER_DATETIME", "");
+        if (regDatetime != null && regDatetime.contains("T")) {
+            regDatetime = regDatetime.substring(0, regDatetime.indexOf('T'));
+        }
+        result.put("def", regDatetime);
         result.put("dataReady", info.getOrDefault("DOC_READY", ""));
         result.put("sentToCabFactory", info.getOrDefault("DOC_SENT", ""));
-        result.put("printItems", info.getOrDefault("XML_DOC", ""));
-        result.put("vpData", info.getOrDefault("XML_DOC", ""));
+        // XML_DOC中存储XML，Print items提取PrintItemName，VP Data提取Variant名与Value
+        String xmlDoc = (String) info.getOrDefault("XML_DOC", "");
+        result.put("printItems", parsePrintItems(xmlDoc));
+        result.put("vpData", parseVpData(xmlDoc));
         return result;
     }
 
@@ -91,5 +100,58 @@ public class UD15ServiceImpl implements UD15Service {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Status and Type updated successfully.");
         return result;
+    }
+
+    /**
+     * 从XML_DOC中提取PrintItemName值
+     */
+    private String parsePrintItems(String xmlDoc) {
+        if (xmlDoc == null || xmlDoc.trim().isEmpty()) return "";
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new ByteArrayInputStream(xmlDoc.getBytes("UTF-8")));
+            NodeList printItemList = doc.getElementsByTagName("PrintItemName");
+            List<String> items = new ArrayList<>();
+            for (int i = 0; i < printItemList.getLength(); i++) {
+                String text = printItemList.item(i).getTextContent();
+                if (text != null && !text.trim().isEmpty()) {
+                    items.add(text.trim());
+                }
+            }
+            return String.join(", ", items);
+        } catch (Exception e) {
+            return xmlDoc;
+        }
+    }
+
+    /**
+     * 从XML_DOC中提取Variant名与Value
+     */
+    private String parseVpData(String xmlDoc) {
+        if (xmlDoc == null || xmlDoc.trim().isEmpty()) return "";
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new ByteArrayInputStream(xmlDoc.getBytes("UTF-8")));
+            NodeList variantList = doc.getElementsByTagName("Variant");
+            List<String> items = new ArrayList<>();
+            for (int i = 0; i < variantList.getLength(); i++) {
+                Node variant = variantList.item(i);
+                String name = "";
+                String value = "";
+                if (variant.getNodeType() == Node.ELEMENT_NODE) {
+                    Element elem = (Element) variant;
+                    NodeList nameNodes = elem.getElementsByTagName("Name");
+                    if (nameNodes.getLength() > 0) name = nameNodes.item(0).getTextContent();
+                    NodeList valueNodes = elem.getElementsByTagName("Value");
+                    if (valueNodes.getLength() > 0) value = valueNodes.item(0).getTextContent();
+                }
+                items.add((name != null ? name.trim() : "") + "=" + (value != null ? value.trim() : ""));
+            }
+            return String.join(", ", items);
+        } catch (Exception e) {
+            return xmlDoc;
+        }
     }
 }

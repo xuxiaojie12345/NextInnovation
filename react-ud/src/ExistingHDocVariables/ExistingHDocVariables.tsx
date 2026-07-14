@@ -271,11 +271,7 @@ const ExistingHDocVariables: React.FC = () => {
         setHasError(true);
       }
     } catch (e: any) {
-      if (e.response?.status === 409) {
-        setMessage('Variant already exists. Please enter the correct content');
-      } else {
-        setMessage('System error. Please contact administrator.');
-      }
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally {
       setIsOperating(false);
@@ -317,11 +313,7 @@ const ExistingHDocVariables: React.FC = () => {
         setHasError(true);
       }
     } catch (e: any) {
-      if (e.response?.status === 404) {
-        setMessage('Variant does not exists. Please enter the correct content');
-      } else {
-        setMessage('System error. Please contact administrator.');
-      }
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally {
       setIsOperating(false);
@@ -362,11 +354,7 @@ const ExistingHDocVariables: React.FC = () => {
         setHasError(true);
       }
     } catch (e: any) {
-      if (e.response?.status === 404) {
-        setMessage('Variant does not exists. Please enter the correct content');
-      } else {
-        setMessage('System error. Please contact administrator.');
-      }
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally {
       setIsOperating(false);
@@ -524,6 +512,7 @@ const ExistingHDocVariables: React.FC = () => {
               style={{ maxWidth: '150px' }}
             />
           </div>
+          <span className='existing-hdoc-annotation-right'>Automatic</span>
         </div>
 
         {/* Date */}
@@ -542,6 +531,7 @@ const ExistingHDocVariables: React.FC = () => {
               style={{ maxWidth: '150px' }}
             />
           </div>
+          <span className='existing-hdoc-annotation-right'>Automatic</span>
         </div>
       </div>
 

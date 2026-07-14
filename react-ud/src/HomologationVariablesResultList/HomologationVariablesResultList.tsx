@@ -335,17 +335,17 @@ const HomologationVariablesResultList: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="ud09-th-checkbox"></th>
-                    <th>Product class</th>
-                    <th>Number</th>
-                    <th>Market</th>
+                    <th><span className="required-asterisk">*</span>Product class</th>
+                    <th><span className="required-asterisk">*</span>Number</th>
+                    <th><span className="required-asterisk">*</span>Market</th>
                     <th>Variable</th>
                     <th>Value</th>
                     <th>Variant string.</th>
                     <th>Comments</th>
-                    <th>Add</th>
-                    <th>Delete</th>
-                    <th>Created by user</th>
-                    <th>Date</th>
+                    <th>Add<br /><span className="ud09-th-desc">(YYYYWW)</span></th>
+                    <th>Delete<br /><span className="ud09-th-desc">(YYYYWW)</span></th>
+                    <th>Created by user<br /><span className="ud09-th-desc">(Automatic)</span></th>
+                    <th>Date<br /><span className="ud09-th-desc">(Automatic)</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -373,8 +373,8 @@ const HomologationVariablesResultList: React.FC = () => {
                         <td>{item.val}</td>
                         <td>{(item.vs || '') + (item.vs && item.vs2 ? ', ' : '') + (item.vs2 || '') || '-'}</td>
                         <td>{item.comments}</td>
-                        <td>{item.addDate}</td>
-                        <td>{item.deleteDate}</td>
+                        <td>{(item.addDate || '').split(' ')[0].split('T')[0]}</td>
+                        <td>{(item.deleteDate || '').split(' ')[0].split('T')[0]}</td>
                         <td>
                           <span
                             className="ud09-user-link"
@@ -386,7 +386,7 @@ const HomologationVariablesResultList: React.FC = () => {
                             {item.updateUser}
                           </span>
                         </td>
-                        <td>{item.updateDatetime}</td>
+                        <td>{(item.updateDatetime || '').split(' ')[0].split('T')[0]}</td>
                       </tr>
                     );
                   })}

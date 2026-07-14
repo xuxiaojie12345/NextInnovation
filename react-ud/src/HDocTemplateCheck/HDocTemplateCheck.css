@@ -36,27 +36,6 @@
   margin: 0 0 12px 0;
 }
 
-/* ---- 消息 ---- */
-.ud13-message {
-  font-size: 13px;
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  text-align: left;
-  font-weight: 500;
-}
-
-.ud13-error {
-  color: #d32f2f;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-}
-
-.ud13-success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-}
-
 /* ---- 区块 ---- */
 .ud13-section {
   margin-bottom: 16px;
@@ -114,62 +93,5 @@
   border-color: #5a8aaa;
 }
 
-.ud13-btn:disabled {
-  background-color: #dce8f0;
-  color: #7a9eb3;
-  border-color: #b0c8d8;
-  cursor: not-allowed;
-}
 
-/* ---- 结果 ---- */
-.ud13-result-box {
-  margin-bottom: 16px;
-  padding: 0;
-}
 
-.ud13-result-text {
-  font-size: 13px;
-  color: #333333;
-  margin: 0 0 10px 0;
-}
-
-/* 变量列表 */
-.ud13-variable-section {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed #d0d0d0;
-}
-
-.ud13-variable-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 4px 0;
-}
-
-.ud13-variable-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.ud13-variable-item {
-  font-family: "Courier New", monospace;
-  font-size: 12px;
-  line-height: 1.8;
-  color: #555;
-}
-
-.ud13-download-link {
-  color: #003057;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.ud13-download-link:hover {
-  color: #0055aa;
-}

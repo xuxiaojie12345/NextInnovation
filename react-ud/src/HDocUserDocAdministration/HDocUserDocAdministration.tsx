@@ -275,7 +275,7 @@ const HDocUserDocAdministration: React.FC = () => {
       {/* 表单区域 */}
       <div className="ud18-form">
         {/* UserID 输入行 + User Info 按钮（同一行） */}
-        <div className="ud18-field" style={{ paddingTop: 12 }}>
+        <div className="ud18-field">
           <label className="ud18-label">UserID</label>
           <input
             type="text"
@@ -306,21 +306,24 @@ const HDocUserDocAdministration: React.FC = () => {
         {/* Document 多选下拉列表 */}
         <div className="ud18-field">
           <label className="ud18-label">Document</label>
-          <div style={{ flex: 1 }}>
+          <div className="ud18-select-wrapper">
             <select
               multiple
               className="ud18-multiselect"
               value={selectedDocs}
               onChange={handleDocSelectChange}
               disabled={loading}
-              style={{ width: "100%" }}
             >
-              {docTypeList.map((doc) => (
-                <option key={doc.DOCTYPE} value={doc.DOCTYPE}>
-                  {doc.DOCTYPE}
-                  {doc.REGISTER_USER ? ` - ${doc.REGISTER_USER}` : ""}
-                </option>
-              ))}
+              {docTypeList.map((doc) => {
+                const isAssigned = selectedDocs.includes(doc.DOCTYPE);
+                return (
+                  <option key={doc.DOCTYPE} value={doc.DOCTYPE}
+                    className={isAssigned ? 'ud18-option-assigned' : ''}>
+                    {isAssigned ? '✓ ' : '  '}{doc.DOCTYPE}
+                    {doc.REGISTER_USER ? ` - ${doc.REGISTER_USER}` : ""}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>

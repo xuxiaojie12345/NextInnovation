@@ -227,8 +227,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
         {/* 按钮组 - 紧贴表单顶部 */}
         <div className='ud11-button-group'>
           <button type='button' className='ud11-btn' onClick={handleSelect} disabled={disabled}>Select</button>
-          <button type='button' className='ud11-btn' onClick={handleBack} disabled={disabled}>Back</button>
           <button type='button' className='ud11-btn' onClick={handleDown} disabled={disabled}>Down</button>
+          <button type='button' className='ud11-btn' onClick={handleBack} disabled={disabled}>Back</button>
           <button type='button' className='ud11-btn' onClick={handlePrint} disabled={disabled}>Print</button>
           <button type='button' className='ud11-btn' onClick={handleExportCsv} disabled={disabled}>Excel</button>
         </div>
@@ -247,11 +247,11 @@ const ExistingHDocVariablesResultList: React.FC = () => {
             <thead>
               <tr>
                 <th className='ud11-row-indicator'></th>
-                <th>Variable</th>
+                <th><span className="required-asterisk">*</span>Variable</th>
                 <th>Type</th>
                 <th>Description</th>
-                <th>Created by user</th>
-                <th>Date</th>
+                <th>Created by user<br /><span className="ud11-th-desc">(Automatic)</span></th>
+                <th>Date<br /><span className="ud11-th-desc">(Automatic)</span></th>
               </tr>
             </thead>
             <tbody>
@@ -286,7 +286,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
                       {item.registerUser}
                     </span>
                   </td>
-                  <td>{item.registerDatetime}</td>
+                  <td>{(item.registerDatetime || '').split(' ')[0].split('T')[0]}</td>
                 </tr>
               ))}
             </tbody>

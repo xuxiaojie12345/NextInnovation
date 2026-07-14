@@ -191,6 +191,13 @@
   border-color: #666666;
 }
 
+/* 表单控件宽度变体 */
+.form-input-w150 { max-width: 150px; }
+.form-input-w250 { max-width: 250px; }
+.form-input-w500 { max-width: 500px; }
+.form-input-w600 { max-width: 600px; }
+.form-select-w200 { max-width: 200px; }
+
 /* 下拉选择框 */
 .form-select {
   padding: 4px 8px;

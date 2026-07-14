@@ -99,42 +99,12 @@ const Login: React.FC = () => {
         }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (response.status === 401) {
-        setMessage("We didn't recognize the username or password you entered. Please try again.");
-        setHasError(true);
-        return;
-      }
-
-      if (response.status === 403) {
-        setMessage("Your account is locked. Please contact your system administrator.");
-        setHasError(true);
-        return;
-      }
-
-      if (!response.ok) {
-        console.error("API request failed with status:", response.status);
-        throw new Error('Authentication request failed');
-      }
-
       const result = await response.json();
-      console.log("Response data:", result);
 
       // 检查响应状态
       if (result.code === 200 && result.data && result.data.success) {
-        const userInfo = result.data.userInfo || {
-          token: result.data.token,
-          userid: result.data.userid,
-          username: result.data.username,
-          responsible: result.data.responsible,
-          userposition: result.data.userposition,
-          email: result.data.email,
-        };
-
-        // 登录成功，将完整用户信息存储到 localStorage，key 为 'userInfo'
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        // 登录成功，将完整用户信息存储到 localStorage
+        localStorage.setItem('userInfo', JSON.stringify(result.data.userInfo));
         setMessage("");
         setHasError(false);
         navigate("/Menu");

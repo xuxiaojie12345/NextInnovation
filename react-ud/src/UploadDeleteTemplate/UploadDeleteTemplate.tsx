@@ -256,7 +256,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
   return (
     <div className="ud12-container">
-      <h1 className="ud12-title">EDB Engineering Database - Upload Delete Template</h1>
+      <h1 className="ud12-title">HDoc - Upload Delete Template</h1>
 
       {loading && <div className="ud12-loading">Loading...</div>}
 
@@ -269,18 +269,16 @@ const UploadDeleteTemplate: React.FC = () => {
         <h2 className="ud12-section-title">HDoc Template Upload</h2>
 
         <div className="ud12-form-group">
-          <label className="ud12-label" htmlFor="templateFileInput">Template File</label>
+          <label className="ud12-label" htmlFor="templateFileInput">Template File:</label>
           <input
             type="file"
             id="templateFileInput"
             ref={fileInputRef}
-            className="ud12-file-input"
-
           />
         </div>
 
         <div className="ud12-form-group">
-          <label className="ud12-label" htmlFor="uploadMarketSelect">Market</label>
+          <label className="ud12-label" htmlFor="uploadMarketSelect">Market:</label>
           <select
             id="uploadMarketSelect"
             className="ud12-select"
@@ -302,6 +300,10 @@ const UploadDeleteTemplate: React.FC = () => {
             Upload file
           </button>
         </div>
+        <p className="ud12-upload-note">
+          Before uploading new VIN plate templates, inform <span className="ud12-email">support.tpi@qq.com</span>,
+          to make sure that the connection to the cab factory will work.
+        </p>
       </div>
 
       {/* HDoc Template Delete区域 */}
@@ -309,7 +311,7 @@ const UploadDeleteTemplate: React.FC = () => {
         <h2 className="ud12-section-title">HDoc Template Delete</h2>
 
         <div className="ud12-form-group">
-          <label className="ud12-label" htmlFor="deleteMarketSelect">Market</label>
+          <label className="ud12-label" htmlFor="deleteMarketSelect">Market:</label>
           <select
             id="deleteMarketSelect"
             className="ud12-select"
@@ -326,7 +328,7 @@ const UploadDeleteTemplate: React.FC = () => {
         </div>
 
         <div className="ud12-form-group">
-          <label className="ud12-label" htmlFor="templateSelect">Templates</label>
+          <label className="ud12-label" htmlFor="templateSelect">Templates:</label>
           <select
             id="templateSelect"
             className="ud12-select"
@@ -355,7 +357,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
       {/* Check Template 说明文字 + 链接 */}
       <div className="ud12-link-section">
-        <p style={{ color: '#ff4d4f', fontWeight: 'bold', margin: 0 }}>Check your rtf template</p>
+        <p className="ud12-check-title">Check your rtf template</p>
         <p className="ud12-check-text">
           In case you have a rtf template you should run a check on it
           before uploading it.

@@ -4,7 +4,7 @@
  * 参照 UD12 风格实现
  */
 import React, { useState, useEffect } from "react";
-import api, { API_BASE_URL } from "../config/api";
+import api from "../config/api";
 import "./ListTemplates.css";
 
 /** 市场数据类型 */
@@ -111,13 +111,28 @@ const ListTemplates: React.FC = () => {
 
   /**
    * 文件下载处理 - 对应详细设计 3.1.3 文件下载流程
+   * 构造下载URL: /api/ud14/download?market={market}&filename={filename}
    */
-  const handleFileDownload = (file: TemplateFile) => {
+  const handleFileDownload = async (file: TemplateFile) => {
     try {
+      if (!selectedMarket) {
+        setError("Market not selected.");
+        return;
+      }
+      const response = await api.get(`/api/ud14/download`, {
+        params: { market: selectedMarket, filename: file.filename },
+        responseType: 'blob'
+      });
+      // 创建下载链接
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = `${API_BASE_URL}${file.downloadUrl}`;
+      link.href = url;
       link.download = file.filename;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       setError("File not found. Please contact administrator.");
     }
@@ -155,6 +170,7 @@ const ListTemplates: React.FC = () => {
           <table className="ud14-table">
             <thead>
               <tr>
+                <th className="ud14-icon-col"></th>
                 <th>Filename</th>
                 <th>Used</th>
                 <th>Last Mod,</th>
@@ -165,11 +181,12 @@ const ListTemplates: React.FC = () => {
               {fileList.length > 0 ? (
                 fileList.map((file, index) => (
                   <tr key={index}>
+                    <td className="ud14-icon-col"><span className="ud14-file-icon">📄</span></td>
                     <td>
                       <a
                         href="#"
                         className="ud14-file-link"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={(e) => { e.preventDefault(); handleFileDownload(file); }}
                       >
                         {file.filename}
                       </a>
@@ -181,7 +198,7 @@ const ListTemplates: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="ud14-empty">No templates available</td>
+                  <td colSpan={5} className="ud14-empty">No templates available</td>
                 </tr>
               )}
             </tbody>

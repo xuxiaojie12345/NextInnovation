@@ -108,6 +108,14 @@
   padding-top: 12px;
 }
 
+/* 初始提示文字 */
+.ud15-hint-text {
+  font-size: 13px;
+  color: #666666;
+  margin: 8px 0 0 0;
+  text-align: left;
+}
+
 /* 字段标签 */
 .ud15-label {
   width: 140px;

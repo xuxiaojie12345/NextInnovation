@@ -209,9 +209,7 @@ const HomologationVariables: React.FC = () => {
       else if (res.data.code === 409) { setMessage('Primary key conflict, Please enter the correct content'); setHasError(true); }
       else { setMessage(res.data.message || 'System error. Please contact administrator.'); setHasError(true); }
     } catch (e: any) {
-      if (e.response?.status === 409) setMessage('Primary key conflict, Please enter the correct content');
-      else if (e.response?.status === 400) setMessage('Variant does not exist, Please enter the correct content');
-      else setMessage('System error. Please contact administrator.');
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally { setIsOperating(false); }
   }, [formData]);
@@ -239,10 +237,7 @@ const HomologationVariables: React.FC = () => {
       else if (res.data.code === 409) { setMessage('Primary key conflict, Please enter the correct content'); setHasError(true); }
       else { setMessage(res.data.message || 'System error. Please contact administrator.'); setHasError(true); }
     } catch (e: any) {
-      if (e.response?.status === 404) setMessage('Data does not exist, Please enter the correct content');
-      else if (e.response?.status === 409) setMessage('Primary key conflict, Please enter the correct content');
-      else if (e.response?.status === 400) setMessage('Variant does not exist, Please enter the correct content');
-      else setMessage('System error. Please contact administrator.');
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally { setIsOperating(false); }
   }, [formData, originalKeys]);
@@ -262,8 +257,7 @@ const HomologationVariables: React.FC = () => {
       } else if (res.data.code === 404) { setMessage('Data does not exist, Please enter the correct content'); setHasError(true); }
       else { setMessage(res.data.message || 'System error. Please contact administrator.'); setHasError(true); }
     } catch (e: any) {
-      if (e.response?.status === 404) setMessage('Data does not exist, Please enter the correct content');
-      else setMessage('System error. Please contact administrator.');
+      setMessage('System error. Please contact administrator.');
       setHasError(true);
     } finally { setIsOperating(false); }
   }, [formData]);
@@ -347,7 +341,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label required'>Number</label>
           <div className='operator-wrapper'>{renderCompareOp('number')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.number} onChange={e => handleNumber(e.target.value)} disabled={disabled} maxLength={10} className='form-input' style={{ maxWidth: '150px' }} />
+            <input type='text' value={formData.number} onChange={e => handleNumber(e.target.value)} disabled={disabled} maxLength={10} className='form-input form-input-w150' />
           </div>
         </div>
 
@@ -356,7 +350,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label required'>Market</label>
           <div className='operator-wrapper'>{renderOp('market')}</div>
           <div className='form-control-wrapper'>
-            <select value={formData.market} onChange={e => setField('market', e.target.value)} disabled={disabled} className='form-select' style={{ maxWidth: '200px' }}>
+            <select value={formData.market} onChange={e => setField('market', e.target.value)} disabled={disabled} className='form-select form-select-w200'>
               <option value=''></option>
               {marketList.map(x => <option key={x.market} value={x.market}>{x.market}</option>)}
             </select>
@@ -368,7 +362,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Variable</label>
           <div className='operator-wrapper'>{renderOp('variable')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.variable} onChange={e => setField('variable', e.target.value)} disabled={disabled} maxLength={20} className='form-input' style={{ maxWidth: '250px' }} />
+            <input type='text' value={formData.variable} onChange={e => setField('variable', e.target.value)} disabled={disabled} maxLength={20} className='form-input form-input-w250' />
           </div>
         </div>
 
@@ -377,7 +371,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Value</label>
           <div className='operator-wrapper'>{renderOp('value')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.value} onChange={e => setField('value', e.target.value)} disabled={disabled} maxLength={200} className='form-input' style={{ maxWidth: '600px' }} />
+            <input type='text' value={formData.value} onChange={e => setField('value', e.target.value)} disabled={disabled} maxLength={200} className='form-input form-input-w600' />
           </div>
         </div>
 
@@ -386,7 +380,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Variant string.</label>
           <div className='operator-wrapper'>{renderOp('vs')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.vs} onChange={e => setField('vs', e.target.value)} disabled={disabled} maxLength={100} className='form-input' style={{ maxWidth: '600px' }} />
+            <input type='text' value={formData.vs} onChange={e => setField('vs', e.target.value)} disabled={disabled} maxLength={100} className='form-input form-input-w600' />
           </div>
         </div>
 
@@ -395,7 +389,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'></label>
           <div className='operator-wrapper'>{renderOp('vs2')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.vs2} onChange={e => setField('vs2', e.target.value)} disabled={disabled} maxLength={100} className='form-input' style={{ maxWidth: '600px' }} />
+            <input type='text' value={formData.vs2} onChange={e => setField('vs2', e.target.value)} disabled={disabled} maxLength={100} className='form-input form-input-w600' />
           </div>
         </div>
 
@@ -404,7 +398,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Comments</label>
           <div className='operator-wrapper'>{renderOp('comments')}</div>
           <div className='form-control-wrapper'>
-            <input type='text' value={formData.comments} onChange={e => setField('comments', e.target.value)} disabled={disabled} maxLength={100} className='form-input' style={{ maxWidth: '500px' }} />
+            <input type='text' value={formData.comments} onChange={e => setField('comments', e.target.value)} disabled={disabled} maxLength={100} className='form-input form-input-w500' />
           </div>
         </div>
 
@@ -413,7 +407,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Add</label>
           <div className='operator-wrapper'>{renderOp('addDate')}</div>
           <div className='form-control-wrapper auto-field'>
-            <input type='text' value={formData.addDate} onChange={e => setField('addDate', e.target.value)} disabled={disabled} maxLength={6} className='form-input' style={{ maxWidth: '150px' }} />
+            <input type='text' value={formData.addDate} onChange={e => setField('addDate', e.target.value)} disabled={disabled} maxLength={6} className='form-input form-input-w150' />
             <span className='auto-label'>YYYYWW</span>
           </div>
         </div>
@@ -423,7 +417,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Delete</label>
           <div className='operator-wrapper'>{renderOp('deleteDate')}</div>
           <div className='form-control-wrapper auto-field'>
-            <input type='text' value={formData.deleteDate} onChange={e => setField('deleteDate', e.target.value)} disabled={disabled} maxLength={6} className='form-input' style={{ maxWidth: '150px' }} />
+            <input type='text' value={formData.deleteDate} onChange={e => setField('deleteDate', e.target.value)} disabled={disabled} maxLength={6} className='form-input form-input-w150' />
             <span className='auto-label'>YYYYWW</span>
           </div>
         </div>
@@ -433,7 +427,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Created by user</label>
           <div className='operator-wrapper'>{renderOp('updateUser')}</div>
           <div className='form-control-wrapper auto-field'>
-            <input type='text' value={formData.updateUser} onChange={e => setField('updateUser', e.target.value)} disabled={disabled} maxLength={16} className='form-input' style={{ maxWidth: '150px' }} />
+            <input type='text' value={formData.updateUser} onChange={e => setField('updateUser', e.target.value)} disabled={disabled} maxLength={16} className='form-input form-input-w150' />
             <span className='auto-label'>Automatic</span>
           </div>
         </div>
@@ -443,7 +437,7 @@ const HomologationVariables: React.FC = () => {
           <label className='form-label'>Date</label>
           <div className='operator-wrapper'>{renderCompareOp('updateDatetime')}</div>
           <div className='form-control-wrapper auto-field'>
-            <input type='text' value={formData.updateDatetime} onChange={e => handleDate(e.target.value)} disabled={disabled} maxLength={10} placeholder='yyyy-MM-dd' className='form-input' style={{ maxWidth: '150px' }} />
+            <input type='text' value={formData.updateDatetime} onChange={e => handleDate(e.target.value)} disabled={disabled} maxLength={10} placeholder='yyyy-MM-dd' className='form-input form-input-w150' />
             <span className='auto-label'>Automatic</span>
           </div>
         </div>

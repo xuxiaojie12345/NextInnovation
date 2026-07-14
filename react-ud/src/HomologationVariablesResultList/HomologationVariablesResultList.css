@@ -36,7 +36,7 @@
 /* ---- 卡片容器 ---- */
 .ud09-card {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
   background-color: #ffffff;
   border: 1px solid #d0d0d0;
   padding: 20px 24px 24px;
@@ -51,24 +51,6 @@
   margin: 0 0 12px 0;
   padding-bottom: 6px;
   border-bottom: 1px solid #e0e0e0;
-}
-
-/* ---- 面包屑导航 ---- */
-.ud09-breadcrumb {
-  font-size: 12px;
-  color: #888888;
-  margin-bottom: 12px;
-  padding: 6px 0;
-}
-
-.ud09-breadcrumb span {
-  color: #003057;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.ud09-breadcrumb span:hover {
-  color: #0055aa;
 }
 
 /* ---- 消息区域 ---- */
@@ -155,6 +137,8 @@
 /* ---- 表格包裹器 ---- */
 .ud09-table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 600px;
   margin-bottom: 10px;
 }
 
@@ -175,6 +159,19 @@
   white-space: nowrap;
   border: 1px solid #8da0c0;
   font-size: 12px;
+}
+
+/* 必填标记星号 */
+.required-asterisk {
+  color: #c00;
+  margin-left: 2px;
+}
+
+/* 表头类型说明（如 Add: YYYYWW） */
+.ud09-th-desc {
+  font-weight: normal;
+  font-size: 11px;
+  color: #666;
 }
 
 .ud09-table td {
@@ -264,10 +261,6 @@
   .ud09-table th {
     background-color: #003057 !important;
     color: #ffffff !important;
-  }
-
-  .ud09-breadcrumb {
-    display: none !important;
   }
 
   .ud09-table-wrapper {
