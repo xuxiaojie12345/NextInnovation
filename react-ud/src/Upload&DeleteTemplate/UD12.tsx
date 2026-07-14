@@ -5,6 +5,8 @@ import "./UD12.css";
 
 const STORAGE_KEY_USER = "user_info";
 const STORAGE_KEY_TOKEN = "auth_token";
+const UD13 = "/UD13";
+const NUM200 = 200;
 
 const getCurrentUser = (): {
   userId: string;
@@ -14,8 +16,8 @@ const getCurrentUser = (): {
   try {
     const userStr = localStorage.getItem(STORAGE_KEY_USER);
     if (!userStr) return null;
-    const userInfo = JSON.parse(userStr);
     const token = localStorage.getItem(STORAGE_KEY_TOKEN);
+    const userInfo = JSON.parse(userStr);
     return {
       userId: userInfo.userId || "",
       name: userInfo.name || "",
@@ -32,15 +34,15 @@ const UD12 = React.memo(() => {
   // Upload
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadMarket, setUploadMarket] = useState<string>("");
-  // Delete
-  const [deleteMarket, setDeleteMarket] = useState<string>("");
-  const [deleteTemplate, setDeleteTemplate] = useState<string>("");
-  const [templateOptions, setTemplateOptions] = useState<string[]>([]);
-  const [marketOptions, setMarketOptions] = useState<string[]>([]);
   // Common
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Delete
+  const [deleteTemplate, setDeleteTemplate] = useState<string>("");
+  const [templateOptions, setTemplateOptions] = useState<string[]>([]);
+  const [marketOptions, setMarketOptions] = useState<string[]>([]);
+  const [deleteMarket, setDeleteMarket] = useState<string>("");
 
   // 初期化 - 获取市场列表
   useEffect(() => {
@@ -52,7 +54,7 @@ const UD12 = React.memo(() => {
     const init = async () => {
       try {
         const result = await templateApi.selectMarket();
-        if (result && result.code === 200 && result.data) {
+        if (result && result.code === NUM200 && result.data) {
           const markets = result.data.markets || result.data;
           const list = Array.isArray(markets)
             ? markets.map((m: any) =>
@@ -80,7 +82,7 @@ const UD12 = React.memo(() => {
     const loadTemplates = async () => {
       try {
         const result = await templateApi.listTemplates(deleteMarket);
-        if (result && result.code === 200 && result.data) {
+        if (result && result.code === NUM200 && result.data) {
           const templates = result.data.templates || result.data;
           const list = Array.isArray(templates)
             ? templates.map((t: any) => (typeof t === "string" ? t : ""))
@@ -123,7 +125,7 @@ const UD12 = React.memo(() => {
 
     try {
       const result = await templateApi.uploadFile(uploadFile, uploadMarket);
-      if (result && result.code === 200) {
+      if (result && result.code === NUM200) {
         setSuccessMessage(
           result.msg ||
             `TEMPLATE ${uploadFile.name} WAS SUCCESSFULLY UPLOADED TO MARKET ${uploadMarket}`,
@@ -151,15 +153,15 @@ const UD12 = React.memo(() => {
       setErrorMessage("请选择市场");
       return;
     }
+    if (!window.confirm("Do you really want to delete template?")) return;
     if (!deleteTemplate) {
       setErrorMessage("请选择模板");
       return;
     }
-    if (!window.confirm("Do you really want to delete template?")) return;
 
     try {
       const result = await templateApi.deleteFile(deleteMarket, deleteTemplate);
-      if (result && result.code === 200) {
+      if (result.code === NUM200 && result) {
         setSuccessMessage(
           result.msg ||
             `TEMPLATE ${deleteTemplate} WAS SUCCESSFULLY DELETE FROM MARKET ${deleteMarket}`,
@@ -167,7 +169,11 @@ const UD12 = React.memo(() => {
         setDeleteTemplate("");
         // 重新从服务器获取模板列表
         const refreshResult = await templateApi.listTemplates(deleteMarket);
-        if (refreshResult && refreshResult.code === 200 && refreshResult.data) {
+        if (
+          refreshResult &&
+          refreshResult.code === NUM200 &&
+          refreshResult.data
+        ) {
           const templates = refreshResult.data.templates || refreshResult.data;
           const list = Array.isArray(templates)
             ? templates.map((t: any) => (typeof t === "string" ? t : ""))
@@ -187,7 +193,7 @@ const UD12 = React.memo(() => {
   // ===== Check Template =====
 
   const handleCheckLink = useCallback(() => {
-    navigate("/UD13");
+    navigate(UD13);
   }, [navigate]);
 
   if (isLoading) {

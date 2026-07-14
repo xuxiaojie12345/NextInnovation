@@ -8,12 +8,19 @@ import "./UD01.css";
 interface LoginResponse {
   code: number;
   msg: string;
-  user: {
+  data: {
     userId: string;
     name: string;
-    password: string;
   };
 }
+
+const MSG =
+  "We didn't recognize the username or password you entered. Please try again.";
+
+const NUM200 = 200;
+const NUM401 = 401;
+const NUM403 = 403;
+const NUM500 = 500;
 
 const UD01: React.FC = () => {
   const navigate = useNavigate();
@@ -78,31 +85,21 @@ const UD01: React.FC = () => {
       );
 
       // 4. 结果处理 - 成功
-      if (response.data && response.data.code === 200) {
-        // 检查 user 对象是否存在且有效
-        if (!response.data) {
-          console.error("错误：后端返回的 user 对象为空");
-          setErrorMessage("登录失败：用户信息不完整");
-          setIsLoading(false);
-          return;
-        }
+      if (
+        response.data &&
+        response.data.code === NUM200 &&
+        response.data.data
+      ) {
+        const userData = response.data.data;
 
         // 保存用户信息到 localStorage（UD02 需要读取）
-        const userInfoStr = JSON.stringify(response.data);
-        localStorage.setItem("user_info", userInfoStr);
-
+        localStorage.setItem("user_info", JSON.stringify(userData));
         localStorage.setItem("auth_token", trimmedUserId); // 使用 userId 作为 token
-
-        // 验证保存是否成功
-        const savedUserInfo = localStorage.getItem("user_info");
-        const savedToken = localStorage.getItem("auth_token");
 
         // 跳转到 UD02 主菜单页面
         navigate("/UD02");
       } else {
-        setErrorMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        setErrorMessage(MSG);
         setPassword(""); // 清空密码
       }
     } catch (error: any) {
@@ -111,16 +108,14 @@ const UD01: React.FC = () => {
         const status = error.response.status;
         const serverMsg = error.response.data?.message;
 
-        if (status === 401 || status === 403) {
+        if (status === NUM401 || status === NUM403) {
           if (serverMsg && serverMsg.toLowerCase().includes("locked")) {
             setErrorMessage("您的账户已被锁定，请联系系统管理员");
           } else {
-            setErrorMessage(
-              "We didn't recognize the username or password you entered. Please try again.",
-            );
+            setErrorMessage(MSG);
           }
           setPassword("");
-        } else if (status === 500) {
+        } else if (status === NUM500) {
           setErrorMessage("System error. Please contact administrator.");
         } else {
           setErrorMessage(serverMsg || "Login failed. Please try again.");
