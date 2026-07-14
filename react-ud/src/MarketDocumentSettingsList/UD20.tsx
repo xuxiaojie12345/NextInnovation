@@ -8,6 +8,12 @@ interface DocRecord {
   registerDatetime: string;
 }
 
+const API_DOCUMENT_LIST = "/api/market-document-settings-list/document-list";
+const ROUTE_UD20_1 = "/UD20-1";
+const ERR_QUERY_FAILED = "查询失败";
+const ERR_SYSTEM_UNAVAILABLE = "系统暂时不可用，请稍后再试";
+const ERR_NO_DATA = "No data found";
+
 const UD20 = React.memo(() => {
   const navigate = useNavigate();
   const [records, setRecords] = useState<DocRecord[]>([]);
@@ -20,20 +26,18 @@ const UD20 = React.memo(() => {
     (async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(
-          "/api/market-document-settings-list/document-list",
-        );
+        const res = await fetch(API_DOCUMENT_LIST);
         const result = await res.json();
         if (result && (result.code === 200 || result.code === undefined)) {
           const data = result.data || result;
           const docs = data.documents || (Array.isArray(data) ? data : []);
           setRecords(docs);
         } else {
-          setMessage("查询失败");
+          setMessage(ERR_QUERY_FAILED);
           setMessageType("error");
         }
       } catch {
-        setMessage("系统暂时不可用，请稍后再试");
+        setMessage(ERR_SYSTEM_UNAVAILABLE);
         setMessageType("error");
       } finally {
         setIsLoading(false);
@@ -43,16 +47,16 @@ const UD20 = React.memo(() => {
 
   const handleSelect = useCallback(() => {
     if (selectedIdx === null) {
-      setMessage("No data found");
+      setMessage(ERR_NO_DATA);
       setMessageType("error");
       return;
     }
     // 回填数据并返回上一页
-    navigate("/UD20-1", { state: { selected: records[selectedIdx] } });
+    navigate(ROUTE_UD20_1, { state: { selected: records[selectedIdx] } });
   }, [selectedIdx, records, navigate]);
 
   const handleBack = useCallback(() => {
-    navigate("/UD20-1");
+    navigate(ROUTE_UD20_1);
   }, [navigate]);
 
   const handlePrint = useCallback(() => {
@@ -100,7 +104,7 @@ const UD20 = React.memo(() => {
               <table className="ud20-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 40 }}></th>
+                    <th className="ud20-th-checkbox"></th>
                     <th>Document type</th>
                     <th>Bussines unit</th>
                     <th>User</th>
@@ -112,10 +116,11 @@ const UD20 = React.memo(() => {
                     <tr
                       key={idx}
                       onClick={() => setSelectedIdx(idx)}
-                      style={{
-                        background: selectedIdx === idx ? "#dce8f0" : undefined,
-                        cursor: "pointer",
-                      }}
+                      className={
+                        selectedIdx === idx
+                          ? "ud20-row-selected ud20-row-clickable"
+                          : "ud20-row-clickable"
+                      }
                     >
                       <td>
                         <input
@@ -123,7 +128,7 @@ const UD20 = React.memo(() => {
                           name="docSelect"
                           checked={selectedIdx === idx}
                           onChange={() => setSelectedIdx(idx)}
-                          style={{ accentColor: "#003057", cursor: "pointer" }}
+                          className="ud20-radio"
                         />
                       </td>
                       <td>{r.doctype}</td>

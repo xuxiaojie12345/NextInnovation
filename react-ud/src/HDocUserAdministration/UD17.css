@@ -94,6 +94,16 @@
 }
 
 /* ===== Roles Section ===== */
+.ud17-role-item-noborder {
+  border: none;
+  background: transparent;
+}
+.ud17-role-item-adapt {
+  max-width: 260px;
+  border: none;
+  background: transparent;
+}
+
 .ud17-roles-section {
   display: flex;
   gap: 12px;
@@ -121,6 +131,12 @@
 }
 
 /* ===== Label ===== */
+.ud17-lbl-w70 {
+  width: 70px;
+}
+.ud17-lbl-w120 {
+  width: 120px;
+}
 .ud17-lbl {
   font-size: 13px;
   font-weight: 500;

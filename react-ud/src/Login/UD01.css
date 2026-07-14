@@ -100,6 +100,10 @@ body {
   font-weight: 500;
 }
 
+.login-input-field {
+  margin-bottom: 16px;
+}
+
 .login-button {
   width: 100%;
   margin-top: 10px;

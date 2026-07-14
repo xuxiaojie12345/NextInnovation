@@ -81,6 +81,9 @@
 }
 
 /* ===== Label ===== */
+.ud19-lbl-w60 {
+  width: 60px;
+}
 .ud19-lbl {
   font-size: 13px;
   font-weight: 500;
@@ -89,6 +92,9 @@
 }
 
 /* ===== Input ===== */
+.ud19-inp-w50 {
+  width: 50%;
+}
 .ud19-inp {
   height: 32px;
   padding: 0 10px;
@@ -135,6 +141,10 @@
 }
 .ud19-market-list select option {
   padding: 3px 6px;
+}
+.ud19-option-selected {
+  background: #dce8f0;
+  font-weight: 600;
 }
 
 /* ===== Radio group ===== */

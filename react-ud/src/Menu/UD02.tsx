@@ -23,6 +23,11 @@ interface MenuItem {
   path: string;
 }
 
+// ===== 固定常量 =====
+const STORAGE_KEY_USER = "user_info";
+const STORAGE_KEY_TOKEN = "auth_token";
+const ROUTE_LOGIN = "/UD01";
+
 // ===== 辅助函数 =====
 
 /**
@@ -31,11 +36,11 @@ interface MenuItem {
  */
 const getCurrentUser = (): User | null => {
   try {
-    const userStr = localStorage.getItem("user_info");
+    const userStr = localStorage.getItem(STORAGE_KEY_USER);
     if (!userStr) return null;
 
     const userInfo = JSON.parse(userStr);
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem(STORAGE_KEY_TOKEN);
     return {
       userId: userInfo.userId || "",
       name: userInfo.name || "",
@@ -100,7 +105,7 @@ const UD02 = React.memo(() => {
     // 校验详细规格表 No.1: Session Check
     if (!currentUser || !currentUser.token) {
       // 会话过期或无用户，重定向至登录页
-      navigate("/UD01", { replace: true });
+      navigate(ROUTE_LOGIN, { replace: true });
       return;
     }
 

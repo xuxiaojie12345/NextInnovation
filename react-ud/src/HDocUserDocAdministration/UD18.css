@@ -84,6 +84,9 @@
 }
 
 /* ===== Label ===== */
+.ud18-lbl-w60 {
+  width: 60px;
+}
 .ud18-lbl {
   font-size: 13px;
   font-weight: 500;
@@ -160,6 +163,10 @@
   color: #333;
   cursor: pointer;
   transition: background 0.15s;
+}
+.ud18-doc-selected {
+  background: #dce8f0;
+  font-weight: 500;
 }
 .ud18-doc-item:last-child {
   border-bottom: none;

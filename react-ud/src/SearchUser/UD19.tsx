@@ -121,11 +121,9 @@ const UD19 = React.memo(() => {
 
           {/* Userid / User (vertical) */}
           <div className="ud19-row">
-            <label className="ud19-lbl" style={{ width: 60 }}>
-              Userid
-            </label>
+            <label className="ud19-lbl ud19-lbl-w60">Userid</label>
             <input
-              className="ud19-inp"
+              className="ud19-inp ud19-inp-w50"
               type="text"
               maxLength={10}
               value={userId}
@@ -133,15 +131,12 @@ const UD19 = React.memo(() => {
                 setUserId(e.target.value);
                 clearMessage();
               }}
-              style={{ width: "50%" }}
             />
           </div>
           <div className="ud19-row">
-            <label className="ud19-lbl" style={{ width: 60 }}>
-              User
-            </label>
+            <label className="ud19-lbl ud19-lbl-w60">User</label>
             <input
-              className="ud19-inp"
+              className="ud19-inp ud19-inp-w50"
               type="text"
               maxLength={32}
               value={userName}
@@ -149,7 +144,6 @@ const UD19 = React.memo(() => {
                 setUserName(e.target.value);
                 clearMessage();
               }}
-              style={{ width: "50%" }}
             />
           </div>
 
@@ -165,14 +159,11 @@ const UD19 = React.memo(() => {
                       key={m}
                       value={m}
                       onClick={() => toggleMarket(m)}
-                      style={{
-                        background: selectedMarkets.includes(m)
-                          ? "#dce8f0"
-                          : undefined,
-                        fontWeight: selectedMarkets.includes(m)
-                          ? 600
-                          : undefined,
-                      }}
+                      className={
+                        selectedMarkets.includes(m)
+                          ? "ud19-option-selected"
+                          : ""
+                      }
                     >
                       {m}
                     </option>

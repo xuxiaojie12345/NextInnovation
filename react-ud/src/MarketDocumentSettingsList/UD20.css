@@ -72,6 +72,20 @@
   border-collapse: collapse;
   font-size: 13px;
 }
+.ud20-th-checkbox {
+  width: 40px;
+}
+.ud20-row-selected {
+  background: #dce8f0;
+}
+.ud20-row-clickable {
+  cursor: pointer;
+}
+.ud20-radio {
+  accent-color: #003057;
+  cursor: pointer;
+}
+
 .ud20-table th {
   background: #dce8f0;
   color: #003057;

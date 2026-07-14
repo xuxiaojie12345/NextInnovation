@@ -14,8 +14,22 @@ interface LoginResponse {
   };
 }
 
+// ===== 固定常量 =====
 const MSG =
   "We didn't recognize the username or password you entered. Please try again.";
+const ERR_REQUIRED = "Username and password are required.";
+const ERR_LOCKED = "您的账户已被锁定，请联系系统管理员";
+const ERR_SYSTEM = "System error. Please contact administrator.";
+const ERR_LOGIN_FAILED = "Login failed. Please try again.";
+const ERR_NETWORK = "Network error. Please check your connection.";
+
+const LOGIN_API = "/api/AuthenticationApi/login";
+const STORAGE_KEY_USER = "user_info";
+const STORAGE_KEY_TOKEN = "auth_token";
+const ROUTE_UD02 = "/UD02";
+
+const MAX_USERID = 10;
+const MAX_PASSWORD = 32;
 
 const NUM200 = 200;
 const NUM401 = 401;
@@ -66,7 +80,7 @@ const UD01: React.FC = () => {
 
     // 2. 空值校验 (Frontend Check)
     if (!trimmedUserId || !trimmedPassword) {
-      setErrorMessage("Username and password are required.");
+      setErrorMessage(ERR_REQUIRED);
       return;
     }
 
@@ -76,13 +90,10 @@ const UD01: React.FC = () => {
 
     try {
       // 3. API 调用 (Backend Check)
-      const response = await axios.post<LoginResponse>(
-        "/api/AuthenticationApi/login",
-        {
-          userId: trimmedUserId,
-          password: trimmedPassword,
-        },
-      );
+      const response = await axios.post<LoginResponse>(LOGIN_API, {
+        userId: trimmedUserId,
+        password: trimmedPassword,
+      });
 
       // 4. 结果处理 - 成功
       if (
@@ -93,11 +104,11 @@ const UD01: React.FC = () => {
         const userData = response.data.data;
 
         // 保存用户信息到 localStorage（UD02 需要读取）
-        localStorage.setItem("user_info", JSON.stringify(userData));
-        localStorage.setItem("auth_token", trimmedUserId); // 使用 userId 作为 token
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userData));
+        localStorage.setItem(STORAGE_KEY_TOKEN, trimmedUserId); // 使用 userId 作为 token
 
         // 跳转到 UD02 主菜单页面
-        navigate("/UD02");
+        navigate(ROUTE_UD02);
       } else {
         setErrorMessage(MSG);
         setPassword(""); // 清空密码
@@ -110,18 +121,18 @@ const UD01: React.FC = () => {
 
         if (status === NUM401 || status === NUM403) {
           if (serverMsg && serverMsg.toLowerCase().includes("locked")) {
-            setErrorMessage("您的账户已被锁定，请联系系统管理员");
+            setErrorMessage(ERR_LOCKED);
           } else {
             setErrorMessage(MSG);
           }
           setPassword("");
         } else if (status === NUM500) {
-          setErrorMessage("System error. Please contact administrator.");
+          setErrorMessage(ERR_SYSTEM);
         } else {
-          setErrorMessage(serverMsg || "Login failed. Please try again.");
+          setErrorMessage(serverMsg || ERR_LOGIN_FAILED);
         }
       } else {
-        setErrorMessage("Network error. Please check your connection.");
+        setErrorMessage(ERR_NETWORK);
       }
     } finally {
       setIsLoading(false);
@@ -163,9 +174,9 @@ const UD01: React.FC = () => {
             value={userId}
             onChange={handleUserIdChange} // 【修正】使用过滤函数
             onKeyDown={handleKeyDown}
-            maxLength={10}
+            maxLength={MAX_USERID}
             disabled={isLoading}
-            style={{ marginBottom: 16 }}
+            className="login-input-field"
           />
 
           {/* Password 输入框 */}
@@ -175,9 +186,9 @@ const UD01: React.FC = () => {
             value={password}
             onChange={handlePasswordChange}
             onKeyDown={handleKeyDown}
-            maxLength={32}
+            maxLength={MAX_PASSWORD}
             disabled={isLoading}
-            style={{ marginBottom: 16 }}
+            className="login-input-field"
           />
 
           <Button

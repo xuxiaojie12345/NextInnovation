@@ -132,9 +132,7 @@ const UD18 = React.memo(() => {
 
           {/* User ID + User Info */}
           <div className="ud18-row">
-            <label className="ud18-lbl" style={{ width: 60 }}>
-              Userid
-            </label>
+            <label className="ud18-lbl ud18-lbl-w60">Userid</label>
             <input
               className="ud18-inp"
               type="text"
@@ -156,9 +154,7 @@ const UD18 = React.memo(() => {
 
           {/* User Name */}
           <div className="ud18-row">
-            <label className="ud18-lbl" style={{ width: 60 }}>
-              User
-            </label>
+            <label className="ud18-lbl ud18-lbl-w60">User</label>
             <input
               className="ud18-inp ud18-ro"
               type="text"
@@ -173,7 +169,10 @@ const UD18 = React.memo(() => {
             <div className="ud18-doc-list">
               {sortedDocs.map((doc) => (
                 <div
-                  className="ud18-doc-item"
+                  className={
+                    "ud18-doc-item" +
+                    (userDocs.has(doc.doctype) ? " ud18-doc-selected" : "")
+                  }
                   key={doc.doctype}
                   onClick={() => {
                     setUserDocs((prev) => {
@@ -186,15 +185,6 @@ const UD18 = React.memo(() => {
                       return next;
                     });
                   }}
-                  style={
-                    userDocs.has(doc.doctype)
-                      ? {
-                          background: "#dce8f0",
-                          fontWeight: 500,
-                          cursor: "pointer",
-                        }
-                      : { cursor: "pointer" }
-                  }
                 >
                   <span className="ud18-doc-lbl">
                     {doc.description || doc.doctype}

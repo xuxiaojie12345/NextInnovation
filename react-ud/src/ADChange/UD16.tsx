@@ -2,9 +2,11 @@ import React, { useState, useCallback } from "react";
 import { adcaApi } from "../services/api";
 import "./UD16.css";
 
+const STORAGE_KEY_USER = "user_info";
+
 const getCurrentUser = (): { userId: string; name: string } | null => {
   try {
-    const userStr = localStorage.getItem("user_info");
+    const userStr = localStorage.getItem(STORAGE_KEY_USER);
     if (!userStr) return null;
     const userInfo = JSON.parse(userStr);
     return {

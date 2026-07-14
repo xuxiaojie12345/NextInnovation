@@ -213,9 +213,7 @@ const UD17 = React.memo(() => {
           {/* User ID */}
           <div className="ud17-sec">
             <div className="ud17-row">
-              <label className="ud17-lbl" style={{ width: 70 }}>
-                Userid
-              </label>
+              <label className="ud17-lbl ud17-lbl-w70">Userid</label>
               <input
                 className="ud17-inp"
                 type="text"
@@ -235,9 +233,7 @@ const UD17 = React.memo(() => {
               </button>
             </div>
             <div className="ud17-row">
-              <label className="ud17-lbl" style={{ width: 70 }}>
-                User
-              </label>
+              <label className="ud17-lbl ud17-lbl-w70">User</label>
               <span className="ud17-inp ud17-ro">{userField1}</span>
             </div>
           </div>
@@ -246,9 +242,8 @@ const UD17 = React.memo(() => {
           <div className="ud17-role-grid">
             {roleList.slice(0, 5).map((role) => (
               <div
-                className="ud17-role-item"
+                className="ud17-role-item ud17-role-item-noborder"
                 key={role}
-                style={{ border: "none", background: "transparent" }}
               >
                 <label className="ud17-chk-lbl">
                   <input
@@ -293,14 +288,7 @@ const UD17 = React.memo(() => {
             </div>
             <div className="ud17-roles-content">
               {/* Adaptation user */}
-              <div
-                className="ud17-role-item"
-                style={{
-                  maxWidth: 260,
-                  border: "none",
-                  background: "transparent",
-                }}
-              >
+              <div className="ud17-role-item ud17-role-item-adapt">
                 <label className="ud17-chk-lbl">
                   <input
                     type="checkbox"
@@ -338,7 +326,7 @@ const UD17 = React.memo(() => {
           {/* Market Super User */}
           <div className="ud17-sec">
             <div className="ud17-row">
-              <label className="ud17-lbl" style={{ width: 120 }}>
+              <label className="ud17-lbl ud17-lbl-w120">
                 Market Super User
               </label>
               <select
