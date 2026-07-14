@@ -75,7 +75,7 @@ const SaveModifications: React.FC = () => {
   if (isLoading) {
     return (
       <div className="save-mod-container">
-        <div className="save-mod-loading">Loading...</div>
+        <div className="loading-placeholder">Loading...</div>
       </div>
     );
   }

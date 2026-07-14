@@ -44,7 +44,7 @@ const MarketsInHDoc: React.FC = () => {
       {message && <div className="mh-error msg-error">{message}</div>}
 
       {isLoading ? (
-        <div className="mh-loading">Loading...</div>
+        <div className="loading-placeholder">Loading...</div>
       ) : marketList.length > 0 ? (
         <div className="mh-table-section">
           <table className="mh-table">
@@ -67,7 +67,7 @@ const MarketsInHDoc: React.FC = () => {
           </table>
         </div>
       ) : (
-        <div className="mh-empty">No markets found.</div>
+        <div className="empty-placeholder">No markets found.</div>
       )}
     </div>
   );

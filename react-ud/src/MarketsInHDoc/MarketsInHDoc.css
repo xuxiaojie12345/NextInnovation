@@ -6,20 +6,6 @@
   width: 800px;
 }
 
-.mh-loading {
-  padding: 30px 20px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
-
-.mh-empty {
-  padding: 30px 20px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
-
 .mh-table-section {
   padding: 10px;
 }
