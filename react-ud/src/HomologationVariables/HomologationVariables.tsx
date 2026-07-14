@@ -688,10 +688,10 @@ const HomologationVariables: React.FC = () => {
         <h1>Homologation Variables</h1>
       </div>
 
-      <table className="hv-btn-table">
+      <table className="btn-table">
         <tbody>
           <tr>
-            <td className="hv-btn-cell">
+            <td className="btn-cell">
               <button
                 className="btn btn-primary"
                 onClick={handleSearch}

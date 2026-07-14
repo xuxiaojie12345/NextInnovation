@@ -26,24 +26,7 @@
   font-size: 13px;
 }
 
-/* ── 按钮 Table ── */
-.ehvr-btn-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 2px solid #acb7ee;
-  border-left: none;
-  border-right: none;
-  background-color: #f1f3ff;
-  margin: 10px;
-  margin-left: 0px;
-}
-
-.ehvr-btn-cell {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  text-align: left;
-}
+/* btn-table/btn-cell moved to common.css */
 
 /* ── テーブル外枠 ── */
 .ehvr-table-wrapper {

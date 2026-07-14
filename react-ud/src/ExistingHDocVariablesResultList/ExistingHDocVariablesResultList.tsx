@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../services/api";
+import { sharedPrint } from "../common/utils";
 import "../common/css/common.css";
 import "./ExistingHDocVariablesResultList.css";
 
@@ -130,12 +131,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     });
   };
 
-  const handlePrint = () => {
-    const prevTitle = document.title;
-    document.title = "ExistingHDocVariablesResultList";
-    window.print();
-    document.title = prevTitle;
-  };
+  const handlePrint = () => sharedPrint("ExistingHDocVariablesResultList");
 
   /**
    * Down 操作：跳转到 Homologation Variables 页面并携带选中记录的 Variable
@@ -199,10 +195,10 @@ const ExistingHDocVariablesResultList: React.FC = () => {
       {errorMessage && <div className="ehvr-error msg-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
-      <table className="ehvr-btn-table no-print">
+      <table className="btn-table no-print">
         <tbody>
           <tr>
-            <td className="ehvr-btn-cell">
+            <td className="btn-cell">
               <button className="btn btn-primary" onClick={handleSelect}>
                 Select
               </button>

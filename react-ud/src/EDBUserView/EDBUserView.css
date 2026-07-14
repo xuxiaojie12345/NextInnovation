@@ -55,11 +55,4 @@
   border-color: #002060;
 }
 
-.edb-btn-row {
-  display: flex;
-  gap: 8px;
-  padding: 6px 10px;
-  background-color: #f1f3f8;
-  border-top: 1px solid #acb7ee;
-  border-bottom: 1px solid #acb7ee;
-}
+/* btn-row moved to common.css */

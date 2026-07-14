@@ -598,7 +598,7 @@ const HDocUserAdministration: React.FC = () => {
           </div>
 
           {/* ── 操作按钮 ── */}
-          <div className="hua-btn-row">
+          <div className="btn-row">
             <button
               className="btn"
               onClick={handleUpdateRole}

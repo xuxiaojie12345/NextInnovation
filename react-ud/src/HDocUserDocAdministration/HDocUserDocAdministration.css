@@ -91,10 +91,11 @@
   padding: 2px 4px;
 }
 
-/* ── 按钮行 ── */
-.huda-btn-row {
-  display: flex;
-  gap: 8px;
+/* btn-row moved to common.css */
+
+/* HDocUserDocAdmin 按钮行：70px 左内边距对齐，无边框 */
+.huda-container .btn-row {
   padding: 8px 10px 10px 70px;
   background-color: #f1f2ff;
+  border: none;
 }

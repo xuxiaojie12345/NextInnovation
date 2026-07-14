@@ -22,7 +22,7 @@ const HDocTemplateCheck: React.FC = () => {
                 <input type="file" />
               </td>
             </tr>
-            <tr className="htc-btn-row">
+            <tr className="btn-tr">
               <td className="htc-value">
                 <button className="btn" onClick={handleCheck}>
                   Check

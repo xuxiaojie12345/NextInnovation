@@ -200,12 +200,13 @@
 }
 
 /* ── 按钮行 ── */
-.hua-btn-row {
-  display: flex;
-  gap: 8px;
+/* btn-row moved to common.css */
+
+/* HDocUserAdmin 按钮行：负边距穿透、2px 上边框 */
+.hua-form-section > .btn-row {
   padding: 10px;
-  border-top: 2px solid #acb7ee;
-  background-color: #f1f3ff;
+  border-top-width: 2px;
+  border-bottom: none;
   margin: -10px;
   margin-top: 0;
 }

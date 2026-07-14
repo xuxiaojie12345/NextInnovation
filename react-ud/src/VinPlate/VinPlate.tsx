@@ -212,11 +212,11 @@ const VinPlate: React.FC = () => {
 
       {/* ── 输入区域 ── */}
       <div className="vp-input-section">
-        <div className="vp-row">
-          <span className="vp-label">Chassis number</span>
+        <div className="f-row">
+          <span className="f-label">Chassis number</span>
           <input
             type="text"
-            className="vp-input"
+            className="f-input"
             value={chassisNumber}
             onChange={(e) => setChassisNumber(e.target.value)}
             maxLength={15}
@@ -225,7 +225,7 @@ const VinPlate: React.FC = () => {
           />
         </div>
 
-        <div className="vp-btn-row">
+        <div className="btn-row">
           <button className="btn" onClick={handleViewInfo} disabled={isLoading}>
             View Info
           </button>

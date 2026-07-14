@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../services/api";
+import { sharedPrint } from "../common/utils";
 import "../common/css/common.css";
 import "./HomologationVariablesResultList.css";
 
@@ -128,12 +129,7 @@ const HomologationVariablesResultList: React.FC = () => {
     });
   };
 
-  const handlePrint = () => {
-    const prevTitle = document.title;
-    document.title = "HomologationVariablesResultList";
-    window.print();
-    document.title = prevTitle;
-  };
+  const handlePrint = () => sharedPrint("HomologationVariablesResultList");
 
   const handleDeleteSelected = async () => {
     if (selectedIds.size === 0) {
@@ -182,10 +178,10 @@ const HomologationVariablesResultList: React.FC = () => {
       {errorMessage && <div className="hv-result-error msg-error">{errorMessage}</div>}
 
       {/* ─── 按钮 Table ─── */}
-      <table className="hv-result-btn-table no-print">
+      <table className="btn-table no-print">
         <tbody>
           <tr>
-            <td className="hv-result-btn-cell">
+            <td className="btn-cell">
               <button
                 className="btn btn-primary"
                 onClick={handleSelect}

@@ -369,10 +369,10 @@ const ExistingHDocVariables: React.FC = () => {
         <h1>Existing HDoc Variables</h1>
       </div>
 
-      <table className="ehv-btn-table">
+      <table className="btn-table">
         <tbody>
           <tr>
-            <td className="ehv-btn-cell">
+            <td className="btn-cell">
               <button
                 className="btn btn-primary"
                 onClick={handleSearch}
@@ -422,14 +422,14 @@ const ExistingHDocVariables: React.FC = () => {
       {message && <div className="ehv-error msg-error">{message}</div>}
       {successMessage && <div className="ehv-success msg-success">{successMessage}</div>}
 
-      <div className="ehv-form">
+      <div className="f-form">
         {/* Variable */}
-        <div className="ehv-row">
-          <span className="ehv-label required">Variable</span>
+        <div className="f-row">
+          <span className="f-label required">Variable</span>
           {renderOpSelect("Variable", variableOp, setVariableOp)}
           <input
             type="text"
-            className="ehv-input ehv-input-variable"
+            className="f-input ehv-input-variable"
             value={variable}
             onChange={(e) => setVariable(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={30}
@@ -438,11 +438,11 @@ const ExistingHDocVariables: React.FC = () => {
         </div>
 
         {/* Type */}
-        <div className="ehv-row">
-          <span className="ehv-label required">Type</span>
+        <div className="f-row">
+          <span className="f-label required">Type</span>
           {renderOpSelect("Type", typeOp, setTypeOp)}
           <select
-            className="ehv-input ehv-select"
+            className="f-input ehv-select"
             value={type}
             onChange={(e) => setType(e.target.value)}
             disabled={isLoading}
@@ -454,12 +454,12 @@ const ExistingHDocVariables: React.FC = () => {
         </div>
 
         {/* Description */}
-        <div className="ehv-row ehv-row-description">
-          <span className="ehv-label">Description</span>
+        <div className="f-row ehv-row-description">
+          <span className="f-label">Description</span>
           {renderOpSelect("Description", descriptionOp, setDescriptionOp)}
           <input
             type="text"
-            className="ehv-input ehv-input-description"
+            className="f-input ehv-input-description"
             value={description}
             onChange={(e) => setDescription(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={100}
@@ -468,8 +468,8 @@ const ExistingHDocVariables: React.FC = () => {
         </div>
 
         {/* Created by user */}
-        <div className="ehv-row">
-          <span className="ehv-label">Created by user</span>
+        <div className="f-row">
+          <span className="f-label">Created by user</span>
           {renderOpSelect(
             "Created by user",
             createdByUserOp,
@@ -477,7 +477,7 @@ const ExistingHDocVariables: React.FC = () => {
           )}
           <input
             type="text"
-            className="ehv-input ehv-input-created-by"
+            className="f-input ehv-input-created-by"
             value={createdByUser}
             onChange={(e) => setCreatedByUser(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={16}
@@ -486,12 +486,12 @@ const ExistingHDocVariables: React.FC = () => {
         </div>
 
         {/* Date */}
-        <div className="ehv-row">
-          <span className="ehv-label">Date</span>
+        <div className="f-row">
+          <span className="f-label">Date</span>
           {renderOpSelect("Date", dateOp, setDateOp)}
           <input
             type="text"
-            className="ehv-input ehv-input-date"
+            className="f-input ehv-input-date"
             value={date}
             onChange={(e) => setDate(e.target.value.replace(/[^0-9\-/]/g, ""))}
             disabled={isLoading}

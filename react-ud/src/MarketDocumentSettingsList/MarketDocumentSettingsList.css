@@ -79,10 +79,10 @@
   border-top: 2px solid #acb7ee;
 }
 
-.mdsl-btn-row {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  background-color: #f1f3ff;
-  border-bottom: 2px solid #acb7ee;
+/* btn-row moved to common.css */
+
+/* MarketDocSetting 按钮行：上边框由父容器提供，仅下边框 2px */
+.mdsl-bordered .btn-row {
+  border-top: none;
+  border-bottom-width: 2px;
 }

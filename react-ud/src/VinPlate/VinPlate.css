@@ -14,58 +14,17 @@
   border-bottom: none;
 }
 
-.vp-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 0;
-}
+/* f-row/f-label/f-input moved to common.css */
 
-.vp-label {
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 700;
-  color: #333;
-  min-width: 110px;
-  text-align: left;
-}
+/* btn-row moved to common.css */
 
-.vp-input {
-  padding: 3px 5px;
-  border: 1px solid #b0b0b0;
-  border-radius: 0;
-  font-size: 12px;
-  color: #333;
-  background-color: #fff;
-  box-sizing: border-box;
-  height: 22px;
-  line-height: normal;
-  min-width: 200px;
-  max-width: 400px;
-}
-
-.vp-input:focus {
-  outline: none;
-  border-color: #002060;
-}
-
-.vp-input:disabled {
-  background-color: #f0f0f0;
-  cursor: not-allowed;
-}
-
-.vp-btn-row {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  flex-wrap: wrap;
-  border-top: 1px solid #acb7ee;
-  border-bottom: 1px solid #acb7ee;
+/* VinPlate 按钮行：用负边距穿透输入区域 */
+.vp-input-section .btn-row {
   margin-top: 8px;
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: -8px;
-  background-color: #f1f3ff;
+  flex-wrap: wrap;
 }
 
 /* ── 信息展示区域 ── */

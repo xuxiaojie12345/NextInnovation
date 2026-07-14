@@ -217,7 +217,7 @@ const UploadDeleteTemplate: React.FC = () => {
                 </select>
               </td>
             </tr>
-            <tr className="udt-btn-row">
+            <tr className="btn-tr">
               <td className="udt-value">
                 <button
                   className="btn"
@@ -281,7 +281,7 @@ const UploadDeleteTemplate: React.FC = () => {
                 </select>
               </td>
             </tr>
-            <tr className="udt-btn-row">
+            <tr className="btn-tr">
               <td className="udt-value">
                 <button
                   className="btn"

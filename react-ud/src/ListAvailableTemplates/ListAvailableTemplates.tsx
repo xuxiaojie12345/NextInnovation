@@ -195,11 +195,11 @@ const ListAvailableTemplates: React.FC = () => {
       {successMessage && <div className="lat-success msg-success">{successMessage}</div>}
 
       {/* ── Market 选择 ── */}
-      <div className="lat-form">
-        <div className="lat-row">
-          <span className="lat-label">Select Market</span>
+      <div className="f-form">
+        <div className="f-row">
+          <span className="f-label">Select Market</span>
           <select
-            className="lat-select"
+            className="f-input"
             value={selectMarket}
             onChange={(e) => setSelectMarket(e.target.value)}
             disabled={isLoading}

@@ -151,7 +151,7 @@ const MarketDocumentSettingsList: React.FC = () => {
 
       <div className="mdsl-bordered">
         {/* 按钮区域：在上方，有背景色 */}
-        <div className="mdsl-btn-row">
+        <div className="btn-row">
           <button className="btn" onClick={handleSearch}>
             Search
           </button>

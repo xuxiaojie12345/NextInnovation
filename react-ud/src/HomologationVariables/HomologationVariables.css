@@ -13,26 +13,7 @@
   letter-spacing: 0.3px;
 }
 
-/* ═══════════════════════════════════════════
-   第一部分：按钮 Table
-   背景色 #f1f3ff，按钮背景色 #bdc3df
-   ═══════════════════════════════════════════ */
-.hv-btn-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 2px solid #acb7ee;
-  border-left: none;
-  border-right: none;
-  background-color: #f1f3ff;
-  margin-top: 0;
-}
-
-.hv-btn-cell {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  text-align: left;
-}
+/* btn-table/btn-cell moved to common.css */
 
 /* ═══════════════════════════════════════════
    第二部分：查询条件列表（无背景色、无边框线）

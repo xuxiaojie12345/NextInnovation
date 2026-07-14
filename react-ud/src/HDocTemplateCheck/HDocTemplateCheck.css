@@ -35,11 +35,7 @@
   text-align: left;
 }
 
-/* ── 按钮行：背景色 + 边框 ── */
-.htc-btn-row {
-  background-color: #f1f3ff;
-  border-top: 2px solid #acb7ee;
-}
+/* btn-row moved to common.css */
 
 .htc-result {
   font-size: 12px;

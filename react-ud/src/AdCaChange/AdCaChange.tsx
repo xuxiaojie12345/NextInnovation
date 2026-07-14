@@ -175,13 +175,13 @@ const AdCaChange: React.FC = () => {
         {message && <div className="adca-error msg-error">{message}</div>}
         {successMessage && <div className="adca-success msg-success">{successMessage}</div>}
 
-        <div className="adca-form">
+        <div className="f-form">
           {/* Serie-Chnr */}
-          <div className="adca-row">
-            <span className="adca-label">Serie-Chnr</span>
+          <div className="f-row">
+            <span className="f-label">Serie-Chnr</span>
             <input
               type="text"
-              className="adca-input"
+              className="f-input"
               value={serieChnr}
               onChange={(e) => setSerieChnr(e.target.value)}
               maxLength={15}
@@ -191,11 +191,11 @@ const AdCaChange: React.FC = () => {
           </div>
 
           {/* Desc */}
-          <div className="adca-row">
-            <span className="adca-label">Desc</span>
+          <div className="f-row">
+            <span className="f-label">Desc</span>
             <input
               type="text"
-              className="adca-input adca-input-desc"
+              className="f-input adca-input-desc"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               maxLength={4000}
@@ -205,7 +205,7 @@ const AdCaChange: React.FC = () => {
         </div>
 
         {/* Buttons */}
-        <div className="adca-btn-row">
+        <div className="btn-row">
           <button className="btn" onClick={handleAdd} disabled={isLoading}>
             ADD
           </button>

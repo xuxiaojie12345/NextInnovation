@@ -80,7 +80,7 @@ const EDBUserView: React.FC = () => {
       </div>
 
       {/* Clear / Back 在表单最上方 */}
-      <div className="edb-btn-row">
+      <div className="btn-row">
         <button className="btn" onClick={handleClear}>
           Clear
         </button>

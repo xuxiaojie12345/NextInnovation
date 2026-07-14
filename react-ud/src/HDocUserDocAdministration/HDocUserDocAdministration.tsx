@@ -245,7 +245,7 @@ const HDocUserDocAdministration: React.FC = () => {
       </div>
 
       {/* ── 操作按钮 ── */}
-      <div className="huda-btn-row">
+      <div className="btn-row">
         <button className="btn" onClick={handleUpdate} disabled={isLoading}>
           UPDATE
         </button>

@@ -8,25 +8,7 @@
   width: 800px;
 }
 
-/* ═══════════════════════════════════════════
-   按钮 Table
-   ═══════════════════════════════════════════ */
-.ehv-btn-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 2px solid #acb7ee;
-  border-left: none;
-  border-right: none;
-  background-color: #f1f3ff;
-  margin-top: 0;
-}
-
-.ehv-btn-cell {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  text-align: left;
-}
+/* btn-table/btn-cell moved to common.css */
 
 /* ═══════════════════════════════════════════
    表单区域
@@ -35,50 +17,12 @@
   padding: 8px 10px;
 }
 
-.ehv-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 0;
-}
-
-.ehv-label {
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 700;
-  color: #333;
-  min-width: 120px;
-  text-align: left;
-}
+/* f-row/f-label/f-input moved to common.css */
 
 .ehv-label.required::after {
   content: " *";
   color: #e53935;
   font-weight: 700;
-}
-
-.ehv-input {
-  padding: 3px 5px;
-  border: 1px solid #b0b0b0;
-  border-radius: 0;
-  font-size: 12px;
-  color: #333;
-  background-color: #fff;
-  box-sizing: border-box;
-  height: 22px;
-  line-height: normal;
-  min-width: 200px;
-  max-width: 400px;
-}
-
-.ehv-input:focus {
-  outline: none;
-  border-color: #002060;
-}
-
-.ehv-input:disabled {
-  background-color: #f0f0f0;
-  cursor: not-allowed;
 }
 
 .ehv-select {

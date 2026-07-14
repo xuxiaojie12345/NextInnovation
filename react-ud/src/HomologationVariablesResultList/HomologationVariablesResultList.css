@@ -170,18 +170,4 @@
 
 
 
-/* ── ボタンエリア ── */
-.hv-result-btn-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-top: 2px solid #acb7ee;
-  border-bottom: 2px solid #acb7ee;
-  background-color: #f1f3ff;
-}
-
-.hv-result-btn-cell {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  text-align: left;
-}
+/* btn-table/btn-cell moved to common.css */

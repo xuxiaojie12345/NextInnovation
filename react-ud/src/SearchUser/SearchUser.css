@@ -128,17 +128,14 @@
   height: 16px;
 }
 
-.su-btn-row {
-  display: flex;
-  gap: 8px;
-  background-color: #f1f3ff;
-  border-left: none;
-  border-right: none;
-  padding: 8px 10px;
+/* btn-row moved to common.css */
+
+/* SearchUser 按钮行：负边距穿透表单 padding，无边框 */
+.su-form .btn-row {
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: -8px;
-  text-align: left;
+  border: none;
 }
 
 .su-table-section {

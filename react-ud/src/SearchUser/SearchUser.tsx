@@ -199,7 +199,7 @@ const SearchUser: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="su-btn-row">
+        <div className="btn-row">
           <button className="btn" onClick={handleSearch} disabled={isLoading}>
             Search
           </button>

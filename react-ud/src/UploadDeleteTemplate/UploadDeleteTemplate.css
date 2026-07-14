@@ -44,12 +44,7 @@
   text-align: left;
 }
 
-/* ── 按钮行：背景色 + 边框 ── */
-.udt-btn-row {
-  background-color: #f1f3ff;
-  border-top: 1px solid #acb7ee;
-  width: 100%;
-}
+/* btn-row moved to common.css */
 
 .udt-select {
   padding: 3px 5px;

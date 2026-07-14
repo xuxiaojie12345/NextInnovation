@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../services/api";
+import { sharedPrint } from "../common/utils";
 import "../common/css/common.css";
 import "./MarketDocumentSettingsResultList.css";
 
@@ -104,12 +105,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
     });
   };
 
-  const handlePrint = () => {
-    const prevTitle = document.title;
-    document.title = "MarketDocumentSettingsList";
-    window.print();
-    document.title = prevTitle;
-  };
+  const handlePrint = () => sharedPrint("MarketDocumentSettingsList");
 
   const handleUserClick = (userId: string) => {
     navigate("/menu/edb-user-view", { state: { userid: userId } });
@@ -123,10 +119,10 @@ const MarketDocumentSettingsResultList: React.FC = () => {
 
       {message && <div className="mdsr-error msg-error no-print">{message}</div>}
 
-      <table className="mdsr-btn-table no-print">
+      <table className="btn-table no-print">
         <tbody>
           <tr>
-            <td className="mdsr-btn-cell">
+            <td className="btn-cell">
               <button
                 className="btn"
                 onClick={handleSelect}
