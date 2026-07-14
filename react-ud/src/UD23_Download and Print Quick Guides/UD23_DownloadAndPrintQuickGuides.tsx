@@ -18,8 +18,7 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
   const navigate = useNavigate();
 
   /**
-   * 处理 Back 按钮点击
-   * 对应设计书 3.1.1 - 返回上一级画面UD24
+   * 处理 Back 按钮点击返回上一级画面UD24
    */
   const handleBack = useCallback(() => {
     navigate(-1);
@@ -64,7 +63,6 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
 
   /**
    * 处理文件下载
-   * 对应设计书 6.3 文件下载 - 使用a标签download属性
    *
    * @param url - 下载链接
    * @param filename - 文件名
@@ -83,7 +81,6 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
     <div className="ud23-container">
       <div className="ud23-layout">
         {/* Back 按钮 - 左侧 */}
-        {/* 对应设计书 2.1 No.1 Back */}
         <div className="ud23-sidebar">
           <button className="ud23-back-btn" onClick={handleBack}>
             « Back
@@ -93,7 +90,6 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
         {/* 主内容区域 - 按钮右侧 */}
         <div className="ud23-main">
           {/* 页面标题 */}
-          {/* 对应设计书 2.1 No.2 Download and Print Quick Guides */}
           <div className="ud23-title">Download and Print Quick Guides</div>
 
           {/* 活性指南区域 */}
@@ -109,7 +105,6 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
               </div>
             </div>
             {/* 下载链接 */}
-            {/* 对应设计书 2.1 No.4/6/8/10/12/14/16/18 Link */}
             <div className="ud23-link-area">
               <a
                 className="ud23-download-link"
@@ -130,7 +125,6 @@ const UD23_DownloadAndPrintQuickGuides: React.FC = () => {
       </div>
         <span style = {{fontSize: '12px', color: '#666'}}>(Note that the font Volvo Broad is removed from the Quick Guides because of problems)</span>
       {/* Volvo 3P Quick Guides 区域 */}
-      {/* 对应设计书 2.1 No.19 Volvo 3P Quick Guides */}
       <div className="ud23-section ud23-volvo-section">
         <div className="ud23-volvo-title">Volvo 3P Quick Guides</div>
         <div className="ud23-volvo-links">

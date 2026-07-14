@@ -8,7 +8,6 @@
   padding: 20px 30px;
   font-family: Arial, sans-serif;
   background-color: white;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   width: 650px;
   border: 1px solid #d0d5dd;
@@ -19,15 +18,12 @@
   font-size: 20px;
   font-weight: bold;
   color: #003366;
-  /* margin-bottom: 20px; */
   padding-bottom: 10px;
-  /* border-bottom: 2px solid #003366; */
 }
 
 /* ---------- 消息显示区域 ---------- */
 .ud10-message {
   padding: 10px 15px;
-  /* margin-bottom: 15px; */
   border-radius: 4px;
   font-size: 14px;
   min-height: 20px;
@@ -70,28 +66,17 @@
 
 .ud10-row .ud10-label {
   min-width: 140px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  text-align: left;
-  padding-right: 10px;
-  white-space: nowrap;
+    font-size: 13px;
+    font-weight: bolder;
+    color: #333;
+    text-align: left;
+    padding-right: 10px;
+    white-space: nowrap;
+    margin-left: 15px;
 }
 
 /* 比较运算符下拉框 */
 .ud10-compare-select {
-  /* width: 50px;
-  height: 25px;
-  border: 1px solid #d9d9d9;
-  padding: 0 4px;
-  font-size: 13px;
-  color: #333;
-  background-color: #ffffff;
-  cursor: pointer;
-  margin-right: 6px;
-  box-sizing: border-box;
-  flex-shrink: 0; */
-
   width: 65px;
   height: 25px;
   border: 1px solid #c0c0c0;
@@ -133,7 +118,6 @@
   flex: 1;
   height: 25px;
   border: 1px solid #d9d9d9;
-  /* border-radius: 4px; */
   padding: 0 8px;
   font-size: 14px;
   color: #333;
@@ -179,55 +163,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-/* Search - 深蓝色 */
-/* .ud10-btn--search {
-  background-color: #1a3a6b;
-  border-color: #1a3a6b;
-  color: #ffffff;
-} */
-
-/* Clear - 浅灰色 */
-/* .ud10-btn--clear {
-  background-color: #e0e0e0;
-  border-color: #c0c0c0;
-  color: #333;
-} */
-
-/* Back - 灰色 */
-/* .ud10-btn--back {
-  background-color: #e0e0e0;
-  border-color: #c0c0c0;
-  color: #333;
-} */
-
-/* Add - 绿色 */
-/* .ud10-btn--add {
-  background-color: #4caf50;
-  border-color: #4caf50;
-  color: #ffffff;
-} */
-
-/* Update - 橙色 */
-/* .ud10-btn--update {
-  background-color: #ff9800;
-  border-color: #ff9800;
-  color: #ffffff;
-} */
-
-/* Delete - 红色 */
-/* .ud10-btn--delete {
-  background-color: #f44336;
-  border-color: #f44336;
-  color: #ffffff;
-} */
-
-/* Excel - 紫色 */
-/* .ud10-btn--excel {
-  background-color: #9c27b0;
-  border-color: #9c27b0;
-  color: #ffffff;
-} */
 
 /* ---------- 信息标签行 ---------- */
 .ud10-info-row {

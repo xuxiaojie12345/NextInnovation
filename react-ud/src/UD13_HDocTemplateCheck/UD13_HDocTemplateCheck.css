@@ -5,19 +5,8 @@
 
 /* ===== 页面整体容器 ===== */
 .ud13-container {
-  /* max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 20px;
-  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
-  background-color: #ffffff;
-  min-height: 100vh; */
-
-  /* max-width: 1100px; */
-  /* margin: 0 auto; */
-  /* padding: 24px 20px; */
   font-family:  Arial, sans-serif;
   background-color: #ffffff;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   width: 800px;
   border: 1px solid #d0d5dd;
@@ -41,7 +30,6 @@
 /* ===== 主区域样式 ===== */
 .ud13-main-section {
   background: #ffffff;
-  /* border: 1px solid #96bfeb; */
   border-radius: 0;
   overflow: hidden;
   display: flex;
@@ -74,7 +62,6 @@
 .ud13-form-group {
   display: flex;
   align-items: center;
-  /* margin-bottom: 12px; */
 }
 
 /* ===== 标签 ===== */
@@ -91,9 +78,7 @@
 
 /* ===== 蓝色边框盒子 ===== */
 .ud13-blue-border-box {
-  /* border: 1px solid #4a90d9; */
   border-radius: 0;
-  /* padding: 2px; */
   background-color: #ffffff;
   flex: 1;
   max-width: 400px;
@@ -155,24 +140,10 @@
   min-width: 70px;
 }
 
-/* .ud13-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-} */
-
 /* ===== Check 按钮 ===== */
 .ud13-btn-check {
-  /* background-color: #1890ff; */
   color: #000000;
 }
-
-/* .ud13-btn-check:hover:not(:disabled) {
-  background-color: #f8f3f3;
-} */
-
-/* .ud13-btn-check:active:not(:disabled) {
-  background-color: #096dd9;
-} */
 
 /* ===== Back 按钮 ===== */
 .ud13-btn-back {
@@ -219,8 +190,6 @@
 .ud13-download-section {
   padding: 12px 16px;
   margin-bottom: 16px;
-  /* border: 1px solid #e8ecf1; */
-  /* background-color: #fafbfc; */
 }
 
 /* ===== Download 链接 ===== */
@@ -286,7 +255,6 @@
   text-align: center;
   margin-top: 16px;
   padding-top: 16px;
-  /* border-top: 1px solid #e8ecf1; */
 }
 
 /* ===== 动画 ===== */

@@ -8,7 +8,6 @@
   padding: 20px 30px;
   font-family: Arial, sans-serif;
   background-color: white;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   border: 1px solid #d0d5dd;
 }
@@ -63,7 +62,6 @@
   padding: 10px;
   background-color: #e8e8ff; /* 浅蓝色背景 */
   border-bottom: 1px solid #9999cc; /* 与form-section相同的边框 */
-  /* border-top: none; */
 }
 
 /* ---------- 按钮样式 ---------- */

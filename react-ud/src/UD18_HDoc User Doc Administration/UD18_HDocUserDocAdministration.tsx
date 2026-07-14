@@ -354,11 +354,10 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
   // ==================== 渲染 UI ====================
   return (
     <div className='ud18-container'>
-      {/* 页面标题 - 参照UD17样式 */}
+      {/* 页面标题 */}
       <div className='ud18-title'>HDoc User Doc Administration</div>
 
-      {/* 消息显示区域 - 在标题下方 */}
-      {/* 对应设计书 2.1 控件属性表 No.6 Message */}
+      {/* 消息显示区域  */}
       {message && (
         <div
           className={`ud18-message ${
@@ -372,7 +371,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       {/* 表单区域 */}
       <div className='ud18-form-section'>
         {/* 第一行：UserID输入 + User Info按钮 */}
-        {/* 对应设计书 2.1 控件属性表 No.1 UserID / No.4 User Info */}
         <div className='ud18-search-row'>
           <div className='ud18-search-group'>
             <label htmlFor='ud18-userid'>UserID:</label>
@@ -400,16 +398,13 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
         </div>
 
         {/* 第二行：User标签 */}
-        {/* 对应设计书 2.1 控件属性表 No.2 User */}
         <div className='ud18-user-row'>
           <span className='ud18-user-label-text'>User:</span>
           <span className='ud18-user-value'>{userName || ''}</span>
         </div>
 
         {/* Document 多选下拉框 */}
-        {/* 对应设计书 2.1 控件属性表 No.3 Document */}
         <div className='ud18-doc-section'>
-          {/* <span className='ud18-doc-label'>Document <span className='ud18-multi-hint'>（按住Ctrl多选）</span></span> */}
           <select
             id='ud18-document'
             className='ud18-document-select'
@@ -433,7 +428,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       </div>
       
         {/* 操作按钮区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.5 Update */}
         <div className='ud18-actions'>
           <button
             className='ud18-btn-update'

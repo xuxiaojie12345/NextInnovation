@@ -8,7 +8,6 @@
   padding: 20px 30px;
   font-family: Arial, sans-serif;
   background-color: white;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   border: 1px solid #d0d5dd;
 }
@@ -18,9 +17,7 @@
   font-size: 20px;
   font-weight: bold;
   color: #003366;
-  /* margin-bottom: 20px; */
   padding-bottom: 10px;
-  /* border-bottom: 2px solid #003366; */
 }
 
 /* ---------- 消息显示区域 ---------- */
@@ -55,9 +52,6 @@
 .ud09-content {
   background: #ffffff;
   border: 1px solid #9999cc; 
-  /* border: 1px solid #d9d9d9; */
-  /* border-radius: 4px; */
-  /* padding: 16px 18px; */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -75,8 +69,6 @@
   overflow-x: auto;
   margin-bottom: 16px;
   padding: 0px 10px;
-  /* border: 1px solid #e8e8e8; */
-  /* border-radius: 4px; */
 }
 
 /* ---------- 数据表格 ---------- */
@@ -186,39 +178,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-/* .ud09-btn--primary {
-  background-color: #003366;
-  border-color: #003366;
-  color: #ffffff;
-}
-
-.ud09-btn--primary:hover {
-  background-color: #004d99;
-  border-color: #004d99;
-}
-
-.ud09-btn--default {
-  background-color: #ffffff;
-  border-color: #d9d9d9;
-  color: #333;
-}
-
-.ud09-btn--default:hover {
-  border-color: #003366;
-  color: #003366;
-}
-
-.ud09-btn--danger {
-  background-color: #ff4d4f;
-  border-color: #ff4d4f;
-  color: #ffffff;
-}
-
-.ud09-btn--danger:hover {
-  background-color: #ff7875;
-  border-color: #ff7875;
-} */
 
 /* ---------- 响应式 ---------- */
 @media screen and (max-width: 768px) {

@@ -8,7 +8,6 @@
   padding: 20px 30px;
   font-family: Arial, sans-serif;
   background-color: white;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   max-width: 900px;
   border: 1px solid #d0d5dd;
@@ -20,9 +19,7 @@
   font-size: 20px;
   font-weight: bold;
   color: #003366;
-  /* margin-bottom: 20px; */
   padding-bottom: 10px;
-  /* border-bottom: 2px solid #003366; */
 }
 
 /* ---------- 消息显示区域 ---------- */
@@ -58,9 +55,6 @@
   max-width: 900px;
   background: #ffffff;
   border: 1px solid #9999cc; /* 与form-section相同的边框 */
-  /* border: 1px solid #d9d9d9; */
-  /* border-radius: 4px; */
-  /* padding: 20px; */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -85,9 +79,6 @@
 }
 
 /* 必填字段标签中*号标记为红色 */
-/* .ud08-label--required {
-  color: #e60000;
-} */
 
 /* 运算符下拉框 */
 .ud08-search-row .ud08-operator {
@@ -185,59 +176,14 @@
 }
 
 /* Search - 深蓝色 */
-/* .ud08-btn--search {
-  background-color: #1a3a6b;
-  border-color: #1a3a6b;
-  color: #ffffff;
-} */
-
-/* .ud08-btn--search:hover {
-  background-color: #254e8a;
-} */
 
 /* Clear - 浅灰色 */
-/* .ud08-btn--clear {
-  background-color: #e0e0e0;
-  border-color: #c0c0c0;
-  color: #333;
-} */
-
-/* .ud08-btn--clear:hover {
-  background-color: #d0d0d0;
-} */
 
 /* Add - 绿色 */
-/* .ud08-btn--add {
-  background-color: #4caf50;
-  border-color: #4caf50;
-  color: #ffffff;
-} */
-
-/* .ud08-btn--add:hover {
-  background-color: #66bb6a;
-} */
 
 /* Update - 橙色 */
-/* .ud08-btn--update {
-  background-color: #ff9800;
-  border-color: #ff9800;
-  color: #ffffff;
-} */
-
-/* .ud08-btn--update:hover {
-  background-color: #ffb74d;
-} */
 
 /* Delete - 红色 */
-/* .ud08-btn--delete {
-  background-color: #f44336;
-  border-color: #f44336;
-  color: #ffffff;
-}
-
-/* .ud08-btn--delete:hover {
-  background-color: #ef5350;
-} */
 
 /* ---------- 响应式 ---------- */
 @media screen and (max-width: 768px) {

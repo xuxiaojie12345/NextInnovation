@@ -48,7 +48,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    * 2. 调用API获取Document type列表
    */
   useEffect(() => {
-    // 对应设计书 5. 异常处理 - 用户未登录
+    // 异常处理 - 用户未登录
     const userID = localStorage.getItem('userID');
     if (!userID) {
       navigate('/', { replace: true });
@@ -147,9 +147,8 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
   /**
    * 点击 Submit 按钮提交流程
-   * 对应设计书 3.1.2 Submit 按钮处理流程
    */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 1. 前置处理（正则已禁止输入空格，无需trim）
     // 2. 空値校验（前端校验）
     if (!chassisSeries) {
@@ -170,12 +169,36 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
       return;
     }
 
-    // 3. 結果処理
+    // 3. 调用UD04 API检查数据是否存在
+    setIsLoading(true);
+    setMessage('');
+    try {
+      const response = await apiClient.get('/api/ud04/getdocumentdata', {
+        params: {
+          chassisSerie: chassisSeries,
+          chassisNo: chassisNo,
+        },
+      });
+
+      if (response.data?.code !== 200) {
+        // 数据不存在
+        setMessage('Chassis no is not exists');
+        setIsLoading(false);
+        return;
+      }
+    } catch (error: any) {
+      // API调用失败时，显示错误消息，画面不跳转
+      setMessage('网络链接错误，请稍后重试');
+      setIsLoading(false);
+      return;
+    }
+
+    // 4. 結果処理
     // キャッシュ入力の検索条件をlocalStorage
     localStorage.setItem('lastChassisSeries', chassisSeries);
     localStorage.setItem('lastChassisNo', chassisNo);
     localStorage.setItem('lastDocumentType', documentType);
-    setMessage('');
+    setIsLoading(false);
     
     try {
       navigate('/UD04', {

@@ -20,7 +20,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表
   const [documents, setDocuments] = useState<DocumentItem[]>([]);   // 文档列表数据
   const [selectedDocType, setSelectedDocType] = useState<string | null>(null); // 选中的文档类型
   const [message, setMessage] = useState<string>('');                // 消息内容
@@ -37,7 +36,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   }
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 初期显示 - 获取文档列表
   useEffect(() => {
     // 从location.state获取从UD20-1传来的搜索参数
     const state = location.state as any;
@@ -81,17 +79,15 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
 
   /**
    * 处理表格行点击选择
-   * 对应设计书 3.1.2 行选择 - 点击行选中该记录
    *
    * @param docType - 选中记录的文档类型（唯一标识）
    */
   const handleRowSelect = useCallback((docType: string) => {
-    setSelectedDocType(docType);
+    setSelectedDocType((prev) => (prev === docType ? null : docType));
   }, []);
 
   /**
    * 处理 Select 按钮点击
-   * 对应设计书 3.1.3 Select按钮处理流程
    * 将选中记录的数据传送到UD20-1画面
    */
   const handleSelect = useCallback(() => {
@@ -110,7 +106,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.4 Back按钮处理流程
    * 返回前一个画面
    */
   const handleBack = useCallback(() => {
@@ -121,7 +116,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
 
   /**
    * 处理 Print 按钮点击
-   * 对应设计书 3.1.5 Print按钮处理流程
    * 打印当前页面内容
    */
   const handlePrint = useCallback(() => {
@@ -129,8 +123,7 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   }, []);
 
   /**
-   * 处理 User 链接点击
-   * 对应设计书 3.1.6 User链接 - 跳转到UD25用户信息画面
+   * 处理 User 链接点击跳转到UD25用户信息画面
    *
    * @param userId - 用户ID
    */
@@ -142,7 +135,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   return (
     <div className="ud20-container">
       {/* 页面标题 */}
-      {/* 对应设计书 2.1 控件属性表 No.8 Page Title */}
       <div className="ud20-title">Market Document Settings List</div>
 
       {/* 消息显示区域 */}
@@ -153,7 +145,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
       )}
 
         {/* 按钮区域 */}
-        {/* 对应设计书 2.1 No.5 Select / No.6 Back / No.7 Print */}
         <div className="ud20-button-row">
           <button className="ud20-btn" onClick={handleSelect} disabled={isLoading}>
             Select
@@ -170,7 +161,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
       <div className="ud20-content">
         
         {/* 数据表格区域 */}
-        {/* 对应设计书 2.1 No.1 Document type / No.2 Bussines unit / No.3 User / No.4 Date */}
         <div className="ud20-table-wrapper">
           <table className="ud20-table">
             <thead>
@@ -203,7 +193,7 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
                         type="radio"
                         name="docSelect"
                         checked={selectedDocType === doc.documentType}
-                        onChange={() => handleRowSelect(doc.documentType)}
+                        readOnly
                       />
                     </td>
                     <td className="ud20-col-doctype">{doc.documentType}</td>

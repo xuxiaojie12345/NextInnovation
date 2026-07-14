@@ -332,7 +332,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
   return (
     <div className="ud12-container">
       {/* ==================== 页面标题 ==================== */}
-      {/* <h1 className="ud12-page-title">Hdoc Template Upload</h1> */}
+
     
       <div className="ud12-content-wrapper">
         {/* ==================== 左侧：Upload区域 ==================== */}

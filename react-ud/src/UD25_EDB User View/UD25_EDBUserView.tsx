@@ -19,7 +19,6 @@ const UD25_EDBUserView: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [userid, setUserid] = useState<string>('');           // 用户ID
   const [responsible, setResponsible] = useState<string>(''); // 负责人
   const [userPosition, setUserPosition] = useState<string>(''); // 用户职位
@@ -32,7 +31,6 @@ const UD25_EDBUserView: React.FC = () => {
   useEffect(() => {
     /**
      * 页面加载时执行用户信息获取
-     * 对应设计书 3.1.1 页面初始化 - 获取用户信息
      *
      * 处理流程：
      * 1. 从location.state中获取userId参数
@@ -52,7 +50,6 @@ const UD25_EDBUserView: React.FC = () => {
       console.log('userId...'+userId);
       try {
         // 调用API获取用户信息
-        // 对应设计书 4.1 AuthenticationApi
         // 注意：参数名须与后端 @RequestParam 一致（userId，非userID）
         const response = await apiClient.get('/api/ud01/authentication', {
           params: { userId: userId },
@@ -67,7 +64,7 @@ const UD25_EDBUserView: React.FC = () => {
           setEmail(data.email || '');
           setMessage('');
         } else {
-          // 对应设计书 3.2 校验详细规格表 - No.1 响应数据为空
+          // 响应数据为空
           setMessage(response.data?.msg || '未找到用户信息');
           setMessageType('error');
         }
@@ -88,8 +85,6 @@ const UD25_EDBUserView: React.FC = () => {
 
   /**
    * 处理 Clear 按钮点击
-   * 对应设计书 3.1.2 Clear按钮处理流程
-   *
    * 处理流程：
    * 1. 清空所有TextField控件的值
    * 2. 清除消息显示
@@ -105,8 +100,6 @@ const UD25_EDBUserView: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.3 Back按钮处理流程
-   *
    * 处理流程：
    * 1. 执行画面迁移到前一个画面
    */

@@ -20,7 +20,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表
   const [documentType, setDocumentType] = useState<string>('');  // Document type（必填）
   const [businessUnit, setBusinessUnit] = useState<string>('BU');  // Bussines unit（默认BU）
   const [user, setUser] = useState<string>('');                   // User
@@ -34,9 +33,12 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   const [compareBU, setCompareBU] = useState<string>('=');
   const [compareUser, setCompareUser] = useState<string>('=');
   const [compareDate, setCompareDate] = useState<string>('=');
+  const [market, setMarket] = useState<string>('');                   // Market
+  const [compareMarket, setCompareMarket] = useState<string>('=');    // Market运算符
+  const [setting, setSetting] = useState<string>('');                 // Setting
+  const [compareSetting, setCompareSetting] = useState<string>('=');  // Setting运算符
 
   // ==================== 接收UD20返回的数据 ====================
-  // 对应设计书 3.1.1 初期表示 - 判断后画面返回场合
   useEffect(() => {
     const state = location.state as any;
     if (state?.backFormData) {
@@ -49,6 +51,10 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       setCompareBU(back.compareBU || '=');
       setCompareUser(back.compareUser || '=');
       setCompareDate(back.compareDate || '=');
+      setMarket(back.market || '');
+      setCompareMarket(back.compareMarket || '=');
+      setSetting(back.setting || '');
+      setCompareSetting(back.compareSetting || '=');
       window.history.replaceState({}, document.title);
     } else if (state?.selectedRecord) {
       // 从UD20 Select按钮返回，回填选中记录
@@ -65,8 +71,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
   /**
    * 处理 Search 按钮点击
-   * 对应设计书 3.1.2 - 跳转到UD20选择记录
-   *
    * 处理流程：
    * 1. 保存当前输入条件
    * 2. 跳转到UD20画面供用户选择记录
@@ -85,20 +89,27 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       params.registerDatetime = date.trim();
       params.registerDatetimeOp = compareDate;
     }
+    if (market.trim()) {
+      params.market = market.trim();
+      params.marketOp = compareMarket;
+    }
+    if (setting.trim()) {
+      params.setting = setting.trim();
+      params.settingOp = compareSetting;
+    }
 
     // 保存当前输入，用于从UD20返回时恢复
     navigate('/UD20', {
       state: {
         searchParams: params,
-        formData: { documentType, user, date, compareDocType, compareBU, compareUser, compareDate },
+        formData: { documentType, user, date, market, setting, compareDocType, compareBU, compareUser, compareDate, compareMarket, compareSetting },
       },
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, documentType, user, date, compareDocType, compareUser, compareDate]);
+  }, [navigate, documentType, user, date, market, setting, compareDocType, compareUser, compareDate, compareMarket, compareSetting]);
 
   /**
    * 处理 Clear 按钮点击
-   * 对应设计书 3.1.4 - 清空输入字段
    */
   const handleClear = useCallback(() => {
     setDocumentType('');
@@ -108,6 +119,10 @@ const UD20_MarketDocumentSettings: React.FC = () => {
     setCompareBU('=');
     setCompareUser('=');
     setCompareDate('=');
+    setMarket('');
+    setCompareMarket('=');
+    setSetting('');
+    setCompareSetting('=');
     setMessage('');
   }, []);
 
@@ -120,8 +135,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   }, [navigate]);
 
   /**
-   * 处理 Update Mode 按钮点击
-   * 对应设计书 3.1.5 - 更新HDOC_DOCUMENT_LIST表
+   * 处理 Update Mode 按钮点击更新HDOC_DOCUMENT_LIST表
    *
    * 处理流程：
    * 1. 前端校验：Document type不能为空
@@ -141,10 +155,12 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
     try {
       // 对应设计书 4.1 - POST /api/ud201/updatedocument
+      const registerUser = localStorage.getItem('userID') || 'SYSTEM';
       const response = await apiClient.post('/api/ud201/updatedocument', {
         doctype: documentType.trim(),
         user: user.trim(),
         date: date.trim(),
+        registerUser,
       });
 
       if (response.data?.code === 200) {
@@ -176,7 +192,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   return (
     <div className="ud201-container">
       {/* 页面标题 */}
-      {/* 对应设计书 2.1 No.1 title */}
       <div className="ud201-title">HDoc - Market Document Settings</div>
 
       {/* 消息显示区域 */}
@@ -187,8 +202,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       )}
 
       {/* 按钮区域 */}
-      {/* 对应设计书 2.1 No.6 Search / No.7 Clear / No.8 Back / No.9 Update Mode */}
-      <div className="ud201-button-row">
+        <div className="ud201-button-row">
         <button className="ud201-btn" onClick={handleSearch} disabled={isLoading}>Search</button>
         <button className="ud201-btn" onClick={handleClear} disabled={isLoading}>Clear</button>
         <button className="ud201-btn" onClick={handleBack} disabled={isLoading}>Back</button>
@@ -200,12 +214,11 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       {/* 表单区域 */}
       <div className="ud201-content">
         {/* Document type */}
-        {/* 对应设计书 2.1 No.2 Document type */}
         <div className="ud201-field-row">
           <span className="ud201-label">Document type</span>
           <select className="ud201-compare-select" value={compareDocType} onChange={(e) => setCompareDocType(e.target.value)}>
             <option value="=">=</option>
-            <option value="!=">≠</option>
+            <option value="!=">!=</option>
           </select>
           <input
             className="ud201-input"
@@ -222,13 +235,44 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           />
         </div>
 
+        {/* Market */}
+        <div className="ud201-field-row">
+          <span className="ud201-label">Market</span>
+          <select className="ud201-compare-select" value={compareMarket} onChange={(e) => setCompareMarket(e.target.value)}>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+          </select>
+          <input
+            className="ud201-input"
+            type="text"
+            value={market}
+            onChange={(e) => setMarket(e.target.value)}
+            placeholder=""
+          />
+        </div>
+
+        {/* Setting */}
+        <div className="ud201-field-row">
+          <span className="ud201-label">Setting</span>
+          <select className="ud201-compare-select" value={compareSetting} onChange={(e) => setCompareSetting(e.target.value)}>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+          </select>
+          <select
+            className="ud201-input"
+            value={setting}
+            onChange={(e) => setSetting(e.target.value)}
+          >
+            <option value=""></option>
+          </select>
+        </div>
+
         {/* Bussines unit */}
-        {/* 对应设计书 2.1 No.3 Bussines unit */}
         <div className="ud201-field-row">
           <span className="ud201-label">Bussines unit</span>
           <select className="ud201-compare-select" value={compareBU} onChange={(e) => setCompareBU(e.target.value)}>
             <option value="=">=</option>
-            <option value="!=">≠</option>
+            <option value="!=">!=</option>
           </select>
           <input
             className="ud201-input"
@@ -239,12 +283,11 @@ const UD20_MarketDocumentSettings: React.FC = () => {
         </div>
 
         {/* User */}
-        {/* 对应设计书 2.1 No.4 User */}
         <div className="ud201-field-row">
           <span className="ud201-label">User</span>
           <select className="ud201-compare-select" value={compareUser} onChange={(e) => setCompareUser(e.target.value)}>
             <option value="=">=</option>
-            <option value="!=">≠</option>
+            <option value="!=">!=</option>
           </select>
           <input
             className="ud201-input"
@@ -261,7 +304,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
         </div>
 
         {/* Date */}
-        {/* 对应设计书 2.1 No.5 Date */}
         <div className="ud201-field-row">
           <span className="ud201-label">Date</span>
           <select className="ud201-compare-select" value={compareDate} onChange={(e) => setCompareDate(e.target.value)}>

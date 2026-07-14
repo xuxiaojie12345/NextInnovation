@@ -93,18 +93,17 @@
   display: flex;
   align-items: center;
   margin-bottom: 14px;
-  padding-left: 10px;
 }
 
 .ud201-label {
-  min-width: 130px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  text-align: left;
-  padding-right: 10px;
-  white-space: nowrap;
-  flex-shrink: 0;
+  min-width: 140px;
+    font-size: 13px;
+    font-weight: bolder;
+    color: #333;
+    text-align: left;
+    padding-right: 10px;
+    white-space: nowrap;
+    margin-left: 15px;
 }
 
 /* 比较运算符下拉框 */

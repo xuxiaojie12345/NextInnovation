@@ -19,12 +19,6 @@ interface SearchUserItem {
   market: string;
 }
 
-/** 搜索API响应数据结构 */
-// interface SearchResponseData {
-//   count: number;
-//   datatable: SearchUserItem[];
-// }
-
 /* ============================================================
    UD19_SearchUser 组件
    Search User - 用户搜索页面
@@ -64,8 +58,6 @@ const UD19_SearchUser: React.FC = () => {
 
   /**
    * 获取Market下拉列表数据
-   * 对应设计书 3.1.1 - 调用 UD19SelectMarketMaster() 方法
-   * 对应设计书 4.1 UD19SelectMarketMaster - 获取Market列表
    */
   const fetchMarketList = async () => {
     try {
@@ -124,8 +116,6 @@ const UD19_SearchUser: React.FC = () => {
 
   /**
    * 搜索用户
-   * 对应设计书 3.1.2 Search按钮处理流程
-   * 对应设计书 4.2 UD19SearchHdoc - 搜索用户
    *
    * 处理流程：
    * 1. 前置处理：获取所有搜索条件
@@ -139,30 +129,16 @@ const UD19_SearchUser: React.FC = () => {
     const trimmedUsername = username.trim();
 
     // 校验：UserID格式（如果有输入）
-    // 对应设计书 3.2 校验详细规格表 No.2
     if (trimmedUserId && !USER_ID_REGEX.test(trimmedUserId)) {
       setMessageType('error');
       setMessage('UserID只能包含半角英数字');
       return;
     }
-    // 对应设计书 3.2 校验详细规格表 No.3
-    if (trimmedUserId.length > MAX_USER_ID_LENGTH) {
-      setMessageType('error');
-      setMessage('UserID最大长度为10字符');
-      return;
-    }
 
     // 校验用户名格式
-    // 对应设计书 3.2 校验详细规格表 No.4
     if (trimmedUsername && !USER_REGEX.test(trimmedUsername)) {
       setMessageType('error');
       setMessage('用户名只能包含半角英数字');
-      return;
-    }
-    // 对应设计书 3.2 校验详细规格表 No.5
-    if (trimmedUsername.length > MAX_USERNAME_LENGTH) {
-      setMessageType('error');
-      setMessage('用户名最大长度为32字符');
       return;
     }
 
@@ -173,7 +149,6 @@ const UD19_SearchUser: React.FC = () => {
 
     try {
       // 构建查询参数
-      // 对应设计书 4.2 Request Parameters
       const params: Record<string, string> = {};
       if (trimmedUserId) params.userId = trimmedUserId;
       if (trimmedUsername) params.username = trimmedUsername;
@@ -183,15 +158,11 @@ const UD19_SearchUser: React.FC = () => {
         params.type = searchType === 'rule' ? 'R' : 'T';
       }
 
-      console.log('UD19 搜索参数:', JSON.stringify(params));
-
       // 调用搜索API
-      // 对应设计书 4.2 - GET /api/ud19/search
+      // GET /api/ud19/search
       const response = await apiClient.get('/api/ud19/search', {
         params,
       });
-
-      console.log('UD19 搜索响应:', JSON.stringify(response.data));
 
       // 结果处理
       if (response.data?.code === 200) {
@@ -199,25 +170,22 @@ const UD19_SearchUser: React.FC = () => {
         const tableData: SearchUserItem[] = responseData?.datatable || [];
         const count = responseData?.count || tableData.length;
 
+        console.log('UD19_SearchUser:', responseData);
         setSearchResults(tableData);
-        // setResultCount(count);
 
         if (count > 0) {
-          // 找到匹配用户
+          // 找到匹配用户，将结果的Userid和User填充到搜索条件中
+          const firstResult = tableData[0];
+          if (firstResult) {
+            setUserId(firstResult.userId);
+            setUsername(firstResult.username);
+          }
           setMessageType('success');
-        //   setMessage(`查询成功，共找到 ${count} 条记录`);
-        } else {
-          // 未找到匹配用户
-          setSearchResults([]);
-          setMessageType('success');
-          setMessage('未找到匹配的用户');
         }
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.7
         setMessageType('error');
         setMessage(response.data?.msg || '搜索失败');
         setSearchResults([]);
-        // setResultCount(0);
       }
     } catch (error: any) {
       // 异常处理
@@ -233,17 +201,16 @@ const UD19_SearchUser: React.FC = () => {
         if (statusCode === 400) {
           setMessage(errorMsg || '请输入至少一个搜索条件');
         } else if (statusCode >= 500) {
-          // 对应设计书 5. 异常处理 - 服务器内部错误
+          // 异常处理 - 服务器内部错误
           setMessage('服务器内部错误，请联系管理员');
         } else {
-          // 对应设计书 3.2 校验详细规格表 No.7
           setMessage(errorMsg || '搜索失败');
         }
       } else if (error.code === 'ECONNABORTED') {
-        // 对应设计书 5. 异常处理 - 超时错误
+        // 异常处理 - 超时错误
         setMessage('请求超时，请稍后重试');
       } else {
-        // 对应设计书 5. 异常处理 - 网络连接失败
+        // 异常处理 - 网络连接失败
         setMessage('网络连接失败，请检查网络设置');
       }
     } finally {
@@ -254,7 +221,7 @@ const UD19_SearchUser: React.FC = () => {
   // ==================== 渲染 UI ====================
   return (
     <div className='ud19-container'>
-      {/* 页面标题 - 参照UD18样式 */}
+      {/* 页面标题 */}
       <div className='ud19-title'>Search User</div>
 
       {/* 消息显示区域 */}
@@ -269,11 +236,9 @@ const UD19_SearchUser: React.FC = () => {
       )}
 
       {/* 搜索条件区域 */}
-      {/* 对应设计书 2.1.1 搜索条件区域 */}
       <div className='ud19-form-section'>
 
         {/* UserID：label + input 同行 */}
-        {/* 对应设计书 No.1 Userid */}
         <div className='ud19-field-row'>
           <label htmlFor='ud19-userid'>Userid</label>
           <input
@@ -289,7 +254,6 @@ const UD19_SearchUser: React.FC = () => {
         </div>
 
         {/* User：label + input 同行 */}
-        {/* 对应设计书 No.2 User */}
         <div className='ud19-field-row'>
           <label htmlFor='ud19-user'>User</label>
           <input
@@ -305,7 +269,6 @@ const UD19_SearchUser: React.FC = () => {
         </div>
 
         {/* Market：label + dropdown + Radio 按钮 */}
-        {/* 对应设计书 No.3 Market / No.4 Not set / No.5 Rule / No.6 Template */}
         <div className='ud19-market-row'>
           <label htmlFor='ud19-market'>Market</label>
           <select
@@ -358,8 +321,7 @@ const UD19_SearchUser: React.FC = () => {
         </div>
       </div>
 
-        {/* Search 按钮 - 下方居中 */}
-        {/* 对应设计书 No.7 Search */}
+        {/* Search 按钮 */}
         <div className='ud19-action-area'>
           <button
             className='ud19-btn-search'
@@ -371,7 +333,6 @@ const UD19_SearchUser: React.FC = () => {
         </div>
 
       {/* 搜索结果区域 */}
-      {/* 对应设计书 2.1.2 搜索结果区域(DataTable) */}
       <div className='ud19-result-section'>
 
           {hasSearched && searchResults.length > 0 ? (

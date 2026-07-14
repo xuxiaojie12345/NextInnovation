@@ -16,7 +16,6 @@ import './UD22_DocumentTypes.css';
  */
 const UD22_DocumentTypes: React.FC = () => {
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表 No.1 Key / No.2 Description
   const [docTypes, setDocTypes] = useState<DocTypeItem[]>([]);  // 文档类型列表
   const [message, setMessage] = useState<string>('');             // 消息内容
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
@@ -29,7 +28,6 @@ const UD22_DocumentTypes: React.FC = () => {
   }
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 文档类型列表展示
   useEffect(() => {
     fetchDocTypes();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,8 +35,6 @@ const UD22_DocumentTypes: React.FC = () => {
 
   /**
    * 获取文档类型列表
-   * 对应设计书 4.1 UD20GetDocumentListApi - UD20SelectHdocDocumentList()
-   * GET /api/ud20/getdocumentlist
    *
    * 处理流程：
    * 1. 调用API获取文档类型列表
@@ -52,7 +48,6 @@ const UD22_DocumentTypes: React.FC = () => {
       // 后端返回格式：{ code: 200, message: "success", data: [{ documentType, ... }] }
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         const data = response.data.data;
-        console.log('获取文档类型列表data成功:', data);
         if (data.length === 0) {
           // 对应设计书 3.1.1 空值校验 - API返回空数组
           setMessage('当前没有可用的文档类型');

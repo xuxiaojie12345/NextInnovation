@@ -31,7 +31,6 @@
   border: 1px solid #9999cc;
   padding: 20px 20px 16px 20px;
   background-color: #ffffff;
-  /* margin-bottom: 10px; */
 }
 
 /* ==================== 字段行：label + input/dropdown 同行 ==================== */
@@ -137,10 +136,6 @@
 
 /* ==================== Search 按钮区域 ==================== */
 .ud19-action-area {
-  /* display: flex;
-  justify-content: center;
-  margin-top: 16px; */
-
   display: flex;
   justify-content: flex-start;
   gap: 10px;
@@ -151,17 +146,6 @@
 }
 
 .ud19-btn-search {
-  /* padding: 5px 32px;
-  background-color: #003366;
-  color: #ffffff;
-  border: 1px solid #003366;
-  border-radius: 0;
-  font-size: 13px;
-  cursor: pointer;
-  font-weight: normal;
-  height: 28px;
-  line-height: 16px; */
-
   color: black;
   padding: 4px 20px;
   font-size: 12px;

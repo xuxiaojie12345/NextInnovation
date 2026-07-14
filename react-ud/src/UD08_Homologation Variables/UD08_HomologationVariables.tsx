@@ -87,8 +87,6 @@ const UD08_HomologationVariables: React.FC = () => {
   useEffect(() => {
     /**
      * 页面加载时执行初始化
-     * 对应设计书 3.1.1 初始显示流程
-     *
      * 处理流程：
      * 1. 调用API获取 Product class 下拉列表数据
      * 2. 调用API获取 Market 下拉列表数据
@@ -114,13 +112,7 @@ const UD08_HomologationVariables: React.FC = () => {
         setMessageType('error');
       }
     };
-
     loadMasterData();
-
-    // 设置 Created by user 和 Date 的初始值（当前用户和当前时间）
-    const currentUser = localStorage.getItem('userID') || 'SYSTEM';
-    setDisplayCreatedByUser(currentUser);
-    setDisplayDate(formatDate(new Date()));
   }, []);
 
   /**
@@ -136,8 +128,6 @@ const UD08_HomologationVariables: React.FC = () => {
   // ==================== 接收UD09传来的数据 ====================
   /**
    * 从UD09返回时，根据返回类型处理数据填充
-   * 对应设计书 3.1.1 初始显示流程 - 第2步
-   *
    * 处理逻辑：
    * - 如果从UD09点Select按钮跳转过来（selectedRecord），则接收选中记录并填充到表单
    * - 如果从UD09点Back按钮跳转过来（backFormData），则恢复跳转前的输入数据
@@ -199,7 +189,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 更新指定字段的输入值
-   * 对应设计书 2.1 - 输入控件状态管理
    *
    * @param setter - 字段的 setState 函数
    * @param newValue - 新的输入值
@@ -230,7 +219,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 执行清空操作
-   * 对应设计书 3.1.3 Clear 操作流程
    *
    * 处理流程：
    * 1. 清空所有输入字段的值
@@ -262,7 +250,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 执行检索操作
-   * 对应设计书 3.1.2 Search 操作流程
    *
    * 处理流程：
    * 1. 收集所有非空的检索条件
@@ -270,7 +257,7 @@ const UD08_HomologationVariables: React.FC = () => {
    */
   const handleSearch = useCallback(() => {
     // 构建检索参数字典（只包含非空值）
-    // 同时传递每个字段的运算符，用于UD09检索时区分 = / ≠ 等条件
+    // 同时传递每个字段的运算符，用于UD09检索时区分 = / ≠  / > / < / 等条件
     const params: Record<string, string> = {};
     if (productClass.value) {
       params.productClass = productClass.value;
@@ -304,8 +291,6 @@ const UD08_HomologationVariables: React.FC = () => {
       params.comments = comments.value;
       params.commentsOp = comments.operator;
     }
-
-    // 将信息标签字段也加入检索参数（Created by user 和 Date 不作为检索条件）
     if (displayAddDate) {
       params.addDate = displayAddDate;
       params.addDateOp = addDateOp;
@@ -313,6 +298,14 @@ const UD08_HomologationVariables: React.FC = () => {
     if (displayDeleteDate) {
       params.deleteDate = displayDeleteDate;
       params.deleteDateOp = deleteDateOp;
+    }
+    if (displayCreatedByUser) {
+      params.createdByUser = displayCreatedByUser;
+      params.createdByUserOp = createdByUserOp;
+    }
+    if (displayDate) {
+      params.registerDatetime = displayDate;
+      params.registerDatetimeOp = registerDatetimeOp;
     }
 
     // 保存当前表单数据，用于UD09点Back返回时恢复输入
@@ -351,7 +344,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 执行前端校验
-   * 对应设计书 3.2 校验详细规格表
    *
    * 校验规则：
    * - Product class 不能为空（No.7）
@@ -561,12 +553,7 @@ const UD08_HomologationVariables: React.FC = () => {
 
         setDisplayCreatedByUser(currentUser);
         setDisplayDate(formatDate(now));
-        // 更新成功后，将当前主键值设为新的原始主键，后续Update不再与旧值比较
-        // originalPkRef.current = {
-        //   productClass: productClass.value.trim(),
-        //   number: number.value.trim(),
-        //   market: market.value.trim(),
-        // };
+
       } else {
         setMessage(response.data.message || '操作失败');
         setMessageType('error');

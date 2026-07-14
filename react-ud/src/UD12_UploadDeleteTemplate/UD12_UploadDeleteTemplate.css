@@ -5,12 +5,8 @@
 
 /* ===== 页面整体容器 ===== */
 .ud12-container {
-  /* max-width: 1100px; */
-  /* margin: 0 auto; */
-  /* padding: 24px 20px; */
   font-family:  Arial, sans-serif;
   background-color: #ffffff;
-  /* min-height: 100vh; */
   box-sizing: border-box;
   max-width: 800px;
 }
@@ -21,7 +17,6 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  /* margin-bottom: 24px; */
   border: 1px solid #d0d5dd;
 }
 
@@ -81,9 +76,7 @@
 
 /* ===== 蓝色边框盒子（输入框/下拉框/按钮容器） ===== */
 .ud12-blue-border-box {
-  /* border: 1px solid #4a90d9; */
   border-radius: 0;
-  /* padding: 2px; */
   background-color: #ffffff;
   flex: 1;
   max-width: 400px;
@@ -96,12 +89,6 @@
 }
 
 /* ===== 蓝色边框盒子 ===== */
-/* .ud12-blue-border-box {
-  border: 1px solid #4a90d9;
-  border-radius: 0;
-  padding: 2px;
-  background-color: #ffffff;
-} */
 
 .ud12-btn-box {
   display: inline-block;
@@ -204,10 +191,6 @@
   background-color: #f8f3f3;
 }
 
-/* .ud12-btn-delete:active:not(:disabled) {
-  background-color: #f0ebeb;
-} */
-
 /* ===== 取消按钮（模态框用） ===== */
 .ud12-btn-cancel {
   background-color: #ffffff;
@@ -233,8 +216,6 @@
 /* ===== 底部提示文字 ===== */
 .ud12-footnote {
   padding: 10px 16px;
-  /* background-color: #fafafa; */
-  /* border-top: 1px solid #e8ecf1; */
   font-size: 15px;
   color: #666666;
   line-height: 1.5;
@@ -242,10 +223,8 @@
 
 /* ===== Check Template 底部区域 ===== */
 .ud12-check-section {
-  /* border: 1px solid #e8ecf1; */
   padding: 10px 10px;
   margin-bottom: 16px;
-  /* background-color: #fafbfc; */
 }
 
 .ud12-check-heading {

@@ -178,7 +178,6 @@
 .ud18-document-select option:checked {
   background-color: #b8d1f1;
   color: #0a0a0a;
-  /* font-weight: 600; */
 }
 
 /* ==================== 消息显示区域 ==================== */

@@ -374,9 +374,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* 对应设计文档 2.1 控件属性表 No.7 */}
             {state.sNoteNo && (
               <div className='result-item'>
-                {/* <label className='result-label'>S-Note NO:</label> */}
                 <label className='result-value'>{state.sNoteNo}</label>
-                {/* <span className='result-value'>{state.sNoteNo}</span> */}
               </div>
             )}
 

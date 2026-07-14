@@ -23,16 +23,11 @@
 
 /* ==================== 链接列表容器 ==================== */
 .ud24-container .ud24-link-list {
-  /* background: #ffffff; */
-  /* border: 1px solid #8b95eb; */
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); */
-  /* padding: 20px; */
   margin-bottom: 20px;
 }
 
 /* ==================== 链接项样式 ==================== */
 .ud24-container .ud24-link-item {
-  /* padding: 16px 20px; */
   margin-bottom: 12px;
   border-left: 4px solid transparent;
   cursor: pointer;
@@ -42,13 +37,6 @@
 
 .ud24-container .ud24-link-item:last-child {
   margin-bottom: 0;
-}
-
-/* 鼠标悬停效果 */
-.ud24-container .ud24-link-item:hover {
-  background-color: #e6f7ff;
-  border-left-color: #1890ff;
-  transform: translateX(4px);
 }
 
 /* 点击效果 */
@@ -66,17 +54,9 @@
   line-height: 1.6;
 }
 
-.ud24-container .ud24-link-item:hover .ud24-link-text {
-  color: #0050b3;
-  text-decoration: underline;
-}
-
 /* ==================== 其他信息区域 ==================== */
 .ud24-container .ud24-other-info {
   background: #ffffff;
-  /* border: 1px solid #8b95eb; */
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); */
-  /* padding: 15px 20px; */
 }
 
 /* ==================== 复选框标签样式 ==================== */

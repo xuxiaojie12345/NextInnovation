@@ -54,14 +54,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // ==================== 初始化 ====================
-  /** 页面加载时设置 Created by user 和 Date 的初始值 */
-  useEffect(() => {
-    const currentUser = localStorage.getItem('userID') || 'SYSTEM';
-    setDisplayCreatedByUser(currentUser);
-    setDisplayDate(formatDate(new Date()));
-  }, []);
-
   /**
    * 格式化日期为 yyyy-MM-DD 格式
    */
@@ -113,7 +105,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Search 按钮点击
-   * 对应设计书 3.1.2 Search 按钮处理流程
    *
    * 携带输入参数跳转到 UD11 搜索结果画面
    */
@@ -131,7 +122,14 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       params.description = description.trim();
       params.descriptionOp = descriptionOp;
     }
-    // Created by user 和 Date 不作为检索条件传递给UD11
+    if (displayCreatedByUser) {
+      params.createdByUser = displayCreatedByUser;
+      params.createdByUserOp = createdByUserOp;
+    }
+    if (displayDate) {
+      params.registerDatetime = displayDate;
+      params.registerDatetimeOp = registerDateOp;
+    }
 
     // 保存当前表单数据，用于UD11点Back返回时恢复输入
     const formData = {
