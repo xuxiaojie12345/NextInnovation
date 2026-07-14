@@ -153,14 +153,14 @@ class UD10HdocVariablesServiceImplTest {
     // ============================================================
     // deleteVariable
     // ============================================================
-    @Test @DisplayName("delete-variable为null-400") void testDel_VarNull() { validReq.setVariable(null); assertEquals(400, service.deleteVariable(validReq).getCode().intValue()); verifyNoInteractions(mapper); }
-    @Test @DisplayName("delete-variable为空-400") void testDel_VarEmpty() { validReq.setVariable(""); assertEquals(400, service.deleteVariable(validReq).getCode().intValue()); verifyNoInteractions(mapper); }
-    @Test @DisplayName("delete-variable超过20-400") void testDel_VarTooLong() { validReq.setVariable("A".repeat(21)); assertEquals(400, service.deleteVariable(validReq).getCode().intValue()); verifyNoInteractions(mapper); }
+    @Test @DisplayName("delete-variable为null-400") void testDel_VarNull() { validReq.setVariable(null); assertEquals(400, service.deleteVariable(validReq.getVariable()).getCode().intValue()); verifyNoInteractions(mapper); }
+    @Test @DisplayName("delete-variable为空-400") void testDel_VarEmpty() { validReq.setVariable(""); assertEquals(400, service.deleteVariable(validReq.getVariable()).getCode().intValue()); verifyNoInteractions(mapper); }
+    @Test @DisplayName("delete-variable超过20-400") void testDel_VarTooLong() { validReq.setVariable("A".repeat(21)); assertEquals(400, service.deleteVariable(validReq.getVariable()).getCode().intValue()); verifyNoInteractions(mapper); }
 
     @Test @DisplayName("delete-记录不存在-400")
     void testDel_NotFound() {
         when(mapper.countByVariable("TEST_VAR")).thenReturn(0);
-        assertEquals(400, service.deleteVariable(validReq).getCode().intValue());
+        assertEquals(400, service.deleteVariable(validReq.getVariable()).getCode().intValue());
         verify(mapper, never()).deleteByVariable(any());
     }
 
@@ -168,7 +168,7 @@ class UD10HdocVariablesServiceImplTest {
     void testDel_Success() {
         when(mapper.countByVariable("TEST_VAR")).thenReturn(1);
         when(mapper.deleteByVariable("TEST_VAR")).thenReturn(1);
-        assertEquals(200, service.deleteVariable(validReq).getCode().intValue());
+        assertEquals(200, service.deleteVariable(validReq.getVariable()).getCode().intValue());
         verify(mapper, times(1)).deleteByVariable("TEST_VAR");
     }
 
@@ -176,13 +176,13 @@ class UD10HdocVariablesServiceImplTest {
     void testDel_DeleteFails() {
         when(mapper.countByVariable("TEST_VAR")).thenReturn(1);
         when(mapper.deleteByVariable("TEST_VAR")).thenReturn(0);
-        assertEquals(500, service.deleteVariable(validReq).getCode().intValue());
+        assertEquals(500, service.deleteVariable(validReq.getVariable()).getCode().intValue());
     }
 
     @Test @DisplayName("delete-异常-500")
     void testDel_Exception() {
         when(mapper.countByVariable("TEST_VAR")).thenThrow(new RuntimeException());
-        assertEquals(500, service.deleteVariable(validReq).getCode().intValue());
+        assertEquals(500, service.deleteVariable(validReq.getVariable()).getCode().intValue());
     }
 
     // ============================================================

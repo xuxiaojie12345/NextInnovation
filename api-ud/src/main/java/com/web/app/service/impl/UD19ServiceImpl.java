@@ -41,7 +41,7 @@ public class UD19ServiceImpl implements UD19Service {
     public ApiResponse<?> searchHdoc(HdocDocumentList request) {
 
         try {
-            String userid = request.getUserid() != null ? request.getUserid().trim() : "";
+            String userid = request.getUserId() != null ? request.getUserId().trim() : "";
             String searchUser = request.getSearchUser() != null ? request.getSearchUser().trim() : "";
             String market = request.getMarket() != null ? request.getMarket().trim() : "";
             String searchType = request.getSearchType() != null ? request.getSearchType().trim().toUpperCase() : "";
