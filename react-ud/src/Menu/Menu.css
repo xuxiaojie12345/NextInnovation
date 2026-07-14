@@ -1,4 +1,4 @@
-/* ── 全体レイアウト ── */
+/* 菜单布局 */
 .menu-root {
   display: flex;
   height: 100vh;
@@ -7,7 +7,26 @@
   font-size: 14px;
 }
 
-/* ── サイドバー ── */
+.menu-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background-color: #000f60;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-title {
+  margin-left: 20px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
 .menu-sidebar {
   width: 260px;
   min-width: 260px;
@@ -17,23 +36,9 @@
   flex-direction: column;
   overflow: hidden;
   border-right: 1px solid #d0d0d0;
+  margin-top: 44px;
 }
 
-.sidebar-header {
-  padding: 14px 20px 12px;
-  background-color: #000f60;
-  border-bottom: 1px solid #d0d0d0;
-}
-
-.sidebar-header h2 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-
-/* ── ナビゲーション（スクロールなし） ── */
 .sidebar-nav {
   flex: 1;
   overflow: hidden;
@@ -42,7 +47,6 @@
   flex-direction: column;
 }
 
-/* ── セクション ── */
 .section-title {
   padding: 6px 16px 4px;
   font-size: 11px;
@@ -55,7 +59,6 @@
   text-align: left;
 }
 
-/* ── メニュー項目 ── */
 .menu-item {
   display: flex;
   align-items: center;
@@ -86,20 +89,20 @@
   font-size: 12px;
 }
 
-/* ── 右上ユーザー情報バー ── */
 .sidebar-footer {
   position: fixed;
   top: 0;
   right: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 8px 20px;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #d0d0d0;
-  border-left: 1px solid #d0d0d0;
+  gap: 12px;
+  padding: 0 16px;
+  background-color: #001050;
+  border-bottom: 1px solid #001050;
+  border-left: 1px solid #002070;
   border-radius: 0 0 0 6px;
   z-index: 100;
+  height: 44px;
 }
 
 .user-info {
@@ -109,36 +112,64 @@
 }
 
 .user-icon {
-  font-size: 16px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .user-name {
   font-size: 13px;
-  color: #333;
+  color: #e0e0e0;
+  font-weight: 500;
 }
 
-.logout-btn {
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn {
   background: transparent;
-  border: 1px solid #aaa;
-  color: #555;
+  border: 1px solid #6680cc;
+  color: #d0d8f0;
   padding: 4px 12px;
   border-radius: 3px;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.back-btn:hover {
+  background-color: #002080;
+  color: #fff;
+  border-color: #88a0e0;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #6680cc;
+  color: #d0d8f0;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
 }
 
 .logout-btn:hover {
-  background-color: #ddd;
-  color: #222;
+  background-color: #cc3333;
+  color: #fff;
+  border-color: #cc3333;
 }
 
-/* ── メインコンテンツ ── */
 .menu-main {
   flex: 1;
-  padding: 45px 36px;
+  padding: 35px 36px;
   background-color: #fff;
   overflow-y: auto;
+  margin-top: 44px;
 }
 
 .menu-main h1 {

@@ -12,6 +12,7 @@ interface DocumentRecord {
   registerDatetime: string;
 }
 
+// 市场文档设置结果列表组件
 const MarketDocumentSettingsResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
       </table>
 
       {isLoading ? (
-        <div className="mdsr-loading">Loading...</div>
+        <div className="loading-placeholder">Loading...</div>
       ) : results.length > 0 ? (
         <div className="mdsr-table-wrapper print-wrapper">
           <table className="mdsr-table print-table">
@@ -187,10 +188,10 @@ const MarketDocumentSettingsResultList: React.FC = () => {
           </table>
         </div>
       ) : (
-        !isLoading && <div className="mdsr-empty">没有找到符合条件的文档</div>
+        !isLoading && <div className="empty-placeholder">没有找到符合条件的文档</div>
       )}
 
-      <div className="mdsr-count">Number of lines found: {results.length}</div>
+      <div className="result-count">Number of lines found: {results.length}</div>
     </div>
   );
 };

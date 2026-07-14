@@ -23,6 +23,7 @@ interface VehicleSpecData {
   kolaList: KolaItem[];
 }
 
+// 车辆规格组件
 const VehicleSpecification: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -108,9 +109,7 @@ const VehicleSpecification: React.FC = () => {
     <div className="vs-container">
       <h1 className="vs-title">VDA - Vehicle Specification</h1>
 
-      {/* 表头左对齐 */}
-
-      {/* 四列表格：项目名: | 项目值 | 项目名: | 项目值 */}
+      {/* 车辆信息表格 */}
       <table className="vs-info-table">
         <tbody>
           <tr>
@@ -162,11 +161,9 @@ const VehicleSpecification: React.FC = () => {
         </tbody>
       </table>
 
-      {/* 间隔 30px */}
       <div style={{ height: "30px" }} />
 
-      {/* KOLA Configuration 左对齐 */}
-
+      {/* KOLA 配置列表 */}
       {data.kolaList && data.kolaList.length > 0 ? (
         <div className="vs-symbol-list">
           {data.kolaList.map((kola, idx) => (
@@ -181,7 +178,7 @@ const VehicleSpecification: React.FC = () => {
         <div className="vs-empty">No symbol data available.</div>
       )}
 
-      {/* 画面底部：S-Note NO */}
+      {/* S-Note 信息 */}
       <div style={{ height: "30px" }} />
       <div className="vs-footer">
         <strong>S-Note NO: </strong>

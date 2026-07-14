@@ -1,4 +1,4 @@
-// api.ts
+// API 服务层：封装 POST/GET/DELETE/文件上传
 export const API_BASE_URL = "/api/v1/hdoc";
 
 interface ApiResponse<T> {

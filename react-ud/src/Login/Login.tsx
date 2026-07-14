@@ -8,12 +8,13 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 画面マウント時にフォームを強制クリア
+  // 页面挂载时强制清空表单（防浏览器自动填充）
   useEffect(() => {
     setUserid("");
     setPassword("");
   }, []);
 
+  // 登录：校验 → API调用 → 保存token
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -42,6 +43,7 @@ const Login: React.FC = () => {
         password: passwordVal,
       };
 
+      // POST请求进行身份认证
       const response = await fetch("/api/v1/hdoc/login", {
         method: "POST",
         headers: {
@@ -72,8 +74,8 @@ const Login: React.FC = () => {
       }
 
       const hasValidData = result !== null;
+      // 登录成功：保存token并跳转菜单页
       if (response.ok && hasValidData && result?.code === 200 && result?.data) {
-        // 登录成功，保存token并跳转
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("userId", result.data.userid);
         localStorage.setItem("username", result.data.username);
@@ -102,6 +104,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      {/* 左侧信息面板 */}
       <div className="login-info-panel">
         <div className="left-content">
           <h1>
@@ -115,6 +118,7 @@ const Login: React.FC = () => {
         </div>
       </div>
 
+      {/* 右侧登录表单 */}
       <div className="login-form-panel">
         <div className="login-form">
           <form onSubmit={handleSubmit} autoComplete="off">

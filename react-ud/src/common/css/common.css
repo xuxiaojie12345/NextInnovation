@@ -1,12 +1,8 @@
 /* ═══════════════════════════════════════════
-   common.css — プロジェクト共通スタイル
-   App.tsx および各画面コンポーネントで import
+   common.css — 项目通用样式
+   App.tsx 及各页面组件中引用
    ═══════════════════════════════════════════ */
 
-/* ═══════════════════════════════════════════
-   汎用ボタン（.btn）
-   全画面統一のクラシックボタンスタイル
-   ═══════════════════════════════════════════ */
 .btn {
   display: inline-block !important;
   padding: 8px 16px !important;
@@ -38,35 +34,25 @@
   cursor: not-allowed !important;
 }
 
-/* ═══════════════════════════════════════════
-   印刷用共通ユーティリティクラス
-   各画面の @media print をここに集約
-   使い方: TSX の className に追加するだけ
-   ═══════════════════════════════════════════ */
 @media print {
-  /* ボタン・操作系・カウント等を非表示 */
   .no-print {
     display: none !important;
   }
 
-  /* 印刷時にサイドバーを非表示 */
   .print-hide-sidebar {
     display: none !important;
   }
 
-  /* コンテナを全幅・無枠に */
   .print-container {
     width: 100% !important;
     border: none !important;
   }
 
-  /* テーブルラッパー：はみ出しを許可 */
   .print-wrapper {
     overflow-x: visible !important;
     margin: 0 !important;
   }
 
-  /* データテーブル：小さく固定レイアウト */
   .print-table {
     width: 100% !important;
     font-size: 9px !important;
@@ -100,13 +86,11 @@
     position: static !important;
   }
 
-  /* 印刷時にリンクをプレーン表示 */
   .print-link-plain {
     text-decoration: none !important;
     color: #333 !important;
   }
 
-  /* 印刷時に見出しを小さく */
   .print-header-sm {
     font-size: 12px !important;
   }
@@ -135,10 +119,6 @@
   }
 }
 
-/* ═══════════════════════════════════════════
-   共通 Panel — 容器 + 标题 + H1
-   各画面の .xxx-container / .xxx-header / h1 を集約
-   ═══════════════════════════════════════════ */
 .panel {
   padding: 0;
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -156,7 +136,6 @@
   color: #333;
 }
 
-/* 宽度变体 */
 .panel-w600  { width: 600px; }
 .panel-w700  { width: 700px; }
 .panel-w800  { width: 800px; }
@@ -165,11 +144,6 @@
 .panel-w1100 { width: 1100px; }
 .panel-w1400 { width: 1400px; }
 
-/* ═══════════════════════════════════════════
-   共通ボタン行 — flex 版（.btn-row）
-   各画面の .xxx-btn-row を集約
-   使い方: <div className="btn-row">
-   ═══════════════════════════════════════════ */
 .btn-row {
   display: flex;
   gap: 8px;
@@ -179,11 +153,6 @@
   border-bottom: 1px solid #acb7ee;
 }
 
-/* ═══════════════════════════════════════════
-   共通ボタン行 — table 版（.btn-table / .btn-cell）
-   各画面の .xxx-btn-table / .xxx-btn-cell を集約
-   使い方: <table className="btn-table"><tbody><tr><td className="btn-cell">
-   ═══════════════════════════════════════════ */
 .btn-table {
   width: 100%;
   border-collapse: collapse;
@@ -199,28 +168,11 @@
   text-align: left;
 }
 
-/* ═══════════════════════════════════════════
-   共通ボタン行 — table-row 版（.btn-tr）
-   <tr> 要素用，背景色 + 上ボーダーのみ
-   各画面の .xxx-btn-row（<tr>版）を集約
-   使い方: <tr className="btn-tr">
-   ═══════════════════════════════════════════ */
 .btn-tr {
   background-color: #f1f3ff;
   border-top: 1px solid #acb7ee;
 }
 
-/* ═══════════════════════════════════════════
-   共通フォーム — コンテナ / 行 / ラベル / 入力
-   各画面の .xxx-form / .xxx-row / .xxx-label / .xxx-input を集約
-   使い方:
-     <div className="f-form">
-       <div className="f-row">
-         <span className="f-label required">Label</span>
-         <input className="f-input" />
-       </div>
-     </div>
-   ═══════════════════════════════════════════ */
 .f-form {
   padding: 8px 10px;
 }
@@ -270,10 +222,28 @@
   cursor: not-allowed;
 }
 
-/* ═══════════════════════════════════════════
-   共通メッセージ — エラー / 成功
-   各画面の .xxx-error / .xxx-success を集約
-   ═══════════════════════════════════════════ */
+.result-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.empty-placeholder {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+.loading-placeholder {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
 .msg-error {
   padding: 6px 10px;
   background-color: #fff1f0;

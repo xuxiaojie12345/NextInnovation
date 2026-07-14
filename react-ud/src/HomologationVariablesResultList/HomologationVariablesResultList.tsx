@@ -48,6 +48,7 @@ interface RuleRecord {
  *
  * @returns {React.FC} HomologationVariablesResultList 组件
  */
+// 认证变量查询结果列表组件
 const HomologationVariablesResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ const HomologationVariablesResultList: React.FC = () => {
   };
 
   const handleBack = () => {
-    // 将查询条件带回前页面
+    // 将查询条件带回前页
     navigate("/menu/homologation-variables", {
       state: { conditions: searchConditions },
     });
@@ -170,14 +171,13 @@ const HomologationVariablesResultList: React.FC = () => {
 
   return (
     <div className="hv-result-container panel panel-w1400 print-container">
-      {/* 顶部深蓝色标题栏 */}
+      {/* 标题栏 */}
       <div className="hv-result-header panel-header">
         <h1>Homologation Variables</h1>
       </div>
 
       {errorMessage && <div className="hv-result-error msg-error">{errorMessage}</div>}
 
-      {/* ─── 按钮 Table ─── */}
       <table className="btn-table no-print">
         <tbody>
           <tr>
@@ -216,7 +216,7 @@ const HomologationVariablesResultList: React.FC = () => {
       </table>
 
       {isLoading ? (
-        <div className="hv-result-empty">
+        <div className="loading-placeholder">
           <p>Loading...</p>
         </div>
       ) : results.length > 0 ? (
@@ -240,17 +240,17 @@ const HomologationVariablesResultList: React.FC = () => {
                   Variant string.
                 </th>
                 <th className="hv-th-underline hv-th-noborder">Comments</th>
-                <th className="hv-th-sub hv-th-noborder">
+                <th className="hv-th-noborder">
                   Add<div className="hv-th-subtext">(YYYWW)</div>
                 </th>
-                <th className="hv-th-sub hv-th-noborder">
+                <th className="hv-th-noborder">
                   Delete<div className="hv-th-subtext">(YYYWW)</div>
                 </th>
-                <th className="hv-th-sub hv-th-noborder">
+                <th className="hv-th-noborder">
                   Created by user
                   <div className="hv-th-subtext">(Automatic)</div>
                 </th>
-                <th className="hv-th-sub hv-th-noborder">
+                <th className="hv-th-noborder">
                   Date<div className="hv-th-subtext">(Automatic)</div>
                 </th>
               </tr>
@@ -299,14 +299,14 @@ const HomologationVariablesResultList: React.FC = () => {
           </table>
         </div>
       ) : (
-        <div className="hv-result-empty">
+        <div className="empty-placeholder">
           <p>
             No results found. Please go back and try different search criteria.
           </p>
         </div>
       )}
 
-      <div className="hv-result-count no-print">
+      <div className="result-count no-print">
         Number of lines found: {results.length}
       </div>
     </div>

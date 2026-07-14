@@ -1,16 +1,7 @@
 /* ═══════════════════════════════════════════
-   List Available Templates Module
+   可用模板列表模块
    ═══════════════════════════════════════════ */
 
-.lat-container {
-  width: 1000px;
-}
-
-/* f-form moved to common.css */
-
-/* f-row/f-label/f-input moved to common.css */
-
-/* ── 表格区域 ── */
 .lat-table-section {
   padding: 0 10px 10px 10px;
 }
@@ -21,7 +12,6 @@
   font-size: 12px;
 }
 
-/* ── 表头行：无背景色，带上边框 ── */
 .lat-table thead tr {
   border-bottom: 1px solid #8698e6;
 }
@@ -37,7 +27,6 @@
   border-left: 1px solid #8698e6;
 }
 
-/* ── 明细行 ── */
 .lat-table tbody td {
   padding: 4px 8px;
   color: #333;
@@ -46,32 +35,26 @@
   text-align: left;
 }
 
-/* 第一行无上边框 */
 .lat-table tbody tr:first-child td {
   border-top: none;
 }
 
-/* 第一行无上边框 */
 .lat-table thead th:first-child {
   border-left: none;
 }
 
-/* 最后一行无下边框 */
 .lat-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* 最左侧列无左边框 */
 .lat-table tbody td:first-child {
   border-left: none;
 }
 
-/* 最右侧列无右边框 */
 .lat-table tbody td:last-child {
   border-right: none;
 }
 
-/* 交互背景色：奇数行白色、偶数行 #f1f3ff */
 .lat-table tbody tr:nth-child(odd) td {
   background-color: #ffffff;
 }
@@ -84,7 +67,6 @@
   background-color: #e0e8ff;
 }
 
-/* ── 文件图标列 ── */
 .lat-th-icon {
   width: 32px;
   text-align: center;
@@ -100,14 +82,12 @@
   line-height: 1;
 }
 
-/* ── 空数据行 ── */
 .lat-empty-cell {
   text-align: center;
   padding: 20px;
   color: #999;
 }
 
-/* ── 下载链接 ── */
 .lat-download-link {
   color: #1c2771;
   text-decoration: underline;
@@ -119,10 +99,4 @@
   color: #002060;
 }
 
-/* ── 空数据 ── */
-.lat-empty {
-  padding: 20px;
-  text-align: center;
-  font-size: 13px;
-  color: #999;
-}
+/* .lat-empty removed: unused */

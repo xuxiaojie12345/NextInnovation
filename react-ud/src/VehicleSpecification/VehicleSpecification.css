@@ -1,4 +1,4 @@
-/* ── Vehicle Specification（Menu 右侧显示） ── */
+/* 车辆规格页面 */
 .vs-container {
   width: 100%;
   max-width: 760px;
@@ -32,7 +32,6 @@
   margin-bottom: 12px;
 }
 
-/* ── セクションヘッダー（左詰め） ── */
 .vs-section-header {
   font-size: 14px;
   font-weight: 700;
@@ -42,7 +41,6 @@
   padding-bottom: 6px;
 }
 
-/* ── 4列情報テーブル（項目名: | 値 | 項目名: | 値） ── */
 .vs-info-table {
   width: 100%;
   border-collapse: collapse;
@@ -66,8 +64,6 @@
   padding: 4px 16px 4px 0;
 }
 
-/* ── KOLA シンボルリスト（左詰め） ── */
-/* ── KOLA シンボルリスト（左詰め） ── */
 .vs-symbol-list {
 }
 
@@ -84,7 +80,6 @@
   font-size: 13px;
 }
 
-/* ── フッター：S-Note NO ── */
 .vs-footer {
   display: flex;
   gap: 6px;

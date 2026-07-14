@@ -1,4 +1,4 @@
-/* ── Generate Document Result（Menu 右侧显示） ── */
+/* 文档生成结果页面 */
 .gen-doc-result-container {
   width: 100%;
   max-width: 720px;
@@ -32,7 +32,6 @@
   margin-bottom: 20px;
 }
 
-/* ── 信息列表（平坦布局，无 section 标题） ── */
 .info-list {
   margin-bottom: 8px;
 }
@@ -87,9 +86,6 @@
   margin-top: -3px;
   margin-bottom: 16px;
   padding: 2px 5px;
-  /* background-color: #fff7e6;
-  border: 1px solid #ffe58f;
-  border-radius: 4px; */
   color: red;
   font-size: 13px;
   font-weight: 500;
@@ -119,7 +115,6 @@
   font-weight: 500;
 }
 
-/* ── 错误日志 ── */
 .error-log {
   margin: 4px 0 8px 180px;
   padding: 8px 12px;

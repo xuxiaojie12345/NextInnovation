@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════════
-   HDoc User Doc Administration Module
+   HDoc 用户文档管理模块
    ═══════════════════════════════════════════ */
 
 .huda-container {
   width: 600px;
 }
 
-/* ── 输入区域表格 ── */
 .huda-input-table {
   width: 400px;
   border-collapse: collapse;
@@ -57,7 +56,6 @@
   cursor: not-allowed;
 }
 
-/* ── 文档权限多选列表 ── */
 .huda-doc-section {
   padding: 4px 10px 10px 10px;
   text-align: left;
@@ -90,8 +88,6 @@
 .huda-doc-listbox option {
   padding: 2px 4px;
 }
-
-/* btn-row moved to common.css */
 
 /* HDocUserDocAdmin 按钮行：70px 左内边距对齐，无边框 */
 .huda-container .btn-row {

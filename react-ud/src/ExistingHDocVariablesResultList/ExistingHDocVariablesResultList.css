@@ -1,47 +1,23 @@
 /* ═══════════════════════════════════════════
-   Existing HDoc Variables Result List
-   参照画像: react-ud/src/doc/image/Existing HDoc Variables Result List_1.png
+   Existing HDoc Variables 结果列表
+   参考图片: react-ud/src/doc/image/Existing HDoc Variables Result List_1.png
    ═══════════════════════════════════════════ */
 
-/* ── 外层容器 ── */
-.ehvr-container {
-  width: 1100px;
-  border: 2px solid #8698e6;
-}
+/* width/border provided by panel */
 
-/* ── 件数表示（表格下方） ── */
-.ehvr-count {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-  padding: 6px 8px;
-  text-align: left;
-}
+/* count/empty moved to common.css */
 
-/* ── 空メッセージ ── */
-.ehvr-empty {
-  padding: 30px 20px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
-
-/* btn-table/btn-cell moved to common.css */
-
-/* ── テーブル外枠 ── */
 .ehvr-table-wrapper {
   overflow-x: auto;
   margin: 10px;
 }
 
-/* ── データテーブル ── */
 .ehvr-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
 }
 
-/* ── ヘッダー行 ── */
 .ehvr-table th {
   padding: 6px 8px;
   text-align: left;
@@ -60,13 +36,11 @@
   border: none !important;
 }
 
-/* 下划线字段 */
 .ehvr-th-underline {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-/* radio列 */
 .th-check,
 .td-check {
   width: 30px;
@@ -79,7 +53,6 @@
   cursor: pointer;
 }
 
-/* ── 明細行 ── */
 .ehvr-table td {
   padding: 4px 8px;
   color: #333;
@@ -91,32 +64,26 @@
   text-align: left !important;
 }
 
-/* 内部格子之间有边框，外侧无边框 */
 .ehvr-table tbody td {
   border: 1px solid #8698e6;
 }
 
-/* 第一行无上边框 */
 .ehvr-table tbody tr:first-child td {
   border-top: none;
 }
 
-/* 最后一行无下边框 */
 .ehvr-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* 最左侧列无左边框 */
 .ehvr-table tbody td:first-child {
   border-left: none;
 }
 
-/* 最右侧列无右边框 */
 .ehvr-table tbody td:last-child {
   border-right: none;
 }
 
-/* 交互背景色：奇数行白色、偶数行 #f1f3ff */
 .ehvr-table tbody tr:nth-child(odd) td {
   background-color: #ffffff;
 }
@@ -133,7 +100,6 @@
   background-color: #dde8f8;
 }
 
-/* ── Created by user リンク ── */
 .link-user {
   color: #002060;
   cursor: pointer;

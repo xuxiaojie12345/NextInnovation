@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════
-   common/utils.ts — 共通ユーティリティ関数
-   各画面で重複するロジックをここに集約
+   common/utils.ts — 通用工具函数
+   各页面重复逻辑集中于此
    ═══════════════════════════════════════════ */
 
 /**
- * 印刷機能：印刷前に document.title を設定し、印刷後に元に戻す。
- * @param title 印刷時のタイトル
+ * 打印功能：打印前设置document.title，打印后还原。
+ * @param title 打印时的标题
  */
 export const sharedPrint = (title: string): void => {
   const prevTitle = document.title;
@@ -15,8 +15,8 @@ export const sharedPrint = (title: string): void => {
 };
 
 /**
- * 現在ログイン中のユーザーIDを取得する。
- * 未ログイン時は空文字を返す。
+ * 获取当前登录用户的ID。
+ * 未登录时返回空字符串。
  */
 export const getCurrentUserId = (): string => {
   return localStorage.getItem("userId") || "";

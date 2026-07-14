@@ -26,6 +26,7 @@ const VOLVO_3P_GUIDES = [
   "WebFRAME Quick Guide",
 ];
 
+// 快速指南下载打印组件
 const DownloadAndPrintQuickGuides: React.FC = () => {
   const navigate = useNavigate();
   const [isPrintChecked, setIsPrintChecked] = useState(false);
@@ -77,7 +78,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
                 <div
                   className="dpg-link-item"
                   key={name}
-                  onClick={() => alert('暂时不支持文件下载')}
+                  onClick={() => alert('暂不支持文件下载')}
                 >
                   <span className="dpg-link-arrow">•</span>
                   <span className="dpg-link">{name}</span>
@@ -85,7 +86,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
               ))}
             </div>
 
-            {/* Checkboxes */}
+            {/* 复选框区域 */}
             <div className="dpg-checkbox-section">
               <div className="dpg-checkbox-item">
                 <label className="dpg-checkbox-label">

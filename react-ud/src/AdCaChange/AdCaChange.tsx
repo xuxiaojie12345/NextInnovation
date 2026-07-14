@@ -3,22 +3,24 @@ import { api } from "../services/api";
 import "../common/css/common.css";
 import "./AdCaChange.css";
 
+// AD/CA 变更管理组件
 const AdCaChange: React.FC = () => {
-  // ── 表单状态 ──
+  // 表单状态
   const [serieChnr, setSerieChnr] = useState("");
   const [desc, setDesc] = useState("");
 
-  // ── UI 状态 ──
+  // UI 状态
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // 清除消息
   const clearMessages = () => {
     setMessage("");
     setSuccessMessage("");
   };
 
-  // ── 解析 Serie-Chnr ──
+  // "FH-12345"形式をserieとchnrに分割（ダッシュ区切り）
   const parseSerieChnr = (value: string): { serie: string; chnr: string } => {
     const trimmed = value.trim();
     const parts = trimmed.split("-");
@@ -29,7 +31,7 @@ const AdCaChange: React.FC = () => {
     return { serie: trimmed, chnr: "" };
   };
 
-  // ── ADD ──
+  // 新增：检查存在性后注册（BU=UD, ACT=Y）
   const handleAdd = async () => {
     clearMessages();
 
@@ -58,7 +60,7 @@ const AdCaChange: React.FC = () => {
       if (checkRes.code === 200 && checkRes.data) {
         const count = parseInt(checkRes.data.count, 10);
         if (count > 0) {
-          // 已存在 → 不允许新增（无论活性状态）
+          // 记录已存在则无法新增
           setMessage("AFTER DEF CHANGE IS NOT ACTIVATED");
           setIsLoading(false);
           return;
@@ -89,7 +91,7 @@ const AdCaChange: React.FC = () => {
     }
   };
 
-  // ── DELETE ──
+  // 删除：调用API删除记录
   const handleDelete = async () => {
     clearMessages();
 
@@ -119,7 +121,7 @@ const AdCaChange: React.FC = () => {
     }
   };
 
-  // ── CHECK ──
+  // 检查：确认记录是否存在及激活状态
   const handleCheck = async () => {
     clearMessages();
 
@@ -147,6 +149,7 @@ const AdCaChange: React.FC = () => {
         const count = parseInt(res.data.count, 10);
         const act = res.data.act;
         if (count > 0) {
+          // ACT=Yなら有効、それ以外は未活性化
           if (act === "Y") {
             setMessage("Record found and activated.");
           } else {
@@ -172,11 +175,11 @@ const AdCaChange: React.FC = () => {
       </div>
 
       <div className="adca-body">
-        {message && <div className="adca-error msg-error">{message}</div>}
-        {successMessage && <div className="adca-success msg-success">{successMessage}</div>}
+        {message && <div className="msg-error">{message}</div>}
+        {successMessage && <div className="msg-success">{successMessage}</div>}
 
         <div className="f-form">
-          {/* Serie-Chnr */}
+          {/* 底盘编号 */}
           <div className="f-row">
             <span className="f-label">Serie-Chnr</span>
             <input
@@ -190,7 +193,7 @@ const AdCaChange: React.FC = () => {
             />
           </div>
 
-          {/* Desc */}
+          {/* 描述 */}
           <div className="f-row">
             <span className="f-label">Desc</span>
             <input
@@ -204,7 +207,7 @@ const AdCaChange: React.FC = () => {
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* 操作按钮 */}
         <div className="btn-row">
           <button className="btn" onClick={handleAdd} disabled={isLoading}>
             ADD

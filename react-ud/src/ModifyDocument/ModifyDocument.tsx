@@ -10,6 +10,7 @@ interface VariableItem {
   newVal: string;
 }
 
+// 修改文档组件
 const ModifyDocument: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -140,6 +141,7 @@ const ModifyDocument: React.FC = () => {
     <div className="modify-doc-container">
       <h1 className="modify-doc-title">Modify Document</h1>
 
+      {/* 车辆信息 */}
       <div className="modify-doc-info">
         <div className="modify-doc-info-item">
           <span className="info-label">Chassis no:</span>

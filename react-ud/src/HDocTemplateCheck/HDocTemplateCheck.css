@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   HDoc Template Check
+   HDoc 模板检查
    ═══════════════════════════════════════════ */
 
 .htc-container {
@@ -7,10 +7,9 @@
 }
 
 .htc-form {
-  padding: 10px 16px;
+  padding: 2px 16px 10px;
 }
 
-/* ── Form Table ── */
 .htc-form-table {
   border-collapse: collapse;
   border: 2px solid #acb7ee;
@@ -34,8 +33,6 @@
   color: #333;
   text-align: left;
 }
-
-/* btn-row moved to common.css */
 
 .htc-result {
   font-size: 12px;

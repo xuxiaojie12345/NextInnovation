@@ -10,25 +10,22 @@ interface TemplateFile {
   lastMod: string;
 }
 
+// 模板上传/删除组件
 const UploadDeleteTemplate: React.FC = () => {
   const navigate = useNavigate();
 
-  // ── Upload 区域状态 ──
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadMarket, setUploadMarket] = useState("");
 
-  // ── Delete 区域状态 ──
   const [deleteMarket, setDeleteMarket] = useState("");
   const [templates, setTemplates] = useState<TemplateFile[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
-  // ── 共用状态 ──
   const [markets, setMarkets] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 加载 Market 下拉数据 ──
   useEffect(() => {
     (async () => {
       try {
@@ -45,7 +42,6 @@ const UploadDeleteTemplate: React.FC = () => {
     })();
   }, []);
 
-  // ── Delete Market 变更时加载 Templates ──
   useEffect(() => {
     if (!deleteMarket) {
       setTemplates([]);
@@ -70,18 +66,16 @@ const UploadDeleteTemplate: React.FC = () => {
     })();
   }, [deleteMarket]);
 
-  // ── 消息 ──
   const clearMessages = () => {
     setMessage("");
     setSuccessMessage("");
   };
 
-  // ── 文件选择 ──
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files?.[0] || null);
   };
 
-  // ── 上传 ──
+  // 上传模板
   const handleUpload = async () => {
     clearMessages();
 
@@ -129,7 +123,7 @@ const UploadDeleteTemplate: React.FC = () => {
     }
   };
 
-  // ── 删除 ──
+  // 删除模板
   const handleDelete = async () => {
     clearMessages();
 
@@ -173,19 +167,20 @@ const UploadDeleteTemplate: React.FC = () => {
     }
   };
 
-  // ── 跳转到 HDoc Template Check 页面 ──
   const handleCheckTemplate = () => {
     navigate("/menu/hdoc-template-check");
   };
 
   return (
     <div className="udt-container panel panel-w700">
+      <div className="udt-header panel-header">
+        <h1>HDoc Template Upload</h1>
+      </div>
+
       {message && <div className="udt-error msg-error">{message}</div>}
       {successMessage && <div className="udt-success msg-success">{successMessage}</div>}
 
-      {/* ═══════ Upload 区域 ═══════ */}
       <div className="udt-section">
-        <h2 className="udt-section-title">HDoc Template Upload</h2>
         <table className="udt-form-table">
           <tbody>
             <tr>
@@ -241,7 +236,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
       <div style={{ height: "60px" }}></div>
 
-      {/* ═══════ Delete 区域 ═══════ */}
+      {/* 删除区域 */}
       <div className="udt-section">
         <h2 className="udt-section-title">HDoc Template Delete/Archive</h2>
         <table className="udt-form-table">
@@ -297,7 +292,7 @@ const UploadDeleteTemplate: React.FC = () => {
         </table>
       </div>
 
-      {/* ═══════ 链接 ═══════ */}
+      {/* 模板检查提示 */}
       <div className="udt-check-info">
         <p>Check your rtf template</p>
         <p>

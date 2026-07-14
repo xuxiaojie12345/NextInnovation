@@ -16,15 +16,13 @@ interface FileDetail {
   size: string;
 }
 
+// 可用模板列表组件
 const ListAvailableTemplates: React.FC = () => {
-  // ── 表单状态 ──
   const [selectMarket, setSelectMarket] = useState("");
 
-  // ── 数据状态 ──
   const [markets, setMarkets] = useState<string[]>([]);
   const [templateList, setTemplateList] = useState<TemplateFile[]>([]);
 
-  // ── UI 状态 ──
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +32,6 @@ const ListAvailableTemplates: React.FC = () => {
     setSuccessMessage("");
   };
 
-  // ── 页面初始化：加载 Market 列表 ──
   useEffect(() => {
     (async () => {
       try {
@@ -53,7 +50,7 @@ const ListAvailableTemplates: React.FC = () => {
     })();
   }, []);
 
-  // ── 选择 Market 后加载模板文件列表 ──
+  // 选择市场后加载模板列表
   useEffect(() => {
     if (!selectMarket) {
       setTemplateList([]);
@@ -126,7 +123,6 @@ const ListAvailableTemplates: React.FC = () => {
     })();
   }, [selectMarket]);
 
-  // ── 下载文件 ──
   const handleDownload = async (filename: string) => {
     clearMessages();
 
@@ -194,7 +190,7 @@ const ListAvailableTemplates: React.FC = () => {
       {message && <div className="lat-error msg-error">{message}</div>}
       {successMessage && <div className="lat-success msg-success">{successMessage}</div>}
 
-      {/* ── Market 选择 ── */}
+      {/* 搜索表单 */}
       <div className="f-form">
         <div className="f-row">
           <span className="f-label">Select Market</span>
@@ -214,7 +210,6 @@ const ListAvailableTemplates: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Template 列表 ── */}
       <div className="lat-table-section">
         <table className="lat-table">
           <thead>

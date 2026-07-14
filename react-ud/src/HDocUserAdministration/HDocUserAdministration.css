@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════════
-   HDoc User Administration Module
+   HDoc 用户管理模块
    ═══════════════════════════════════════════ */
 
 .hua-container {
   width: 1000px;
 }
 
-/* ── 输入区域表格 ── */
 .hua-input-table {
   width: auto;
   border-collapse: collapse;
@@ -68,12 +67,10 @@
   margin-left: 54px;
 }
 
-/* ── 表单区块 ── */
 .hua-form-section {
   padding: 10px;
 }
 
-/* ── 网格行 ── */
 .hua-grid-row {
   display: flex;
   gap: 10px;
@@ -81,7 +78,6 @@
   margin-bottom: 8px;
 }
 
-/* ── 网格单元格 ── */
 .hua-grid-cell {
   display: flex;
   flex-direction: column;
@@ -153,7 +149,6 @@
   white-space: nowrap;
 }
 
-/* ── 列表框（多选） ── */
 .hua-listbox {
   padding: 2px;
   border: 1px solid #b0b0b0;
@@ -177,7 +172,6 @@
   cursor: not-allowed;
 }
 
-/* ── Roles 侧边栏布局 ── */
 .hua-roles-sidebar-layout {
   display: flex;
   gap: 10px;
@@ -198,9 +192,6 @@
   min-width: 0;
   margin-left: -16px;
 }
-
-/* ── 按钮行 ── */
-/* btn-row moved to common.css */
 
 /* HDocUserAdmin 按钮行：负边距穿透、2px 上边框 */
 .hua-form-section > .btn-row {

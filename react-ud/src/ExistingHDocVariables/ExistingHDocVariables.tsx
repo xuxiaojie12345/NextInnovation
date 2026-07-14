@@ -8,11 +8,12 @@ type Operator = "=" | "!=" | ">" | "<";
 
 const STORAGE_KEY = "ehv_conditions";
 
+// 现有 HDoc 变量管理组件
 const ExistingHDocVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── 表单状态 ──
+  // 搜索条件
   const [variable, setVariable] = useState("");
   const [variableOp, setVariableOp] = useState<Operator>("=");
   const [type, setType] = useState("");
@@ -24,19 +25,19 @@ const ExistingHDocVariables: React.FC = () => {
   const [date, setDate] = useState("");
   const [dateOp, setDateOp] = useState<Operator>("=");
 
-  // ── UI 状态 ──
+  // UI 状态
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 从 Result List 返回时恢复条件或选中记录 ──
+  // 从结果列表返回时恢复选中记录或搜索条件
   useEffect(() => {
     const st = location.state as {
       conditions?: Record<string, string>;
       selectedRecords?: any[];
     } | null;
 
-    // Select 返回：选中记录填充到表单
+    // Select返回：选中记录回填表单
     if (st?.selectedRecords?.length) {
       const rec = st.selectedRecords[0];
       const toStr = (v: any): string => (v == null ? "" : String(v));
@@ -54,7 +55,7 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
-    // Back 返回：从 location.state 恢复条件
+    // Back返回：从location.state恢复条件
     if (st?.conditions) {
       const c = st.conditions;
       setVariable(c.variable ?? "");
@@ -71,7 +72,7 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
-    // 尝试从 sessionStorage 恢复
+    // 从sessionStorage恢复条件（首次访问）
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -93,12 +94,12 @@ const ExistingHDocVariables: React.FC = () => {
     }
   }, [location.state]);
 
-  // ── 消息 ──
   const clearMessages = () => {
     setMessage("");
     setSuccessMessage("");
   };
 
+  // 重置表单
   const clearForm = (keepSuccess = false) => {
     setVariable("");
     setVariableOp("=");
@@ -114,7 +115,7 @@ const ExistingHDocVariables: React.FC = () => {
     if (!keepSuccess) clearMessages();
   };
 
-  // ── 搜索 ──
+  // 搜索：保存条件并跳转结果列表
   const handleSearch = async () => {
     clearMessages();
 
@@ -139,7 +140,7 @@ const ExistingHDocVariables: React.FC = () => {
     navigate("/menu/existing-hdoc-vars/result", { state: { conditions } });
   };
 
-  // ── 新增 ──
+  // 新增：注册新Variable（先查重）
   const handleAdd = async () => {
     clearMessages();
 
@@ -160,7 +161,7 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
-    // Variable 存在性校验
+    // 变量重名检查
     try {
       const checkRes = await api.post<{ exists: boolean }>(
         "/ud08/checkVariable",
@@ -203,7 +204,7 @@ const ExistingHDocVariables: React.FC = () => {
     }
   };
 
-  // ── 更新 ──
+  // 更新：修改已有Variable（先校验存在性）
   const handleUpdate = async () => {
     clearMessages();
 
@@ -254,7 +255,7 @@ const ExistingHDocVariables: React.FC = () => {
     }
   };
 
-  // ── 删除 ──
+  // 删除：确认后删除Variable
   const handleDelete = async () => {
     clearMessages();
 
@@ -288,12 +289,11 @@ const ExistingHDocVariables: React.FC = () => {
     }
   };
 
-  // ── 返回 ──
   const handleBack = () => {
     navigate("/menu");
   };
 
-  // ── CSV 导出（纯前端） ──
+  // 导出CSV：客户端生成文件并下载
   const handleExcel = () => {
     clearMessages();
     const now = new Date();
@@ -332,7 +332,6 @@ const ExistingHDocVariables: React.FC = () => {
     setSuccessMessage("CSV文件导出成功");
   };
 
-  // ── 辅助函数 ──
   const isNumericField = (field: string): boolean => {
     return field === "Date";
   };
@@ -362,13 +361,13 @@ const ExistingHDocVariables: React.FC = () => {
     );
   };
 
-  // ── JSX ──
   return (
     <div className="ehv-container panel panel-w800">
       <div className="ehv-header panel-header">
         <h1>Existing HDoc Variables</h1>
       </div>
 
+      {/* 操作按钮 */}
       <table className="btn-table">
         <tbody>
           <tr>

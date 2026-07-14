@@ -8,6 +8,7 @@ interface MarketItem {
   description: string;
 }
 
+// 市场列表组件
 const MarketsInHDoc: React.FC = () => {
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
   const [message, setMessage] = useState("");

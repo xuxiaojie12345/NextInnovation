@@ -1,22 +1,17 @@
 /* ═══════════════════════════════════════════
-   Vin Plate Module
+   Vin Plate 模块
    ═══════════════════════════════════════════ */
 
 .vp-container {
   width: 900px;
 }
 
-/* ── 输入区域 ── */
 .vp-input-section {
   padding: 8px 10px;
   border: 1px solid #acb7ee;
   margin: 10px;
   border-bottom: none;
 }
-
-/* f-row/f-label/f-input moved to common.css */
-
-/* btn-row moved to common.css */
 
 /* VinPlate 按钮行：用负边距穿透输入区域 */
 .vp-input-section .btn-row {
@@ -27,7 +22,6 @@
   flex-wrap: wrap;
 }
 
-/* ── 信息展示区域 ── */
 .vp-info-section {
   padding: 10px;
 }
@@ -59,7 +53,6 @@
   font-weight: 500;
 }
 
-/* ── XML 数据展示 ── */
 .vp-xml-section {
   margin-top: 16px;
 }
@@ -99,7 +92,6 @@
   font-weight: 500;
 }
 
-/* ── 无数据 ── */
 .vp-no-data {
   padding: 20px;
   text-align: center;

@@ -30,11 +30,14 @@ import EDBUserView from "./EDBUserView/EDBUserView";
 import "./App.css";
 import "./common/css/common.css";
 
+// 根组件：定义所有路由
 const App: React.FC = () => {
   return (
     <div className="App">
       <Routes>
+        {/* 登录页 */}
         <Route path="/login" element={<Login />} />
+        {/* 主菜单（需登录） */}
         <Route
           path="/menu"
           element={

@@ -1,4 +1,4 @@
-/* ── User Guide (HDoc Help) ── */
+/* 用户指南页面 */
 .user-guide-page {
   width: 100%;
   max-width: 720px;
@@ -13,7 +13,6 @@
   text-align: left;
 }
 
-/* ── 帮助链接列表 ── */
 .help-list {
   display: flex;
   flex-direction: column;
@@ -63,7 +62,6 @@
   text-decoration: underline;
 }
 
-/* ── 复选框项 ── */
 .help-checkbox-label {
   display: flex;
   align-items: center;
@@ -79,7 +77,6 @@
   accent-color: #002182;
 }
 
-/* ── 额外信息区域 ── */
 .other-info-panel {
   margin-top: 16px;
   padding: 14px 16px;
@@ -91,7 +88,6 @@
   line-height: 1.6;
 }
 
-/* ── 底部支持信息 ── */
 .user-guide-footer {
   margin-top: 24px;
   padding-top: 14px;

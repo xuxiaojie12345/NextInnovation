@@ -1,4 +1,4 @@
-/* ── Modify Document（Menu 右侧显示） ── */
+/* 修改文档页面 */
 .modify-doc-container {
   width: 100%;
   max-width: 960px;
@@ -22,7 +22,6 @@
   text-align: left;
 }
 
-/* ── 情報エリア（Chassis no / Market を2行で表示） ── */
 .modify-doc-info {
   display: flex;
   flex-direction: column;
@@ -47,7 +46,6 @@
   color: #333;
 }
 
-/* ── Template ファイルリンク ── */
 .modify-doc-template {
   margin-bottom: 50px;
   text-align: left;
@@ -72,13 +70,11 @@
   margin-bottom: 0;
 }
 
-/* ── 大枠テーブル ── */
 .modify-doc-table-wrapper {
   border-radius: 4px;
   overflow: hidden;
 }
 
-/* ── Save ボタン行 ── */
 .modify-doc-save-bar {
   display: flex;
   gap: 10px;
@@ -163,7 +159,6 @@
   font-size: 14px;
 }
 
-/* ── Chassis number リンク（Vehicle Spec へ遷移） ── */
 .modify-doc-chassis-link {
   text-decoration: underline;
   color: #66707b;

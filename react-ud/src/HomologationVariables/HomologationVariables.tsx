@@ -50,11 +50,11 @@ const ALL_LABELS = [
 
 const STORAGE_KEY = "hv_conditions";
 
+// 认证变量管理组件
 const HomologationVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── 条件状态 ──
   const [conditions, setConditions] = useState<Condition[]>(
     ALL_LABELS.map((label) => ({
       label,
@@ -71,23 +71,20 @@ const HomologationVariables: React.FC = () => {
     value2: "",
   });
 
-  // ── 下拉数据 ──
   const [productClasses, setProductClasses] = useState<ProductClass[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
 
-  // ── UI 状态 ──
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── 原始主键（从 Result List 返回时保存，用于 Update 时校验主键是否被修改） ──
+  // 原始主键（从结果列表返回时保存，用于更新时校验主键）
   const [originalKeys, setOriginalKeys] = useState<{
     pc: string;
     num: string;
     market: string;
   } | null>(null);
 
-  // ── 更新函数 ──
   const updateConditionOp = (i: number, op: Operator) =>
     setConditions((prev) => {
       const next = [...prev];
@@ -102,7 +99,6 @@ const HomologationVariables: React.FC = () => {
       return next;
     });
 
-  // ── 加载下拉数据 ──
   useEffect(() => {
     (async () => {
       try {
@@ -119,7 +115,7 @@ const HomologationVariables: React.FC = () => {
     })();
   }, []);
 
-  // ── 从 Select / Back / Down 返回时恢复条件 ──
+  // 从 Select/Back/Down 返回时恢复条件
   useEffect(() => {
     const st = location.state as {
       selectedRecords?: any[];
@@ -127,7 +123,7 @@ const HomologationVariables: React.FC = () => {
       downVariable?: string;
     } | null;
 
-    // Down 操作：从 Existing HDoc Variables 跳转过来，填充 Variable 字段
+    // Down操作：从Existing HDoc Variables跳转过来填充Variable
     if (st?.downVariable) {
       const idx = ALL_LABELS.indexOf("Variable");
       if (idx >= 0) {
@@ -141,7 +137,7 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
-    // Select 返回：选中记录填充到表单
+    // Select返回：选中记录回填表单
     if (st?.selectedRecords?.length) {
       const rec = st.selectedRecords[0];
       // 将所有值转为字符串，避免数字类型导致后端 JSON 反序列化异常
@@ -185,7 +181,7 @@ const HomologationVariables: React.FC = () => {
       return;
     }
 
-    // Back 返回：从 location.state 或 sessionStorage 恢复
+    // Back返回：从location.state或sessionStorage恢复
     const rawConds =
       st?.conditions ??
       (() => {
@@ -237,7 +233,6 @@ const HomologationVariables: React.FC = () => {
     }
   }, [location.state]);
 
-  // ── 消息 ──
   const clearMessages = () => {
     setErrorMessage("");
     setSuccessMessage("");
@@ -263,7 +258,6 @@ const HomologationVariables: React.FC = () => {
     if (!keepSuccess) clearMessages();
   };
 
-  // ── 工具函数 ──
   const getCondValue = (label: string): string =>
     conditions.find((c) => c.label === label)?.value ?? "";
 
@@ -302,7 +296,6 @@ const HomologationVariables: React.FC = () => {
   const getFormVal = (label: string): string =>
     conditions.find((c) => c.label === label)?.value ?? "";
 
-  // ── 按钮处理 ──
   const handleSearch = async () => {
     clearMessages();
     const pc = getCondValue("Product class");
@@ -515,7 +508,6 @@ const HomologationVariables: React.FC = () => {
     }
   };
 
-  // ── 渲染函数 ──
   const isRequired = (label: string) =>
     ["Product class", "Number", "Market"].includes(label);
 
@@ -681,13 +673,13 @@ const HomologationVariables: React.FC = () => {
     </div>
   );
 
-  // ── JSX ──
   return (
     <div className="homologation-vars-container panel panel-w800">
       <div className="homologation-vars-header panel-header">
         <h1>Homologation Variables</h1>
       </div>
 
+      {/* 操作按钮 */}
       <table className="btn-table">
         <tbody>
           <tr>

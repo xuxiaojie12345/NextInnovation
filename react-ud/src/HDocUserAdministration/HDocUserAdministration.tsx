@@ -8,14 +8,14 @@ interface AuthItem {
   market: string;
 }
 
+// 用户管理组件
 const HDocUserAdministration: React.FC = () => {
-  // ── 表单状态 ──
   const [userid, setUserid] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [markets, setMarkets] = useState<string[]>([]);
 
-  // 各role的权限状态 - Market 改为 string[] 支持多选
+  // 各角色的权限状态
   const [standardUser, setStandardUser] = useState(false);
   const [standardMarket, setStandardMarket] = useState<string[]>([]);
   const [ruleAdmin, setRuleAdmin] = useState(false);
@@ -26,18 +26,17 @@ const HDocUserAdministration: React.FC = () => {
   const [docAuthMarket, setDocAuthMarket] = useState<string[]>([]);
   const [userAdmin, setUserAdmin] = useState(false);
 
-  // Roles分组
+  // 角色分组（扩展）
   const [adaptationUser, setAdaptationUser] = useState(false);
   const [adaptationMarket, setAdaptationMarket] = useState<string[]>([]);
   const [manageVarList, setManageVarList] = useState(false);
   const [marketSuperUser, setMarketSuperUser] = useState<string[]>([]);
 
-  // ── UI 状态 ──
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 加载 Market 列表
+  // 加载市场列表
   useEffect(() => {
     (async () => {
       try {
@@ -77,7 +76,7 @@ const HDocUserAdministration: React.FC = () => {
     setMarketSuperUser([]);
   };
 
-  // 构建 authList（每个 market 生成一条记录）
+  // 构建权限列表（每个市场一条记录）
   const buildAuthList = (): AuthItem[] => {
     const list: AuthItem[] = [];
     if (standardUser) {
@@ -112,7 +111,7 @@ const HDocUserAdministration: React.FC = () => {
     return list;
   };
 
-  // 根据 authList 填充表单（聚合相同 function 的多条 market）
+  // 根据权限列表回填表单
   const applyAuthList = (authList: AuthItem[]) => {
     setStandardUser(false);
     setStandardMarket([]);
@@ -167,7 +166,6 @@ const HDocUserAdministration: React.FC = () => {
     });
   };
 
-  // ── User Info ──
   const handleUserInfo = async () => {
     clearMessages();
 
@@ -215,7 +213,6 @@ const HDocUserAdministration: React.FC = () => {
     }
   };
 
-  // ── Update Role ──
   const handleUpdateRole = async () => {
     clearMessages();
 
@@ -285,7 +282,6 @@ const HDocUserAdministration: React.FC = () => {
     }
   };
 
-  // ── Delete Role ──
   const handleDeleteRole = async () => {
     clearMessages();
 
@@ -323,7 +319,6 @@ const HDocUserAdministration: React.FC = () => {
         {message && <div className="hua-error msg-error">{message}</div>}
         {successMessage && <div className="hua-success msg-success">{successMessage}</div>}
 
-        {/* ── UserID / User / Password 输入 ── */}
         <table className="hua-input-table">
           <tbody>
             <tr>
@@ -366,14 +361,14 @@ const HDocUserAdministration: React.FC = () => {
           </tbody>
         </table>
 
-        {/* ---- 权限项目 ---- */}
+        {/* 权限配置 */}
         <div className="hua-form-section">
           <div className="hua-roles-sidebar-layout">
-            {/* Roles 侧标题 */}
+            {/* 角色标题 */}
             <div className="hua-roles-sidebar">Roles</div>
 
             <div className="hua-roles-content">
-              {/* 第一行：5个角色权限横向排列 */}
+              {/* 角色权限行 */}
               <div className="hua-grid-row">
                 {/* Standard User */}
                 <div className="hua-grid-cell">
@@ -597,7 +592,6 @@ const HDocUserAdministration: React.FC = () => {
             </div>
           </div>
 
-          {/* ── 操作按钮 ── */}
           <div className="btn-row">
             <button
               className="btn"

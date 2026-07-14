@@ -13,6 +13,7 @@ interface UserData {
   email?: string;
 }
 
+// EDB 用户视图组件
 const EDBUserView: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const EDBUserView: React.FC = () => {
     { label: "E-mail", operator: "=" as string, value: "" },
   ]);
 
-  // 进入画面时获取用户信息并填入输入框
+  // 进入页面时获取用户信息并回填
   useEffect(() => {
     const userId = state?.userid;
     if (!userId) return;

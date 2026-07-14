@@ -12,21 +12,24 @@ interface UserRecord {
 
 type PermissionFilter = "" | "R" | "T";
 
+// 用户搜索组件
 const SearchUser: React.FC = () => {
   const location = useLocation();
   const state = location.state as { userid?: string } | null;
 
+  // 搜索条件
   const [userid, setUserid] = useState(state?.userid || "");
   const [username, setUsername] = useState("");
   const [market, setMarket] = useState("");
   const [permissionFilter, setPermissionFilter] =
     useState<PermissionFilter>("");
+  // 数据状态
   const [markets, setMarkets] = useState<string[]>([]);
   const [results, setResults] = useState<UserRecord[]>([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 加载 Market 列表
+  // 初始化时获取市场列表
   useEffect(() => {
     (async () => {
       try {
@@ -45,7 +48,7 @@ const SearchUser: React.FC = () => {
     })();
   }, []);
 
-  // 如果有从外部传入的 userid（如从 EDB User View），自动执行查询
+  // 外部传入userid时自动搜索（来自EDB User View）
   useEffect(() => {
     if (state?.userid) {
       handleSearch();
@@ -55,6 +58,7 @@ const SearchUser: React.FC = () => {
 
   const clearMessages = () => setMessage("");
 
+  // 搜索：按条件查找用户
   const handleSearch = async () => {
     clearMessages();
 
@@ -93,11 +97,10 @@ const SearchUser: React.FC = () => {
         const list = res.data.hdocList || [];
         setResults(list);
         if (list.length > 0) {
-          // Userid 已输入、User 为空时，用搜索结果中的 username 填充 User
+          // 片方だけ入力時は検索結果から不足フィールドを補完
           if (trimmedUserid && !trimmedUsername) {
             setUsername(list[0].username);
           }
-          // User 已输入、Userid 为空时，用搜索结果中的 userid 填充 Userid
           if (trimmedUsername && !trimmedUserid) {
             setUserid(list[0].userid);
           }
@@ -122,7 +125,7 @@ const SearchUser: React.FC = () => {
 
       {message && <div className="su-error msg-error">{message}</div>}
 
-      {/* Search form */}
+      {/* 搜索表单 */}
       <div className="su-form">
         <div className="su-row">
           <span className="su-label">Userid</span>
@@ -206,7 +209,7 @@ const SearchUser: React.FC = () => {
         </div>
       </div>
 
-      {/* Results */}
+      {/* 搜索结果 */}
       {results.length > 0 && (
         <div className="su-table-section">
           <table className="su-table">
@@ -227,7 +230,7 @@ const SearchUser: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <div className="su-count">COUNT: {results.length}</div>
+          <div className="result-count">COUNT: {results.length}</div>
         </div>
       )}
     </div>

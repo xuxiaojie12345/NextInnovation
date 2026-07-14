@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   AD/CA Change Module
+   AD/CA 变更模块
    ═══════════════════════════════════════════ */
 
 .adca-container {
@@ -11,27 +11,19 @@
   margin: 0 0 4px 0;
 }
 
-/* ── 除标题外的边框包裹 ── */
 .adca-body {
   border: 1px solid #acb7ee;
   padding: 0;
   margin: 15px;
 }
 
-/* ── 消息提示 ── */
-.adca-error,
-.adca-success {
-  padding: 2px 4px;
-  margin-bottom: 0;
-}
-
-/* f-form moved to common.css */
-
-/* f-row/f-label/f-input moved to common.css */
-
 .adca-input-desc {
   min-width: 300px;
   max-width: 600px;
 }
 
-/* btn-row moved to common.css */
+/* AdCaChange 按钮行：去除下边框（adca-body 已有边框） */
+.adca-body .btn-row {
+  border-bottom: none;
+}
+

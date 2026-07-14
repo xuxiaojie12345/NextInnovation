@@ -24,6 +24,7 @@ interface GenerateDocData {
   usingTemplate: string;
 }
 
+// 文档生成结果组件
 const GenerateDocumentResult: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const GenerateDocumentResult: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // 统一常量集合
+  // 静态配置常量
   const STATIC_CONFIG = {
     defaultMasterArea: "-EU",
     systemEdition: "4.2.1",
@@ -148,7 +149,7 @@ const GenerateDocumentResult: React.FC = () => {
     <div className="gen-doc-result-container">
       <h1 className="gen-doc-result-title">Generate document</h1>
 
-      {/* 信息列表 */}
+      {/* 文档详情 */}
       <div className="info-list">
         <div className="info-row">
           <span className="info-label">

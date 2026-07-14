@@ -8,6 +8,7 @@ interface DocumentType {
   description: string;
 }
 
+// 文档类型列表组件
 const DocumentTypes: React.FC = () => {
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [message, setMessage] = useState("");
@@ -40,7 +41,7 @@ const DocumentTypes: React.FC = () => {
       {message && <div className="dt-error msg-error">{message}</div>}
 
       {isLoading ? (
-        <div className="dt-loading">Loading...</div>
+        <div className="loading-placeholder">Loading...</div>
       ) : documentTypes.length > 0 ? (
         <div className="dt-table-section">
           <table className="dt-table">
@@ -61,7 +62,7 @@ const DocumentTypes: React.FC = () => {
           </table>
         </div>
       ) : (
-        <div className="dt-empty">No document types found.</div>
+        <div className="empty-placeholder">No document types found.</div>
       )}
     </div>
   );

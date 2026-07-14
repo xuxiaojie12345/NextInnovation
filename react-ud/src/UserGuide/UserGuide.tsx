@@ -21,6 +21,7 @@ const HELP_LINKS: HelpLink[] = [
   { label: "Describation", externalUrl: "#description" },
 ];
 
+// 用户指南组件
 const UserGuide: React.FC = () => {
   const navigate = useNavigate();
   const [otherInfo, setOtherInfo] = useState(false);
@@ -69,7 +70,7 @@ const UserGuide: React.FC = () => {
         </div>
       </div>
 
-      {/* 额外信息区域 */}
+      {/* 额外信息 */}
       {otherInfo && (
         <div className="other-info-panel">
           <p>

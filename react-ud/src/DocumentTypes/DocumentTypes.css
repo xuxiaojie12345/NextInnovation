@@ -1,24 +1,8 @@
 /* ═══════════════════════════════════════════
-   Document Types Module
+   文档类型模块
    ═══════════════════════════════════════════ */
 
-.dt-container {
-  width: 800px;
-}
-
-.dt-loading {
-  padding: 30px 20px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
-
-.dt-empty {
-  padding: 30px 20px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
+/* loading/empty moved to common.css */
 
 .dt-table-section {
   padding: 10px;

@@ -1,25 +1,25 @@
 /* ═══════════════════════════════════════════
-   Upload & Delete Template
+   模板上传与删除
    ═══════════════════════════════════════════ */
 
 .udt-container {
   width: 700px;
 }
 
-/* ── Section ── */
 .udt-section {
   padding: 0 20px;
 }
 
+/* title moved to panel-header */
+/* section title matches panel-header h1 style */
 .udt-section-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  color: #002060;
+  color: #333;
   margin: 0 0 8px 0;
   text-align: left;
 }
 
-/* ── Form Table ── */
 .udt-form-table {
   border-collapse: collapse;
   width: 100%;
@@ -44,8 +44,6 @@
   text-align: left;
 }
 
-/* btn-row moved to common.css */
-
 .udt-select {
   padding: 3px 5px;
   border: 1px solid #b0b0b0;
@@ -63,13 +61,11 @@
   cursor: not-allowed;
 }
 
-/* ── Link Area ── */
 .udt-link-area {
   padding: 10px 20px;
   text-align: left;
 }
 
-/* ── 模板检查提示 ── */
 .udt-check-info {
   padding: 8px 20px 0;
   font-size: 12px;
@@ -99,7 +95,6 @@
 }
 
 
-/* ── 提示信息 ── */
 .udt-notice {
   padding: 10px 20px;
   font-size: 14px;

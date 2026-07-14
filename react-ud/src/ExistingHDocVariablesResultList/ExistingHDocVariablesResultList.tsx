@@ -56,6 +56,7 @@ const toCamelCase = (raw: RawRecord): VariableRecord => ({
  *
  * @returns {React.FC} ExistingHDocVariablesResultList 组件
  */
+// 现有变量查询结果列表组件
 const ExistingHDocVariablesResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -110,22 +111,23 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     fetchResults();
   }, [searchConditions]);
 
+  // 单选切换（再次点击取消选中）
   const toggleSelect = (idx: number) => {
     setSelectedIdx((prev) => (prev === idx ? -1 : idx));
   };
 
+  // 选择：将选中记录返回前页
   const handleSelect = () => {
     if (selectedIdx < 0) {
       setErrorMessage("Please select a record first.");
       return;
     }
-    // Return selected records to previous page
     const selectedRecords = [results[selectedIdx]];
     navigate("/menu/existing-hdoc-vars", { state: { selectedRecords } });
   };
 
+  // 返回：保持搜索条件回前页
   const handleBack = () => {
-    // 将查询条件带回前页面
     navigate("/menu/existing-hdoc-vars", {
       state: { conditions: searchConditions },
     });
@@ -181,20 +183,20 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  // Created by userリンク：EDB User View画面へ遷移
   const handleUserViewClick = (userid: string) => {
     navigate("/menu/edb-user-view", { state: { userid } });
   };
 
   return (
     <div className="ehvr-container panel panel-w1100 print-container">
-      {/* 顶部标题栏 */}
+      {/* 标题栏 */}
       <div className="ehvr-header panel-header">
         <h1>Existing HDoc Variables</h1>
       </div>
 
       {errorMessage && <div className="ehvr-error msg-error">{errorMessage}</div>}
 
-      {/* ─── 按钮 Table ─── */}
       <table className="btn-table no-print">
         <tbody>
           <tr>
@@ -220,7 +222,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
       </table>
 
       {isLoading ? (
-        <div className="ehvr-empty">
+        <div className="empty-placeholder">
           <p>Loading...</p>
         </div>
       ) : results.length > 0 ? (
@@ -273,14 +275,14 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           </table>
         </div>
       ) : (
-        <div className="ehvr-empty">
+        <div className="empty-placeholder">
           <p>
             No results found. Please go back and try different search criteria.
           </p>
         </div>
       )}
 
-      <div className="ehvr-count no-print">Number of lines found: {results.length}</div>
+      <div className="result-count no-print">Number of lines found: {results.length}</div>
     </div>
   );
 };

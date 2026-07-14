@@ -1,14 +1,6 @@
 /* ═══════════════════════════════════════════
-   Market Document Settings List Module
+   市场文档设置列表模块
    ═══════════════════════════════════════════ */
-
-.mdsl-container {
-  width: 600px;
-}
-
-.mdsl-success {
-  color: #52c41a;
-}
 
 .mdsl-form {
   padding: 8px 10px;
@@ -53,7 +45,6 @@
   min-width: 200px;
 }
 
-/* ── 运算符下拉列表 ── */
 .mdsl-op-select {
   width: 55px;
   padding: 3px 2px;
@@ -74,12 +65,9 @@
   border-color: #002060;
 }
 
-/* ── 边框包裹：按钮 + 检索条件 ── */
 .mdsl-bordered {
   border-top: 2px solid #acb7ee;
 }
-
-/* btn-row moved to common.css */
 
 /* MarketDocSetting 按钮行：上边框由父容器提供，仅下边框 2px */
 .mdsl-bordered .btn-row {

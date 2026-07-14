@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   Download and Print Quick Guides Module
+   快速指南下载打印模块
    ═══════════════════════════════════════════ */
 
 .dpg-container {
@@ -35,7 +35,6 @@
   gap: 4px;
 }
 
-/* 每个列表的第一个项（标题行）：不是链接，粗体，d33300 */
 .dpg-link-section .dpg-link-item:first-child .dpg-link {
   font-weight: bold;
   color: #d33300;

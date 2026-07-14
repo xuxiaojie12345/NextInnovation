@@ -8,19 +8,18 @@ interface DocumentType {
   description: string;
 }
 
+// 用户文档权限管理组件
 const HDocUserDocAdministration: React.FC = () => {
-  // ── 表单状态 ──
   const [userid, setUserid] = useState("");
   const [username, setUsername] = useState("");
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
 
-  // ── UI 状态 ──
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 页面初始化: 加载文档类型列表
+  // 初始化：加载文档类型列表
   useEffect(() => {
     (async () => {
       try {
@@ -48,7 +47,6 @@ const HDocUserDocAdministration: React.FC = () => {
     setSuccessMessage("");
   };
 
-  // ── User Info ──
   const handleUserInfo = async () => {
     clearMessages();
 
@@ -112,7 +110,6 @@ const HDocUserDocAdministration: React.FC = () => {
     }
   };
 
-  // ── Update ──
   const handleUpdate = async () => {
     clearMessages();
 
@@ -186,7 +183,7 @@ const HDocUserDocAdministration: React.FC = () => {
       {message && <div className="huda-error msg-error">{message}</div>}
       {successMessage && <div className="huda-success msg-success">{successMessage}</div>}
 
-      {/* ── UserID / User 输入区域 ── */}
+      {/* 用户输入 */}
       <table className="huda-input-table">
         <tbody>
           <tr>
@@ -220,7 +217,7 @@ const HDocUserDocAdministration: React.FC = () => {
         </tbody>
       </table>
 
-      {/* ── 文档权限多选列表 ── */}
+      {/* 文档类型选择 */}
       <div className="huda-doc-section">
         <select
           className="huda-doc-listbox"
@@ -244,7 +241,6 @@ const HDocUserDocAdministration: React.FC = () => {
         </select>
       </div>
 
-      {/* ── 操作按钮 ── */}
       <div className="btn-row">
         <button className="btn" onClick={handleUpdate} disabled={isLoading}>
           UPDATE

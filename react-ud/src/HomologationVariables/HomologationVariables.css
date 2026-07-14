@@ -1,27 +1,16 @@
 /* ═══════════════════════════════════════════
    Homologation Variables
-   画面构成：按钮 Table + 条件 Table
+   按钮 Table + 条件 Table
    ═══════════════════════════════════════════ */
 
-/* ── 外层容器 ── */
 .homologation-vars-container {
   width: 800px;
 }
 
-.homologation-vars-title {
-  color: #ffffff;
-  letter-spacing: 0.3px;
-}
+/* .homologation-vars-title removed: unused */
 
-/* btn-table/btn-cell moved to common.css */
-
-/* ═══════════════════════════════════════════
-   第二部分：查询条件列表（无背景色、无边框线）
-   ═══════════════════════════════════════════ */
 .hv-cond-list {
   padding: 8px 10px;
-  /* border: 2px solid #acb7ee;
-  border-top: none; */
 }
 
 .hv-cond-row {
@@ -31,7 +20,6 @@
   padding: 3px 0;
 }
 
-/* 项目名标签（加粗） */
 .hv-cond-label {
   white-space: nowrap;
   font-size: 12px;
@@ -47,7 +35,6 @@
   font-weight: 700;
 }
 
-/* ── 运算符下拉列表（短固定宽度） ── */
 .hv-op-select {
   width: 55px;
   padding: 3px 2px;
@@ -73,7 +60,6 @@
   cursor: not-allowed;
 }
 
-/* ── 条件值控件（输入框/下拉框，根据内容自适应） ── */
 .hv-cond-input {
   padding: 3px 5px;
   border: 1px solid #b0b0b0;
@@ -176,7 +162,6 @@
   flex: 0 1 auto;
 }
 
-/* ── 输入框后面的追加文字 ── */
 .hv-input-suffix {
   font-size: 12px;
   color: #888;

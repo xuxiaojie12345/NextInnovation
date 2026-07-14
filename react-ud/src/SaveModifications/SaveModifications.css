@@ -1,4 +1,4 @@
-/* ── Save Modifications（Menu 右侧显示） ── */
+/* 保存修改页面 */
 .save-mod-container {
   width: 100%;
   max-width: 400px;
@@ -23,7 +23,6 @@
   margin-bottom: 0;
 }
 
-/* ── 情報エリア：1行1項目、左詰め ── */
 .save-mod-info {
   display: flex;
   flex-direction: column;
@@ -53,7 +52,6 @@
   font-weight: 500;
 }
 
-/* ── Version（下30px） ── */
 .save-mod-version-row {
   display: flex;
   gap: 4px;
@@ -128,7 +126,6 @@
   color: #333;
 }
 
-/* ── VERSION IS RELEASED（背景色 #008000） ── */
 .save-mod-message {
   padding: 2px;
   background-color: #008000;

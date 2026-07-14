@@ -6,6 +6,7 @@ import "./MarketDocumentSettingsList.css";
 
 type Operator = "=" | "!=" | ">" | "<";
 
+// 市场文档设置组件
 const MarketDocumentSettingsList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -147,7 +148,7 @@ const MarketDocumentSettingsList: React.FC = () => {
       </div>
 
       {message && <div className="mdsl-error msg-error">{message}</div>}
-      {successMessage && <div className="mdsl-success msg-success">{successMessage}</div>}
+      {successMessage && <div className="msg-success">{successMessage}</div>}
 
       <div className="mdsl-bordered">
         {/* 按钮区域：在上方，有背景色 */}
@@ -170,7 +171,7 @@ const MarketDocumentSettingsList: React.FC = () => {
           </button>
         </div>
 
-        {/* 检索条件区域 */}
+        {/* 搜索条件 */}
         <div className="mdsl-form">
           <div className="mdsl-row">
             <span className="mdsl-label">Document type</span>

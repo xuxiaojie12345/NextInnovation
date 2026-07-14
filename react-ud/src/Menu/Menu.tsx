@@ -12,6 +12,7 @@ interface MenuCategory {
   linkList: MenuItem[];
 }
 
+// 菜单配置：按类别分组
 const MENU_CATEGORIES: MenuCategory[] = [
   {
     groupHeader: "Generate",
@@ -71,7 +72,6 @@ const MENU_CATEGORIES: MenuCategory[] = [
 const Menu: React.FC = () => {
   const navigate = useNavigate();
 
-  // 获取当前用户名
   const location = useLocation();
   const usernameVal = localStorage.getItem("username");
   const userIdVal = localStorage.getItem("userId");
@@ -84,31 +84,28 @@ const Menu: React.FC = () => {
     username = "User";
   }
 
-  // 退出登录
+  // 登出：清除所有存储后跳转登录页
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/login", { replace: true });
   };
 
-  // link压下
+  // 菜单点击：有路径则跳转，否则忽略
   const handleLinkItemClick = (linkItem: MenuItem) => {
     if (linkItem.path) {
       navigate(linkItem.path);
     }
   };
 
-  // 当前路径是否为菜单根路径（无子路由选中）
   const isRootMenu = location.pathname === "/menu";
 
   return (
     <div className="menu-root">
+      <div className="menu-topbar">
+        <div className="topbar-title">Generate Document</div>
+      </div>
       <aside className="menu-sidebar print-hide-sidebar">
-        <div className="sidebar-header">
-          <h2>Generate Document</h2>
-        </div>
-
-        {/* 菜单列表 */}
         <nav className="sidebar-nav">
           {MENU_CATEGORIES.map((menu) => (
             <div key={menu.groupHeader} className="menu-section">
@@ -128,7 +125,6 @@ const Menu: React.FC = () => {
         </nav>
       </aside>
 
-      {/* 初始主页面 */}
       <main className="menu-main">
         {isRootMenu ? (
           <>
@@ -149,9 +145,14 @@ const Menu: React.FC = () => {
           <span className="user-icon">👤</span>
           <span className="user-name">{username}</span>
         </div>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="footer-actions">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            Back
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );

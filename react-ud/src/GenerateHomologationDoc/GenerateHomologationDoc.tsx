@@ -22,6 +22,7 @@ interface GenerateDocData {
   };
 }
 
+// 生成认证文档组件
 const GenerateHomologationDoc: React.FC = () => {
   const navigate = useNavigate();
 
@@ -68,7 +69,7 @@ const GenerateHomologationDoc: React.FC = () => {
     loadDocumentTypes();
   }, []);
 
-  // 保存输入条件到 localStorage
+  // 保存输入条件到localStorage
   const saveInputs = useCallback(() => {
     localStorage.setItem('chassisSeries', chassisSeries);
     localStorage.setItem('chassisNo', chassisNo);
@@ -154,24 +155,24 @@ const GenerateHomologationDoc: React.FC = () => {
 
   return (
     <div className="generate-doc-page">
-      {/* 顶部标题栏 */}
+      {/* 标题栏 */}
       <div className="gen-doc-header">
         <h1 className="gen-doc-header-title">HDoc - Generate Homologation Document</h1>
       </div>
 
       <div className="generate-doc-container">
-        {/* 错误信息 */}
+        {/* 错误提示 */}
         {errorMessage && (
           <div className="msg-error" style={{marginTop:"-24px", marginLeft:"-24px" , marginRight:"-24px"}}>{errorMessage}</div>
         )}
         
-        {/* Chassis series 项目 */}
+        {/* 表单 */}
         <form onSubmit={handleSubmit} className="generate-doc-form">
-          <div className="form-row">
-            <label className="form-label required">Chassis series</label>
+          <div className="f-row" style={{gap:"12px",padding:"6px 0"}}>
+            <label className="f-label required" style={{fontSize:"13px",color:"#444",minWidth:"140px",flexShrink:0}}>Chassis series</label>
             <input
               type="text"
-              className="form-input"
+              className="f-input" style={{width:"320px",padding:"9px 12px",border:"1px solid #acb7ee",borderRadius:"4px",fontSize:"14px",height:"auto"}}
               value={chassisSeries}
               onChange={(e) => setChassisSeries(e.target.value.replace(/[^a-zA-Z]/g, ""))}
               maxLength={5}
@@ -180,11 +181,11 @@ const GenerateHomologationDoc: React.FC = () => {
           </div>
 
           {/* Chassis no 项目 */}
-          <div className="form-row">
-            <label className="form-label required">Chassis no</label>
+          <div className="f-row" style={{gap:"12px",padding:"6px 0"}}>
+            <label className="f-label required" style={{fontSize:"13px",color:"#444",minWidth:"140px",flexShrink:0}}>Chassis no</label>
             <input
               type="text"
-              className="form-input"
+              className="f-input" style={{width:"320px",padding:"9px 12px",border:"1px solid #acb7ee",borderRadius:"4px",fontSize:"14px",height:"auto"}}
               value={chassisNo}
               onChange={(e) => setChassisNo(e.target.value.replace(/[^0-9]/g, ""))}
               maxLength={10}
@@ -193,10 +194,10 @@ const GenerateHomologationDoc: React.FC = () => {
           </div>
 
           {/* Document type 项目 */}
-          <div className="form-row">
-            <label className="form-label required">Document type</label>
+          <div className="f-row" style={{gap:"12px",padding:"6px 0"}}>
+            <label className="f-label required" style={{fontSize:"13px",color:"#444",minWidth:"140px",flexShrink:0}}>Document type</label>
             <select
-              className="form-select"
+              className="f-input" style={{width:"320px",padding:"9px 12px",border:"1px solid #acb7ee",borderRadius:"4px",fontSize:"14px",height:"auto"}}
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
               disabled={isLoading || isDocTypesLoading}

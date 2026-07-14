@@ -23,27 +23,29 @@ interface VpDataItem {
   value: string;
 }
 
+// Vin Plate 面板组件
 const VinPlate: React.FC = () => {
-  // ── 表单状态 ──
+  // 表单状态
   const [chassisNumber, setChassisNumber] = useState("");
 
-  // ── 显示数据状态 ──
+  // 查询结果
   const [vinPlateInfo, setVinPlateInfo] = useState<VinPlateInfo | null>(null);
   const [printItems, setPrintItems] = useState<PrintItem[]>([]);
   const [vpData, setVpData] = useState<VpDataItem[]>([]);
 
-  // ── UI 状态 ──
+  // UI 状态
   const [message, setMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // 清除消息
   const clearMessages = () => {
     setMessage("");
     setSuccessMessage("");
   };
 
-  // ── 解析 Chassis number 为 serie 和 chnr ──
+  // "FH 12345"または"FH-12345"をserieとchnrに分割
   const parseChassis = (value: string): { serie: string; chnr: string } => {
     const trimmed = value.trim();
     const parts = trimmed.split(/\s+/);
@@ -58,7 +60,7 @@ const VinPlate: React.FC = () => {
     return { serie: trimmed, chnr: "" };
   };
 
-  // ── 解析 XML_DOC（JSON / XML 両対応） ──
+  // XML_DOCを解析：JSON→XMLの順にパースを試行
   const parseXmlDoc = (rawStr: string) => {
     const items: PrintItem[] = [];
     const vpDataItems: VpDataItem[] = [];
@@ -118,7 +120,7 @@ const VinPlate: React.FC = () => {
     setVpData(vpDataItems);
   };
 
-  // ── View Info ──
+  // 查看信息：获取底盘信息并展示
   const handleViewInfo = async () => {
     clearMessages();
 
@@ -159,7 +161,7 @@ const VinPlate: React.FC = () => {
     }
   };
 
-  // ── 执行操作（Set Regenerate / Set OK / Change to Basic / Change to Advanced） ──
+  // 通用操作（Regenerate/OK/Basic/Advanced切换）
   const executeAction = async (endpoint: string, successMsg: string) => {
     clearMessages();
 
@@ -210,9 +212,8 @@ const VinPlate: React.FC = () => {
       {message && <div className="vp-error msg-error">{message}</div>}
       {successMessage && <div className="vp-success msg-success">{successMessage}</div>}
 
-      {/* ── 输入区域 ── */}
       <div className="vp-input-section">
-        <div className="f-row">
+        <div className="f-row" style={{padding:"6px 0"}}>
           <span className="f-label">Chassis number</span>
           <input
             type="text"
@@ -225,6 +226,7 @@ const VinPlate: React.FC = () => {
           />
         </div>
 
+        {/* 操作按钮 */}
         <div className="btn-row">
           <button className="btn" onClick={handleViewInfo} disabled={isLoading}>
             View Info
@@ -256,7 +258,7 @@ const VinPlate: React.FC = () => {
         </div>
       </div>
 
-      {/* ── 信息展示区域 ── */}
+      {/* 查询结果信息 */}
       {hasSearched && vinPlateInfo && (
         <div className="vp-info-section">
           <table className="vp-info-table">
@@ -306,7 +308,6 @@ const VinPlate: React.FC = () => {
             </tbody>
           </table>
 
-          {/* ── Print items ── */}
           {printItems.length > 0 && (
             <div className="vp-xml-section">
               <h3 className="vp-xml-title">Print items</h3>
@@ -321,7 +322,6 @@ const VinPlate: React.FC = () => {
             </div>
           )}
 
-          {/* ── VP Data ── */}
           {vpData.length > 0 && (
             <div className="vp-xml-section">
               <h3 className="vp-xml-title">VP Data</h3>
@@ -338,7 +338,6 @@ const VinPlate: React.FC = () => {
         </div>
       )}
 
-      {/* ── 未搜索到记录 ── */}
       {hasSearched && !vinPlateInfo && !isLoading && (
         <div className="vp-no-data">Chassis record not found.</div>
       )}
