@@ -4,9 +4,10 @@ import com.web.app.domain.AuthenticationRequest;
 import com.web.app.domain.AuthenticationResponse;
 
 /**
- * 认证服务接口
+ * UD01服务接口
+ * 提供UD01AuthenticationApi接口 - 用户认证
  */
-public interface AuthenticationService {
+public interface UD01Service {
     
     /**
      * 用户认证

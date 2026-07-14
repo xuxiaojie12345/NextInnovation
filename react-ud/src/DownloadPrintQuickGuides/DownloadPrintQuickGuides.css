@@ -37,7 +37,7 @@
   color: #0000cc;
 }
 
-.page-title {
+.download-quick-guides-container .page-title {
   color: #ff6600;
   font-size: 20px;
   font-weight: bold;
@@ -163,7 +163,7 @@
     gap: 10px;
   }
 
-  .page-title {
+  .download-quick-guides-container .page-title {
     font-size: 18px;
   }
 

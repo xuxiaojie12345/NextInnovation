@@ -4,15 +4,15 @@ import com.web.app.domain.AuthenticationRequest;
 import com.web.app.domain.AuthenticationResponse;
 import com.web.app.domain.entity.UserInfo;
 import com.web.app.mapper.UserInfoMapper;
-import com.web.app.service.AuthenticationService;
+import com.web.app.service.UD01Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * 认证服务实现类
+ * UD01服务实现类
  */
 @Service
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class UD01ServiceImpl implements UD01Service {
     
     @Autowired
     private UserInfoMapper userInfoMapper;

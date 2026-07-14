@@ -19,8 +19,9 @@ public class UD16ServiceImpl implements UD16Service {
         String serieChnr = request.getSerieChnr() != null ? request.getSerieChnr().trim() : "";
         
         // 校验Serie-Chnr格式：必须包含空格分隔的SERIE和CHNR
+        // 注: .trim() 已去除首尾空格，只需检查 split 后是否有 2 个部分
         String[] parts = serieChnr.split(" ", 2);
-        if (parts.length < 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+        if (parts.length < 2) {
             throw new IllegalArgumentException("Serie-Chnr格式无效，请输入'Serie Chnr'格式（如'SERIE CHNR'）");
         }
         String serie = parts[0];

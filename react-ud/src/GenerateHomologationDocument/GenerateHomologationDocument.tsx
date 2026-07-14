@@ -95,7 +95,7 @@ const GenerateHomologationDocument: React.FC = () => {
         throw new Error('Failed to get document types');
       }
     } catch (error) {
-      setMessage('Document type acquisition failed. Please try again later.');
+      setMessage('Failed to load document types. Please try again.');
     } finally {
       setIsLoading(false);
     }
