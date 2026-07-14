@@ -119,6 +119,14 @@ const UD03 = React.memo(() => {
 
     setUser(currentUser);
 
+    // 回填上次检索条件
+    const savedCriteria = loadSearchCriteria();
+    if (savedCriteria) {
+      setChassisSeries(savedCriteria.chassisSeries);
+      setChassisNo(savedCriteria.chassisNo);
+      setDocumentType(savedCriteria.documentType);
+    }
+
     // 4.1 调用 UD03SelectHdocdocumentlistApi 获取下拉列表数据
     const initPage = async () => {
       try {

@@ -309,7 +309,6 @@ export const AdcaChangeExample = () => {
       const response = await adcaApi.selectAdcaChange(serieChnr);
       if (response.code === 200) {
         alert("查询成功");
-        console.log(response.data);
       } else {
         alert(response.msg);
       }

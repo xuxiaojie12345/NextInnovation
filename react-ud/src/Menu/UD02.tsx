@@ -66,7 +66,6 @@ const MENU_STRUCTURE: MenuGroup[] = [
       },
       { label: "Existing HDoc variables", path: "/UD10" },
       { label: "Upload/Delete template", path: "/UD12" },
-      { label: "Template Check", path: "/UD13" },
       { label: "List Templates", path: "/UD14" },
       { label: "VPPS Vin plate", path: "/UD15" },
       { label: "AD/CA Change", path: "/UD16" },

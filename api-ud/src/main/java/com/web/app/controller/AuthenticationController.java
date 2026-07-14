@@ -1,6 +1,5 @@
 package com.web.app.controller;
 
-import com.web.app.dto.CommonResponse;
 import com.web.app.dto.LoginRequest;
 import com.web.app.dto.LoginResponse;
 import com.web.app.service.LoginService;

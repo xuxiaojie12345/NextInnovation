@@ -147,11 +147,6 @@ const UD08 = React.memo(() => {
           homologationVariablesApi.getHdocVariables(),
         ]);
 
-        // デバッグ: 実際のレスポンス構造を確認
-        console.log("UD08 ProductClass response:", productRes);
-        console.log("UD08 Market response:", marketRes);
-        console.log("UD08 Variable response:", variableRes);
-
         // 处理下拉列表数据
         // 返回格式: { code: 200, data: { productClasses: [{pc, description}, ...] } }
         // 也可能 data 本身就是数组: { code: 200, data: [{pc, description}, ...] }
@@ -169,10 +164,6 @@ const UD08 = React.memo(() => {
           // 遍历 data 内的所有属性，找到第一个数组
           for (const key of Object.keys(dataObj)) {
             if (Array.isArray(dataObj[key])) {
-              console.log(
-                `UD08 extractArray found key: ${key}`,
-                dataObj[key].slice(0, 2),
-              );
               return mapItems(dataObj[key], labelName, useValueAsLabel);
             }
           }
