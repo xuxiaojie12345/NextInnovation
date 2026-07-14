@@ -1,13 +1,8 @@
-// ListAvailableTemplates.tsx - UD14模块
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./ListAvailableTemplates.css";
 
 interface MarketItem {
   market: string;
-}
-
-interface VariableItem {
-  variable: string;
 }
 
 interface TemplateFile {
@@ -17,11 +12,10 @@ interface TemplateFile {
   size: string;
 }
 
-const ListAvailableTemplates = () => {
+const ListAvailableTemplates: React.FC = () => {
   const [selectedMarket, setSelectedMarket] = useState("");
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
   const [templateFiles, setTemplateFiles] = useState<TemplateFile[]>([]);
-  const [usedVariables, setUsedVariables] = useState<VariableItem[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +28,8 @@ const ListAvailableTemplates = () => {
   // 获取市场列表
   const fetchMarketList = async () => {
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud14Searchresultist/getmarkets`,
@@ -77,7 +72,8 @@ const ListAvailableTemplates = () => {
   const fetchTemplateFiles = async (marketCode: string) => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       // 构建请求参数
       const requestBody = {
@@ -135,8 +131,9 @@ const ListAvailableTemplates = () => {
 
     try {
       setIsLoading(true);
-      const API_BASE_URL = "http://localhost:8081";
-      const downloadUrl = `${API_BASE_URL}/api/template/download/${selectedMarket}/${encodeURIComponent(filename)}`;
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
+      const downloadUrl = `${API_BASE_URL}/api/ud14Searchresultist/download/${selectedMarket}/${encodeURIComponent(filename)}`;
 
       const response = await fetch(downloadUrl);
 
@@ -223,16 +220,17 @@ const ListAvailableTemplates = () => {
                       <span className='lat-file-icon'>📄</span>
                     </td>
                     <td className='lat-td-filename'>
-                      <a
-                        href='#'
+                      <span
                         className='lat-filename-link'
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleDownload(file.filename);
+                        onClick={() => handleDownload(file.filename)}
+                        style={{
+                          cursor: "pointer",
+                          color: "#0000ff",
+                          textDecoration: "underline",
                         }}
                       >
                         {file.filename}
-                      </a>
+                      </span>
                     </td>
                     <td className='lat-td-used'>{file.used}</td>
                     <td className='lat-td-lastmod'>{file.lastMod}</td>

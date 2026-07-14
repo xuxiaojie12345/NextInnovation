@@ -6,6 +6,7 @@ import com.web.app.mapper.HdocDocumentListMapper;
 import com.web.app.service.UD18Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -91,6 +92,7 @@ public class UD18ServiceImpl implements UD18Service {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ApiResponse<?> updateUserDocuments(HdocDocumentList request) {
 
@@ -126,11 +128,9 @@ public class UD18ServiceImpl implements UD18Service {
             int deletedCount = hdocDocumentListMapper.deleteAllUserDocAuth(userId);
 
             // Step2: 再插入新的文档权限
-            int insertedCount = 0;
             for (String docType : documentTypes) {
                 if (docType != null && !docType.trim().isEmpty()) {
                     hdocDocumentListMapper.insertUserDocAuth(userId, docType.trim(), currentUser, process, currentUser, process);
-                    insertedCount++;
                 }
             }
 
@@ -139,7 +139,6 @@ public class UD18ServiceImpl implements UD18Service {
             data.put("userid", userId);
             data.put("documentTypes", documentTypes);
             data.put("deletedCount", deletedCount);
-            data.put("insertedCount", insertedCount);
 
             return ApiResponse.success("更新用户文档权限成功", data);
 

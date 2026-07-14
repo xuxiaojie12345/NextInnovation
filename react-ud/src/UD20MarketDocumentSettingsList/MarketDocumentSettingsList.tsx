@@ -1,5 +1,4 @@
-// MarketDocumentSettingsList.tsx - UD20模块
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MarketDocumentSettingsList.css";
 
@@ -10,7 +9,7 @@ interface DocumentItem {
   registerDatetime: string;
 }
 
-const MarketDocumentSettingsList = () => {
+const MarketDocumentSettingsList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,7 +33,8 @@ const MarketDocumentSettingsList = () => {
       setIsLoading(true);
       setErrorMessage("");
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
         method: "POST",

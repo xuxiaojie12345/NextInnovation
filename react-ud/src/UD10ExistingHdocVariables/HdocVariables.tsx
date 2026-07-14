@@ -1,5 +1,4 @@
-// HdocVariables.tsx - UD10模块
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./HdocVariables.css";
 
@@ -17,7 +16,7 @@ interface FormData {
   dateOperator: string;
 }
 
-const HdocVariables = () => {
+const HdocVariables: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     variable: "",
     type: "",
@@ -113,7 +112,8 @@ const HdocVariables = () => {
         }));
       } else {
         // 如果没有登录用户，尝试从后端 API 获取
-        const API_BASE_URL = "http://localhost:8081";
+        const API_BASE_URL =
+          process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
         const response = await fetch(
           `${API_BASE_URL}/api/ud10Hdocvariables/getCurrentUserInfo`,
@@ -269,7 +269,8 @@ const HdocVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/add`,
@@ -305,7 +306,7 @@ const HdocVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(
@@ -327,7 +328,8 @@ const HdocVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/update`,
@@ -363,7 +365,7 @@ const HdocVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(
@@ -385,18 +387,13 @@ const HdocVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
-        `${API_BASE_URL}/api/ud10Hdocvariables/delete`,
+        `${API_BASE_URL}/api/ud10Hdocvariables/delete/${encodeURIComponent(formData.variable)}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            variable: formData.variable,
-          }),
         },
       );
 
@@ -417,7 +414,7 @@ const HdocVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(

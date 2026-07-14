@@ -45,7 +45,7 @@ interface FormData {
   dateOperator: string;
 }
 
-const HomologationVariables = () => {
+const HomologationVariables: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     productClass: "",
     number: "",
@@ -173,7 +173,8 @@ const HomologationVariables = () => {
   // 获取下拉列表数据
   const fetchDropdownData = async () => {
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       // 获取Product class列表
       const pcResponse = await fetch(
@@ -231,7 +232,8 @@ const HomologationVariables = () => {
         }));
       } else {
         // 如果没有登录用户，尝试从后端 API 获取
-        const API_BASE_URL = "http://localhost:8081";
+        const API_BASE_URL =
+          process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
         const response = await fetch(
           `${API_BASE_URL}/api/ud08HomologationVariables/getCurrentUserInfo`,
         );
@@ -479,7 +481,8 @@ const HomologationVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/ud08HomologationVariables/add`,
         {
@@ -519,7 +522,7 @@ const HomologationVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(
@@ -544,7 +547,8 @@ const HomologationVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/ud08HomologationVariables/update`,
         {
@@ -583,7 +587,7 @@ const HomologationVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(
@@ -605,7 +609,8 @@ const HomologationVariables = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud08HomologationVariables/delete`,
@@ -640,7 +645,7 @@ const HomologationVariables = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(

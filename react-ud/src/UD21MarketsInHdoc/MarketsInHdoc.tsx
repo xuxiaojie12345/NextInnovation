@@ -7,9 +7,9 @@ interface MarketItem {
   weightsFromHdoc?: string;
 }
 
-const API_BASE_URL = "http://localhost:8081";
-
 const MarketsInHdoc: React.FC = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -31,16 +31,15 @@ const MarketsInHdoc: React.FC = () => {
       const result = await response.json();
       if (result.code === 200 && result.data) {
         const sortedData = [...result.data].sort(
-          (a: MarketItem, b: MarketItem) => a.market.localeCompare(b.market),
+          (a: MarketItem, b: MarketItem) =>
+            (a.market || "").localeCompare(b.market || ""),
         );
         setMarketList(sortedData);
       } else {
         setErrorMessage(result.msg || "获取市场列表失败");
       }
     } catch (error: any) {
-      if (error.name === "AbortError") {
-        setErrorMessage("请求超时，请检查网络连接后重试");
-      } else if (
+      if (
         error.message?.includes("NetworkError") ||
         error.message?.includes("Failed to fetch")
       ) {

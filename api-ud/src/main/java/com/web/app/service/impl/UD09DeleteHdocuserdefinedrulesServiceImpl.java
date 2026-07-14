@@ -51,8 +51,8 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
 
             // 4.6 各查询条件格式验证
             // 字段长度校验
-            if (request.getVariable() != null && request.getVariable().length() > 20) {
-                return ApiResponse.error(400, "Variable长度不能超过20");
+            if (request.getVariable() != null && request.getVariable().length() > 30) {
+                return ApiResponse.error(400, "Variable长度不能超过30");
             }
             if (request.getValue() != null && request.getValue().length() > 200) {
                 return ApiResponse.error(400, "Value长度不能超过200");

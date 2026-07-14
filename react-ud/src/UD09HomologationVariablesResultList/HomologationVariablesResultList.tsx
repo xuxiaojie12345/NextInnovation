@@ -1,5 +1,4 @@
-// HomologationVariablesResultList.tsx - UD09模块
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./HomologationVariablesResultList.css";
 
@@ -18,7 +17,7 @@ interface SearchResultItem {
   registerDatetime: string;
 }
 
-const HomologationVariablesResultList = () => {
+const HomologationVariablesResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -45,7 +44,8 @@ const HomologationVariablesResultList = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/search`,
@@ -161,7 +161,8 @@ const HomologationVariablesResultList = () => {
         };
       });
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/deleteSelected`,

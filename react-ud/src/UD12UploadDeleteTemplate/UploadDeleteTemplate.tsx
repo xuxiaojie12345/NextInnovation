@@ -1,4 +1,3 @@
-// UploadDeleteTemplate.tsx - UD12模块
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UploadDeleteTemplate.css";
@@ -12,7 +11,7 @@ interface TemplateFile {
   filePath: string;
 }
 
-const UploadDeleteTemplate = () => {
+const UploadDeleteTemplate: React.FC = () => {
   const [uploadMarket, setUploadMarket] = useState("");
   const [deleteMarket, setDeleteMarket] = useState("");
   const [templates, setTemplates] = useState<TemplateFile[]>([]);
@@ -32,7 +31,8 @@ const UploadDeleteTemplate = () => {
   // 获取市场列表
   const fetchMarketList = async () => {
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud12UploadDeletetemplat/getMarketList`,
@@ -84,7 +84,8 @@ const UploadDeleteTemplate = () => {
   const fetchTemplateFiles = async (marketCode: string) => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/template/files/${marketCode}`,
@@ -147,7 +148,8 @@ const UploadDeleteTemplate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       // 构建FormData（确保使用file对象的原始数据）
       const formData = new FormData();
@@ -186,7 +188,7 @@ const UploadDeleteTemplate = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(
@@ -219,7 +221,8 @@ const UploadDeleteTemplate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(`${API_BASE_URL}/api/template/delete`, {
         method: "POST",
@@ -254,7 +257,7 @@ const UploadDeleteTemplate = () => {
     } catch (error) {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         setErrorMessage(
-          "无法连接到后端服务，请确认后端服务已启动（http://localhost:8081）",
+          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
         );
       } else {
         setErrorMessage(

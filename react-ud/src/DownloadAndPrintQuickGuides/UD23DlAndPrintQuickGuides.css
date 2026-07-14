@@ -43,6 +43,15 @@
   gap: 15px;
 }
 
+.header-section .back-link {
+  line-height: 1;
+}
+
+.header-section .volvo-3p-title {
+  margin: 0;
+  line-height: 1;
+}
+
 .back-link {
   background: none;
   border: none;

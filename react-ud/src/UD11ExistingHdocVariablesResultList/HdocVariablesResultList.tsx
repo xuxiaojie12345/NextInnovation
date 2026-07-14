@@ -1,4 +1,3 @@
-// HdocVariablesResultList.tsx - UD10搜索结果列表模块
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./HdocVariablesResultList.css";
@@ -11,12 +10,12 @@ interface SearchResultItem {
   date: string;
 }
 
-const HdocVariablesResultList = () => {
+const HdocVariablesResultList: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   // 从state中获取前画面传递的搜索条件
-  const searchCriteria = location.state?.searchCriteria || {};
+  const searchCriteria = location.state?.searchCriteria;
 
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -33,12 +32,23 @@ const HdocVariablesResultList = () => {
 
   // 调用API获取搜索结果
   const fetchSearchResults = async () => {
+    // 如果没有搜索条件（直接刷新页面进入），跳转回搜索画面
+    if (!searchCriteria || Object.keys(searchCriteria).length === 0) {
+      setErrorMessage(
+        "No search criteria found. Redirecting to search page...",
+      );
+      setIsLoading(false);
+      setTimeout(() => navigate("/hdoc-variables"), 1500);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud10Hdocvariables/search`,
@@ -82,7 +92,11 @@ const HdocVariablesResultList = () => {
 
   // 点击Select按钮：返回前画面并填充选中记录
   const handleSelect = () => {
-    if (selectedRow === null) {
+    if (
+      selectedRow === null ||
+      selectedRow < 0 ||
+      selectedRow >= searchResults.length
+    ) {
       setErrorMessage("Please select a record.");
       return;
     }
@@ -295,15 +309,16 @@ const HdocVariablesResultList = () => {
                       <td className='hvrl-td'>{item.type}</td>
                       <td className='hvrl-td'>{item.description}</td>
                       <td className='hvrl-td hvrl-link'>
-                        <a
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleUserClick(item.createdByUser);
+                        <span
+                          onClick={() => handleUserClick(item.createdByUser)}
+                          style={{
+                            cursor: "pointer",
+                            color: "#0000ff",
+                            textDecoration: "underline",
                           }}
                         >
                           {item.createdByUser}
-                        </a>
+                        </span>
                       </td>
                       <td className='hvrl-td'>{item.date}</td>
                     </tr>

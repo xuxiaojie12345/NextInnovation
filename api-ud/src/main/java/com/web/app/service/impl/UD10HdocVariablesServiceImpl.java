@@ -37,8 +37,8 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             variable = variable.trim();
 
             // 4.6 检查Variable字段长度是否符合数据库约束
-            if (variable.length() > 20) {
-                return ApiResponse.error(400, "Variable长度不能超过20");
+            if (variable.length() > 30) {
+                return ApiResponse.error(400, "Variable长度不能超过30");
             }
             if (request.getType() != null && request.getType().length() > 50) {
                 return ApiResponse.error(400, "Type长度不能超过50");
@@ -102,8 +102,8 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             variable = variable.trim();
 
             // 4.6 检查Variable字段长度是否符合数据库约束
-            if (variable.length() > 20) {
-                return ApiResponse.error(400, "Variable长度不能超过20");
+            if (variable.length() > 30) {
+                return ApiResponse.error(400, "Variable长度不能超过30");
             }
             if (request.getType() != null && request.getType().length() > 50) {
                 return ApiResponse.error(400, "Type长度不能超过50");
@@ -154,19 +154,18 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
      * 对Variable参数进行非空、格式等合法性校验
      */
     @Override
-    public ApiResponse<?> deleteVariable(HdocVariables request) {
+    public ApiResponse<?> deleteVariable(String variable) {
 
         try {
             // 4.4 参数合法性校验
-            String variable = request.getVariable();
             if (variable == null || variable.trim().isEmpty()) {
                 return ApiResponse.error(400, "Variable不能为空");
             }
             variable = variable.trim();
 
             // 4.6 检查Variable字段长度
-            if (variable.length() > 20) {
-                return ApiResponse.error(400, "Variable长度不能超过20");
+            if (variable.length() > 30) {
+                return ApiResponse.error(400, "Variable长度不能超过30");
             }
 
             // 4.5 检查记录是否存在
@@ -209,8 +208,8 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             variable = variable.trim();
 
             // 4.6 验证Variable字段长度
-            if (variable.length() > 20) {
-                return ApiResponse.error(400, "Variable长度不能超过20");
+            if (variable.length() > 30) {
+                return ApiResponse.error(400, "Variable长度不能超过30");
             }
 
             // 4.6 映射操作符为XML安全的标识（eq / ne）
@@ -236,6 +235,9 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
                     date, dateOp);
 
             // 4.7 构建响应数据（映射字段名以匹配前端）
+            if (variablesList == null) {
+                variablesList = new java.util.ArrayList<>();
+            }
 
             List<Map<String, Object>> dataList = variablesList.stream().map(v -> {
                 Map<String, Object> item = new HashMap<>();

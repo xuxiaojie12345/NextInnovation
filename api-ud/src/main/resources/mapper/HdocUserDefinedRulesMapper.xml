@@ -61,10 +61,10 @@
             #{upDate}, 
             #{comments}, 
             #{addDate}, 
-            CURRENT_TIMESTAMP, 
+            #{registerDatetime}, 
             #{registerUser}, 
             #{registerProcess}, 
-            CURRENT_TIMESTAMP, 
+            #{updateDatetime}, 
             #{updateUser}, 
             #{updateProcess}
         )
@@ -81,7 +81,7 @@
             USERID = #{userid}, 
             UP_DATE = #{upDate}, 
             COMMENTS = #{comments}, 
-            UPDATE_DATETIME = CURRENT_TIMESTAMP, 
+            UPDATE_DATETIME = #{updateDatetime}, 
             UPDATE_USER = #{updateUser}, 
             UPDATE_PROCESS = #{updateProcess}
         WHERE 
@@ -89,11 +89,11 @@
     </update>
     
     <!-- 软删除用户定义规则（更新删除日期） -->
-    <update id="softDelete">
+    <delete id="softDelete">
         DELETE FROM HDOC_USER_DEFINED_RULES 
         WHERE 
             PC = #{pc} AND NUM = #{num} AND MARKET = #{market}
-    </update>
+    </delete>
 
     <!-- ========== UD09 Methods ========== -->
 

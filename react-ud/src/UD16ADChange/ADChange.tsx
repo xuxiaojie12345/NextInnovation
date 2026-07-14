@@ -1,8 +1,7 @@
-// ADChange.tsx - UD16模块
-import React, { useState } from "react";
+import { useState } from "react";
 import "./ADChange.css";
 
-const ADChange = () => {
+const ADChange: React.FC = () => {
   const [serieChnr, setSerieChnr] = useState("");
   const [desc, setDesc] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -48,7 +47,8 @@ const ADChange = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -107,7 +107,8 @@ const ADChange = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -152,7 +153,8 @@ const ADChange = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud16/check?serieChnr=${encodeURIComponent(serieChnr)}`,

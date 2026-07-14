@@ -101,6 +101,17 @@
                     </otherwise>
                 </choose>
             </if>
+            <!-- REGISTER_DATETIME: 可选，eq 对应 =, ne 对应 != -->
+            <if test="date != null and date != ''">
+                <choose>
+                    <when test="dateOp == 'ne'">
+                        AND REGISTER_DATETIME != #{date}
+                    </when>
+                    <otherwise>
+                        AND REGISTER_DATETIME = #{date}
+                    </otherwise>
+                </choose>
+            </if>
     </select>
 
 </mapper>

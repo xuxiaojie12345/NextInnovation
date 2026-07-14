@@ -7,53 +7,56 @@ interface DocumentType {
   description: string;
 }
 
-const API_BASE_URL = "http://localhost:8081";
-
 const DocumentTypes: React.FC = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   // 获取文档类型列表
   useEffect(() => {
+    const fetchDocumentTypes = async () => {
+      try {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/ud20/getdocumentlist`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.code === 200 && result.data) {
+          // 按Key（doctype）字母顺序排序
+          const sortedData = [...result.data].sort(
+            (a: DocumentType, b: DocumentType) =>
+              (a.doctype || "").localeCompare(b.doctype || ""),
+          );
+          setDocumentTypes(sortedData);
+        } else {
+          setErrorMessage(result.msg || "无法获取文档类型信息");
+        }
+      } catch (error) {
+        setErrorMessage("系统错误，请稍后重试");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchDocumentTypes();
   }, []);
-
-  const fetchDocumentTypes = async () => {
-    try {
-      setIsLoading(true);
-      setErrorMessage("");
-
-      const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({}),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.code === 200 && result.data) {
-        // 按Key（doctype）字母顺序排序
-        const sortedData = [...result.data].sort(
-          (a: DocumentType, b: DocumentType) =>
-            a.doctype.localeCompare(b.doctype),
-        );
-        setDocumentTypes(sortedData);
-      } else {
-        setErrorMessage(result.msg || "无法获取文档类型信息");
-      }
-    } catch (error) {
-      setErrorMessage("系统错误，请稍后重试");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className='document-types-container'>

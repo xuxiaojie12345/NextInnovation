@@ -13,7 +13,7 @@ interface ModificationData {
   message: string;
 }
 
-const SaveModifications = () => {
+const SaveModifications: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -37,15 +37,27 @@ const SaveModifications = () => {
       const chassisSerieParam = searchParams.get("chassisSerie");
       const chassisNumberParam = searchParams.get("chassisNumber");
 
-      // 前端校验：检查参数是否为空
+      // 前端校验：与后端保持一致
       if (!chassisSerieParam || chassisSerieParam.trim() === "") {
         setErrorMessage("Chassis serie不能为空");
         setIsLoading(false);
         return;
       }
 
+      if (chassisSerieParam.trim().length !== 4) {
+        setErrorMessage("Chassis serie长度必须为4位");
+        setIsLoading(false);
+        return;
+      }
+
       if (!chassisNumberParam || chassisNumberParam.trim() === "") {
         setErrorMessage("Chassis number不能为空");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9]+$/.test(chassisNumberParam.trim())) {
+        setErrorMessage("Chassis number只能包含字母和数字");
         setIsLoading(false);
         return;
       }
@@ -69,7 +81,8 @@ const SaveModifications = () => {
       };
 
       // 始终调用API获取Doctype/Version等基本信息
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD06/saveModifications?chassisSerie=${encodeURIComponent(chassisSerieParam)}&chassisNumber=${encodeURIComponent(chassisNumberParam)}`,
         {

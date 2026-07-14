@@ -33,6 +33,9 @@ public class UD14ServiceImpl implements UD14Service {
 
         try {
             List<MarketMaster> marketList = ud14Mapper.selectMarketMaster();
+            if (marketList == null) {
+                marketList = new java.util.ArrayList<>();
+            }
             List<Map<String, String>> dataList = marketList.stream().map(m -> {
                 Map<String, String> item = new HashMap<>();
                 item.put("market", m.getMarket());

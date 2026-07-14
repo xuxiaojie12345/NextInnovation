@@ -1,5 +1,6 @@
 // Login.tsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./UD01Login.css";
 
 // 定义后端返回的数据结构接口
@@ -11,10 +12,10 @@ interface BackendLoginResponse {
   };
 }
 
-const Login = () => {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({
     userId: "",
@@ -64,7 +65,7 @@ const Login = () => {
         localStorage.setItem("currentUser", userId.trim());
 
         // 跳转到菜单页面
-        window.location.href = "/menu";
+        navigate("/menu");
       } else {
         // 登录失败，显示后端返回的错误信息或默认信息
         setErrors((prev) => ({
@@ -89,7 +90,7 @@ const Login = () => {
     userId: string,
     password: string,
   ): Promise<BackendLoginResponse> => {
-    const API_BASE_URL = "http://localhost:8081";
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
     const response = await fetch(`${API_BASE_URL}/api/login`, {
       method: "POST",
@@ -101,10 +102,6 @@ const Login = () => {
         password: password,
       }),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
 
     const data: BackendLoginResponse = await response.json();
     return data;

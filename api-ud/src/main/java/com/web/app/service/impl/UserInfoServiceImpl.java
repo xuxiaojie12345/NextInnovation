@@ -14,7 +14,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public UserInfo login(String userId, String password) {
         UserInfo user = userInfoMapper.selectUserById(userId);
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && password != null && password.equals(user.getPassword())) {
             return user;
         }
         return null;

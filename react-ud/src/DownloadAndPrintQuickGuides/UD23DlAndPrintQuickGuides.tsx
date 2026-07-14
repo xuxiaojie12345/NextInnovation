@@ -90,9 +90,6 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
           <button onClick={handleBack} className='back-link'>
             Back
           </button>
-          <h2 className='page-title'>Download and Print Quick Guides</h2>
-        </div>
-        <div className='volvo-3p-section'>
           <h3 className='volvo-3p-title'>Download and Print Quick Guides</h3>
         </div>
 

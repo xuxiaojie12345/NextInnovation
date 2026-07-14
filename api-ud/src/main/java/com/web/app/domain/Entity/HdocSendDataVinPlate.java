@@ -1,6 +1,5 @@
 package com.web.app.domain.Entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -21,8 +20,4 @@ public class HdocSendDataVinPlate {
     private String updateDatetime;  // UPDATE_DATETIME
     private String updateUser;      // UPDATE_USER
     private String updateProcess;   // UPDATE_PROCESS
-
-    // 前端传入字段
-    @JsonProperty("chassisNumber")
-    private String chassisNumber;   // 前端传入的Chassis number
 }

@@ -22,9 +22,10 @@ public class UserInfoController {
 
         UserInfo user = userInfoService.login(request.getUserId(), request.getPassword());
         if (user != null) {
-            return ResponseEntity.ok(LoginResponse.builder().success(true).message("Login successful").build());
+            LoginResponse.LoginData data = LoginResponse.LoginData.builder().userId(user.getUserId()).build();
+            return ResponseEntity.ok(LoginResponse.builder().success(true).message("Login successful").data(data).build());
         } else {
-            return ResponseEntity.ok(LoginResponse.builder().success(false).message("Login failed").build());
+            return ResponseEntity.status(401).body(LoginResponse.builder().success(false).message("Login failed").build());
         }
     }
 
@@ -35,6 +36,9 @@ public class UserInfoController {
      */
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<UserInfo>> getUserById(@PathVariable String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return ResponseEntity.status(400).body(ApiResponse.error(400, "用户ID不能为空"));
+        }
         try {
             UserInfo user = userInfoService.getUserById(userId);
             if (user != null) {
@@ -42,10 +46,10 @@ public class UserInfoController {
                 user.setPassword(null);
                 return ResponseEntity.ok(ApiResponse.success("获取用户信息成功", user));
             } else {
-                return ResponseEntity.ok(ApiResponse.error(404, "未找到该用户信息"));
+                return ResponseEntity.status(404).body(ApiResponse.error(404, "未找到该用户信息"));
             }
         } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.error(500, "获取用户信息失败"));
+            return ResponseEntity.status(500).body(ApiResponse.error(500, "获取用户信息失败"));
         }
     }
 }

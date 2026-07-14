@@ -20,7 +20,7 @@ interface VariantItem {
   functionGroup: string;
 }
 
-const VehicleSpecification = () => {
+const VehicleSpecification: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [chassisNo, setChassisNo] = useState("");
   const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo | null>(null);
@@ -53,7 +53,8 @@ const VehicleSpecification = () => {
       setChassisNo(chassisNoParam);
 
       // 调用UD07 API
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD07/vehicleSpecification?chassisNo=${encodeURIComponent(chassisNoParam)}`,
         {
@@ -170,10 +171,11 @@ const VehicleSpecification = () => {
         {/* SYMBOL_STR表格区域 - 显示description */}
         <div className='vs-snote-section'>
           <div className='vs-snote-content'>
-            {variantList.map((variant) => (
+            {variantList.map((variant, index) => (
               <span
+                key={index}
                 className='vs-symbol'
-                title={variant.description} // tooltip显示SYMBOL
+                title={variant.description}
               >
                 {variant.symbol}&nbsp;
               </span>

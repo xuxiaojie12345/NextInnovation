@@ -1,5 +1,4 @@
-// VinPlate.tsx - UD15模块
-import React, { useState } from "react";
+import { useState } from "react";
 import "./VinPlate.css";
 
 interface VinPlateData {
@@ -13,7 +12,7 @@ interface VinPlateData {
   xmlDoc: string;
 }
 
-const VinPlate = () => {
+const VinPlate: React.FC = () => {
   const [chassisNumber, setChassisNumber] = useState("");
   const [vinPlateData, setVinPlateData] = useState<VinPlateData | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,21 +27,36 @@ const VinPlate = () => {
   };
 
   // 将Chassis number按"-"拆分为serie和chnr
-  const parseChassisNumber = (value: string) => {
+  const parseChassisNumber = (
+    value: string,
+  ): { serie: string; chnr: string } => {
     const parts = value.split("-");
-    if (parts.length >= 2) {
+    if (parts.length >= 2 && parts[0].trim() !== "") {
       // "ABC-123" → serie="ABC", chnr="123"
       return { serie: parts[0], chnr: parts.slice(1).join("-") };
     }
-    // 没有"-"时，serie为空，chnr为整个值
+    // 没有"-"时返回空标识，由调用方处理错误
     return { serie: "", chnr: value };
+  };
+
+  // 验证Chassis number格式
+  const validateChassisNumber = (value: string): string | null => {
+    if (!value.trim()) {
+      return "Please enter a chassis number.";
+    }
+    const parts = value.split("-");
+    if (parts.length < 2 || parts[0].trim() === "") {
+      return 'Invalid chassis number format. Please use format "SERIE-CHNR" (e.g., "ABC-123").';
+    }
+    return null;
   };
 
   // View Info功能：查询VIN Plate详细信息
   const handleViewInfo = async () => {
-    // 验证Chassis number是否为空
-    if (!chassisNumber.trim()) {
-      setErrorMessage("Please enter a chassis number.");
+    // 验证Chassis number格式
+    const validationError = validateChassisNumber(chassisNumber);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -54,7 +68,8 @@ const VinPlate = () => {
     setVinPlateData(null);
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -88,8 +103,9 @@ const VinPlate = () => {
 
   // Set Regenerate功能：将Status更新为'0'
   const handleSetRegenerate = async () => {
-    if (!chassisNumber.trim()) {
-      setErrorMessage("Please enter a chassis number.");
+    const validationError = validateChassisNumber(chassisNumber);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -105,7 +121,8 @@ const VinPlate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -138,8 +155,9 @@ const VinPlate = () => {
 
   // Set OK功能：将Status更新为'1'
   const handleSetOK = async () => {
-    if (!chassisNumber.trim()) {
-      setErrorMessage("Please enter a chassis number.");
+    const validationError = validateChassisNumber(chassisNumber);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -155,7 +173,8 @@ const VinPlate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -188,8 +207,9 @@ const VinPlate = () => {
 
   // Change to Basic Info功能：将Status更新为'0'，Type更新为'1'
   const handleChangeToBasic = async () => {
-    if (!chassisNumber.trim()) {
-      setErrorMessage("Please enter a chassis number.");
+    const validationError = validateChassisNumber(chassisNumber);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -205,7 +225,8 @@ const VinPlate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 
@@ -241,8 +262,9 @@ const VinPlate = () => {
 
   // Change to Advanced Info功能：将Status更新为'0'，Type更新为'2'
   const handleChangeToAdvanced = async () => {
-    if (!chassisNumber.trim()) {
-      setErrorMessage("Please enter a chassis number.");
+    const validationError = validateChassisNumber(chassisNumber);
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -258,7 +280,8 @@ const VinPlate = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const currentUser = localStorage.getItem("currentUser") || "";
 

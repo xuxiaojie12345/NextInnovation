@@ -17,8 +17,6 @@ public class HdocDocumentList {
     private String userName;
 
     // 用户信息
-    private String userid;
-    private String username;
     private String responsible;
     private String userposition;
     private String email;
@@ -53,26 +51,9 @@ public class HdocDocumentList {
     private String searchUser;
 
     // ============================================================
-    // 手动添加的 getter/setter（Lombok 因字段名冲突跳过了这些）
+    // 手动添加的 getter/setter
     // ============================================================
 
-    public String getUserid() {
-        return userid;
-    }
-
-    public void setUserid(String userid) {
-        this.userid = userid;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    
     public String getUserId() {
         return userId;
     }

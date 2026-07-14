@@ -1,5 +1,4 @@
-// SearchUser.tsx - UD19模块
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./SearchUser.css";
 
 interface MarketItem {
@@ -13,7 +12,7 @@ interface SearchResult {
   market: string;
 }
 
-const SearchUser = () => {
+const SearchUser: React.FC = () => {
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
   const [market, setMarket] = useState("");
@@ -23,7 +22,8 @@ const SearchUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
 
-  const API_BASE_URL = "http://localhost:8081";
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
   // 页面初始化：加载市场列表
   useEffect(() => {
@@ -143,10 +143,10 @@ const SearchUser = () => {
           setSearchResults(data.data.users || []);
         } else {
           // 检查是否是用户不存在的错误
-          if (data.message && data.message.includes("不存在")) {
-            setErrorMessage(data.message);
+          if (data.msg && data.msg.includes("不存在")) {
+            setErrorMessage(data.msg);
           } else {
-            setErrorMessage(data.message || "搜索失败，请联系管理员");
+            setErrorMessage(data.msg || "搜索失败，请联系管理员");
           }
         }
       } catch (error: any) {

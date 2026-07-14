@@ -1,4 +1,3 @@
-// MarketDocumentSettings.tsx - UD20模块主画面
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MarketDocumentSettings.css";
@@ -11,7 +10,7 @@ interface FormData {
   date: string;
 }
 
-const MarketDocumentSettings = () => {
+const MarketDocumentSettings: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -108,9 +107,9 @@ const MarketDocumentSettings = () => {
     setErrorMessage("");
   };
 
-  // 点击Back按钮：返回前画面
+  // 点击Back按钮：跳转到市场文档设置列表画面
   const handleBack = () => {
-    navigate(-1);
+    navigate("/market-document-settings-list");
   };
 
   // Update Mode处理：更新HDOC_DOCUMENT_LIST表
@@ -127,7 +126,8 @@ const MarketDocumentSettings = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud20-1/updatehdocdocumentlist`,

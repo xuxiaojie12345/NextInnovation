@@ -167,31 +167,6 @@
   box-shadow: 0 0 3px rgba(0, 0, 255, 0.3);
 }
 
-/* 底部按钮区域 */
-.md-footer {
-  margin-top: 20px;
-  padding: 10px 0;
-}
-
-.md-cancel-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #cccccc;
-  padding: 6px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #000000;
-  margin-left: 10px;
-}
-
-.md-cancel-btn:hover:not(:disabled) {
-  background-color: #e0e0e0;
-}
-
-.md-cancel-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 /* 加载状态 */
 .md-loading {
   text-align: center;

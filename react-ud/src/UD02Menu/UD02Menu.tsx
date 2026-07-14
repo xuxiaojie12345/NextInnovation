@@ -1,4 +1,3 @@
-// src/components/NavigationMenu/NavigationMenu.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./UD02Menu.css";
@@ -111,7 +110,7 @@ const Menu: React.FC = () => {
           // ✅ 带有 Link
           id: "admin_ad_ca",
           label: "AD/CA Change",
-          path: "ad-change",
+          path: "/ad-change",
           type: "link",
         },
         {

@@ -1,12 +1,18 @@
 package com.web.app.controller;
 
 import com.web.app.domain.ApiResponse;
+import com.web.app.service.UD12Service;
 import com.web.app.service.UD14Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -24,6 +30,9 @@ public class UD14Controller {
 
     @Autowired
     private UD14Service ud14Service;
+
+    @Autowired
+    private UD12Service ud12Service;
 
     /**
      * 获取市场列表
@@ -57,5 +66,35 @@ public class UD14Controller {
         ApiResponse<?> response = ud14Service.getVariablesByMarket(market);
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 下载模板文件
+     * GET /api/ud14Searchresultist/download/{market}/{fileName}
+     *
+     * @param market   市场代码
+     * @param fileName 文件名
+     * @return 文件流
+     */
+    @GetMapping("/api/ud14Searchresultist/download/{market}/{fileName}")
+    public ResponseEntity<Resource> downloadFile(
+            @PathVariable String market,
+            @PathVariable String fileName) {
+        Resource resource = ud12Service.downloadFile(market, fileName);
+        if (resource == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                    .replace("+", "%20");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename*=UTF-8''" + encodedFileName)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

@@ -10,7 +10,7 @@ interface VariableData {
   modifiedValue: string;
 }
 
-const ModifyDocument = () => {
+const ModifyDocument: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [chassisNo, setChassisNo] = useState("");
@@ -51,9 +51,15 @@ const ModifyDocument = () => {
 
     try {
       // 拆分完整的底盘号为 Chassis series 和 Chassis no
+      if (chassisNo.length < 4) {
+        setErrorMessage("Invalid chassis number format.");
+        setIsLoading(false);
+        return;
+      }
       const chassisSeries = chassisNo.substring(0, 4);
       const chassisNoPart = chassisNo.substring(4);
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       // 先调用UD04 API获取generatedFilePath（用于下载template）
       const ud04Response = await fetch(
@@ -180,7 +186,8 @@ const ModifyDocument = () => {
           })),
       };
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/UD05/modifyDocumentSave`,
         {
@@ -257,10 +264,8 @@ const ModifyDocument = () => {
           <span className='md-label'>Chassis no:</span>
           <span className='md-value md-chassis-no'>
             {chassisNo.substring(0, 4)}
-            <a
-              href='#'
-              onClick={(e) => {
-                e.preventDefault(); // 阻止默认行为
+            <span
+              onClick={() => {
                 if (chassisNo && chassisNo !== "-") {
                   navigate(
                     `/vehicle-specification?chassisNo=${encodeURIComponent(chassisNo)}`,
@@ -275,7 +280,7 @@ const ModifyDocument = () => {
               }}
             >
               {chassisNo.substring(4)}
-            </a>
+            </span>
           </span>
         </div>
         <div className='md-info-group'>
@@ -284,9 +289,13 @@ const ModifyDocument = () => {
         </div>
         <div className='md-info-group'>
           <span className='md-label'>Template:</span>
-          <a href='#' className='md-link' onClick={handleDownloadTemplate}>
+          <span
+            className='md-link'
+            onClick={handleDownloadTemplate}
+            style={{ cursor: "pointer" }}
+          >
             {template}
-          </a>
+          </span>
         </div>
       </div>
 

@@ -32,7 +32,7 @@
 .table-container {
   background-color: #ffffff;
   border: 1px solid #cccccc;
-  overflow-x: 60%;
+  overflow-x: auto;
 }
 
 .document-types-table {

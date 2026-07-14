@@ -1,4 +1,3 @@
-// HDocUserDocAdministration.tsx - UD18模块
 import React, { useState } from "react";
 import "./HDocUserDocAdministration.css";
 
@@ -6,7 +5,7 @@ interface DocumentItem {
   description: string;
 }
 
-const HDocUserDocAdministration = () => {
+const HDocUserDocAdministration: React.FC = () => {
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
   const [documentList, setDocumentList] = useState<DocumentItem[]>([]);
@@ -16,7 +15,8 @@ const HDocUserDocAdministration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
 
-  const API_BASE_URL = "http://localhost:8081";
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
   // 页面初始化：加载文档列表
   React.useEffect(() => {

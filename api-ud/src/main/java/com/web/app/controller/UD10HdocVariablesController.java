@@ -48,7 +48,7 @@ public class UD10HdocVariablesController {
      * @param request 变量信息（variable, type, description, createdByUser）
      * @return API响应
      */
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ApiResponse<?>> updateVariable(@RequestBody HdocVariables request) {
         // 4.3 调用Service层处理更新逻辑
         ApiResponse<?> response = ud10HdocVariablesService.updateVariable(request);
@@ -58,15 +58,15 @@ public class UD10HdocVariablesController {
 
     /**
      * 4.1~4.2 删除变量
-     * 客户端通过DELETE请求将Variable参数，以JSON格式发送至后端服务
+     * 客户端通过DELETE请求将Variable作为路径参数传递
      *
-     * @param request 变量信息（variable）
+     * @param variable 变量名称
      * @return API响应
      */
-    @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<?>> deleteVariable(@RequestBody HdocVariables request) {
+    @DeleteMapping("/delete/{variable}")
+    public ResponseEntity<ApiResponse<?>> deleteVariable(@PathVariable String variable) {
         // 4.3 调用Service层处理删除逻辑
-        ApiResponse<?> response = ud10HdocVariablesService.deleteVariable(request);
+        ApiResponse<?> response = ud10HdocVariablesService.deleteVariable(variable);
 
         return ResponseEntity.ok(response);
     }

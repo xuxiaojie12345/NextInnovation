@@ -7,6 +7,7 @@
     <select id="selectDoctypeList" resultType="java.lang.String">
         SELECT DOCTYPE 
         FROM HDOC_DOCUMENT_LIST
+        ORDER BY DOCTYPE
     </select>
 
     <!-- ==================== UD17 用户管理 ==================== -->

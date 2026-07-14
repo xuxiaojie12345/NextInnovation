@@ -1,4 +1,3 @@
-// HDocUserAdministration.tsx - UD17模块
 import React, { useState, useEffect } from "react";
 import "./HDocUserAdministration.css";
 
@@ -38,7 +37,7 @@ interface FormData {
   marketSuperUserMarkets: string[];
 }
 
-const HDocUserAdministration = () => {
+const HDocUserAdministration: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     userId: "",
     userName: "",
@@ -71,7 +70,8 @@ const HDocUserAdministration = () => {
   const fetchMarketList = async () => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/ud17HDocUserAdministration/getMarketList`,
         {
@@ -118,7 +118,8 @@ const HDocUserAdministration = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       // 调用API获取用户信息
       const response = await fetch(
@@ -165,7 +166,8 @@ const HDocUserAdministration = () => {
   // 获取用户权限配置
   const fetchUserPermissions = async (userId: string, userName?: string) => {
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
         `${API_BASE_URL}/api/ud17HDocUserAdministration/getUserPermissions`,
         {
@@ -340,7 +342,8 @@ const HDocUserAdministration = () => {
       setSuccessMessage("");
 
       // 构建请求数据
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const currentUser = localStorage.getItem("currentUser") || "";
 
       // 角色→TYPE代码(MARKET_AUTH) / FUNCTION描述(FUNCTION_AUTH) 映射
@@ -497,6 +500,12 @@ const HDocUserAdministration = () => {
         );
       }
 
+      if (roleUpdatePromises.length === 0) {
+        setErrorMessage("请至少选择一个角色权限");
+        setIsLoading(false);
+        return;
+      }
+
       const responses = await Promise.all(roleUpdatePromises);
       const results = await Promise.all(responses.map((r) => r.json()));
       const allSuccess = results.every((r) => r.code === 200);
@@ -530,7 +539,8 @@ const HDocUserAdministration = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL =
+        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(

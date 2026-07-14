@@ -11,9 +11,9 @@ interface UserInfo {
   eMmail: string;
 }
 
-const API_BASE_URL = "http://localhost:8081";
-
 const EdbUserView: React.FC = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
   const { username } = useParams<{ username: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -80,11 +80,7 @@ const EdbUserView: React.FC = () => {
   };
 
   const handleBack = () => {
-    try {
-      navigate(-1);
-    } catch {
-      setErrorMessage("页面跳转失败，请刷新页面重试");
-    }
+    navigate(-1);
   };
 
   return (

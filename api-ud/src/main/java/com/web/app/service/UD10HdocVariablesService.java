@@ -31,7 +31,7 @@ public interface UD10HdocVariablesService {
      * @param request 变量信息（variable）
      * @return API响应
      */
-    ApiResponse<?> deleteVariable(HdocVariables request);
+    ApiResponse<?> deleteVariable(String variable);
 
     /**
      * UD11: 搜索变量

@@ -35,9 +35,7 @@ public class UD201Controller {
      *   "operation": "UPDATE_HDOC_DOCUMENT_LIST",
      *   "doctype": "string",
      *   "user": "string",
-     *   "date": "string",
-     *   "market": "string",
-     *   "setting": "string"
+     *   "date": "string"
      * }
      */
     @PostMapping("/updatehdocdocumentlist")

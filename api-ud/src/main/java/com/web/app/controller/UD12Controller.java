@@ -4,7 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.service.UD12Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -112,17 +110,12 @@ public class UD12Controller {
     public ResponseEntity<Resource> downloadFile(
             @PathVariable String market,
             @PathVariable String fileName) {
+        Resource resource = ud12Service.downloadFile(market, fileName);
+        if (resource == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         try {
-            // 获取文件路径
-            String uploadDir = ud12Service.getUploadDir();
-            File file = new File(new File(uploadDir, market), fileName);
-
-            if (!file.exists() || !file.isFile()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Resource resource = new FileSystemResource(file);
-
             // 对文件名进行URL编码，确保中文文件名正常
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
                     .replace("+", "%20");
@@ -132,7 +125,6 @@ public class UD12Controller {
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename*=UTF-8''" + encodedFileName)
                     .body(resource);
-
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

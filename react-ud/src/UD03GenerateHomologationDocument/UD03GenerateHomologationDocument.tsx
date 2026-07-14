@@ -1,4 +1,3 @@
-// GenerateHomologationDocument.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UD03GenerateHomologationDocument.css";
@@ -8,7 +7,7 @@ interface DocumentTypeOption {
   label: string;
 }
 
-const GenerateHomologationDocument = () => {
+const GenerateHomologationDocument: React.FC = () => {
   const navigate = useNavigate();
   const [chassisSeries, setChassisSeries] = useState("");
   const [chassisNo, setChassisNo] = useState("");
@@ -41,7 +40,7 @@ const GenerateHomologationDocument = () => {
   // 获取文档类型列表
   const fetchDocumentTypeList = async () => {
     try {
-      const API_BASE_URL = "http://localhost:8081";
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
       const response = await fetch(
         `${API_BASE_URL}/api/UD03/selectHdocdocumentlist`,
         {
@@ -160,12 +159,7 @@ const GenerateHomologationDocument = () => {
       const targetUrl = `/generate-document?chassisNo=${encodeURIComponent(combinedChassisNo)}`;
 
       // 使用React Router的navigate进行页面跳转
-      try {
-        navigate(targetUrl);
-      } catch (navError) {
-        // 如果navigate失败，尝试使用window.location.href作为备用方案
-        window.location.href = targetUrl;
-      }
+      navigate(targetUrl);
     } catch (error) {
       setErrorMessage("System error. Please contact administrator.");
       setIsLoading(false);

@@ -8,6 +8,7 @@ import com.web.app.mapper.HdocDocumentListMapper;
 import com.web.app.service.UD17Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -130,6 +131,7 @@ public class UD17ServiceImpl implements UD17Service {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ApiResponse<?> updateRole(HdocDocumentList request) {
 
@@ -182,12 +184,12 @@ public class UD17ServiceImpl implements UD17Service {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ApiResponse<?> deleteRole(HdocDocumentList request) {
 
         try {
             String userId = request.getUserId() != null ? request.getUserId().trim() : "";
-            String function = request.getFunction() != null ? request.getFunction().trim() : "";
 
             // 参数校验
             if (userId.isEmpty()) {
@@ -197,7 +199,6 @@ public class UD17ServiceImpl implements UD17Service {
             // 构建返回数据
             Map<String, Object> data = new HashMap<>();
             data.put("userid", userId);
-            data.put("function", function);
 
             return ApiResponse.success("删除用户角色成功", data);
 

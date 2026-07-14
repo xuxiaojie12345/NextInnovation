@@ -6,6 +6,8 @@ import com.web.app.mapper.UD12Mapper;
 import com.web.app.service.UD12Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -188,6 +190,15 @@ public class UD12ServiceImpl implements UD12Service {
         } catch (Exception e) {
             return ApiResponse.error(500, "系统内部错误，请联系管理员");
         }
+    }
+
+    @Override
+    public Resource downloadFile(String market, String fileName) {
+        File file = new File(new File(uploadDir, market), fileName);
+        if (!file.exists() || !file.isFile()) {
+            return null;
+        }
+        return new FileSystemResource(file);
     }
 
     @Override

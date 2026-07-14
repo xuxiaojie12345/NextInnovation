@@ -1,4 +1,3 @@
-// HdocTemplateCheck.tsx - UD13模块
 import React, { useState } from "react";
 import "./HdocTemplateCheck.css";
 
@@ -7,7 +6,7 @@ interface VariableInfo {
   position: number;
 }
 
-const HdocTemplateCheck = () => {
+const HdocTemplateCheck: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -54,105 +53,6 @@ const HdocTemplateCheck = () => {
     return variableList;
   };
 
-  // 检查模板文件功能
-  const handleCheck = async () => {
-    // 验证是否选择了文件
-    if (!selectedFile) {
-      setErrorMessage("ERROR: Unable to access file!");
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
-    setVariables([]);
-    setCheckedFileUrl(null);
-
-    try {
-      // 读取文件内容
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        try {
-          const content = e.target?.result as string;
-
-          if (!content) {
-            setErrorMessage("ERROR: Unable to access file!");
-            setIsLoading(false);
-            return;
-          }
-
-          // 解析变量
-          const extractedVariables = parseRtfContent(content);
-
-          if (extractedVariables.length === 0) {
-            // 没有找到任何变量
-            setErrorMessage("ERROR: The file content is incorrect!");
-          } else {
-            // 成功找到变量
-            setVariables(extractedVariables);
-            setSuccessMessage(
-              `Found ${extractedVariables.length} variable(s) in the template.`,
-            );
-
-            // 创建检查后的文件下载链接
-            const blob = new Blob([content], { type: "application/rtf" });
-            const url = URL.createObjectURL(blob);
-            setCheckedFileUrl(url);
-          }
-        } catch (error) {
-          setErrorMessage("ERROR: Unable to access file!");
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      reader.onerror = () => {
-        setErrorMessage("ERROR: Unable to access file!");
-        setIsLoading(false);
-      };
-
-      // 以文本方式读取文件
-      reader.readAsText(selectedFile);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "System error. Please contact administrator.",
-      );
-      setIsLoading(false);
-    }
-  };
-
-  // 下载检查后的模板文件
-  const handleDownload = () => {
-    if (!checkedFileUrl || !selectedFile) {
-      return;
-    }
-
-    // 生成文件名
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
-    const originalName = selectedFile.name.replace(".rtf", "");
-    const fileName = `checked_${originalName}_${dateStr}.rtf`;
-
-    // 创建下载链接
-    const link = document.createElement("a");
-    link.href = checkedFileUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  if (isLoading) {
-    return (
-      <div className='htc-container'>
-        <div className='htc-loading'>Checking...</div>
-      </div>
-    );
-  }
-
   return (
     <div className='htc-container'>
       {/* 消息显示 */}
@@ -191,11 +91,7 @@ const HdocTemplateCheck = () => {
         </div>
 
         <div className='htc-button-row'>
-          <button
-            className='htc-btn'
-            onClick={handleCheck}
-            disabled={isLoading}
-          >
+          <button className='htc-btn' disabled={isLoading}>
             Check
           </button>
         </div>
@@ -204,16 +100,9 @@ const HdocTemplateCheck = () => {
       {/* 下载链接显示 */}
       {checkedFileUrl && (
         <div className='htc-download-row'>
-          <a
-            href='#'
-            className='htc-link'
-            onClick={(e) => {
-              e.preventDefault();
-              handleDownload();
-            }}
-          >
+          <span className='htc-link' style={{ cursor: "pointer" }}>
             Download checked template
-          </a>
+          </span>
         </div>
       )}
     </div>
