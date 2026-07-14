@@ -29,6 +29,7 @@
             UPDATE_DATETIME = NOW(),
             UPDATE_USER = #{currentUser},
             UPDATE_PROCESS = 'UD16UpdateHdocAdcaChange'
+        WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </update>
 
 </mapper>

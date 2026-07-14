@@ -48,6 +48,7 @@ public class ModifyDocumentController {
     try {
       String serie = (String) request.get("serie");
       String chnr = (String) request.get("chnr");
+      String currentUser = (String) request.get("currentUser");
       @SuppressWarnings("unchecked")
       List<Map<String, String>> modifications =
           (List<Map<String, String>>) request.get("modifications");
@@ -57,7 +58,7 @@ public class ModifyDocumentController {
             .body(ApiResponse.error(400, "Invalid request parameters."));
       }
 
-      int count = modifyDocumentService.updateModifications(serie, chnr, modifications);
+      int count = modifyDocumentService.updateModifications(serie, chnr, modifications, currentUser);
       Map<String, Object> data = new HashMap<>();
       data.put("updateCount", count);
       ApiResponse<Map<String, Object>> response = ApiResponse.success(data);

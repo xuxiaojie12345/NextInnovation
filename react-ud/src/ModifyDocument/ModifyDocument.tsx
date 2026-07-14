@@ -93,6 +93,7 @@ const ModifyDocument: React.FC = () => {
         serie,
         chnr,
         modifications,
+        currentUser: localStorage.getItem("userId") || "",
       });
 
       if (res.code === 200) {

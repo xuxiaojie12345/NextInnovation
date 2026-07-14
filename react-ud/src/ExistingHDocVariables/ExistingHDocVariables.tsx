@@ -431,7 +431,7 @@ const ExistingHDocVariables: React.FC = () => {
             type="text"
             className="ehv-input ehv-input-variable"
             value={variable}
-            onChange={(e) => setVariable(e.target.value)}
+            onChange={(e) => setVariable(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={30}
             disabled={isLoading}
           />
@@ -461,7 +461,7 @@ const ExistingHDocVariables: React.FC = () => {
             type="text"
             className="ehv-input ehv-input-description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={100}
             disabled={isLoading}
           />
@@ -479,7 +479,7 @@ const ExistingHDocVariables: React.FC = () => {
             type="text"
             className="ehv-input ehv-input-created-by"
             value={createdByUser}
-            onChange={(e) => setCreatedByUser(e.target.value)}
+            onChange={(e) => setCreatedByUser(e.target.value.replace(/[^\x20-\x7E]/g, ""))}
             maxLength={16}
             disabled={isLoading}
           />
@@ -493,7 +493,7 @@ const ExistingHDocVariables: React.FC = () => {
             type="text"
             className="ehv-input ehv-input-date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => setDate(e.target.value.replace(/[^0-9\-/]/g, ""))}
             disabled={isLoading}
           />
         </div>

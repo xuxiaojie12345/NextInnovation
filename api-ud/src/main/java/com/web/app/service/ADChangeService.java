@@ -7,5 +7,5 @@ public interface ADChangeService {
 
   int insert(String serie, String chnr, String act, String bu, String reason, String currentUser);
 
-  int updateAllActToN(String currentUser);
+  int updateAllActToN(String serie, String chnr, String currentUser);
 }

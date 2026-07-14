@@ -31,8 +31,9 @@ public class UD15SendDataController {
       if (data != null) {
         return ResponseEntity.ok(ApiResponse.success(data));
       } else {
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
         return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "Vehicle data record not found."));
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
       return ResponseEntity.status(500)
@@ -55,10 +56,13 @@ public class UD15SendDataController {
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.setRegenerate(serie, chnr, currentUser);
       if (result > 0) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Status updated to regenerate.");
+        return ResponseEntity.ok(resp);
       } else {
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
         return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "Vehicle data record not found, update failed."));
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
       return ResponseEntity.status(500)
@@ -80,10 +84,13 @@ public class UD15SendDataController {
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.setOK(serie, chnr, currentUser);
       if (result > 0) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Status updated to OK.");
+        return ResponseEntity.ok(resp);
       } else {
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
         return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "Vehicle data record not found, update failed."));
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
       return ResponseEntity.status(500)
@@ -106,10 +113,13 @@ public class UD15SendDataController {
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.changeToBasicInfo(serie, chnr, currentUser);
       if (result > 0) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Type changed to Basic Info.");
+        return ResponseEntity.ok(resp);
       } else {
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
         return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "Vehicle data record not found, update failed."));
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
       return ResponseEntity.status(500)
@@ -132,10 +142,13 @@ public class UD15SendDataController {
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.changeToAdvancedInfo(serie, chnr, currentUser);
       if (result > 0) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Type changed to Advanced Info.");
+        return ResponseEntity.ok(resp);
       } else {
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
         return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "Vehicle data record not found, update failed."));
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
       return ResponseEntity.status(500)

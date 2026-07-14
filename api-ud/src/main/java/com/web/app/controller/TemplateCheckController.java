@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 @CrossOrigin(origins = "*")
 public class TemplateCheckController {
 
-  private static final String CHECK_RESULT_DIR = "//172.17.0.63/hdoc/template/check_result";
+  @Value("${file.template.checkResultDir}")
+  private String checkResultDir;
 
   @PostMapping("/check")
   public ResponseEntity<ApiResponse<Map<String, Object>>> checkTemplate(
@@ -56,10 +58,10 @@ public class TemplateCheckController {
       String downloadUrl = "/api/v1/hdoc/template/check/result/" + resultId;
 
       // 保存校验结果到文件
-      File dir = new File(CHECK_RESULT_DIR);
+      File dir = new File(checkResultDir);
       if (!dir.exists()) dir.mkdirs();
 
-      Path resultPath = Paths.get(CHECK_RESULT_DIR, resultId + ".csv");
+      Path resultPath = Paths.get(checkResultDir, resultId + ".csv");
       try (BufferedWriter writer = Files.newBufferedWriter(resultPath, StandardCharsets.UTF_8)) {
         writer.write("Variable Count: " + variableCount + "\n");
         writer.write("Variable Name\n");
@@ -83,7 +85,7 @@ public class TemplateCheckController {
   @GetMapping("/check/result/{id}")
   public ResponseEntity<?> downloadCheckResult(@PathVariable("id") String id) {
     try {
-      Path filePath = Paths.get(CHECK_RESULT_DIR, id + ".csv");
+      Path filePath = Paths.get(checkResultDir, id + ".csv");
       if (!Files.exists(filePath)) {
         return ResponseEntity.status(404).body(ApiResponse.error(404, "Result file not found."));
       }

@@ -173,7 +173,7 @@ const GenerateHomologationDoc: React.FC = () => {
               type="text"
               className="form-input"
               value={chassisSeries}
-              onChange={(e) => setChassisSeries(e.target.value)}
+              onChange={(e) => setChassisSeries(e.target.value.replace(/[^a-zA-Z]/g, ""))}
               maxLength={5}
               disabled={isLoading}
             />
@@ -186,7 +186,7 @@ const GenerateHomologationDoc: React.FC = () => {
               type="text"
               className="form-input"
               value={chassisNo}
-              onChange={(e) => setChassisNo(e.target.value)}
+              onChange={(e) => setChassisNo(e.target.value.replace(/[^0-9]/g, ""))}
               maxLength={10}
               disabled={isLoading}
             />

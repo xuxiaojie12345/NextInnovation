@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { api } from "../services/api";
 import "../common/css/common.css";
@@ -25,7 +25,6 @@ const SearchUser: React.FC = () => {
   const [results, setResults] = useState<UserRecord[]>([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const marketRef = useRef<HTMLSelectElement>(null);
 
   // 加载 Market 列表
   useEffect(() => {
@@ -45,13 +44,6 @@ const SearchUser: React.FC = () => {
       }
     })();
   }, []);
-
-  // Market 列表加载完成后，取消所有选中项
-  useEffect(() => {
-    if (marketRef.current) {
-      marketRef.current.selectedIndex = -1;
-    }
-  }, [markets]);
 
   // 如果有从外部传入的 userid（如从 EDB User View），自动执行查询
   useEffect(() => {
@@ -158,13 +150,13 @@ const SearchUser: React.FC = () => {
           <div className="su-market-section">
             <span className="su-label">Market</span>
             <select
-              ref={marketRef}
               className="su-market-listbox"
               size={Math.max(markets.length, 3)}
               defaultValue=""
               onChange={(e) => setMarket(e.target.value)}
               disabled={isLoading}
             >
+              <option value=""></option>
               {markets.map((m) => (
                 <option key={m} value={m}>
                   {m}

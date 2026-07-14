@@ -122,7 +122,7 @@ const Login: React.FC = () => {
               <input
                 type="text"
                 value={userid}
-                onChange={(e) => setUserid(e.target.value)}
+                onChange={(e) => setUserid(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
                 placeholder="UserID"
                 maxLength={10}
                 disabled={isLoading}

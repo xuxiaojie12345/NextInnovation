@@ -73,9 +73,12 @@ const GenerateDocumentResult: React.FC = () => {
 
         if (res.code === 200 && res.data) {
           setData(res.data);
+        } else {
+          setErrorMessage(
+            res.message || "Chassis no is not exists",
+          );
         }
       } catch (err) {
-        console.error("Failed to fetch document data", err);
         setErrorMessage("System error. Please contact administrator.");
       } finally {
         setIsLoading(false);

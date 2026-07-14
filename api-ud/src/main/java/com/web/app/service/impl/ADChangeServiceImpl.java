@@ -27,10 +27,10 @@ public class ADChangeServiceImpl implements ADChangeService {
   }
 
   @Override
-  public int updateAllActToN(String currentUser) {
+  public int updateAllActToN(String serie, String chnr, String currentUser) {
     if (currentUser == null || currentUser.trim().isEmpty()) {
       currentUser = "SYSTEM";
     }
-    return adChangeMapper.updateAllActToN(currentUser);
+    return adChangeMapper.updateAllActToN(serie, chnr, currentUser);
   }
 }

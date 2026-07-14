@@ -20,9 +20,9 @@ public class ModifyDocumentServiceImpl implements ModifyDocumentService {
 
   @Override
   public int updateModifications(
-      String serie, String chnr, List<Map<String, String>> modifications) {
+      String serie, String chnr, List<Map<String, String>> modifications, String currentUser) {
     int count = 0;
-    String user = "SYSTEM";
+    String user = (currentUser != null && !currentUser.isEmpty()) ? currentUser : "SYSTEM";
     for (Map<String, String> mod : modifications) {
       String variable = mod.get("variable");
       String val = mod.get("val");

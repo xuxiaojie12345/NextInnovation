@@ -104,6 +104,8 @@ const HDocUserDocAdministration: React.FC = () => {
         setSelectedDocs(new Set(docList));
       }
     } catch (err: any) {
+      setUsername("");
+      setSelectedDocs(new Set());
       setMessage(err?.message || "System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
@@ -194,7 +196,7 @@ const HDocUserDocAdministration: React.FC = () => {
                 type="text"
                 className="huda-input"
                 value={userid}
-                onChange={(e) => setUserid(e.target.value)}
+                onChange={(e) => setUserid(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
                 maxLength={10}
                 disabled={isLoading}
               />

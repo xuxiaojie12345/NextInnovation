@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,6 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/hdoc/template")
 @CrossOrigin(origins = "*")
 public class TemplateController {
+
+  @Value("${file.template.uploadDir}")
+  private String uploadDir;
 
   @Autowired
   private TemplateService templateService;
@@ -87,7 +91,7 @@ public class TemplateController {
         return ResponseEntity.badRequest().body(ApiResponse.error(400, "Market is required."));
       }
 
-      String dirPath = "//172.17.0.63/hdoc/template/upload/" + market;
+      String dirPath = uploadDir + "/" + market;
       File dir = new File(dirPath);
       List<Map<String, Object>> templates = new ArrayList<>();
       if (dir.exists() && dir.isDirectory()) {
@@ -115,6 +119,8 @@ public class TemplateController {
                       return fileInfo;
                     })
                 .collect(Collectors.toList());
+      } else {
+        return ResponseEntity.ok(ApiResponse.error(400, "Market folder not found."));
       }
 
       Map<String, Object> data = new HashMap<>();

@@ -1,7 +1,7 @@
 package com.web.app.controller;
 
 import com.web.app.dto.ApiResponse;
-import com.web.app.mapper.SaveModificationsMapper;
+import com.web.app.service.SaveModificationsService;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class SaveModificationsController {
 
   @Autowired
-  private SaveModificationsMapper saveModificationsMapper;
+  private SaveModificationsService saveModificationsService;
 
   @PostMapping("/adcamodification")
   public ResponseEntity<ApiResponse<Map<String, Object>>> getAdcaModification(
@@ -25,7 +25,7 @@ public class SaveModificationsController {
         return ResponseEntity.badRequest()
             .body(ApiResponse.error(400, "Invalid chassis information."));
       }
-      List<Map<String, Object>> list = saveModificationsMapper.selectModificationData(serie, chno);
+      List<Map<String, Object>> list = saveModificationsService.selectModificationData(serie, chno);
 
       Map<String, Object> data = new LinkedHashMap<>();
       if (list != null && !list.isEmpty()) {

@@ -66,3 +66,8 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: d://uploads/
     downloadFolder: d://downloads/
+    template:
+        uploadDir: //172.17.0.63/hdoc/template/upload
+        checkResultDir: //172.17.0.63/hdoc/template/check_result
+        username: Administrator
+        password: 3edcVFR$

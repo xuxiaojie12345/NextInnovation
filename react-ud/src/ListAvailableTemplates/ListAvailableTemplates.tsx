@@ -77,7 +77,7 @@ const ListAvailableTemplates: React.FC = () => {
           const fileDetails = listRes.data.templateList || [];
 
           if (fileDetails.length === 0) {
-            setMessage("Market folder not found.");
+            setMessage("No templates found for the selected market.");
             setTemplateList([]);
             return;
           }
@@ -114,11 +114,11 @@ const ListAvailableTemplates: React.FC = () => {
           const templates = await Promise.all(templatePromises);
           setTemplateList(templates);
         } else {
-          setMessage("Market folder not found.");
+          setMessage(listRes.message || "Market folder not found.");
           setTemplateList([]);
         }
       } catch {
-        setMessage("Market folder not found.");
+        setMessage("System error. Please contact administrator.");
         setTemplateList([]);
       } finally {
         setIsLoading(false);

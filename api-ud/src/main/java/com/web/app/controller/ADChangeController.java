@@ -85,8 +85,10 @@ public class ADChangeController {
   public ResponseEntity<ApiResponse<Map<String, Object>>> updateHdocAdcaChange(
       @RequestBody Map<String, String> request) {
     try {
+      String serie = request.get("serie");
+      String chnr = request.get("chnr");
       String updateUser = request.get("updateUser");
-      int updateCount = adChangeService.updateAllActToN(updateUser);
+      int updateCount = adChangeService.updateAllActToN(serie, chnr, updateUser);
       Map<String, Object> data = new HashMap<>();
       data.put("updateCount", String.valueOf(updateCount));
       data.put("updateContent", "ACT status has been set to N for all records.");
