@@ -285,12 +285,13 @@ def analyze(commits, surviving, file_churn):
         dev_stats[a]["deleted"] += deleted
 
     dev_summary = []
-    for author, s in sorted(dev_stats.items(), key=lambda x: -x[1]["added"]):
+    for author, s in dev_stats.items():
         retention = round(s["survived"] / max(s["added"], 1) * 100, 2)
         churn = round(s["deleted"] / max(s["added"] + s["deleted"], 1) * 100, 2)
         dev_summary.append({"author": author, "commits": s["commits"], "added": s["added"],
             "survived": s["survived"], "deleted": s["deleted"], "retention": retention,
             "churn": churn, "net": s["added"] - s["deleted"]})
+    dev_summary.sort(key=lambda x: x["retention"])
 
     week_trend = defaultdict(lambda: {"added": 0, "survived": 0})
     for c in commit_details:
@@ -472,7 +473,8 @@ def main():
                 print(f"\n  ⚠️  无法连接到远端仓库，请检查网络后重试。")
                 print(f"{'='*55}\n")
                 return
-            output = result.stdout.strip()
+            # git fetch 的进度和更新信息输出到 stderr 而非 stdout
+            output = (result.stderr.strip() or result.stdout.strip())
             if output:
                 for line in output.splitlines()[:10]:
                     print(f"  {line}")
