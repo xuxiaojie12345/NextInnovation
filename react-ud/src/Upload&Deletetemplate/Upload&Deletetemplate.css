@@ -1,0 +1,231 @@
+.udt-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.udt-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.udt-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.udt-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.udt-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.udt-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: udtFadeIn 0.25s ease-in;
+}
+
+.udt-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.udt-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.udt-section {
+  margin-bottom: 8px;
+}
+
+.udt-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #003366;
+  margin: 0 0 14px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.udt-divider {
+  height: 1px;
+  background-color: #d0d0d0;
+  margin: 20px 0;
+}
+
+.udt-form-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.udt-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.udt-field-file {
+  flex: 2;
+}
+
+.udt-field-btn {
+  flex: 0 0 auto;
+  min-width: 100px;
+}
+
+.udt-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.udt-file-input {
+  display: block;
+  font-size: 13px;
+  color: #333333;
+  padding: 4px 0;
+  width: 100%;
+}
+
+.udt-file-input::file-selector-button {
+  height: 28px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  background-color: #f5f5f5;
+  color: #333333;
+  padding: 0 12px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.udt-file-input::file-selector-button:hover {
+  background-color: #e8e8e8;
+  border-color: #4096ff;
+}
+
+.udt-file-name {
+  font-size: 12px;
+  color: #666666;
+  margin-left: 4px;
+}
+
+.udt-select.ant-select {
+  width: 100%;
+}
+
+.udt-select .ant-select-selector {
+  border-radius: 3px !important;
+  border: 1px solid #d0d0d0 !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  color: #333333 !important;
+}
+
+.udt-select .ant-select-selector:hover {
+  border-color: #4096ff !important;
+}
+
+.udt-select.ant-select-focused .ant-select-selector {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+.udt-btn {
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-width: 80px;
+  padding: 0 16px !important;
+}
+
+.udt-btn-upload {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+.udt-btn-upload:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.udt-btn-delete {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: #ffffff !important;
+}
+
+.udt-btn-delete:hover {
+  background-color: #d9363e !important;
+  border-color: #d9363e !important;
+}
+
+.udt-check-link {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.udt-check-link a {
+  font-size: 13px;
+  color: #1a73e8;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.udt-check-link a:hover {
+  color: #1557b0;
+}
+
+.udt-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.udt-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.udt-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes udtFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

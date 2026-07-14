@@ -1,0 +1,251 @@
+.hv-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.hv-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.hv-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.hv-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.hv-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 1200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hv-form {
+  margin-bottom: 16px;
+}
+
+.hv-form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.hv-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.hv-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.hv-input.ant-input {
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  height: 34px;
+  font-size: 13px;
+  color: #333333;
+  width: 100%;
+}
+
+.hv-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.hv-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.hv-select.ant-select {
+  width: 100%;
+}
+
+.hv-select .ant-select-selector {
+  border-radius: 3px !important;
+  border: 1px solid #d0d0d0 !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  color: #333333 !important;
+}
+
+.hv-select .ant-select-selector:hover {
+  border-color: #4096ff !important;
+}
+
+.hv-select.ant-select-focused .ant-select-selector {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+.hv-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 20px;
+  flex-wrap: wrap;
+}
+
+.hv-btn {
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-width: 80px;
+  padding: 0 16px !important;
+}
+
+.hv-btn-search {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+.hv-btn-search:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.hv-btn-clear {
+  background-color: #ffffff !important;
+  border-color: #d0d0d0 !important;
+  color: #333333 !important;
+}
+
+.hv-btn-clear:hover {
+  border-color: #1a73e8 !important;
+  color: #1a73e8 !important;
+}
+
+.hv-btn-add {
+  background-color: #52c41a !important;
+  border-color: #52c41a !important;
+  color: #ffffff !important;
+}
+
+.hv-btn-add:hover {
+  background-color: #45a818 !important;
+  border-color: #45a818 !important;
+}
+
+.hv-btn-update {
+  background-color: #faad14 !important;
+  border-color: #faad14 !important;
+  color: #ffffff !important;
+}
+
+.hv-btn-update:hover {
+  background-color: #d99a0e !important;
+  border-color: #d99a0e !important;
+}
+
+.hv-btn-delete {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: #ffffff !important;
+}
+
+.hv-btn-delete:hover {
+  background-color: #d9363e !important;
+  border-color: #d9363e !important;
+}
+
+.hv-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: hvFadeIn 0.25s ease-in;
+}
+
+.hv-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.hv-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.hv-table-section {
+  margin-top: 8px;
+}
+
+.hv-table {
+  font-size: 13px;
+}
+
+.hv-table .ant-table-thead > tr > th {
+  background-color: #f5f5f5;
+  color: #333333;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.hv-table .ant-table-tbody > tr > td {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #333333;
+}
+
+.hv-row-clickable {
+  cursor: pointer;
+}
+
+.hv-row-clickable:hover {
+  background-color: #e6f4ff !important;
+}
+
+.hv-row-selected {
+  background-color: #bae0ff !important;
+}
+
+.hv-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.hv-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.hv-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes hvFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
