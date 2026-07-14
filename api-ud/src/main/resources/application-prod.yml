@@ -50,3 +50,8 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: /home/uploads/
     downloadFolder: /home/downloads/
+    # Market模板文件存放路径（服务器共享路径）
+    marketFolder: \\172.17.0.63\hdoc\template\upload
+    # 文件服务器认证
+    fileServerUsername: Administrator
+    fileServerPassword: 3edcVFR$

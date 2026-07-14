@@ -66,5 +66,8 @@ file:
     # file.uploadFolder=d://uploads/
     uploadFolder: d://uploads/
     downloadFolder: d://downloads/
-    # Market模板文件存放路径（对应react前端项目的market文件夹）
-    marketFolder: E:\NextInnovation - コピー\react-ud\src\market\
+    # Market模板文件存放路径（服务器共享路径）
+    marketFolder: \\172.17.0.63\hdoc\template\upload
+    # 文件服务器认证
+    fileServerUsername: Administrator
+    fileServerPassword: 3edcVFR$
