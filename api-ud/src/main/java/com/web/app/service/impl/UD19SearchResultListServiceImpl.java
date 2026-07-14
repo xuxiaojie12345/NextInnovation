@@ -60,10 +60,7 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
 
             if (userList == null || userList.isEmpty()) {
                 log.warn("UD19搜索用户 - 未找到数据");
-                UD19SearchResultListResponse.SearchResultData emptyResult = new UD19SearchResultListResponse.SearchResultData();
-                emptyResult.setCount(0);
-                emptyResult.setDatatable(new ArrayList<>());
-                return UD19SearchResultListResponse.success("查询成功", emptyResult);
+                return UD19SearchResultListResponse.error(404, "未找到匹配的用户");
             }
 
             UD19SearchResultListResponse.SearchResultData resultData = new UD19SearchResultListResponse.SearchResultData();

@@ -33,4 +33,7 @@ public class UD20MarketDocumentSettingsRequest implements Serializable {
 
     @ApiModelProperty(value = "注册日期时间", example = "2026-05-15 10:30:00")
     private String date;
+
+    @ApiModelProperty(value = "登录用户ID", example = "admin")
+    private String registerUser;
 }

@@ -60,10 +60,16 @@ public class UD20MarketDocumentSettingsServiceImpl implements UD20MarketDocument
             }
 
             // 4.5 通过数据访问层更新 HDOC_DOCUMENT_LIST 表
+            String registerUser = (request.getRegisterUser() != null && !request.getRegisterUser().trim().isEmpty())
+                    ? request.getRegisterUser().trim()
+                    : "SYSTEM";
+            String process = "UD20MarketDocumentSettings";
             int updatedRows = ud201Mapper.updateDocumentList(
                     doctype,
+                    registerUser,
                     request.getUser(),
-                    request.getDate());
+                    request.getDate(),
+                    process);
 
             if (updatedRows > 0) {
                 log.info("UD20-1更新成功，影响 {} 条记录", updatedRows);

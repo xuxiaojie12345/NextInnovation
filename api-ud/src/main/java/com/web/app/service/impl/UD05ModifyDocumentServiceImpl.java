@@ -103,7 +103,7 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 if (updatedRows <= 0) {
                     log.warn("UD05更新未修改任何记录，chassisSerie: {}, chassisNo: {}, variable: {}, currentValue: {}",
                             request.getChassisSerie(), request.getChassisNo(), variable, currentValue);
-                    return UD05ModifyDocumentResponse.error(500, "Update failed.");
+                    throw new RuntimeException("Update failed for variable: " + variable);
                 }
                 totalUpdated += updatedRows;
             }
@@ -111,7 +111,6 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
             if (totalUpdated <= 0) {
                 return UD05ModifyDocumentResponse.error(500, "No records were updated.");
             }
-
             return UD05ModifyDocumentResponse.successNoData("Update successful");
         } catch (Exception e) {
             log.error("UD05更新失败", e);

@@ -14,16 +14,17 @@
 
     <!--
         UD20-1 更新文档列表
-        对应设计文档 5.42 - 更新语句
-        
         功能说明：根据 DOCTYPE 更新 HDOC_DOCUMENT_LIST 表
         - 更新 REGISTER_USER 和 REGISTER_DATETIME 字段
     -->
     <update id="updateDocumentList">
         UPDATE HDOC_DOCUMENT_LIST
         SET
-            REGISTER_USER = #{user},
-            REGISTER_DATETIME = #{date}
+            REGISTER_USER = #{registerUser},
+            REGISTER_DATETIME = #{date},
+            UPDATE_USER = #{user},
+            UPDATE_DATETIME = #{date},
+            UPDATE_PROCESS = #{process}
         WHERE DOCTYPE = #{doctype}
     </update>
 

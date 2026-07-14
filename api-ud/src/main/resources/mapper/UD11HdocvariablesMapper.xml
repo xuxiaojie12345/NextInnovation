@@ -60,16 +60,16 @@
             <if test="registerDatetime != null and registerDatetime != ''">
                 <choose>
                     <when test="registerDatetimeOp != null and registerDatetimeOp.equals('!=')">
-                        AND (REGISTER_DATETIME != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                        AND (DATE(REGISTER_DATETIME) != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
-                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('lt')">
-                        AND (REGISTER_DATETIME &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    <when test='registerDatetimeOp != null and (registerDatetimeOp.equals("lt") or registerDatetimeOp.equals("&lt;"))'>
+                        AND (DATE(REGISTER_DATETIME) &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
-                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('gt')">
-                        AND (REGISTER_DATETIME &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
+                    <when test='registerDatetimeOp != null and (registerDatetimeOp.equals("gt") or registerDatetimeOp.equals(">"))'>
+                        AND (DATE(REGISTER_DATETIME) &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
                     <otherwise>
-                        AND REGISTER_DATETIME = #{registerDatetime}
+                        AND DATE(REGISTER_DATETIME) = #{registerDatetime}
                     </otherwise>
                 </choose>
             </if>

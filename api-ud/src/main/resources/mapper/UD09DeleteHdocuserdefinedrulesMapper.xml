@@ -38,6 +38,12 @@
                     <when test="numberOp != null and numberOp.equals('!=')">
                         AND NUM != #{number}
                     </when>
+                    <when test='numberOp != null and numberOp.equals("&lt;")'>
+                        AND NUM &lt; #{number}
+                    </when>
+                    <when test='numberOp != null and numberOp.equals(">")'>
+                        AND NUM &gt; #{number}
+                    </when>
                     <otherwise>
                         AND NUM = #{number}
                     </otherwise>
@@ -108,10 +114,10 @@
                     <when test="addDateOp != null and addDateOp.equals('!=')">
                         AND (ADD_DATE != #{addDate} OR ADD_DATE IS NULL)
                     </when>
-                    <when test="addDateOp != null and addDateOp.equals('lt')">
+                    <when test='addDateOp != null and (addDateOp.equals("lt") or addDateOp.equals("&lt;"))'>
                         AND (ADD_DATE &lt; #{addDate} OR ADD_DATE IS NULL)
                     </when>
-                    <when test="addDateOp != null and addDateOp.equals('gt')">
+                    <when test='addDateOp != null and (addDateOp.equals("gt") or addDateOp.equals(">"))'>
                         AND (ADD_DATE &gt; #{addDate} OR ADD_DATE IS NULL)
                     </when>
                     <otherwise>
@@ -124,10 +130,10 @@
                     <when test="deleteDateOp != null and deleteDateOp.equals('!=')">
                         AND (DELETE_DATE != #{deleteDate} OR DELETE_DATE IS NULL)
                     </when>
-                    <when test="deleteDateOp != null and deleteDateOp.equals('lt')">
+                    <when test='deleteDateOp != null and (deleteDateOp.equals("lt") or deleteDateOp.equals("&lt;"))'>
                         AND (DELETE_DATE &lt; #{deleteDate} OR DELETE_DATE IS NULL)
                     </when>
-                    <when test="deleteDateOp != null and deleteDateOp.equals('gt')">
+                    <when test='deleteDateOp != null and (deleteDateOp.equals("gt") or deleteDateOp.equals(">"))'>
                         AND (DELETE_DATE &gt; #{deleteDate} OR DELETE_DATE IS NULL)
                     </when>
                     <otherwise>
@@ -150,10 +156,10 @@
                     <when test="registerDatetimeOp != null and registerDatetimeOp.equals('!=')">
                         AND (REGISTER_DATETIME != #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
-                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('lt')">
+                    <when test='registerDatetimeOp != null and (registerDatetimeOp.equals("lt") or registerDatetimeOp.equals("&lt;"))'>
                         AND (REGISTER_DATETIME &lt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
-                    <when test="registerDatetimeOp != null and registerDatetimeOp.equals('gt')">
+                    <when test='registerDatetimeOp != null and (registerDatetimeOp.equals("gt") or registerDatetimeOp.equals(">"))'>
                         AND (REGISTER_DATETIME &gt; #{registerDatetime} OR REGISTER_DATETIME IS NULL)
                     </when>
                     <otherwise>

@@ -40,6 +40,8 @@ public interface UD20MarketDocumentSettingsMapper {
      */
     int updateDocumentList(
             @Param("doctype") String doctype,
+            @Param("registerUser") String registerUser,
             @Param("user") String user,
-            @Param("date") String date);
+            @Param("date") String date,
+            @Param("process") String process);
 }
