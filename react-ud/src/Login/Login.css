@@ -156,3 +156,11 @@
   font-style: italic;
   text-decoration: underline;
 }
+
+.error-message{
+  color: #ff4d4f;
+  text-align: left;
+  margin-bottom: 15px;
+  font-size: 14px;
+  word-break: break-word;
+}
