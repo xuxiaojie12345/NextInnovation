@@ -8,5 +8,4 @@ public class MenuItem {
   private String name;
   private String path;
   private String icon;
-  private boolean hasPermission;
 }

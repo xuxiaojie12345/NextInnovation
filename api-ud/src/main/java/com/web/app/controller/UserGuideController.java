@@ -23,21 +23,6 @@ public class UserGuideController {
     }
   }
 
-  /** 获取用户权限（用于前端控制链接显示） GET /api/v1/hdoc/user/permissions */
-  @GetMapping("/user/permissions")
-  public ResponseEntity<ApiResponse<UserPermissions>> getUserPermissions() {
-    try {
-      UserPermissions permissions = new UserPermissions();
-      permissions.setCanViewTemplates(true);
-      permissions.setCanEditVariables(false);
-      permissions.setCanViewMarkets(true);
-      permissions.setCanViewDocumentSettings(true);
-      return ResponseEntity.ok(ApiResponse.success(permissions));
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body(ApiResponse.error(500, "权限服务不可用"));
-    }
-  }
-
   private List<UserGuideLink> getDefaultHelpLinks() {
     List<UserGuideLink> links = new ArrayList<>();
 
@@ -60,43 +45,4 @@ public class UserGuideController {
     return link;
   }
 
-  /** 内部类：用户权限 */
-  public static class UserPermissions {
-    private boolean canViewTemplates;
-    private boolean canEditVariables;
-    private boolean canViewMarkets;
-    private boolean canViewDocumentSettings;
-
-    public boolean isCanViewTemplates() {
-      return canViewTemplates;
-    }
-
-    public void setCanViewTemplates(boolean canViewTemplates) {
-      this.canViewTemplates = canViewTemplates;
-    }
-
-    public boolean isCanEditVariables() {
-      return canEditVariables;
-    }
-
-    public void setCanEditVariables(boolean canEditVariables) {
-      this.canEditVariables = canEditVariables;
-    }
-
-    public boolean isCanViewMarkets() {
-      return canViewMarkets;
-    }
-
-    public void setCanViewMarkets(boolean canViewMarkets) {
-      this.canViewMarkets = canViewMarkets;
-    }
-
-    public boolean isCanViewDocumentSettings() {
-      return canViewDocumentSettings;
-    }
-
-    public void setCanViewDocumentSettings(boolean canViewDocumentSettings) {
-      this.canViewDocumentSettings = canViewDocumentSettings;
-    }
-  }
 }
