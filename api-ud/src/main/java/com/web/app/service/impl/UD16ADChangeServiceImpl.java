@@ -42,39 +42,29 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                     request.getSerie().trim(), request.getChnr().trim());
 
             if (existing != null) {
-                // 对应设计书 3.2 校验详细规格表 No.4
-                // 记录已存在时检查ACT字段
-                if ("U".equals(existing.getAct())) {
-                    // force=true时跳过检查，直接更新ACT='Y'
-                    if (Boolean.TRUE.equals(request.getForce())) {
-                        Integer result = ud16Mapper.updateAdcaChangeActY(
-                                request.getSerie().trim(), request.getChnr().trim());
-                        if (result == null || result == 0) {
-                            return UD16ADChangeResponse.error(500, "更新失败");
-                        }
-                        log.info("UD16添加AD/CA变更成功（force激活已存在记录）");
-                        return UD16ADChangeResponse.success("添加成功", null);
-                    }
-                    // ACT='U'（未激活）-> 返回409，前端弹框确认后重试
-                    log.warn("UD16添加AD/CA变更 - 记录存在但ACT未激活(U)");
-                    return UD16ADChangeResponse.error(409, "AFTER DEF CHANGE IS NOT ACTIVATED");
-                }
-                // ACT='Y'（已激活）-> 提示信息后终止处理
-                log.warn("UD16添加AD/CA变更 - 记录已存在且已激活(Y)，处理终止");
-                return UD16ADChangeResponse.error(400, "记录已存在且已激活");
+                // 记录已存在时，无论ACT状态如何，都返回409，前端弹框后结束处理
+                log.warn("UD16添加AD/CA变更 - 记录已存在, serie: {}, chnr: {}",
+                        request.getSerie(), request.getChnr());
+                return UD16ADChangeResponse.error(409, "AFTER DEF CHANGE IS NOT ACTIVATED");
             } else {
                 // 不存在则插入新记录
+                String loginUser = (request.getUserId() != null && !request.getUserId().trim().isEmpty())
+                        ? request.getUserId().trim()
+                        : "SYSTEM";
                 HdocAdcaChange adcaChange = new HdocAdcaChange();
                 adcaChange.setSerie(request.getSerie().trim());
                 adcaChange.setChnr(request.getChnr().trim());
                 adcaChange.setAct("Y");
                 adcaChange.setBu("UD");
                 adcaChange.setReason(request.getDesc());
+                adcaChange.setRegisterUser(loginUser);
+                adcaChange.setRegisterProcess("UD16");
+                adcaChange.setUpdateUser(loginUser);
+                adcaChange.setUpdateProcess("UD16");
                 Integer result = ud16Mapper.insertAdcaChange(adcaChange);
                 if (result == null || result == 0) {
                     return UD16ADChangeResponse.error(500, "插入失败");
                 }
-                log.info("UD16添加AD/CA变更成功（新建记录）");
             }
 
             return UD16ADChangeResponse.success("添加成功", null);
@@ -109,7 +99,6 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                 return UD16ADChangeResponse.error(500, "删除失败");
             }
 
-            log.info("UD16删除AD/CA变更成功");
             return UD16ADChangeResponse.success("删除成功", null);
         } catch (Exception e) {
             log.error("UD16删除AD/CA变更失败", e);
@@ -135,7 +124,6 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                 return UD16ADChangeResponse.error(404, "记录不存在");
             }
 
-            log.info("UD16检查AD/CA变更成功 - 记录存在");
             // 返回exists和act字段，前端需要根据data.exists做判断
             java.util.Map<String, Object> resultData = new java.util.HashMap<>();
             resultData.put("exists", true);

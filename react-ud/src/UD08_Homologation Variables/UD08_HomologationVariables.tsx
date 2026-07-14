@@ -28,6 +28,14 @@ const UD08_HomologationVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 状态管理 ====================
   // 对应设计书 2.1 控件属性表 - 各字段的输入值和运算符
   const [productClass, setProductClass] = useState<SearchField>({ value: '', operator: '=' });

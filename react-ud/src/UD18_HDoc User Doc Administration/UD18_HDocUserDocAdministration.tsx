@@ -50,18 +50,13 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
   /**
    * 获取文档下拉列表数据
-   * 对应设计书 3.1.1 - 调用 UD20GetDocumentListApi 获取文档列表
-   * 对应设计书 4.1 UD20GetDocumentListApi
+   * 调用 UD20GetDocumentListApi 获取文档列表
    */
   const fetchDocumentList = async () => {
     try {
       const response = await apiClient.get('/api/ud20/getdocumentlist');
-      console.log('UD18 文档列表原始响应:', JSON.stringify(response.data));
-      // 对应设计书 4.1 UD20GetDocumentListApi
-      // 后端返回格式：{ code: 200, message: "success", data: [...] }
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         setDocumentList(response.data.data);
-        console.log('UD18 文档列表加载成功, 数量:', response.data.data.length);
       } else {
         console.warn('UD18 文档列表响应格式异常:', response.data);
       }
@@ -109,8 +104,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
   /**
    * 查询用户信息
-   * 对应设计书 3.1.2 User Info按钮处理流程
-   *
    * 处理流程：
    * 1. 前置处理：获取UserID并去除首尾空格
    * 2. 空值校验（前端校验）
@@ -124,7 +117,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
     const trimmedUserID = userID.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!trimmedUserID) {
       setMessageType('error');
       setMessage('请输入UserID');
@@ -152,7 +144,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
     try {
       // 步骤1：调用UD18CheckAuthApi检查用户是否存在
-      // 对应设计书 4.2 - GET /api/ud18/checkauth?userId=xxx
+      //  GET /api/ud18/checkauth?userId=xxx
       const authResponse = await apiClient.get('/api/ud18/checkauth', {
         params: { userId: trimmedUserID },
       });
@@ -160,7 +152,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       const exists = authResponse.data?.data?.exists === true;
 
       // 步骤2：若不存在，显示错误消息并终止
-      // 对应设计书 3.2 校验详细规格表 No.4
       if (!exists) {
         setMessageType('error');
         setMessage("We didn't recognize the userid you entered. Please try again.");
@@ -169,23 +160,22 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       }
 
       // 步骤3：若存在，调用AuthenticationApi获取用户名
-      // 对应设计书 4.3 - GET /api/ud01/authentication
-      let displayName = trimmedUserID;
+      // let displayName = trimmedUserID;
       try {
-        const authUserResponse = await apiClient.get('/api/ud01/authentication', {
+        const authUserResponse = await apiClient.get("/api/ud01/authentication", {
           params: { userId: trimmedUserID },
         });
-        if (authUserResponse.data?.status === 'success' && authUserResponse.data?.data?.name) {
-          displayName = authUserResponse.data.data.name;
+        if (authUserResponse.data?.code === 200 && authUserResponse.data?.data?.username) {
+          setUserName(authUserResponse.data.data.username);
         }
       } catch (authErr) {
-        // 使用UserID作为显示名
-        console.warn('用户名获取失败，使用UserID作为显示名:', authErr);
-        displayName = trimmedUserID;
+        setUserName("");
+        setMessageType('error');
+        setMessage('Username获取失败');
       }
 
       // 步骤4：调用UD18GetUserDocApi查询用户当前文档权限（返回doctypes列表）
-      // 对应设计书 4.4 - GET /api/ud18/getuserdoc?userId=xxx
+      // GET /api/ud18/getuserdoc?userId=xxx
       let currentDocs: string[] = [];
       try {
         const docResponse = await apiClient.get('/api/ud18/getuserdoc', {
@@ -200,7 +190,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       }
 
       // 5. 结果处理 - 多个文档权限全部高亮
-      setUserName(displayName);
+      // setUserName(displayName);
       setSelectedDocs(currentDocs);
       setIsQueried(true);
       setMessageType('success');

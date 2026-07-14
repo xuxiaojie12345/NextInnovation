@@ -23,21 +23,11 @@
             REGISTER_DATETIME, UPDATE_DATETIME
         ) VALUES (
             #{serie}, #{chnr}, 'Y', 'UD', #{reason},
-            'SYSTEM', 'UD',
-            'SYSTEM', 'UD',
+            #{registerUser}, #{registerProcess},
+            #{updateUser}, #{updateProcess},
             NOW(), NOW()
         )
     </insert>
-
-    <!--
-        UD16 ADD: 更新AD/CA变更记录（ACT = 'Y'）
-    -->
-    <update id="updateAdcaChangeActY">
-        UPDATE HDOC_ADCA_CHANGE
-        SET ACT = 'Y'
-        WHERE SERIE = #{serie}
-          AND CHNR = #{chnr}
-    </update>
 
     <!--
         UD16 DELETE: 物理删除AD/CA变更记录

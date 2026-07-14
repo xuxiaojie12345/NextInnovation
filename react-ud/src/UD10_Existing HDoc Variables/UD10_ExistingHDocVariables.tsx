@@ -19,6 +19,14 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 状态管理 ====================
   // 对应设计书 2.1 控件属性表
   const [variable, setVariable] = useState<string>('');           // 变量名（必填）

@@ -34,6 +34,6 @@ public class UD16ADChangeRequest implements Serializable {
     @ApiModelProperty(value = "变更理由", example = "设计变更")
     private String desc;
 
-    @ApiModelProperty(value = "是否强制更新（ACT='U'时弹框确认后设为true）", example = "false")
-    private Boolean force;
+    @ApiModelProperty(value = "登录用户ID", example = "admin")
+    private String userId;
 }

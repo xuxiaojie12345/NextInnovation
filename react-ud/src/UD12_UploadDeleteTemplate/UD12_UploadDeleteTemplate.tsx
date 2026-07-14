@@ -6,20 +6,19 @@ import "./UD12_UploadDeleteTemplate.css";
 /**
  * 上传删除模板页面组件
  * 
- * 功能说明：
- * - 提供 HDoc 模板文件的上传功能（仅支持 RTF 格式）
- * - 提供 HDoc 模板文件的删除功能
- * - 支持 Market 下拉联动和模板文件列表加载
- * - 删除操作前显示确认警告对话框
- * - 提供 "Check Template" 链接跳转到模板检查画面
- * 
- * 对应设计书：Upload & Delete Template 模块详细设计说明书
- * 
  * @component
  * @returns {JSX.Element} 上传删除模板页面元素
  */
 const UD12_UploadDeleteTemplate: React.FC = () => {
   const navigate = useNavigate();
+
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
 
   // ==================== 状态管理 ====================
   // 对应设计书 6.1 状态管理
@@ -38,16 +37,11 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false); // 确认对话框显示状态
 
   // ==================== 常量定义 ====================
-  // 允许的文件格式
-  const ALLOWED_FILE_EXTENSION = ".rtf";
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   // ==================== API调用函数 ====================
-
   /**
    * 获取 Market 下拉列表数据
-   * 对应设计书 4.2 UD12SelectMarket - 获取Market列表
-   * 
    * 在组件加载时调用，填充 Upload 区域和 Delete 区域的 Market 下拉框
    */
   const fetchMarketList = useCallback(async () => {
@@ -70,8 +64,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 根据选中的 Market 获取 Templates 列表
-   * 对应设计书 3.1.1 初始显示流程 - Delete区域的Templates下拉框初始为空
-   * 
    * 当 Delete 区域的 Market 改变时，动态加载对应文件夹下的模板文件名
    */
   const fetchTemplateList = useCallback(async (market: string) => {
@@ -93,7 +85,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         setTemplateOptions([]);
       }
     } catch (error) {
-      // 对应设计书 3.2 校验详细规格表 No.8
       setMessage("获取模板列表失败");
       setMessageType("error");
       setTemplateOptions([]);
@@ -106,7 +97,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 组件加载时初始化数据
-   * 对应设计书 3.1.1 初始显示流程
    */
   useEffect(() => {
     fetchMarketList();
@@ -126,8 +116,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
   };
 
   /**
-   * 处理 Delete 区域 Market 下拉框变更
-   * 对应设计书 3.1.1 - Delete区域的Templates下拉框联动加载
+   * 处理 Delete 区域 Market 下拉框变更， Delete区域的Templates下拉框联动加载
    * 
    * @param {React.ChangeEvent<HTMLSelectElement>} e - 变更事件对象
    */
@@ -152,7 +141,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 处理文件选择
-   * 对应设计书 3.1.2 Upload按钮处理流程 - 前端校验
    * 
    * @param {React.ChangeEvent<HTMLInputElement>} e - 文件选择事件对象
    */
@@ -160,19 +148,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      const fileName = file.name.toLowerCase();
-
-      // 校验文件格式：仅支持RTF
-      // 对应设计书 3.2 校验详细规格表 No.2
-      if (!fileName.endsWith(ALLOWED_FILE_EXTENSION)) {
-        setMessage("只支持RTF格式文件");
-        setMessageType("error");
-        setSelectedFile(null);
-        // 清空文件输入框
-        e.target.value = "";
-        return;
-      }
-
       // 校验文件大小
       if (file.size > MAX_FILE_SIZE) {
         setMessage("The file exceeds 10MB, please select again");
@@ -199,13 +174,10 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 点击 Upload file 按钮触发上传流程
-   * 对应设计书 3.1.2 Upload按钮处理流程
    */
   const handleUploadFile = async () => {
     // 1. 前置处理：获取选中的文件和Market值
-    
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!selectedFile) {
       setMessage("NO FILE UPLOADED");
       setMessageType("error");
@@ -219,10 +191,8 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     }
 
     // 3. API调用（后端校验）
-    // 对应设计书 4.1 UD12UploadFlie - 文件上传
     setIsUploadLoading(true);
     clearMessage();
-
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
@@ -230,12 +200,9 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
       // 调用文件上传API
       // Method: POST, Endpoint: /api/ud12/uploadflie
-      // 注意：上传FormData时不能手动设置Content-Type，必须由浏览器自动生成带boundary的multipart头
       const response = await apiClient.post("/api/ud12/uploadflie", formData);
-
       if (response.data.code === 200) {
         // 4. 结果处理 - 成功
-        // 对应设计书 3.2 校验详细规格表 No.3
         const msg = response.data.msg || `TEMPLATE ${selectedFile.name} WAS SUCESSFULLY UPLOADED TO MARKET ${uploadMarket}`;
         setMessage(msg);
         setMessageType("success");
@@ -250,12 +217,10 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         setMessageType("error");
       }
     } catch (error: any) {
-      // 对应设计书 5. 异常处理
+      // 异常处理
       if (error.response) {
         const status = error.response.status;
-        if (status === 415) {
-          setMessage("只支持RTF格式文件");
-        } else if (status === 400) {
+        if (status === 400) {
           setMessage(error.response.data?.msg || "NO FILE UPLOADED");
         } else {
           setMessage("文件上传失败");
@@ -271,7 +236,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 点击 Delete 按钮触发删除流程
-   * 对应设计书 3.1.3 Delete按钮处理流程
    */
   const handleDeleteTemplate = () => {
     // 1. 前置处理：获取选中的Market和Template值
@@ -393,7 +357,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
                   id="templateFileInput"
                   type="file"
                   className="ud12-file-input"
-                  accept=".rtf"
                   onChange={handleFileChange}
                   disabled={isUploadLoading}
                 />
@@ -410,7 +373,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
                   onChange={handleUploadMarketChange}
                   disabled={isUploadLoading || isMarketLoading}
                 >
-                  <option value="">-- Select Market --</option>
+                  <option value=""></option>
                   {marketOptions.map((item, index) => (
                     <option key={index} value={item.market}>
                       {item.market}
@@ -458,7 +421,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
                   onChange={handleDeleteMarketChange}
                   disabled={isDeleteLoading || isMarketLoading}
                 >
-                  <option value="">-- Select Market --</option>
+                  <option value=""></option>
                   {marketOptions.map((item, index) => (
                     <option key={index} value={item.market}>
                       {item.market}
@@ -478,7 +441,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
                   onChange={handleTemplateChange}
                   disabled={isDeleteLoading || isTemplateLoading || templateOptions.length === 0}
                 >
-                  <option value="">-- Select Template --</option>
+                  <option value=""></option>
                   {templateOptions.map((template, index) => (
                     <option key={index} value={template}>
                       {template}
@@ -517,7 +480,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
                 className="ud12-check-link"
                 onClick={handleCheckTemplateClick}
                 >
-                Check Template (Only for rtf files)
+                Check Template
                 </a>
             </div>
 

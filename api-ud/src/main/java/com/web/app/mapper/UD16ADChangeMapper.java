@@ -34,13 +34,17 @@ public interface UD16ADChangeMapper {
     Integer insertAdcaChange(HdocAdcaChange adcaChange);
 
     /**
-     * 更新AD/CA变更记录（ACT = 'Y'）
+     * 更新AD/CA变更记录（ACT = 'Y'），同时更新用户和程序信息
      *
-     * @param serie 系列
-     * @param chnr  底盘号
+     * @param serie         系列
+     * @param chnr          底盘号
+     * @param updateUser    更新用户
+     * @param updateProcess 更新程序
      * @return 影响行数
      */
-    Integer updateAdcaChangeActY(@Param("serie") String serie, @Param("chnr") String chnr);
+    Integer updateAdcaChangeActY(@Param("serie") String serie, @Param("chnr") String chnr,
+            @Param("updateUser") String updateUser,
+            @Param("updateProcess") String updateProcess);
 
     /**
      * 物理删除AD/CA变更记录

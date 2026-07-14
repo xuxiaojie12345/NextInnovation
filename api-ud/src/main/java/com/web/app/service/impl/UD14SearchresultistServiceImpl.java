@@ -35,6 +35,50 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
     @Value("${file.marketFolder}")
     private String marketFolder;
 
+    @Value("${file.fileServerUsername}")
+    private String fileServerUsername;
+
+    @Value("${file.fileServerPassword}")
+    private String fileServerPassword;
+
+    /** 认证是否已成功的标记 */
+    private boolean authenticated = false;
+
+    /**
+     * 认证文件服务器共享路径（懒加载，首次操作时调用）
+     * 通过 net use 建立 UNC 路径的认证会话
+     */
+    private synchronized void authenticateIfNeeded() {
+        if (authenticated)
+            return;
+        try {
+            // 从 marketFolder 中提取 UNC 根路径
+            String normalized = marketFolder.replace('\\', '/');
+            String[] parts = normalized.split("/");
+            String serverShare = "\\\\" + parts[2] + "\\" + parts[3];
+
+            // 先尝试断开已有连接
+            new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
+                    .start().waitFor();
+
+            // 建立新的认证连接
+            Process process = new ProcessBuilder("cmd.exe", "/c",
+                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
+                    .start();
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                authenticated = true;
+                log.info("UD14文件服务器认证成功: {}", serverShare);
+            } else {
+                String errorMsg = new String(process.getErrorStream().readAllBytes());
+                log.warn("UD14文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
+            }
+        } catch (Exception e) {
+            log.error("UD14文件服务器认证失败", e);
+        }
+    }
+
     @Override
     public UD14SearchresultistResponse selectMarketMaster() {
         log.info("开始UD14查询市场列表");
@@ -84,6 +128,7 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
 
     @Override
     public UD14SearchresultistResponse getMarketFiles(UD14SearchresultistRequest request) {
+        authenticateIfNeeded();
         log.info("开始UD14查询市场文件列表, market: {}", request.getMarket());
         try {
             if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
@@ -92,7 +137,7 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
 
             String market = request.getMarket().trim();
             // 构建market文件夹路径
-            String marketDirPath = marketFolder + market;
+            String marketDirPath = marketFolder + File.separator + market;
             File marketDir = new File(marketDirPath);
 
             // 检查文件夹是否存在

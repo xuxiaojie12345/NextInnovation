@@ -41,6 +41,46 @@ public class UD14SearchresultistController {
     @Value("${file.marketFolder}")
     private String marketFolder;
 
+    @Value("${file.fileServerUsername}")
+    private String fileServerUsername;
+
+    @Value("${file.fileServerPassword}")
+    private String fileServerPassword;
+
+    /** 认证是否已成功的标记 */
+    private boolean authenticated = false;
+
+    /**
+     * 认证文件服务器共享路径（懒加载，首次操作时调用）
+     */
+    private synchronized void authenticateIfNeeded() {
+        if (authenticated)
+            return;
+        try {
+            String normalized = marketFolder.replace('\\', '/');
+            String[] parts = normalized.split("/");
+            String serverShare = "\\\\" + parts[2] + "\\" + parts[3];
+
+            new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
+                    .start().waitFor();
+
+            Process process = new ProcessBuilder("cmd.exe", "/c",
+                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
+                    .start();
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                authenticated = true;
+                log.info("UD14文件服务器认证成功: {}", serverShare);
+            } else {
+                String errorMsg = new String(process.getErrorStream().readAllBytes());
+                log.warn("UD14文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
+            }
+        } catch (Exception e) {
+            log.error("UD14文件服务器认证失败", e);
+        }
+    }
+
     @GetMapping("/market")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD14SearchresultistResponse getMarket() {
@@ -90,6 +130,7 @@ public class UD14SearchresultistController {
             @ApiParam(value = "市场", required = true, example = "AF") @RequestParam("market") String market,
             @ApiParam(value = "文件名", required = true, example = "af_file.rtf") @RequestParam("filename") String filename) {
         log.info("收到UD14下载文件请求, market: {}, filename: {}", market, filename);
+        authenticateIfNeeded();
 
         try {
             // 验证文件名合法性（防止路径遍历攻击）
@@ -99,7 +140,7 @@ public class UD14SearchresultistController {
             }
 
             // 构建文件路径
-            String filePath = marketFolder + market + File.separator + filename;
+            String filePath = marketFolder + File.separator + market + File.separator + filename;
             File file = new File(filePath);
 
             // 检查文件是否存在

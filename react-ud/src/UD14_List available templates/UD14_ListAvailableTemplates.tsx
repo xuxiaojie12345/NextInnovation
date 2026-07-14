@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UD14_ListAvailableTemplates.css';
 import apiClient from '../api/config';
 
 /**
  * ファイル情報インターフェース
- * 对应设计书 2.1 控件属性表 - DataTable列定义
+ * 控件属性表 - DataTable列定义
  * 后端返回Market文件夹下的文件信息列表
  */
 interface FileInfo {
@@ -17,7 +18,6 @@ interface FileInfo {
 
 /**
  * Market选项接口
- * 对应设计书 2.1 控件属性表 No.1 SelectMarKet
  * 后端返回MARKET_MASTER表的market字段
  */
 interface MarketOption {
@@ -34,12 +34,20 @@ interface MarketOption {
  * - 支持文件下载（点击Filename列链接）
  * - 显示文件使用状态（Used列）
  *
- * 对应设计书：DES-List Available Templates-001
- *
  * @component
  * @returns {JSX.Element} 模板一覧表示ページ元素
  */
 const UD14_ListAvailableTemplates: React.FC = () => {
+  const navigate = useNavigate();
+
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 状态管理 ====================
   // 对应设计书 6.1 状态管理
   const [selectedMarket, setSelectedMarket] = useState<string>('');        // 当前选中的Market值
@@ -52,22 +60,14 @@ const UD14_ListAvailableTemplates: React.FC = () => {
 
   /**
    * 组件加载时获取Market列表
-   * 对应设计书 3.1.1 初始显示流程
-   *
-   * 处理流程：
-   * 1. 调用UD14SearchresultistApi获取Market列表
-   * 2. 成功时填充到SelectMarKet下拉框
-   * 3. 失败时显示错误消息
    */
   useEffect(() => {
     fetchMarketList();
   }, []);
 
   // ==================== API调用 ====================
-
   /**
    * 获取Market列表
-   * 对应设计书 4.1 UD14SearchresultistApi - 获取Market列表
    * 调用API的UD14SelectMarketmaster()方法，从MARKET_MASTER表获取Market列表
    *
    * Method: GET
@@ -89,12 +89,10 @@ const UD14_ListAvailableTemplates: React.FC = () => {
         }));
         setMarketOptions(options);
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.1
         setMessage('获取Market列表失败');
       }
     } catch (error: any) {
       // 异常处理：网络连接失败或服务器内部错误
-      // 对应设计书 5. 异常处理
       console.error('获取Market列表失败:', error);
       if (error.response && error.response.status >= 500) {
         setMessage('服务器内部错误，请联系管理员');
@@ -110,7 +108,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
 
   /**
    * 获取指定Market文件夹下的文件列表
-   * 对应设计书 3.1.2 Market选择与文件列表显示流程
    * 调用API从market文件夹读取文件信息，并检查文件是否在HDOC_USER_DEFINED_RULES中已使用
    *
    * Method: GET
@@ -158,7 +155,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
 
   /**
    * 下载指定的模板文件
-   * 对应设计书 3.1.3 文件下载处理流程
    *
    * Method: GET
    * Endpoint: /api/ud14/downfile
@@ -176,7 +172,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
     setIsLoading(true);
     try {
       // 调用文件下载API
-      // 对应设计书 4.3 UD14SearchresultistApi - 下载指定的模板文件
       const response = await apiClient.get('/api/ud14/downfile', {
         params: {
           market: selectedMarket,
@@ -201,7 +196,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       setMessage(''); // 清除旧消息
     } catch (error: any) {
       // 异常处理
-      // 对应设计书 3.2 校验详细规格表 No.5, No.6
       console.error('文件下载失败:', error);
       if (error.response) {
         const statusCode = error.response.status;
@@ -226,7 +220,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
 
   /**
    * 处理 SelectMarKet 下拉框选择变化
-   * 对应设计书 3.1.2 Market选择与文件列表显示流程
    *
    * @param {React.ChangeEvent<HTMLSelectElement>} e - 选择事件对象
    */
@@ -235,7 +228,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
     setSelectedMarket(market);
 
     // 空值校验：若未选择Market，DataTable保持为空
-    // 对应设计书 3.2 校验详细规格表 No.2
     if (!market) {
       setFileList([]);
       setMessage('');
@@ -252,11 +244,9 @@ const UD14_ListAvailableTemplates: React.FC = () => {
     <div className='ud14-container'>
       <div className='ud14-content'>
         {/* 页面标题 */}
-        {/* 对应设计书 2.1 - 画面标题 */}
         <h1 className='ud14-title'>List Templates</h1>
 
         {/* 错误消息显示区域 */}
-        {/* 对应设计书 3.2 校验详细规格表 */}
         {message && (
           <div className='ud14-message ud14-message--error'>
             {message}
@@ -268,7 +258,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
           {/* 查询条件区域 */}
           <div className='ud14-search-section'>
             {/* SelectMarKet 下拉框 */}
-            {/* 对应设计书 2.1 控件属性表 No.1 SelectMarKet */}
             <div className='ud14-form-group'>
               <label htmlFor='selectMarket'>
                 Select Market:
@@ -280,7 +269,7 @@ const UD14_ListAvailableTemplates: React.FC = () => {
                 onChange={handleMarketChange}
                 disabled={isLoading}
               >
-                <option value=''>-- 请选择Market --</option>
+                <option value=''></option>
                 {marketOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -296,7 +285,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
           )}
 
           {/* 数据表格 - 文件列表 */}
-          {/* 对应设计书 2.1 控件属性表 No.2~No.5 DataTable */}
           <div className='ud14-table-wrapper'>
           <table className='ud14-table'>
             <thead>
@@ -312,7 +300,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
                 fileList.map((file, index) => (
                   <tr key={`${file.filename}-${index}`}>
                     {/* Filename列 - 可点击链接下载 */}
-                    {/* 对应设计书 3.1.3 文件下载处理流程 */}
                     <td>
                       <span
                         className='ud14-file-link'
@@ -323,13 +310,10 @@ const UD14_ListAvailableTemplates: React.FC = () => {
                       </span>
                     </td>
                     {/* Used列 - 显示VARIABLE值或为空 */}
-                    {/* 对应设计书 2.1 控件属性表 No.3 Used */}
                     <td>{file.variable || ''}</td>
                     {/* Last Mod列 - 文件更新日期 */}
-                    {/* 对应设计书 2.1 控件属性表 No.4 Last Mod, */}
                     <td>{file.lastMod}</td>
                     {/* Size列 - 文件大小 */}
-                    {/* 对应设计书 2.1 控件属性表 No.5 Size */}
                     <td>{file.size}</td>
                   </tr>
                 ))

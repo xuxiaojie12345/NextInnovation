@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UD16_ADChange.css';
 import apiClient from '../api/config';
 
@@ -17,6 +18,16 @@ import apiClient from '../api/config';
  * @returns {JSX.Element} AD Change管理页面元素
  */
 const UD16_ADChange: React.FC = () => {
+  const navigate = useNavigate();
+
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 状态管理 ====================
   // 对应设计书 6.1 状态管理
   const [serieChnr, setSerieChnr] = useState<string>('');  // Serie-Chnr输入值
@@ -27,31 +38,26 @@ const UD16_ADChange: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false); // CHECK弹框显示状态
   const [modalMessage, setModalMessage] = useState<string>(''); // CHECK弹框消息内容
   const [showAddModal, setShowAddModal] = useState<boolean>(false); // ADD确认弹框显示状态
-  const addModalResolver = useRef<((value: boolean) => void) | null>(null); // ADD弹框Promise解析器
 
   // ==================== 常量定义 ====================
-  const MAX_SERIE_CHNR_LENGTH = 15;    // Serie-Chnr最大长度（对应设计书 2.1 No.1）
-  const MAX_DESC_LENGTH = 4000;        // Desc最大长度（对应设计书 2.1 No.2）
+  const MAX_SERIE_CHNR_LENGTH = 16;    // Serie-Chnr最大长度
+  const MAX_DESC_LENGTH = 4000;        // Desc最大长度
 
   // ==================== 工具函数 ====================
 
   /**
    * 从Serie-Chnr中拆分出SERIE和CHNR
-   * 对应设计书 3.1.1 ADD按钮处理流程 前置处理
    * Serie-Chnr的英文字母部分赋值给serie，数字部分赋值给chnr
    *
    * @param {string} value - 完整的Serie-Chnr值
    * @returns {{ serie: string, chnr: string }} 拆分后的系列和编号
    */
   const splitSerieChnr = (value: string) => {
-    // 去除连字符后提取前半部分英文字母作为serie
-    const cleaned = value.replace(/-/g, '');
-    const matchSerie = cleaned.match(/^[A-Za-z]+/);
-    // 提取后半部分数字作为chnr
-    const matchChnr = cleaned.match(/\d+$/);
+    // 按连字符拆分，前半部分为serie，后半部分为chnr
+    const parts = value.split('-');
     return {
-      serie: matchSerie ? matchSerie[0] : '',
-      chnr: matchChnr ? matchChnr[0] : '',
+      serie: parts[0] || '',
+      chnr: parts.slice(1).join('-') || '',
     };
   };
 
@@ -69,13 +75,12 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击ADD按钮处理流程
-   * 对应设计书 3.1.1 ADD按钮处理流程 和 4.1 UD16InsertHdocAdcaChange
    *
    * 处理流程：
    * 1. 前置处理：获取输入的Serie-Chnr和Desc值
    * 2. 空值校验和长度校验（前端校验）
    * 3. 拆分Serie-Chnr为SERIE和CHNR
-   * 4. 调用API添加记录（若记录已存在且ACT="U"，弹框提示后激活）
+   * 4. 调用API添加记录（若记录已存在，弹框提示结束处理；不存在添加记录）
    * 5. 结果处理：成功时显示成功消息并清空输入框
    */
   const handleAdd = async () => {
@@ -84,23 +89,10 @@ const UD16_ADChange: React.FC = () => {
     const trimmedDesc = desc.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!trimmedSerieChnr) {
       showMessage('请输入Serie-Chnr');
       return; // 终止流程
     }
-
-    // 对应设计书 3.2 校验详细规格表 No.2
-    // if (trimmedSerieChnr.length > MAX_SERIE_CHNR_LENGTH) {
-    //   showMessage('Serie-Chnr最大长度为15字符');
-    //   return; // 终止流程
-    // }
-
-    // 对应设计书 3.2 校验详细规格表 No.3
-    // if (trimmedDesc.length > MAX_DESC_LENGTH) {
-    //   showMessage('描述最大长度为4000字符');
-    //   return; // 终止流程
-    // }
 
     // 3. 拆分Serie-Chnr
     const { serie, chnr } = splitSerieChnr(trimmedSerieChnr);
@@ -110,12 +102,13 @@ const UD16_ADChange: React.FC = () => {
     showMessage('');
 
     try {
-      // 对应设计书 4.1 UD16InsertHdocAdcaChange
       // POST /api/ud16/addchange
+      const userId = localStorage.getItem('userID') || 'SYSTEM';
       const response = await apiClient.post('/api/ud16/addchange', {
         serie,
         chnr,
         desc: trimmedDesc,
+        userId,
       });
 
       // 5. 结果处理
@@ -126,7 +119,6 @@ const UD16_ADChange: React.FC = () => {
         setSerieChnr('');
         setDesc('');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.5
         showMessage(response.data?.msg || '添加失败');
       }
     } catch (error: any) {
@@ -137,39 +129,15 @@ const UD16_ADChange: React.FC = () => {
         const statusCode = error.response.status;
         const errorMsg = error.response.data?.msg;
 
-        // 对应设计书 3.2 校验详细规格表 No.4
         // 记录已存在且ACT="U"的情况（HTTP 409 Conflict）
         if (statusCode === 400 && errorMsg === '记录已存在且已激活') {
-          // 对应设计书 3.1.1 ADD按钮处理流程 - 记录已存在且已激活
           // 弹框显示警告消息，点击确定后终止流程
           setModalMessage('记录已存在且已激活');
           setShowModal(true);
         } else if (statusCode === 409 && errorMsg === 'AFTER DEF CHANGE IS NOT ACTIVATED') {
-          // 弹框显示警告消息，点击确定后继续处理
-          const userConfirmed = await showAddConfirmModal();
-          if (userConfirmed) {
-            // 用户点击OK后，调用添加API继续（force=true跳过检查，直接更新ACT为"Y"）
-            try {
-              const retryResponse = await apiClient.post('/api/ud16/addchange', {
-                serie,
-                chnr,
-                desc: trimmedDesc,
-                force: true,
-              });
-              if (retryResponse.data && retryResponse.data.code === 200) {
-                showMessage('添加成功');
-                setSerieChnr('');
-                setDesc('');
-              } else {
-                showMessage(retryResponse.data?.msg || '添加失败');
-              }
-            } catch (retryError: any) {
-              showMessage(retryError.response?.data?.msg || '添加失败');
-            }
-          } else {
-            // 用户取消操作
-            showMessage('操作已取消');
-          }
+          // 弹框显示警告消息，点击确定后结束处理
+          setModalMessage('AFTER DEF CHANGE IS NOT ACTIVATED');
+          setShowAddModal(true);
         } else if (statusCode >= 500) {
           showMessage('服务器内部错误，请联系管理员');
         } else {
@@ -187,13 +155,12 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击DELETE按钮处理流程
-   * 对应设计书 3.1.2 DELETE按钮处理流程 和 4.2 UD16UpdateHdocAdcaChange
    *
    * 处理流程：
    * 1. 前置处理：获取输入的Serie-Chnr值
    * 2. 空值校验（前端校验）
    * 3. 拆分Serie-Chnr为SERIE和CHNR
-   * 4. 调用API删除记录（更新ACT字段为"U"）
+   * 4. 调用API删除记录（物理删除）
    * 5. 结果处理
    */
   const handleDelete = async () => {
@@ -201,7 +168,6 @@ const UD16_ADChange: React.FC = () => {
     const trimmedSerieChnr = serieChnr.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.6
     if (!trimmedSerieChnr) {
       showMessage('请输入Serie-Chnr');
       return; // 终止流程
@@ -215,8 +181,6 @@ const UD16_ADChange: React.FC = () => {
     showMessage('');
 
     try {
-      // 对应设计书 4.2 UD16UpdateHdocAdcaChange
-      // DELETE /api/ud16/deletechange
       const response = await apiClient.delete('/api/ud16/deletechange', {
         data: {
           serie,
@@ -262,8 +226,6 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击CHECK按钮处理流程
-   * 对应设计书 3.1.3 CHECK按钮处理流程 和 4.3 UD16SelectHdocAdcaChange
-   *
    * 处理流程：
    * 1. 前置处理：获取输入的Serie-Chnr值
    * 2. 空值校验（前端校验）
@@ -276,7 +238,6 @@ const UD16_ADChange: React.FC = () => {
     const trimmedSerieChnr = serieChnr.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.9
     if (!trimmedSerieChnr) {
       showMessage('请输入Serie-Chnr');
       return; // 终止流程
@@ -290,8 +251,6 @@ const UD16_ADChange: React.FC = () => {
     showMessage('');
 
     try {
-      // 对应设计书 4.3 UD16SelectHdocAdcaChange
-      // GET /api/ud16/checkchange
       const response = await apiClient.get('/api/ud16/checkchange', {
         params: {
           serie,
@@ -300,14 +259,12 @@ const UD16_ADChange: React.FC = () => {
       });
 
       // 5. 结果处理 - 弹框显示查询结果
-      // 对应设计书 3.1.3 CHECK按钮处理流程 和 3.2 校验详细规格表 No.8, No.10
       if (response.data && response.data.code === 200 && response.data.data) {
         if (response.data.data.exists) {
           // 记录存在 - 弹框显示
           setModalMessage('对应的数据存在');
           setShowModal(true);
         } else {
-          // 对应设计书 3.2 校验详细规格表 No.10 - 弹框显示
           setModalMessage('记录不存在');
           setShowModal(true);
         }
@@ -337,49 +294,12 @@ const UD16_ADChange: React.FC = () => {
   };
 
   /**
-   * 显示ADD确认弹框 - 返回Promise，用户点击确定时resolve(true)，取消时resolve(false)
-   * 对应设计书 3.2 校验详细规格表 No.4
-   *
-   * @returns {Promise<boolean>} 用户是否点击确定
-   */
-  const showAddConfirmModal = (): Promise<boolean> => {
-    return new Promise((resolve) => {
-      addModalResolver.current = resolve;
-      setShowAddModal(true);
-    });
-  };
-
-  /**
    * 关闭CHECK弹框
    * 点击弹框中的"确定"按钮时调用，关闭弹框
    */
   const handleCloseModal = () => {
     setShowModal(false);
     setModalMessage('');
-  };
-
-  /**
-   * ADD确认弹框 - 点击确定
-   * 关闭弹框，resolve(true) 继续处理
-   */
-  const handleAddModalConfirm = () => {
-    setShowAddModal(false);
-    if (addModalResolver.current) {
-      addModalResolver.current(true);
-      addModalResolver.current = null;
-    }
-  };
-
-  /**
-   * ADD确认弹框 - 点击取消
-   * 关闭弹框，resolve(false) 终止处理
-   */
-  const handleAddModalCancel = () => {
-    setShowAddModal(false);
-    if (addModalResolver.current) {
-      addModalResolver.current(false);
-      addModalResolver.current = null;
-    }
   };
 
   // ==================== 事件处理函数 ====================
@@ -407,12 +327,9 @@ const UD16_ADChange: React.FC = () => {
    * @param {React.ChangeEvent<HTMLTextAreaElement>} e - 输入事件对象
    */
   const handleDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value;
-    if (val.length <= MAX_DESC_LENGTH) {
-      setDesc(val);
-      // 用户重新输入时清空错误提示
-      if (message) showMessage('');
-    }
+    setDesc(e.target.value);
+    // 用户重新输入时清空错误提示
+    if (message) showMessage('');
   };
 
   // ==================== 渲染 UI ====================
@@ -423,7 +340,6 @@ const UD16_ADChange: React.FC = () => {
         <h1 className='ud16-title'>AD Change</h1>
 
         {/* 错误消息显示区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.3 error message */}
         {message && (
           <div className={`ud16-message ud16-message--${messageType}`}>
             {message}
@@ -433,7 +349,6 @@ const UD16_ADChange: React.FC = () => {
         {/* 输入区域 */}
         <div className='ud16-form-section'>
           {/* Serie-Chnr 输入框 */}
-          {/* 对应设计书 2.1 控件属性表 No.1 Serie-Chnr */}
           <div className='ud16-form-group'>
             <label htmlFor='serieChnr'>
               Serie-Chnr
@@ -451,7 +366,6 @@ const UD16_ADChange: React.FC = () => {
           </div>
 
           {/* Desc 输入框 */}
-          {/* 对应设计书 2.1 控件属性表 No.2 Desc */}
           <div className='ud16-form-group ud16-form-group-desc'>
             <label htmlFor='desc'>
               Desc
@@ -470,7 +384,6 @@ const UD16_ADChange: React.FC = () => {
         </div>
 
         {/* 按钮区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.4 ADD, No.5 DELETE, No.6 CHECK */}
         <div className='ud16-button-section'>
           <button
             className='ud16-btn ud16-btn-add'
@@ -500,7 +413,6 @@ const UD16_ADChange: React.FC = () => {
       </div>
 
       {/* 弹框遮罩层 - CHECK按钮查询结果显示 */}
-      {/* 对应设计书 3.1.3 CHECK按钮处理流程 和 6.1 状态管理 */}
       {showModal && (
         <div className='ud16-modal-overlay' onClick={handleCloseModal}>
           <div className='ud16-modal-dialog' onClick={(e) => e.stopPropagation()}>
@@ -520,25 +432,18 @@ const UD16_ADChange: React.FC = () => {
       )}
 
       {/* 弹框遮罩层 - ADD确认弹框 */}
-      {/* 对应设计书 3.2 校验详细规格表 No.4 - 记录已存在且ACT="U" */}
       {showAddModal && (
-        <div className='ud16-modal-overlay'>
-          <div className='ud16-modal-dialog'>
+        <div className='ud16-modal-overlay' onClick={() => setShowAddModal(false)}>
+          <div className='ud16-modal-dialog' onClick={(e) => e.stopPropagation()}>
             <div className='ud16-modal-content'>
               <p className='ud16-modal-message'>AFTER DEF CHANGE IS NOT ACTIVATED</p>
             </div>
             <div className='ud16-modal-footer'>
               <button
                 className='ud16-btn ud16-btn-modal-ok'
-                onClick={handleAddModalConfirm}
+                onClick={() => setShowAddModal(false)}
               >
                 确定
-              </button>
-              <button
-                className='ud16-btn ud16-btn-modal-cancel'
-                onClick={handleAddModalCancel}
-              >
-                取消
               </button>
             </div>
           </div>

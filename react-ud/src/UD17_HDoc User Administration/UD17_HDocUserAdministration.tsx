@@ -93,8 +93,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 获取Market下拉列表数据
-   * 对应设计书 3.1.1 - 调用UD14SearchresultistApi获取MARKET_MASTER表数据
-   * 对应设计书 4.1 UD14SearchresultistApi
    */
   const fetchMarketList = async () => {
     try {
@@ -135,7 +133,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 处理角色复选框变化
-   * 对应设计书 3.1.2 - 用户勾选/取消角色权限
    *
    * @param roleKey - 角色标识
    * @param checked - 是否选中
@@ -149,7 +146,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 处理Market下拉框变化
-   * 对应设计书 3.1.2 - 用户选择Market值
    *
    * @param roleKey - 角色标识
    * @param market - 选择的Market值
@@ -165,9 +161,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 查询用户信息
-   * 对应设计书 4.2 查询用户信息
-   * 对应设计书 UD17HDocUserAdministrationApi - 获取用户权限API
-   *
    * 处理流程：
    * 1. 获取UserID并去除首尾空格
    * 2. 空值校验（前端校验）
@@ -182,13 +175,11 @@ const UD17_HDocUserAdministration: React.FC = () => {
     const trimmedUserID = userID.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!trimmedUserID) {
       setMessageType('error');
       setMessage('请输入用户ID');
       return;
     }
-
     // 3. API调用
     setIsLoading(true);
     setMessage('');
@@ -197,17 +188,9 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
     try {
       // 步骤4: 首先检查该用户是否存在于用户机能权限表HDOC_FUNCTION_AUTH表里
-      // 对应设计书 4.2 - GET /api/ud17/userinfo
       const response = await apiClient.get('/api/ud17/userinfo', {
         params: { userId: trimmedUserID },
       });
-
-      // 后端返回格式：{ code: "200", success: true, userId: "...", userName: "...", authList: [...] }
-      // authList格式：[{ market: "-EU", type: "U", BU: "UD" }, ...]
-      // type→checkbox对应: U=Standard User, R=Rule Admin, T=Template Admin,
-      //                     D=Document Auth Admin, A=User Admin,
-      //                     DOCMOD=Adaptation user, MCSU=Market Super User
-      console.log('UD17 userinfo response:', JSON.stringify(response.data));
 
       if (response.data?.success === true || response.data?.code === "200") {
         // 步骤5: 用户存在，从userName字段获取用户名称
@@ -292,8 +275,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 更新用户权限
-   * 对应设计书 3.1.3 更新用户角色功能
-   * 对应设计书 4.3 UD17HDocUserAdministrationApi - 更新用户权限API
    *
    * 处理流程：
    * 1. 检查是否已查询用户信息
@@ -313,7 +294,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
     setMessage('');
 
     try {
-      // 构建请求数据 - 对应全体API設計 4.2 Update Role
+      // 构建请求数据
       // 格式：{ userId, functionAuths: [{ function, market }] }
       const functionAuths: Array<{ function: string; market: string }> = [];
 
@@ -349,7 +330,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
       console.log('UD17 更新响应:', JSON.stringify(response.data));
 
       // 结果处理
-      // 对应设计书 4.3 Response Success
       // 后端返回格式：{ code: "200", success: true, message: "用户权限更新成功" }
       if (response.data?.success === true || response.data?.code === "200") {
         setMessageType('success');
@@ -385,9 +365,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 删除用户所有权限
-   * 对应设计书 3.1.4 删除用户角色功能
-   * 对应设计书 4.4 UD17HDocUserAdministrationApi - 删除用户权限API
-   *
    * 处理流程：
    * 1. 检查是否已查询用户信息
    * 2. 弹框确认（防止误操作）
@@ -413,13 +390,12 @@ const UD17_HDocUserAdministration: React.FC = () => {
     setMessage('');
 
     try {
-      // 对应设计书 4.4 - POST /api/ud17/deleteuser（设计书: Method POST, Request Body: { userId }）
+      //  /api/ud17/deleteuser（设计书: Method POST, Request Body: { userId }）
       const response = await apiClient.post('/api/ud17/deleteuser', {
         userId: userID.trim(),
       });
 
       // 结果处理
-      // 对应设计书 4.4 Response Success
       // 后端返回格式：{ code: "200", success: true, message: "用户权限删除成功" }
       if (response.data?.success === true || response.data?.code === "200") {
         // 成功：清空画面所有权限配置
@@ -462,7 +438,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 重置所有权限配置
-   * 对应设计书 3.1.4 结果处理 - 清空画面所有权限配置
    */
   const resetPermissions = useCallback(() => {
     setCheckedRoles({});
@@ -479,7 +454,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   return (
     <div className='ud17-container'>
-      {/* 页面标题 - 参照UD16样式 */}
+      {/* 页面标题*/}
       <div className='ud17-title'>HDoc User Administration</div>
 
         {/* 消息显示区域 */}
@@ -522,10 +497,23 @@ const UD17_HDocUserAdministration: React.FC = () => {
           </button>
         </div>
 
-        {/* User标签 - 显示在UserID下方 */}
-        <div className='ud17-user-row'>
-          <span className='ud17-user-label-text'>User</span>
-          <span className='ud17-user-value'>{userName || ''}</span>
+        {/* User输入框 - 显示在UserID下方 */}
+        <div className='ud17-search-row'>
+          <div className='ud17-search-group'>
+            <label htmlFor='ud17-user'>User</label>
+            <input
+              id='ud17-user'
+              type='text'
+              value={userName || ''}
+              placeholder=''
+              disabled
+              maxLength={MAX_USER_ID_LENGTH}
+              inputMode='text'
+              autoCapitalize='off'
+              autoCorrect='off'
+              autoComplete='off'
+            />
+          </div>
         </div>
 
 

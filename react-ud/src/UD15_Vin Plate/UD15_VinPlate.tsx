@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UD15_VinPlate.css';
 import apiClient from '../api/config';
 
 /**
  * 打印项数据接口
- * 对应设计书 2.1 控件属性表 No.15 Print items - XML_DOC中的PrintItemName名及其值
  */
 interface PrintItemData {
   name: string;          // 打印项名称
@@ -13,7 +13,6 @@ interface PrintItemData {
 
 /**
  * VP数据项接口
- * 对应设计书 2.1 控件属性表 No.16 VP Data - XML_DOC中的Variant名和Value的值
  */
 interface VpDataItem {
   variantName: string;   // 变体名
@@ -22,7 +21,6 @@ interface VpDataItem {
 
 /**
  * VIN Plate信息接口
- * 对应设计书 6.1 状态管理 - plateInfo
  */
 interface VinPlateInfo {
   chassisNumber: string;                              // 底盘号
@@ -44,12 +42,20 @@ interface VinPlateInfo {
  * - 支持对VIN Plate数据进行状态更新操作（重新生成、设置为OK）
  * - 支持切换基本信息/高级信息模式
  *
- * 对应设计书：DES-VIN Plate-001
- *
  * @component
  * @returns {JSX.Element} VIN Plate数据管理页面元素
  */
 const UD15_VinPlate: React.FC = () => {
+  const navigate = useNavigate();
+
+  // 未登录时重定向到登录页面
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    if (!userID) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   // ==================== 状态管理 ====================
   // 对应设计书 6.1 状态管理
   const [chassisNumber, setChassisNumber] = useState<string>('');     // 底盘号输入值
@@ -65,7 +71,6 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 从底盘号中拆分出chassisSerie和chassisNo
-   * 对应设计书 3.1.2 前置处理
    * Chassis number的半角英字部分赋值给chassisSerie，半角数字部分赋值给chassisNo
    *
    * @param {string} chassisNumber - 完整底盘号
@@ -97,7 +102,6 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 获取VIN Plate详细信息
-   * 对应设计书 3.1.2 View Info按钮处理流程 和 4.1 UD15ViewInfo
    *
    * 处理流程：
    * 1. 前置处理：获取底盘号并拆分为chassisSerie和chassisNo
@@ -136,7 +140,6 @@ const UD15_VinPlate: React.FC = () => {
       // 6. 结果处理
       if (response.data && response.data.code === 200 && response.data.data) {
         // 成功 - 底盘号存在
-        // 对应设计书 3.2 校验详细规格表 成功分支
         const data = response.data.data;
         const info: VinPlateInfo = {
           chassisNumber: data.chassisNumber || trimmedChassis,
@@ -156,7 +159,6 @@ const UD15_VinPlate: React.FC = () => {
         showMessage('', 'info');
       } else {
         // 失败 - 底盘号不存在或查询失败
-        // 对应设计书 3.2 校验详细规格表 No.3
         const notFoundMsg = response.data?.msg
           ? `Chassis number ${trimmedChassis} not found.`
           : (response.data?.msg || '查询失败');
@@ -165,7 +167,6 @@ const UD15_VinPlate: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      // 对应设计书 5. 异常处理
       console.error('获取VIN Plate信息失败:', error);
       if (error.response) {
         const statusCode = error.response.status;
@@ -190,7 +191,6 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 执行状态更新操作
-   * 对应设计书 3.1.3 ~ 3.1.6 各按钮处理流程
    *
    * @param {'regenerate' | 'setok' | 'changebasic' | 'changeadvanced'} actionType - 操作类型
    */
@@ -199,14 +199,12 @@ const UD15_VinPlate: React.FC = () => {
     const trimmedChassis = chassisNumber.trim();
 
     // 2. 检查是否已先执行查询
-    // 对应设计书 3.2 校验详细规格表 No.3~No.6
     if (!plateInfo) {
       showMessage('请先查询Chassis信息', 'error');
       return;
     }
 
     // 3. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.4, No.6, No.8, No.10
     if (!trimmedChassis) {
       showMessage('请输入底盘号', 'error');
       return; // 终止流程
