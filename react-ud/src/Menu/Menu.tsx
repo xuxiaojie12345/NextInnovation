@@ -30,8 +30,6 @@ const Menu: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   // ==================== 画面初始化 ====================
-  // 对应设计书 3.1.1 初始显示流程 - 验证用户登录状态
-  // 对应设计书 5. 异常处理 - 用户未登录
   useEffect(() => {
     const userID = localStorage.getItem('userID');
     if (!userID) {
@@ -40,7 +38,6 @@ const Menu: React.FC = () => {
   }, [navigate]);
 
   // ==================== 菜单配置 ====================
-  // 对应设计文档 2.1 控件属性表 和 3.2 画面跳转映射表
   const menuSections: MenuSection[] = [
     {
       title: 'Generate Document',
@@ -96,8 +93,6 @@ const Menu: React.FC = () => {
 
   /**
    * 处理菜单项点击事件
-   * 对应设计文档 3.1.2 菜单点击跳转流程
-   * 
    * 处理流程：
    * 1. 检查菜单项是否配置了path
    * 2. 如果配置了path，使用navigate进行路由跳转
@@ -108,13 +103,12 @@ const Menu: React.FC = () => {
   const handleMenuItemClick = (item: MenuItem) => {
     // 清除之前的错误消息
     setErrorMessage('');
-
     if (item.path) {
       try {
         // 有path配置，执行路由跳转
         navigate(item.path);
       } catch (error) {
-        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        // 异常处理 - 网络异常导致路由失败
         setErrorMessage('页面跳转失败，请稍后重试');
       }
     }
@@ -124,9 +118,7 @@ const Menu: React.FC = () => {
     <div className="menu-container">
       <div className="menu-header">
         <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
+          src="/volvo-logo.png" alt="VOLVO" className="volvo-logo"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
             const parent = (e.target as HTMLImageElement).parentElement;
