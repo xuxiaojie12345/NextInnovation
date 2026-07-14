@@ -10,18 +10,17 @@ interface User {
   name: string;
   token: string;
 }
-
-/** 菜单项 */
-interface MenuItem {
-  label: string;
-  path: string;
-}
-
 /** 菜单组 */
 interface MenuGroup {
   id: string;
   title: string;
   items: MenuItem[];
+}
+
+/** 菜单项 */
+interface MenuItem {
+  label: string;
+  path: string;
 }
 
 // ===== 辅助函数 =====
@@ -64,12 +63,17 @@ const MENU_STRUCTURE: MenuGroup[] = [
         label: "Update user defined variables (rules)",
         path: "/UD08",
       },
+      { label: "VPPS Vin plate", path: "/UD15" },
+      { label: "AD/CA Change", path: "/UD16" },
       { label: "Existing HDoc variables", path: "/UD10" },
       { label: "Upload/Delete template", path: "/UD12" },
       { label: "List Templates", path: "/UD14" },
-      { label: "VPPS Vin plate", path: "/UD15" },
-      { label: "AD/CA Change", path: "/UD16" },
     ],
+  },
+  {
+    id: "documentation",
+    title: "Documentation",
+    items: [{ label: "User Guide", path: "/UD24" }],
   },
   {
     id: "user-administration",
@@ -80,19 +84,14 @@ const MENU_STRUCTURE: MenuGroup[] = [
       { label: "Search User", path: "/UD19" },
     ],
   },
-  {
-    id: "documentation",
-    title: "Documentation",
-    items: [{ label: "User Guide", path: "/UD24" }],
-  },
 ];
 
 // ===== 主菜单组件 =====
 
 const UD02 = React.memo(() => {
-  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   // 3.1 处理流程 - Page Mount: 会话校验
   useEffect(() => {

@@ -9,9 +9,9 @@ interface MarketItem {
 }
 
 const UD21 = React.memo(() => {
-  const [markets, setMarkets] = useState<MarketItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [markets, setMarkets] = useState<MarketItem[]>([]);
 
   useEffect(() => {
     (async () => {

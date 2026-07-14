@@ -33,7 +33,18 @@ export const apiRequest = async (
     const response = await fetch(url, config);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorBody = await response.text().catch(() => "");
+      throw new Error(
+        `HTTP error! status: ${response.status}${errorBody ? ` - ${errorBody.slice(0, 2000)}` : ""}`,
+      );
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const text = await response.text();
+      throw new Error(
+        `Unexpected response type: ${contentType}, body: ${text.slice(0, 100)}`,
+      );
     }
 
     const result = await response.json();

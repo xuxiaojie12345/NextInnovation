@@ -23,8 +23,9 @@ const getCurrentUser = (): {
   try {
     const userStr = localStorage.getItem(STORAGE_KEY_USER);
     if (!userStr) return null;
-    const userInfo = JSON.parse(userStr);
+
     const token = localStorage.getItem(STORAGE_KEY_TOKEN);
+    const userInfo = JSON.parse(userStr);
     return {
       userId: userInfo.userId || "",
       name: userInfo.name || "",
@@ -38,17 +39,15 @@ const getCurrentUser = (): {
 const UD05 = React.memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const stateData = location.state as {
-    chassisNo?: string;
-    market?: string;
-  } | null;
-
   const [chassisInfo, setChassisInfo] = useState<{
     chassisNo: string;
     market: string;
     templateFile: string;
   } | null>(null);
+  const stateData = location.state as {
+    chassisNo?: string;
+    market?: string;
+  } | null;
   const [modificationsList, setModificationsList] = useState<
     ModificationItem[]
   >([]);

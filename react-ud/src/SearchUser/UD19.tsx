@@ -44,21 +44,14 @@ const UD19 = React.memo(() => {
   const handleSearch = useCallback(async () => {
     clearMessage();
 
-    // 检查是否同时输入了多个条件
-    const hasUserId = userId.trim().length > 0;
+    // 校验：至少输入一个条件
+
     const hasUserName = userName.trim().length > 0;
+    const hasUserId = userId.trim().length > 0;
+    const hasMarkets = selectedMarkets.length > 0;
     const hasSearchType = searchType.length > 0;
-    const conditions = [hasUserId, hasUserName, hasSearchType].filter(
-      Boolean,
-    ).length;
 
-    if (conditions > 1) {
-      setMessage("请只选择一种查询方式");
-      setMessageType("error");
-      return;
-    }
-
-    if (conditions === 0) {
+    if (!hasUserId && !hasUserName && !hasSearchType && !hasMarkets) {
       setMessage("请输入查询条件或选择筛选方式");
       setMessageType("error");
       return;
@@ -74,8 +67,12 @@ const UD19 = React.memo(() => {
         else if (searchType === "RULE") params.rule = "true";
         else if (searchType === "TEMPLATE") params.template = "true";
       }
+      if (selectedMarkets.length > 0) {
+        params.markets = selectedMarkets;
+      }
 
       const result = await userSearchApi.searchUser(params);
+      console.log("UD19 search result:", result);
       if (result && (result.code === 200 || result.code === undefined)) {
         const data = result.data || result;
         const users: SearchResult[] = data.users || [];
@@ -83,21 +80,17 @@ const UD19 = React.memo(() => {
         setMessageType("success");
         setMessage(result.message || result.msg || "查询成功");
       } else {
-        setMessage(result?.msg || "查询失败，请稍后再试");
+        setMessage(result?.msg || `查询失败(code=${result?.code})，请稍后再试`);
         setMessageType("error");
         setResults([]);
       }
-    } catch {
-      setMessage("查询失败，请稍后再试");
+    } catch (err: any) {
+      setMessage(`查询失败: ${err?.message || "未知错误"}`);
       setMessageType("error");
     } finally {
       setIsLoading(false);
     }
-  }, [userId, userName, searchType, clearMessage]);
-
-  const handleRadioChange = useCallback((value: string) => {
-    setSearchType((prev) => (prev === value ? "" : value));
-  }, []);
+  }, [userId, userName, searchType, selectedMarkets, clearMessage]);
 
   const toggleMarket = useCallback((market: string) => {
     setSelectedMarkets((prev) =>
@@ -105,6 +98,10 @@ const UD19 = React.memo(() => {
         ? prev.filter((m) => m !== market)
         : [...prev, market],
     );
+  }, []);
+
+  const handleRadioChange = useCallback((value: string) => {
+    setSearchType((prev) => (prev === value ? "" : value));
   }, []);
 
   return (

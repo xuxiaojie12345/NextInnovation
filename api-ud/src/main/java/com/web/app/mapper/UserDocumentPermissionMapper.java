@@ -18,6 +18,11 @@ public interface UserDocumentPermissionMapper {
     String selectUserIdFromFunctionAuth(@Param("userid") String userid);
     
     /**
+     * 查询用户名
+     */
+    String selectUserNameByUserId(@Param("userid") String userid);
+
+    /**
      * 查询用户文档权限（仅返回DOCTYPE）
      */
     List<String> selectUserDocDoctypes(@Param("userid") String userid);

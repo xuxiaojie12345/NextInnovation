@@ -212,8 +212,8 @@
 
 /* ---- 短入力框 ---- */
 .ud10-field-control-short {
-  width: 15%;
-  min-width: 70px;
+  width: 35%;
+  min-width: 200px;
   flex-shrink: 0;
 }
 

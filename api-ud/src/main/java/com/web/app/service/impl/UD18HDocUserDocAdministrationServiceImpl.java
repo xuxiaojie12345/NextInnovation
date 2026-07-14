@@ -62,9 +62,13 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
         // 2. 存在的场合：查询HDOC_USER_DOC取得该用户的DOCTYPE列表
         List<String> doctypes = userDocumentPermissionMapper.selectUserDocDoctypes(request.getUserid());
 
-        // 3. 返回结果（去重后的userid + doctype列表）
+        // 3. 查询用户名
+        String username = userDocumentPermissionMapper.selectUserNameByUserId(request.getUserid());
+
+        // 4. 返回结果（去重后的userid + username + doctype列表）
         Map<String, Object> data = new HashMap<>();
         data.put("userid", foundUserId);
+        data.put("username", username != null ? username : foundUserId);
         data.put("doctypes", doctypes != null ? doctypes : List.of());
 
         response.setCode(200);

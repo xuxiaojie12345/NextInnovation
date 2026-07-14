@@ -134,8 +134,20 @@ const UD17 = React.memo(() => {
         setMessage(result?.msg || "操作失败，请稍后重试");
         setMessageType("error");
       }
-    } catch {
-      setMessage("网络连接失败，请检查网络设置");
+    } catch (err: any) {
+      const errMsg = err?.message || "";
+      if (errMsg.includes("HTTP error")) {
+        setMessage(
+          `服务端错误(${errMsg.replace("HTTP error! status: ", "")})，请稍后重试`,
+        );
+      } else if (
+        errMsg.includes("Failed to fetch") ||
+        errMsg.includes("NetworkError")
+      ) {
+        setMessage("网络连接失败，请检查网络设置");
+      } else {
+        setMessage(`操作失败: ${errMsg || "未知错误"}`);
+      }
       setMessageType("error");
     } finally {
       setIsLoading(false);
@@ -226,13 +238,7 @@ const UD17 = React.memo(() => {
               <label className="ud17-lbl" style={{ width: 70 }}>
                 User
               </label>
-              <input
-                className="ud17-inp"
-                type="text"
-                value={userField1}
-                onChange={(e) => setUserField1(e.target.value)}
-                placeholder="First Name"
-              />
+              <span className="ud17-inp ud17-ro">{userField1}</span>
             </div>
           </div>
 

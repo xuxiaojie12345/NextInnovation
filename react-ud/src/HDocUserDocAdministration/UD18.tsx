@@ -47,7 +47,7 @@ const UD18 = React.memo(() => {
     try {
       const result = await userDocApi.getUserDoc(trimmed);
       if (result && result.code === 200 && result.data) {
-        setUserName(result.data.userid || "");
+        setUserName(result.data.username || result.data.userid || "");
         const matchedDoctypes: string[] = result.data.doctypes || [];
         setUserDocs(new Set(matchedDoctypes));
         setMessage("");

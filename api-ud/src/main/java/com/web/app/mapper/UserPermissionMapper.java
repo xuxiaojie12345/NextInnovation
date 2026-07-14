@@ -50,7 +50,8 @@ public interface UserPermissionMapper {
      */
     List<Map<String, Object>> searchHdocUsers(@Param("userid") String userid,
                                                @Param("user") String user,
-                                               @Param("function") String function);
+                                               @Param("function") String function,
+                                               @Param("markets") java.util.List<String> markets);
     
     /**
      * 删除用户功能权限

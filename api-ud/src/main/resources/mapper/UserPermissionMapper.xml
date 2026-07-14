@@ -73,7 +73,14 @@
     <select id="searchHdocUsers" resultType="map">
         SELECT DISTINCT u.USERID, u.USERNAME AS `user`,
             (SELECT GROUP_CONCAT(DISTINCT ma.MARKET ORDER BY ma.MARKET SEPARATOR ',')
-             FROM HDOC_MARKET_AUTH ma WHERE ma.USERID = u.USERID) AS market
+             FROM HDOC_MARKET_AUTH ma WHERE ma.USERID = u.USERID
+             <if test="markets != null and markets.size() > 0">
+                 AND ma.MARKET IN
+                 <foreach collection="markets" item="m" open="(" separator="," close=")">
+                     #{m}
+                 </foreach>
+             </if>
+            ) AS market
         FROM hdoc_user_infor u
         INNER JOIN HDOC_FUNCTION_AUTH fa ON u.USERID = fa.USERID
         WHERE 1=1
@@ -85,6 +92,15 @@
         </if>
         <if test="function != null and function != ''">
             AND fa.FUNCTION = #{function}
+        </if>
+        <if test="markets != null and markets.size() > 0">
+            AND u.USERID IN (
+                SELECT DISTINCT ma.USERID FROM HDOC_MARKET_AUTH ma
+                WHERE ma.MARKET IN
+                <foreach collection="markets" item="m" open="(" separator="," close=")">
+                    #{m}
+                </foreach>
+            )
         </if>
         ORDER BY u.USERID
     </select>
@@ -101,7 +117,7 @@
 
     <!-- 插入功能权限 -->
     <insert id="insertFunctionAuth">
-        INSERT INTO HDOC_FUNCTION_AUTH (USERID, FUNCTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        INSERT INTO HDOC_FUNCTION_AUTH (USERID, `FUNCTION`, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
         VALUES (#{userid}, #{function}, NOW(), #{updateUser}, 'UD17UpdateRole', NOW(), #{updateUser}, 'UD17UpdateRole')
     </insert>
 
@@ -113,7 +129,7 @@
     
     <!-- 更新用户功能权限 -->
     <update id="updateFunctionAuth">
-        UPDATE HDOC_FUNCTION_AUTH SET FUNCTION = #{permissions}
+        UPDATE HDOC_FUNCTION_AUTH SET `FUNCTION` = #{permissions}
         WHERE USERID = #{userid}
     </update>
     

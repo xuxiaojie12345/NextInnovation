@@ -152,10 +152,12 @@ const UD07 = React.memo(() => {
                   <span className="ud07-info-value">{vehicleData.vin}</span>
                 </div>
                 <div className="ud07-info-row">
-                  <span className="ud07-info-label">Engine no:</span>
+                  <span className="ud07-info-label">Symbol:</span>
                   <span className="ud07-info-value">
-                    {/* {vehicleData.engineNo} */}
-                    423828
+                    {vehicleData.symbols
+                      .filter((s) => s.symbol && s.symbol.trim().length > 0)
+                      .map((s) => s.symbol)
+                      .join(", ") || "—"}
                   </span>
                 </div>
                 <div className="ud07-info-row">

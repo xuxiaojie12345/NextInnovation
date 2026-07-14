@@ -242,8 +242,8 @@
 
 /* ---- 短入力框（系统输出字段用） ---- */
 .ud08-field-control-short {
-  width: 15%;
-  min-width: 70px;
+  width: 30%;
+  min-width: 160px;
   flex-shrink: 0;
 }
 

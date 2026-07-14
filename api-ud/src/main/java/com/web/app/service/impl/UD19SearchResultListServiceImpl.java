@@ -37,28 +37,34 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
         boolean hasNotSet = request.getNotSet() != null;
         boolean hasRule = request.getRule() != null;
         boolean hasTemplate = request.getTemplate() != null;
+        java.util.List<String> markets = request.getMarkets();
+        boolean hasMarkets = markets != null && !markets.isEmpty();
 
-        if (!hasUserid && !hasUser && !hasNotSet && !hasRule && !hasTemplate) {
+        if (!hasUserid && !hasUser && !hasNotSet && !hasRule && !hasTemplate && !hasMarkets) {
             response.setCode(400);
             response.setMsg("请至少输入一个搜索条件");
             return response;
         }
 
-        // 确定搜索用的function参数
+        // 确定搜索用的function参数（支持组合检索）
         String function = null;
         if (hasNotSet) {
-            function = null; // 查询全部
-        } else if (hasRule) {
+            function = null;
+        }
+        if (hasRule) {
             function = "Rule Admin";
-        } else if (hasTemplate) {
+        }
+        if (hasTemplate) {
             function = "Template Admin";
         }
+        // 多个条件可组合，后选的覆盖 function（若同时选了 Rule + Template 则取 Template）
 
         // 查询用户及市场信息
         List<Map<String, Object>> users = userPermissionMapper.searchHdocUsers(
             hasUserid ? request.getUserid().trim() : null,
             hasUser ? request.getUser().trim() : null,
-            function
+            function,
+            hasMarkets ? markets : null
         );
 
         Map<String, Object> data = new HashMap<>();

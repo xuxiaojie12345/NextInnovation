@@ -19,6 +19,9 @@ public class UD19SearchResultListRequest implements Serializable {
     /** 市场 */
     private String market;
 
+    /** 市场列表（多选） */
+    private java.util.List<String> markets;
+
     /** 未配置 */
     private String notSet;
 

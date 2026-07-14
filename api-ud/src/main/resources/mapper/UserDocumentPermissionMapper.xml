@@ -7,6 +7,11 @@
         SELECT DISTINCT USERID FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userid}
     </select>
 
+    <!-- 查询用户名 -->
+    <select id="selectUserNameByUserId" resultType="string">
+        SELECT USERNAME FROM hdoc_user_infor WHERE USERID = #{userid}
+    </select>
+
     <!-- 查询用户文档权限（仅返回DOCTYPE） -->
     <select id="selectUserDocDoctypes" resultType="string">
         SELECT DOCTYPE FROM HDOC_USER_DOC WHERE USERID = #{userid}

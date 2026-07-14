@@ -6,15 +6,15 @@ import "./UD06.css";
 // ===== 类型定义 =====
 
 interface ModStatusData {
+  foundUnreleasedVersion: number;
+  message: string;
   doctype: string;
   version: string;
   storing: string;
-  foundUnreleasedVersion: number;
-  message: string;
 }
 
-const STORAGE_KEY_USER = "user_info";
 const STORAGE_KEY_TOKEN = "auth_token";
+const STORAGE_KEY_USER = "user_info";
 
 const getCurrentUser = (): {
   userId: string;
