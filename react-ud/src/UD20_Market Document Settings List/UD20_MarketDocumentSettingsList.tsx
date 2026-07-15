@@ -40,8 +40,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
 
   /**
    * 获取文档列表数据
-   * 对应设计书 4.1 UD20GetDocumentListApi
-   * GET /api/ud20/getdocumentlist
    *
    * @param params - 从UD20-1传来的搜索条件
    */

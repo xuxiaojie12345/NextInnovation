@@ -4,15 +4,7 @@ import './UD16_ADChange.css';
 import apiClient from '../api/config';
 
 /**
- * UD16_ADChange - AD Change 管理ページコンポーネント
- *
- * 功能说明：
- * - 用户可以对Serie-Chnr进行添加(ADD)、删除(DELETE)和检查(CHECK)操作
- * - 管理HDOC_ADCA_CHANGE表中的ADCA变更信息
- * - 添加时支持长文本描述输入（最大4000字符）
- * - 删除时逻辑删除（设置ACT字段为"U"）
- *
- * 对应设计书：DES-UD16-001
+ * UD16_ADChange - AD Change 管理页面组件
  *
  * @component
  * @returns {JSX.Element} AD Change管理页面元素
@@ -29,7 +21,6 @@ const UD16_ADChange: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [serieChnr, setSerieChnr] = useState<string>('');  // Serie-Chnr输入值
   const [desc, setDesc] = useState<string>('');             // Desc描述输入值
   const [message, setMessage] = useState<string>('');        // 消息
@@ -75,13 +66,6 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击ADD按钮处理流程
-   *
-   * 处理流程：
-   * 1. 前置处理：获取输入的Serie-Chnr和Desc值
-   * 2. 空值校验和长度校验（前端校验）
-   * 3. 拆分Serie-Chnr为SERIE和CHNR
-   * 4. 调用API添加记录（若记录已存在，弹框提示结束处理；不存在添加记录）
-   * 5. 结果处理：成功时显示成功消息并清空输入框
    */
   const handleAdd = async () => {
     // 1. 前置处理：获取输入值并去除首尾空格
@@ -154,13 +138,6 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击DELETE按钮处理流程
-   *
-   * 处理流程：
-   * 1. 前置处理：获取输入的Serie-Chnr值
-   * 2. 空值校验（前端校验）
-   * 3. 拆分Serie-Chnr为SERIE和CHNR
-   * 4. 调用API删除记录（物理删除）
-   * 5. 结果处理
    */
   const handleDelete = async () => {
     // 1. 前置处理：获取输入值并去除首尾空格
@@ -194,7 +171,6 @@ const UD16_ADChange: React.FC = () => {
         setSerieChnr('');
         setDesc('');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.8
         showMessage(response.data?.msg || '删除失败');
       }
     } catch (error: any) {
@@ -204,7 +180,6 @@ const UD16_ADChange: React.FC = () => {
         const statusCode = error.response.status;
         const errorMsg = error.response.data?.msg;
 
-        // 对应设计书 3.2 校验详细规格表 No.7
         if (statusCode === 404) {
           showMessage('记录不存在');
         } else if (statusCode >= 500) {
@@ -224,12 +199,6 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 点击CHECK按钮处理流程
-   * 处理流程：
-   * 1. 前置处理：获取输入的Serie-Chnr值
-   * 2. 空值校验（前端校验）
-   * 3. 拆分Serie-Chnr为SERIE和CHNR
-   * 4. 调用API查询记录
-   * 5. 结果处理：弹框显示查询结果
    */
   const handleCheck = async () => {
     // 1. 前置处理：获取输入值并去除首尾空格
@@ -303,14 +272,14 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 处理 Serie-Chnr 输入变化
-   * 限制：只允许半角英数字，最大长度15字符
+   * 限制：只允许半角英数字
    *
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
    */
   const handleSerieChnrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     // 半角英数字和连字符校验
-    if (/^[a-zA-Z0-9-]*$/.test(val) && val.length <= MAX_SERIE_CHNR_LENGTH) {
+    if (/^[a-zA-Z0-9-]*$/.test(val)) {
       setSerieChnr(val);
       // 用户重新输入时清空错误提示
       if (message) showMessage('');
@@ -319,7 +288,6 @@ const UD16_ADChange: React.FC = () => {
 
   /**
    * 处理 Desc 输入变化
-   * 限制：最大长度4000字符
    *
    * @param {React.ChangeEvent<HTMLTextAreaElement>} e - 输入事件对象
    */
@@ -387,7 +355,7 @@ const UD16_ADChange: React.FC = () => {
             onClick={handleAdd}
             disabled={isLoading}
           >
-            {isLoading ? '処理中...' : 'ADD'}
+            {isLoading ? '处理中...' : 'ADD'}
           </button>
 
           <button
@@ -395,7 +363,7 @@ const UD16_ADChange: React.FC = () => {
             onClick={handleDelete}
             disabled={isLoading}
           >
-            {isLoading ? '処理中...' : 'DELETE'}
+            {isLoading ? '处理中...' : 'DELETE'}
           </button>
 
           <button
@@ -403,7 +371,7 @@ const UD16_ADChange: React.FC = () => {
             onClick={handleCheck}
             disabled={isLoading}
           >
-            {isLoading ? '処理中...' : 'CHECK'}
+            {isLoading ? '处理中...' : 'CHECK'}
           </button>
         </div>
 

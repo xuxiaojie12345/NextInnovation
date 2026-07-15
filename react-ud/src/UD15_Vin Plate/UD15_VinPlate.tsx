@@ -35,12 +35,7 @@ interface VinPlateInfo {
 }
 
 /**
- * UD15_VinPlate - VIN Plate 数据管理页面コンポーネント
- *
- * 功能说明：
- * - 用户输入底盘号后，查看VIN Plate的详细信息
- * - 支持对VIN Plate数据进行状态更新操作（重新生成、设置为OK）
- * - 支持切换基本信息/高级信息模式
+ * UD15_VinPlate - VIN Plate 数据管理页面组件
  *
  * @component
  * @returns {JSX.Element} VIN Plate数据管理页面元素
@@ -57,7 +52,6 @@ const UD15_VinPlate: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [chassisNumber, setChassisNumber] = useState<string>('');     // 底盘号输入值
   const [plateInfo, setPlateInfo] = useState<VinPlateInfo | null>(null); // VIN Plate信息
   const [message, setMessage] = useState<string>('');                  // 消息
@@ -65,7 +59,7 @@ const UD15_VinPlate: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);          // 加载状态标识
 
   // ==================== 常量定义 ====================
-  const MAX_CHASSIS_LENGTH = 15;  // 底盘号最大长度（对应设计书 2.1 控件属性表 No.1）
+  const MAX_CHASSIS_LENGTH = 15;  // 底盘号最大长度1）
 
   // ==================== 工具函数 ====================
 
@@ -158,7 +152,7 @@ const UD15_VinPlate: React.FC = () => {
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {
-          // 对应设计书 3.2 No.3 - 底盘号不存在
+          // 底盘号不存在
           showMessage(`Chassis number ${trimmedChassis} not found.`, 'warning');
         } else if (statusCode >= 500) {
           showMessage('服务器内部错误，请联系管理员', 'error');
@@ -177,82 +171,37 @@ const UD15_VinPlate: React.FC = () => {
   };
 
   /**
-   * 执行状态更新操作
-   *
-   * @param {'regenerate' | 'setok' | 'changebasic' | 'changeadvanced'} actionType - 操作类型
+   * 执行状态更新操作（抽像方法）
    */
-  const handleStatusUpdate = async (actionType: 'regenerate' | 'setok' | 'changebasic' | 'changeadvanced') => {
-    // 1. 前置处理：获取底盘号并去除首尾空格
+  const updateStatus = async (endpoint: string, successMsg: string) => {
     const trimmedChassis = chassisNumber.trim();
 
-    // 2. 检查是否已先执行查询
     if (!plateInfo) {
       showMessage('请先查询Chassis信息', 'error');
       return;
     }
 
-    // 3. 空值校验（前端校验）
     if (!trimmedChassis) {
       showMessage('请输入底盘号', 'error');
-      return; // 终止流程
+      return;
     }
 
-    // 3. 拆分底盘号
     const { chassisSerie, chassisNo } = splitChassisNumber(trimmedChassis);
-
-    // 4. 根据操作类型设置API请求参数
-    const actionConfig: Record<string, { method: 'post' | 'put'; endpoint: string; successMsg: string }> = {
-      regenerate: {
-        method: 'post',
-        endpoint: '/api/ud15/regenerate',
-        successMsg: '状态已更新为重新生成',
-      },
-      setok: {
-        method: 'post',
-        endpoint: '/api/ud15/setok',
-        successMsg: '状态已更新为OK',
-      },
-      changebasic: {
-        method: 'post',
-        endpoint: '/api/ud15/changebasic',
-        successMsg: '已切换到基本信息',
-      },
-      changeadvanced: {
-        method: 'post',
-        endpoint: '/api/ud15/changeadvanced',
-        successMsg: '已切换到高级信息',
-      },
-    };
-
-    const config = actionConfig[actionType];
 
     setIsLoading(true);
     showMessage('', 'info');
 
     try {
-      // 对应设计书 4.2~4.5 各API定义
-      const response = await apiClient({
-        method: config.method,
-        url: config.endpoint,
-        data: {
-          chassisSerie,
-          chassisNo,
-        },
-      });
+      const response = await apiClient.post(endpoint, { chassisSerie, chassisNo });
 
-      // 5. 结果处理
       if (response.data && response.data.code === 200) {
-        // 成功
-        showMessage(config.successMsg, 'success');
-        // 刷新显示区域：重新查询VIN Plate信息
+        showMessage(successMsg, 'success');
         handleRefreshInfo(chassisSerie, chassisNo, trimmedChassis);
       } else {
-        // 失败
         const errorMsg = response.data?.msg || `Chassis number ${trimmedChassis} not found.`;
         showMessage(errorMsg, 'warning');
       }
     } catch (error: any) {
-      // 异常处理
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {
@@ -271,6 +220,15 @@ const UD15_VinPlate: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  /** Set Regenerate 按钮压下 - 设置重新生成 */
+  const handleSetRegenerate = () => updateStatus('/api/ud15/regenerate', '状态已更新为重新生成');
+  /** Set OK 按钮压下 - 设置完成状态 */
+  const handleSetOk = () => updateStatus('/api/ud15/setok', '状态已更新为OK');
+  /** Change to Basic Info 按钮压下 - 切换为基础信息 */
+  const handleChangeBasic = () => updateStatus('/api/ud15/changebasic', '已切换到基本信息');
+  /** Change to Advanced Info 按钮压下 - 切换为高级信息 */
+  const handleChangeAdvanced = () => updateStatus('/api/ud15/changeadvanced', '已切换到高级信息');
 
   /**
    * 刷新VIN Plate信息
@@ -369,10 +327,10 @@ const UD15_VinPlate: React.FC = () => {
         {/* 按钮区域 - 所有按钮排成一行 */}
         <div className='ud15-button-group'>
           <button className='ud15-btn' onClick={handleViewInfo} disabled={isLoading}>View Info</button>
-          <button className='ud15-btn' onClick={() => handleStatusUpdate('regenerate')} disabled={isLoading}>Set Regenerate</button>
-          <button className='ud15-btn' onClick={() => handleStatusUpdate('setok')} disabled={isLoading}>Set OK</button>
-          <button className='ud15-btn' onClick={() => handleStatusUpdate('changebasic')} disabled={isLoading}>Change to Basic Info</button>
-          <button className='ud15-btn' onClick={() => handleStatusUpdate('changeadvanced')} disabled={isLoading}>Change to Advanced Info</button>
+          <button className='ud15-btn' onClick={handleSetRegenerate} disabled={isLoading}>Set Regenerate</button>
+          <button className='ud15-btn' onClick={handleSetOk} disabled={isLoading}>Set OK</button>
+          <button className='ud15-btn' onClick={handleChangeBasic} disabled={isLoading}>Change to Basic Info</button>
+          <button className='ud15-btn' onClick={handleChangeAdvanced} disabled={isLoading}>Change to Advanced Info</button>
         </div>
 
         {/* 加载状态提示 */}

@@ -2,10 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './UD17_HDocUserAdministration.css';
 import apiClient from '../api/config';
 
-/* ============================================================
-   类型定义
-   ============================================================ */
-
+/*  类型定义 */
 /** type代码→角色key映射表（对应全体API設計 type与checkbox对应关系） */
 const TYPE_TO_ROLE_MAP: Record<string, string> = {
   U: 'Standard User',
@@ -38,9 +35,7 @@ interface RoleConfig {
   isLabel?: boolean;               // 是否为Label（Output），不显示复选框
 }
 
-/* ============================================================
-   角色配置表 - 对应设计书 2.1 控件属性表
-   ============================================================ */
+/* 角色配置表  */
 const ROLE_CONFIGS: RoleConfig[] = [
   { key: 'Standard User',       label: 'Standard User',       hasMarket: true,  marketFixed: '-EU' },
   { key: 'Rule Admin',          label: 'Rule Admin',          hasMarket: true  },
@@ -55,13 +50,6 @@ const ROLE_CONFIGS: RoleConfig[] = [
 /* ============================================================
    UD17_HDocUserAdministration 组件
    HDoc User Administration - 用户权限管理页面
-
-   功能说明：
-   - 通过UserID查询用户信息和权限配置
-   - 支持为不同角色分配对应的Market权限
-   - 支持更新和删除用户的所有权限
-
-   对应设计书：DES-HDocUserAdministration-001
    ============================================================ */
 const UD17_HDocUserAdministration: React.FC = () => {
 
@@ -74,9 +62,9 @@ const UD17_HDocUserAdministration: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);          // 加载状态
   const [isQueried, setIsQueried] = useState<boolean>(false);          // 是否已查询用户信息
 
-  // 角色勾选状态：key -> checked（对应设计书 3.1.2）
+  // 角色勾选状态：key -> checked
   const [checkedRoles, setCheckedRoles] = useState<Record<string, boolean>>({});
-  // Market选择状态：roleType -> market值（对应设计书 3.1.2）
+  // Market选择状态：roleType -> market值
   const [marketSelections, setMarketSelections] = useState<Record<string, string>>({});
   // Market下拉列表数据源（从API获取）
   const [marketList, setMarketList] = useState<string[]>([]);
@@ -86,7 +74,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
   const MAX_USER_ID_LENGTH = 10;
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 初期表示功能
   useEffect(() => {
     fetchMarketList();
   }, []);
@@ -118,11 +105,11 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 处理 UserID 输入变化
-   * 限制：只允许半角英数字，最大长度10字符
+   * 限制：只允许半角英数字
    */
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
+    if (USER_ID_REGEX.test(val)) {
       setUserID(val);
       if (message) {
         setMessage('');
@@ -157,18 +144,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
   };
 
   // ==================== API 调用 ====================
-
-  /**
-   * 查询用户信息
-   * 处理流程：
-   * 1. 获取UserID并去除首尾空格
-   * 2. 空值校验（前端校验）
-   * 3. 步骤4: 首先检查该用户是否存在于HDOC_FUNCTION_AUTH表中
-   * 4. 步骤5: 如果存在，调用API从HDOC_USER_INFOR表获取用户名称并显示
-   * 5. 步骤5: 从HDOC_FUNCTION_AUTH获取权限配置并勾选对应复选框
-   * 6. 步骤6: 从HDOC_MARKET_AUTH获取market权限并设置下拉框
-   * 7. 步骤7: 显示用户名称和权限配置
-   */
   const handleUserInfo = async () => {
     // 1. 前置处理：去除首尾空格
     const trimmedUserID = userID.trim();
@@ -233,7 +208,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
         setMessageType('success');
         setMessage('');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.2
         setMessageType('error');
         setMessage("We didn't recognize the userid you entered. Please try again.");
         resetPermissions();
@@ -270,12 +244,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 更新用户权限
-   *
-   * 处理流程：
-   * 1. 检查是否已查询用户信息
-   * 2. 收集当前画面的权限配置数据
-   * 3. 调用API更新
-   * 4. 显示结果消息
    */
   const handleUpdateRole = async () => {
     // 对应设计书 3.2 校验详细规格表 No.3
@@ -290,7 +258,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
     try {
       // 构建请求数据
-      // 格式：{ userId, functionAuths: [{ function, market }] }
       const functionAuths: Array<{ function: string; market: string }> = [];
 
       ROLE_CONFIGS.forEach((role) => {
@@ -311,19 +278,16 @@ const UD17_HDocUserAdministration: React.FC = () => {
         }
       });
 
-      // PUT /api/ud17/updaterole（全体API設計: PUT）
       const response = await apiClient.put('/api/ud17/updaterole', {
         userId: userID.trim(),
         functionAuths,
       });
 
       // 结果处理
-      // 后端返回格式：{ code: "200", success: true, message: "用户权限更新成功" }
       if (response.data?.success === true || response.data?.code === "200") {
         setMessageType('success');
         setMessage('用户权限更新成功');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.4
         setMessageType('error');
         setMessage(response.data?.message || '用户权限更新失败，请稍后重试');
       }
@@ -352,14 +316,8 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
   /**
    * 删除用户所有权限
-   * 处理流程：
-   * 1. 检查是否已查询用户信息
-   * 2. 弹框确认（防止误操作）
-   * 3. 调用API删除
-   * 4. 清空画面权限配置
    */
   const handleDeleteRole = async () => {
-    // 对应设计书 3.2 校验详细规格表 No.5
     if (!userID.trim() || !isQueried) {
       setMessageType('error');
       setMessage('请先查询用户信息');
@@ -367,7 +325,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
     }
 
     // 删除确认对话框
-    // 对应设计书 6. 实现注意事项 No.3
     const confirmed = window.confirm('确定要删除该用户的所有权限吗？');
     if (!confirmed) {
       return;
@@ -377,23 +334,19 @@ const UD17_HDocUserAdministration: React.FC = () => {
     setMessage('');
 
     try {
-      //  /api/ud17/deleteuser（设计书: Method POST, Request Body: { userId }）
       const response = await apiClient.post('/api/ud17/deleteuser', {
         userId: userID.trim(),
       });
 
       // 结果处理
-      // 后端返回格式：{ code: "200", success: true, message: "用户权限删除成功" }
       if (response.data?.success === true || response.data?.code === "200") {
         // 成功：清空画面所有权限配置
-        // 对应设计书 3.1.4 结果处理 - 成功分支
         resetPermissions();
         setUserName('');
         setIsQueried(false);
         setMessageType('success');
         setMessage('用户权限删除成功');
       } else {
-        // 对应设计书 3.2 校验详细规格表 No.6
         setMessageType('error');
         setMessage(response.data?.message || '用户权限删除失败，请稍后重试');
       }
@@ -460,18 +413,9 @@ const UD17_HDocUserAdministration: React.FC = () => {
         <div className='ud17-search-row'>
           <div className='ud17-search-group'>
             <label htmlFor='ud17-userid'>UserID</label>
-            <input
-              id='ud17-userid'
-              type='text'
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder=''
-              disabled={isLoading}
-              maxLength={MAX_USER_ID_LENGTH}
-              inputMode='text'
-              autoCapitalize='off'
-              autoCorrect='off'
-              autoComplete='off'
+            <input id='ud17-userid'  type='text' value={userID} onChange={handleUserIDChange}
+              placeholder='' disabled={isLoading} maxLength={MAX_USER_ID_LENGTH}
+              inputMode='text'autoCapitalize='off' autoCorrect='off' autoComplete='off'
             />
           </div>
           <button className='ud17-btn-info' onClick={handleUserInfo} disabled={isLoading}>{isLoading ? '处理中...' : 'User Info'}</button>
@@ -481,17 +425,9 @@ const UD17_HDocUserAdministration: React.FC = () => {
         <div className='ud17-search-row'>
           <div className='ud17-search-group'>
             <label htmlFor='ud17-user'>User</label>
-            <input
-              id='ud17-user'
-              type='text'
-              value={userName || ''}
-              placeholder=''
-              disabled
-              maxLength={MAX_USER_ID_LENGTH}
-              inputMode='text'
-              autoCapitalize='off'
-              autoCorrect='off'
-              autoComplete='off'
+            <input id='ud17-user' type='text' value={userName || ''}
+              placeholder='' disabled maxLength={MAX_USER_ID_LENGTH}
+              inputMode='text' autoCapitalize='off' autoCorrect='off' autoComplete='off'
             />
           </div>
         </div>

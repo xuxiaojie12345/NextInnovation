@@ -6,12 +6,6 @@ import apiClient from '../api/config';
 /**
  * Generate Homologation Document 页面组件
  * 
- * 功能说明：
- * - 用户输入 Chassis series、Chassis no 和 Document type
- * - 提交后跳转到 UD04 Generate document 画面
- * - 支持 Reset 清空输入和 Help 跳转帮助页面
- * - 默认显示上次输入的条件（从localStorage读取）
- * 
  * @component
  * @returns {JSX.Element} Generate Homologation Document页面元素
  */
@@ -44,8 +38,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
   
   /**
    * 组件加载时初始化
-   * 1. 从localStorage读取上次输入的条件
-   * 2. 调用API获取Document type列表
    */
   useEffect(() => {
     // 异常处理 - 用户未登录

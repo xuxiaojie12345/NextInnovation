@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './UD18_HDocUserDocAdministration.css';
 import apiClient from '../api/config';
 
-/* ============================================================
-   类型定义
-   ============================================================ */
+/* 类型定义 */
 
 /** 文档列表项 */
 interface DocumentItem {
@@ -18,13 +16,6 @@ interface DocumentItem {
 /* ============================================================
    UD18_HDocUserDocAdministration 组件
    HDoc User Doc Administration - 用户文档权限管理页面
-
-   功能说明：
-   - 通过UserID查询用户是否存在并从Saviynt获取用户名
-   - 查看用户当前拥有的文档权限
-   - 更新用户的文档权限配置（先删后增）
-
-   对应设计书：DES-UD18-001
    ============================================================ */
 const UD18_HDocUserDocAdministration: React.FC = () => {
 
@@ -43,7 +34,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
   const MAX_USER_ID_LENGTH = 10;
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 初期显示处理流程
   useEffect(() => {
     fetchDocumentList();
   }, []);
@@ -68,11 +58,11 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
   /**
    * 处理 UserID 输入变化
-   * 限制：只允许半角英数字，最大长度10字符
+   * 限制：只允许半角英数字
    */
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
+    if (USER_ID_REGEX.test(val)) {
       setUserID(val);
       if (message) {
         setMessage('');
@@ -117,12 +107,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       setMessage('UserID只能包含半角英数字');
       return;
     }
-    if (trimmedUserID.length > MAX_USER_ID_LENGTH) {
-      setMessageType('error');
-      setMessage('UserID最大长度为10字符');
-      return;
-    }
-
     // 3. API调用
     setIsLoading(true);
     setMessage('');

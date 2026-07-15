@@ -6,11 +6,6 @@ import './UD25_EDBUserView.css';
 /**
  * UD25_EDBUserView EDB用户信息展示页面组件
  *
- * 功能说明：
- * - 从UD09画面的"Created by user"链接跳转过来，接收userId参数
- * - 页面加载时调用API获取用户详细信息（Userid、Responsible、User Position、E-mail）
- * - 提供Clear（清空）和Back（返回）按钮
- *
  * @component
  * @returns {JSX.Element} EDB用户信息展示页面元素
  */
@@ -63,7 +58,6 @@ const UD25_EDBUserView: React.FC = () => {
           setMessageType('error');
         }
       } catch (error) {
-        // 对应设计书 3.2 校验详细规格表 - No.2 API调用失败
         setMessage('获取用户信息失败');
         setMessageType('error');
       } finally {
@@ -90,8 +84,6 @@ const UD25_EDBUserView: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 处理流程：
-   * 1. 执行画面迁移到前一个画面
    */
   const handleBack = useCallback(() => {
     navigate(-1); // 返回前一个画面

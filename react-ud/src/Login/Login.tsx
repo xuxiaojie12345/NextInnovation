@@ -6,12 +6,6 @@ import apiClient from "../api/config";
 /**
  * 登录页面组件
  * 
- * 功能说明：
- * - 用户身份验证，集成 ISAM 统一身份认证
- * - 提供简洁的登录界面，清晰的错误提示
- * - 密码输入掩码显示，保障安全性
- * - 登录成功后缓存 UserID 用于后续会话管理
- * 
  * @component
  * @returns {JSX.Element} 登录页面元素
  */
@@ -19,7 +13,6 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [userID, setUserID] = useState<string>("");           // 用户ID输入值
   const [password, setPassword] = useState<string>("");       // 密码输入值
   const [message, setMessage] = useState<string>("");         // 普通错误消息
@@ -42,14 +35,14 @@ const Login: React.FC = () => {
   // ==================== 事件处理函数 ====================
   /**
    * 处理 UserID 输入变化
-   * 限制：只允许半角英数字，最大长度10字符
+   * 限制：只允许半角英数字
    * 用户体验优化：用户重新输入时清空错误提示
    * 
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
    */
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角英数字（maxLength 已在 HTML 控件中控制）
+    // 正则校验：只允许半角英数字
     if (USER_ID_REGEX.test(val)) {
       setUserID(val);
       // 用户体验优化：用户重新输入时清空错误提示
@@ -79,10 +72,8 @@ const Login: React.FC = () => {
    */
   const handleLogin = async () => {
     // 1. 前置处理
-    // （正则已禁止输入空格，无需 trim）
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1 和 No.2
     if (!userID) {
       setMessage("Username and password are required.");
       userIDRef.current?.focus(); // 焦点移到UserID
@@ -106,8 +97,7 @@ const Login: React.FC = () => {
         },
       });
       if (response.data.code === 200) {
-        // 认证成功（Code 200）
-        // 缓存 UserID 到 localStorage（用于后续会话管理）
+        // 认证成功（Code 200），缓存 UserID 到 localStorage（用于后续会话管理）
         localStorage.setItem("userID", userID);
         // 保存用户信息到 localStorage
         if (response.data.data) {
@@ -125,8 +115,7 @@ const Login: React.FC = () => {
         // 画面迁移：跳转到 Menu 画面 (UD02)
         navigate("/Menu");
       } else {
-        // 认证失败（Code != 200 或业务错误）
-        // 根据后端返回的 business code 区分处理
+        // 认证失败（Code != 200 或业务错误）， 根据后端返回的 business code 区分处理
         const businessCode = response.data.code;
         if (businessCode === 500) {
           // 服务器内部错误
@@ -142,7 +131,6 @@ const Login: React.FC = () => {
       // 异常处理 - 网络异常/超时/后端不可达
       if (error.code === "ECONNABORTED") {
         // 请求超时
-        // 对应设计书 5. 异常处理 - 请求超时
         setMessage("Request timeout. Please check your network connection.");
       } else {
         // 网络异常或其他错误（后端不可达、ISAM服务不可用等）

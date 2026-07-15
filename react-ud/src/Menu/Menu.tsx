@@ -15,11 +15,6 @@ interface MenuSection {
 /**
  * Menu 菜单页面组件
  * 
- * 功能说明：
- * - 提供系统各功能模块的导航入口
- * - 用户点击菜单项可跳转到对应的功能画面
- * - 按功能分组展示菜单项（Generate、Admin、User Administration、Documentation）
- * 
  * @component
  * @returns {JSX.Element} Menu菜单页面元素
  */

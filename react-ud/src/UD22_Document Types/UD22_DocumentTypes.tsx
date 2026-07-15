@@ -38,7 +38,6 @@ const UD22_DocumentTypes: React.FC = () => {
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         const data = response.data.data;
         if (data.length === 0) {
-          // 对应设计书 3.1.1 空值校验 - API返回空数组
           setMessage('当前没有可用的文档类型');
           setMessageType('success');
         }
@@ -56,7 +55,7 @@ const UD22_DocumentTypes: React.FC = () => {
         }
       }
     } catch (error) {
-      // 对应设计书 5. 异常处理
+      // 异常处理
       setMessage('获取文档类型列表失败，请稍后重试');
       setMessageType('error');
     } finally {

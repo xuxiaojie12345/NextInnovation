@@ -22,13 +22,6 @@ interface SearchUserItem {
 /* ============================================================
    UD19_SearchUser 组件
    Search User - 用户搜索页面
-
-   功能说明：
-   - 提供多条件用户搜索功能（UserID、用户名、Market、权限类型）
-   - 以表格形式展示搜索结果
-   - 支持组合条件搜索
-
-   对应设计书：DES-UD19-001
    ============================================================ */
 const UD19_SearchUser: React.FC = () => {
 
@@ -51,7 +44,6 @@ const UD19_SearchUser: React.FC = () => {
   const MAX_USERNAME_LENGTH = 32;
 
   // ==================== 初期表示 ====================
-  // 对应设计书 3.1.1 初始显示
   useEffect(() => {
     fetchMarketList();
   }, []);
@@ -210,12 +202,9 @@ const UD19_SearchUser: React.FC = () => {
 
       {/* 消息显示区域 */}
       {message && (
-        <div
-          className={`ud19-message ${
-            messageType === 'success' ? 'ud19-message-success' : 'ud19-message-error'
-          }`}
-        >
-          {message}
+        <div className={`ud19-message ${
+           messageType === 'success' ? 'ud19-message-success' : 'ud19-message-error'
+          }`} > {message} 
         </div>
       )}
 

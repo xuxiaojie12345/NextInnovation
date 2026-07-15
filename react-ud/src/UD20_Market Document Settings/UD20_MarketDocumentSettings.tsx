@@ -128,7 +128,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
    * 处理 Update Mode 按钮点击更新HDOC_DOCUMENT_LIST表
    */
   const handleUpdateMode = useCallback(async () => {
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!documentType.trim()) {
       setMessage('Document type不能为空');
       setMessageType('error');
@@ -139,7 +138,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
     setMessage('');
 
     try {
-      // POST /api/ud201/updatedocument
       const registerUser = localStorage.getItem('userID') || 'SYSTEM';
       const response = await apiClient.post('/api/ud201/updatedocument', {
         doctype: documentType.trim(),
@@ -153,7 +151,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
         setMessage('更新成功');
         setMessageType('success');
       } else if (response.data?.code === 404) {
-        // 对应设计书 3.2 校验详细规格表 No.2 - Document type不存在
         setMessage('Document type does not exists. Please enter the correct content.');
         setMessageType('error');
       } else {

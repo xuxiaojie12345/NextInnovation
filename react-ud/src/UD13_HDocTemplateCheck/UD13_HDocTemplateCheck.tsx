@@ -4,14 +4,6 @@ import "./UD13_HDocTemplateCheck.css";
 /**
  * HDoc Template Check 页面组件
  * 
- * 功能说明：
- * - 提供 RTF 模板文件的上传和选择功能
- * - Check 按钮用于执行模板检查（当前版本机能不实装）
- * - Download checked template 链接用于下载检查后的文件（当前版本机能不实装）
- * - 显示变量计数等检查结果信息
- * 
- * 对应设计书：HDoc Template Check 模块详细设计说明书
- * 
  * @component
  * @returns {JSX.Element} HDoc Template Check 页面元素
  */
@@ -93,8 +85,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
    * 点击 Check 按钮执行模板检查
    */
   const handleCheck = async () => {
-   
-
     // 当前版本 Check 机能不实装
     setMessage("Check 机能未实装（当前版本暂不支持）");
     setMessageType("error");
@@ -103,7 +93,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
 
   /**
    * 点击 Download checked template 链接
-   * 注意：当前版本机能不实装
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownload = (e: React.MouseEvent) => {

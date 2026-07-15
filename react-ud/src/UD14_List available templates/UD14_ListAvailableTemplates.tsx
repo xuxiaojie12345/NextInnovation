@@ -4,9 +4,7 @@ import './UD14_ListAvailableTemplates.css';
 import apiClient from '../api/config';
 
 /**
- * ファイル情報インターフェース
- * 控件属性表 - DataTable列定义
- * 后端返回Market文件夹下的文件信息列表
+ * 文件信息接口
  */
 interface FileInfo {
   filename: string;          // 文件名（可点击链接下载）
@@ -18,7 +16,6 @@ interface FileInfo {
 
 /**
  * Market选项接口
- * 后端返回MARKET_MASTER表的market字段
  */
 interface MarketOption {
   value: string;
@@ -26,16 +23,10 @@ interface MarketOption {
 }
 
 /**
- * UD14_ListAvailableTemplates - テンプレート一覧表示ページコンポーネント
- *
- * 功能说明：
- * - 显示指定Market文件夹中存储的所有模板文件列表
- * - 用户选择Market后，显示该Market文件夹下的模板文件信息
- * - 支持文件下载（点击Filename列链接）
- * - 显示文件使用状态（Used列）
+ * UD14_ListAvailableTemplates - 模板列表展示页面组件
  *
  * @component
- * @returns {JSX.Element} 模板一覧表示ページ元素
+ * @returns {JSX.Element} 模板列表展示页面元素
  */
 const UD14_ListAvailableTemplates: React.FC = () => {
   const navigate = useNavigate();
@@ -49,7 +40,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [selectedMarket, setSelectedMarket] = useState<string>('');        // 当前选中的Market值
   const [marketOptions, setMarketOptions] = useState<MarketOption[]>([]);   // Market下拉列表选项
   const [fileList, setFileList] = useState<FileInfo[]>([]);                 // 文件列表数据（从market文件夹获取）
@@ -68,10 +58,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
   // ==================== API调用 ====================
   /**
    * 获取Market列表
-   * 调用API的UD14SelectMarketmaster()方法，从MARKET_MASTER表获取Market列表
-   *
-   * Method: GET
-   * Endpoint: /api/ud14/market
    */
   const fetchMarketList = async () => {
     setIsLoading(true);
@@ -79,10 +65,8 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       const response = await apiClient.get('/api/ud14/market');
 
       // 处理成功响应
-      // 后端返回格式：[{market: "JP"}, {market: "USA"}] (MarketData对象)
       if (response.data && response.data.code === 200 && response.data.data) {
         // 将API返回的Market列表映射为下拉框选项
-        // 后端MarketData只有market字段，同时作为value和label使用
         const options: MarketOption[] = response.data.data.map((item: any) => ({
           value: item.market,
           label: item.market,
@@ -107,12 +91,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
 
   /**
    * 获取指定Market文件夹下的文件列表
-   * 调用API从market文件夹读取文件信息，并检查文件是否在HDOC_USER_DEFINED_RULES中已使用
-   *
-   * Method: GET
-   * Endpoint: /api/ud14/files
-   * 参数: market
-   * 后端返回格式：[{filename, isUsed, variable, lastMod, size}] (FileData对象列表)
    */
   const fetchFileList = async (market: string) => {
     setIsLoading(true);
@@ -154,10 +132,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
   /**
    * 下载指定的模板文件
    *
-   * Method: GET
-   * Endpoint: /api/ud14/downfile
-   * 参数: market, filename
-   *
    * @param {string} filename - 要下载的文件名
    */
   const handleDownloadFile = async (filename: string) => {
@@ -186,8 +160,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-
-      // 清理资源
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
@@ -197,10 +169,8 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {
-          // 对应设计书 3.2 No.5 - 文件不存在
           setMessage('文件不存在');
         } else {
-          // 对应设计书 3.2 No.6 - 下载失败
           setMessage('文件下载失败');
         }
       } else if (error.code === 'ECONNABORTED') {
@@ -250,7 +220,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
           </div>
         )}
 
-        {/* 查询条件 + 数据表格 - 合并到一个容器 */}
         <div className='ud14-content-box'>
           {/* 查询条件区域 */}
           <div className='ud14-search-section'>
@@ -296,7 +265,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
               {fileList.length > 0 ? (
                 fileList.map((file, index) => (
                   <tr key={`${file.filename}-${index}`}>
-                    {/* Filename列 - 可点击链接下载 */}
                     <td>
                       <span
                         className='ud14-file-link'
@@ -306,16 +274,12 @@ const UD14_ListAvailableTemplates: React.FC = () => {
                         {file.filename}
                       </span>
                     </td>
-                    {/* Used列 - 显示VARIABLE值或为空 */}
                     <td>{file.variable || ''}</td>
-                    {/* Last Mod列 - 文件更新日期 */}
                     <td>{file.lastMod}</td>
-                    {/* Size列 - 文件大小 */}
                     <td>{file.size}</td>
                   </tr>
                 ))
               ) : (
-                /* 空数据状态 */
                 <tr>
                   <td colSpan={4} className='ud14-empty-cell'>
                     {selectedMarket ? '暂无文件数据' : '请先选择Market'}
