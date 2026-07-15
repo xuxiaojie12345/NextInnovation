@@ -61,7 +61,6 @@ public class UD20GetDocumentListController {
             @ApiParam(value = "注册用户运算符") @RequestParam(value = "registerUserOp", required = false) String registerUserOp,
             @ApiParam(value = "注册日期（起始日期，大于等于条件）", example = "2026-01-01") @RequestParam(value = "registerDatetime", required = false) String registerDatetime,
             @ApiParam(value = "注册日期运算符") @RequestParam(value = "registerDatetimeOp", required = false) String registerDatetimeOp) {
-        log.info("收到UD20获取文档列表请求");
 
         // 4.2 封装请求参数
         UD20GetDocumentListRequest request = new UD20GetDocumentListRequest();
@@ -74,10 +73,6 @@ public class UD20GetDocumentListController {
 
         // 4.3 调用Service层处理业务逻辑
         UD20GetDocumentListResponse response = ud20Service.getDocumentList(request);
-
-        log.info("返回响应，code: {}, 数据条数: {}",
-                response.getCode(),
-                response.getData() != null ? response.getData().size() : 0);
 
         return response;
     }

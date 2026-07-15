@@ -31,12 +31,10 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
 
     @Override
     public UD06SaveModificationsResponse UD06SelectHdocAdcaModification(UD06SaveModificationsRequest request) {
-        log.info("开始UD06查询，request: {}", request);
 
         try {
             String validationError = validateRequest(request);
             if (validationError != null) {
-                log.warn("UD06查询参数验证失败: {}", validationError);
                 return UD06SaveModificationsResponse.error(400, validationError);
             }
 
@@ -47,8 +45,6 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
                     request.getVariables());
 
             if (voList == null || voList.isEmpty()) {
-                log.warn("UD06查询未找到记录，chassisSerie: {}, chassisNo: {}, variables: {}",
-                        request.getChassisSerie(), request.getChassisNo(), request.getVariables());
                 return UD06SaveModificationsResponse.error(404, "Record not found.");
             }
 
@@ -62,7 +58,6 @@ public class UD06SaveModificationsServiceImpl implements UD06SaveModificationsSe
 
             return UD06SaveModificationsResponse.success(data);
         } catch (Exception e) {
-            log.error("UD06查询失败", e);
             return UD06SaveModificationsResponse.error(500, "System error. Please try again later.");
         }
     }

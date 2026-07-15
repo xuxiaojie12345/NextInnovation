@@ -29,12 +29,10 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD16ADChangeResponse addChange(UD16ADChangeRequest request) {
-        log.info("开始UD16添加AD/CA变更, serie: {}, chnr: {}, desc: {}",
-                request.getSerie(), request.getChnr(), request.getDesc());
         try {
-            if (request.getSerie() == null || request.getSerie().trim().isEmpty()
-                    || request.getChnr() == null || request.getChnr().trim().isEmpty()) {
-                return UD16ADChangeResponse.error(400, "系列和底盘号不能为空");
+            String validationError = validateSerieChnr(request);
+            if (validationError != null) {
+                return UD16ADChangeResponse.error(400, validationError);
             }
 
             // 检查记录是否存在
@@ -43,8 +41,6 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
 
             if (existing != null) {
                 // 记录已存在时，无论ACT状态如何，都返回409，前端弹框后结束处理
-                log.warn("UD16添加AD/CA变更 - 记录已存在, serie: {}, chnr: {}",
-                        request.getSerie(), request.getChnr());
                 return UD16ADChangeResponse.error(409, "AFTER DEF CHANGE IS NOT ACTIVATED");
             } else {
                 // 不存在则插入新记录
@@ -69,7 +65,6 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
 
             return UD16ADChangeResponse.success("添加成功", null);
         } catch (Exception e) {
-            log.error("UD16添加AD/CA变更失败", e);
             return UD16ADChangeResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -77,18 +72,16 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD16ADChangeResponse deleteChange(UD16ADChangeRequest request) {
-        log.info("开始UD16删除AD/CA变更, serie: {}, chnr: {}", request.getSerie(), request.getChnr());
         try {
-            if (request.getSerie() == null || request.getSerie().trim().isEmpty()
-                    || request.getChnr() == null || request.getChnr().trim().isEmpty()) {
-                return UD16ADChangeResponse.error(400, "系列和底盘号不能为空");
+            String validationError = validateSerieChnr(request);
+            if (validationError != null) {
+                return UD16ADChangeResponse.error(400, validationError);
             }
 
             // 检查记录是否存在
             HdocAdcaChange existing = ud16Mapper.selectAdcaChange(
                     request.getSerie().trim(), request.getChnr().trim());
             if (existing == null) {
-                log.warn("UD16删除AD/CA变更 - 记录不存在");
                 return UD16ADChangeResponse.error(404, "记录不存在");
             }
 
@@ -101,18 +94,16 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
 
             return UD16ADChangeResponse.success("删除成功", null);
         } catch (Exception e) {
-            log.error("UD16删除AD/CA变更失败", e);
             return UD16ADChangeResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD16ADChangeResponse checkChange(UD16ADChangeRequest request) {
-        log.info("开始UD16检查AD/CA变更, serie: {}, chnr: {}", request.getSerie(), request.getChnr());
         try {
-            if (request.getSerie() == null || request.getSerie().trim().isEmpty()
-                    || request.getChnr() == null || request.getChnr().trim().isEmpty()) {
-                return UD16ADChangeResponse.error(400, "系列和底盘号不能为空");
+            String validationError = validateSerieChnr(request);
+            if (validationError != null) {
+                return UD16ADChangeResponse.error(400, validationError);
             }
 
             // 查询记录是否存在
@@ -120,7 +111,6 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
                     request.getSerie().trim(), request.getChnr().trim());
 
             if (existing == null) {
-                log.warn("UD16检查AD/CA变更 - 记录不存在");
                 return UD16ADChangeResponse.error(404, "记录不存在");
             }
 
@@ -130,8 +120,15 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
             resultData.put("act", existing.getAct());
             return UD16ADChangeResponse.success("对应的数据存在", resultData);
         } catch (Exception e) {
-            log.error("UD16检查AD/CA变更失败", e);
             return UD16ADChangeResponse.error(500, "系统繁忙，请稍后重试");
         }
+    }
+
+    private String validateSerieChnr(UD16ADChangeRequest request) {
+        if (request.getSerie() == null || request.getSerie().trim().isEmpty()
+                || request.getChnr() == null || request.getChnr().trim().isEmpty()) {
+            return "系列和底盘号不能为空";
+        }
+        return null;
     }
 }

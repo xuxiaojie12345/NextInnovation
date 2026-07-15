@@ -34,20 +34,16 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
 
     @Override
     public UD05ModifyDocumentResponse UD05SelectVariableModification(UD05ModifyDocumentRequest request) {
-        log.info("开始UD05查询，request: {}", request);
 
         try {
             String validationError = validateSelectRequest(request);
             if (validationError != null) {
-                log.warn("UD05查询参数验证失败: {}", validationError);
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
             List<UD05ModifyDocumentVO> voList = ud05Mapper.selectVariableModification(request.getChassisSerie(),
                     request.getChassisNo());
             if (voList == null || voList.isEmpty()) {
-                log.warn("UD05查询未找到记录，chassisSerie: {}, chassisNo: {}", request.getChassisSerie(),
-                        request.getChassisNo());
                 return UD05ModifyDocumentResponse.error(404, "Record not found.");
             }
 
@@ -65,7 +61,6 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
 
             return UD05ModifyDocumentResponse.success(dataList);
         } catch (Exception e) {
-            log.error("UD05查询失败", e);
             return UD05ModifyDocumentResponse.error(500, "System error. Please try again later.");
         }
     }
@@ -73,12 +68,10 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
     @Override
     @Transactional
     public UD05ModifyDocumentResponse UD05UpdateHdocAdcaModification(UD05ModifyDocumentUpdateRequest request) {
-        log.info("开始UD05更新，request: {}", request);
 
         try {
             String validationError = validateUpdateRequest(request);
             if (validationError != null) {
-                log.warn("UD05更新参数验证失败: {}", validationError);
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
@@ -94,15 +87,12 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 // 获取登录用户ID，用于记录更新人
                 String user = request.getUserId();
                 if (!StringUtils.hasText(user)) {
-                    log.warn("UD05更新缺少userId");
                     return UD05ModifyDocumentResponse.error(400, "User ID is required.");
                 }
 
                 int updatedRows = ud05Mapper.updateHdocAdcaModificationByVariable(
                         request.getChassisSerie(), request.getChassisNo(), variable, currentValue, modifiedValue, user);
                 if (updatedRows <= 0) {
-                    log.warn("UD05更新未修改任何记录，chassisSerie: {}, chassisNo: {}, variable: {}, currentValue: {}",
-                            request.getChassisSerie(), request.getChassisNo(), variable, currentValue);
                     throw new RuntimeException("Update failed for variable: " + variable);
                 }
                 totalUpdated += updatedRows;
@@ -113,7 +103,6 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
             }
             return UD05ModifyDocumentResponse.successNoData("Update successful");
         } catch (Exception e) {
-            log.error("UD05更新失败", e);
             return UD05ModifyDocumentResponse.error(500, "System error. Please try again later.");
         }
     }

@@ -74,19 +74,13 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
             if (exitCode == 0) {
                 authenticated = true;
-                log.info("UD12文件服务器认证成功: {}", serverShare);
-            } else {
-                String errorMsg = new String(process.getErrorStream().readAllBytes());
-                log.warn("UD12文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
             }
         } catch (Exception e) {
-            log.error("UD12文件服务器认证失败", e);
         }
     }
 
     @Override
     public UD12UploadDeletetemplatResponse selectMarket() {
-        log.info("开始UD12查询市场列表");
         try {
             List<MarketMaster> list = ud12Mapper.selectAllMarket();
             List<UD12UploadDeletetemplatResponse.MarketData> dataList = new ArrayList<>();
@@ -95,10 +89,8 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
                     dataList.add(new UD12UploadDeletetemplatResponse.MarketData(mm.getMarket()));
                 }
             }
-            log.info("UD12查询市场列表成功，共 {} 条", dataList.size());
             return UD12UploadDeletetemplatResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD12查询市场列表失败", e);
             return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -106,7 +98,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     @Override
     public UD12UploadDeletetemplatResponse uploadFile(MultipartFile file, String market) {
         authenticateIfNeeded();
-        log.info("开始UD12上传文件, market: {}, fileName: {}", market, file.getOriginalFilename());
         try {
             String originalFilename = file.getOriginalFilename();
 
@@ -116,14 +107,12 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             if (!directory.exists()) {
                 boolean created = directory.mkdirs();
                 if (!created) {
-                    log.error("UD12上传文件失败 - 无法创建目录: {}", marketDir);
                     return UD12UploadDeletetemplatResponse.error(500,
                             "无法创建目录，请确认服务器共享路径可访问: " + marketDir);
                 }
             }
             // 确认目录有写权限
             if (!directory.canWrite()) {
-                log.error("UD12上传文件失败 - 目录无写入权限: {}", marketDir);
                 return UD12UploadDeletetemplatResponse.error(500,
                         "目录无写入权限，请检查共享路径权限: " + marketDir);
             }
@@ -140,13 +129,10 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
             String msg = "TEMPLATE " + originalFilename + " WAS SUCESSFULLY UPLOADED TO MARKET " + market.trim();
 
-            log.info("UD12上传文件成功, path: {}", serverPath);
             return UD12UploadDeletetemplatResponse.success(msg, uploadData);
         } catch (IOException e) {
-            log.error("UD12上传文件IO异常", e);
             return UD12UploadDeletetemplatResponse.error(500, "文件上传失败，请稍后重试");
         } catch (Exception e) {
-            log.error("UD12上传文件失败", e);
             return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -154,7 +140,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     @Override
     public UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request) {
         authenticateIfNeeded();
-        log.info("开始UD12删除文件, market: {}, template: {}", request.getMarket(), request.getTemplate());
         try {
             // 构建文件路径
             String filePath = uploadFolder + File.separator + request.getMarket().trim()
@@ -163,14 +148,12 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
             // 检查文件是否存在
             if (!file.exists()) {
-                log.warn("UD12删除文件失败 - 文件不存在, path: {}", filePath);
                 return UD12UploadDeletetemplatResponse.error(404, "文件不存在");
             }
 
             // 删除文件
             boolean deleted = file.delete();
             if (!deleted) {
-                log.warn("UD12删除文件失败 - 文件删除操作失败, path: {}", filePath);
                 return UD12UploadDeletetemplatResponse.error(500, "文件删除失败");
             }
 
@@ -180,10 +163,8 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             String msg = "TEMPLATE " + request.getTemplate().trim()
                     + " WAS SUCESSFULLY DELETE FROM MARKET " + request.getMarket().trim();
 
-            log.info("UD12删除文件成功");
             return UD12UploadDeletetemplatResponse.success(msg, deleteData);
         } catch (Exception e) {
-            log.error("UD12删除文件失败", e);
             return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -191,7 +172,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     @Override
     public UD12UploadDeletetemplatResponse getTemplateList(String market) {
         authenticateIfNeeded();
-        log.info("开始UD12查询模板文件列表, market: {}", market);
         try {
             // 构建market文件夹路径
             String marketDirPath = uploadFolder + File.separator + market.trim();
@@ -199,7 +179,6 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
 
             // 检查文件夹是否存在
             if (!marketDir.exists() || !marketDir.isDirectory()) {
-                log.warn("UD12市场文件夹不存在: {}", marketDirPath);
                 return UD12UploadDeletetemplatResponse.success("查询成功", new ArrayList<>());
             }
 
@@ -214,10 +193,8 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
                         .collect(Collectors.toList());
             }
 
-            log.info("UD12查询模板文件列表成功，共 {} 个文件", fileNames.size());
             return UD12UploadDeletetemplatResponse.success("查询成功", fileNames);
         } catch (Exception e) {
-            log.error("UD12查询模板文件列表失败", e);
             return UD12UploadDeletetemplatResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

@@ -40,24 +40,19 @@ public class UD20GetDocumentListServiceImpl implements UD20GetDocumentListServic
      */
     @Override
     public UD20GetDocumentListResponse getDocumentList(UD20GetDocumentListRequest request) {
-        log.info("开始查询文档列表, request: {}", request);
 
         try {
             // 4.5 通过数据访问层查询数据库（动态SQL）
             List<UD20GetDocumentListResponse.DocumentData> documentList = ud20Mapper.selectDocumentList(request);
 
             if (documentList == null || documentList.isEmpty()) {
-                log.warn("未查询到任何文档数据");
                 return UD20GetDocumentListResponse.success("success", documentList);
             }
-
-            log.info("查询成功，共找到 {} 条文档记录", documentList.size());
 
             // 4.6 封装响应对象
             return UD20GetDocumentListResponse.success("success", documentList);
 
         } catch (Exception e) {
-            log.error("查询文档列表失败", e);
             return UD20GetDocumentListResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

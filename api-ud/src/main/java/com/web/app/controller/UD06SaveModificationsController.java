@@ -39,12 +39,9 @@ public class UD06SaveModificationsController {
             @ApiParam(value = "底盘系列", required = true, example = "JPCT") @RequestParam("chassisSerie") String chassisSerie,
             @ApiParam(value = "底盘编号", required = true, example = "028321") @RequestParam("chassisNo") String chassisNo) {
 
-        log.info("收到UD06查询请求(GET)，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
-
         final UD06SaveModificationsRequest request = new UD06SaveModificationsRequest();
         UD06SaveModificationsResponse response = ud06Service.UD06SelectHdocAdcaModification(request);
 
-        log.info("UD06查询返回，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 
@@ -53,11 +50,8 @@ public class UD06SaveModificationsController {
     public UD06SaveModificationsResponse postSaveModifications(
             @RequestBody UD06SaveModificationsRequest request) {
 
-        log.info("收到UD06查询请求(POST)，request: {}", request);
-
         UD06SaveModificationsResponse response = ud06Service.UD06SelectHdocAdcaModification(request);
 
-        log.info("UD06查询返回，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 }

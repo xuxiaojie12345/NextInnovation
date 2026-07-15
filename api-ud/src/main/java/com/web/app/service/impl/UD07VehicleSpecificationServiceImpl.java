@@ -32,19 +32,16 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
 
     @Override
     public UD07VehicleSpecificationResponse getHdocRecDataVdaKolaGeneral(UD07VehicleSpecificationRequest request) {
-        log.info("开始UD07查询，request: {}", request);
 
         try {
             String validationError = validateRequest(request);
             if (validationError != null) {
-                log.warn("UD07查询参数验证失败: {}", validationError);
                 return UD07VehicleSpecificationResponse.error(400, validationError);
             }
 
             List<UD07VehicleSpecificationVO> voList = ud07Mapper.selectVehicleSpecification(request.getSerie(),
                     request.getChno());
             if (voList == null || voList.isEmpty()) {
-                log.warn("UD07查询未找到记录，serie: {}, chno: {}", request.getSerie(), request.getChno());
                 return UD07VehicleSpecificationResponse.error(404, "Record not found.");
             }
             // 取第一条数据作为主数据
@@ -98,7 +95,6 @@ public class UD07VehicleSpecificationServiceImpl implements UD07VehicleSpecifica
 
             return UD07VehicleSpecificationResponse.success(data);
         } catch (Exception e) {
-            log.error("UD07查询失败", e);
             return UD07VehicleSpecificationResponse.error(500, "System error. Please try again later.");
         }
     }

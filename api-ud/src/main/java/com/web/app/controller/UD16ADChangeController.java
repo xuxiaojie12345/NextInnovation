@@ -32,7 +32,6 @@ public class UD16ADChangeController {
     @PostMapping("/addchange")
     @ApiOperation(value = "添加AD/CA变更", notes = "新增或更新AD/CA变更记录（ACT='Y'）")
     public ResponseEntity<UD16ADChangeResponse> addChange(@RequestBody UD16ADChangeRequest request) {
-        log.info("收到UD16添加AD/CA变更请求, serie: {}, chnr: {}", request.getSerie(), request.getChnr());
         UD16ADChangeResponse response = ud16Service.addChange(request);
         HttpStatus httpStatus = (response.getCode() != null && response.getCode() >= 400)
                 ? HttpStatus.valueOf(response.getCode())
@@ -43,7 +42,6 @@ public class UD16ADChangeController {
     @DeleteMapping("/deletechange")
     @ApiOperation(value = "删除AD/CA变更", notes = "删除AD/CA变更记录（ACT='U'）")
     public ResponseEntity<UD16ADChangeResponse> deleteChange(@RequestBody UD16ADChangeRequest request) {
-        log.info("收到UD16删除AD/CA变更请求, serie: {}, chnr: {}", request.getSerie(), request.getChnr());
         UD16ADChangeResponse response = ud16Service.deleteChange(request);
         HttpStatus httpStatus = (response.getCode() != null && response.getCode() >= 400)
                 ? HttpStatus.valueOf(response.getCode())
@@ -56,7 +54,6 @@ public class UD16ADChangeController {
     public ResponseEntity<UD16ADChangeResponse> checkChange(
             @RequestParam("serie") String serie,
             @RequestParam("chnr") String chnr) {
-        log.info("收到UD16检查AD/CA变更请求, serie: {}, chnr: {}", serie, chnr);
         UD16ADChangeRequest request = new UD16ADChangeRequest();
         request.setSerie(serie);
         request.setChnr(chnr);

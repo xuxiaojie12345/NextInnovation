@@ -31,7 +31,6 @@ public class UD19SearchResultListController {
     @GetMapping("/getmarket")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD19SearchResultListResponse getMarket() {
-        log.info("收到UD19查询市场列表请求");
         return ud19Service.getMarket();
     }
 
@@ -42,7 +41,7 @@ public class UD19SearchResultListController {
             @ApiParam(value = "用户名", example = "John") @RequestParam(value = "username", required = false) String username,
             @ApiParam(value = "市场", example = "JP") @RequestParam(value = "market", required = false) String market,
             @ApiParam(value = "类型", example = "Standard User") @RequestParam(value = "type", required = false) String type) {
-        log.info("收到UD19搜索用户请求");
+
         UD19SearchResultListRequest request = new UD19SearchResultListRequest();
         request.setUserId(userId);
         request.setUsername(username);

@@ -47,24 +47,18 @@ public class UD04SelectGeneratedocumentController {
      * 4. 返回标准响应格式
      * 
      * @param chassisSerie 底盘系列（必填，最大5字符，半角英数字）
-     * @param chassisNo 底盘编号（必填，最大10字符，半角数字）
+     * @param chassisNo    底盘编号（必填，最大10字符，半角数字）
      * @return UD04SelectGeneratedocumentResponse 响应对象
      */
     @GetMapping("/getdocumentdata")
     @ApiOperation(value = "获取生成文档数据", notes = "根据底盘系列和底盘编号查询生成文档所需的数据")
     public UD04SelectGeneratedocumentResponse getDocumentData(
-            @ApiParam(value = "底盘系列", required = true, example = "ABC12")
-            @RequestParam("chassisSerie") String chassisSerie,
-            
-            @ApiParam(value = "底盘编号", required = true, example = "1234567890")
-            @RequestParam("chassisNo") String chassisNo) {
-        
-        log.info("收到获取生成文档数据的请求，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
+            @ApiParam(value = "底盘系列", required = true, example = "ABC12") @RequestParam("chassisSerie") String chassisSerie,
+
+            @ApiParam(value = "底盘编号", required = true, example = "1234567890") @RequestParam("chassisNo") String chassisNo) {
 
         // 4.3 调用Service层处理业务逻辑
         UD04SelectGeneratedocumentResponse response = ud04Service.getUD04GenerateDocumentData(chassisSerie, chassisNo);
-
-        log.info("返回响应，code: {}, msg: {}", response.getCode(), response.getMsg());
 
         return response;
     }

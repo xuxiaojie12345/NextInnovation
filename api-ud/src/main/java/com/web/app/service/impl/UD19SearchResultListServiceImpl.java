@@ -30,7 +30,6 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
 
     @Override
     public UD19SearchResultListResponse getMarket() {
-        log.info("开始UD19查询市场列表");
         try {
             List<MarketMaster> list = ud19Mapper.selectAllMarket();
             List<UD19SearchResultListResponse.MarketData> dataList = new ArrayList<>();
@@ -40,17 +39,14 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
                             mm.getMarket(), mm.getDescription()));
                 }
             }
-            log.info("UD19查询市场列表成功，共 {} 条", dataList.size());
             return UD19SearchResultListResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD19查询市场列表失败", e);
             return UD19SearchResultListResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD19SearchResultListResponse search(UD19SearchResultListRequest request) {
-        log.info("开始UD19搜索用户, request: {}", request);
         try {
             List<UD19SearchResultListResponse.UserData> userList = ud19Mapper.searchUsers(
                     request.getUserId(),
@@ -59,7 +55,6 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
                     request.getType());
 
             if (userList == null || userList.isEmpty()) {
-                log.warn("UD19搜索用户 - 未找到数据");
                 return UD19SearchResultListResponse.error(404, "未找到匹配的用户");
             }
 
@@ -67,10 +62,8 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
             resultData.setCount(userList.size());
             resultData.setDatatable(userList);
 
-            log.info("UD19搜索用户成功，共 {} 条", userList.size());
             return UD19SearchResultListResponse.success("查询成功", resultData);
         } catch (Exception e) {
-            log.error("UD19搜索用户失败", e);
             return UD19SearchResultListResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

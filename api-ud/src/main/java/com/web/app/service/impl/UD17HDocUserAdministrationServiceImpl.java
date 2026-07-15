@@ -68,10 +68,10 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
 
     @Override
     public UD17HDocUserAdministrationResponse userInfo(UD17HDocUserAdministrationRequest request) {
-        log.info("开始UD17查询用户权限信息, userid: {}", request.getUserid());
         try {
-            if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
-                return UD17HDocUserAdministrationResponse.error("400", "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD17HDocUserAdministrationResponse.error("400", validationError);
             }
 
             String userid = request.getUserid().trim();
@@ -80,7 +80,6 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
             // 对应全体API設計 4.1 - "先根据UserID查询用户HDOC_USER_INFOR表中是否存在"
             String userName = ud17Mapper.selectUserNameByUserid(userid);
             if (userName == null) {
-                log.warn("UD17查询用户权限信息 - 用户不存在, userid: {}", userid);
                 return UD17HDocUserAdministrationResponse.error("404", "用户不存在");
             }
 
@@ -99,10 +98,8 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
                 }
             }
 
-            log.info("UD17查询用户权限信息成功, userName: {}", userName);
             return UD17HDocUserAdministrationResponse.success(userid, userName, authList);
         } catch (Exception e) {
-            log.error("UD17查询用户权限信息失败", e);
             return UD17HDocUserAdministrationResponse.error("500", "系统繁忙，请稍后重试");
         }
     }
@@ -110,10 +107,10 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD17HDocUserAdministrationResponse updateRole(UD17HDocUserAdministrationRequest request) {
-        log.info("开始UD17更新用户角色权限, userid: {}", request.getUserid());
         try {
-            if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
-                return UD17HDocUserAdministrationResponse.error("400", "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD17HDocUserAdministrationResponse.error("400", validationError);
             }
 
             String userid = request.getUserid().trim();
@@ -121,7 +118,6 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
             // 检查用户是否存在于HDOC_USER_INFOR表
             String userName = ud17Mapper.selectUserNameByUserid(userid);
             if (userName == null) {
-                log.warn("UD17更新用户角色权限 - 用户不存在, userid: {}", userid);
                 return UD17HDocUserAdministrationResponse.error("404", "用户不存在");
             }
 
@@ -130,23 +126,15 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
             ud17Mapper.deleteMarketAuthByUserid(userid);
 
             // 然后再插入新数据
-            // 对应全体API設計 5.33, 5.34
-            // functionAuths格式：[{ function: "Standard User", market: "-EU" }, ...]
             List<UD17HDocUserAdministrationRequest.FunctionAuthItem> authList = request.getFunctionAuths();
-            log.info("UD17 functionAuths列表大小: {}", authList != null ? authList.size() : "null");
             if (authList != null && !authList.isEmpty()) {
                 String registerUser = userid;
                 String updateUser = userid;
 
                 // 用于记录已插入HDOC_FUNCTION_AUTH的FUNCTION值，避免主键重复
-                // 例如Manage Variable List和Market Super User都映射为"market super user"
                 Set<String> insertedFunctions = new HashSet<>();
 
-                int index = 0;
                 for (UD17HDocUserAdministrationRequest.FunctionAuthItem item : authList) {
-                    log.info("UD17插入第{}项: function={}, market={}",
-                            ++index, item.getFunction(), item.getMarket());
-
                     // 插入机能权限 - 对应 5.33（跳过重复FUNCTION避免主键冲突）
                     if (!insertedFunctions.contains(item.getFunction())) {
                         ud17Mapper.insertFunctionAuth(
@@ -154,9 +142,6 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
                                 registerUser, REGISTER_PROCESS,
                                 updateUser, UPDATE_PROCESS);
                         insertedFunctions.add(item.getFunction());
-                        log.info("UD17 insertFunctionAuth成功: function={}", item.getFunction());
-                    } else {
-                        log.info("UD17 FUNCTION重复跳过insertFunctionAuth: function={}", item.getFunction());
                     }
 
                     // 插入市场权限 - 对应 5.34（market为空时不插入）
@@ -167,20 +152,12 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
                                 userid, item.getMarket(), typeCode,
                                 registerUser, REGISTER_PROCESS,
                                 updateUser, UPDATE_PROCESS);
-                        log.info("UD17 insertMarketAuth成功: market={}, function={}, typeCode={}",
-                                item.getMarket(), item.getFunction(), typeCode);
-                    } else {
-                        log.info("UD17 market为空跳过insertMarketAuth: function={}", item.getFunction());
                     }
                 }
             } else {
-                log.warn("UD17 functionAuths为空，未执行任何插入操作");
             }
-
-            log.info("UD17更新用户角色权限成功");
             return UD17HDocUserAdministrationResponse.updateSuccess("用户权限更新成功");
         } catch (Exception e) {
-            log.error("UD17更新用户角色权限失败", e);
             return UD17HDocUserAdministrationResponse.error("500", "系统繁忙，请稍后重试");
         }
     }
@@ -188,10 +165,10 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD17HDocUserAdministrationResponse deleteUser(UD17HDocUserAdministrationRequest request) {
-        log.info("开始UD17删除用户权限, userid: {}", request.getUserid());
         try {
-            if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
-                return UD17HDocUserAdministrationResponse.error("400", "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD17HDocUserAdministrationResponse.error("400", validationError);
             }
 
             String userid = request.getUserid().trim();
@@ -199,7 +176,6 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
             // 检查用户是否存在于HDOC_USER_INFOR表
             String userName = ud17Mapper.selectUserNameByUserid(userid);
             if (userName == null) {
-                log.warn("UD17删除用户权限 - 用户不存在, userid: {}", userid);
                 return UD17HDocUserAdministrationResponse.error("404", "用户不存在");
             }
 
@@ -207,11 +183,16 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
             ud17Mapper.deleteUserFunctionAuth(userid);
             ud17Mapper.deleteUserMarketAuth(userid);
 
-            log.info("UD17删除用户权限成功");
             return UD17HDocUserAdministrationResponse.updateSuccess("用户权限删除成功");
         } catch (Exception e) {
-            log.error("UD17删除用户权限失败", e);
             return UD17HDocUserAdministrationResponse.error("500", "系统繁忙，请稍后重试");
         }
+    }
+
+    private String validateUserId(UD17HDocUserAdministrationRequest request) {
+        if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {
+            return "用户ID不能为空";
+        }
+        return null;
     }
 }

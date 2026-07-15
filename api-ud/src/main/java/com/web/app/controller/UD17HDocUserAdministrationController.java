@@ -32,7 +32,6 @@ public class UD17HDocUserAdministrationController {
     @ApiOperation(value = "获取用户权限信息", notes = "根据用户ID查询用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse userInfo(
             @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
-        log.info("收到UD17查询用户权限信息请求, userId: {}", userId);
         UD17HDocUserAdministrationRequest request = new UD17HDocUserAdministrationRequest();
         request.setUserid(userId);
         return ud17Service.userInfo(request);
@@ -41,14 +40,12 @@ public class UD17HDocUserAdministrationController {
     @PutMapping("/updaterole")
     @ApiOperation(value = "更新用户角色权限", notes = "更新用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse updateRole(@RequestBody UD17HDocUserAdministrationRequest request) {
-        log.info("收到UD17更新用户角色权限请求, userid: {}", request.getUserid());
         return ud17Service.updateRole(request);
     }
 
     @PostMapping("/deleteuser")
     @ApiOperation(value = "删除用户权限", notes = "删除用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse deleteUser(@RequestBody UD17HDocUserAdministrationRequest request) {
-        log.info("收到UD17删除用户权限请求, userid: {}", request.getUserid());
         return ud17Service.deleteUser(request);
     }
 }

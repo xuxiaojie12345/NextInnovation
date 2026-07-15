@@ -53,13 +53,11 @@ public class UD20MarketDocumentSettingsController {
     @ApiOperation(value = "更新文档列表", notes = "根据 DOCTYPE 更新 HDOC_DOCUMENT_LIST 表的 REGISTER_USER 和 REGISTER_DATETIME")
     public UD20MarketDocumentSettingsResponse updateDocument(
             @ApiParam(value = "更新请求", required = true) @RequestBody UD20MarketDocumentSettingsRequest request) {
-        log.info("收到UD20-1更新文档列表请求, doctype: {}", request.getDoctype());
 
         // 4.2 接收前端请求，通过 Request 对象封装并校验请求参数
         // 4.3 调用 Service 层处理业务逻辑
         UD20MarketDocumentSettingsResponse response = ud201Service.updateDocument(request);
 
-        log.info("返回响应，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 }

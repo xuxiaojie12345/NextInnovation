@@ -29,16 +29,15 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD10HdocvariablesResponse addVariable(UD10HdocvariablesRequest request) {
-        log.info("开始UD10新增变量, variable: {}", request.getVariable());
         try {
-            if (!StringUtils.hasText(request.getVariable())) {
-                return UD10HdocvariablesResponse.error(400, "变量名不能为空");
+            String validationError = validateVariable(request);
+            if (validationError != null) {
+                return UD10HdocvariablesResponse.error(400, validationError);
             }
 
             // 检查变量是否已存在
             Integer count = ud10Mapper.countByVariable(request.getVariable().trim());
             if (count != null && count > 0) {
-                log.warn("UD10新增变量失败 - 变量已存在: {}", request.getVariable());
                 return UD10HdocvariablesResponse.error(409,
                         "Variant already exists. Please enter the correct content.");
             }
@@ -53,10 +52,8 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
                     user,
                     user);
 
-            log.info("UD10新增变量成功: {}", request.getVariable());
             return UD10HdocvariablesResponse.success("添加成功");
         } catch (Exception e) {
-            log.error("UD10新增变量失败", e);
             return UD10HdocvariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -64,16 +61,15 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD10HdocvariablesResponse updateVariable(UD10HdocvariablesRequest request) {
-        log.info("开始UD10更新变量, variable: {}", request.getVariable());
         try {
-            if (!StringUtils.hasText(request.getVariable())) {
-                return UD10HdocvariablesResponse.error(400, "变量名不能为空");
+            String validationError = validateVariable(request);
+            if (validationError != null) {
+                return UD10HdocvariablesResponse.error(400, validationError);
             }
 
             // 检查变量是否存在
             Integer count = ud10Mapper.countByVariable(request.getVariable().trim());
             if (count == null || count == 0) {
-                log.warn("UD10更新变量失败 - 变量不存在: {}", request.getVariable());
                 return UD10HdocvariablesResponse.error(404,
                         "Variant does not exists. Please enter the correct content.");
             }
@@ -86,10 +82,8 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
                     request.getDescription(),
                     user);
 
-            log.info("UD10更新变量成功: {}", request.getVariable());
             return UD10HdocvariablesResponse.success("更新成功");
         } catch (Exception e) {
-            log.error("UD10更新变量失败", e);
             return UD10HdocvariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -97,27 +91,31 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD10HdocvariablesResponse deleteVariable(UD10HdocvariablesRequest request) {
-        log.info("开始UD10删除变量, variable: {}", request.getVariable());
         try {
-            if (!StringUtils.hasText(request.getVariable())) {
-                return UD10HdocvariablesResponse.error(400, "变量名不能为空");
+            String validationError = validateVariable(request);
+            if (validationError != null) {
+                return UD10HdocvariablesResponse.error(400, validationError);
             }
 
             // 检查变量是否存在
             Integer count = ud10Mapper.countByVariable(request.getVariable().trim());
             if (count == null || count == 0) {
-                log.warn("UD10删除变量失败 - 变量不存在: {}", request.getVariable());
                 return UD10HdocvariablesResponse.error(404,
                         "Variant does not exists. Please enter the correct content.");
             }
 
             ud10Mapper.deleteVariable(request.getVariable().trim());
 
-            log.info("UD10删除变量成功: {}", request.getVariable());
             return UD10HdocvariablesResponse.success("删除成功");
         } catch (Exception e) {
-            log.error("UD10删除变量失败", e);
             return UD10HdocvariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
+    }
+
+    private String validateVariable(UD10HdocvariablesRequest request) {
+        if (!StringUtils.hasText(request.getVariable())) {
+            return "变量名不能为空";
+        }
+        return null;
     }
 }

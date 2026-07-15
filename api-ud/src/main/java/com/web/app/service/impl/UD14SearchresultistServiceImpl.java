@@ -48,7 +48,8 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
      * 认证文件服务器共享路径（懒加载，首次操作时调用）
      * 通过 net use 建立 UNC 路径的认证会话
      */
-    private synchronized void authenticateIfNeeded() {
+    @Override
+    public synchronized void authenticateIfNeeded() {
         if (authenticated)
             return;
         try {
@@ -69,19 +70,13 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
 
             if (exitCode == 0) {
                 authenticated = true;
-                log.info("UD14文件服务器认证成功: {}", serverShare);
-            } else {
-                String errorMsg = new String(process.getErrorStream().readAllBytes());
-                log.warn("UD14文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
             }
         } catch (Exception e) {
-            log.error("UD14文件服务器认证失败", e);
         }
     }
 
     @Override
     public UD14SearchresultistResponse selectMarketMaster() {
-        log.info("开始UD14查询市场列表");
         try {
             List<MarketMaster> list = ud14Mapper.selectAllMarket();
             List<UD14SearchresultistResponse.MarketData> dataList = new ArrayList<>();
@@ -90,17 +85,14 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
                     dataList.add(new UD14SearchresultistResponse.MarketData(mm.getMarket()));
                 }
             }
-            log.info("UD14查询市场列表成功，共 {} 条", dataList.size());
             return UD14SearchresultistResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD14查询市场列表失败", e);
             return UD14SearchresultistResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD14SearchresultistResponse selectUserDefinedRules(UD14SearchresultistRequest request) {
-        log.info("开始UD14查询用户定义规则变量, market: {}", request.getMarket());
         try {
             if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
                 return UD14SearchresultistResponse.error(400, "市场参数不能为空");
@@ -109,7 +101,6 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
             List<String> variableList = ud14Mapper.selectVariableByMarket(request.getMarket().trim());
 
             if (variableList == null || variableList.isEmpty()) {
-                log.warn("UD14查询用户定义规则变量 - 未找到数据, market: {}", request.getMarket());
                 return UD14SearchresultistResponse.error(404, "可能有记录不存在");
             }
 
@@ -118,10 +109,8 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
                 dataList.add(new UD14SearchresultistResponse.VariableData(var));
             }
 
-            log.info("UD14查询用户定义规则变量成功，共 {} 条", dataList.size());
             return UD14SearchresultistResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD14查询用户定义规则变量失败", e);
             return UD14SearchresultistResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -129,7 +118,6 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
     @Override
     public UD14SearchresultistResponse getMarketFiles(UD14SearchresultistRequest request) {
         authenticateIfNeeded();
-        log.info("开始UD14查询市场文件列表, market: {}", request.getMarket());
         try {
             if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
                 return UD14SearchresultistResponse.error(400, "市场参数不能为空");
@@ -142,7 +130,6 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
 
             // 检查文件夹是否存在
             if (!marketDir.exists() || !marketDir.isDirectory()) {
-                log.warn("UD14市场文件夹不存在: {}", marketDirPath);
                 return UD14SearchresultistResponse.error(404, "Market文件夹不存在");
             }
 
@@ -172,10 +159,8 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
                 }
             }
 
-            log.info("UD14查询市场文件列表成功，共 {} 个文件", fileDataList.size());
             return UD14SearchresultistResponse.success("查询成功", fileDataList);
         } catch (Exception e) {
-            log.error("UD14查询市场文件列表失败", e);
             return UD14SearchresultistResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

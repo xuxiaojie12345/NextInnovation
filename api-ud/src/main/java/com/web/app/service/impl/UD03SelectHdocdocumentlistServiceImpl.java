@@ -36,14 +36,12 @@ public class UD03SelectHdocdocumentlistServiceImpl implements UD03SelectHdocdocu
      */
     @Override
     public UD03SelectHdocdocumentlistResponse getHdocDocumentList() {
-        log.info("开始查询文档类型列表");
 
         try {
             // 4.5 通过数据访问层查询数据库
             List<String> doctypeList = ud03Mapper.selectDoctypeList();
 
             if (doctypeList == null || doctypeList.isEmpty()) {
-                log.warn("未查询到任何文档类型数据");
                 // 返回空列表，而不是错误
                 return UD03SelectHdocdocumentlistResponse.success(doctypeList);
             }
@@ -51,7 +49,6 @@ public class UD03SelectHdocdocumentlistServiceImpl implements UD03SelectHdocdocu
             return UD03SelectHdocdocumentlistResponse.success(doctypeList);
 
         } catch (Exception e) {
-            log.error("查询文档类型列表异常", e);
             // 返回错误响应
             return UD03SelectHdocdocumentlistResponse.error(500, "System error. Please try again later.");
         }

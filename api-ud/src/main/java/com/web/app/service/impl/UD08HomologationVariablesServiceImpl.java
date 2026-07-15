@@ -35,7 +35,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
 
     @Override
     public UD08HomologationVariablesResponse UD08SelectProductclassmaster() {
-        log.info("开始UD08查询产品类别列表");
         try {
             List<ProductClassMaster> list = ud08Mapper.selectAllProductClass();
             List<UD08HomologationVariablesResponse.ProductClassData> dataList = new ArrayList<>();
@@ -46,14 +45,12 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             }
             return UD08HomologationVariablesResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD08查询产品类别失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD08HomologationVariablesResponse UD08SelectMarketmaster() {
-        log.info("开始UD08查询市场列表");
         try {
             List<MarketMaster> list = ud08Mapper.selectAllMarket();
             List<UD08HomologationVariablesResponse.MarketData> dataList = new ArrayList<>();
@@ -64,14 +61,12 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             }
             return UD08HomologationVariablesResponse.success("查询成功", dataList);
         } catch (Exception e) {
-            log.error("UD08查询市场列表失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD08HomologationVariablesResponse UD08SelectHdocvariables(UD08HomologationVariablesRequest request) {
-        log.info("开始UD08检查HDOC变量是否存在, variables: {}", request.getVariables());
         try {
             if (request.getVariables() == null || request.getVariables().trim().isEmpty()) {
                 return UD08HomologationVariablesResponse.error(400, "参数variables不能为空");
@@ -83,7 +78,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             String msg = exists ? "数据存在" : "数据不存在";
             return UD08HomologationVariablesResponse.success(msg, data);
         } catch (Exception e) {
-            log.error("UD08检查HDOC变量失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -91,7 +85,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD08HomologationVariablesResponse UD08Add(UD08HomologationVariablesRequest request) {
-        log.info("开始UD08新增规则, request: {}", request);
         try {
             // 校验必填参数
             String validationError = validateRequiredPk(request);
@@ -103,8 +96,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             Integer count = ud08Mapper.countUserDefinedRule(
                     request.getProductClass(), request.getNumber(), request.getMarket());
             if (count != null && count > 0) {
-                log.warn("UD08新增规则失败 - 数据已存在, PC: {}, NUM: {}, MARKET: {}",
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 return UD08HomologationVariablesResponse.error(409,
                         "Primary key conflict, Please enter the correct content");
             }
@@ -113,10 +104,8 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             HdocUserDefinedRules rule = buildRuleFromRequest(request);
             ud08Mapper.insertUserDefinedRule(rule);
 
-            log.info("UD08新增规则成功");
             return UD08HomologationVariablesResponse.success("数据添加成功", "");
         } catch (Exception e) {
-            log.error("UD08新增规则失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -124,7 +113,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD08HomologationVariablesResponse UD08Update(UD08HomologationVariablesRequest request) {
-        log.info("开始UD08更新规则, request: {}", request);
         try {
             // 校验必填参数
             String validationError = validateRequiredPk(request);
@@ -150,9 +138,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             }
 
             if (pkChanged) {
-                log.warn("UD08更新规则失败 - 主键冲突, 原PK: ({},{},{}), 新PK: ({},{},{})",
-                        request.getOriginalProductClass(), request.getOriginalNumber(), request.getOriginalMarket(),
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 return UD08HomologationVariablesResponse.error(409,
                         "Primary key conflict, Please enter the correct content");
             }
@@ -161,8 +146,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             Integer count = ud08Mapper.countUserDefinedRule(
                     request.getProductClass(), request.getNumber(), request.getMarket());
             if (count == null || count == 0) {
-                log.warn("UD08更新规则失败 - 数据不存在, PC: {}, NUM: {}, MARKET: {}",
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 return UD08HomologationVariablesResponse.error(404,
                         "Data does not exist, Please enter the correct content");
             }
@@ -171,10 +154,8 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
             HdocUserDefinedRules rule = buildRuleFromRequest(request);
             ud08Mapper.updateUserDefinedRule(rule);
 
-            log.info("UD08更新规则成功");
             return UD08HomologationVariablesResponse.success("数据更新成功", null);
         } catch (Exception e) {
-            log.error("UD08更新规则失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -182,20 +163,16 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD08HomologationVariablesResponse UD08Delete(UD08HomologationVariablesRequest request) {
-        log.info("开始UD08删除规则, request: {}", request);
         try {
-            if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()
-                    || request.getNumber() == null || request.getMarket() == null
-                    || request.getMarket().trim().isEmpty()) {
-                return UD08HomologationVariablesResponse.error(400, "参数productClass、number、market不能为空");
+            String validationError = validateRequiredPk(request);
+            if (validationError != null) {
+                return UD08HomologationVariablesResponse.error(400, validationError);
             }
 
             // 检查数据是否存在
             Integer count = ud08Mapper.countUserDefinedRule(
                     request.getProductClass(), request.getNumber(), request.getMarket());
             if (count == null || count == 0) {
-                log.warn("UD08删除规则失败 - 数据不存在, PC: {}, NUM: {}, MARKET: {}",
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 return UD08HomologationVariablesResponse.error(404,
                         "Data does not exist, Please enter the correct content");
             }
@@ -205,7 +182,6 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
 
             return UD08HomologationVariablesResponse.success("数据删除成功", null);
         } catch (Exception e) {
-            log.error("UD08删除规则失败", e);
             return UD08HomologationVariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

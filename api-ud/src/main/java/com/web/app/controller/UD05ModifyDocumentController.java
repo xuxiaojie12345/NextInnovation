@@ -37,17 +37,12 @@ public class UD05ModifyDocumentController {
     @GetMapping("/selectmodifydocument")
     @ApiOperation(value = "查询修改文档变量", notes = "根据底盘系列和底盘编号查询文档变量修改数据")
     public UD05ModifyDocumentResponse selectModifyDocument(
-            @ApiParam(value = "底盘系列", required = true, example = "ABC12")
-            @RequestParam("chassisSerie") String chassisSerie,
-            @ApiParam(value = "底盘编号", required = true, example = "1234567890")
-            @RequestParam("chassisNo") String chassisNo) {
-
-        log.info("收到UD05查询请求，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
+            @ApiParam(value = "底盘系列", required = true, example = "ABC12") @RequestParam("chassisSerie") String chassisSerie,
+            @ApiParam(value = "底盘编号", required = true, example = "1234567890") @RequestParam("chassisNo") String chassisNo) {
 
         UD05ModifyDocumentRequest request = new UD05ModifyDocumentRequest(chassisSerie, chassisNo);
         UD05ModifyDocumentResponse response = ud05Service.UD05SelectVariableModification(request);
 
-        log.info("UD05查询返回，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 
@@ -56,13 +51,8 @@ public class UD05ModifyDocumentController {
     public UD05ModifyDocumentResponse updateModifyDocument(
             @RequestBody UD05ModifyDocumentUpdateRequest request) {
 
-        int itemCount = request.getModifiedItems() == null ? 0 : request.getModifiedItems().size();
-        log.info("收到UD05更新请求，chassisSerie: {}, chassisNo: {}, modifiedItemsCount: {}",
-                request.getChassisSerie(), request.getChassisNo(), itemCount);
-
         UD05ModifyDocumentResponse response = ud05Service.UD05UpdateHdocAdcaModification(request);
 
-        log.info("UD05更新返回，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 }

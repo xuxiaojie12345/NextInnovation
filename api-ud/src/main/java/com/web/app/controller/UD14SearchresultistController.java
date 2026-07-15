@@ -41,50 +41,9 @@ public class UD14SearchresultistController {
     @Value("${file.marketFolder}")
     private String marketFolder;
 
-    @Value("${file.fileServerUsername}")
-    private String fileServerUsername;
-
-    @Value("${file.fileServerPassword}")
-    private String fileServerPassword;
-
-    /** 认证是否已成功的标记 */
-    private boolean authenticated = false;
-
-    /**
-     * 认证文件服务器共享路径（懒加载，首次操作时调用）
-     */
-    private synchronized void authenticateIfNeeded() {
-        if (authenticated)
-            return;
-        try {
-            String normalized = marketFolder.replace('\\', '/');
-            String[] parts = normalized.split("/");
-            String serverShare = "\\\\" + parts[2] + "\\" + parts[3];
-
-            new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
-                    .start().waitFor();
-
-            Process process = new ProcessBuilder("cmd.exe", "/c",
-                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
-                    .start();
-            int exitCode = process.waitFor();
-
-            if (exitCode == 0) {
-                authenticated = true;
-                log.info("UD14文件服务器认证成功: {}", serverShare);
-            } else {
-                String errorMsg = new String(process.getErrorStream().readAllBytes());
-                log.warn("UD14文件服务器认证结果: exitCode={}, msg={}", exitCode, errorMsg);
-            }
-        } catch (Exception e) {
-            log.error("UD14文件服务器认证失败", e);
-        }
-    }
-
     @GetMapping("/market")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD14SearchresultistResponse getMarket() {
-        log.info("收到UD14查询市场列表请求");
         return ud14Service.selectMarketMaster();
     }
 
@@ -92,7 +51,6 @@ public class UD14SearchresultistController {
     @ApiOperation(value = "获取用户定义规则变量列表", notes = "根据市场查询HDOC_USER_DEFINED_RULES表中的变量列表")
     public UD14SearchresultistResponse getUserDefinedRules(
             @ApiParam(value = "市场", required = true, example = "JP") @RequestParam("market") String market) {
-        log.info("收到UD14查询用户定义规则变量请求, market: {}", market);
         UD14SearchresultistRequest request = new UD14SearchresultistRequest();
         request.setMarket(market);
         return ud14Service.selectUserDefinedRules(request);
@@ -110,7 +68,6 @@ public class UD14SearchresultistController {
     @ApiOperation(value = "获取市场文件列表", notes = "根据市场查询该Market文件夹下的所有文件信息")
     public UD14SearchresultistResponse getMarketFiles(
             @ApiParam(value = "市场", required = true, example = "AF") @RequestParam("market") String market) {
-        log.info("收到UD14查询市场文件列表请求, market: {}", market);
         UD14SearchresultistRequest request = new UD14SearchresultistRequest();
         request.setMarket(market);
         return ud14Service.getMarketFiles(request);
@@ -129,8 +86,7 @@ public class UD14SearchresultistController {
     public ResponseEntity<?> downloadFile(
             @ApiParam(value = "市场", required = true, example = "AF") @RequestParam("market") String market,
             @ApiParam(value = "文件名", required = true, example = "af_file.rtf") @RequestParam("filename") String filename) {
-        log.info("收到UD14下载文件请求, market: {}, filename: {}", market, filename);
-        authenticateIfNeeded();
+        ud14Service.authenticateIfNeeded();
 
         try {
             // 验证文件名合法性（防止路径遍历攻击）
@@ -145,7 +101,6 @@ public class UD14SearchresultistController {
 
             // 检查文件是否存在
             if (!file.exists() || !file.isFile()) {
-                log.warn("UD14下载文件不存在: {}", filePath);
                 return ResponseEntity.status(404)
                         .body(UD14SearchresultistResponse.error(404, "文件不存在"));
             }
@@ -160,8 +115,10 @@ public class UD14SearchresultistController {
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"" + encodedFilename + "\"")
                     .body(resource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500)
+                    .body(UD14SearchresultistResponse.error(500, e.getMessage()));
         } catch (Exception e) {
-            log.error("UD14文件下载失败", e);
             return ResponseEntity.status(500)
                     .body(UD14SearchresultistResponse.error(500, "文件下载失败"));
         }

@@ -32,7 +32,6 @@ public class UD12UploadDeletetemplatController {
     @GetMapping("/selectmarket")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD12UploadDeletetemplatResponse selectMarket() {
-        log.info("收到UD12查询市场列表请求");
         return ud12Service.selectMarket();
     }
 
@@ -41,7 +40,6 @@ public class UD12UploadDeletetemplatController {
     public UD12UploadDeletetemplatResponse uploadFile(
             @ApiParam(value = "RTF文件", required = true) @RequestParam("file") MultipartFile file,
             @ApiParam(value = "市场", required = true, example = "JP") @RequestParam("market") String market) {
-        log.info("收到UD12上传文件请求, market: {}, fileName: {}", market, file.getOriginalFilename());
         return ud12Service.uploadFile(file, market);
     }
 
@@ -49,7 +47,6 @@ public class UD12UploadDeletetemplatController {
     @ApiOperation(value = "获取模板文件列表", notes = "根据市场获取该Market文件夹下的所有模板文件名")
     public UD12UploadDeletetemplatResponse getTemplateList(
             @ApiParam(value = "市场", required = true, example = "AF") @RequestParam("market") String market) {
-        log.info("收到UD12查询模板文件列表请求, market: {}", market);
         return ud12Service.getTemplateList(market);
     }
 
@@ -58,7 +55,6 @@ public class UD12UploadDeletetemplatController {
     public UD12UploadDeletetemplatResponse deleteFile(
             @ApiParam(value = "市场", required = true, example = "JP") @RequestParam("market") String market,
             @ApiParam(value = "模板文件名", required = true, example = "template.rtf") @RequestParam("template") String template) {
-        log.info("收到UD12删除文件请求, market: {}, template: {}", market, template);
         UD12UploadDeletetemplatRequest request = new UD12UploadDeletetemplatRequest();
         request.setMarket(market);
         request.setTemplate(template);

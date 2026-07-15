@@ -32,12 +32,10 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
 
     @Override
     public UD09DeleteHdocuserdefinedrulesResponse searchRules(UD09DeleteHdocuserdefinedrulesRequest request) {
-        log.info("开始UD09搜索用户定义规则, request: {}", request);
         try {
             List<HdocUserDefinedRules> ruleList = ud09Mapper.searchUserDefinedRules(request);
 
             if (ruleList == null || ruleList.isEmpty()) {
-                log.warn("UD09搜索未找到匹配记录");
                 return UD09DeleteHdocuserdefinedrulesResponse.error(404, "数据不存在");
             }
 
@@ -61,7 +59,6 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
 
             return UD09DeleteHdocuserdefinedrulesResponse.success("", dataList);
         } catch (Exception e) {
-            log.error("UD09搜索用户定义规则失败", e);
             return UD09DeleteHdocuserdefinedrulesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -69,7 +66,6 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD09DeleteHdocuserdefinedrulesResponse deleteSelected(UD09DeleteHdocuserdefinedrulesRequest request) {
-        log.info("开始UD09批量删除规则, request: {}", request);
         try {
             // 校验必填参数
             if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()
@@ -82,18 +78,14 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
             Integer count = ud09Mapper.countUserDefinedRule(
                     request.getProductClass(), request.getNumber(), request.getMarket());
             if (count == null || count == 0) {
-                log.warn("UD09删除失败 - 数据不存在, PC: {}, NUM: {}, MARKET: {}",
-                        request.getProductClass(), request.getNumber(), request.getMarket());
                 return UD09DeleteHdocuserdefinedrulesResponse.error(400, "数据不存在");
             }
 
             // 执行删除
             ud09Mapper.deleteUserDefinedRule(request.getProductClass(), request.getNumber(), request.getMarket());
 
-            log.info("UD09批量删除规则成功");
             return UD09DeleteHdocuserdefinedrulesResponse.success("", null);
         } catch (Exception e) {
-            log.error("UD09批量删除规则失败", e);
             return UD09DeleteHdocuserdefinedrulesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }

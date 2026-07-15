@@ -48,12 +48,8 @@ public class UD03SelectHdocdocumentlistController {
     @GetMapping("/gethdocdocumentlist")
     @ApiOperation(value = "获取文档类型列表", notes = "从 HDOC_DOCUMENT_LIST 表中查询所有文档类型，按 DOCTYPE 排序")
     public UD03SelectHdocdocumentlistResponse getHdocDocumentList() {
-        log.info("收到获取文档类型列表的请求");
-
         // 4.3 调用Service层处理业务逻辑
         UD03SelectHdocdocumentlistResponse response = ud03Service.getHdocDocumentList();
-
-        log.info("返回响应，code: {}", response.getCode());
 
         return response;
     }

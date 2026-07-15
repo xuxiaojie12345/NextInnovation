@@ -40,10 +40,10 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
 
     @Override
     public UD18HDocUserDocAdministrationResponse checkAuth(UD18HDocUserDocAdministrationRequest request) {
-        log.info("开始UD18检查用户权限, userId: {}", request.getUserId());
         try {
-            if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
             String userId = request.getUserId().trim();
 
@@ -54,20 +54,18 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
             Map<String, Object> data = new HashMap<>();
             data.put("exists", exists);
 
-            log.info("UD18检查用户权限成功, exists: {}", exists);
             return UD18HDocUserDocAdministrationResponse.success("success", data);
         } catch (Exception e) {
-            log.error("UD18检查用户权限失败", e);
             return UD18HDocUserDocAdministrationResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
 
     @Override
     public UD18HDocUserDocAdministrationResponse getUserDoc(UD18HDocUserDocAdministrationRequest request) {
-        log.info("开始UD18获取用户文档类型, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
         try {
-            if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
             String userId = request.getUserId().trim();
             String doctype = request.getDoctype() != null ? request.getDoctype().trim() : null;
@@ -90,10 +88,8 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
             Map<String, Object> resultData = new HashMap<>();
             resultData.put("doctypes", doctypeList);
 
-            log.info("UD18获取用户文档类型成功, 数量: {}", doctypeList.size());
             return UD18HDocUserDocAdministrationResponse.success("查询成功", resultData);
         } catch (Exception e) {
-            log.error("UD18获取用户文档类型失败", e);
             return UD18HDocUserDocAdministrationResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -101,13 +97,14 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD18HDocUserDocAdministrationResponse createDoc(UD18HDocUserDocAdministrationRequest request) {
-        log.info("开始UD18新增用户文档权限, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
         try {
-            if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
-            if (request.getDoctype() == null || request.getDoctype().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "文档类型不能为空");
+            validationError = validateDoctype(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
             String userId = request.getUserId().trim();
             String doctype = request.getDoctype().trim();
@@ -115,10 +112,8 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
             // 对应5.38.1: 插入HDOC_USER_DOC表
             ud18Mapper.insertUserDoc(userId, doctype, userId, REGISTER_PROCESS, userId, UPDATE_PROCESS);
 
-            log.info("UD18新增用户文档权限成功");
             return UD18HDocUserDocAdministrationResponse.success("权限插入成功", null);
         } catch (Exception e) {
-            log.error("UD18新增用户文档权限失败", e);
             return UD18HDocUserDocAdministrationResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -126,13 +121,14 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD18HDocUserDocAdministrationResponse deleteDoc(UD18HDocUserDocAdministrationRequest request) {
-        log.info("开始UD18删除用户文档权限, userId: {}, doctype: {}", request.getUserId(), request.getDoctype());
         try {
-            if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "用户ID不能为空");
+            String validationError = validateUserId(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
-            if (request.getDoctype() == null || request.getDoctype().trim().isEmpty()) {
-                return UD18HDocUserDocAdministrationResponse.error(400, "文档类型不能为空");
+            validationError = validateDoctype(request);
+            if (validationError != null) {
+                return UD18HDocUserDocAdministrationResponse.error(400, validationError);
             }
             String userId = request.getUserId().trim();
             String doctype = request.getDoctype().trim();
@@ -140,11 +136,23 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
             // 对应5.38.2: 从HDOC_USER_DOC表删除
             ud18Mapper.deleteUserDoc(userId, doctype);
 
-            log.info("UD18删除用户文档权限成功");
             return UD18HDocUserDocAdministrationResponse.success("权限删除成功", null);
         } catch (Exception e) {
-            log.error("UD18删除用户文档权限失败", e);
             return UD18HDocUserDocAdministrationResponse.error(500, "系统繁忙，请稍后重试");
         }
+    }
+
+    private String validateUserId(UD18HDocUserDocAdministrationRequest request) {
+        if (request.getUserId() == null || request.getUserId().trim().isEmpty()) {
+            return "用户ID不能为空";
+        }
+        return null;
+    }
+
+    private String validateDoctype(UD18HDocUserDocAdministrationRequest request) {
+        if (request.getDoctype() == null || request.getDoctype().trim().isEmpty()) {
+            return "文档类型不能为空";
+        }
+        return null;
     }
 }

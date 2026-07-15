@@ -39,13 +39,11 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
      */
     @Override
     public UD04SelectGeneratedocumentResponse getUD04GenerateDocumentData(String chassisSerie, String chassisNo) {
-        log.info("开始查询生成文档数据，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
 
         try {
             // 4.2 参数校验
             String validationError = validateParameters(chassisSerie, chassisNo);
             if (validationError != null) {
-                log.warn("参数验证失败: {}", validationError);
                 return UD04SelectGeneratedocumentResponse.error(400, validationError);
             }
 
@@ -54,12 +52,9 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
 
             // 4.6 查询核心验证逻辑
             if (documentData == null) {
-                log.warn("未找到匹配的文档数据，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo);
                 // 无匹配结果时返回友好提示
                 return UD04SelectGeneratedocumentResponse.error(404, "We can not get the data. Please try again.");
             }
-
-            log.info("查询成功，找到文档数据");
 
             // 4.7 封装响应对象
             UD04SelectGeneratedocumentResponse.DocumentData responseData = new UD04SelectGeneratedocumentResponse.DocumentData();
@@ -75,7 +70,6 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
             return UD04SelectGeneratedocumentResponse.success(responseData);
 
         } catch (Exception e) {
-            log.error("查询生成文档数据失败，chassisSerie: {}, chassisNo: {}", chassisSerie, chassisNo, e);
             // 返回错误响应
             return UD04SelectGeneratedocumentResponse.error(500, "System error. Please try again later.");
         }

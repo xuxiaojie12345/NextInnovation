@@ -33,19 +33,16 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
 
     @Override
     public UD15SelecthdocsenddatavinplateResponse viewInfo(UD15SelecthdocsenddatavinplateRequest request) {
-        log.info("开始UD15查询VIN Plate信息, serie: {}, chnr: {}", request.getChassisSerie(), request.getChassisNo());
         try {
-            if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
-                    || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
-                return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
+            String validationError = validateChassisParams(request);
+            if (validationError != null) {
+                return UD15SelecthdocsenddatavinplateResponse.error(400, validationError);
             }
 
             HdocSendDataVinPlate vinPlate = ud15Mapper.selectVinPlateInfo(
                     request.getChassisSerie().trim(), request.getChassisNo().trim());
 
             if (vinPlate == null) {
-                log.warn("UD15查询VIN Plate信息 - 记录不存在, serie: {}, chnr: {}",
-                        request.getChassisSerie(), request.getChassisNo());
                 return UD15SelecthdocsenddatavinplateResponse.error(404, "记录不存在");
             }
 
@@ -96,10 +93,8 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
             data.setPrintItems(printItems);
             data.setVpData(vpData);
 
-            log.info("UD15查询VIN Plate信息成功");
             return UD15SelecthdocsenddatavinplateResponse.success("查询成功", data);
         } catch (Exception e) {
-            log.error("UD15查询VIN Plate信息失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -107,18 +102,16 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD15SelecthdocsenddatavinplateResponse setRegenerate(UD15SelecthdocsenddatavinplateRequest request) {
-        log.info("开始UD15设置重新生成, serie: {}, chnr: {}", request.getChassisSerie(), request.getChassisNo());
         try {
-            if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
-                    || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
-                return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
+            String validationError = validateChassisParams(request);
+            if (validationError != null) {
+                return UD15SelecthdocsenddatavinplateResponse.error(400, validationError);
             }
 
             // 检查记录是否存在
             HdocSendDataVinPlate vinPlate = ud15Mapper.selectVinPlateInfo(
                     request.getChassisSerie().trim(), request.getChassisNo().trim());
             if (vinPlate == null) {
-                log.warn("UD15设置重新生成 - 记录不存在");
                 return UD15SelecthdocsenddatavinplateResponse.error(404, "记录不存在，无法更新");
             }
 
@@ -128,10 +121,8 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
             }
 
-            log.info("UD15设置重新生成成功");
             return UD15SelecthdocsenddatavinplateResponse.success("状态已更新为重新生成", null);
         } catch (Exception e) {
-            log.error("UD15设置重新生成失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -139,11 +130,10 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD15SelecthdocsenddatavinplateResponse setOK(UD15SelecthdocsenddatavinplateRequest request) {
-        log.info("开始UD15设置OK, serie: {}, chnr: {}", request.getChassisSerie(), request.getChassisNo());
         try {
-            if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
-                    || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
-                return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
+            String validationError = validateChassisParams(request);
+            if (validationError != null) {
+                return UD15SelecthdocsenddatavinplateResponse.error(400, validationError);
             }
 
             Integer result = ud15Mapper.updateStatusSetOk(
@@ -152,10 +142,8 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
             }
 
-            log.info("UD15设置OK成功");
             return UD15SelecthdocsenddatavinplateResponse.success("状态已更新为OK", null);
         } catch (Exception e) {
-            log.error("UD15设置OK失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -163,11 +151,10 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD15SelecthdocsenddatavinplateResponse changeToBasicInfo(UD15SelecthdocsenddatavinplateRequest request) {
-        log.info("开始UD15切换为基础信息, serie: {}, chnr: {}", request.getChassisSerie(), request.getChassisNo());
         try {
-            if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
-                    || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
-                return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
+            String validationError = validateChassisParams(request);
+            if (validationError != null) {
+                return UD15SelecthdocsenddatavinplateResponse.error(400, validationError);
             }
 
             Integer result = ud15Mapper.updateStatusChangeBasic(
@@ -176,10 +163,8 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
             }
 
-            log.info("UD15切换为基础信息成功");
             return UD15SelecthdocsenddatavinplateResponse.success("已切换到基本信息", null);
         } catch (Exception e) {
-            log.error("UD15切换为基础信息失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
@@ -187,11 +172,10 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UD15SelecthdocsenddatavinplateResponse changeToAdvancedInfo(UD15SelecthdocsenddatavinplateRequest request) {
-        log.info("开始UD15切换为高级信息, serie: {}, chnr: {}", request.getChassisSerie(), request.getChassisNo());
         try {
-            if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
-                    || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
-                return UD15SelecthdocsenddatavinplateResponse.error(400, "底盘系列和底盘编号不能为空");
+            String validationError = validateChassisParams(request);
+            if (validationError != null) {
+                return UD15SelecthdocsenddatavinplateResponse.error(400, validationError);
             }
 
             Integer result = ud15Mapper.updateStatusChangeAdvanced(
@@ -200,11 +184,17 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
                 return UD15SelecthdocsenddatavinplateResponse.error(500, "更新失败");
             }
 
-            log.info("UD15切换为高级信息成功");
             return UD15SelecthdocsenddatavinplateResponse.success("已切换到高级信息", null);
         } catch (Exception e) {
-            log.error("UD15切换为高级信息失败", e);
             return UD15SelecthdocsenddatavinplateResponse.error(500, "系统繁忙，请稍后重试");
         }
+    }
+
+    private String validateChassisParams(UD15SelecthdocsenddatavinplateRequest request) {
+        if (request.getChassisSerie() == null || request.getChassisSerie().trim().isEmpty()
+                || request.getChassisNo() == null || request.getChassisNo().trim().isEmpty()) {
+            return "底盘系列和底盘编号不能为空";
+        }
+        return null;
     }
 }

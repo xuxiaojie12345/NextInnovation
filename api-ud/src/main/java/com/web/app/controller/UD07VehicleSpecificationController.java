@@ -34,17 +34,12 @@ public class UD07VehicleSpecificationController {
     @GetMapping("/vehiclespecification")
     @ApiOperation(value = "查询车辆规格", notes = "根据底盘系列和底盘编号查询车辆规格及KOLA变体信息")
     public UD07VehicleSpecificationResponse getVehicleSpecification(
-            @ApiParam(value = "底盘系列", required = true, example = "ABC12")
-            @RequestParam("serie") String serie,
-            @ApiParam(value = "底盘编号", required = true, example = "1234567890")
-            @RequestParam("chno") String chno) {
-
-        log.info("收到UD07车辆规格查询请求，serie: {}, chno: {}", serie, chno);
+            @ApiParam(value = "底盘系列", required = true, example = "ABC12") @RequestParam("serie") String serie,
+            @ApiParam(value = "底盘编号", required = true, example = "1234567890") @RequestParam("chno") String chno) {
 
         UD07VehicleSpecificationRequest request = new UD07VehicleSpecificationRequest(serie, chno);
         UD07VehicleSpecificationResponse response = ud07Service.getHdocRecDataVdaKolaGeneral(request);
 
-        log.info("UD07查询返回，code: {}, msg: {}", response.getCode(), response.getMsg());
         return response;
     }
 }

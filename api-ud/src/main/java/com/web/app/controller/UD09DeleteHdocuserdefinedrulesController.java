@@ -31,7 +31,6 @@ public class UD09DeleteHdocuserdefinedrulesController {
     @ApiOperation(value = "搜索用户定义规则", notes = "根据动态条件搜索HDOC_USER_DEFINED_RULES表中的规则")
     public UD09DeleteHdocuserdefinedrulesResponse search(
             UD09DeleteHdocuserdefinedrulesRequest request) {
-        log.info("收到UD09搜索规则请求, request: {}", request);
         return ud09Service.searchRules(request);
     }
 
@@ -39,7 +38,6 @@ public class UD09DeleteHdocuserdefinedrulesController {
     @ApiOperation(value = "删除选中的规则", notes = "根据PC、NUM、MARKET删除HDOC_USER_DEFINED_RULES表中的规则")
     public UD09DeleteHdocuserdefinedrulesResponse deleteSelected(
             @RequestBody UD09DeleteHdocuserdefinedrulesRequest request) {
-        log.info("收到UD09删除规则请求, request: {}", request);
         return ud09Service.deleteSelected(request);
     }
 }

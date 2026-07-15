@@ -29,19 +29,15 @@ public class UD11HdocvariablesServiceImpl implements UD11HdocvariablesService {
 
     @Override
     public UD11HdocvariablesResponse searchVariables(UD11HdocvariablesRequest request) {
-        log.info("开始UD11搜索HDOC变量, request: {}", request);
         try {
             List<VariableData> resultList = ud11Mapper.searchVariables(request);
 
             if (resultList == null || resultList.isEmpty()) {
-                log.warn("UD11搜索未找到匹配的HDOC变量");
                 return UD11HdocvariablesResponse.error(404, "数据不存在");
             }
 
-            log.info("UD11搜索成功, 找到 {} 条记录", resultList.size());
             return UD11HdocvariablesResponse.success("查询成功", resultList);
         } catch (Exception e) {
-            log.error("UD11搜索HDOC变量失败", e);
             return UD11HdocvariablesResponse.error(500, "系统繁忙，请稍后重试");
         }
     }
