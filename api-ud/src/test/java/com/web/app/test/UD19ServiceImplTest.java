@@ -27,8 +27,25 @@ class UD19ServiceImplTest {
         assertEquals(1, service.selectAllMarkets().size());
     }
 
-    @Test void shouldSearchHdoc() {
+    @Test void shouldSearchHdocWithResults() {
+        List<Map<String, Object>> rawList = new ArrayList<>();
+        Map<String, Object> row = new HashMap<>();
+        row.put("USERID", "user1");
+        row.put("USERNAME", "User One");
+        row.put("MARKET", "JP");
+        rawList.add(row);
+        when(mapper.searchHdoc(anyString(), anyString(), anyString(), anyString())).thenReturn(rawList);
+
+        List<Map<String, Object>> result = service.searchHdoc("user1", "user", "JP", "R");
+
+        assertEquals(1, result.size());
+        assertEquals("user1", result.get(0).get("userid"));
+        assertEquals("User One", result.get(0).get("username"));
+        assertEquals("JP", result.get(0).get("market"));
+    }
+
+    @Test void shouldSearchHdocWithEmptyResults() {
         when(mapper.searchHdoc(anyString(), anyString(), anyString(), anyString())).thenReturn(new ArrayList<>());
-        assertNotNull(service.searchHdoc("user1", "user", "JP", "R"));
+        assertTrue(service.searchHdoc("user1", "user", "JP", "R").isEmpty());
     }
 }

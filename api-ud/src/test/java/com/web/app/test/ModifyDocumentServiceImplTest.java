@@ -29,4 +29,50 @@ class ModifyDocumentServiceImplTest {
     @Test void shouldHandleEmptyModifications() {
         assertEquals(0, service.updateModifications("FH", "12345", new ArrayList<>(), "user1"));
     }
+
+    @Test void shouldUpdateModificationWithValue() {
+        List<Map<String, String>> mods = new ArrayList<>();
+        Map<String, String> mod = new HashMap<>();
+        mod.put("variable", "VAR1");
+        mod.put("val", "NEW_VAL");
+        mods.add(mod);
+        when(mapper.updateModificationValue(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
+        assertEquals(1, service.updateModifications("FH", "12345", mods, "user1"));
+    }
+
+    @Test void shouldUseSystemUserWhenNull() {
+        List<Map<String, String>> mods = new ArrayList<>();
+        Map<String, String> mod = new HashMap<>();
+        mod.put("variable", "VAR1");
+        mod.put("val", "NEW_VAL");
+        mods.add(mod);
+        when(mapper.updateModificationValue(anyString(), anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.updateModifications("FH", "12345", mods, null));
+    }
+
+    @Test void shouldUseSystemUserWhenEmpty() {
+        List<Map<String, String>> mods = new ArrayList<>();
+        Map<String, String> mod = new HashMap<>();
+        mod.put("variable", "VAR1");
+        mod.put("val", "NEW_VAL");
+        mods.add(mod);
+        when(mapper.updateModificationValue(anyString(), anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.updateModifications("FH", "12345", mods, ""));
+    }
+
+    @Test void shouldSkipModificationWhenVariableOrValNull() {
+        List<Map<String, String>> mods = new ArrayList<>();
+        Map<String, String> mod = new HashMap<>();
+        mod.put("variable", "VAR1");
+        mods.add(mod);
+        assertEquals(0, service.updateModifications("FH", "12345", mods, "user1"));
+    }
+
+    @Test void shouldSkipModificationWhenVariableNull() {
+        List<Map<String, String>> mods = new ArrayList<>();
+        Map<String, String> mod = new HashMap<>();
+        mod.put("val", "NEW_VAL");
+        mods.add(mod);
+        assertEquals(0, service.updateModifications("FH", "12345", mods, "user1"));
+    }
 }

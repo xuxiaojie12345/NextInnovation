@@ -25,4 +25,9 @@ class UD14SearchServiceImplTest {
         when(mapper.selectAllMarketCodes()).thenReturn(Arrays.asList("JP", "US"));
         assertEquals(2, service.selectAllMarkets().size());
     }
+
+    @Test void shouldSelectVariablesByMarketAndFile() {
+        when(mapper.selectVariablesByVal("JP/file.csv")).thenReturn(Arrays.asList("VAR1", "VAR2"));
+        assertEquals(2, service.selectVariablesByMarketAndFile("JP", "file.csv").size());
+    }
 }

@@ -42,9 +42,24 @@ class UD15SendDataServiceImplTest {
         assertEquals(1, service.setRegenerate("FH", "12345", "user1"));
     }
 
+    @Test void shouldSetRegenerateWithNullUser() {
+        when(mapper.updateStatus(anyString(), anyString(), anyString(), isNull(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.setRegenerate("FH", "12345", null));
+    }
+
+    @Test void shouldSetRegenerateWithEmptyUser() {
+        when(mapper.updateStatus(anyString(), anyString(), anyString(), isNull(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.setRegenerate("FH", "12345", ""));
+    }
+
     @Test void shouldSetOK() {
         when(mapper.updateStatus(anyString(), anyString(), anyString(), isNull(), anyString(), anyString())).thenReturn(1);
         assertEquals(1, service.setOK("FH", "12345", "user1"));
+    }
+
+    @Test void shouldSetOKWithNullUser() {
+        when(mapper.updateStatus(anyString(), anyString(), anyString(), isNull(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.setOK("FH", "12345", null));
     }
 
     @Test void shouldChangeToBasicInfo() {
@@ -52,8 +67,18 @@ class UD15SendDataServiceImplTest {
         assertEquals(1, service.changeToBasicInfo("FH", "12345", "user1"));
     }
 
+    @Test void shouldChangeToBasicInfoWithNullUser() {
+        when(mapper.updateStatusAndType(anyString(), anyString(), anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.changeToBasicInfo("FH", "12345", null));
+    }
+
     @Test void shouldChangeToAdvancedInfo() {
         when(mapper.updateStatusAndType(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
         assertEquals(1, service.changeToAdvancedInfo("FH", "12345", "user1"));
+    }
+
+    @Test void shouldChangeToAdvancedInfoWithNullUser() {
+        when(mapper.updateStatusAndType(anyString(), anyString(), anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+        assertEquals(1, service.changeToAdvancedInfo("FH", "12345", null));
     }
 }

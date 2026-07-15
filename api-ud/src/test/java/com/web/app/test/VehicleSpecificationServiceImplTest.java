@@ -83,5 +83,49 @@ class VehicleSpecificationServiceImplTest {
             assertNotNull(result);
             assertTrue(((List<?>) result.get("kolaList")).isEmpty());
         }
+
+        @Test void shouldUseModelFallbackWhenModelKeyIsNull() {
+            Map<String, Object> baseData = new LinkedHashMap<>();
+            baseData.put("MODEL", "FALLBACK_MODEL");
+            baseData.put("BUILD", "2024-W01");
+            baseData.put("FAMILY_ID", "FAM001");
+            baseData.put("VARIANT_ID", "VAR001");
+
+            when(mapper.selectVehicleBase("FH", "12345")).thenReturn(baseData);
+            when(mapper.selectKolaList("FAM001", "VAR001")).thenReturn(new ArrayList<>());
+
+            Map<String, Object> result = service.getVehicleSpecification("FH", "12345");
+            assertNotNull(result);
+            assertEquals("FALLBACK_MODEL", result.get("model"));
+        }
+
+        @Test void shouldTransformKolaListItems() {
+            Map<String, Object> baseData = new LinkedHashMap<>();
+            baseData.put("model", "FH16");
+            baseData.put("BUILD", "2024-W01");
+            baseData.put("FAMILY_ID", "FAM001");
+            baseData.put("VARIANT_ID", "VAR001");
+
+            List<Map<String, Object>> rawKolaList = new ArrayList<>();
+            Map<String, Object> item1 = new HashMap<>();
+            item1.put("SYMBOL", "S1");
+            item1.put("DESCRIPTION", "Desc1");
+            rawKolaList.add(item1);
+            Map<String, Object> item2 = new HashMap<>();
+            item2.put("SYMBOL", "S2");
+            item2.put("DESCRIPTION", "Desc2");
+            rawKolaList.add(item2);
+
+            when(mapper.selectVehicleBase("FH", "12345")).thenReturn(baseData);
+            when(mapper.selectKolaList("FAM001", "VAR001")).thenReturn(rawKolaList);
+
+            Map<String, Object> result = service.getVehicleSpecification("FH", "12345");
+            List<Map<String, Object>> kolaList = (List<Map<String, Object>>) result.get("kolaList");
+            assertEquals(2, kolaList.size());
+            assertEquals("S1", kolaList.get(0).get("symbol"));
+            assertEquals("Desc1", kolaList.get(0).get("description"));
+            assertEquals("S2", kolaList.get(1).get("symbol"));
+            assertEquals("Desc2", kolaList.get(1).get("description"));
+        }
     }
 }

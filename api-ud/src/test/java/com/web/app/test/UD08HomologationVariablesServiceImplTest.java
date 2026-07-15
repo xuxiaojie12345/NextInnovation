@@ -66,24 +66,114 @@ class UD08HomologationVariablesServiceImplTest {
         }
     }
 
-    @Nested @DisplayName("addRule/updateRule/deleteRule")
+    @Nested @DisplayName("addRule/updateRule/deleteRule/deleteSelectedRules/searchRules")
     class Rules {
         @Test void shouldAddRule() {
             HdocUserDefinedRules rule = new HdocUserDefinedRules();
             rule.setPc("PC1");
             rule.setNum("001");
             rule.setMarket("JP");
+            rule.setRegisterUser("user1");
+            rule.setUpdateUser("user1");
             when(mapper.insertRule(any())).thenReturn(1);
             assertEquals(1, service.addRule(rule));
         }
+
+        @Test void shouldAddRuleWithNullRegisterUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setPc("PC1");
+            rule.setNum("001");
+            rule.setMarket("JP");
+            rule.setRegisterUser(null);
+            rule.setUpdateUser("user1");
+            when(mapper.insertRule(any())).thenReturn(1);
+            assertEquals(1, service.addRule(rule));
+            assertEquals("SYSTEM", rule.getRegisterUser());
+        }
+
+        @Test void shouldAddRuleWithEmptyRegisterUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setPc("PC1");
+            rule.setNum("001");
+            rule.setMarket("JP");
+            rule.setRegisterUser("");
+            rule.setUpdateUser("user1");
+            when(mapper.insertRule(any())).thenReturn(1);
+            assertEquals(1, service.addRule(rule));
+            assertEquals("SYSTEM", rule.getRegisterUser());
+        }
+
+        @Test void shouldAddRuleWithNullUpdateUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setPc("PC1");
+            rule.setNum("001");
+            rule.setMarket("JP");
+            rule.setRegisterUser("user1");
+            rule.setUpdateUser(null);
+            when(mapper.insertRule(any())).thenReturn(1);
+            assertEquals(1, service.addRule(rule));
+            assertEquals("SYSTEM", rule.getUpdateUser());
+        }
+
+        @Test void shouldAddRuleWithEmptyUpdateUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setPc("PC1");
+            rule.setNum("001");
+            rule.setMarket("JP");
+            rule.setRegisterUser("user1");
+            rule.setUpdateUser("");
+            when(mapper.insertRule(any())).thenReturn(1);
+            assertEquals(1, service.addRule(rule));
+            assertEquals("SYSTEM", rule.getUpdateUser());
+        }
+
         @Test void shouldUpdateRule() {
             HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setUpdateUser("user1");
             when(mapper.updateRule(any())).thenReturn(2);
             assertEquals(2, service.updateRule(rule));
         }
+
+        @Test void shouldUpdateRuleWithNullUpdateUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setUpdateUser(null);
+            when(mapper.updateRule(any())).thenReturn(2);
+            assertEquals(2, service.updateRule(rule));
+            assertEquals("SYSTEM", rule.getUpdateUser());
+        }
+
+        @Test void shouldUpdateRuleWithEmptyUpdateUser() {
+            HdocUserDefinedRules rule = new HdocUserDefinedRules();
+            rule.setUpdateUser("");
+            when(mapper.updateRule(any())).thenReturn(2);
+            assertEquals(2, service.updateRule(rule));
+            assertEquals("SYSTEM", rule.getUpdateUser());
+        }
+
         @Test void shouldDeleteRule() {
             when(mapper.deleteRule("PC1", "001", "JP")).thenReturn(1);
             assertEquals(1, service.deleteRule("PC1", "001", "JP"));
+        }
+
+        @SuppressWarnings("unchecked")
+        @Test void shouldDeleteSelectedRules() {
+            List<Map<String, Object>> rules = new ArrayList<>();
+            Map<String, Object> rule = new HashMap<>();
+            rule.put("pc", "PC1");
+            rule.put("num", "001");
+            rule.put("market", "JP");
+            rules.add(rule);
+            when(mapper.deleteSelectedRules(any(List.class))).thenReturn(1);
+            assertEquals(1, service.deleteSelectedRules(rules));
+        }
+
+        @Test void shouldSearchRules() {
+            when(mapper.searchRules(any(), any(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any())).thenReturn(new ArrayList<>());
+            assertNotNull(service.searchRules(null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null));
         }
     }
 }

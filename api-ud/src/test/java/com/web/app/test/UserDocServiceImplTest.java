@@ -45,4 +45,12 @@ class UserDocServiceImplTest {
         List<String> result = service.selectUserDoc("user1");
         assertEquals(2, result.size());
     }
+
+    @Test void shouldUpdateUserDoc() {
+        when(userDocMapper.deleteUserDoc("user1")).thenReturn(1);
+        when(userDocMapper.insertUserDoc(anyString(), anyString(), anyString())).thenReturn(1);
+        service.updateUserDoc("user1", Arrays.asList("HDOC", "OTHER"));
+        verify(userDocMapper).deleteUserDoc("user1");
+        verify(userDocMapper, times(2)).insertUserDoc(anyString(), anyString(), anyString());
+    }
 }

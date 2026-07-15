@@ -157,6 +157,24 @@ class ADChangeServiceImplTest {
       assertEquals(1, result);
       verify(adChangeMapper).insert(SERIE, null, ACT, BU, REASON, UPDATE_USER);
     }
+
+    @Test
+    @DisplayName("currentUser 为 null 时使用 SYSTEM")
+    void shouldUseSystemUserWhenNull() {
+      when(adChangeMapper.insert(SERIE, CHNR, ACT, BU, REASON, "SYSTEM")).thenReturn(1);
+      int result = adChangeService.insert(SERIE, CHNR, ACT, BU, REASON, null);
+      assertEquals(1, result);
+      verify(adChangeMapper).insert(SERIE, CHNR, ACT, BU, REASON, "SYSTEM");
+    }
+
+    @Test
+    @DisplayName("currentUser 为空字符串时使用 SYSTEM")
+    void shouldUseSystemUserWhenEmpty() {
+      when(adChangeMapper.insert(SERIE, CHNR, ACT, BU, REASON, "SYSTEM")).thenReturn(1);
+      int result = adChangeService.insert(SERIE, CHNR, ACT, BU, REASON, "");
+      assertEquals(1, result);
+      verify(adChangeMapper).insert(SERIE, CHNR, ACT, BU, REASON, "SYSTEM");
+    }
   }
 
   // ================================================================
@@ -187,6 +205,22 @@ class ADChangeServiceImplTest {
 
       assertEquals(0, result);
       verify(adChangeMapper).updateAllActToN(SERIE, CHNR, UPDATE_USER);
+    }
+
+    @Test
+    @DisplayName("currentUser 为 null 时使用 SYSTEM")
+    void shouldUseSystemUserWhenNull() {
+      when(adChangeMapper.updateAllActToN(SERIE, CHNR, "SYSTEM")).thenReturn(1);
+      int result = adChangeService.updateAllActToN(SERIE, CHNR, null);
+      assertEquals(1, result);
+    }
+
+    @Test
+    @DisplayName("currentUser 为空字符串时使用 SYSTEM")
+    void shouldUseSystemUserWhenEmpty() {
+      when(adChangeMapper.updateAllActToN(SERIE, CHNR, "SYSTEM")).thenReturn(1);
+      int result = adChangeService.updateAllActToN(SERIE, CHNR, "");
+      assertEquals(1, result);
     }
   }
 }

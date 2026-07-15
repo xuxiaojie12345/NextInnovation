@@ -29,6 +29,14 @@ class HdocVariablesServiceImplTest {
             when(mapper.insertVariable(anyString(), anyString(), anyString(), anyString())).thenReturn(1);
             assertEquals(1, service.addVariable("VAR", "TEXT", "desc", "user1"));
         }
+        @Test void shouldAddWithNullUser() {
+            when(mapper.insertVariable(anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+            assertEquals(1, service.addVariable("VAR", "TEXT", "desc", null));
+        }
+        @Test void shouldAddWithEmptyUser() {
+            when(mapper.insertVariable(anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+            assertEquals(1, service.addVariable("VAR", "TEXT", "desc", ""));
+        }
     }
 
     @Nested @DisplayName("updateVariable()")
@@ -36,6 +44,14 @@ class HdocVariablesServiceImplTest {
         @Test void shouldUpdate() {
             when(mapper.updateVariable(anyString(), anyString(), anyString(), anyString())).thenReturn(1);
             assertEquals(1, service.updateVariable("VAR", "TEXT", "desc", "user1"));
+        }
+        @Test void shouldUpdateWithNullUser() {
+            when(mapper.updateVariable(anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+            assertEquals(1, service.updateVariable("VAR", "TEXT", "desc", null));
+        }
+        @Test void shouldUpdateWithEmptyUser() {
+            when(mapper.updateVariable(anyString(), anyString(), anyString(), eq("SYSTEM"))).thenReturn(1);
+            assertEquals(1, service.updateVariable("VAR", "TEXT", "desc", ""));
         }
     }
 
