@@ -27,8 +27,6 @@ public class UD03SelectHdocdocumentlistServiceImpl implements UD03SelectHdocdocu
 
     /**
      * 获取文档类型列表
-     * 对应设计文档 4.4 - 业务实现层执行查询逻辑
-     * 
      * 处理流程：
      * 1. 调用 Mapper 查询 HDOC_DOCUMENT_LIST 表
      * 2. 获取所有 DOCTYPE 并按 DOCTYPE 排序

@@ -4,7 +4,6 @@
 
     <!--
         UD20 动态条件查询文档列表
-        对应设计文档 5.41 - 查询语句（动态条件）
         
         功能说明：从 HDOC_DOCUMENT_LIST 表中查询文档信息
         - DOCTYPE 支持模糊查询（LIKE '%${doctype}%'）

@@ -94,7 +94,7 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
         log.info("开始UD08新增规则, request: {}", request);
         try {
             // 校验必填参数
-            String validationError = validateAddRequest(request);
+            String validationError = validateRequiredPk(request);
             if (validationError != null) {
                 return UD08HomologationVariablesResponse.error(400, validationError);
             }
@@ -127,7 +127,7 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
         log.info("开始UD08更新规则, request: {}", request);
         try {
             // 校验必填参数
-            String validationError = validateUpdateRequest(request);
+            String validationError = validateRequiredPk(request);
             if (validationError != null) {
                 return UD08HomologationVariablesResponse.error(400, validationError);
             }
@@ -212,20 +212,7 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
 
     // ==================== 私有方法 ====================
 
-    private String validateAddRequest(UD08HomologationVariablesRequest request) {
-        if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()) {
-            return "productClass不能为空";
-        }
-        if (request.getNumber() == null) {
-            return "number不能为空";
-        }
-        if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
-            return "market不能为空";
-        }
-        return null;
-    }
-
-    private String validateUpdateRequest(UD08HomologationVariablesRequest request) {
+    private String validateRequiredPk(UD08HomologationVariablesRequest request) {
         if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()) {
             return "productClass不能为空";
         }

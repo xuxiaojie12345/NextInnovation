@@ -4,9 +4,7 @@
 
     <!--
         UD03 获取文档类型列表查询
-        对应设计文档 5.2 - 查询语句:
         SELECT DOCTYPE FROM HDOC_DOCUMENT_LIST ORDER BY DOCTYPE
-        
         功能说明：从 HDOC_DOCUMENT_LIST 表中查询所有文档类型，按 DOCTYPE 排序
     -->
     <select id="selectDoctypeList" resultType="java.lang.String">

@@ -4,7 +4,6 @@
 
     <!--
         UD17 userinfo - 查询语句1：从HDOC_USER_INFOR表获取用户名称（判断用户是否存在）
-        对应全体API設計 5.32 查询语句1
     -->
     <select id="selectUserNameByUserid" resultType="java.lang.String">
         SELECT USERNAME FROM HDOC_USER_INFOR
@@ -13,7 +12,6 @@
 
     <!--
         UD17 userinfo - 查询语句2：关联查询功能权限和市场权限
-        对应全体API設計 5.32 查询语句2
         对于有MARKET_AUTH记录的角色返回市场信息，没有的也从FUNCTION_AUTH返回type代码
     -->
     <select id="selectAuthListByUserid" resultType="java.util.Map">
@@ -88,7 +86,6 @@
 
     <!--
         UD17 updaterole - 后插入：插入HDOC_FUNCTION_AUTH表
-        对应全体API設計 5.33
     -->
     <insert id="insertFunctionAuth">
         INSERT INTO HDOC_FUNCTION_AUTH
@@ -114,7 +111,6 @@
 
     <!--
         UD17 deleteuser - 删除语句1：删除HDOC_FUNCTION_AUTH表
-        对应全体API設計 5.35 删除语句1
     -->
     <delete id="deleteUserFunctionAuth">
         DELETE FROM HDOC_FUNCTION_AUTH
@@ -123,7 +119,6 @@
 
     <!--
         UD17 deleteuser - 删除语句2：删除HDOC_MARKET_AUTH表
-        对应全体API設計 5.35 删除语句2
     -->
     <delete id="deleteUserMarketAuth">
         DELETE FROM HDOC_MARKET_AUTH

@@ -27,8 +27,6 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
 
     /**
      * 根据底盘系列和底盘编号获取生成文档数据
-     * 对应设计文档 4.4 - 业务实现层执行查询逻辑
-     * 
      * 处理流程：
      * 1. 对参数进行合法性校验
      * 2. 调用 Mapper 通过多表关联查询获取生成文档数据
@@ -36,7 +34,7 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
      * 4. 有结果则封装响应对象返回
      * 
      * @param chassisSerie 底盘系列
-     * @param chassisNo 底盘编号
+     * @param chassisNo    底盘编号
      * @return UD04SelectGeneratedocumentResponse 响应对象
      */
     @Override
@@ -87,7 +85,7 @@ public class UD04SelectGeneratedocumentServiceImpl implements UD04SelectGenerate
      * 参数验证
      * 
      * @param chassisSerie 底盘系列
-     * @param chassisNo 底盘编号
+     * @param chassisNo    底盘编号
      * @return 错误消息，如果验证通过返回null
      */
     private String validateParameters(String chassisSerie, String chassisNo) {
