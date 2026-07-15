@@ -62,17 +62,23 @@
   font-weight: 500;
 }
 
+/* ud09 */
+
 .ud09-message.error {
   color: #d32f2f;
   background-color: #fff1f0;
   border: 1px solid #ffccc7;
 }
 
+/* ud09 */
+
 .ud09-message.success {
   color: #2e7d32;
   background-color: #e8f5e9;
   border: 1px solid #c8e6c9;
 }
+
+/* ud09 */
 
 .ud09-message.warning {
   color: #ad8b00;
@@ -104,18 +110,26 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud09 */
+
 .ud09-btn:hover:not(:disabled) {
   background-color: #c0d0e5;
 }
+
+/* ud09 */
 
 .ud09-btn:active:not(:disabled) {
   background-color: #b0c0d5;
 }
 
+/* ud09 */
+
 .ud09-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ud09 */
 
 .ud09-btn-danger {
   background-color: #d32f2f;
@@ -123,9 +137,13 @@
   border-color: #b0b0b0;
 }
 
+/* ud09 */
+
 .ud09-btn-danger:hover:not(:disabled) {
   background-color: #b71c1c;
 }
+
+/* ud09 */
 
 .ud09-btn-danger:disabled {
   background-color: #f0d0d0;
@@ -149,6 +167,8 @@
   font-size: 12px;
   border: 1px solid #8da0c0;
 }
+
+/* ud09 */
 
 .ud09-table th {
   background-color: #d0ddf0;
@@ -174,6 +194,8 @@
   color: #666;
 }
 
+/* ud09 */
+
 .ud09-table td {
   padding: 5px 6px;
   border: 1px solid #b0c4de;
@@ -188,6 +210,8 @@
   text-align: center;
 }
 
+/* ud09 */
+
 .ud09-td-checkbox {
   text-align: center;
 }
@@ -197,9 +221,13 @@
   transition: background-color 0.15s ease;
 }
 
+/* ud09 */
+
 .ud09-tr:hover {
   background-color: #e8f0f8;
 }
+
+/* ud09 */
 
 .ud09-tr-selected {
   background-color: #cce5ff;
@@ -220,6 +248,8 @@
   text-decoration: underline;
   font-weight: 500;
 }
+
+/* ud09 */
 
 .ud09-user-link:hover {
   color: #0055aa;
@@ -249,24 +279,34 @@
 @media print {
   .ud09-btn,
   .ud09-button-row,
+  /* ud09 */
+
   .ud09-user-info {
     display: none !important;
   }
+
+  /* ud09 */
 
   .ud09-card {
     border: none;
     padding: 0;
   }
 
+  /* ud09 */
+
   .ud09-table th {
     background-color: #003057 !important;
     color: #ffffff !important;
   }
 
+  /* ud09 */
+
   .ud09-table-wrapper {
     overflow: visible !important;
     width: 100%;
   }
+
+  /* ud09 */
 
   .ud09-table {
     width: 100%;
@@ -275,12 +315,16 @@
   }
 
   .ud09-table th,
+  /* ud09 */
+
   .ud09-table td {
     white-space: normal;
     word-break: break-all;
   }
 
   .ud09-th-checkbox,
+  /* ud09 */
+
   .ud09-td-checkbox {
     display: none !important;
   }
@@ -290,23 +334,33 @@
    响应式适配
    ======================================== */
 @media (max-width: 768px) {
+  /* ud09 */
+
   .ud09-main {
     padding: 12px;
   }
+
+  /* ud09 */
 
   .ud09-card {
     padding: 16px;
   }
 
+  /* ud09 */
+
   .ud09-button-row {
     flex-direction: column;
   }
+
+  /* ud09 */
 
   .ud09-btn {
     width: 100%;
   }
 
   .ud09-table th,
+  /* ud09 */
+
   .ud09-table td {
     padding: 4px 5px;
     font-size: 11px;

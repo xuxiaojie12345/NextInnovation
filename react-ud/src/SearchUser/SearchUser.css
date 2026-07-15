@@ -3,6 +3,8 @@
    参照 UD19.css 风格，保留原有业务逻辑
    ======================================== */
 
+/* ud19 */
+
 .ud19-container {
   display: flex;
   flex-direction: column;
@@ -13,6 +15,8 @@
   background: #f4f6f9;
   box-sizing: border-box;
 }
+
+/* ud19 */
 
 .ud19-card {
   background: #fff;
@@ -79,14 +83,20 @@
   max-width: 300px;
 }
 
+/* ud19 */
+
 .ud19-input:focus {
   border-color: #003057;
   box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
 }
 
+/* ud19 */
+
 .ud19-input::placeholder {
   color: #b0b0b0;
 }
+
+/* ud19 */
 
 .ud19-input:disabled {
   background-color: #f5f5f5;
@@ -111,10 +121,14 @@
   max-width: 200px;
 }
 
+/* ud19 */
+
 .ud19-select:focus {
   border-color: #003057;
   box-shadow: 0 0 0 2px rgba(0, 48, 87, 0.15);
 }
+
+/* ud19 */
 
 .ud19-select:disabled {
   background-color: #f5f5f5;
@@ -130,6 +144,8 @@
   padding: 4px;
 }
 
+/* ud19 */
+
 .ud19-select-wide option {
   padding: 3px 6px;
 }
@@ -142,6 +158,8 @@
   justify-content: center;
 }
 
+/* ud19 */
+
 .ud19-radio-label {
   display: flex;
   align-items: center;
@@ -150,6 +168,8 @@
   color: #333;
   cursor: pointer;
 }
+
+/* ud19 */
 
 .ud19-radio {
   width: 16px;
@@ -180,10 +200,14 @@
   transition: background 0.2s, color 0.2s;
 }
 
+/* ud19 */
+
 .ud19-btn:hover:not(:disabled) {
   background: #003057;
   color: #fff;
 }
+
+/* ud19 */
 
 .ud19-btn:disabled {
   opacity: 0.55;
@@ -198,6 +222,8 @@
   overflow: hidden;
 }
 
+/* ud19 */
+
 .ud19-result-header {
   display: flex;
   align-items: center;
@@ -205,6 +231,8 @@
   background: #f8fafc;
   border-bottom: 1px solid #e0e0e0;
 }
+
+/* ud19 */
 
 .ud19-count-label {
   font-size: 13px;
@@ -223,6 +251,8 @@
   font-size: 13px;
 }
 
+/* ud19 */
+
 .ud19-table th {
   background: #dce8f0;
   color: #003057;
@@ -233,15 +263,21 @@
   white-space: nowrap;
 }
 
+/* ud19 */
+
 .ud19-table td {
   padding: 8px 12px;
   border: 1px solid #e0e0e0;
   color: #333;
 }
 
+/* ud19 */
+
 .ud19-table tr:nth-child(even) {
   background: #f8fafc;
 }
+
+/* ud19 */
 
 .ud19-table tr:hover {
   background: #eef3f8;
@@ -256,14 +292,20 @@
 }
 
 @media (max-width: 768px) {
+  /* ud19 */
+
   .ud19-container {
     margin: 20px 12px;
     padding: 20px 16px 24px;
   }
 
+  /* ud19 */
+
   .ud19-form {
     padding: 16px 12px 20px;
   }
+
+  /* ud19 */
 
   .ud19-field {
     flex-direction: column;
@@ -271,19 +313,27 @@
     gap: 4px;
   }
 
+  /* ud19 */
+
   .ud19-label {
     width: auto;
   }
+
+  /* ud19 */
 
   .ud19-radio-group {
     flex-wrap: wrap;
     gap: 12px;
   }
 
+  /* ud19 */
+
   .ud19-btn-row {
     flex-direction: column;
     align-items: center;
   }
+
+  /* ud19 */
 
   .ud19-btn {
     width: 100%;

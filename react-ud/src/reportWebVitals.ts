@@ -1,4 +1,10 @@
+// reportWebVitals 组件
+
+// 对应功能模块
+
 import { ReportHandler } from 'web-vitals';
+
+// reportWebVitals
 
 const reportWebVitals = (onPerfEntry?: ReportHandler) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
@@ -11,5 +17,7 @@ const reportWebVitals = (onPerfEntry?: ReportHandler) => {
     });
   }
 };
+
+// reportWebVitals
 
 export default reportWebVitals;

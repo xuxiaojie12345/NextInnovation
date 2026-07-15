@@ -20,8 +20,14 @@ interface DocumentListItem {
  * MarketDocumentSettingsList 组件
  * 展示文档列表，支持单选、选择返回、打印、User链接查看等功能
  */
+// MarketDocumentSettingsList
+
 const MarketDocumentSettingsList: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
@@ -41,17 +47,33 @@ const MarketDocumentSettingsList: React.FC = () => {
    * 从URL参数中获取检索条件 documentType
    */
   useEffect(() => {
+    // fetchDocumentList
+
     const fetchDocumentList = async () => {
       setIsLoading(true);
       try {
         // 从URL参数中获取检索条件
         const params = new URLSearchParams(location.search);
+        // documentType
+
         const documentType = params.get("documentType") || "";
+        // userField
+
         const userField = params.get("user") || "";
+        // dateField
+
         const dateField = params.get("date") || "";
+        // documentTypeOp
+
         const documentTypeOp = params.get("documentTypeOp") || "=";
+        // userOp
+
         const userOp = params.get("userOp") || "=";
+        // dateOp
+
         const dateOp = params.get("dateOp") || "=";
+
+        // response
 
         const response = await api.get(
           `/api/ud20/marketdocumentsettings`,
@@ -103,6 +125,8 @@ const MarketDocumentSettingsList: React.FC = () => {
   /**
    * 处理 RadioBox 选择变化（对应详细设计 2.1 - RadioBox单选模式）
    */
+  // handleRadioChange
+
   const handleRadioChange = (index: number) => {
     setSelectedIndex(index);
     if (message) clearMessage();
@@ -112,6 +136,8 @@ const MarketDocumentSettingsList: React.FC = () => {
    * Select 按钮处理（对应详细设计 3.1.2 Select操作流程）
    * 校验是否有选中记录，将数据返回前画面
    */
+  // handleSelect
+
   const handleSelect = () => {
     clearMessage();
 
@@ -121,6 +147,8 @@ const MarketDocumentSettingsList: React.FC = () => {
       setMessageType("error");
       return;
     }
+
+    // selected
 
     const selected = documents[selectedIndex];
     // 将选中数据带回前画面（MarketDocumentSettings）
@@ -140,6 +168,8 @@ const MarketDocumentSettingsList: React.FC = () => {
    * Back 按钮处理（对应详细设计 3.1.3 Back操作流程）
    * 返回前画面，不携带任何数据
    */
+  // handleBack
+
   const handleBack = () => {
     clearMessage();
     navigate("/Menu/MarketDocumentSettings");
@@ -149,9 +179,13 @@ const MarketDocumentSettingsList: React.FC = () => {
    * Print 按钮处理（对应详细设计 3.1.4 Print操作流程）
    * 调用浏览器打印功能
    */
+  // handlePrint
+
   const handlePrint = () => {
     clearMessage();
     try {
+      // now
+
       const now = new Date();
       setPrintTime(now.toLocaleString());
       // 延迟执行打印，确保打印时间已渲染
@@ -168,6 +202,8 @@ const MarketDocumentSettingsList: React.FC = () => {
    * User 链接点击处理（对应详细设计 3.1.5 User链接点击流程）
    * 打开新窗口跳转到EDB用户查看画面
    */
+  // handleUserClick
+
   const handleUserClick = (userId: string) => {
     if (!userId || userId === "-") return;
     window.open(`/Menu/EDBUserView?userId=${encodeURIComponent(userId)}`, "_blank");
@@ -265,5 +301,7 @@ const MarketDocumentSettingsList: React.FC = () => {
     </div>
   );
 };
+
+// MarketDocumentSettingsList
 
 export default MarketDocumentSettingsList;

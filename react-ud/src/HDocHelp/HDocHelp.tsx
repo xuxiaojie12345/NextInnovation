@@ -48,7 +48,11 @@ const NAV_LINKS: NavLinkItem[] = [
  * HDocHelp 组件
  * 提供系统功能的导航入口和帮助信息，无后端API调用
  */
+// HDocHelp
+
 const HDocHelp: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
 
   // -------- 状态管理（对应详细设计 2.1 - Other Information Checkbox）--------
@@ -62,6 +66,8 @@ const HDocHelp: React.FC = () => {
    * 处理导航链接点击（对应详细设计 3.1.2 ~ 3.1.5 跳转流程）
    * 通过 React Router 跳转到对应路由
    */
+  // handleNavigation
+
   const handleNavigation = (route: string, label: string) => {
     clearMessage();
     try {
@@ -81,6 +87,8 @@ const HDocHelp: React.FC = () => {
    * 处理 Other Information Checkbox 变化
    * 控制 Other Information 区域的显示/隐藏
    */
+  // handleOtherInfoChange
+
   const handleOtherInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShowOtherInfo(e.target.checked);
     if (message) clearMessage();
@@ -161,5 +169,7 @@ const HDocHelp: React.FC = () => {
     </div>
   );
 };
+
+// HDocHelp
 
 export default HDocHelp;

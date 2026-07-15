@@ -45,8 +45,14 @@ interface ApiResponse<T> {
  * ExistingHDocVariables 组件
  * 提供HDOC_VARIABLES表的CRUD操作及CSV导出功能
  */
+// ExistingHDocVariables
+
 const ExistingHDocVariables: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // 各字段的 = / != 运算符状态（普通字段）
@@ -58,13 +64,19 @@ const ExistingHDocVariables: React.FC = () => {
     registerDatetime: '='
   });
 
+  // setOp
+
   const setOp = (field: string, v: Operator) => setOps(prev => ({ ...prev, [field]: v }));
+  // setCompareOp
+
   const setCompareOp = (field: string, v: CompareOperator) => setCompareOps(prev => ({ ...prev, [field]: v }));
 
   /**
    * 渲染运算符下拉框（= / !=）
    * 参照 UD08 页面风格
    */
+  // renderOp
+
   const renderOp = (field: string) => (
     <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='existing-hdoc-operator-select' />
   );
@@ -98,11 +110,15 @@ const ExistingHDocVariables: React.FC = () => {
    * 对应详细设计 3.1.1 页面初始化流程
    */
   useEffect(() => {
+    // state
+
     const state = location.state as Record<string, any> | null;
     if (!state) return;
 
     // 从UD11 Back返回时，恢复所有搜索条件
     if (state.searchConditions) {
+      // cond
+
       const cond = state.searchConditions;
       setFormData(prev => ({
         ...prev,
@@ -122,6 +138,8 @@ const ExistingHDocVariables: React.FC = () => {
 
     // 从UD11 Select返回时，自动填充选中记录的内容
     if (state.selectedRecord) {
+      // rec
+
       const rec = state.selectedRecord;
       setFormData(prev => ({
         ...prev,
@@ -143,6 +161,8 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 更新表单字段值
    */
+  // setField
+
   const setField = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (message) {
@@ -155,6 +175,8 @@ const ExistingHDocVariables: React.FC = () => {
    * 校验必填字段（Variable）
    * 对应详细设计 3.2 校验详细规格表 No.1
    */
+  // validateRequired
+
   const validateRequired = (): string | null => {
     const { variable } = formData;
     if (!variable || !variable.trim()) {
@@ -166,7 +188,11 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 校验 Variable 输入格式（只允许半角英数字+记号）
    */
+  // handleVariableChange
+
   const handleVariableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     // 只允许半角英数字+記号
     if (/^[a-zA-Z0-9\-_]*$/.test(val) && val.length <= 30) {
@@ -177,6 +203,8 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 处理 Type 下拉选项变更
    */
+  // handleTypeChange
+
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setField('type', e.target.value);
   };
@@ -184,7 +212,11 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 处理 Description 输入
    */
+  // handleDescriptionChange
+
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     if (val.length <= 100) {
       setField('description', val);
@@ -194,7 +226,11 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 处理 Created by user 输入
    */
+  // handleUseridChange
+
   const handleUseridChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     if (val.length <= 16) {
       setField('userid', val);
@@ -204,7 +240,11 @@ const ExistingHDocVariables: React.FC = () => {
   /**
    * 处理 Date 输入（只允许数字和中划线，格式 yyyy-MM-dd）
    */
+  // handleDateChange
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     if (/^[0-9-]*$/.test(val) && val.length <= 10) {
       setField('registerDatetime', val);
@@ -217,6 +257,8 @@ const ExistingHDocVariables: React.FC = () => {
    * 至少需要输入一个搜索条件才能执行搜索
    * 对应详细设计 3.1.2 搜索流程
    */
+  // handleSearch
+
   const handleSearch = useCallback(() => {
     // 检查是否输入了Variable（必填搜索条件）
     if (!formData.variable || !formData.variable.trim()) {
@@ -240,9 +282,13 @@ const ExistingHDocVariables: React.FC = () => {
    * 新增功能 - 调用 UD10Add API 新增变量定义记录
    * 对应详细设计 3.1.3 新增流程
    */
+  // handleAdd
+
   const handleAdd = useCallback(async () => {
     setMessage('');
     setHasError(false);
+    // err
+
     const err = validateRequired();
     if (err) {
       setMessage(err);
@@ -256,6 +302,8 @@ const ExistingHDocVariables: React.FC = () => {
       if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
         submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
       }
+      // res
+
       const res = await api.post<ApiResponse<string>>(
         '/api/ud10/add',
         submitData
@@ -282,9 +330,13 @@ const ExistingHDocVariables: React.FC = () => {
    * 更新功能 - 调用 UD10Update API 更新变量定义记录
    * 对应详细设计 3.1.4 更新流程
    */
+  // handleUpdate
+
   const handleUpdate = useCallback(async () => {
     setMessage('');
     setHasError(false);
+    // err
+
     const err = validateRequired();
     if (err) {
       setMessage(err);
@@ -298,6 +350,8 @@ const ExistingHDocVariables: React.FC = () => {
       if (submitData.registerDatetime && submitData.registerDatetime.length === 10) {
         submitData.registerDatetime = submitData.registerDatetime + ' 00:00:00';
       }
+      // res
+
       const res = await api.post<ApiResponse<string>>(
         '/api/ud10/update',
         submitData
@@ -324,9 +378,13 @@ const ExistingHDocVariables: React.FC = () => {
    * 删除功能 - 调用 UD10Delete API 删除变量定义记录
    * 对应详细设计 3.1.5 删除流程
    */
+  // handleDelete
+
   const handleDelete = useCallback(async () => {
     setMessage('');
     setHasError(false);
+    // err
+
     const err = validateRequired();
     if (err) {
       setMessage(err);
@@ -335,6 +393,8 @@ const ExistingHDocVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
+      // res
+
       const res = await api.post<ApiResponse<string>>(
         '/api/ud10/delete',
         { variable: formData.variable }
@@ -365,6 +425,8 @@ const ExistingHDocVariables: React.FC = () => {
    * 清空功能 - 清空所有输入字段
    * 对应详细设计 3.1.7 清空流程
    */
+  // handleClear
+
   const handleClear = useCallback(() => {
     setFormData({
       variable: '', type: '', description: '', userid: '', registerDatetime: ''
@@ -377,6 +439,8 @@ const ExistingHDocVariables: React.FC = () => {
    * 返回功能 - 导航回 HomologationVariables 页面
    * 对应详细设计 3.1.8 返回流程
    */
+  // handleBack
+
   const handleBack = useCallback(() => {
     navigate('/Menu');
   }, [navigate]);
@@ -386,6 +450,8 @@ const ExistingHDocVariables: React.FC = () => {
    * 将当前表单数据导出为CSV文件：第一行项目名，第二行值
    * 对应详细设计 3.1.6 导出CSV流程
    */
+  // handleExportCsv
+
   const handleExportCsv = useCallback(() => {
     // CSV 头部（项目名）
     const headers = ['Variable', 'Type', 'Description', 'Created by user', 'Date'];
@@ -405,16 +471,26 @@ const ExistingHDocVariables: React.FC = () => {
 
     // 生成文件名
     const now = new Date();
+    // dateStr
+
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    // filename
+
     const filename = `HDOC_Variables_Form_${dateStr}.csv`;
 
+    // blob
+
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    // link
+
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
     URL.revokeObjectURL(link.href);
   }, [formData]);
+
+  // disabled
 
   const disabled = isOperating || loading;
 
@@ -538,5 +614,7 @@ const ExistingHDocVariables: React.FC = () => {
     </div>
   );
 };
+
+// ExistingHDocVariables
 
 export default ExistingHDocVariables;

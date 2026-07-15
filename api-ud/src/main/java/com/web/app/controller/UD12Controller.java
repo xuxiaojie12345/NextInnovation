@@ -2,8 +2,6 @@ package com.web.app.controller;
 
 import com.web.app.domain.*;
 import com.web.app.service.UD12Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,11 +28,7 @@ import java.util.List;
 
  */
 
-public class UD12Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD12Controller.class);
-
-    @Autowired
+public class UD12Controller extends BaseController {@Autowired
     /** ud12Service */
 
     private UD12Service ud12Service;

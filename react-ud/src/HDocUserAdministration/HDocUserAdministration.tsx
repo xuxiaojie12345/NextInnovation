@@ -40,6 +40,8 @@ interface FormData {
   marketSuperUserMarkets: string[];
 }
 
+// HDocUserAdministration
+
 const HDocUserAdministration = () => {
   const [formData, setFormData] = useState<FormData>({
     userId: "",
@@ -75,7 +77,11 @@ const HDocUserAdministration = () => {
   const fetchMarketList = async () => {
     try {
       setIsLoading(true);
+      // API_BASE_URL
+
       const API_BASE_URL = "http://localhost:8081";
+      // response
+
       const response = await fetch(
         `${API_BASE_URL}/api/ud17/markets`,
         {
@@ -85,6 +91,8 @@ const HDocUserAdministration = () => {
           },
         },
       );
+
+      // data
 
       const data = await response.json();
       console.log("【marketList】response:", JSON.stringify(data));
@@ -127,8 +135,14 @@ const HDocUserAdministration = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
+      // API_BASE_URL
+
       const API_BASE_URL = "http://localhost:8081";
+      // userid
+
       const userid = formData.userId.trim();
+
+      // response
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud17/UD17HDocUserAdministrationApi`,
@@ -144,10 +158,16 @@ const HDocUserAdministration = () => {
         },
       );
 
+      // data
+
       const data = await response.json();
 
       if (data.code === 200 && data.data) {
+        // permissionData
+
         const permissionData: PermissionData = data.data;
+        // userName
+
         const userName = permissionData.username || "";
 
         // 解析并填充表单数据
@@ -160,9 +180,13 @@ const HDocUserAdministration = () => {
         // FUNCTION存的是描述名称(User Administrator、RULES等)
         // TYPE存的是代码(A、R、T等)或"代码:描述"格式(U:USER、A：User Administrator等)
         const toCode = (val: string) => {
+          // trimmed
+
           const trimmed = val.trim();
           // 尝试提取冒号前的代码前缀
           const parts = trimmed.split(/[：:]/);
+          // first
+
           const first = parts[0].trim().toUpperCase();
           // 常见FUNCTION描述名称 → 代码映射
           const descToCode: Record<string, string> = {
@@ -185,6 +209,8 @@ const HDocUserAdministration = () => {
         // FUNCTION列的值: User Administrator, RULES, TEMPLATE, USER, Document, ADAPTATION DOC, market super user
         if (permissionData.functions) {
           permissionData.functions.forEach((func: any) => {
+            // functionCode
+
             const functionCode = toCode(func.FUNCTION || func.function || "");
             switch (functionCode) {
               case "U":
@@ -216,7 +242,11 @@ const HDocUserAdministration = () => {
         // TYPE列的值: A, R, T, D, DOCMOD, MCSU（纯代码）
         if (permissionData.markets) {
           permissionData.markets.forEach((market: any) => {
+            // marketCode
+
             const marketCode = market.MARKET || market.market;
+            // marketType
+
             const marketType = toCode(market.TYPE || market.type || "");
             switch (marketType) {
               case "U":
@@ -291,6 +321,8 @@ const HDocUserAdministration = () => {
     // Standard User / Adaptation use 勾选时自动设置 "-EU"
     const isStandardOrAdapt =
       role === "standardUserChecked" || role === "adaptationUserChecked";
+    // marketsKey
+
     const marketsKey =
       role === "standardUserChecked"
         ? "standardUserMarkets"
@@ -331,7 +363,11 @@ const HDocUserAdministration = () => {
 
       // 构建请求数据
       const API_BASE_URL = "http://localhost:8081";
+      // userInfo
+
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      // currentUser
+
       const currentUser = userInfo.userid || userInfo.username || "admin";
 
       // 收集选中的功能权限
@@ -354,6 +390,8 @@ const HDocUserAdministration = () => {
         { key: "adaptationUser", typeCode: "DOCMOD", markets: formData.adaptationUserMarkets },
         { key: "marketSuperUser", typeCode: "MCSU", markets: formData.marketSuperUserMarkets },
       ];
+
+      // markets
 
       const markets: Array<{ market: string; type: string; bu: string }> = [];
       roleMap.forEach((role) => {
@@ -378,6 +416,8 @@ const HDocUserAdministration = () => {
           }),
         },
       );
+      // result
+
       const result = await response.json();
 
       if (result.code === 200 && result.data?.success) {
@@ -410,7 +450,11 @@ const HDocUserAdministration = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
+      // API_BASE_URL
+
       const API_BASE_URL = "http://localhost:8081";
+
+      // response
 
       const response = await fetch(
         `${API_BASE_URL}/api/ud17/UD17HDocUserAdministrationApi`,
@@ -425,6 +469,8 @@ const HDocUserAdministration = () => {
           }),
         },
       );
+
+      // data
 
       const data = await response.json();
 
@@ -463,7 +509,11 @@ const HDocUserAdministration = () => {
   const getSortedMarketList = (selectedMarkets: string[]) => {
     if (!searched) return marketList;
     return [...marketList].sort((a, b) => {
+      // aSelected
+
       const aSelected = selectedMarkets.includes(a.market);
+      // bSelected
+
       const bSelected = selectedMarkets.includes(b.market);
       if (aSelected && !bSelected) return -1;
       if (!aSelected && bSelected) return 1;
@@ -539,6 +589,8 @@ const HDocUserAdministration = () => {
               className='ud17-sel'
               value={formData.standardUserMarkets}
               onChange={(e) => {
+                // selectedOptions
+
                 const selectedOptions = Array.from(
                   e.target.selectedOptions,
                 ).map((option) => option.value);
@@ -569,6 +621,8 @@ const HDocUserAdministration = () => {
               className='ud17-sel'
               value={formData.ruleAdminMarkets}
               onChange={(e) => {
+                // selectedOptions
+
                 const selectedOptions = Array.from(
                   e.target.selectedOptions,
                 ).map((option) => option.value);
@@ -603,6 +657,8 @@ const HDocUserAdministration = () => {
               className='ud17-sel'
               value={formData.templateAdminMarkets}
               onChange={(e) => {
+                // selectedOptions
+
                 const selectedOptions = Array.from(
                   e.target.selectedOptions,
                 ).map((option) => option.value);
@@ -642,6 +698,8 @@ const HDocUserAdministration = () => {
               className='ud17-sel'
               value={formData.documentAuthAdminMarkets}
               onChange={(e) => {
+                // selectedOptions
+
                 const selectedOptions = Array.from(
                   e.target.selectedOptions,
                 ).map((option) => option.value);
@@ -702,6 +760,8 @@ const HDocUserAdministration = () => {
                 className='ud17-sel'
                 value={formData.adaptationUserMarkets}
                 onChange={(e) => {
+                  // selectedOptions
+
                   const selectedOptions = Array.from(
                     e.target.selectedOptions,
                   ).map((option) => option.value);
@@ -744,6 +804,8 @@ const HDocUserAdministration = () => {
               className='ud17-sel'
             value={formData.marketSuperUserMarkets}
             onChange={(e) => {
+              // selectedOptions
+
               const selectedOptions = Array.from(
                 e.target.selectedOptions,
               ).map((option) => option.value);
@@ -785,5 +847,7 @@ const HDocUserAdministration = () => {
     </div>
   );
 };
+
+// HDocUserAdministration
 
 export default HDocUserAdministration;

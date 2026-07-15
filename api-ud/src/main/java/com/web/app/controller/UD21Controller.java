@@ -2,8 +2,6 @@ package com.web.app.controller;
 
 import com.web.app.domain.ApiResponse;
 import com.web.app.service.UD21Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +16,7 @@ import java.util.Map;
 
  */
 
-public class UD21Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD21Controller.class);
-
-    @Autowired
+public class UD21Controller extends BaseController {@Autowired
     /** ud21Service */
 
     private UD21Service ud21Service;

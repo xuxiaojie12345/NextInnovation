@@ -41,11 +41,15 @@
   max-width: fit-content;
 }
 
+/* ud15 */
+
 .ud15-message.error {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
 }
+
+/* ud15 */
 
 .ud15-message.success {
   background-color: #efe;
@@ -77,13 +81,19 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud15 */
+
 .ud15-btn:hover {
   background-color: #c0d0e5;
 }
 
+/* ud15 */
+
 .ud15-btn:active {
   background-color: #b0c0d5;
 }
+
+/* ud15 */
 
 .ud15-btn:disabled {
   opacity: 0.5;
@@ -137,6 +147,8 @@
   height: 26px;
 }
 
+/* ud15 */
+
 .ud15-input:focus {
   border-color: #666666;
 }
@@ -147,6 +159,8 @@
   max-width: 800px;
   border: 1px solid #b0c4de;
 }
+
+/* ud15 */
 
 .ud15-info-title {
   color: #2c3e50;
@@ -165,10 +179,14 @@
   font-size: 13px;
 }
 
+/* ud15 */
+
 .ud15-info-table td {
   padding: 8px 16px;
   border-bottom: 1px solid #e8e8e8;
 }
+
+/* ud15 */
 
 .ud15-info-label {
   width: 200px;
@@ -176,6 +194,8 @@
   font-weight: 500;
   background-color: #fafafa;
 }
+
+/* ud15 */
 
 .ud15-info-value {
   color: #333333;

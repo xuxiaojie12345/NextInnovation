@@ -63,6 +63,8 @@
   font-size: 13px;
 }
 
+/* ud22 */
+
 .ud22-table thead th {
   padding: 8px 16px;
   text-align: left;
@@ -73,9 +75,13 @@
   white-space: nowrap;
 }
 
+/* ud22 */
+
 .ud22-table thead th:first-child {
   border-right: 1px solid #b0c4de;
 }
+
+/* ud22 */
 
 .ud22-table tbody td {
   padding: 8px 16px;
@@ -84,13 +90,19 @@
   vertical-align: middle;
 }
 
+/* ud22 */
+
 .ud22-table tbody td:first-child {
   border-right: 1px solid #e0e0e0;
 }
 
+/* ud22 */
+
 .ud22-table tbody tr:hover {
   background-color: #f0f4ff;
 }
+
+/* ud22 */
 
 .ud22-table tbody tr:last-child td {
   border-bottom: none;
@@ -106,15 +118,21 @@
 /* ========== 响应式适配 ========== */
 
 @media (max-width: 768px) {
+  /* ud22 */
+
   .ud22-container {
     padding: 12px;
   }
+
+  /* ud22 */
 
   .ud22-table-wrapper {
     max-width: 100%;
   }
 
   .ud22-table thead th,
+  /* ud22 */
+
   .ud22-table tbody td {
     padding: 6px 10px;
   }

@@ -1,8 +1,16 @@
+// Login 组件
+
+// 对应功能模块
+
 import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
+// Login
+
 const Login: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
   // 状态管理 (对应设计书 6. 实现注意事项)
   const [userID, setUserID] = useState<string>("");
@@ -14,6 +22,8 @@ const Login: React.FC = () => {
 
   // 处理 UserID 输入 - 输入时限制（对应设计书 4.2.1）
   const handleUserIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     
     // 只允许半角英数字输入
@@ -37,6 +47,8 @@ const Login: React.FC = () => {
 
   // 处理 Password 输入 - 输入时限制（对应设计书 4.2.2）
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     
     // 只允许半角英数字+记号输入（ASCII可打印字符 0x20-0x7E）
@@ -98,6 +110,8 @@ const Login: React.FC = () => {
           password: password.trim()
         }),
       });
+
+      // result
 
       const result = await response.json();
 
@@ -205,5 +219,7 @@ const Login: React.FC = () => {
     </div>
   );
 };
+
+// Login
 
 export default Login;

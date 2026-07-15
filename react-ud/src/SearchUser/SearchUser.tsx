@@ -27,6 +27,8 @@ type AuthType = "Not set" | "Rule" | "Template";
  * SearchUser 组件
  * 提供多条件组合的用户搜索功能，支持输入限制、单选按钮互斥、搜索结果展示
  */
+// SearchUser
+
 const SearchUser: React.FC = () => {
   // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
   const [userid, setUserid] = useState<string>("");
@@ -48,8 +50,12 @@ const SearchUser: React.FC = () => {
    * 调用 UD19SelectMarketMaster（operation=GET_MARKET_LIST）
    */
   useEffect(() => {
+    // fetchMarketList
+
     const fetchMarketList = async () => {
       try {
+        // response
+
         const response = await api.post(
           `/api/ud19/UD19SearchResultListApi`,
           { operation: "GET_MARKET_LIST" }
@@ -68,7 +74,11 @@ const SearchUser: React.FC = () => {
    * 处理 Userid 输入变化（对应详细设计 2.1 输入限制）
    * 只允许半角英数字，最大10字符
    */
+  // handleUseridChange
+
   const handleUseridChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 10) {
       setUserid(val);
@@ -80,7 +90,11 @@ const SearchUser: React.FC = () => {
    * 处理 User 输入变化（对应详细设计 2.1 输入限制）
    * 只允许半角英数字，最大32字符
    */
+  // handleUserChange
+
   const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 32) {
       setUser(val);
@@ -91,8 +105,14 @@ const SearchUser: React.FC = () => {
   /**
    * 处理 Market 多选列表变化
    */
+  // handleMarketChange
+
   const handleMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // selected
+
     const selected = Array.from(e.target.selectedOptions);
+    // val
+
     const val = selected.length > 0 ? selected[selected.length - 1].value : '';
     setMarket(val);
     if (message) clearMessage();
@@ -102,6 +122,8 @@ const SearchUser: React.FC = () => {
    * 处理权限类型单选按钮变化（对应详细设计 6. 实现注意事项 - 单选按钮互斥）
    * Not set、Rule、Template 三个 RadioBox 为互斥选择
    */
+  // handleAuthTypeChange
+
   const handleAuthTypeChange = (type: AuthType) => {
     setAuthType(type);
     if (message) clearMessage();
@@ -111,7 +133,11 @@ const SearchUser: React.FC = () => {
    * 构建搜索参���（对应详细设计 3.1.2 ~ 3.1.4 搜索流程）
    * 根据输入条件决定搜索参数
    */
+  // buildSearchParams
+
   const buildSearchParams = () => {
+    // params
+
     const params: Record<string, string> = {
       operation: "SEARCH_USER"
     };
@@ -140,6 +166,8 @@ const SearchUser: React.FC = () => {
    * 当通过 Userid 搜索时，先调用 Saviynt（/api/authentication/userinfo）
    * 验证用户是否存在并获取用户名，用户不存在则终止搜索
    */
+  // handleSearch
+
   const handleSearch = async () => {
     clearMessage();
     setIsLoading(true);
@@ -147,6 +175,8 @@ const SearchUser: React.FC = () => {
     try {
       // 步骤1：当输入 Userid 时，先调用 Saviynt 验证用户是否存在
       if (userid.trim()) {
+        // saviyntResponse
+
         const saviyntResponse = await api.get(
           `/api/authentication/userinfo`,
           { params: { userId: userid.trim() } }
@@ -165,22 +195,36 @@ const SearchUser: React.FC = () => {
 
       // 步骤2：执行搜索
       const params = buildSearchParams();
+      // response
+
       const response = await api.post(
         `/api/ud19/UD19SearchResultListApi`,
         params
       );
 
       if (response.data.code === 200) {
+        // data
+
         const data = response.data.data;
+        // rawResults
+
         const rawResults = data.results || [];
+        // totalCount
+
         const totalCount = data.count || 0;
 
         // 统一标准化列名（后端MyBatis返回的列名大小写不确定）
         const results = rawResults.map((item: Record<string, any>) => {
           // 找出实际存在的key
           const keys = Object.keys(item);
+          // userIdKey
+
           const userIdKey = keys.find(k => k.toUpperCase() === "USERID") || "USERID";
+          // userNameKey
+
           const userNameKey = keys.find(k => k.toUpperCase() === "USERNAME") || "USERNAME";
+          // marketKey
+
           const marketKey = keys.find(k => k.toUpperCase() === "MARKET") || "MARKET";
           return {
             USERID: item[userIdKey] || "",
@@ -221,6 +265,8 @@ const SearchUser: React.FC = () => {
   /**
    * 处理键盘事件 - 按回车触发搜索
    */
+  // handleKeyDown
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !isLoading) {
       handleSearch();
@@ -352,5 +398,7 @@ const SearchUser: React.FC = () => {
     </div>
   );
 };
+
+// SearchUser
 
 export default SearchUser;

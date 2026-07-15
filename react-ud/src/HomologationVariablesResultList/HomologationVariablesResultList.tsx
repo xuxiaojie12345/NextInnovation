@@ -1,3 +1,7 @@
+// HomologationVariablesResultList 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../config/api';
@@ -51,8 +55,14 @@ interface BatchDeleteResponse {
  * - 支持批量删除选中的记录（Delete selected 按钮）
  * - 显示搜索结果总数（Count 字段）
  */
+// HomologationVariablesResultList
+
 const HomologationVariablesResultList: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // 搜索结果列表数据
@@ -76,10 +86,14 @@ const HomologationVariablesResultList: React.FC = () => {
    * 调用 UD08Search API（POST方法），传递搜索条件作为请求参数
    */
   useEffect(() => {
+    // fetchData
+
     const fetchData = async () => {
       setLoading(true);
       setMessage('');
       try {
+        // res
+
         const res = await api.post(`/api/ud09/search`, searchState);
         if (res.data.code === 200 && Array.isArray(res.data.data)) {
           setDataList(res.data.data);
@@ -101,6 +115,8 @@ const HomologationVariablesResultList: React.FC = () => {
    * 单选切换（Radio 行为）
    * @param key 记录的唯一标识 "pc|num|market"
    */
+  // toggleSelect
+
   const toggleSelect = (key: string) => {
     setSelectedKeys(prev => {
       if (prev.has(key)) {
@@ -120,8 +136,12 @@ const HomologationVariablesResultList: React.FC = () => {
    * 获取选中记录的完整数据（用于 Select 操作）
    * 选中记录只能有一条
    */
+  // getSelectedRecord
+
   const getSelectedRecord = useCallback((): SearchResultItem | null => {
     if (selectedKeys.size === 0) return null;
+    // firstKey
+
     const firstKey = Array.from(selectedKeys)[0];
     // 直接从 dataList 中根据唯一键查找匹配的记录
     return dataList.find(item => `${item.pc}|${item.num}|${item.market}` === firstKey) || null;
@@ -130,7 +150,11 @@ const HomologationVariablesResultList: React.FC = () => {
   /**
    * 获取选中记录的主键列表（用于 Delete selected 操作）
    */
+  // getSelectedPrimaryKeys
+
   const getSelectedPrimaryKeys = (): BatchDeleteItem[] => {
+    // keys
+
     const keys: BatchDeleteItem[] = [];
     selectedKeys.forEach(key => {
       const [productClass, number, market] = key.split('|');
@@ -145,6 +169,8 @@ const HomologationVariablesResultList: React.FC = () => {
    * - 获取选中记录的完整数据，存储到 state 中
    * - 导航回 /Menu/HomologationVariables 页面
    */
+  // handleSelect
+
   const handleSelect = useCallback(() => {
     if (selectedKeys.size === 0) {
       setMessage('Please select a record.');
@@ -180,6 +206,8 @@ const HomologationVariablesResultList: React.FC = () => {
   /**
    * Back 按钮处理：返回前画面，保留搜索条件
    */
+  // handleBack
+
   const handleBack = useCallback(() => {
     // 将当前搜索条件回传给前画面
     navigate('/Menu/HomologationVariables', { state: { searchConditions: searchState } });
@@ -189,6 +217,8 @@ const HomologationVariablesResultList: React.FC = () => {
    * Print 按钮处理：打印搜索结果列表
    * 调用 window.print() 方法，打印内容包括 DataTable 和 Count 信息
    */
+  // handlePrint
+
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
@@ -199,6 +229,8 @@ const HomologationVariablesResultList: React.FC = () => {
    * - 调用 UD09DeleteHdocuserdefinedrules API 批量删除
    * - 根据删除结果刷新列表
    */
+  // handleDeleteSelected
+
   const handleDeleteSelected = useCallback(async () => {
     if (selectedKeys.size === 0) {
       setMessage('Please select at least one record to delete.');
@@ -210,13 +242,19 @@ const HomologationVariablesResultList: React.FC = () => {
     setMessage('');
 
     try {
+      // deleteItems
+
       const deleteItems = getSelectedPrimaryKeys();
+      // res
+
       const res = await api.post(
         `/api/ud09/deletehdocuserdefinedrules`,
         deleteItems
       );
 
       if (res.data.code === 200) {
+        // response
+
         const response: BatchDeleteResponse = res.data.data;
         if (response.failedCount === 0) {
           setMessage(response.message);
@@ -252,6 +290,8 @@ const HomologationVariablesResultList: React.FC = () => {
   /**
    * 根据主键生成唯一标识
    */
+  // getKey
+
   const getKey = (item: SearchResultItem): string => {
     return `${item.pc}|${item.num}|${item.market}`;
   };
@@ -259,9 +299,13 @@ const HomologationVariablesResultList: React.FC = () => {
   /**
    * 判断记录是否被选中
    */
+  // isSelected
+
   const isSelected = (item: SearchResultItem): boolean => {
     return selectedKeys.has(getKey(item));
   };
+
+  // disabled
 
   const disabled = isOperating || loading;
 
@@ -350,6 +394,8 @@ const HomologationVariablesResultList: React.FC = () => {
                 </thead>
                 <tbody>
                   {dataList.map((item) => {
+                    // key
+
                     const key = getKey(item);
                     return (
                       <tr
@@ -403,5 +449,7 @@ const HomologationVariablesResultList: React.FC = () => {
     </div>
   );
 };
+
+// HomologationVariablesResultList
 
 export default HomologationVariablesResultList;

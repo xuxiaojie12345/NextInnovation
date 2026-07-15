@@ -28,6 +28,8 @@ h1.page-title {
   margin: 0 0 4px 0;
 }
 
+/* page */
+
 .page-subtitle {
   font-size: 13px;
   color: #666666;
@@ -112,11 +114,15 @@ h1.page-title {
   margin-bottom: 16px;
 }
 
+/* info */
+
 .info-message-area p {
   margin: 0;
   color: #ad8b00;
   font-size: 13px;
 }
+
+/* error */
 
 .error-message-area {
   background-color: #ffebee;
@@ -125,6 +131,8 @@ h1.page-title {
   padding: 12px 16px;
   margin-bottom: 16px;
 }
+
+/* error */
 
 .error-message-area p {
   margin: 0;

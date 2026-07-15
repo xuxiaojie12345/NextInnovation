@@ -19,6 +19,8 @@ interface MarketItem {
  * MarketsInHDoc 组件
  * 以表格形式展示所有市场信息，纯展示页面，无用户输入操作
  */
+// MarketsInHDoc
+
 const MarketsInHDoc: React.FC = () => {
   // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
@@ -30,9 +32,13 @@ const MarketsInHDoc: React.FC = () => {
    * 调用 UD19SearchResultListApi（operation=GET_MARKET_LIST）
    */
   useEffect(() => {
+    // fetchMarkets
+
     const fetchMarkets = async () => {
       setIsLoading(true);
       try {
+        // response
+
         const response = await api.post(
           `/api/ud19/UD19SearchResultListApi`,
           { operation: "GET_MARKET_LIST" }
@@ -41,7 +47,11 @@ const MarketsInHDoc: React.FC = () => {
         if (response.data.code === 200 && response.data.data?.markets) {
           // 标准化列名并构造展示数据（对应详细设计 6. 实现注意事项 - 权重标识）
           const list = response.data.data.markets.map((item: Record<string, any>) => {
+            // marketCode
+
             const marketCode = item.MARKET || item.market || "";
+            // description
+
             const description = item.DESCRIPTION || item.description || "";
             // 权重标识：X / X(*) / 空（根据业务逻辑模拟，实际从后端获取）
             const weights = item.WEIGHTS || item.weights || "";
@@ -121,5 +131,7 @@ const MarketsInHDoc: React.FC = () => {
     </div>
   );
 };
+
+// MarketsInHDoc
 
 export default MarketsInHDoc;

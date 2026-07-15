@@ -20,8 +20,14 @@ type Operator = "=" | "!=";
  * 提供市场文档的检索、更新、清空和返回功能
  * 可接收从 MarketDocumentSettingsList 返回的选中数据
  */
+// MarketDocumentSettings
+
 const MarketDocumentSettings: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
@@ -39,6 +45,8 @@ const MarketDocumentSettings: React.FC = () => {
     documentType: "=", user: "=", date: "=", bussinesUnit: "=", market: "=", setting: "="
   });
 
+  // setOp
+
   const setOp = (field: string, v: Operator) =>
     setOps((prev) => ({ ...prev, [field]: v }));
 
@@ -46,6 +54,8 @@ const MarketDocumentSettings: React.FC = () => {
   const renderOp = (field: string) => (
     <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='operator-select' />
   );
+
+  // clearMessage
 
   const clearMessage = () => setMessage("");
 
@@ -73,6 +83,8 @@ const MarketDocumentSettings: React.FC = () => {
   /**
    * Search 按钮处理（对应详细设计 3.1.2）
    */
+  // handleSearch
+
   const handleSearch = () => {
     clearMessage();
     if (!documentType.trim() && !user.trim() && !date.trim()) {
@@ -80,6 +92,8 @@ const MarketDocumentSettings: React.FC = () => {
       setMessageType("error");
       return;
     }
+    // params
+
     const params = new URLSearchParams();
     if (documentType.trim()) params.set("documentType", documentType.trim());
     if (user.trim()) params.set("user", user.trim());
@@ -94,6 +108,8 @@ const MarketDocumentSettings: React.FC = () => {
   /**
    * Clear 按钮处理（对应详细设计 3.1.4）
    */
+  // handleClear
+
   const handleClear = () => {
     setDocumentType("");
     setMarket("");
@@ -107,6 +123,8 @@ const MarketDocumentSettings: React.FC = () => {
   /**
    * Back 按钮处理（对应详细设计 3.1.3）
    */
+  // handleBack
+
   const handleBack = () => {
     clearMessage();
     navigate('/Menu/UserGuide');
@@ -115,6 +133,8 @@ const MarketDocumentSettings: React.FC = () => {
   /**
    * Update Mode 按钮处理（对应详细设计 3.1.5）
    */
+  // handleUpdateMode
+
   const handleUpdateMode = async () => {
     clearMessage();
     if (!documentType.trim()) {
@@ -125,8 +145,12 @@ const MarketDocumentSettings: React.FC = () => {
     // 获取当前登录用户ID
     let updateUser = '';
     try {
+      // userInfoStr
+
       const userInfoStr = localStorage.getItem('userInfo');
       if (userInfoStr) {
+        // userInfo
+
         const userInfo = JSON.parse(userInfoStr);
         updateUser = userInfo.userid || userInfo.username || '';
       }
@@ -135,6 +159,8 @@ const MarketDocumentSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
+      // response
+
       const response = await api.post(
         `/api/ud20-1/UpdateHdocDocumentList`,
         {
@@ -257,5 +283,7 @@ const MarketDocumentSettings: React.FC = () => {
     </div>
   );
 };
+
+// MarketDocumentSettings
 
 export default MarketDocumentSettings;

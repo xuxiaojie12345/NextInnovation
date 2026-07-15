@@ -1,3 +1,7 @@
+// SaveModifications 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../config/api';
@@ -23,14 +27,26 @@ interface LocationState {
  *
  * 对应详细设计：DES-SaveModifications-001
  */
+// SaveModifications
+
 const SaveModifications: React.FC = () => {
+  // location
+
   const location = useLocation();
+  // navigate
+
   const navigate = useNavigate();
+  // state
+
   const state = location.state as LocationState | null;
 
   // 从路由参数获取底盘信息和修改变量列表（对应设计书 3.1.1 步骤2）
   const chassisNo = state?.chassisNo || '';
+  // serie
+
   const serie = state?.serie || '';
+  // modifiedVariables
+
   const modifiedVariables = state?.modifiedVariables || [];
 
   // 生成 Storing 显示文本（逗号分隔）- 保持现有逻辑
@@ -50,6 +66,8 @@ const SaveModifications: React.FC = () => {
    * 对应设计书 3.1.1 页面初始化流程，4.1 UD06SaveModificationsApi
    */
   useEffect(() => {
+    // fetchModifications
+
     const fetchModifications = async () => {
       if (!chassisNo || !serie) {
         setError('缺少必要的底盘信息');
@@ -61,6 +79,8 @@ const SaveModifications: React.FC = () => {
         setLoading(true);
         setError('');
 
+        // response
+
         const response = await api.post(
           `/api/ud06/savemodifications/query`,
           { serie, chno: chassisNo },
@@ -68,6 +88,8 @@ const SaveModifications: React.FC = () => {
         );
 
         if (response.data.code === 200 && response.data.data) {
+          // data
+
           const data = response.data.data;
           setDoctype(data.doctype || '-');
           setVersion(data.version || '-');
@@ -94,6 +116,8 @@ const SaveModifications: React.FC = () => {
    * 点击 Close 按钮 - 关闭当前页面
    * 对应设计书 3.1.2 Close按钮点击处理
    */
+  // handleClose
+
   const handleClose = () => {
     navigate(-1);
   };
@@ -166,5 +190,7 @@ const SaveModifications: React.FC = () => {
     </div>
   );
 };
+
+// SaveModifications
 
 export default SaveModifications;

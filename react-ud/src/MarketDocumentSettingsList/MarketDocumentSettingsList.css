@@ -50,11 +50,15 @@
   max-width: fit-content;
 }
 
+/* ud20 */
+
 .ud20-message.error {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
 }
+
+/* ud20 */
 
 .ud20-message.success {
   background-color: #efe;
@@ -88,6 +92,8 @@
   font-size: 13px;
 }
 
+/* ud20 */
+
 .ud20-table thead th {
   padding: 8px 12px;
   text-align: left;
@@ -98,6 +104,8 @@
   white-space: nowrap;
 }
 
+/* ud20 */
+
 .ud20-table tbody td {
   padding: 6px 12px;
   color: #333333;
@@ -105,10 +113,14 @@
   vertical-align: middle;
 }
 
+/* ud20 */
+
 .ud20-table tbody tr:hover {
   background-color: #f0f4ff;
   cursor: pointer;
 }
+
+/* ud20 */
 
 .ud20-table tbody tr:last-child td {
   border-bottom: none;
@@ -119,6 +131,8 @@
   background-color: #d0ddf0 !important;
 }
 
+/* ud20 */
+
 .ud20-row-selected:hover {
   background-color: #c0d0e5 !important;
 }
@@ -128,6 +142,8 @@
   width: 40px;
   text-align: center;
 }
+
+/* ud20 */
 
 .ud20-td-radio {
   text-align: center;
@@ -145,6 +161,8 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* ud20 */
 
 .ud20-user-link:hover {
   color: #003366;
@@ -167,23 +185,33 @@
 
 /* ========== 打印样式 ========== */
 @media print {
+  /* ud20 */
+
   .ud20-container {
     box-shadow: none;
     margin: 0;
     padding: 20px;
   }
 
+  /* ud20 */
+
   .ud20-btn-group {
     display: none;
   }
+
+  /* ud20 */
 
   .ud20-message {
     display: none;
   }
 
+  /* ud20 */
+
   .ud20-loading {
     display: none;
   }
+
+  /* ud20 */
 
   .ud20-print-timestamp {
     display: block !important;
@@ -193,9 +221,13 @@
 /* ========== 响应式适配 ========== */
 
 @media (max-width: 768px) {
+  /* ud20 */
+
   .ud20-container {
     padding: 12px;
   }
+
+  /* ud20 */
 
   .ud20-btn-group {
     flex-wrap: wrap;

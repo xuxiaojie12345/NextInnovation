@@ -24,15 +24,27 @@ interface UserInfo {
  * 展示当前登录用户的详细信息，所有字段为只读展示
  * 提供清空显示内容（Clear）和返回前页面（Back）功能
  */
+// EDBUserView
+
 const EDBUserView: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // 从导航状态或URL参数中获取userId
   // 支持两种方式：1) location.state.userId（SPA内导航） 2) URL查询参数（新窗口打开）
   const stateUserId = (location.state as { userId?: string })?.userId || "";
+  // params
+
   const params = new URLSearchParams(location.search);
+  // queryUserId
+
   const queryUserId = params.get("userId") || "";
+  // userId
+
   const userId = stateUserId || queryUserId;
 
   // 用户信息状态（对应详细设计 2.1 控件属性表）
@@ -54,6 +66,8 @@ const EDBUserView: React.FC = () => {
    * API Endpoint: GET /api/authentication/userinfo?userId=xxx
    */
   useEffect(() => {
+    // fetchUserInfo
+
     const fetchUserInfo = async () => {
       setLoading(true);
       setError("");
@@ -104,6 +118,8 @@ const EDBUserView: React.FC = () => {
    * 对应详细设计 3.1.2 Clear处理流程
    * 仅前端清空显示，不调用任何API
    */
+  // handleClear
+
   const handleClear = () => {
     setUserInfo({
       userid: "",
@@ -119,6 +135,8 @@ const EDBUserView: React.FC = () => {
    * 对应详细设计 3.1.3 Back处理流程
    * 使用浏览器历史记录返回前画面
    */
+  // handleBack
+
   const handleBack = () => {
     navigate(-1);
   };
@@ -175,5 +193,7 @@ const EDBUserView: React.FC = () => {
     </div>
   );
 };
+
+// EDBUserView
 
 export default EDBUserView;

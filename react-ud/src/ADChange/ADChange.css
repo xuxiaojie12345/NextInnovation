@@ -4,6 +4,8 @@
  * 对应详细设计：详细设计/詳細設計UD16.md
  */
 
+/* ud16 */
+
 .ud16-container {
   padding: 20px;
   background-color: #ffffff;
@@ -11,6 +13,8 @@
   overflow-x: hidden;
   box-sizing: border-box;
 }
+
+/* ud16 */
 
 .ud16-title {
   color: #2c3e50;
@@ -21,11 +25,15 @@
   padding-bottom: 10px;
 }
 
+/* ud16 */
+
 .ud16-loading {
   padding: 12px 0;
   font-size: 13px;
   color: #666666;
 }
+
+/* ud16 */
 
 .ud16-message {
   padding: 8px 12px;
@@ -38,17 +46,23 @@
   max-width: fit-content;
 }
 
+/* ud16 */
+
 .ud16-message.error {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
 }
 
+/* ud16 */
+
 .ud16-message.success {
   background-color: #efe;
   color: #3c3;
   border: 1px solid #cfc;
 }
+
+/* ud16 */
 
 .ud16-btn-group {
   display: flex;
@@ -58,6 +72,8 @@
   background-color: #e8f0fe;
   border-top: 1px solid #b0c4de;
 }
+
+/* ud16 */
 
 .ud16-btn {
   padding: 4px 12px;
@@ -71,14 +87,20 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud16 */
+
 .ud16-btn:hover {
   background-color: #c0d0e5;
 }
+
+/* ud16 */
 
 .ud16-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ud16 */
 
 .ud16-form {
   border: 1px solid #b0c4de;
@@ -91,12 +113,16 @@
   flex-direction: column;
 }
 
+/* ud16 */
+
 .ud16-field {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   padding-top: 12px;
 }
+
+/* ud16 */
 
 .ud16-label {
   width: 140px;
@@ -106,6 +132,8 @@
   flex-shrink: 0;
   padding-top: 4px;
 }
+
+/* ud16 */
 
 .ud16-input {
   padding: 4px 8px;
@@ -118,9 +146,13 @@
   height: 26px;
 }
 
+/* ud16 */
+
 .ud16-input:focus {
   border-color: #666666;
 }
+
+/* ud16 */
 
 .ud16-textarea {
   padding: 4px 8px;
@@ -133,6 +165,8 @@
   resize: vertical;
   font-family: inherit;
 }
+
+/* ud16 */
 
 .ud16-textarea:focus {
   border-color: #666666;
@@ -161,6 +195,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* ud16 */
+
 .ud16-modal-header {
   display: flex;
   justify-content: space-between;
@@ -170,11 +206,15 @@
   border-bottom: 1px solid #b0c4de;
 }
 
+/* ud16 */
+
 .ud16-modal-header h3 {
   margin: 0;
   font-size: 16px;
   color: #2c3e50;
 }
+
+/* ud16 */
 
 .ud16-modal-close {
   background: none;
@@ -185,9 +225,13 @@
   padding: 0 4px;
 }
 
+/* ud16 */
+
 .ud16-modal-body {
   padding: 16px;
 }
+
+/* ud16 */
 
 .ud16-modal-footer {
   padding: 10px 16px;
@@ -202,10 +246,14 @@
   font-size: 13px;
 }
 
+/* ud16 */
+
 .ud16-check-table td {
   padding: 8px 12px;
   border-bottom: 1px solid #e8e8e8;
 }
+
+/* ud16 */
 
 .ud16-check-label {
   width: 120px;
@@ -214,9 +262,13 @@
   background-color: #fafafa;
 }
 
+/* ud16 */
+
 .ud16-check-value {
   color: #333333;
 }
+
+/* ud16 */
 
 .ud16-check-not-found {
   text-align: center;

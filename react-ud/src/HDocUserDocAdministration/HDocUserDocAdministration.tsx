@@ -18,6 +18,8 @@ interface DocTypeItem {
  * HDocUserDocAdministration 组件
  * 提供用户文档权限的查询和更新管理功能
  */
+// HDocUserDocAdministration
+
 const HDocUserDocAdministration: React.FC = () => {
   // -------- 状态管理 (对应详细设计 6. 实现注意事项) --------
   const [userid, setUserid] = useState<string>("");
@@ -37,8 +39,12 @@ const HDocUserDocAdministration: React.FC = () => {
    * 调用 UD20GetDocumentListApi（GET /api/ud20/marketdocumentsettings）
    */
   useEffect(() => {
+    // fetchDocTypes
+
     const fetchDocTypes = async () => {
       try {
+        // response
+
         const response = await api.get(
           `/api/ud20/marketdocumentsettings`
         );
@@ -61,6 +67,8 @@ const HDocUserDocAdministration: React.FC = () => {
   /**
    * 校验UserID是否为空（对应详细设计 3.2 No.1/3）
    */
+  // validateUserid
+
   const validateUserid = (): boolean => {
     if (!userid || userid.trim() === "") {
       setMessage("UserID is required.");
@@ -73,6 +81,8 @@ const HDocUserDocAdministration: React.FC = () => {
   /**
    * 校验UserID是否只包含半角英数字（对应详细设计 3.2 No.2/4）
    */
+  // validateAlphanumeric
+
   const validateAlphanumeric = (): boolean => {
     if (!/^[a-zA-Z0-9]*$/.test(userid.trim())) {
       setMessage("UserID must contain only alphanumeric characters.");
@@ -86,7 +96,11 @@ const HDocUserDocAdministration: React.FC = () => {
    * 处理UserID输入变化（对应详细设计 6. 实现注意事项 - 输入限制）
    * 只允许半角英数字（a-z, A-Z, 0-9），最大10字符
    */
+  // handleUseridChange
+
   const handleUseridChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // val
+
     const val = e.target.value;
     // 只允许半角英数字
     if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 10) {
@@ -99,8 +113,14 @@ const HDocUserDocAdministration: React.FC = () => {
    * 处理Document多选列表变更
    * 对应详细设计 2.1 Document多选控件
    */
+  // handleDocSelectChange
+
   const handleDocSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // options
+
     const options = e.target.options;
+    // selected
+
     const selected: string[] = [];
     for (let i = 0; i < options.length; i++) {
       if (options[i].selected) {
@@ -116,6 +136,8 @@ const HDocUserDocAdministration: React.FC = () => {
    * 步骤2: 存在性检查（checkAuth）
    * 步骤3: 查询用户信息和文档权限（select）
    */
+  // handleUserInfo
+
   const handleUserInfo = async () => {
     clearMessage();
 
@@ -158,6 +180,8 @@ const HDocUserDocAdministration: React.FC = () => {
       );
 
       if (selectResponse.data.code === 200) {
+        // data
+
         const data = selectResponse.data.data;
         // 显示用户名（对应详细设计 3.1.2 步骤5 - 成功）
         setUsername(data.username || "");
@@ -188,6 +212,8 @@ const HDocUserDocAdministration: React.FC = () => {
    * Update按钮处理 - 更新用户文档权限（对应详细设计 3.1.3 Update处理流程）
    * 先DELETE后INSERT（先删既有数据，再创建新权限）
    */
+  // handleUpdate
+
   const handleUpdate = async () => {
     clearMessage();
 
@@ -315,6 +341,8 @@ const HDocUserDocAdministration: React.FC = () => {
               disabled={loading}
             >
               {docTypeList.map((doc) => {
+                // isAssigned
+
                 const isAssigned = selectedDocs.includes(doc.DOCTYPE);
                 return (
                   <option key={doc.DOCTYPE} value={doc.DOCTYPE}
@@ -343,5 +371,7 @@ const HDocUserDocAdministration: React.FC = () => {
     </div>
   );
 };
+
+// HDocUserDocAdministration
 
 export default HDocUserDocAdministration;

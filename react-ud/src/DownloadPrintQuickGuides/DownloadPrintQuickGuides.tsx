@@ -1,3 +1,7 @@
+// DownloadPrintQuickGuides 组件
+
+// 对应功能模块
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./DownloadPrintQuickGuides.css";
@@ -11,7 +15,11 @@ const getGuideImage = (filename: string): string => {
   }
 };
 
+// DownloadPrintQuickGuides
+
 const DownloadPrintQuickGuides: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
 
   // 快速指南数据
@@ -32,6 +40,8 @@ const DownloadPrintQuickGuides: React.FC = () => {
     "AVP Quick Guide", "KAX Quick Guide", "CAE Homepage Quick Guide",
     "BPP Quick Guide", "SPC Quick Guide", "WebFRAME Quick Guide",
   ];
+
+  // handleBack
 
   const handleBack = () => {
     navigate(-1);
@@ -94,5 +104,7 @@ const DownloadPrintQuickGuides: React.FC = () => {
     </div>
   );
 };
+
+// DownloadPrintQuickGuides
 
 export default DownloadPrintQuickGuides;

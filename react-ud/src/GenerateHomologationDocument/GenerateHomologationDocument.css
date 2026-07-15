@@ -24,6 +24,8 @@
   gap: 12px;
 }
 
+/* generate */
+
 .generate-homologation-container .page-title {
   color: #ffffff;
   font-size: 18px;
@@ -80,6 +82,8 @@
   margin-bottom: 14px;
 }
 
+/* generate */
+
 .generate-homologation-container .form-group label {
   width: 130px;
   flex-shrink: 0;
@@ -89,6 +93,8 @@
   text-align: left;
   line-height: 1.4;
 }
+
+/* generate */
 
 .generate-homologation-container .field-control {
   flex: 1;
@@ -108,15 +114,21 @@
   box-sizing: border-box;
 }
 
+/* generate */
+
 .generate-homologation-container .form-group input[type="text"]:focus {
   border-color: #003057;
 }
+
+/* generate */
 
 .generate-homologation-container .form-group input[type="text"]:disabled {
   background-color: #f0f0f0;
   color: #888888;
   cursor: not-allowed;
 }
+
+/* generate */
 
 .generate-homologation-container .form-group input[type="text"]::placeholder {
   color: #b0b0b0;
@@ -137,9 +149,13 @@
   appearance: auto;
 }
 
+/* generate */
+
 .generate-homologation-container .form-group select:focus {
   border-color: #003057;
 }
+
+/* generate */
 
 .generate-homologation-container .form-group select:disabled {
   background-color: #f0f0f0;
@@ -149,6 +165,8 @@
 
 /* ---- 错误状态输入框 ---- */
 .generate-homologation-container .form-group input.input-error,
+/* generate */
+
 .generate-homologation-container .form-group select.input-error {
   border-color: #d32f2f;
   background-color: #fff1f0;
@@ -165,6 +183,8 @@
   justify-content: flex-start;
 }
 
+/* generate */
+
 .generate-homologation-container .button-area button {
   padding: 4px 12px;
   font-size: 13px;
@@ -178,13 +198,19 @@
   transition: background-color 0.2s ease;
 }
 
+/* generate */
+
 .generate-homologation-container .button-area button:hover:not(:disabled) {
   background-color: #c0d0e5;
 }
 
+/* generate */
+
 .generate-homologation-container .button-area button:active:not(:disabled) {
   background-color: #b0c0d5;
 }
+
+/* generate */
 
 .generate-homologation-container .button-area button:disabled {
   opacity: 0.5;

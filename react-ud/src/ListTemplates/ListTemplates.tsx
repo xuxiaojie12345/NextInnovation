@@ -37,6 +37,8 @@ interface FileListResponse {
  * ListTemplates 组件
  * 选择Market后显示该市场文件夹下的模板文件列表
  */
+// ListTemplates
+
 const ListTemplates: React.FC = () => {
   // 市场列表
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
@@ -53,14 +55,20 @@ const ListTemplates: React.FC = () => {
    * 页面初始化 - 获取市场列表
    */
   useEffect(() => {
+    // fetchMarkets
+
     const fetchMarkets = async () => {
       setLoading(true);
       setError("");
       try {
+        // response
+
         const response = await api.get(
           `/api/ud14/UD14SelectMarketmaster`
         );
         if (response.data.code === 200 && response.data.data) {
+          // data
+
           const data: MarketListResponse = response.data.data;
           setMarketList(data.markets || []);
         } else {
@@ -78,7 +86,11 @@ const ListTemplates: React.FC = () => {
   /**
    * 市场选择处理 - 加载对应市场的文件列表
    */
+  // handleMarketChange
+
   const handleMarketChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // market
+
     const market = e.target.value;
     setSelectedMarket(market);
     setError("");
@@ -90,11 +102,15 @@ const ListTemplates: React.FC = () => {
 
     setLoading(true);
     try {
+      // response
+
       const response = await api.get(
         `/api/ud14/UD14SelectHdocuserdefinedrules`,
         { params: { market } }
       );
       if (response.data.code === 200 && response.data.data) {
+        // data
+
         const data: FileListResponse = response.data.data;
         setFileList(data.files || []);
       } else {
@@ -113,19 +129,27 @@ const ListTemplates: React.FC = () => {
    * 文件下载处理 - 对应详细设计 3.1.3 文件下载流程
    * 构造下载URL: /api/ud14/download?market={market}&filename={filename}
    */
+  // handleFileDownload
+
   const handleFileDownload = async (file: TemplateFile) => {
     try {
       if (!selectedMarket) {
         setError("Market not selected.");
         return;
       }
+      // response
+
       const response = await api.get(`/api/ud14/download`, {
         params: { market: selectedMarket, filename: file.filename },
         responseType: 'blob'
       });
       // 创建下载链接
       const blob = new Blob([response.data]);
+      // url
+
       const url = window.URL.createObjectURL(blob);
+      // link
+
       const link = document.createElement("a");
       link.href = url;
       link.download = file.filename;
@@ -208,5 +232,7 @@ const ListTemplates: React.FC = () => {
     </div>
   );
 };
+
+// ListTemplates
 
 export default ListTemplates;

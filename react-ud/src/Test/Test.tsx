@@ -1,4 +1,10 @@
+// Test 组件
+
+// 对应功能模块
+
 import React, { useState } from "react";
+
+// TestMain
 
 function TestMain(props: any) {
   return (
@@ -7,5 +13,7 @@ function TestMain(props: any) {
     </div>
   );
 }
+
+// TestMain
 
 export default TestMain;

@@ -71,9 +71,13 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud25 */
+
 .ud25-btn:hover {
   background-color: #c0d0e5;
 }
+
+/* ud25 */
 
 .ud25-btn:active {
   background-color: #b0c0d5;
@@ -124,6 +128,8 @@
   background-color: #f5f5f5;
   cursor: default;
 }
+
+/* ud25 */
 
 .ud25-input:focus {
   border-color: #666666;

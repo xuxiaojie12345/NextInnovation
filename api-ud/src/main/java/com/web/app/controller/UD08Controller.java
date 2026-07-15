@@ -10,8 +10,6 @@ import com.web.app.domain.entity.HdocVariable;
 import com.web.app.domain.entity.MarketMaster;
 import com.web.app.domain.entity.ProductClassMaster;
 import com.web.app.service.UD08Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +29,7 @@ import java.util.List;
 
  */
 
-public class UD08Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD08Controller.class);
-
-    @Autowired
+public class UD08Controller extends BaseController {@Autowired
     /** ud08Service */
 
     private UD08Service ud08Service;

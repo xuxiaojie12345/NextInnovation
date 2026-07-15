@@ -25,6 +25,8 @@ interface CompareOperatorSelectProps {
 /**
  * 普通运算符下拉框（= / !=）
  */
+// OperatorSelect
+
 const OperatorSelect: React.FC<OperatorSelectProps> = ({ value, onChange, className }) => (
   <select
     value={value}
@@ -39,6 +41,8 @@ const OperatorSelect: React.FC<OperatorSelectProps> = ({ value, onChange, classN
 /**
  * 数值/日期字段专用运算符下拉框（= / > / <）
  */
+// CompareOperatorSelect
+
 export const CompareOperatorSelect: React.FC<CompareOperatorSelectProps> = ({ value, onChange, className }) => (
   <select
     value={value}
@@ -50,5 +54,7 @@ export const CompareOperatorSelect: React.FC<CompareOperatorSelectProps> = ({ va
     <option value="LT">&lt;</option>
   </select>
 );
+
+// OperatorSelect
 
 export default OperatorSelect;

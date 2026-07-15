@@ -3,8 +3,6 @@ package com.web.app.controller;
 import com.web.app.domain.ApiResponse;
 import com.web.app.domain.UD17Request;
 import com.web.app.service.UD17Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +17,7 @@ import java.util.Map;
 
  */
 
-public class UD17Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD17Controller.class);
-
-    @Autowired
+public class UD17Controller extends BaseController {@Autowired
     /** ud17Service */
 
     private UD17Service ud17Service;

@@ -1,3 +1,7 @@
+// VehicleSpecification 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../config/api";
@@ -39,7 +43,11 @@ interface VehicleSpecificationData {
  *
  * 对应详细设计：DES-VehicleSpecification-001
  */
+// VehicleSpecification
+
 const VehicleSpecification: React.FC = () => {
+  // location
+
   const location = useLocation();
   // 从路由参数获取底盘编号（格式：serie + 半角空格 + chassisNo）
   const chassisNo = (location.state as { chassisNo?: string })?.chassisNo || "";
@@ -56,6 +64,8 @@ const VehicleSpecification: React.FC = () => {
    * 对应详细设计 3.1.1 页面初始化流程
    */
   useEffect(() => {
+    // fetchVehicleSpecification
+
     const fetchVehicleSpecification = async () => {
       // 前置处理：校验底盘编号是否为空
       if (!chassisNo) {
@@ -78,6 +88,8 @@ const VehicleSpecification: React.FC = () => {
         );
 
         if (response.data.code === 200 && response.data.data) {
+          // data
+
           const data: VehicleSpecificationData = response.data.data;
           setChassisInfo(data.chassisInfo);
           setEngineInfo(data.engineInfo);
@@ -209,5 +221,7 @@ const VehicleSpecification: React.FC = () => {
     </div>
   );
 };
+
+// VehicleSpecification
 
 export default VehicleSpecification;

@@ -6,8 +6,6 @@ import com.web.app.domain.UD08SearchRequest;
 import com.web.app.domain.ApiResponse;
 import com.web.app.domain.entity.HdocUserDefinedRules;
 import com.web.app.service.UD09Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +27,7 @@ import java.util.List;
 
  */
 
-public class UD09Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD09Controller.class);
-
-    @Autowired
+public class UD09Controller extends BaseController {@Autowired
     /** ud09Service */
 
     private UD09Service ud09Service;

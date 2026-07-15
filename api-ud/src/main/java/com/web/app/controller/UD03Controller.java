@@ -19,7 +19,7 @@ import java.util.List;
 
  */
 
-public class UD03Controller {
+public class UD03Controller extends BaseController {
 
     @Autowired
     /** ud03Service */

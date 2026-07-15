@@ -106,9 +106,13 @@
   background-color: #ffffff;
 }
 
+/* ud12 */
+
 .ud12-select:focus {
   border-color: #666666;
 }
+
+/* ud12 */
 
 .ud12-select:disabled {
   background-color: #e9ecef;
@@ -125,6 +129,8 @@
   padding: 4px 12px;
   transition: background-color 0.2s ease;
 }
+
+/* ud12 */
 
 .ud12-file-input:hover {
   background-color: #c0d0e5;
@@ -165,6 +171,8 @@
   border: 1px solid #8da0c0;
 }
 
+/* ud12 */
+
 .ud12-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -176,6 +184,8 @@
   background-color: #d0ddf0;
 }
 
+/* ud12 */
+
 .ud12-btn-primary:hover:not(:disabled) {
   background-color: #c0d0e5;
 }
@@ -186,6 +196,8 @@
   background-color: #d0ddf0;
   border-color: #8da0c0;
 }
+
+/* ud12 */
 
 .ud12-btn-danger:hover:not(:disabled) {
   background-color: #c0d0e5;
@@ -222,6 +234,8 @@
   font-size: 13px;
   cursor: pointer;
 }
+
+/* ud12 */
 
 .ud12-link:hover {
   color: #0055aa;

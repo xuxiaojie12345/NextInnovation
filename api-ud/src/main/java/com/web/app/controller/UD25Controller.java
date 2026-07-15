@@ -5,9 +5,6 @@ import com.web.app.domain.UD25UserInfoResponse;
 import com.web.app.service.UD25Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * UD25控制器 - UD25AuthenticationApi
  * 对应详细设计：详细设计/詳細設計UD25.md
@@ -25,11 +22,7 @@ import org.slf4j.LoggerFactory;
 
  */
 
-public class UD25Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD25Controller.class);
-
-    @Autowired
+public class UD25Controller extends BaseController {@Autowired
     /** ud25Service */
 
     private UD25Service ud25Service;

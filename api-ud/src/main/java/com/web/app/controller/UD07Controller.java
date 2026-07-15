@@ -5,9 +5,6 @@ import com.web.app.domain.VehicleSpecificationResponse;
 import com.web.app.service.UD07Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * UD07控制器
  * 提供UD07VehicleSpecificationApi接口 - 获取车辆规格信息
@@ -25,11 +22,7 @@ import org.slf4j.LoggerFactory;
 
  */
 
-public class UD07Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD07Controller.class);
-
-    @Autowired
+public class UD07Controller extends BaseController {@Autowired
     /** ud07Service */
 
     private UD07Service ud07Service;

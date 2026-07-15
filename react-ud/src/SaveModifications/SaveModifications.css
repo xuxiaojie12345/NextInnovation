@@ -48,6 +48,8 @@ h1.page-title {
   font-weight: bold;
 }
 
+/* error */
+
 .error-message-area p {
   margin: 0;
   white-space: pre-wrap;
@@ -71,12 +73,16 @@ h1.page-title {
   line-height: 1.6;
 }
 
+/* info */
+
 .info-item label {
   font-weight: normal;
   color: #333;
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+/* info */
 
 .info-item span {
   color: #003087;
@@ -103,12 +109,16 @@ h1.page-title {
   line-height: 1.6;
 }
 
+/* found */
+
 .found-version-section label {
   font-weight: normal;
   color: #333;
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+/* found */
 
 .found-version-section span {
   color: #003087;
@@ -125,6 +135,8 @@ h1.page-title {
   max-width: 195px;
 }
 
+/* release */
+
 .release-message {
   color: #000;
   font-weight: bold;
@@ -139,6 +151,8 @@ h1.page-title {
   padding-top: 10px;
 }
 
+/* close */
+
 .close-button {
   padding: 10px 30px;
   background-color: #e8f4f8;
@@ -152,11 +166,15 @@ h1.page-title {
   min-width: 100px;
 }
 
+/* close */
+
 .close-button:hover:not(:disabled) {
   background-color: #d0e8f0;
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* close */
 
 .close-button:disabled {
   opacity: 0.6;
@@ -165,24 +183,34 @@ h1.page-title {
 
 /* 响应式 - 小屏幕 */
 @media (max-width: 768px) {
+  /* save */
+
   .save-modifications-container {
     padding: 16px;
   }
+
+  /* info */
 
   .info-item {
     flex-direction: column;
     align-items: flex-start;
   }
 
+  /* info */
+
   .info-item label {
     min-width: auto;
     margin-bottom: 2px;
   }
 
+  /* found */
+
   .found-version-section {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  /* found */
 
   .found-version-section label {
     min-width: auto;

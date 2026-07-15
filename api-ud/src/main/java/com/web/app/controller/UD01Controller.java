@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 
  */
 
-public class UD01Controller {
+public class UD01Controller extends BaseController {
     
     @Autowired
     /** ud01Service */

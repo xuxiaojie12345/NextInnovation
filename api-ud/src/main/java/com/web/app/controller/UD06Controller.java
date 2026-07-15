@@ -6,9 +6,6 @@ import com.web.app.domain.SaveModificationsQueryResponse;
 import com.web.app.service.UD06Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * UD06控制器
  * 提供UD06SaveModificationsApi接口 - ADCA修改信息查询
@@ -25,11 +22,7 @@ import org.slf4j.LoggerFactory;
 
  */
 
-public class UD06Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD06Controller.class);
-
-    @Autowired
+public class UD06Controller extends BaseController {@Autowired
     /** ud06Service */
 
     private UD06Service ud06Service;

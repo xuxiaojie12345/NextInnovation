@@ -3,8 +3,6 @@ package com.web.app.controller;
 import com.web.app.domain.ApiResponse;
 import com.web.app.domain.UD16Request;
 import com.web.app.service.UD16Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +20,7 @@ import java.util.Map;
 
  */
 
-public class UD16Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD16Controller.class);
-
-    @Autowired
+public class UD16Controller extends BaseController {@Autowired
     /** ud16Service */
 
     private UD16Service ud16Service;

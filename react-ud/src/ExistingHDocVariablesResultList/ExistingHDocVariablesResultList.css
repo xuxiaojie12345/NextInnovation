@@ -59,17 +59,23 @@
   text-align: left;
 }
 
+/* ud11 */
+
 .ud11-message.error {
   background-color: #fff2f0;
   border: 1px solid #ffccc7;
   color: #ff4d4f;
 }
 
+/* ud11 */
+
 .ud11-message.success {
   background-color: #d4edda;
   border: 1px solid #c3e6cb;
   color: #155724;
 }
+
+/* ud11 */
 
 .ud11-message.warning {
   background-color: #fffbe6;
@@ -102,13 +108,19 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud11 */
+
 .ud11-btn:hover {
   background-color: #c0d0e5;
 }
 
+/* ud11 */
+
 .ud11-btn:active {
   background-color: #b0c0d5;
 }
+
+/* ud11 */
 
 .ud11-btn:disabled {
   opacity: 0.5;
@@ -139,6 +151,8 @@
   border: 1px solid #e8e8e8;
 }
 
+/* ud11 */
+
 .ud11-table th {
   background-color: #fafafa;
   color: #333333;
@@ -150,12 +164,16 @@
   font-size: 12px;
 }
 
+/* ud11 */
+
 .ud11-table td {
   padding: 7px 10px;
   border-bottom: 1px solid #f0f0f0;
   color: #333333;
   vertical-align: top;
 }
+
+/* ud11 */
 
 .ud11-table tr:hover {
   background-color: #e6f7ff;
@@ -188,6 +206,8 @@
   font-weight: 500;
 }
 
+/* ud11 */
+
 .ud11-user-link:hover {
   color: #0055aa;
 }
@@ -217,9 +237,13 @@
 
 /* 响应式 */
 @media (max-width: 768px) {
+  /* ud11 */
+
   .ud11-container {
     padding: 16px;
   }
+
+  /* ud11 */
 
   .ud11-button-group {
     flex-direction: column;

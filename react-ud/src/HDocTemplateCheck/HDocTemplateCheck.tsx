@@ -11,6 +11,8 @@ import "./HDocTemplateCheck.css";
  * HDocTemplateCheck 组件
  * 提供rtf模板文件的选择界面（检查功能未实现）
  */
+// HDocTemplateCheck
+
 const HDocTemplateCheck: React.FC = () => {
   // 选择的文件
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -18,6 +20,8 @@ const HDocTemplateCheck: React.FC = () => {
   /**
    * 文件选择处理
    */
+  // handleFileChange
+
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
@@ -30,6 +34,8 @@ const HDocTemplateCheck: React.FC = () => {
   /**
    * Check按钮点击处理 - 暂不实现
    */
+  // handleCheck
+
   const handleCheck = useCallback(() => {
     // Check功能暂不实现，按钮点击不做任何处理
   }, []);
@@ -63,5 +69,7 @@ const HDocTemplateCheck: React.FC = () => {
     </div>
   );
 };
+
+// HDocTemplateCheck
 
 export default HDocTemplateCheck;

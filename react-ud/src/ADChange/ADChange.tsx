@@ -13,6 +13,7 @@
  */
 import React, { useState } from "react";
 import api, { API_BASE_URL } from "../config/api";
+import usePageState from "../hooks/usePageState";
 import "./ADChange.css";
 
 /**
@@ -40,6 +41,8 @@ interface CheckResult {
  * 
  * @returns 渲染 AD Change 管理页面
  */
+// ADChange
+
 const ADChange: React.FC = () => {
   // ── 输入字段状态 ──────────────────────────────────────────
   // serieChnr: 用户输入的 Serie-Chnr 组合，格式示例 "ABC-123456"
@@ -56,18 +59,7 @@ const ADChange: React.FC = () => {
   const [showCheckModal, setShowCheckModal] = useState<boolean>(false);
 
   // ── 通用 UI 状态 ───────────────────────────────────────────
-  // message: 页面中的提示消息文本（操作成功/失败时更新）
-  const [message, setMessage] = useState<string>("");
-  // messageType: 消息类型，控制样式（error=红色错误消息, success=绿色成功消息）
-  const [messageType, setMessageType] = useState<"error" | "success">("error");
-  // loading: 请求进行中标记，为 true 时禁用按钮和输入框（防止重复提交）
-  const [loading, setLoading] = useState<boolean>(false);
-
-  /**
-   * 清空当前页面中的所有消息提示
-   * 在用户开始新的操作前调用，清除上次操作的遗留消息
-   */
-  const clearMessage = () => setMessage("");
+  const { loading, setLoading, message, setMessage, messageType, setMessageType, clearMessage } = usePageState();
 
   /**
    * 校验 Serie-Chnr 输入是否为空
@@ -77,6 +69,8 @@ const ADChange: React.FC = () => {
    * 
    * @returns {boolean} - true=校验通过（不为空）, false=校验失败（为空）
    */
+  // validateSerieChnr
+
   const validateSerieChnr = (): boolean => {
     if (!serieChnr || serieChnr.trim() === "") {
       return false;
@@ -99,6 +93,8 @@ const ADChange: React.FC = () => {
    * 
    * 对应详细设计 3.1.2 ADD操作流程
    */
+  // handleAdd
+
   const handleAdd = async () => {
     // 步骤1：清空此前操作残留的状态
     clearMessage();
@@ -128,6 +124,8 @@ const ADChange: React.FC = () => {
     // 步骤5：发起 API 请求（加锁防止重复提交）
     setLoading(true);
     try {
+      // response
+
       const response = await api.post(
         '/api/adchange/process',
         {
@@ -175,6 +173,8 @@ const ADChange: React.FC = () => {
    * 注意：DELETE 操作为逻辑删除（标记记录为无效），非物理删除数据。
    * 对应详细设计 3.1.3 DELETE操作流程
    */
+  // handleDelete
+
   const handleDelete = async () => {
     clearMessage();
     setCheckResult(null);
@@ -188,6 +188,8 @@ const ADChange: React.FC = () => {
 
     setLoading(true);
     try {
+      // response
+
       const response = await api.post(
         '/api/adchange/process',
         {
@@ -229,6 +231,8 @@ const ADChange: React.FC = () => {
    * 
    * 对应详细设计 3.1.4 CHECK操作流程
    */
+  // handleCheck
+
   const handleCheck = async () => {
     clearMessage();
     setCheckResult(null);
@@ -242,6 +246,8 @@ const ADChange: React.FC = () => {
 
     setLoading(true);
     try {
+      // response
+
       const response = await api.post(
         '/api/adchange/process',
         {
@@ -282,6 +288,8 @@ const ADChange: React.FC = () => {
    *   - 点击弹窗右上角 × 按钮
    *   - 点击弹窗背景的半透明遮罩层（onClick={closeCheckModal}）
    */
+  // closeCheckModal
+
   const closeCheckModal = () => {
     setShowCheckModal(false);  // 隐藏弹窗
     setCheckResult(null);       // 清空查询结果（下次打开时重新加载）
@@ -404,5 +412,7 @@ const ADChange: React.FC = () => {
     </div>
   );
 };
+
+// ADChange
 
 export default ADChange;

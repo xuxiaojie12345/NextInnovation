@@ -31,7 +31,11 @@ interface TemplateFile {
  * 提供模板文件上传和删除管理功能
  * 包含HDoc Template Upload和HDoc Template Delete两个区域
  */
+// UploadDeleteTemplate
+
 const UploadDeleteTemplate: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
 
   // 市场列表状态
@@ -60,12 +64,18 @@ const UploadDeleteTemplate: React.FC = () => {
    * API: GET /api/ud12/selectmarket
    */
   useEffect(() => {
+    // initializePage
+
     const initializePage = async () => {
       setLoading(true);
       setError("");
       setSuccessMessage("");
       try {
+        // response
+
         const response = await api.get(`/api/ud12/selectmarket`);
+        // data
+
         const data: Market[] = response.data.data || [];
         // 填充Upload和Delete两个区域的Market下拉列表
         setUploadMarketList(data);
@@ -84,6 +94,8 @@ const UploadDeleteTemplate: React.FC = () => {
   /**
    * Upload区域Market选择处理
    */
+  // handleUploadMarketChange
+
   const handleUploadMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedUploadMarket(e.target.value);
     setError("");
@@ -95,7 +107,11 @@ const UploadDeleteTemplate: React.FC = () => {
    * 对应详细设计 3.1.4 市场选择联动流程
    * API: GET /api/ud12/selectmarket/{marketCode}
    */
+  // handleDeleteMarketChange
+
   const handleDeleteMarketChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // marketCode
+
     const marketCode = e.target.value;
     setSelectedDeleteMarket(marketCode);
     setSelectedTemplate("");
@@ -105,7 +121,11 @@ const UploadDeleteTemplate: React.FC = () => {
     if (marketCode) {
       setLoading(true);
       try {
+        // response
+
         const response = await api.get(`/api/ud12/selectmarket/${marketCode}`);
+        // data
+
         const data: TemplateFile[] = response.data.data || [];
         setTemplatesList(data);
       } catch (err) {
@@ -122,6 +142,8 @@ const UploadDeleteTemplate: React.FC = () => {
   /**
    * 获取选中的File对象 - 直接从DOM的input.files读取，不受React渲染影响
    */
+  // getSelectedFile
+
   const getSelectedFile = (): File | null => {
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files.length > 0) {
       return fileInputRef.current.files[0];
@@ -132,6 +154,8 @@ const UploadDeleteTemplate: React.FC = () => {
   /**
    * Templates下拉列表选择处理
    */
+  // handleTemplateChange
+
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTemplate(e.target.value);
     setError("");
@@ -143,6 +167,8 @@ const UploadDeleteTemplate: React.FC = () => {
    * 对应详细设计 3.1.2 文件上传流程
    * API: POST /api/ud12/upload (multipart/form-data)
    */
+  // handleUploadClick
+
   const handleUploadClick = async () => {
     setError("");
     setSuccessMessage("");
@@ -171,6 +197,8 @@ const UploadDeleteTemplate: React.FC = () => {
 
     setLoading(true);
     try {
+      // formData
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("market", selectedUploadMarket);
@@ -182,6 +210,8 @@ const UploadDeleteTemplate: React.FC = () => {
       );
 
       if (response.data.code === 200) {
+        // result
+
         const result = response.data.data;
         setSuccessMessage(
           `TEMPLATE ${result.fileName} WAS SUCESSFULLY UPLOADED TO MARKET ${result.market}`
@@ -205,6 +235,8 @@ const UploadDeleteTemplate: React.FC = () => {
    * 对应详细设计 3.1.3 模板删除流程
    * API: POST /api/ud12/delete
    */
+  // handleDeleteClick
+
   const handleDeleteClick = async () => {
     setError("");
     setSuccessMessage("");
@@ -220,6 +252,8 @@ const UploadDeleteTemplate: React.FC = () => {
 
     setLoading(true);
     try {
+      // response
+
       const response = await api.post(`/api/ud12/delete`, {
         market: selectedDeleteMarket,
         fileName: selectedTemplate
@@ -249,6 +283,8 @@ const UploadDeleteTemplate: React.FC = () => {
    * Check Template链接点击处理
    * 对应详细设计 3.1.5 模板检查链接跳转
    */
+  // handleCheckTemplateClick
+
   const handleCheckTemplateClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     navigate("/Menu/HDocTemplateCheck");
@@ -375,5 +411,7 @@ const UploadDeleteTemplate: React.FC = () => {
     </div>
   );
 };
+
+// UploadDeleteTemplate
 
 export default UploadDeleteTemplate;

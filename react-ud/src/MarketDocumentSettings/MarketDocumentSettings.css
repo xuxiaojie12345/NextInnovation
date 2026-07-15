@@ -50,11 +50,15 @@
   max-width: fit-content;
 }
 
+/* ud20 */
+
 .ud20-1-message.error {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
 }
+
+/* ud20 */
 
 .ud20-1-message.success {
   background-color: #efe;
@@ -115,6 +119,8 @@
   flex-shrink: 0;
 }
 
+/* operator */
+
 .operator-select:focus {
   border-color: #666666;
 }
@@ -139,6 +145,8 @@
   height: 26px;
 }
 
+/* form */
+
 .form-input:focus {
   border-color: #666666;
 }
@@ -156,6 +164,8 @@
   background-color: #ffffff;
   cursor: pointer;
 }
+
+/* form */
 
 .form-select:focus {
   border-color: #666666;
@@ -178,9 +188,13 @@
 /* ========== 响应式适配 ========== */
 
 @media (max-width: 768px) {
+  /* ud20 */
+
   .ud20-1-container {
     padding: 12px;
   }
+
+  /* ud20 */
 
   .ud20-1-btn-group {
     flex-wrap: wrap;
@@ -189,14 +203,20 @@
     width: calc(100% + 24px);
   }
 
+  /* form */
+
   .form-row {
     flex-wrap: wrap;
     gap: 4px;
   }
 
+  /* form */
+
   .form-label {
     width: 100%;
   }
+
+  /* operator */
 
   .operator-select {
     width: 50px;

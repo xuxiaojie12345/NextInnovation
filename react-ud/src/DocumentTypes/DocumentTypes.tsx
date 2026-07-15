@@ -18,6 +18,8 @@ interface DocTypeItem {
  * DocumentTypes 组件
  * 以表格形式展示所有文档类型信息，纯展示页面，无用户输入操作
  */
+// DocumentTypes
+
 const DocumentTypes: React.FC = () => {
   // -------- 状态管理（对应详细设计 2.1 控件属性表）--------
   const [docTypeList, setDocTypeList] = useState<DocTypeItem[]>([]);
@@ -29,9 +31,13 @@ const DocumentTypes: React.FC = () => {
    * 调用 UD20SelectHdocDocumentList（GET /api/ud22/getdocumenttypes）
    */
   useEffect(() => {
+    // fetchDocTypes
+
     const fetchDocTypes = async () => {
       setIsLoading(true);
       try {
+        // response
+
         const response = await api.get(
           '/api/ud22/getdocumenttypes'
         );
@@ -110,5 +116,7 @@ const DocumentTypes: React.FC = () => {
     </div>
   );
 };
+
+// DocumentTypes
 
 export default DocumentTypes;

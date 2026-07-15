@@ -28,6 +28,8 @@ interface VinPlateInfo {
  * 提供底盘号输入、查看VIN Plate信息、状态更新等功能
  * 五个按钮分别对应五种操作类型
  */
+// VinPlate
+
 const VinPlate: React.FC = () => {
   // 底盘号输入
   const [chassisNumber, setChassisNumber] = useState<string>("");
@@ -45,6 +47,8 @@ const VinPlate: React.FC = () => {
    * 对应详细设计 3.1 所有按钮的共同前置处理
    * @param operation 操作类型
    */
+  // callApi
+
   const callApi = async (operation: string) => {
     setMessage("");
 
@@ -60,12 +64,18 @@ const VinPlate: React.FC = () => {
       // 获取当前登录用户ID
       let updateUser = '';
       try {
+        // userInfoStr
+
         const userInfoStr = localStorage.getItem('userInfo');
         if (userInfoStr) {
+          // userInfo
+
           const userInfo = JSON.parse(userInfoStr);
           updateUser = userInfo.userid || userInfo.username || '';
         }
       } catch { /* ignore */ }
+
+      // response
 
       const response = await api.post(
         `/api/ud15/UD15SelecthdocsenddatavinplateApi`,
@@ -104,6 +114,8 @@ const VinPlate: React.FC = () => {
   /**
    * 处理API返回的错误
    */
+  // handleApiError
+
   const handleApiError = (errorMsg: string, operation: string) => {
     if (errorMsg && errorMsg.includes("not found")) {
       // 底盘号不存在（对应详细设计 3.2 No.2）
@@ -122,30 +134,40 @@ const VinPlate: React.FC = () => {
    * View Info - 查看VIN Plate详细信息
    * 对应详细设计 3.1.1 View Info处理流程
    */
+  // handleViewInfo
+
   const handleViewInfo = () => callApi("viewInfo");
 
   /**
    * Set Regenerate - 将底盘状态更新为"0"
    * 对应详细设计 3.1.2 Set Regenerate处理流程
    */
+  // handleSetRegenerate
+
   const handleSetRegenerate = () => callApi("setRegenerate");
 
   /**
    * Set OK - 将底盘状态更新为"1"
    * 对应详细设计 3.1.3 Set OK处理流程
    */
+  // handleSetOK
+
   const handleSetOK = () => callApi("setOK");
 
   /**
    * Change to Basic Info - 将Status更新为"0"，Type更新为"1"
    * 对应详细设计 3.1.4 Change to Basic Info处理流程
    */
+  // handleChangeToBasicInfo
+
   const handleChangeToBasicInfo = () => callApi("changeToBasicInfo");
 
   /**
    * Change to Advanced Info - 将Status更新为"0"，Type更新为"2"
    * 对应详细设计 3.1.5 Change to Advanced Info处理流程
    */
+  // handleChangeToAdvancedInfo
+
   const handleChangeToAdvancedInfo = () => callApi("changeToAdvancedInfo");
 
   return (
@@ -281,5 +303,7 @@ const VinPlate: React.FC = () => {
     </div>
   );
 };
+
+// VinPlate
 
 export default VinPlate;

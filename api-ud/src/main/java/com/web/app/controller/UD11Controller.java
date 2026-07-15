@@ -4,8 +4,6 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.UD10SearchRequest;
 import com.web.app.domain.entity.HdocVariable;
 import com.web.app.service.UD11Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +23,7 @@ import java.util.List;
 
  */
 
-public class UD11Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD11Controller.class);
-
-    @Autowired
+public class UD11Controller extends BaseController {@Autowired
     /** ud11Service */
 
     private UD11Service ud11Service;

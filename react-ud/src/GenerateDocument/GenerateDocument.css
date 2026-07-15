@@ -1,3 +1,5 @@
+/* generate */
+
 .generate-document-container {
   padding: 20px;
   max-width: 1200px;
@@ -5,6 +7,8 @@
   font-family: Arial, sans-serif;
   background-color: #fff;
 }
+
+/* page */
 
 .page-header {
   padding-bottom: 15px;
@@ -24,12 +28,16 @@ h1.page-title {
   text-decoration: none !important;
 }
 
+/* loading */
+
 .loading-message {
   text-align: center;
   padding: 50px;
   font-size: 16px;
   color: #666;
 }
+
+/* error */
 
 .error-message-area {
   background-color: #ffebee;
@@ -41,6 +49,8 @@ h1.page-title {
   font-weight: bold;
 }
 
+/* error */
+
 .error-message-area p {
   margin: 0;
   white-space: pre-wrap;
@@ -51,12 +61,16 @@ h1.page-title {
   margin-bottom: 20px;
 }
 
+/* info */
+
 .info-item {
   display: flex;
   align-items: flex-start;
   margin-bottom: 8px;
   line-height: 1.6;
 }
+
+/* info */
 
 .info-item label {
   font-weight: normal;
@@ -66,6 +80,8 @@ h1.page-title {
 }
 
 .info-item span,
+/* replacing */
+
 .replacing-params-section .info-item span {
   color: #333 !important;
   font-weight: 500;
@@ -76,11 +92,15 @@ h1.page-title {
 .replacing-params-section .info-item {
   flex-direction: column;
 }
+/* replacing */
+
 .replacing-params-section .info-item label {
   display: block;
   width: 100%;
   margin-bottom: 4px;
 }
+/* replacing */
+
 .replacing-params-section .info-item span {
   display: block;
   width: 100%;
@@ -95,6 +115,8 @@ h1.page-title {
   gap: 4px;
 }
 
+/* chassis */
+
 .chassis-label {
   font-weight: bold;
   font-size: 15px;
@@ -103,15 +125,21 @@ h1.page-title {
   flex-shrink: 0;
 }
 
+/* chassis */
+
 .chassis-value {
   font-size: 15px;
   display: inline;
 }
 
+/* chassis */
+
 .chassis-series {
   color: #333;
   font-weight: bold;
 }
+
+/* chassis */
 
 .chassis-number {
   color: #333;
@@ -124,6 +152,8 @@ h1.page-title {
   transition: color 0.2s ease;
 }
 
+/* chassis */
+
 .chassis-link:hover {
   color: #1890ff;
   text-decoration: underline;
@@ -134,11 +164,15 @@ h1.page-title {
   margin-bottom: 20px;
 }
 
+/* s */
+
 .s-note-warning {
   color: #f44336;
   font-size: 13px;
   margin: 2px 0;
 }
+
+/* s */
 
 .s-note-content {
   padding: 4px 0;
@@ -154,6 +188,8 @@ h1.page-title {
   margin-bottom: 20px;
 }
 
+/* link */
+
 .link-item {
   color: #999;
   text-decoration: none;
@@ -161,6 +197,8 @@ h1.page-title {
   font-size: 14px;
   font-weight: bold;
 }
+
+/* link */
 
 .link-item:hover {
   color: #666;
@@ -175,6 +213,8 @@ h1.page-title {
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* ad */
 
 .ad-change-warning:hover {
   color: #ff7875;
@@ -198,6 +238,8 @@ h1.page-title {
   margin-bottom: 20px;
 }
 
+/* param */
+
 .param-item {
   margin: 5px 0;
   color: #333;
@@ -209,6 +251,8 @@ h1.page-title {
   margin-bottom: 30px;
 }
 
+/* generated */
+
 .generated-doc-link {
   color: #003087;
   text-decoration: underline;
@@ -217,9 +261,13 @@ h1.page-title {
   cursor: pointer;
 }
 
+/* generated */
+
 .generated-doc-link:hover {
   color: #002060;
 }
+
+/* generated */
 
 .generated-doc-link.disabled {
   color: #bbbbbb;
@@ -234,14 +282,20 @@ h1.page-title {
   border-top: 1px solid #ddd;
 }
 
+/* footer */
+
 .footer-info .info-item {
   margin-bottom: 5px;
 }
+
+/* footer */
 
 .footer-info .info-item label {
   color: #666;
   font-size: 13px;
 }
+
+/* footer */
 
 .footer-info .info-item span {
   color: #666;
@@ -257,6 +311,8 @@ h1.page-title {
   color: #666;
   font-size: 14px;
 }
+
+/* support */
 
 .support-info p {
   margin: 0;

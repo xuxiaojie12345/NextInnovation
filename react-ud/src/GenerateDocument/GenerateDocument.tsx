@@ -1,3 +1,7 @@
+// GenerateDocument 组件
+
+// 对应功能模块
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import api from '../config/api';
@@ -16,16 +20,28 @@ interface LocationState {
  * 显示底盘相关文档信息、ADCA变更状态、模板参数、文档下载等
  * 对应详细设计：DES-GenerateDocumentPage-001
  */
+// GenerateDocument
+
 const GenerateDocument: React.FC = () => {
   // 获取路由参数（优先从URL参数获取，其次从state获取）
   const { chassisNo: routeChassisNo } = useParams<{ chassisNo: string }>();
+  // location
+
   const location = useLocation();
+  // navigate
+
   const navigate = useNavigate();
+  // state
+
   const state = location.state as LocationState | null;
 
   // 使用路由参数或location.state中的参数
   const currentChassisNo = routeChassisNo || state?.chassisNo || '';
+  // currentChassisSeries
+
   const currentChassisSeries = state?.chassisSeries || '';
+  // currentDocumentType
+
   const currentDocumentType = state?.documentType || '';
 
   // 页面数据状态
@@ -36,6 +52,8 @@ const GenerateDocument: React.FC = () => {
 
   // 页面初始化时获取数据（对应设计书 3.1.1 页面初始化流程）
   useEffect(() => {
+    // fetchData
+
     const fetchData = async () => {
       if (!currentChassisNo) {
         setError('Chassis not found');
@@ -107,6 +125,8 @@ const GenerateDocument: React.FC = () => {
    * 对应设计书 5. 异常处理 - 文档文件不存在
    * 当前功能尚未实装文件下载，点击显示提示信息
    */
+  // handleGeneratedDocClick
+
   const handleGeneratedDocClick = useCallback(() => {
     setDocDownloadError('Document file not found');
   }, []);
@@ -116,7 +136,11 @@ const GenerateDocument: React.FC = () => {
    * 对应详细设计 3.1.3 Chassis no Link押下时处理
    * 传递参数：chassisNo（serie + 半角空格 + chassisNo 的拼接值）
    */
+  // handleChassisNoClick
+
   const handleChassisNoClick = useCallback(() => {
+    // fullChassisNo
+
     const fullChassisNo = `${currentChassisSeries} ${currentChassisNo}`.trim();
     if (fullChassisNo) {
       navigate('/Menu/VehicleSpecification', {
@@ -280,5 +304,7 @@ const GenerateDocument: React.FC = () => {
     </div>
   );
 };
+
+// GenerateDocument
 
 export default GenerateDocument;

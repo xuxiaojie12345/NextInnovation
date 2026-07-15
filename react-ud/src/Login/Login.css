@@ -35,11 +35,15 @@ html, body {
   padding-top: calc(15vh + 150px);
 }
 
+/* left */
+
 .left-content {
   max-width: 600px;
   text-align: center;
   white-space: nowrap;
 }
+
+/* login */
 
 .login-info-panel h1 {
   font-weight: normal;
@@ -47,6 +51,8 @@ html, body {
   font-size: 64px;
   white-space: nowrap;
 }
+
+/* login */
 
 .login-info-panel p {
   margin: 10px 0;
@@ -69,6 +75,8 @@ html, body {
 
 /* 中等屏幕：缩小重叠偏移量 */
 @media (max-width: 1399px) {
+  /* login */
+
   .login-form-panel {
     margin-left: -150px;
   }
@@ -76,29 +84,41 @@ html, body {
 
 /* 小屏幕：取消重叠，左右面板自适应 */
 @media (max-width: 1023px) {
+  /* login */
+
   .login-container {
     flex-direction: column;
     height: auto;
     min-height: 100vh;
   }
 
+  /* login */
+
   .login-info-panel {
     padding: 40px 40px;
     padding-top: 60px;
   }
 
+  /* login */
+
   .login-info-panel h1 {
     font-size: 36px;
   }
+
+  /* login */
 
   .login-info-panel p {
     font-size: 16px;
     white-space: normal;
   }
 
+  /* left */
+
   .left-content {
     white-space: normal;
   }
+
+  /* login */
 
   .login-form-panel {
     margin-left: 0;
@@ -106,14 +126,20 @@ html, body {
   }
 }
 
+/* login */
+
 .login-form {
   width: 100%;
   max-width: 480px;
 }
 
+/* form */
+
 .form-group {
   margin-bottom: 25px;
 }
+
+/* form */
 
 .form-group input {
   width: 100%;
@@ -124,10 +150,14 @@ html, body {
   box-sizing: border-box;
 }
 
+/* form */
+
 .form-group input::placeholder {
   color: #999;
   font-size: 18px;
 }
+
+/* form */
 
 .form-group input:focus {
   border-color: #0070c0;
@@ -139,6 +169,8 @@ html, body {
 .input-error {
   border-color: #ff4444 !important;
 }
+
+/* input */
 
 .input-error:focus {
   border-color: #ff4444 !important;
@@ -155,6 +187,8 @@ html, body {
   line-height: 1.4;
 }
 
+/* login */
+
 .login-button {
   width: 100%;
   padding: 18px;
@@ -169,9 +203,13 @@ html, body {
   transition: background-color 0.3s;
 }
 
+/* login */
+
 .login-button:hover:not(:disabled) {
   background-color: #005a9e;
 }
+
+/* login */
 
 .login-button:disabled {
   background-color: #bfbfbf;
@@ -185,6 +223,8 @@ html, body {
   color: red;
   line-height: 1.6;
 }
+
+/* alternative */
 
 .alternative-login-info p {
   white-space: nowrap;

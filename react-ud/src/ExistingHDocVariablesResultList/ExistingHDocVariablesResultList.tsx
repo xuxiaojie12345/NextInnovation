@@ -33,8 +33,14 @@ interface ApiResponse<T> {
  * ExistingHDocVariablesResultList 组件
  * 显示搜索结果列表，支持记录选择、下钻、打印、导出CSV等功能
  */
+// ExistingHDocVariablesResultList
+
 const ExistingHDocVariablesResultList: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // 搜索结果列表数据
@@ -59,6 +65,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * 对应详细设计 3.1.1 页面初始化流程
    */
   useEffect(() => {
+    // fetchData
+
     const fetchData = async () => {
       setLoading(true);
       setMessage('');
@@ -76,6 +84,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           useridOp: searchState.useridOp || '=',
           registerDatetimeOp: searchState.registerDatetimeOp || '='
         };
+        // res
+
         const res = await api.post<ApiResponse<SearchResultItem[]>>(
           `/api/ud11/search`,
           searchParams
@@ -100,6 +110,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * 点击行切换选中状态（单选模式）
    * @param index 行索引
    */
+  // handleRowClick
+
   const handleRowClick = (index: number) => {
     setSelectedIndex(prev => prev === index ? -1 : index);
     if (message) {
@@ -110,6 +122,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   /**
    * 获取选中记录的完整数据
    */
+  // getSelectedRecord
+
   const getSelectedRecord = (): SearchResultItem | null => {
     if (selectedIndex < 0 || selectedIndex >= dataList.length) return null;
     return dataList[selectedIndex];
@@ -119,12 +133,16 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Select 按钮处理：将选中记录返回到前画面
    * 对应详细设计 3.1.2 Select操作流程
    */
+  // handleSelect
+
   const handleSelect = useCallback(() => {
     if (selectedIndex < 0) {
       setMessage('Please select a record.');
       setMessageType('error');
       return;
     }
+    // record
+
     const record = getSelectedRecord();
     if (!record) {
       setMessage('Please select a record.');
@@ -147,6 +165,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Back 按钮处理：返回前画面，保留搜索条件
    * 对应详细设计 3.1.3 Back操作流程
    */
+  // handleBack
+
   const handleBack = useCallback(() => {
     navigate('/Menu/ExistingHDocVariables', { state: { searchConditions: searchState } });
   }, [navigate, searchState]);
@@ -154,6 +174,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
   /**
    * Down 按钮（暂不实装具体功能）
    */
+  // handleDown
+
   const handleDown = useCallback(() => {
     // 暂不实装
   }, []);
@@ -162,6 +184,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Print 按钮处理：打印搜索结果列表
    * 对应详细设计 3.1.5 Print操作流程
    */
+  // handlePrint
+
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
@@ -170,6 +194,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Excel 按钮处理：导出搜索结果列表为CSV文件
    * 对应详细设计 3.1.6 Excel操作流程
    */
+  // handleExportCsv
+
   const handleExportCsv = useCallback(() => {
     if (dataList.length === 0) {
       setMessage('No data to export.');
@@ -194,16 +220,26 @@ const ExistingHDocVariablesResultList: React.FC = () => {
 
     // 生成文件名
     const now = new Date();
+    // dateStr
+
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    // filename
+
     const filename = `HDOC_Variables_ResultList_${dateStr}.csv`;
 
+    // blob
+
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    // link
+
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
     URL.revokeObjectURL(link.href);
   }, [dataList]);
+
+  // disabled
 
   const disabled = isOperating || loading;
 
@@ -306,5 +342,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
     </div>
   );
 };
+
+// ExistingHDocVariablesResultList
 
 export default ExistingHDocVariablesResultList;

@@ -1,3 +1,7 @@
+// ModifyDocument 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../config/api';
@@ -35,14 +39,26 @@ interface LocationState {
  *
  * 对应详细设计：DES-ModifyDocument-001
  */
+// ModifyDocument
+
 const ModifyDocument: React.FC = () => {
+  // location
+
   const location = useLocation();
+  // navigate
+
   const navigate = useNavigate();
+  // state
+
   const state = location.state as LocationState | null;
 
   // 从路由参数获取底盘信息（对应设计书 3.1.1 步骤2）
   const chassisNo = state?.chassisNo || '';
+  // serie
+
   const serie = state?.serie || '';
+  // market
+
   const market = state?.market || '';
 
   // 页面数据状态
@@ -59,6 +75,8 @@ const ModifyDocument: React.FC = () => {
    * 对应设计书 3.1.1 页面初始化流程
    */
   useEffect(() => {
+    // fetchVariables
+
     const fetchVariables = async () => {
       if (!chassisNo) {
         setError('缺少必要的底盘信息');
@@ -82,6 +100,8 @@ const ModifyDocument: React.FC = () => {
         );
 
         if (response.data.code === 200 && response.data.data) {
+          // data
+
           const data = response.data.data;
           setVariables(data.variables || []);
           setTemplateFile(data.templateFile || '');
@@ -109,11 +129,15 @@ const ModifyDocument: React.FC = () => {
    * 处理 Modified value 输入变化
    * 对应设计书 2.1 Modified value - Input类型，最大长度500字符
    */
+  // handleModifiedValueChange
+
   const handleModifiedValueChange = useCallback(
     (index: number, value: string) => {
       // 限制最大长度500字符（对应设计书 3.2 校验 No.3）
       if (value.length <= 500) {
         setVariables((prev) => {
+          // updated
+
           const updated = [...prev];
           updated[index] = { ...updated[index], modifiedValue: value };
           return updated;
@@ -131,6 +155,8 @@ const ModifyDocument: React.FC = () => {
    * 判断是否所有 Modified value 均为空或未修改
    * 对应设计书 3.1.2 步骤3 空值校验
    */
+  // isAllModifiedEmpty
+
   const isAllModifiedEmpty = useCallback((): boolean => {
     return variables.every((row) => !row.modifiedValue || row.modifiedValue.trim() === '');
   }, [variables]);
@@ -139,6 +165,8 @@ const ModifyDocument: React.FC = () => {
    * 点击 Save 按钮 - 保存修改
    * 对应设计书 3.1.2 保存修改流程
    */
+  // handleSave
+
   const handleSave = useCallback(async () => {
     // 清除旧消息
     setMessage('');
@@ -166,12 +194,18 @@ const ModifyDocument: React.FC = () => {
       // 获取当前登录用户ID
       let updateUser = '';
       try {
+        // userInfoStr
+
         const userInfoStr = localStorage.getItem('userInfo');
         if (userInfoStr) {
+          // userInfo
+
           const userInfo = JSON.parse(userInfoStr);
           updateUser = userInfo.userid || userInfo.username || '';
         }
       } catch { /* ignore */ }
+
+      // updatePromises
 
       const updatePromises = variables
         .filter((row) => row.modifiedValue && row.modifiedValue.trim() !== '')
@@ -220,7 +254,11 @@ const ModifyDocument: React.FC = () => {
    * 对应详细设计 2.1 chassis no Link押下时处理
    * 传递参数：chassisNo（serie + 半角空格 + chassisNo 的拼接值）
    */
+  // handleChassisNoClick
+
   const handleChassisNoClick = useCallback(() => {
+    // fullChassisNo
+
     const fullChassisNo = `${serie} ${chassisNo}`.trim();
     if (fullChassisNo) {
       navigate('/Menu/VehicleSpecification', {
@@ -232,6 +270,8 @@ const ModifyDocument: React.FC = () => {
   /**
    * 模板文件点击处理 - 当前版本未实装下载功能
    */
+  // handleTemplateDownload
+
   const handleTemplateDownload = useCallback(() => {
     setTemplateDownloadError('模板文件下载功能未实装');
   }, []);
@@ -359,5 +399,7 @@ const ModifyDocument: React.FC = () => {
     </div>
   );
 };
+
+// ModifyDocument
 
 export default ModifyDocument;

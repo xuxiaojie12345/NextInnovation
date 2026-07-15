@@ -1,3 +1,7 @@
+// App 组件
+
+// 对应功能模块
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login/Login";
 import TestMain from "./Test/Test";
@@ -26,6 +30,8 @@ import HDocHelp from "./HDocHelp/HDocHelp";
 import MarketsInHDoc from "./MarketsInHDoc/MarketsInHDoc";
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
 import DownloadPrintQuickGuides from "./DownloadPrintQuickGuides/DownloadPrintQuickGuides";
+
+// App
 
 function App() {
   return (
@@ -68,5 +74,7 @@ function App() {
     </div>
   );
 }
+
+// App
 
 export default App;

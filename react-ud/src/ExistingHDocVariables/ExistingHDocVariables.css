@@ -41,11 +41,15 @@
   text-align: left;
 }
 
+/* existing */
+
 .existing-hdoc-message.error {
   background-color: #fff2f0;
   border: 1px solid #ffccc7;
   color: #ff4d4f;
 }
+
+/* existing */
 
 .existing-hdoc-message.success {
   background-color: #d4edda;
@@ -78,13 +82,19 @@
   transition: background-color 0.2s ease;
 }
 
+/* existing */
+
 .existing-hdoc-btn:hover {
   background-color: #c0d0e5;
 }
 
+/* existing */
+
 .existing-hdoc-btn:active {
   background-color: #b0c0d5;
 }
+
+/* existing */
 
 .existing-hdoc-btn:disabled {
   opacity: 0.5;
@@ -129,6 +139,8 @@
   text-align: center;
   height: 26px;
 }
+
+/* existing */
 
 .existing-hdoc-operator-select:focus {
   border-color: #666666;
@@ -179,6 +191,8 @@
   height: 32px;
 }
 
+/* existing */
+
 .existing-hdoc-input:focus {
   border-color: #1890ff;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
@@ -198,6 +212,8 @@
   cursor: pointer;
 }
 
+/* existing */
+
 .existing-hdoc-select:focus {
   border-color: #1890ff;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
@@ -205,27 +221,39 @@
 
 /* 响应式 */
 @media (max-width: 768px) {
+  /* existing */
+
   .existing-hdoc-container {
     padding: 16px;
   }
+
+  /* existing */
 
   .existing-hdoc-button-group {
     flex-direction: column;
   }
 
+  /* existing */
+
   .existing-hdoc-btn {
     width: 100%;
   }
+
+  /* existing */
 
   .existing-hdoc-form-row {
     flex-direction: column;
     align-items: flex-start;
   }
 
+  /* existing */
+
   .existing-hdoc-form-label {
     width: 100%;
     margin-bottom: 4px;
   }
+
+  /* existing */
 
   .existing-hdoc-form-control {
     width: 100%;

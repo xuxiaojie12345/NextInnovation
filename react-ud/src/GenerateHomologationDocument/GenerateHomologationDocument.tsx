@@ -1,3 +1,7 @@
+// GenerateHomologationDocument 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './GenerateHomologationDocument.css';
@@ -16,7 +20,11 @@ interface SearchCondition {
   documentType: string;
 }
 
+// GenerateHomologationDocument
+
 const GenerateHomologationDocument: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
   
   // 状态管理
@@ -37,6 +45,8 @@ const GenerateHomologationDocument: React.FC = () => {
     initializeComponent();
   }, []);
 
+  // initializeComponent
+
   const initializeComponent = async () => {
     try {
       // 从本地存储加载上次搜索条件
@@ -52,10 +62,16 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * 加载上次搜索条件
    */
+  // loadPreviousCondition
+
   const loadPreviousCondition = () => {
     try {
+      // savedCondition
+
       const savedCondition = localStorage.getItem('homologationSearchCondition');
       if (savedCondition) {
+        // condition
+
         const condition: SearchCondition = JSON.parse(savedCondition);
         setChassisSeries(condition.chassisSeries || '');
         setChassisNo(condition.chassisNo || '');
@@ -71,6 +87,8 @@ const GenerateHomologationDocument: React.FC = () => {
    * API: UD03SelectHdocdocumentlistApi
    * 后端直接返回 DocumentType 数组，无需解析 code/data 包装
    */
+  // fetchDocumentTypeList
+
   const fetchDocumentTypeList = async () => {
     try {
       setIsLoading(true);
@@ -86,6 +104,8 @@ const GenerateHomologationDocument: React.FC = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch document types');
       }
+
+      // data
 
       const data: DocumentType[] = await response.json();
       
@@ -104,7 +124,11 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Chassis series 输入处理 - 输入时限制
    */
+  // handleChassisSeriesChange
+
   const handleChassisSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // value
+
     const value = e.target.value;
     // 仅允许半角英文字母，最大5字符
     if (/^[a-zA-Z]*$/.test(value) && value.length <= 5) {
@@ -116,7 +140,11 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Chassis no 输入处理 - 输入时限制
    */
+  // handleChassisNoChange
+
   const handleChassisNoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // value
+
     const value = e.target.value;
     // 仅允许半角数字，最大10字符
     if (/^[0-9]*$/.test(value) && value.length <= 10) {
@@ -128,6 +156,8 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Document type 选择处理
    */
+  // handleDocumentTypeChange
+
   const handleDocumentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDocumentType(e.target.value);
     clearFieldError('documentType');
@@ -136,8 +166,12 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * 清除字段错误提示
    */
+  // clearFieldError
+
   const clearFieldError = (fieldName: string) => {
     if (hasError) {
+      // newErrorFields
+
       const newErrorFields = new Set(errorFields);
       newErrorFields.delete(fieldName);
       setErrorFields(newErrorFields);
@@ -151,8 +185,14 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * 表单校验处理 - 仅必填项检查
    */
+  // validate
+
   const validate = (): boolean => {
+    // errors
+
     const errors: string[] = [];
+    // newErrorFields
+
     const newErrorFields = new Set<string>();
 
     // Chassis series 必填检查
@@ -186,6 +226,8 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Submit 按钮点击处理
    */
+  // handleSubmit
+
   const handleSubmit = async () => {
     setMessage('');
     setHasError(false);
@@ -225,8 +267,12 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * 保存搜索条件到本地存储
    */
+  // saveSearchCondition
+
   const saveSearchCondition = () => {
     try {
+      // condition
+
       const condition: SearchCondition = {
         chassisSeries,
         chassisNo,
@@ -241,6 +287,8 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Reset 按钮点击处理
    */
+  // handleReset
+
   const handleReset = () => {
     setChassisSeries('');
     setChassisNo('');
@@ -253,6 +301,8 @@ const GenerateHomologationDocument: React.FC = () => {
   /**
    * Help 按钮点击处理 - 跳转到 User Guide 页面
    */
+  // handleHelp
+
   const handleHelp = () => {
     navigate('/Menu/UserGuide');
   };
@@ -372,5 +422,7 @@ const GenerateHomologationDocument: React.FC = () => {
     </div>
   );
 };
+
+// GenerateHomologationDocument
 
 export default GenerateHomologationDocument;

@@ -36,10 +36,14 @@
   flex-shrink: 0;
 }
 
+/* menu */
+
 .menu-title {
   text-align: center;
   width: 100%;
 }
+
+/* menu */
 
 .menu-user-info {
   margin-top: 4px;
@@ -59,12 +63,16 @@
   -ms-overflow-style: none;
 }
 
+/* menu */
+
 .menu-tree-container::-webkit-scrollbar {
   display: none;
 }
 
 /* 菜单项文字不截断、不显示省略号 */
 .menu-tree .ant-menu-item,
+/* menu */
+
 .menu-tree .ant-menu-submenu-title {
   overflow: visible;
   text-overflow: clip;
@@ -90,6 +98,8 @@
 }
 
 .menu-tree .ant-menu-item:hover::before,
+/* menu */
+
 .menu-tree .ant-menu-item-selected::before {
   color: rgba(255, 255, 255, 0.85);
 }
@@ -105,6 +115,8 @@
 }
 
 .menu-tree .ant-menu-item .ant-menu-title-content,
+/* menu */
+
 .menu-tree .ant-menu-submenu-title .ant-menu-title-content {
   overflow: visible;
   text-overflow: clip;
@@ -112,9 +124,13 @@
   height: auto;
 }
 
+/* menu */
+
 .menu-tree-container::-webkit-scrollbar {
   width: 4px;
 }
+
+/* menu */
 
 .menu-tree-container::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
@@ -149,6 +165,8 @@
   font-weight: 500;
 }
 
+/* menu */
+
 .menu-tree .ant-menu-item-selected::after {
   border-right: 3px solid #1677ff;
 }
@@ -163,6 +181,8 @@
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
+
+/* menu */
 
 .menu-tree .ant-menu-submenu-title {
   font-size: 13px;
@@ -189,11 +209,15 @@
 
 /* 响应式适配 */
 @media (max-width: 768px) {
+  /* menu */
+
   .menu-sider {
     min-width: 340px !important;
     max-width: 340px !important;
     width: 340px !important;
   }
+
+  /* menu */
 
   .menu-content {
     margin: 8px;

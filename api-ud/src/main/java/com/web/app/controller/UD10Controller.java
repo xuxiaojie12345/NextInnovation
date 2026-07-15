@@ -5,8 +5,6 @@ import com.web.app.domain.UD10Request;
 import com.web.app.domain.UD10SearchRequest;
 import com.web.app.domain.entity.HdocVariable;
 import com.web.app.service.UD10Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +25,7 @@ import java.util.List;
 
  */
 
-public class UD10Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD10Controller.class);
-
-    @Autowired
+public class UD10Controller extends BaseController {@Autowired
     /** ud10Service */
 
     private UD10Service ud10Service;

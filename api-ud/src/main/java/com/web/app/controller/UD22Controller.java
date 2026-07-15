@@ -2,8 +2,6 @@ package com.web.app.controller;
 
 import com.web.app.domain.ApiResponse;
 import com.web.app.service.UD22Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +16,7 @@ import java.util.Map;
 
  */
 
-public class UD22Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD22Controller.class);
-
-    @Autowired
+public class UD22Controller extends BaseController {@Autowired
     /** ud22Service */
 
     private UD22Service ud22Service;

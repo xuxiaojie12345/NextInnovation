@@ -144,13 +144,19 @@
   transition: background-color 0.2s ease;
 }
 
+/* btn */
+
 .btn:hover {
   background-color: #c0d0e5;
 }
 
+/* btn */
+
 .btn:active {
   background-color: #b0c0d5;
 }
+
+/* btn */
 
 .btn:disabled {
   opacity: 0.5;
@@ -172,10 +178,14 @@
   transition: background 0.2s, color 0.2s;
 }
 
+/* btn */
+
 .btn-dark:hover:not(:disabled) {
   background: #003057;
   color: #fff;
 }
+
+/* btn */
 
 .btn-dark:disabled {
   opacity: 0.55;
@@ -225,6 +235,8 @@
 
 /* 必填标记 */
 .form-label.required::before,
+/* form */
+
 .form-label-center.required::before {
   content: '*';
   color: #000000;
@@ -251,9 +263,13 @@
   height: 26px;
 }
 
+/* form */
+
 .form-input:focus {
   border-color: #666666;
 }
+
+/* form */
 
 .form-input:disabled {
   background-color: #f5f5f5;
@@ -290,9 +306,13 @@
   cursor: pointer;
 }
 
+/* form */
+
 .form-select:focus {
   border-color: #666666;
 }
+
+/* form */
 
 .form-select:disabled {
   background-color: #e9ecef;
@@ -314,6 +334,8 @@
   flex-shrink: 0;
 }
 
+/* operator */
+
 .operator-select:focus {
   border-color: #666666;
 }
@@ -332,6 +354,8 @@
   font-family: inherit;
 }
 
+/* form */
+
 .form-textarea:focus {
   border-color: #666666;
 }
@@ -347,6 +371,8 @@
    信息展示行（label + value 水平布局）
    ======================================== */
 
+/* info */
+
 .info-item {
   display: flex;
   align-items: flex-start;
@@ -354,12 +380,16 @@
   line-height: 1.6;
 }
 
+/* info */
+
 .info-item label {
   font-weight: normal;
   min-width: 150px;
   color: #333;
   flex-shrink: 0;
 }
+
+/* info */
 
 .info-item span {
   color: #333;
@@ -373,6 +403,8 @@
   text-decoration: none;
   transition: color 0.2s ease;
 }
+
+/* chassis */
 
 .chassis-link:hover {
   color: #1890ff;
@@ -390,6 +422,8 @@
   font-size: 13px;
 }
 
+/* data */
+
 .data-table th {
   padding: 8px 12px;
   text-align: left;
@@ -400,6 +434,8 @@
   white-space: nowrap;
 }
 
+/* data */
+
 .data-table td {
   padding: 6px 12px;
   color: #333333;
@@ -407,9 +443,13 @@
   vertical-align: middle;
 }
 
+/* data */
+
 .data-table tbody tr:hover {
   background-color: #f0f4ff;
 }
+
+/* data */
 
 .data-table tbody tr:last-child td {
   border-bottom: none;
@@ -442,6 +482,8 @@
   font-weight: 500;
 }
 
+/* user */
+
 .user-link:hover {
   color: #0055aa;
 }
@@ -473,6 +515,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* modal */
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -482,11 +526,15 @@
   border-bottom: 1px solid #b0c4de;
 }
 
+/* modal */
+
 .modal-header h3 {
   margin: 0;
   font-size: 16px;
   color: #2c3e50;
 }
+
+/* modal */
 
 .modal-close {
   background: none;
@@ -497,9 +545,13 @@
   padding: 0 4px;
 }
 
+/* modal */
+
 .modal-body {
   padding: 16px;
 }
+
+/* modal */
 
 .modal-footer {
   padding: 10px 16px;

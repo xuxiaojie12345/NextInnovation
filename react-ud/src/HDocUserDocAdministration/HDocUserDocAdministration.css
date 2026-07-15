@@ -41,11 +41,15 @@
   max-width: fit-content;
 }
 
+/* ud18 */
+
 .ud18-message.error {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
 }
+
+/* ud18 */
 
 .ud18-message.success {
   background-color: #efe;
@@ -66,9 +70,13 @@
   transition: background-color 0.2s ease;
 }
 
+/* ud18 */
+
 .ud18-btn:hover {
   background-color: #c0d0e5;
 }
+
+/* ud18 */
 
 .ud18-btn:disabled {
   opacity: 0.5;
@@ -93,6 +101,8 @@
   padding-top: 12px;
 }
 
+/* ud18 */
+
 .ud18-label {
   width: 140px;
   text-align: left;
@@ -101,6 +111,8 @@
   flex-shrink: 0;
   padding-top: 4px;
 }
+
+/* ud18 */
 
 .ud18-input {
   height: 26px;
@@ -130,6 +142,8 @@
   text-align: center;
 }
 
+/* ud18 */
+
 .ud18-input:focus {
   border-color: #3498db;
   outline: none;
@@ -141,6 +155,8 @@
   font-size: 14px;
   color: #333333;
 }
+
+/* ud18 */
 
 .ud18-user-label strong {
   font-weight: 600;
@@ -160,14 +176,20 @@
   box-sizing: border-box;
 }
 
+/* ud18 */
+
 .ud18-multiselect:focus {
   border-color: #3498db;
   outline: none;
 }
 
+/* ud18 */
+
 .ud18-multiselect option {
   padding: 3px 6px;
 }
+
+/* ud18 */
 
 .ud18-multiselect option:checked {
   background-color: #d0ddf0;
@@ -187,14 +209,20 @@
 
 /* 响应式适配 */
 @media (max-width: 600px) {
+  /* ud18 */
+
   .ud18-field {
     flex-direction: column;
     align-items: stretch;
   }
 
+  /* ud18 */
+
   .ud18-label {
     width: auto;
   }
+
+  /* ud18 */
 
   .ud18-multiselect {
     height: 100px;

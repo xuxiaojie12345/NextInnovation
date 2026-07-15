@@ -1,3 +1,7 @@
+// Menu 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Layout, Menu as AntMenu, Typography } from "antd";
@@ -81,10 +85,14 @@ const menuItems: MenuItem[] = [
 // 获取用户权限列表（从 localStorage 中读取）
 const getUserPermissions = (): string[] => {
   try {
+    // userInfoStr
+
     const userInfoStr = localStorage.getItem("userInfo");
     if (!userInfoStr) {
       return [];
     }
+    // userInfo
+
     const userInfo = JSON.parse(userInfoStr);
     // 权限列表存储在 userInfo.permissions 中，若没有则赋予所有权限（开发阶段）
     return userInfo.permissions || [
@@ -107,6 +115,8 @@ const filterMenuByPermissions = (items: MenuItem[], permissions: string[]): Menu
   return items
     .map((item) => {
       if (item.children) {
+        // filteredChildren
+
         const filteredChildren = filterMenuByPermissions(item.children, permissions);
         return filteredChildren.length > 0
           ? { ...item, children: filteredChildren }
@@ -131,7 +141,11 @@ const convertToAntMenuItems = (items: MenuItem[]): any[] => {
 
 // 构建 key -> route 的映射
 const buildRouteMap = (items: MenuItem[]): Record<string, string> => {
+  // map
+
   const map: Record<string, string> = {};
+  // traverse
+
   const traverse = (list: MenuItem[]) => {
     list.forEach((item) => {
       if (item.route) {
@@ -148,7 +162,11 @@ const buildRouteMap = (items: MenuItem[]): Record<string, string> => {
 
 // 获取所有叶子节点的 key
 const getLeafKeys = (items: MenuItem[]): string[] => {
+  // keys
+
   const keys: string[] = [];
+  // traverse
+
   const traverse = (list: MenuItem[]) => {
     list.forEach((item) => {
       if (item.children) {
@@ -162,8 +180,14 @@ const getLeafKeys = (items: MenuItem[]): string[] => {
   return keys;
 };
 
+// Menu
+
 const Menu: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
   const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -177,6 +201,8 @@ const Menu: React.FC = () => {
       return;
     }
     try {
+      // userInfo
+
       const userInfo = JSON.parse(userInfoStr);
     } catch {
       navigate("/");
@@ -185,11 +211,15 @@ const Menu: React.FC = () => {
 
     // 获取权限并过滤菜单
     const permissions = getUserPermissions();
+    // filtered
+
     const filtered = filterMenuByPermissions(menuItems, permissions);
     setFilteredMenuItems(filtered);
 
     // 递归收集所有层级的 key，使所有子菜单默认展开
     const getAllKeys = (items: MenuItem[]): string[] => {
+      // keys
+
       const keys: string[] = [];
       for (const item of items) {
         keys.push(item.key);
@@ -197,13 +227,19 @@ const Menu: React.FC = () => {
       }
       return keys;
     };
+    // defaultOpenKeys
+
     const defaultOpenKeys = getAllKeys(filtered);
     setOpenKeys(defaultOpenKeys);
   }, [navigate]);
 
   // 根据当前路由高亮对应的菜单项
   useEffect(() => {
+    // routeMap
+
     const routeMap = buildRouteMap(menuItems);
+    // currentPath
+
     const currentPath = location.pathname;
 
     // 查找匹配当前路由的菜单项 key
@@ -213,12 +249,16 @@ const Menu: React.FC = () => {
           return item.key;
         }
         if (item.children) {
+          // found
+
           const found = findKeyByRoute(item.children);
           if (found) return found;
         }
       }
       return null;
     };
+
+    // matchedKey
 
     const matchedKey = findKeyByRoute(menuItems);
     if (matchedKey) {
@@ -228,7 +268,11 @@ const Menu: React.FC = () => {
 
   // 菜单点击事件处理（对应详细设计3.1 处理流程-菜单点击处理）
   const handleMenuClick = (info: { key: string }) => {
+    // routeMap
+
     const routeMap = buildRouteMap(filteredMenuItems);
+    // route
+
     const route = routeMap[info.key];
 
     // 设置选中状态（即使 route === '#' 也高亮）
@@ -293,5 +337,7 @@ const Menu: React.FC = () => {
     </Layout>
   );
 };
+
+// Menu
 
 export default Menu;

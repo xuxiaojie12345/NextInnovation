@@ -1,6 +1,10 @@
+/* App */
+
 .App {
   text-align: center;
 }
+
+/* App */
 
 .App-logo {
   height: 40vmin;
@@ -8,10 +12,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* App */
+
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
+/* App */
 
 .App-header {
   background-color: #282c34;
@@ -23,6 +31,8 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+/* App */
 
 .App-link {
   color: #61dafb;

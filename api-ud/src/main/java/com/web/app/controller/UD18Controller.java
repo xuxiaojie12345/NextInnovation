@@ -3,8 +3,6 @@ package com.web.app.controller;
 import com.web.app.domain.ApiResponse;
 import com.web.app.domain.UD18Request;
 import com.web.app.service.UD18Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +16,7 @@ import java.util.Map;
 
  */
 
-public class UD18Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD18Controller.class);
-
-    @Autowired
+public class UD18Controller extends BaseController {@Autowired
     /** ud18Service */
 
     private UD18Service ud18Service;

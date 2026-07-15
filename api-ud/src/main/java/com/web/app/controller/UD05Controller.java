@@ -6,9 +6,6 @@ import com.web.app.domain.ModifyDocumentUpdateRequest;
 import com.web.app.service.UD05Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * UD05控制器
  * 提供UD05ModifyDocumentApi接口 - 文档变量修改与保存
@@ -26,11 +23,7 @@ import org.slf4j.LoggerFactory;
 
  */
 
-public class UD05Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD05Controller.class);
-
-    @Autowired
+public class UD05Controller extends BaseController {@Autowired
     /** ud05Service */
 
     private UD05Service ud05Service;

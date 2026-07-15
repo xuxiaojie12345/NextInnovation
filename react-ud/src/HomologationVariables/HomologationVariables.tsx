@@ -1,3 +1,7 @@
+// HomologationVariables 组件
+
+// 对应功能模块
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../config/api';
@@ -49,8 +53,14 @@ interface FormData {
 /**
  * HomologationVariables 组件 - 认证变量管理页面（UD08）
  */
+// HomologationVariables
+
 const HomologationVariables: React.FC = () => {
+  // navigate
+
   const navigate = useNavigate();
+  // location
+
   const location = useLocation();
 
   // 各字段的 = / != 运算符状态（普通字段）
@@ -63,9 +73,15 @@ const HomologationVariables: React.FC = () => {
     number: '=', updateDatetime: '='
   });
 
+  // setOp
+
   const setOp = (field: string, v: Operator) => setOps(prev => ({ ...prev, [field]: v }));
 
+  // setCompareOp
+
   const setCompareOp = (field: string, v: CompareOperator) => setCompareOps(prev => ({ ...prev, [field]: v }));
+
+  // renderOp
 
   const renderOp = (field: string) => (
     <OperatorSelect value={ops[field]} onChange={(v) => setOp(field, v)} className='operator-select' />
@@ -91,6 +107,8 @@ const HomologationVariables: React.FC = () => {
   const [originalKeys, setOriginalKeys] = useState<{ productClass: string; number: string; market: string } | null>(null);
 
   useEffect(() => {
+    // init
+
     const init = async () => {
       try {
         setLoading(true);
@@ -128,7 +146,11 @@ const HomologationVariables: React.FC = () => {
           const conditions = state.searchConditions as Record<string, string>;
           // 分离字段值和运算符
           const formValues: Record<string, string> = {};
+          // equalOpValues
+
           const equalOpValues: Record<string, Operator> = {};
+          // compareOpValues
+
           const compareOpValues: Record<string, CompareOperator> = {};
           // 比较运算符字段列表（number、updateDatetime）
           const compareFields = ['number', 'updateDatetime'];
@@ -136,6 +158,8 @@ const HomologationVariables: React.FC = () => {
             if (key.endsWith('Op')) {
               // 运算符字段，如 productClassOp -> productClass
               const fieldName = key.slice(0, -2); // 去掉 'Op' 后缀
+              // val
+
               const val = conditions[key];
               if (compareFields.includes(fieldName)) {
                 if (['=', '!=', 'GT', 'LT', '>=', '<='].includes(val)) {
@@ -167,18 +191,26 @@ const HomologationVariables: React.FC = () => {
     init();
   }, []);
 
+  // setField
+
   const setField = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (message) { setMessage(''); setHasError(false); }
   };
 
+  // handleNumber
+
   const handleNumber = (v: string) => {
     if (/^[0-9]*$/.test(v) && v.length <= 10) setField('number', v);
   };
 
+  // handleDate
+
   const handleDate = (v: string) => {
     if (/^[0-9-]*$/.test(v) && v.length <= 10) setField('updateDatetime', v);
   };
+
+  // validateRequired
 
   const validateRequired = (): string | null => {
     const { productClass, number, market } = formData;
@@ -189,21 +221,31 @@ const HomologationVariables: React.FC = () => {
     return null;
   };
 
+  // validateVariable
+
   const validateVariable = (): string | null => {
     const { variable } = formData;
     if (variable && variable.startsWith('TEMPLATE-')) {
+      // s
+
       const s = variable.substring(9);
       if (s && !hdocVariableList.includes(s)) return 'Variant does not exist, Please enter the correct content';
     }
     return null;
   };
 
+  // handleAdd
+
   const handleAdd = useCallback(async () => {
     setMessage(''); setHasError(false);
+    // err
+
     const err = validateRequired() || validateVariable();
     if (err) { setMessage(err); setHasError(true); return; }
     setIsOperating(true);
     try {
+      // res
+
       const res = await api.post('/api/ud08/add', formData);
       if (res.data.code === 200) { setMessage('Record added successfully.'); setHasError(false); }
       else if (res.data.code === 409) { setMessage('Primary key conflict, Please enter the correct content'); setHasError(true); }
@@ -214,8 +256,12 @@ const HomologationVariables: React.FC = () => {
     } finally { setIsOperating(false); }
   }, [formData]);
 
+  // handleUpdate
+
   const handleUpdate = useCallback(async () => {
     setMessage(''); setHasError(false);
+    // err
+
     const err = validateRequired() || validateVariable();
     if (err) { setMessage(err); setHasError(true); return; }
     // 主键变更校验：若从UD09返回（有原始主键值），检查主键是否被修改
@@ -231,6 +277,8 @@ const HomologationVariables: React.FC = () => {
     }
     setIsOperating(true);
     try {
+      // res
+
       const res = await api.post('/api/ud08/update', formData);
       if (res.data.code === 200) { setMessage('Record updated successfully.'); setHasError(false); }
       else if (res.data.code === 404) { setMessage('Data does not exist, Please enter the correct content'); setHasError(true); }
@@ -242,6 +290,8 @@ const HomologationVariables: React.FC = () => {
     } finally { setIsOperating(false); }
   }, [formData, originalKeys]);
 
+  // handleDelete
+
   const handleDelete = useCallback(async () => {
     setMessage(''); setHasError(false);
     const { productClass, number, market } = formData;
@@ -250,6 +300,8 @@ const HomologationVariables: React.FC = () => {
     if (!market) { setMessage('Market is required.'); setHasError(true); return; }
     setIsOperating(true);
     try {
+      // res
+
       const res = await api.post('/api/ud08/delete', { productClass, number, market });
       if (res.data.code === 200) {
         setMessage('Record deleted successfully.'); setHasError(false);
@@ -261,6 +313,8 @@ const HomologationVariables: React.FC = () => {
       setHasError(true);
     } finally { setIsOperating(false); }
   }, [formData]);
+
+  // handleSearch
 
   const handleSearch = () => {
     // 将字段值和运算符一起传递给搜索结果页面
@@ -285,6 +339,8 @@ const HomologationVariables: React.FC = () => {
     navigate('/Menu/HomologationVariables/Search', { state: searchState });
   };
 
+  // handleClear
+
   const handleClear = () => {
     setFormData({
       productClass: '', number: '', market: '', variable: '', value: '',
@@ -292,6 +348,8 @@ const HomologationVariables: React.FC = () => {
     });
     setMessage(''); setHasError(false);
   };
+
+  // disabled
 
   const disabled = isOperating || loading;
 
@@ -445,5 +503,7 @@ const HomologationVariables: React.FC = () => {
     </div>
   );
 };
+
+// HomologationVariables
 
 export default HomologationVariables;

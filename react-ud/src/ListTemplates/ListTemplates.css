@@ -82,6 +82,8 @@
   background-color: #ffffff;
 }
 
+/* ud14 */
+
 .ud14-select:focus {
   border-color: #666666;
 }
@@ -93,6 +95,8 @@
   overflow-x: auto;
 }
 
+/* ud14 */
+
 .ud14-table {
   width: 100%;
   border-collapse: collapse;
@@ -100,17 +104,23 @@
 }
 
 .ud14-table th,
+/* ud14 */
+
 .ud14-table td {
   border: 1px solid #b0c4de;
   padding: 6px 10px;
   text-align: left;
 }
 
+/* ud14 */
+
 .ud14-table th {
   background-color: #e8f0fe;
   color: #2c3e50;
   font-weight: bold;
 }
+
+/* ud14 */
 
 .ud14-table tbody tr:hover {
   background-color: #f0f5ff;
@@ -134,6 +144,8 @@
   text-decoration: none;
   vertical-align: middle;
 }
+
+/* ud14 */
 
 .ud14-file-link:hover {
   color: #2980b9;

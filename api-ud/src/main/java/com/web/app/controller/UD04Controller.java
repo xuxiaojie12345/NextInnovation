@@ -6,9 +6,6 @@ import com.web.app.domain.GenerateDocumentQueryResponse;
 import com.web.app.service.UD04Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * UD04控制器
  * 提供UD04SelectGeneratedocumentApi接口 - 根据底盘号查询文档信息
@@ -22,11 +19,7 @@ import org.slf4j.LoggerFactory;
 
  */
 
-public class UD04Controller {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD04Controller.class);
-
-    @Autowired
+public class UD04Controller extends BaseController {@Autowired
     /** ud04Service */
 
     private UD04Service ud04Service;

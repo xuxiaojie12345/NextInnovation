@@ -70,9 +70,13 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+/* ud24 */
+
 .ud24-link-item:last-child {
   border-bottom: none;
 }
+
+/* ud24 */
 
 .ud24-link-item:hover {
   background-color: #e6f7ff;
@@ -86,6 +90,8 @@
   transition: color 0.2s;
 }
 
+/* ud24 */
+
 .ud24-link-item:hover .ud24-link-text {
   color: #40a9ff;
 }
@@ -96,6 +102,8 @@
   font-size: 16px;
   transition: transform 0.2s;
 }
+
+/* ud24 */
 
 .ud24-link-item:hover .ud24-link-arrow {
   transform: translateX(4px);
@@ -140,9 +148,13 @@
   line-height: 1.8;
 }
 
+/* ud24 */
+
 .ud24-info-content p {
   margin: 0;
 }
+
+/* ud24 */
 
 .ud24-info-content strong {
   color: #333333;
@@ -157,6 +169,8 @@
   border-radius: 4px;
 }
 
+/* ud24 */
+
 .ud24-footer-row {
   display: flex;
   align-items: center;
@@ -165,15 +179,21 @@
   line-height: 1.6;
 }
 
+/* ud24 */
+
 .ud24-footer-label {
   width: 120px;
   color: #888888;
   flex-shrink: 0;
 }
 
+/* ud24 */
+
 .ud24-footer-value {
   color: #333333;
 }
+
+/* ud24 */
 
 .ud24-footer-copyright {
   margin-top: 8px;
@@ -199,14 +219,20 @@
 /* ========== 响应式适配 ========== */
 
 @media (max-width: 768px) {
+  /* ud24 */
+
   .ud24-container {
     margin: 20px 12px;
     padding: 20px 16px 24px;
   }
 
+  /* ud24 */
+
   .ud24-link-item {
     padding: 10px 12px;
   }
+
+  /* ud24 */
 
   .ud24-link-text {
     font-size: 13px;
