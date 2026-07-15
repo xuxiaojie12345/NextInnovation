@@ -216,9 +216,9 @@ public class UD10HdocVariablesServiceImpl implements UD10HdocVariablesService {
             String varOp = mapOperatorForXml(request.getVariableOperator());
             String typeOp = mapOperatorForXml(request.getTypeOperator());
             String descrOp = mapOperatorForXml(request.getDescriptionOperator());
-            // Variable 用 eq（精确匹配），其他字段默认为 eq
-            String userOp = "eq";
-            String dateOp = "eq";
+            // 映射操作符为XML安全的标识（eq / ne）
+            String userOp = mapOperatorForXml(request.getCreatedByUserOperator());
+            String dateOp = mapOperatorForXml(request.getDateOperator());
 
             // 4.6 对模糊查询参数进行转义处理，防止SQL注入
             String type = escapeLikeParam(request.getType());

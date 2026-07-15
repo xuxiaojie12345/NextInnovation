@@ -90,28 +90,6 @@
                     </otherwise>
                 </choose>
             </if>
-            <!-- REGISTER_USER: 可选，eq 对应 LIKE, ne 对应 NOT LIKE -->
-            <if test="createdByUser != null and createdByUser != ''">
-                <choose>
-                    <when test="userOp == 'ne'">
-                        AND (REGISTER_USER NOT LIKE CONCAT('%', #{createdByUser}, '%') OR REGISTER_USER IS NULL)
-                    </when>
-                    <otherwise>
-                        AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%')
-                    </otherwise>
-                </choose>
-            </if>
-            <!-- REGISTER_DATETIME: 可选，eq 对应 =, ne 对应 != -->
-            <if test="date != null and date != ''">
-                <choose>
-                    <when test="dateOp == 'ne'">
-                        AND REGISTER_DATETIME != #{date}
-                    </when>
-                    <otherwise>
-                        AND REGISTER_DATETIME = #{date}
-                    </otherwise>
-                </choose>
-            </if>
     </select>
 
 </mapper>

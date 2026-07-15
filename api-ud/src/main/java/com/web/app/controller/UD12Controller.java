@@ -72,10 +72,6 @@ public class UD12Controller {
             @RequestParam("file") MultipartFile file,
             @RequestParam("market") String market) {
 
-        if (file == null || file.isEmpty()) {
-            log.warn("File is null or empty in controller!");
-        }
-
         ApiResponse<?> response = ud12Service.uploadFile(file, market);
 
         return ResponseEntity.ok(response);

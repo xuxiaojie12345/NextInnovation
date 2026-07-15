@@ -41,14 +41,6 @@ public class SwaggerAutoConfiguration {
         .groupName("default") // 分组
         .apiInfo(genApiInfo())// 设置其他几个属性
         .select()
-        // 设置swagger读取的controller包
-        // RequestHandlerSelectors配置要扫描接口的方式
-        // basePackage() 扫描指定路径下的包
-        // any() 扫描所有
-        // none() 都不扫描
-        // withClassAnnotation()扫描指定的注解
-        // GetMapping()扫描方法上的注解
-        // .apis(RequestHandlerSelectors.basePackage("com.web.app.controller"))
         .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
         // 根据请求路径匹配，
         // 一般用 ant 匹配路径； any 是匹配任意路径，

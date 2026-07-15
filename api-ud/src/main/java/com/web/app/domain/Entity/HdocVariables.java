@@ -25,7 +25,9 @@ public class HdocVariables {
     private String date;            // 日期（前端传入，当前未使用）
 
     // 搜索用运算符字段（非数据库字段）
-    private String variableOperator;    // Variable运算符 (= / !=)
-    private String typeOperator;        // Type运算符 (= / !=)
-    private String descriptionOperator; // Description运算符 (= / !=)
+    private String variableOperator;        // Variable运算符 (= / !=)
+    private String typeOperator;            // Type运算符 (= / !=)
+    private String descriptionOperator;     // Description运算符 (= / !=)
+    private String createdByUserOperator;   // Created by user运算符 (= / !=)
+    private String dateOperator;            // Date运算符 (= / !=)
 }

@@ -33,10 +33,6 @@ public class UD03SelectHdocdocumentlistController {
         ApiResponse<UD03SelectHdocdocumentlistResponse> response = 
                 ud03SelectHdocdocumentlistService.selectHdocdocumentlist();
         
-        if (response.getData() != null && response.getData().getDoctypeList() != null) {
-            log.info("Document type count: {}", response.getData().getDoctypeList().size());
-        }
-        
         return ResponseEntity.ok(response);
     }
 }

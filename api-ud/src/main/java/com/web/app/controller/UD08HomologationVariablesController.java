@@ -32,17 +32,13 @@ public class UD08HomologationVariablesController {
      */
     @GetMapping("/getProductClassMaster")
     public ResponseEntity<ApiResponse<?>> getProductClassMaster() {
-        log.info("========== UD08 Controller: Get Product Class Master ==========");
-
         ApiResponse<?> response = ud08HomologationVariablesService.getProductClassMaster();
 
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
         if (response.getData() != null) {
             log.info("Data count: {}", 
                 response.getData() instanceof java.util.List ? 
                 ((java.util.List<?>) response.getData()).size() : "N/A");
         }
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -54,17 +50,7 @@ public class UD08HomologationVariablesController {
      */
     @GetMapping("/getMarketMaster")
     public ResponseEntity<ApiResponse<?>> getMarketMaster() {
-        log.info("========== UD08 Controller: Get Market Master ==========");
-
         ApiResponse<?> response = ud08HomologationVariablesService.getMarketMaster();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        if (response.getData() != null) {
-            log.info("Data count: {}", 
-                response.getData() instanceof java.util.List ? 
-                ((java.util.List<?>) response.getData()).size() : "N/A");
-        }
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -76,17 +62,8 @@ public class UD08HomologationVariablesController {
      */
     @GetMapping("/getHdocVariables")
     public ResponseEntity<ApiResponse<?>> getHdocVariables() {
-        log.info("========== UD08 Controller: Get HDOC Variables ==========");
 
         ApiResponse<?> response = ud08HomologationVariablesService.getHdocVariables();
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        if (response.getData() != null) {
-            log.info("Data count: {}", 
-                response.getData() instanceof java.util.List ? 
-                ((java.util.List<?>) response.getData()).size() : "N/A");
-        }
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -99,14 +76,8 @@ public class UD08HomologationVariablesController {
      */
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<?>> addUserDefinedRule(@RequestBody HdocUserDefinedRules rules) {
-        log.info("========== UD08 Controller: Add User Defined Rule ==========");
-        log.info("Received request: PC={}, NUM={}, MARKET={}", 
-            rules.getPc(), rules.getNum(), rules.getMarket());
 
         ApiResponse<?> response = ud08HomologationVariablesService.addUserDefinedRule(rules);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -119,14 +90,8 @@ public class UD08HomologationVariablesController {
      */
     @PostMapping("/update")
     public ResponseEntity<ApiResponse<?>> updateUserDefinedRule(@RequestBody HdocUserDefinedRules rules) {
-        log.info("========== UD08 Controller: Update User Defined Rule ==========");
-        log.info("Received request: PC={}, NUM={}, MARKET={}", 
-            rules.getPc(), rules.getNum(), rules.getMarket());
 
         ApiResponse<?> response = ud08HomologationVariablesService.updateUserDefinedRule(rules);
-
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -139,18 +104,11 @@ public class UD08HomologationVariablesController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<?>> deleteUserDefinedRule(@RequestBody HdocUserDefinedRules rules) {
-        log.info("========== UD08 Controller: Delete User Defined Rule ==========");
-        log.info("Received request: PC={}, NUM={}, MARKET={}, USERID={}", 
-            rules.getPc(), rules.getNum(), rules.getMarket(), rules.getUserid());
-        
         // 从请求中获取用户信息（userid 字段）
         String updateUser = rules.getUserid();
         
         ApiResponse<?> response = ud08HomologationVariablesService.deleteUserDefinedRule(
             rules.getPc(), rules.getNum(), rules.getMarket(), updateUser);
-        
-        log.info("Response code: {}, msg: {}", response.getCode(), response.getMsg());
-        log.info("========== UD08 Controller: Request completed ==========");
 
         return ResponseEntity.ok(response);
     }
@@ -162,8 +120,6 @@ public class UD08HomologationVariablesController {
      */
     @GetMapping("/getCurrentUserInfo")
     public ResponseEntity<ApiResponse<?>> getCurrentUserInfo() {
-        log.info("========== UD08 Controller: Get Current User Info ==========");
-        
         try {
             // 构建返回数据
             java.util.Map<String, Object> data = new java.util.HashMap<>();
@@ -185,7 +141,7 @@ public class UD08HomologationVariablesController {
             return ResponseEntity.ok(ApiResponse.success("获取当前用户信息成功", data));
             
         } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.error(500, "系统内部错误，请联系管理员"));
+            return ResponseEntity.status(500).body(ApiResponse.error(500, "系统内部错误，请联系管理员"));
         }
     }
     

@@ -78,21 +78,16 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
         
         try {
             // 4.5 遍历变量列表，逐个更新
-            int updateCount = 0;
             for (UD05ModifyDocumentSaveRequest.VariableItem variable : request.getVariables()) {
                 // 只更新有值的字段
                 if (variable.getNewval() != null && !variable.getNewval().trim().isEmpty()) {
-                    int result = hdocAdcaModificationMapper.updateNewval(
+                    hdocAdcaModificationMapper.updateNewval(
                             request.getChassisSeries(),
                             request.getChassisNo(),
                             variable.getVariable(),
                             variable.getNewval(),
                             request.getUpdateUser() != null ? request.getUpdateUser() : "SYSTEM"
                     );
-                    
-                    if (result > 0) {
-                        updateCount++;
-                    }
                 }
             }
             
@@ -170,8 +165,6 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
             if (variable.getVariable() == null || variable.getVariable().trim().isEmpty()) {
                 return "Variable name at index " + i + " is required.";
             }
-            
-            // NEWVAL可以为空，表示不更新该字段
         }
         
         return null; // 验证通过
