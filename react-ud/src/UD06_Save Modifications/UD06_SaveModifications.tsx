@@ -19,12 +19,6 @@ interface SaveModificationsState {
 
 /**
  * UD06 Save Modifications 页面组件
- *
- * 功能说明：
- * - 从前画面接收 chassisSerie 和 chassisNo，调用后端接口获取修改确认信息
- * - 显示 Chassis 信息、Doctype、版本、Storing 信息和固定提示信息
- * - 支持 Close 按钮返回上一画面
- *
  * @component
  * @returns {JSX.Element} Save Modifications 页面元素
  */
@@ -76,9 +70,6 @@ const UD06_SaveModifications: React.FC = () => {
   // ==================== API调用 ====================
   /**
    * 调用后端接口获取 Save Modifications 数据
-   * Method: POST
-   * Endpoint: /api/ud06/savemodifications
-   *
    * @param chassisSerie - Chassis series
    * @param chassisNumber - Chassis number
    * @param variables - 修改的变量名列表（从UD05传入），用于精确查询每条修改记录

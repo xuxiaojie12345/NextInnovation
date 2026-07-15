@@ -6,23 +6,6 @@ import apiClient from "../api/config";
 /**
  * UD05 修改文档页面组件
  * 
- * 功能说明：
- * - 根据前画面传入的数据，展示可以修正的变量数据
- * - 用户可以查看当前值并输入修改后的值，然后保存修改
- * - 提供清晰的DataTable展示，区分当前值和修改值
- * - 支持模板下载和跳转到车辆规格页面
- * 
- * 用户体验：
- * - DataTable四列清晰对齐（Variable、Description、Current value、Modified value）
- * - Current value 和 Modified value 对比显示
- * - 高亮显示有修改的行
- * - 按钮在加载期间禁用
- * 
- * 安全性：
- * - 所有API请求通过HTTPS发送
- * - Modified value长度限制为500字符
- * - 防止XSS攻击
- * 
  * @component
  * @returns {JSX.Element} 修改文档页面元素
  */
@@ -31,7 +14,6 @@ const UD05_ModifyDocument: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [chassisNo, setChassisNo] = useState<string>("");                    // Chassis no（从前画面传入）
   const [market, setMarket] = useState<string>("");                          // Market（从前画面传入）
   const [chassisSerie, setChassisSerie] = useState<string>("");              // Chassis series（从前画面传入）
@@ -80,8 +62,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 获取修改文档数据
-   * 对应设计书 4.1 UD05SelectVariableModification - 获取数据
-   * Method: POST, Endpoint: /api/ud05/selectmodifydocument
    * 
    * @param chassisSerie - 底盘系列
    * @param chassisNo - 底盘编号
@@ -133,8 +113,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 更新修改文档数据
-   * 对应设计书 4.2 UD05UpdateHdocAdcaModification - 更新数据
-   * Method: POST, Endpoint: /api/ud05/updatemodifydocument
    * 
    * @param chassisSerie - 底盘系列
    * @param chassisNo - 底盘编号
@@ -189,7 +167,6 @@ const UD05_ModifyDocument: React.FC = () => {
 
   /**
    * 处理 Modified value 输入变化
-   * 限制：最大长度500字符
    * 用户体验优化：用户重新输入时清空错误提示
    * 
    * @param index - 变量索引

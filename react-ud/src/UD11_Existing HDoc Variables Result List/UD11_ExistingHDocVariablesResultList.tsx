@@ -5,7 +5,6 @@ import './UD11_ExistingHDocVariablesResultList.css';
 
 /**
  * 检索结果记录接口
- * 对应设计书 2.1 控件属性表 和 6.1 状态管理
  */
 interface ResultRecord {
   variable: string;
@@ -17,12 +16,6 @@ interface ResultRecord {
 
 /**
  * UD11_ExistingHDocVariablesResultList 检索结果列表页面组件
- *
- * 功能说明：
- * - 从UD10画面接收检索条件，调用API查询HDOC_VARIABLES表
- * - 以DataTable形式展示检索结果，支持选择和导出操作
- * - 提供Select（选择返回UD10）、Down（钻取到UD08）、Back（返回前画面）、Print（打印）、Excel（导出CSV）功能
- * - Created by user 列可点击跳转到UD25
  *
  * @component
  * @returns {JSX.Element} 检索结果列表页面元素

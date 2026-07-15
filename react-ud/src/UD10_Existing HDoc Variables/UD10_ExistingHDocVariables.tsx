@@ -6,12 +6,6 @@ import './UD10_ExistingHDocVariables.css';
 /**
  * UD10_ExistingHDocVariables 现有HDoc变量管理页面组件
  *
- * 功能说明：
- * - 管理现有的HDoc Variables（认证文档变量）
- * - 支持搜索、添加、更新、删除变量
- * - 支持导出CSV文件
- * - Search按钮携带参数跳转到UD11搜索结果画面
- *
  * @component
  * @returns {JSX.Element} Existing HDoc Variables 管理页面元素
  */
@@ -28,7 +22,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表
   const [variable, setVariable] = useState<string>('');           // 变量名（必填）
   const [variableOp, setVariableOp] = useState<string>('=');     // Variable运算符
   const [type, setType] = useState<string>('');                   // 类型（下拉框）
@@ -40,11 +33,10 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   const [displayDate, setDisplayDate] = useState<string>('');     // 日期（Output）
   const [registerDateOp, setRegisterDateOp] = useState<string>('='); // Date运算符
 
-  // Type下拉框固定选项（对应设计书 2.1 备注）
+  // Type下拉框固定选项
   const TYPE_OPTIONS = ['VDA', 'User Defined'];
 
-  // 操作符选项（固定值）
-  // Date 项目后面的下拉框内容为：【=,<,>】
+  // 操作符选项（固定值）Date 项目后面的下拉框内容为：【=,<,>】
   const OPERATOR_OPTIONS_DATE = ['=', '<', '>'];
   // 其他项目后的下拉框内容为：【=,!=】
   const OPERATOR_OPTIONS_DEFAULT = ['=', '!='];
@@ -64,11 +56,8 @@ const UD10_ExistingHDocVariables: React.FC = () => {
     return `${y}-${m}-${d}`;
   };
 
-  // ==================== 接收UD11传来的数据 ====================
   /**
    * 从UD11返回时，根据返回类型处理数据填充
-   * - Select: 接收选中记录并填充到表单
-   * - Back: 恢复跳转前的输入数据
    */
   useEffect(() => {
     const state = (location.state as any);
@@ -146,7 +135,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Clear 按钮点击
-   * 对应设计书 3.1.3 Clear 按钮处理流程
    */
   const handleClear = useCallback(() => {
     setVariable('');

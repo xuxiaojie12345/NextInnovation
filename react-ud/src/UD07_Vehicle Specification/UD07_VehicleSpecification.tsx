@@ -30,12 +30,6 @@ interface VehicleSpecificationState {
 /**
  * UD07 Vehicle Specification 页面组件
  *
- * 功能说明：
- * - 从前画面接收 Chassis no 参数
- * - 拆分为 serie 和 chno
- * - 调用后端 API 获取车辆规格数据
- * - 显示车辆规格、SYMBOL_STR 和 DESCRIPTION 提示信息
- *
  * @component
  * @returns {JSX.Element} 车辆规格页面元素
  */
@@ -206,13 +200,6 @@ const UD07_VehicleSpecification: React.FC = () => {
 
         <div className='ud07-snote'>{state.sNoteNo || '-'}</div>
 
-        {/* <button
-          className='ud07-close-btn'
-          onClick={handleClose}
-          disabled={state.isLoading}
-        >
-          Close
-        </button> */}
       </div>
     </div>
   );

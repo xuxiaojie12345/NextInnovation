@@ -251,14 +251,9 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
           {/* Chassis series 输入框 */}
           <div className='form-group'>
             <label htmlFor='chassisSeries'>Chassis series <span className='required'>*</span></label>
-            <input
-              id='chassisSeries'
-              type='text'
-              ref={chassisSeriesRef}
-              value={chassisSeries}
+            <input id='chassisSeries' type='text' ref={chassisSeriesRef} value={chassisSeries}
               onChange={handleChassisSeriesChange}
-              placeholder=''
-              disabled={isLoading}
+              placeholder='' disabled={isLoading}
               maxLength={MAX_CHASSIS_SERIES_LENGTH}
               className='form-input'
             />
@@ -267,14 +262,9 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
           {/* Chassis no 输入框 */}
           <div className='form-group'>
             <label htmlFor='chassisNo'>Chassis no <span className='required'>*</span></label>
-            <input
-              id='chassisNo'
-              type='text'
-              ref={chassisNoRef}
-              value={chassisNo}
+            <input id='chassisNo' type='text' ref={chassisNoRef} value={chassisNo}
               onChange={handleChassisNoChange}
-              placeholder=''
-              disabled={isLoading}
+              placeholder='' disabled={isLoading}
               maxLength={MAX_CHASSIS_NO_LENGTH}
               className='form-input'
             />
@@ -283,13 +273,9 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
           {/* Document type ドロップダウン */}
           <div className='form-group'>
             <label htmlFor='documentType'>Document type <span className='required'>*</span></label>
-            <select
-              id='documentType'
-              ref={documentTypeRef}
-              value={documentType}
+            <select id='documentType' ref={documentTypeRef} value={documentType}
               onChange={handleDocumentTypeChange}
-              disabled={isLoading}
-              className='form-select'
+              disabled={isLoading} className='form-select'
             >
               <option value=''></option>
               {documentTypeOptions.map((option, index) => (

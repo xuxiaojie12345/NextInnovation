@@ -14,13 +14,6 @@ interface SearchField {
 
 /**
  * UD08_HomologationVariables 认证变量规则管理页面组件
- *
- * 功能说明：
- * - 提供认证变量（Homologation Variables）的检索、新增、更新、删除功能
- * - 支持按 Product class、Number、Market、Variable、Value 等条件检索
- * - 对输入数据进行前端校验，调用后端API进行数据操作
- * - 页面加载时从 PRODUCT_CLASS_MASTER 和 MARKET_MASTER 表加载下拉列表数据
- *
  * @component
  * @returns {JSX.Element} Homologation Variables 管理页面元素
  */
@@ -37,7 +30,6 @@ const UD08_HomologationVariables: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 2.1 控件属性表 - 各字段的输入值和运算符
   const [productClass, setProductClass] = useState<SearchField>({ value: '', operator: '=' });
   const [number, setNumber] = useState<SearchField>({ value: '', operator: '=' });
   const [market, setMarket] = useState<SearchField>({ value: '', operator: '=' });
@@ -87,9 +79,6 @@ const UD08_HomologationVariables: React.FC = () => {
   useEffect(() => {
     /**
      * 页面加载时执行初始化
-     * 处理流程：
-     * 1. 调用API获取 Product class 下拉列表数据
-     * 2. 调用API获取 Market 下拉列表数据
      */
     const loadMasterData = async () => {
       try {
@@ -215,14 +204,8 @@ const UD08_HomologationVariables: React.FC = () => {
   };
 
   // ==================== 业务操作函数 ====================
-
   /**
    * 执行清空操作
-   *
-   * 处理流程：
-   * 1. 清空所有输入字段的值
-   * 2. 重置运算符为默认值 '='
-   * 3. 清空消息显示
    */
   const handleClear = useCallback(() => {
     setProductClass({ value: '', operator: '=' });
@@ -249,10 +232,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 执行检索操作
-   *
-   * 处理流程：
-   * 1. 收集所有非空的检索条件
-   * 2. 携带参数跳转到 UD09 检索结果画面
    */
   const handleSearch = useCallback(() => {
     // 构建检索参数字典（只包含非空值）
@@ -344,12 +323,6 @@ const UD08_HomologationVariables: React.FC = () => {
   /**
    * 执行前端校验
    *
-   * 校验规则：
-   * - Product class 不能为空（No.7）
-   * - Number 不能为空（No.8）
-   * - Number 必须是半角数字（No.9）
-   * - Market 不能为空（No.10）
-   *
    * @param operationName - 操作名称（用于错误消息）
    * @returns {boolean} 校验是否通过
    */
@@ -379,11 +352,6 @@ const UD08_HomologationVariables: React.FC = () => {
 
   /**
    * 校验 Variable 在 HDOC_VARIABLES 表中的存在性
-   * 对应设计书 3.1.4 Add 操作流程 - 步骤4
-   *
-   * 处理逻辑：
-   * - 若 Variable 输入以 'TEMPLATE-' 开头，去掉前缀后进行检查
-   * - 调用后端API校验剩余内容是否存在于 HDOC_VARIABLES 表
    *
    * @returns {Promise<boolean>} 校验是否通过
    */

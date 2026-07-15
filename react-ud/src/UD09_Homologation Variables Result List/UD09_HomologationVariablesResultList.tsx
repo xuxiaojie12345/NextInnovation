@@ -12,27 +12,18 @@ interface ResultRecord {
   market: string;
   variable: string;
   value: string;
-  /** VS和VS2通过逗号拼接 */
   variantString: string;
   variantString1: string;
   variantString2: string;
   comments: string;
   addDate: string;
   deleteDate: string;
-  /** 可点击链接跳转到UD25 */
   createdByUser: string;
   date: string;
 }
 
 /**
  * UD09_HomologationVariablesResultList 检索结果列表页面组件
- *
- * 功能说明：
- * - 从UD08画面接收检索条件，调用API查询HDOC_USER_DEFINED_RULES表
- * - 以DataTable形式展示检索结果，支持选择和删除操作
- * - 提供Select（选择返回UD08）、Back（返回前画面）、Print（打印）、Delete selected（批量删除）功能
- * - 按照 Product Class, Market, Number 排序显示
- * - Created by user 列可点击跳转到UD25
  *
  * @component
  * @returns {JSX.Element} 检索结果列表页面元素
@@ -62,9 +53,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   // ==================== 初始数据加载 ====================
   useEffect(() => {
-    /**
-     * 画面加载时执行检索
-     */
+    // 画面加载时执行检索
     const fetchResults = async () => {
       setIsLoading(true);
       try {
@@ -79,8 +68,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
         if (response.data && response.data.code === 200) {
           const dataList = response.data.data || [];
 
-          // 将API返回的数据映射为前端展示格式
-          // Variant string. 列由 VS 和 VS2 拼接显示
+          // 将API返回的数据映射为前端展示格式, Variant string. 列由 VS 和 VS2 拼接显示
           const mappedResults: ResultRecord[] = dataList.map((item: any) => ({
             productClass: item.productClass || '',
             number: item.number !== null && item.number !== undefined ? String(item.number) : '',

@@ -21,7 +21,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
   }, [navigate]);
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [marketOptions, setMarketOptions] = useState<Array<{ market: string }>>([]); // Market下拉列表选项
   const [uploadMarket, setUploadMarket] = useState<string>("");   // Upload区域选中的Market
   const [deleteMarket, setDeleteMarket] = useState<string>("");   // Delete区域选中的Market
@@ -48,7 +47,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     setIsMarketLoading(true);
     try {
       // 调用后端API获取Market列表
-      // Method: GET, Endpoint: /api/ud12/selectmarket
       const response = await apiClient.get("/api/ud12/selectmarket");
       if (response.data.code === 200 && response.data.data) {
         setMarketOptions(response.data.data);
@@ -199,7 +197,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
       formData.append("market", uploadMarket);
 
       // 调用文件上传API
-      // Method: POST, Endpoint: /api/ud12/uploadflie
       const response = await apiClient.post("/api/ud12/uploadflie", formData);
       if (response.data.code === 200) {
         // 4. 结果处理 - 成功
@@ -241,14 +238,12 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     // 1. 前置处理：获取选中的Market和Template值
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.4
     if (!deleteMarket) {
       setMessage("请选择Market");
       setMessageType("error");
       return;
     }
 
-    // 对应设计书 3.2 校验详细规格表 No.5
     if (!selectedTemplate) {
       setMessage("请选择要删除的模板");
       setMessageType("error");
@@ -256,13 +251,11 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
     }
 
     // 3. 显示确认对话框
-    // 对应设计书 3.2 校验详细规格表 No.6
     setShowConfirmModal(true);
   };
 
   /**
-   * 确认删除操作
-   * 用户点击确认对话框的确认按钮后执行
+   * 确认删除操作，用户点击确认对话框的确认按钮后执行
    */
   const confirmDelete = async () => {
     setShowConfirmModal(false);
@@ -271,9 +264,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
     try {
       // 调用文件删除API
-      // 对应设计书 4.3 UD12DeleteFlie - 文件删除
-      // Method: DELETE, Endpoint: /api/ud12/deleteflie
-      // 后端使用@DeleteMapping且参数为@RequestParam，需以params形式传递
       const response = await apiClient.delete("/api/ud12/deleteflie", {
         params: {
           market: deleteMarket,
@@ -282,7 +272,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
       });
 
       if (response.data.code === 200) {
-        // 对应设计书 3.2 校验详细规格表 No.7
         const msg = response.data.msg || `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${deleteMarket}`;
         setMessage(msg);
         setMessageType("success");
@@ -295,7 +284,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         setMessageType("error");
       }
     } catch (error: any) {
-      // 对应设计书 5. 异常处理
+      // 异常处理
       if (error.response) {
         const status = error.response.status;
         if (status === 404) {
@@ -321,7 +310,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
   /**
    * 点击 Check Template 链接跳转到模板检查画面
-   * 对应设计书 3.1.4 Check Template Link 点击流程
    */
   const handleCheckTemplateClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -335,7 +323,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
 
     
       <div className="ud12-content-wrapper">
-        {/* ==================== 左侧：Upload区域 ==================== */}
+        {/* ==================== Upload区域 ==================== */}
         <div className="ud12-upload-section">
           <div className="ud12-section-header">
             <h2 className="ud12-section-title">HDoc Template Upload</h2>
@@ -395,7 +383,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
           </div>
         </div>
 
-        {/* ==================== 右侧：Delete区域 ==================== */}
+        {/* ==================== Delete区域 ==================== */}
         <div className="ud12-delete-section">
           <div className="ud12-section-header">
             <h2 className="ud12-section-title">Hdoc Template Delete/Archive</h2>

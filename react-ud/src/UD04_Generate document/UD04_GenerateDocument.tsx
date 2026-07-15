@@ -5,8 +5,6 @@ import apiClient from '../api/config';
 
 /**
  * Generate Document 页面组件接口定义
- * 
- * 状态管理接口，包含所有需要显示的数据字段
  */
 interface GenerateDocumentState {
   chassisNo: string;                    // Chassis no（从前画面传入）
@@ -32,12 +30,6 @@ interface GenerateDocumentState {
 /**
  * Generate Document 页面组件
  * 
- * 功能说明：
- * - 根据前画面传入的Chassis series和Chassis no，展示VIN Plate生成的结果信息
- * - 显示车辆认证文档的生成结果，包括订单信息、构建信息、市场信息等
- * - 支持跳转到相关功能页面（Modify Document、Vehicle Specification等）
- * - 关键信息突出显示，条件性显示S-Note消息和Modify Doc链接
- * 
  * @component
  * @returns {JSX.Element} Generate Document页面元素
  */
@@ -46,7 +38,6 @@ const UD04_GenerateDocument: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计文档 6.1 状态管理
   const [state, setState] = useState<GenerateDocumentState>({
     chassisNo: '',
     ordernumber: '',
@@ -72,8 +63,6 @@ const UD04_GenerateDocument: React.FC = () => {
 
   /**
    * 组件加载时初始化
-   * 1. 从路由参数获取Chassis series和Chassis no
-   * 2. 调用API获取文档生成结果数据
    */
   useEffect(() => {
     // 对应设计书 5. 异常处理 - 用户未登录
@@ -104,8 +93,6 @@ const UD04_GenerateDocument: React.FC = () => {
 
   /**
    * 获取文档生成结果数据
-   * 对应设计文档 4.1 UD04SelectGeneratedocumentApi
-   * Method: GET, Endpoint: /api/ud04/getdocumentdata
    * 
    * @param {string} chassisSerie - Chassis series
    * @param {string} chassisNo - Chassis no
@@ -157,8 +144,7 @@ const UD04_GenerateDocument: React.FC = () => {
           isLoading: false,
         }));
       } else {
-        // 对应设计书 5. 异常处理 - 数据不存在 / 业务错误
-        // 服务器返回了业务错误（code != 200），记录服务器返回的错误详情
+        // 异常处理 - 数据不存在 / 业务错误
         setState(prev => ({
           ...prev,
           message: 'We can not get the data. Please try again.',
@@ -175,8 +161,6 @@ const UD04_GenerateDocument: React.FC = () => {
         errorMessage = 'Request timeout. Please check your network.';
       } else if (error.response) {
         // 服务器返回了错误状态码（4xx, 5xx）
-        const status = error.response.status;
-        // 服务器内部错误(500)、未授权(401)等统一显示 System error
         errorMessage = 'System error. Please try again later.';
       } else if (error.request) {
         // 请求已发出但没有收到响应 — 网络异常
@@ -198,19 +182,13 @@ const UD04_GenerateDocument: React.FC = () => {
 
   /**
    * 点击 Modify Doc Link 跳转流程
-   * 对应设计文档 3.1.2 Modify Doc Link 点击流程
-   * 
-   * 处理流程：
-   * 1. 获取Chassis series、Chassis no和Market
-   * 2. 将参数传递给下个画面
-   * 3. 画面迁移：跳转到UD05 Modify Document画面
    */
   const handleModifyDocClick = () => {
     // 从路由state获取参数
     const stateData = location.state as any;
     if (stateData) {
       try {
-        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        //  异常处理 - 网络异常导致路由失败
         navigate('/UD05', {
           state: {
             chassisSeries: stateData.chassisSeries,
@@ -219,7 +197,7 @@ const UD04_GenerateDocument: React.FC = () => {
           },
         });
       } catch (error) {
-        // 对应设计书 5. 异常处理 - 画面迁移异常
+        // 异常处理 - 画面迁移异常
         setState(prev => ({
           ...prev,
           message: 'System error. Please try again later.',
@@ -230,19 +208,13 @@ const UD04_GenerateDocument: React.FC = () => {
 
   /**
    * 点击 Chassis no Link 跳转流程
-   * 对应设计文档 3.1.3 Chassis no Link 点击流程
-   * 
-   * 处理流程：
-   * 1. 获取Chassis no
-   * 2. 将Chassis no作为参数传给下个画面
-   * 3. 打开UD07 VDA - Vehicle Specification画面
    */
   const handleChassisNoClick = () => {
     // 从路由state获取参数
     const stateData = location.state as any;
     if (stateData) {
       try {
-        // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+        //  异常处理 - 网络异常导致路由失败
         navigate('/UD07', {
           state: {
             chassisSeries: stateData.chassisSeries,
@@ -250,7 +222,7 @@ const UD04_GenerateDocument: React.FC = () => {
           },
         });
       } catch (error) {
-        // 对应设计书 5. 异常处理 - 画面迁移异常
+        //  异常处理 - 画面迁移异常
         setState(prev => ({
           ...prev,
           message: 'System error. Please try again later.',
