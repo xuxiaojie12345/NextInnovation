@@ -6,6 +6,7 @@ import com.web.app.domain.UD12TemplateFileResponse;
 import com.web.app.domain.entity.MarketMaster;
 import com.web.app.mapper.UD12Mapper;
 import com.web.app.service.UD12Service;
+import com.web.app.tool.NetworkShareUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,6 @@ public class UD12ServiceImpl implements UD12Service {
     /** 允许上传的最大文件大小（10MB） */
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-
-
-    /** 网络共享连接是否已验证 */
-    private boolean networkAuthenticated = false;
-
     @Autowired
     private UD12Mapper ud12Mapper;
 
@@ -66,85 +62,14 @@ public class UD12ServiceImpl implements UD12Service {
      */
     @PostConstruct
     public void init() {
-        authenticateNetworkShare();
-    }
-
-    /**
-     * 认证网络共享文件夹
-     * 使用 net use 命令建立到网络共享的持久连接
-     */
-    private void authenticateNetworkShare() {
-        if (networkAuthenticated) {
-            return;
-        }
-
-        // 判断是否为UNC路径（以\\开头）
-        if (templateRoot != null && templateRoot.startsWith("\\\\")) {
-            // 检查是否有用户名密码配置
-            if (networkUsername == null || networkUsername.isEmpty()) {
-                logger.warn("Network username not configured, trying direct access to: {}",
-                        templateRoot);
-                networkAuthenticated = true;
-                return;
-            }
-            try {
-                // 提取服务器共享根路径（例如 \\172.17.0.63\hdoc）
-                String shareRoot = templateRoot;
-                int firstSlashAfterServer = templateRoot.indexOf('\\', 2);
-                if (firstSlashAfterServer > 0) {
-                    int secondSlashAfterServer = templateRoot.indexOf('\\', firstSlashAfterServer + 1);
-                    if (secondSlashAfterServer > 0) {
-                        shareRoot = templateRoot.substring(0, secondSlashAfterServer);
-                    }
-                }
-
-                // 构建net use命令
-                String command = String.format("net use %s %s /user:%s /persistent:no",
-                        shareRoot, networkPassword, networkUsername);
-
-                logger.info("Authenticating network share: {}", shareRoot);
-
-                Process process = Runtime.getRuntime().exec(command);
-
-                // 等待net use完成，最多5秒超时
-                boolean completed = process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
-
-                if (completed) {
-                    int exitCode = process.exitValue();
-                    if (exitCode == 0) {
-                        networkAuthenticated = true;
-                        logger.info("Network share authenticated successfully: {}", shareRoot);
-                    } else {
-                        String errorOutput = new String(process.getErrorStream().readAllBytes());
-                        logger.warn("Network share authentication returned code {}: {}",
-                                exitCode, errorOutput.trim());
-                        networkAuthenticated = true;
-                    }
-                } else {
-                    // 超时，销毁进程
-                    process.destroyForcibly();
-                    logger.warn("Network share authentication timed out, will try direct access");
-                    networkAuthenticated = true;
-                }
-            } catch (Exception e) {
-                logger.warn("Failed to authenticate network share, will try direct access: {}",
-                        e.getMessage());
-                // 不阻断执行，可能已有连接
-                networkAuthenticated = true;
-            }
-        } else {
-            // 非UNC路径（如本地路径），无需认证
-            networkAuthenticated = true;
-        }
+        NetworkShareUtil.authenticate(templateRoot, networkUsername, networkPassword);
     }
 
     /**
      * 获取市场根目录Path对象（确保已认证）
      */
     private Path getTemplateRootPath() {
-        if (!networkAuthenticated) {
-            authenticateNetworkShare();
-        }
+        NetworkShareUtil.authenticate(templateRoot, networkUsername, networkPassword);
         return Paths.get(templateRoot);
     }
 

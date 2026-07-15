@@ -12,13 +12,13 @@ import com.web.app.domain.entity.MarketMaster;
 import com.web.app.domain.entity.ProductClassMaster;
 import com.web.app.mapper.UD08Mapper;
 import com.web.app.service.UD08Service;
+import com.web.app.tool.AuditFieldHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -76,12 +76,7 @@ public class UD08ServiceImpl implements UD08Service {
 
         // 插入HDOC_USER_DEFINED_RULES表
         HdocUserDefinedRules record = buildRecord(pc, num, market, request);
-        record.setRegisterDatetime(LocalDateTime.now());
-        record.setRegisterUser(request.getUpdateUser() != null ? request.getUpdateUser().trim() : null);
-        record.setRegisterProcess("UD08Add");
-        record.setUpdateDatetime(LocalDateTime.now());
-        record.setUpdateUser(request.getUpdateUser() != null ? request.getUpdateUser().trim() : null);
-        record.setUpdateProcess("UD08Add");
+        AuditFieldHelper.fillCreateFields(record, request.getUpdateUser(), "UD08Add");
 
         ud08Mapper.insert(record);
         logger.info("UD08Add - Record inserted successfully: pc={}, num={}, market={}", pc, num, market);
@@ -125,27 +120,8 @@ public class UD08ServiceImpl implements UD08Service {
 
         // 更新HDOC_USER_DEFINED_RULES表
         HdocUserDefinedRules record = buildRecord(pc, num, market, request);
-        // 使用前端传入的updateDatetime，若为空则使用系统时间
-        String reqDatetime = request.getUpdateDatetime();
-        if (reqDatetime != null && !reqDatetime.trim().isEmpty()) {
-            try {
-                String datetimeStr = reqDatetime.trim();
-                // 前端格式为"yyyy-MM-dd"（10字符）时补全时间部分
-                if (datetimeStr.length() == 10) {
-                    datetimeStr = datetimeStr + " 00:00:00";
-                }
-                record.setUpdateDatetime(LocalDateTime.parse(datetimeStr,
-                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            } catch (Exception e) {
-                logger.warn("UD08Update - Invalid updateDatetime format: {}, use system time", reqDatetime);
-                record.setUpdateDatetime(LocalDateTime.now());
-            }
-        } else {
-            record.setUpdateDatetime(LocalDateTime.now());
-        }
-        String updateUser = request.getUpdateUser() != null ? request.getUpdateUser().trim() : null;
-        record.setUpdateUser(updateUser);
-        record.setUpdateProcess("UD08Update");
+        AuditFieldHelper.fillUpdateFields(record, request.getUpdateUser(), "UD08Update",
+                request.getUpdateDatetime());
 
         ud08Mapper.updateByPrimaryKey(record);
         logger.info("UD08Update - Record updated successfully: pc={}, num={}, market={}", pc, num, market);

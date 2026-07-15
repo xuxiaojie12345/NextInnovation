@@ -2,6 +2,7 @@ package com.web.app.service.impl;
 
 import com.web.app.mapper.UD14Mapper;
 import com.web.app.service.UD14Service;
+import com.web.app.tool.NetworkShareUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -42,9 +42,6 @@ public class UD14ServiceImpl implements UD14Service {
     @Value("${ud12.network.password:}")
     private String networkPassword;
 
-    /** 网络共享连接是否已验证 */
-    private boolean networkAuthenticated = false;
-
     @Autowired
     private UD14Mapper ud14Mapper;
 
@@ -53,53 +50,7 @@ public class UD14ServiceImpl implements UD14Service {
      */
     @PostConstruct
     public void init() {
-        authenticateNetworkShare();
-    }
-
-    /**
-     * 认证网络共享文件夹
-     */
-    private void authenticateNetworkShare() {
-        if (networkAuthenticated) return;
-
-        if (templateRoot != null && templateRoot.startsWith("\\\\")) {
-            if (networkUsername == null || networkUsername.isEmpty()) {
-                networkAuthenticated = true;
-                return;
-            }
-            try {
-                String shareRoot = templateRoot;
-                int firstSlash = templateRoot.indexOf('\\', 2);
-                if (firstSlash > 0) {
-                    int secondSlash = templateRoot.indexOf('\\', firstSlash + 1);
-                    if (secondSlash > 0) shareRoot = templateRoot.substring(0, secondSlash);
-                }
-
-                String command = String.format("net use %s %s /user:%s /persistent:no",
-                        shareRoot, networkPassword, networkUsername);
-
-                Process process = Runtime.getRuntime().exec(command);
-                boolean completed = process.waitFor(5, TimeUnit.SECONDS);
-
-                if (completed) {
-                    int exitCode = process.exitValue();
-                    if (exitCode == 0) {
-                        logger.info("UD14 - Network share authenticated: {}", shareRoot);
-                    } else {
-                        logger.warn("UD14 - Network share auth code: {}", exitCode);
-                    }
-                } else {
-                    process.destroyForcibly();
-                    logger.warn("UD14 - Network share auth timed out");
-                }
-                networkAuthenticated = true;
-            } catch (Exception e) {
-                logger.warn("UD14 - Network auth error: {}", e.getMessage());
-                networkAuthenticated = true;
-            }
-        } else {
-            networkAuthenticated = true;
-        }
+        NetworkShareUtil.authenticate(templateRoot, networkUsername, networkPassword);
     }
 
     @Override

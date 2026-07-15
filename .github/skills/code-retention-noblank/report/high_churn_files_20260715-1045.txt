@@ -1,0 +1,30 @@
+react-ud/src/Menu/Menu.tsx	流失率:54.58%	修改:50次	新增:2477	删除:1352
+react-ud/src/Login/Login.tsx	流失率:79.73%	修改:41次	新增:2398	删除:1912
+react-ud/src/Login/Login.test.tsx	流失率:578.59%	修改:12次	新增:654	删除:3784
+react-ud/src/AdCaChange/AdCaChange.css	流失率:78.03%	修改:9次	新增:132	删除:103
+react-ud/src/MarketDocumentSettingsResultList/MarketDocumentSettingsResultList.css	流失率:53.37%	修改:9次	新增:208	删除:111
+api-ud/src/main/resources/mapper/UD19Mapper.xml	流失率:51.28%	修改:9次	新增:117	删除:60
+api-ud/src/main/java/com/web/app/controller/ADChangeController.java	流失率:50.19%	修改:8次	新增:269	删除:135
+react-ud/src/index.tsx	流失率:61.7%	修改:7次	新增:47	删除:29
+api-ud/src/main/java/com/web/app/controller/ModifyDocumentController.java	流失率:51.11%	修改:5次	新增:135	删除:69
+api-ud/src/main/java/com/web/app/controller/UD15SendDataController.java	流失率:58.28%	修改:5次	新增:326	删除:190
+react-ud/src/UD24_UD HDoc/UD24_UDHDoc.css	流失率:62.5%	修改:5次	新增:224	删除:140
+react-ud/src/Test/Test.tsx	流失率:184.62%	修改:5次	新增:13	删除:24
+api-ud/src/main/java/com/web/app/controller/HdocVariablesController.java	流失率:51.87%	修改:4次	新增:347	删除:180
+api-ud/src/main/java/com/web/app/controller/TemplateController.java	流失率:52.19%	修改:4次	新增:320	删除:167
+react-ud/src/App.test.tsx	流失率:100.0%	修改:4次	新增:17	删除:17
+react-ud/src/index.css	流失率:100.0%	修改:4次	新增:23	删除:23
+react-ud/src/reportWebVitals.ts	流失率:100.0%	修改:4次	新增:19	删除:19
+react-ud/src/setupTests.ts	流失率:100.0%	修改:4次	新增:7	删除:7
+react-ud/src/App.css	流失率:74.47%	修改:4次	新增:47	删除:35
+api-ud/src/main/java/com/web/app/dto/HdocVariablesResponse.java	流失率:57.58%	修改:4次	新增:33	删除:19
+api-ud/src/main/java/com/web/app/config/SwaggerAutoConfiguration.java	流失率:63.01%	修改:4次	新增:219	删除:138
+api-ud/src/main/java/com/web/app/config/SwaggerProperties.java	流失率:58.58%	修改:4次	新增:268	删除:157
+react-ud/src/ExistingHDocVariablesResult List/UD11.tsx	流失率:100.0%	修改:4次	新增:285	删除:285
+api-ud/src/main/java/com/web/app/controller/MenuController.java	流失率:53.85%	修改:3次	新增:221	删除:119
+react-ud/src/UD23_Download and Print Quick Guides/UD23_DownloadAndPrintQuickGuides.tsx	流失率:117.24%	修改:3次	新增:29	删除:34
+react-ud/src/UD01Login/UD01Login.tsx	流失率:114.29%	修改:3次	新增:28	删除:32
+react-ud/src/UD03GenerateHomologationDocument/UD03GenerateHomologationDocument.tsx	流失率:237.84%	修改:3次	新增:37	删除:88
+react-ud/src/UD04GenerateDocument/UD04GenerateDocument.tsx	流失率:116.89%	修改:3次	新增:148	删除:173
+react-ud/src/UD05ModifyDocument/UD05ModifyDocument.tsx	流失率:142.31%	修改:3次	新增:52	删除:74
+react-ud/src/UD06SaveModifications/SaveModifications.tsx	流失率:106.25%	修改:3次	新增:48	删除:51
