@@ -26,5 +26,5 @@ public interface UD20GetDocumentListService {
      * @param request 请求对象，包含可选的查询条件
      * @return UD20GetDocumentListResponse 响应对象
      */
-    UD20GetDocumentListResponse getDocumentList(UD20GetDocumentListRequest request);
+    UD20GetDocumentListResponse UD20SelectHdocDocumentList(UD20GetDocumentListRequest request);
 }

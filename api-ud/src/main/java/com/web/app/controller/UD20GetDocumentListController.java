@@ -72,7 +72,7 @@ public class UD20GetDocumentListController {
         request.setRegisterDatetimeOp(registerDatetimeOp);
 
         // 4.3 调用Service层处理业务逻辑
-        UD20GetDocumentListResponse response = ud20Service.getDocumentList(request);
+        UD20GetDocumentListResponse response = ud20Service.UD20SelectHdocDocumentList(request);
 
         return response;
     }

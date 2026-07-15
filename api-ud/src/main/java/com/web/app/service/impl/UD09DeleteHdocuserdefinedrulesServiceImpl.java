@@ -31,7 +31,7 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
     private UD09DeleteHdocuserdefinedrulesMapper ud09Mapper;
 
     @Override
-    public UD09DeleteHdocuserdefinedrulesResponse searchRules(UD09DeleteHdocuserdefinedrulesRequest request) {
+    public UD09DeleteHdocuserdefinedrulesResponse UD09Seach(UD09DeleteHdocuserdefinedrulesRequest request) {
         try {
             List<HdocUserDefinedRules> ruleList = ud09Mapper.searchUserDefinedRules(request);
 
@@ -65,7 +65,7 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD09DeleteHdocuserdefinedrulesResponse deleteSelected(UD09DeleteHdocuserdefinedrulesRequest request) {
+    public UD09DeleteHdocuserdefinedrulesResponse UD09DeleteSelected(UD09DeleteHdocuserdefinedrulesRequest request) {
         try {
             // 校验必填参数
             if (request.getProductClass() == null || request.getProductClass().trim().isEmpty()

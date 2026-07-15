@@ -39,7 +39,8 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
     private static final String UPDATE_PROCESS = "HDoc User Doc Administration";
 
     @Override
-    public UD18HDocUserDocAdministrationResponse checkAuth(UD18HDocUserDocAdministrationRequest request) {
+    public UD18HDocUserDocAdministrationResponse UD18SelectHdocFunctionAuth(
+            UD18HDocUserDocAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {
@@ -61,7 +62,7 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
     }
 
     @Override
-    public UD18HDocUserDocAdministrationResponse getUserDoc(UD18HDocUserDocAdministrationRequest request) {
+    public UD18HDocUserDocAdministrationResponse UD18SelectHdocUserDoc(UD18HDocUserDocAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {
@@ -96,7 +97,7 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD18HDocUserDocAdministrationResponse createDoc(UD18HDocUserDocAdministrationRequest request) {
+    public UD18HDocUserDocAdministrationResponse UD18CreateHdocUserDoc(UD18HDocUserDocAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {
@@ -120,7 +121,7 @@ public class UD18HDocUserDocAdministrationServiceImpl implements UD18HDocUserDoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD18HDocUserDocAdministrationResponse deleteDoc(UD18HDocUserDocAdministrationRequest request) {
+    public UD18HDocUserDocAdministrationResponse UD18DeleteHdocUserDoc(UD18HDocUserDocAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {

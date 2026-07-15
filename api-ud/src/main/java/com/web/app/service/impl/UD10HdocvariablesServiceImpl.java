@@ -28,7 +28,7 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD10HdocvariablesResponse addVariable(UD10HdocvariablesRequest request) {
+    public UD10HdocvariablesResponse UD10Add(UD10HdocvariablesRequest request) {
         try {
             String validationError = validateVariable(request);
             if (validationError != null) {
@@ -60,7 +60,7 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD10HdocvariablesResponse updateVariable(UD10HdocvariablesRequest request) {
+    public UD10HdocvariablesResponse UD10Update(UD10HdocvariablesRequest request) {
         try {
             String validationError = validateVariable(request);
             if (validationError != null) {
@@ -90,7 +90,7 @@ public class UD10HdocvariablesServiceImpl implements UD10HdocvariablesService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD10HdocvariablesResponse deleteVariable(UD10HdocvariablesRequest request) {
+    public UD10HdocvariablesResponse UD10Delete(UD10HdocvariablesRequest request) {
         try {
             String validationError = validateVariable(request);
             if (validationError != null) {

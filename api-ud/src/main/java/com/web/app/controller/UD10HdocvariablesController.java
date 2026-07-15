@@ -30,18 +30,18 @@ public class UD10HdocvariablesController {
     @PostMapping("/add")
     @ApiOperation(value = "新增变量", notes = "向HDOC_VARIABLES表新增一个变量")
     public UD10HdocvariablesResponse addVariable(@RequestBody UD10HdocvariablesRequest request) {
-        return ud10Service.addVariable(request);
+        return ud10Service.UD10Add(request);
     }
 
     @PostMapping("/update")
     @ApiOperation(value = "更新变量", notes = "更新HDOC_VARIABLES表中的变量数据")
     public UD10HdocvariablesResponse updateVariable(@RequestBody UD10HdocvariablesRequest request) {
-        return ud10Service.updateVariable(request);
+        return ud10Service.UD10Update(request);
     }
 
     @PostMapping("/delete")
     @ApiOperation(value = "删除变量", notes = "根据变量名删除HDOC_VARIABLES表中的变量")
     public UD10HdocvariablesResponse deleteVariable(@RequestBody UD10HdocvariablesRequest request) {
-        return ud10Service.deleteVariable(request);
+        return ud10Service.UD10Delete(request);
     }
 }

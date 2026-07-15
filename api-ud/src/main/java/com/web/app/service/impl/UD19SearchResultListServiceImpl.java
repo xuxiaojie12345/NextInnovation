@@ -29,7 +29,7 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
     private UD19SearchResultListMapper ud19Mapper;
 
     @Override
-    public UD19SearchResultListResponse getMarket() {
+    public UD19SearchResultListResponse UD19SelectMarketMaster() {
         try {
             List<MarketMaster> list = ud19Mapper.selectAllMarket();
             List<UD19SearchResultListResponse.MarketData> dataList = new ArrayList<>();
@@ -46,7 +46,7 @@ public class UD19SearchResultListServiceImpl implements UD19SearchResultListServ
     }
 
     @Override
-    public UD19SearchResultListResponse search(UD19SearchResultListRequest request) {
+    public UD19SearchResultListResponse UD19SearchHdoc(UD19SearchResultListRequest request) {
         try {
             List<UD19SearchResultListResponse.UserData> userList = ud19Mapper.searchUsers(
                     request.getUserId(),

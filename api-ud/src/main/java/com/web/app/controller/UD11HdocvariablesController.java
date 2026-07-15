@@ -32,6 +32,6 @@ public class UD11HdocvariablesController {
     @GetMapping("/search")
     @ApiOperation(value = "搜索HDOC变量", notes = "根据动态条件搜索HDOC_VARIABLES表中的变量")
     public UD11HdocvariablesResponse search(UD11HdocvariablesRequest request) {
-        return ud11Service.searchVariables(request);
+        return ud11Service.UD11Search(request);
     }
 }

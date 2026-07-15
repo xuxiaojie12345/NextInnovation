@@ -39,7 +39,7 @@ public class UD20GetDocumentListServiceImpl implements UD20GetDocumentListServic
      * @return UD20GetDocumentListResponse 响应对象
      */
     @Override
-    public UD20GetDocumentListResponse getDocumentList(UD20GetDocumentListRequest request) {
+    public UD20GetDocumentListResponse UD20SelectHdocDocumentList(UD20GetDocumentListRequest request) {
 
         try {
             // 4.5 通过数据访问层查询数据库（动态SQL）

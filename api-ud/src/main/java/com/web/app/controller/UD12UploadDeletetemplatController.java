@@ -32,7 +32,7 @@ public class UD12UploadDeletetemplatController {
     @GetMapping("/selectmarket")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD12UploadDeletetemplatResponse selectMarket() {
-        return ud12Service.selectMarket();
+        return ud12Service.UD12SelectMarket();
     }
 
     @PostMapping("/uploadflie")
@@ -40,7 +40,7 @@ public class UD12UploadDeletetemplatController {
     public UD12UploadDeletetemplatResponse uploadFile(
             @ApiParam(value = "RTF文件", required = true) @RequestParam("file") MultipartFile file,
             @ApiParam(value = "市场", required = true, example = "JP") @RequestParam("market") String market) {
-        return ud12Service.uploadFile(file, market);
+        return ud12Service.UD12UploadFlie(file, market);
     }
 
     @GetMapping("/template/list")
@@ -58,6 +58,6 @@ public class UD12UploadDeletetemplatController {
         UD12UploadDeletetemplatRequest request = new UD12UploadDeletetemplatRequest();
         request.setMarket(market);
         request.setTemplate(template);
-        return ud12Service.deleteFile(request);
+        return ud12Service.UD12DeleteFlie(request);
     }
 }

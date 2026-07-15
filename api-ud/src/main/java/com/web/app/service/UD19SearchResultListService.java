@@ -19,7 +19,7 @@ public interface UD19SearchResultListService {
      *
      * @return 响应对象
      */
-    UD19SearchResultListResponse getMarket();
+    UD19SearchResultListResponse UD19SelectMarketMaster();
 
     /**
      * 搜索用户
@@ -27,5 +27,5 @@ public interface UD19SearchResultListService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD19SearchResultListResponse search(UD19SearchResultListRequest request);
+    UD19SearchResultListResponse UD19SearchHdoc(UD19SearchResultListRequest request);
 }

@@ -20,7 +20,7 @@ public interface UD12UploadDeletetemplatService {
      *
      * @return 响应对象
      */
-    UD12UploadDeletetemplatResponse selectMarket();
+    UD12UploadDeletetemplatResponse UD12SelectMarket();
 
     /**
      * 上传模板文件
@@ -29,7 +29,7 @@ public interface UD12UploadDeletetemplatService {
      * @param market 市场
      * @return 响应对象
      */
-    UD12UploadDeletetemplatResponse uploadFile(MultipartFile file, String market);
+    UD12UploadDeletetemplatResponse UD12UploadFlie(MultipartFile file, String market);
 
     /**
      * 删除模板文件
@@ -37,7 +37,7 @@ public interface UD12UploadDeletetemplatService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request);
+    UD12UploadDeletetemplatResponse UD12DeleteFlie(UD12UploadDeletetemplatRequest request);
 
     /**
      * 获取指定Market文件夹下的模板文件列表

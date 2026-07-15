@@ -76,7 +76,7 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
     }
 
     @Override
-    public UD14SearchresultistResponse selectMarketMaster() {
+    public UD14SearchresultistResponse UD14SelectMarketmaster() {
         try {
             List<MarketMaster> list = ud14Mapper.selectAllMarket();
             List<UD14SearchresultistResponse.MarketData> dataList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
     }
 
     @Override
-    public UD14SearchresultistResponse selectUserDefinedRules(UD14SearchresultistRequest request) {
+    public UD14SearchresultistResponse UD14SelectHdocuserdefinedrules(UD14SearchresultistRequest request) {
         try {
             if (request.getMarket() == null || request.getMarket().trim().isEmpty()) {
                 return UD14SearchresultistResponse.error(400, "市场参数不能为空");

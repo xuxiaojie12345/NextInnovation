@@ -20,7 +20,7 @@ public interface UD16ADChangeService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD16ADChangeResponse addChange(UD16ADChangeRequest request);
+    UD16ADChangeResponse UD16InsertHdocAdcaChange(UD16ADChangeRequest request);
 
     /**
      * 删除AD/CA变更记录
@@ -28,7 +28,7 @@ public interface UD16ADChangeService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD16ADChangeResponse deleteChange(UD16ADChangeRequest request);
+    UD16ADChangeResponse UD16UpdateHdocAdcaChange(UD16ADChangeRequest request);
 
     /**
      * 检查AD/CA变更记录
@@ -36,5 +36,5 @@ public interface UD16ADChangeService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD16ADChangeResponse checkChange(UD16ADChangeRequest request);
+    UD16ADChangeResponse UD16SelectHdocAdcaChange(UD16ADChangeRequest request);
 }

@@ -32,7 +32,7 @@ public class UD16ADChangeController {
     @PostMapping("/addchange")
     @ApiOperation(value = "添加AD/CA变更", notes = "新增或更新AD/CA变更记录（ACT='Y'）")
     public ResponseEntity<UD16ADChangeResponse> addChange(@RequestBody UD16ADChangeRequest request) {
-        UD16ADChangeResponse response = ud16Service.addChange(request);
+        UD16ADChangeResponse response = ud16Service.UD16InsertHdocAdcaChange(request);
         HttpStatus httpStatus = (response.getCode() != null && response.getCode() >= 400)
                 ? HttpStatus.valueOf(response.getCode())
                 : HttpStatus.OK;
@@ -42,7 +42,7 @@ public class UD16ADChangeController {
     @DeleteMapping("/deletechange")
     @ApiOperation(value = "删除AD/CA变更", notes = "删除AD/CA变更记录（ACT='U'）")
     public ResponseEntity<UD16ADChangeResponse> deleteChange(@RequestBody UD16ADChangeRequest request) {
-        UD16ADChangeResponse response = ud16Service.deleteChange(request);
+        UD16ADChangeResponse response = ud16Service.UD16UpdateHdocAdcaChange(request);
         HttpStatus httpStatus = (response.getCode() != null && response.getCode() >= 400)
                 ? HttpStatus.valueOf(response.getCode())
                 : HttpStatus.OK;
@@ -57,7 +57,7 @@ public class UD16ADChangeController {
         UD16ADChangeRequest request = new UD16ADChangeRequest();
         request.setSerie(serie);
         request.setChnr(chnr);
-        UD16ADChangeResponse response = ud16Service.checkChange(request);
+        UD16ADChangeResponse response = ud16Service.UD16SelectHdocAdcaChange(request);
         HttpStatus httpStatus = (response.getCode() != null && response.getCode() >= 400)
                 ? HttpStatus.valueOf(response.getCode())
                 : HttpStatus.OK;

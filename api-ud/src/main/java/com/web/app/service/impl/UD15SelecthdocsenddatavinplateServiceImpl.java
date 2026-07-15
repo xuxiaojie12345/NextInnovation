@@ -32,7 +32,7 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
     private UD15SelecthdocsenddatavinplateMapper ud15Mapper;
 
     @Override
-    public UD15SelecthdocsenddatavinplateResponse viewInfo(UD15SelecthdocsenddatavinplateRequest request) {
+    public UD15SelecthdocsenddatavinplateResponse UD15ViewInfo(UD15SelecthdocsenddatavinplateRequest request) {
         try {
             String validationError = validateChassisParams(request);
             if (validationError != null) {
@@ -101,7 +101,7 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD15SelecthdocsenddatavinplateResponse setRegenerate(UD15SelecthdocsenddatavinplateRequest request) {
+    public UD15SelecthdocsenddatavinplateResponse UD15SetRegenerate(UD15SelecthdocsenddatavinplateRequest request) {
         try {
             String validationError = validateChassisParams(request);
             if (validationError != null) {
@@ -129,7 +129,7 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD15SelecthdocsenddatavinplateResponse setOK(UD15SelecthdocsenddatavinplateRequest request) {
+    public UD15SelecthdocsenddatavinplateResponse UD15SetOK(UD15SelecthdocsenddatavinplateRequest request) {
         try {
             String validationError = validateChassisParams(request);
             if (validationError != null) {
@@ -150,7 +150,7 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD15SelecthdocsenddatavinplateResponse changeToBasicInfo(UD15SelecthdocsenddatavinplateRequest request) {
+    public UD15SelecthdocsenddatavinplateResponse UD15ChangetoBasicInfo(UD15SelecthdocsenddatavinplateRequest request) {
         try {
             String validationError = validateChassisParams(request);
             if (validationError != null) {
@@ -171,7 +171,8 @@ public class UD15SelecthdocsenddatavinplateServiceImpl implements UD15Selecthdoc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD15SelecthdocsenddatavinplateResponse changeToAdvancedInfo(UD15SelecthdocsenddatavinplateRequest request) {
+    public UD15SelecthdocsenddatavinplateResponse UD15ChangetoAdvancedInfo(
+            UD15SelecthdocsenddatavinplateRequest request) {
         try {
             String validationError = validateChassisParams(request);
             if (validationError != null) {

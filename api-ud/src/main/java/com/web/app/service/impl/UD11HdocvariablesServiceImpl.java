@@ -28,7 +28,7 @@ public class UD11HdocvariablesServiceImpl implements UD11HdocvariablesService {
     private UD11HdocvariablesMapper ud11Mapper;
 
     @Override
-    public UD11HdocvariablesResponse searchVariables(UD11HdocvariablesRequest request) {
+    public UD11HdocvariablesResponse UD11Search(UD11HdocvariablesRequest request) {
         try {
             List<VariableData> resultList = ud11Mapper.searchVariables(request);
 

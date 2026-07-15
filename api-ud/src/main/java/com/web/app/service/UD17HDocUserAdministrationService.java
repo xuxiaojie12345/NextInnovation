@@ -20,7 +20,7 @@ public interface UD17HDocUserAdministrationService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD17HDocUserAdministrationResponse userInfo(UD17HDocUserAdministrationRequest request);
+    UD17HDocUserAdministrationResponse UD17Userinfo(UD17HDocUserAdministrationRequest request);
 
     /**
      * 更新用户角色权限
@@ -28,7 +28,7 @@ public interface UD17HDocUserAdministrationService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD17HDocUserAdministrationResponse updateRole(UD17HDocUserAdministrationRequest request);
+    UD17HDocUserAdministrationResponse UD17UpdateRole(UD17HDocUserAdministrationRequest request);
 
     /**
      * 删除用户权限
@@ -36,5 +36,5 @@ public interface UD17HDocUserAdministrationService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD17HDocUserAdministrationResponse deleteUser(UD17HDocUserAdministrationRequest request);
+    UD17HDocUserAdministrationResponse UD17DeleteRole(UD17HDocUserAdministrationRequest request);
 }

@@ -34,18 +34,18 @@ public class UD17HDocUserAdministrationController {
             @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
         UD17HDocUserAdministrationRequest request = new UD17HDocUserAdministrationRequest();
         request.setUserid(userId);
-        return ud17Service.userInfo(request);
+        return ud17Service.UD17Userinfo(request);
     }
 
     @PutMapping("/updaterole")
     @ApiOperation(value = "更新用户角色权限", notes = "更新用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse updateRole(@RequestBody UD17HDocUserAdministrationRequest request) {
-        return ud17Service.updateRole(request);
+        return ud17Service.UD17UpdateRole(request);
     }
 
     @PostMapping("/deleteuser")
     @ApiOperation(value = "删除用户权限", notes = "删除用户的机能权限和市场权限")
     public UD17HDocUserAdministrationResponse deleteUser(@RequestBody UD17HDocUserAdministrationRequest request) {
-        return ud17Service.deleteUser(request);
+        return ud17Service.UD17DeleteRole(request);
     }
 }

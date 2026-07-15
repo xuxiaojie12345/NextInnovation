@@ -20,7 +20,7 @@ public interface UD15SelecthdocsenddatavinplateService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD15SelecthdocsenddatavinplateResponse viewInfo(UD15SelecthdocsenddatavinplateRequest request);
+    UD15SelecthdocsenddatavinplateResponse UD15ViewInfo(UD15SelecthdocsenddatavinplateRequest request);
 
     /**
      * 设置重新生成状态
@@ -28,7 +28,7 @@ public interface UD15SelecthdocsenddatavinplateService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD15SelecthdocsenddatavinplateResponse setRegenerate(UD15SelecthdocsenddatavinplateRequest request);
+    UD15SelecthdocsenddatavinplateResponse UD15SetRegenerate(UD15SelecthdocsenddatavinplateRequest request);
 
     /**
      * 设置OK状态
@@ -36,7 +36,7 @@ public interface UD15SelecthdocsenddatavinplateService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD15SelecthdocsenddatavinplateResponse setOK(UD15SelecthdocsenddatavinplateRequest request);
+    UD15SelecthdocsenddatavinplateResponse UD15SetOK(UD15SelecthdocsenddatavinplateRequest request);
 
     /**
      * 切换为基础信息
@@ -44,7 +44,7 @@ public interface UD15SelecthdocsenddatavinplateService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD15SelecthdocsenddatavinplateResponse changeToBasicInfo(UD15SelecthdocsenddatavinplateRequest request);
+    UD15SelecthdocsenddatavinplateResponse UD15ChangetoBasicInfo(UD15SelecthdocsenddatavinplateRequest request);
 
     /**
      * 切换为高级信息
@@ -52,5 +52,5 @@ public interface UD15SelecthdocsenddatavinplateService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD15SelecthdocsenddatavinplateResponse changeToAdvancedInfo(UD15SelecthdocsenddatavinplateRequest request);
+    UD15SelecthdocsenddatavinplateResponse UD15ChangetoAdvancedInfo(UD15SelecthdocsenddatavinplateRequest request);
 }

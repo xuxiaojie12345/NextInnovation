@@ -19,7 +19,7 @@ public interface UD14SearchresultistService {
      *
      * @return 响应对象
      */
-    UD14SearchresultistResponse selectMarketMaster();
+    UD14SearchresultistResponse UD14SelectMarketmaster();
 
     /**
      * 根据市场获取用户定义规则变量列表
@@ -27,7 +27,7 @@ public interface UD14SearchresultistService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD14SearchresultistResponse selectUserDefinedRules(UD14SearchresultistRequest request);
+    UD14SearchresultistResponse UD14SelectHdocuserdefinedrules(UD14SearchresultistRequest request);
 
     /**
      * 获取指定Market文件夹下的文件列表
@@ -37,4 +37,10 @@ public interface UD14SearchresultistService {
      * @return 响应对象（包含文件列表）
      */
     UD14SearchresultistResponse getMarketFiles(UD14SearchresultistRequest request);
+
+    /**
+     * 认证文件服务器共享路径
+     * 通过 net use 建立 UNC 路径的认证会话
+     */
+    void authenticateIfNeeded();
 }

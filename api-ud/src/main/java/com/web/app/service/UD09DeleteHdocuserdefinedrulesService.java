@@ -20,7 +20,7 @@ public interface UD09DeleteHdocuserdefinedrulesService {
      * @param request 搜索请求参数
      * @return 响应对象
      */
-    UD09DeleteHdocuserdefinedrulesResponse searchRules(UD09DeleteHdocuserdefinedrulesRequest request);
+    UD09DeleteHdocuserdefinedrulesResponse UD09Seach(UD09DeleteHdocuserdefinedrulesRequest request);
 
     /**
      * 批量删除用户定义规则
@@ -28,5 +28,5 @@ public interface UD09DeleteHdocuserdefinedrulesService {
      * @param request 删除请求参数
      * @return 响应对象
      */
-    UD09DeleteHdocuserdefinedrulesResponse deleteSelected(UD09DeleteHdocuserdefinedrulesRequest request);
+    UD09DeleteHdocuserdefinedrulesResponse UD09DeleteSelected(UD09DeleteHdocuserdefinedrulesRequest request);
 }

@@ -31,7 +31,7 @@ public class UD19SearchResultListController {
     @GetMapping("/getmarket")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD19SearchResultListResponse getMarket() {
-        return ud19Service.getMarket();
+        return ud19Service.UD19SelectMarketMaster();
     }
 
     @GetMapping("/search")
@@ -47,6 +47,6 @@ public class UD19SearchResultListController {
         request.setUsername(username);
         request.setMarket(market);
         request.setType(type);
-        return ud19Service.search(request);
+        return ud19Service.UD19SearchHdoc(request);
     }
 }

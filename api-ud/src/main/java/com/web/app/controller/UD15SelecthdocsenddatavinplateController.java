@@ -35,34 +35,34 @@ public class UD15SelecthdocsenddatavinplateController {
         UD15SelecthdocsenddatavinplateRequest request = new UD15SelecthdocsenddatavinplateRequest();
         request.setChassisSerie(chassisSerie);
         request.setChassisNo(chassisNo);
-        return ud15Service.viewInfo(request);
+        return ud15Service.UD15ViewInfo(request);
     }
 
     @PostMapping("/regenerate")
     @ApiOperation(value = "设置重新生成", notes = "将VIN Plate状态更新为重新生成")
     public UD15SelecthdocsenddatavinplateResponse setRegenerate(
             @RequestBody UD15SelecthdocsenddatavinplateRequest request) {
-        return ud15Service.setRegenerate(request);
+        return ud15Service.UD15SetRegenerate(request);
     }
 
     @PostMapping("/setok")
     @ApiOperation(value = "设置OK状态", notes = "将VIN Plate状态更新为OK")
     public UD15SelecthdocsenddatavinplateResponse setOK(
             @RequestBody UD15SelecthdocsenddatavinplateRequest request) {
-        return ud15Service.setOK(request);
+        return ud15Service.UD15SetOK(request);
     }
 
     @PostMapping("/changebasic")
     @ApiOperation(value = "切换为基础信息", notes = "将VIN Plate切换为基础信息模式")
     public UD15SelecthdocsenddatavinplateResponse changeToBasicInfo(
             @RequestBody UD15SelecthdocsenddatavinplateRequest request) {
-        return ud15Service.changeToBasicInfo(request);
+        return ud15Service.UD15ChangetoBasicInfo(request);
     }
 
     @PostMapping("/changeadvanced")
     @ApiOperation(value = "切换为高级信息", notes = "将VIN Plate切换为高级信息模式（含weights）")
     public UD15SelecthdocsenddatavinplateResponse changeToAdvancedInfo(
             @RequestBody UD15SelecthdocsenddatavinplateRequest request) {
-        return ud15Service.changeToAdvancedInfo(request);
+        return ud15Service.UD15ChangetoAdvancedInfo(request);
     }
 }

@@ -80,7 +80,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     }
 
     @Override
-    public UD12UploadDeletetemplatResponse selectMarket() {
+    public UD12UploadDeletetemplatResponse UD12SelectMarket() {
         try {
             List<MarketMaster> list = ud12Mapper.selectAllMarket();
             List<UD12UploadDeletetemplatResponse.MarketData> dataList = new ArrayList<>();
@@ -96,7 +96,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     }
 
     @Override
-    public UD12UploadDeletetemplatResponse uploadFile(MultipartFile file, String market) {
+    public UD12UploadDeletetemplatResponse UD12UploadFlie(MultipartFile file, String market) {
         authenticateIfNeeded();
         try {
             String originalFilename = file.getOriginalFilename();
@@ -138,7 +138,7 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
     }
 
     @Override
-    public UD12UploadDeletetemplatResponse deleteFile(UD12UploadDeletetemplatRequest request) {
+    public UD12UploadDeletetemplatResponse UD12DeleteFlie(UD12UploadDeletetemplatRequest request) {
         authenticateIfNeeded();
         try {
             // 构建文件路径

@@ -26,5 +26,5 @@ public interface UD20MarketDocumentSettingsService {
      * @param request 请求对象，包含 doctype, registerUser, registerDatetime
      * @return UD20MarketDocumentSettingsResponse 响应对象
      */
-    UD20MarketDocumentSettingsResponse updateDocument(UD20MarketDocumentSettingsRequest request);
+    UD20MarketDocumentSettingsResponse UD20UpdateHdocDocumentList(UD20MarketDocumentSettingsRequest request);
 }

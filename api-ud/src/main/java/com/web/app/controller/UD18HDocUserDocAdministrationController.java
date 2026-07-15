@@ -39,7 +39,7 @@ public class UD18HDocUserDocAdministrationController {
             @ApiParam(value = "用户ID", required = true, example = "user123") @RequestParam("userId") String userId) {
         UD18HDocUserDocAdministrationRequest request = new UD18HDocUserDocAdministrationRequest();
         request.setUserId(userId);
-        return ud18Service.checkAuth(request);
+        return ud18Service.UD18SelectHdocFunctionAuth(request);
     }
 
     @GetMapping("/getuserdoc")
@@ -50,18 +50,18 @@ public class UD18HDocUserDocAdministrationController {
         UD18HDocUserDocAdministrationRequest request = new UD18HDocUserDocAdministrationRequest();
         request.setUserId(userId);
         request.setDoctype(doctype);
-        return ud18Service.getUserDoc(request);
+        return ud18Service.UD18SelectHdocUserDoc(request);
     }
 
     @PostMapping("/createdoc")
     @ApiOperation(value = "4.3 - 新增用户文档权限", notes = "对应5.38.1，插入HDOC_USER_DOC表")
     public UD18HDocUserDocAdministrationResponse createDoc(@RequestBody UD18HDocUserDocAdministrationRequest request) {
-        return ud18Service.createDoc(request);
+        return ud18Service.UD18CreateHdocUserDoc(request);
     }
 
     @PostMapping("/deleteedoc")
     @ApiOperation(value = "4.4 - 删除用户文档权限", notes = "对应5.38.2，从HDOC_USER_DOC表删除")
     public UD18HDocUserDocAdministrationResponse deleteDoc(@RequestBody UD18HDocUserDocAdministrationRequest request) {
-        return ud18Service.deleteDoc(request);
+        return ud18Service.UD18DeleteHdocUserDoc(request);
     }
 }

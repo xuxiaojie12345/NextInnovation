@@ -20,5 +20,5 @@ public interface UD11HdocvariablesService {
      * @param request 搜索请求参数
      * @return 响应对象
      */
-    UD11HdocvariablesResponse searchVariables(UD11HdocvariablesRequest request);
+    UD11HdocvariablesResponse UD11Search(UD11HdocvariablesRequest request);
 }

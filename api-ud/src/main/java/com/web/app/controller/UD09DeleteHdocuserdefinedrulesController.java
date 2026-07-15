@@ -31,13 +31,13 @@ public class UD09DeleteHdocuserdefinedrulesController {
     @ApiOperation(value = "搜索用户定义规则", notes = "根据动态条件搜索HDOC_USER_DEFINED_RULES表中的规则")
     public UD09DeleteHdocuserdefinedrulesResponse search(
             UD09DeleteHdocuserdefinedrulesRequest request) {
-        return ud09Service.searchRules(request);
+        return ud09Service.UD09Seach(request);
     }
 
     @PostMapping("/deleteselected")
     @ApiOperation(value = "删除选中的规则", notes = "根据PC、NUM、MARKET删除HDOC_USER_DEFINED_RULES表中的规则")
     public UD09DeleteHdocuserdefinedrulesResponse deleteSelected(
             @RequestBody UD09DeleteHdocuserdefinedrulesRequest request) {
-        return ud09Service.deleteSelected(request);
+        return ud09Service.UD09DeleteSelected(request);
     }
 }

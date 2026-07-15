@@ -56,7 +56,7 @@ public class UD20MarketDocumentSettingsController {
 
         // 4.2 接收前端请求，通过 Request 对象封装并校验请求参数
         // 4.3 调用 Service 层处理业务逻辑
-        UD20MarketDocumentSettingsResponse response = ud201Service.updateDocument(request);
+        UD20MarketDocumentSettingsResponse response = ud201Service.UD20UpdateHdocDocumentList(request);
 
         return response;
     }

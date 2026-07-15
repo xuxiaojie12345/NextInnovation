@@ -28,7 +28,7 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD16ADChangeResponse addChange(UD16ADChangeRequest request) {
+    public UD16ADChangeResponse UD16InsertHdocAdcaChange(UD16ADChangeRequest request) {
         try {
             String validationError = validateSerieChnr(request);
             if (validationError != null) {
@@ -71,7 +71,7 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD16ADChangeResponse deleteChange(UD16ADChangeRequest request) {
+    public UD16ADChangeResponse UD16UpdateHdocAdcaChange(UD16ADChangeRequest request) {
         try {
             String validationError = validateSerieChnr(request);
             if (validationError != null) {
@@ -99,7 +99,7 @@ public class UD16ADChangeServiceImpl implements UD16ADChangeService {
     }
 
     @Override
-    public UD16ADChangeResponse checkChange(UD16ADChangeRequest request) {
+    public UD16ADChangeResponse UD16SelectHdocAdcaChange(UD16ADChangeRequest request) {
         try {
             String validationError = validateSerieChnr(request);
             if (validationError != null) {

@@ -20,7 +20,7 @@ public interface UD10HdocvariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD10HdocvariablesResponse addVariable(UD10HdocvariablesRequest request);
+    UD10HdocvariablesResponse UD10Add(UD10HdocvariablesRequest request);
 
     /**
      * 更新变量
@@ -28,7 +28,7 @@ public interface UD10HdocvariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD10HdocvariablesResponse updateVariable(UD10HdocvariablesRequest request);
+    UD10HdocvariablesResponse UD10Update(UD10HdocvariablesRequest request);
 
     /**
      * 删除变量
@@ -36,5 +36,5 @@ public interface UD10HdocvariablesService {
      * @param request 请求对象
      * @return 响应对象
      */
-    UD10HdocvariablesResponse deleteVariable(UD10HdocvariablesRequest request);
+    UD10HdocvariablesResponse UD10Delete(UD10HdocvariablesRequest request);
 }

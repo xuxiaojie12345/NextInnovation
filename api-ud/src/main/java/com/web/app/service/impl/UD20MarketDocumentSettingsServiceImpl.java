@@ -37,7 +37,7 @@ public class UD20MarketDocumentSettingsServiceImpl implements UD20MarketDocument
      */
     @Override
     @Transactional
-    public UD20MarketDocumentSettingsResponse updateDocument(UD20MarketDocumentSettingsRequest request) {
+    public UD20MarketDocumentSettingsResponse UD20UpdateHdocDocumentList(UD20MarketDocumentSettingsRequest request) {
 
         // 4.4 对请求参数进行非空、合法性校验
         if (request.getDoctype() == null || request.getDoctype().trim().isEmpty()) {

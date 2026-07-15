@@ -67,7 +67,7 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
     }
 
     @Override
-    public UD17HDocUserAdministrationResponse userInfo(UD17HDocUserAdministrationRequest request) {
+    public UD17HDocUserAdministrationResponse UD17Userinfo(UD17HDocUserAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {
@@ -106,7 +106,7 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD17HDocUserAdministrationResponse updateRole(UD17HDocUserAdministrationRequest request) {
+    public UD17HDocUserAdministrationResponse UD17UpdateRole(UD17HDocUserAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {
@@ -164,7 +164,7 @@ public class UD17HDocUserAdministrationServiceImpl implements UD17HDocUserAdmini
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UD17HDocUserAdministrationResponse deleteUser(UD17HDocUserAdministrationRequest request) {
+    public UD17HDocUserAdministrationResponse UD17DeleteRole(UD17HDocUserAdministrationRequest request) {
         try {
             String validationError = validateUserId(request);
             if (validationError != null) {

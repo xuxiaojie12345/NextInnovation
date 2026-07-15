@@ -44,7 +44,7 @@ public class UD14SearchresultistController {
     @GetMapping("/market")
     @ApiOperation(value = "获取市场列表", notes = "查询所有市场MARKET列表")
     public UD14SearchresultistResponse getMarket() {
-        return ud14Service.selectMarketMaster();
+        return ud14Service.UD14SelectMarketmaster();
     }
 
     @GetMapping("/user-defined-rules")
@@ -53,7 +53,7 @@ public class UD14SearchresultistController {
             @ApiParam(value = "市场", required = true, example = "JP") @RequestParam("market") String market) {
         UD14SearchresultistRequest request = new UD14SearchresultistRequest();
         request.setMarket(market);
-        return ud14Service.selectUserDefinedRules(request);
+        return ud14Service.UD14SelectHdocuserdefinedrules(request);
     }
 
     /**
