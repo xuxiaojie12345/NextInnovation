@@ -9,12 +9,26 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+/**
+
+ * UD16ServiceImpl
+
+ */
+
 public class UD16ServiceImpl implements UD16Service {
 
     @Autowired
+    /** ud16Mapper */
+
     private UD16Mapper ud16Mapper;
 
     @Override
+    /**
+
+     * processAdChange
+
+     */
+
     public Map<String, Object> processAdChange(UD16Request request) {
         String serieChnr = request.getSerieChnr() != null ? request.getSerieChnr().trim() : "";
         
@@ -39,6 +53,12 @@ public class UD16ServiceImpl implements UD16Service {
         }
     }
 
+    /**
+
+     * handleCheck
+
+     */
+
     private Map<String, Object> handleCheck(String serie, String chnr, String serieChnr) {
         Map<String, Object> record = ud16Mapper.selectHdocAdcaChange(serie, chnr);
         Map<String, Object> result = new LinkedHashMap<>();
@@ -54,6 +74,12 @@ public class UD16ServiceImpl implements UD16Service {
         return result;
     }
 
+    /**
+
+     * handleAdd
+
+     */
+
     private Map<String, Object> handleAdd(String serie, String chnr, String reason, String serieChnr) {
         // 检查是否存在
         Map<String, Object> existing = ud16Mapper.selectHdocAdcaChange(serie, chnr);
@@ -65,6 +91,12 @@ public class UD16ServiceImpl implements UD16Service {
         result.put("message", "添加成功");
         return result;
     }
+
+    /**
+
+     * handleDelete
+
+     */
 
     private Map<String, Object> handleDelete(String serie, String chnr, String user, String process) {
         ud16Mapper.logicalDeleteHdocAdcaChange(serie, chnr, user, process);

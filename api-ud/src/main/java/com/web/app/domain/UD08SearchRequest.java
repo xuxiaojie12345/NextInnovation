@@ -4,34 +4,88 @@ package com.web.app.domain;
  * UD08搜索请求DTO
  * 接收前端传递的搜索条件及运算符（= / !=）
  */
+ /**
+
+  * UD08SearchRequest
+
+  */
+
 public class UD08SearchRequest {
 
     // 字段值
+    /** productClass */
+
     private String productClass;
+    /** number */
+
     private String number;
+    /** market */
+
     private String market;
+    /** variable */
+
     private String variable;
+    /** value */
+
     private String value;
+    /** vs */
+
     private String vs;
+    /** vs2 */
+
     private String vs2;
+    /** comments */
+
     private String comments;
+    /** addDate */
+
     private String addDate;
+    /** deleteDate */
+
     private String deleteDate;
+    /** updateUser */
+
     private String updateUser;
+    /** updateDatetime */
+
     private String updateDatetime;
 
     // 各字段对应的运算符（= 或 !=），前端传递
+    /** productClassOp */
+
     private String productClassOp;
+    /** numberOp */
+
     private String numberOp;
+    /** marketOp */
+
     private String marketOp;
+    /** variableOp */
+
     private String variableOp;
+    /** valueOp */
+
     private String valueOp;
+    /** vsOp */
+
     private String vsOp;
+    /** vs2Op */
+
     private String vs2Op;
+    /** commentsOp */
+
     private String commentsOp;
+    /** addDateOp */
+
     private String addDateOp;
+    /** deleteDateOp */
+
     private String deleteDateOp;
+    /** updateUserOp */
+
     private String updateUserOp;
+    /** updateDatetimeOp */
+
     private String updateDatetimeOp;
 
     public UD08SearchRequest() {

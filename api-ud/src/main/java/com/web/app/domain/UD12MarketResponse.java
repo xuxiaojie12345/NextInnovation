@@ -5,6 +5,12 @@ package com.web.app.domain;
  * 对应详细设计 4.1 Response Success
  * 前端期望格式：{ marketCode: "JPN", marketName: "Japan" }
  */
+ /**
+
+  * UD12MarketResponse
+
+  */
+
 public class UD12MarketResponse {
 
     /** 市场代码 */

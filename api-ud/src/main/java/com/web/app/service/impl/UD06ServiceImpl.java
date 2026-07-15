@@ -23,14 +23,28 @@ import java.util.List;
  * - chassisNumber为chno中'-'后的部分
  */
 @Service
+/**
+
+ * UD06ServiceImpl
+
+ */
+
 public class UD06ServiceImpl implements UD06Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD06ServiceImpl.class);
 
     @Autowired
+    /** ud06Mapper */
+
     private UD06Mapper ud06Mapper;
 
     @Override
+    /**
+
+     * selectHdocAdcaModification
+
+     */
+
     public SaveModificationsQueryResponse selectHdocAdcaModification(String serie, String chno) {
         logger.debug("UD06ServiceImpl.selectHdocAdcaModification - serie: {}, chno: {}", serie, chno);
 

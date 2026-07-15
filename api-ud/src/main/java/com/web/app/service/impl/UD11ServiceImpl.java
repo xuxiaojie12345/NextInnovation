@@ -15,12 +15,26 @@ import java.util.List;
  * 对应全体APIのプロンプト.txt 【UD11HdocvariablesApi】
  */
 @Service
+/**
+
+ * UD11ServiceImpl
+
+ */
+
 public class UD11ServiceImpl implements UD11Service {
 
     @Autowired
+    /** ud11Mapper */
+
     private UD11Mapper ud11Mapper;
 
     @Override
+    /**
+
+     * search
+
+     */
+
     public List<HdocVariable> search(UD10SearchRequest request) {
         return ud11Mapper.searchHdocVariables(request);
     }

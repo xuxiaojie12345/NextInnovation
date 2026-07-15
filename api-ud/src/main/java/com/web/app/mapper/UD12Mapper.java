@@ -11,6 +11,12 @@ import java.util.List;
  * 对应全体APIのプロンプト.txt 【UD12UploadDeletetemplatApi】
  */
 @Mapper
+/**
+
+ * UD12Mapper
+
+ */
+
 public interface UD12Mapper {
 
     /**

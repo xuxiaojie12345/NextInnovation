@@ -13,9 +13,17 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api")
+/**
+
+ * UD03Controller
+
+ */
+
 public class UD03Controller {
 
     @Autowired
+    /** ud03Service */
+
     private UD03Service ud03Service;
 
     /**
@@ -25,6 +33,12 @@ public class UD03Controller {
      * @return 文档类型列表
      */
     @GetMapping("/documenttypes")
+    /**
+
+     * selectHdocDocumentList
+
+     */
+
     public ResponseEntity<List<DocumentType>> selectHdocDocumentList() {
         try {
             List<DocumentType> documentTypes = ud03Service.getAllDocumentTypes();

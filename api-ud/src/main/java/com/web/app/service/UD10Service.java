@@ -10,6 +10,12 @@ import java.util.List;
  * HDOC_VARIABLES表的增删改查
  * 对应全体APIのプロンプト.txt 【UD10HdocvariablesApi】
  */
+ /**
+
+  * UD10Service
+
+  */
+
 public interface UD10Service {
 
     /**

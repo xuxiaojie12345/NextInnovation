@@ -4,9 +4,19 @@ package com.web.app.domain.entity;
 /**
  * HDOC_DOCUMENT_LIST表对应的实体类
  */
+ /**
+
+  * DocumentType
+
+  */
+
 public class DocumentType extends BaseEntity {
     
+/** doctype */
+
     private String doctype;
+    /** description */
+
     private String description;
 
     // 默认构造函数

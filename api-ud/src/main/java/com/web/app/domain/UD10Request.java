@@ -5,12 +5,28 @@ package com.web.app.domain;
  * 接收前端表单所有字段（字段名为前端formData中的key）
  * 对应全体APIのプロンプト.txt 【UD10HdocvariablesApi】
  */
+ /**
+
+  * UD10Request
+
+  */
+
 public class UD10Request {
 
+/** variable */
+
     private String variable;
+    /** type */
+
     private String type;
+    /** description */
+
     private String description;
+    /** userid */
+
     private String userid;
+    /** registerDatetime */
+
     private String registerDatetime;
 
     public UD10Request() {

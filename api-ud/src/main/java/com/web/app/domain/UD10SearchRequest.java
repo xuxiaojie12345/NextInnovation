@@ -5,20 +5,46 @@ package com.web.app.domain;
  * 接收前端传递的搜索条件及运算符（= / !=）
  * 对应全体APIのプロンプト.txt 【UD10HdocvariablesApi】
  */
+ /**
+
+  * UD10SearchRequest
+
+  */
+
 public class UD10SearchRequest {
 
     // 字段值
+    /** variable */
+
     private String variable;
+    /** type */
+
     private String type;
+    /** description */
+
     private String description;
+    /** userid */
+
     private String userid;
+    /** registerDatetime */
+
     private String registerDatetime;
 
     // 各字段对应的运算符（= 或 !=），前端传递
+    /** variableOp */
+
     private String variableOp;
+    /** typeOp */
+
     private String typeOp;
+    /** descriptionOp */
+
     private String descriptionOp;
+    /** useridOp */
+
     private String useridOp;
+    /** registerDatetimeOp */
+
     private String registerDatetimeOp;
 
     public UD10SearchRequest() {

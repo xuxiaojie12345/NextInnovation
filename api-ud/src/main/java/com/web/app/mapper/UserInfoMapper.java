@@ -6,6 +6,12 @@ import org.apache.ibatis.annotations.Param;
 /**
  * 用户信息Mapper接口
  */
+ /**
+
+  * UserInfoMapper
+
+  */
+
 public interface UserInfoMapper {
     
     /**

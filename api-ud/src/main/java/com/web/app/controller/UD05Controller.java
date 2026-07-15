@@ -20,11 +20,19 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @RequestMapping("/api/ud05")
+/**
+
+ * UD05Controller
+
+ */
+
 public class UD05Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD05Controller.class);
 
     @Autowired
+    /** ud05Service */
+
     private UD05Service ud05Service;
 
     /**

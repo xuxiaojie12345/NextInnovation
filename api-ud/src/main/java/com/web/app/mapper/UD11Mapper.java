@@ -13,6 +13,12 @@ import java.util.List;
  * 对应全体APIのプロンプト.txt 【UD11HdocvariablesApi】
  */
 @Mapper
+/**
+
+ * UD11Mapper
+
+ */
+
 public interface UD11Mapper {
 
     /**

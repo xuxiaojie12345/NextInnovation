@@ -3,10 +3,22 @@ package com.web.app.domain;
 /**
  * UD09批量删除响应DTO
  */
+ /**
+
+  * UD09BatchDeleteResponse
+
+  */
+
 public class UD09BatchDeleteResponse {
 
+/** deletedCount */
+
     private int deletedCount;
+    /** failedCount */
+
     private int failedCount;
+    /** message */
+
     private String message;
 
     public UD09BatchDeleteResponse() {

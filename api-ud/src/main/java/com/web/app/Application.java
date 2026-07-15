@@ -15,8 +15,20 @@ import org.apache.logging.log4j.Logger;
 
 @MapperScan(basePackages = "com.web.app.mapper") // 扫描mapper包
 @SpringBootApplication
+/**
+
+ * Application
+
+ */
+
 public class Application {
   private static final Logger logger = LogManager.getLogger(Application.class);
+
+  /**
+
+   * main
+
+   */
 
   public static void main(String[] args) throws InterruptedException, ServletException {
     // 禁用热修补(spring-boot-devtools)

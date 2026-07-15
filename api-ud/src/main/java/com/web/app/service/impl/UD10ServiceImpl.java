@@ -18,24 +18,50 @@ import java.util.List;
  * 对应全体APIのプロンプト.txt 【UD10HdocvariablesApi】
  */
 @Service
+/**
+
+ * UD10ServiceImpl
+
+ */
+
 public class UD10ServiceImpl implements UD10Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD10ServiceImpl.class);
 
     @Autowired
+    /** ud10Mapper */
+
     private UD10Mapper ud10Mapper;
 
     @Override
+    /**
+
+     * search
+
+     */
+
     public List<HdocVariable> search(UD10SearchRequest request) {
         return ud10Mapper.searchHdocVariables(request);
     }
 
     @Override
+    /**
+
+     * selectByVariable
+
+     */
+
     public HdocVariable selectByVariable(String variable) {
         return ud10Mapper.selectByVariable(variable);
     }
 
     @Override
+    /**
+
+     * add
+
+     */
+
     public String add(String variable, String type, String description, String userid, String registerDatetime) {
         // 检查1：Variable是否已存在
         int count = ud10Mapper.countByVariable(variable);
@@ -59,6 +85,12 @@ public class UD10ServiceImpl implements UD10Service {
     }
 
     @Override
+    /**
+
+     * update
+
+     */
+
     public String update(String variable, String type, String description, String userid, String registerDatetime) {
         // 检查：记录是否存在
         HdocVariable existing = ud10Mapper.selectByVariable(variable);
@@ -86,6 +118,12 @@ public class UD10ServiceImpl implements UD10Service {
     }
 
     @Override
+    /**
+
+     * delete
+
+     */
+
     public String delete(String variable) {
         // 检查：记录是否存在
         HdocVariable existing = ud10Mapper.selectByVariable(variable);

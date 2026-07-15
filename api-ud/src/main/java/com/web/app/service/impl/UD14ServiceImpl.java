@@ -27,6 +27,12 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("null")
 @Service
+/**
+
+ * UD14ServiceImpl
+
+ */
+
 public class UD14ServiceImpl implements UD14Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD14ServiceImpl.class);
@@ -44,17 +50,31 @@ public class UD14ServiceImpl implements UD14Service {
     private String networkPassword;
 
     @Autowired
+    /** ud14Mapper */
+
     private UD14Mapper ud14Mapper;
 
     /**
      * 初始化时认证网络共享文件夹
      */
     @PostConstruct
+    /**
+
+     * init
+
+     */
+
     public void init() {
         NetworkShareUtil.authenticate(templateRoot, networkUsername, networkPassword);
     }
 
     @Override
+    /**
+
+     * selectMarketMaster
+
+     */
+
     public Map<String, Object> selectMarketMaster() {
         List<Map<String, String>> markets = ud14Mapper.selectAllMarketMaster().stream()
                 .map(m -> {
@@ -71,6 +91,12 @@ public class UD14ServiceImpl implements UD14Service {
     }
 
     @Override
+    /**
+
+     * selectHdocUserDefinedRules
+
+     */
+
     public Map<String, Object> selectHdocUserDefinedRules(String market) {
         List<Map<String, Object>> fileList = new ArrayList<>();
 
@@ -119,6 +145,12 @@ public class UD14ServiceImpl implements UD14Service {
     /**
      * 格式化文件大小
      */
+     /**
+
+      * formatFileSize
+
+      */
+
     private String formatFileSize(long bytes) {
         if (bytes < 1024) return bytes + " B";
         if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);

@@ -4,19 +4,49 @@ package com.web.app.domain;
  * UD08添加请求DTO
  * 接收前端表单所有字段
  */
+ /**
+
+  * UD08AddRequest
+
+  */
+
 public class UD08AddRequest {
 
+/** productClass */
+
     private String productClass;
+    /** number */
+
     private String number;
+    /** market */
+
     private String market;
+    /** variable */
+
     private String variable;
+    /** value */
+
     private String value;
+    /** vs */
+
     private String vs;
+    /** vs2 */
+
     private String vs2;
+    /** comments */
+
     private String comments;
+    /** addDate */
+
     private String addDate;
+    /** deleteDate */
+
     private String deleteDate;
+    /** updateUser */
+
     private String updateUser;
+    /** updateDatetime */
+
     private String updateDatetime;
 
     public UD08AddRequest() {

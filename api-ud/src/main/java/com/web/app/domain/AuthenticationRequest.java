@@ -5,6 +5,12 @@ import java.io.Serializable;
 /**
  * 认证请求DTO
  */
+ /**
+
+  * AuthenticationRequest
+
+  */
+
 public class AuthenticationRequest implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -12,11 +18,15 @@ public class AuthenticationRequest implements Serializable {
     /**
      * 用户名
      */
+     /** username */
+
     private String username;
     
     /**
      * 密码
      */
+     /** password */
+
     private String password;
     
     // Getter and Setter methods

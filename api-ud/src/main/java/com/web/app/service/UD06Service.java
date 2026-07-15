@@ -9,6 +9,12 @@ import com.web.app.domain.SaveModificationsQueryResponse;
  * 提供ADCA修改信息查询功能：
  * UD06SelectHdocAdcaModification - 查询修改信息
  */
+ /**
+
+  * UD06Service
+
+  */
+
 public interface UD06Service {
 
     /**

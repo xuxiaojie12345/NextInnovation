@@ -21,14 +21,28 @@ import java.time.format.DateTimeFormatter;
  * HDOC_ADCA_MODIFICATION表，获取底盘完整信息
  */
 @Service
+/**
+
+ * UD04ServiceImpl
+
+ */
+
 public class UD04ServiceImpl implements UD04Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD04ServiceImpl.class);
 
     @Autowired
+    /** ud04Mapper */
+
     private UD04Mapper ud04Mapper;
 
     @Override
+    /**
+
+     * selectGeneratedDocument
+
+     */
+
     public GenerateDocumentQueryResponse selectGeneratedDocument(String chassisSeries, String chassisNo, String documentType) {
         logger.debug("UD04ServiceImpl.selectGeneratedDocument - series: {}, chassisNo: {}, documentType: {}",
                 chassisSeries, chassisNo, documentType);

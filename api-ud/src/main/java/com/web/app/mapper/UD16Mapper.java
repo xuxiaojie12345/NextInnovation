@@ -6,6 +6,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Map;
 
 @Mapper
+/**
+
+ * UD16Mapper
+
+ */
+
 public interface UD16Mapper {
 
     Map<String, Object> selectHdocAdcaChange(@Param("serie") String serie, @Param("chnr") String chnr);

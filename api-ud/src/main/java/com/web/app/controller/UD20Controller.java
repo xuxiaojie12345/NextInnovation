@@ -16,11 +16,19 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/ud20")
+/**
+
+ * UD20Controller
+
+ */
+
 public class UD20Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD20Controller.class);
 
     @Autowired
+    /** ud20Service */
+
     private UD20Service ud20Service;
 
     @GetMapping("/marketdocumentsettings")

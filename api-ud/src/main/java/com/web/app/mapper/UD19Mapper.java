@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
+/**
+
+ * UD19Mapper
+
+ */
+
 public interface UD19Mapper {
 
     List<Map<String, String>> selectAllMarkets();

@@ -5,24 +5,64 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * 生成文档查询响应DTO
  */
+ /**
+
+  * GenerateDocumentQueryResponse
+
+  */
+
 public class GenerateDocumentQueryResponse {
     
+/** chassisNo */
+
     private String chassisNo;              // Chassis no (CHNR)
+    /** serie */
+
     private String serie;                  // Chassis series (SERIE)
+    /** ordernumber */
+
     private String ordernumber;            // Ordernumber
+    /** buildWeek */
+
     private String buildWeek;              // Build week
+    /** specWeek */
+
     private String specWeek;               // Spec week
+    /** market */
+
     private String market;                 // Market (CountryOfOperation)
+    /** masterMarket */
+
     private String masterMarket;           // Master Market (固定为'-EU')
+    /** sNoteNo */
+
     private String sNoteNo;                // S-Note NO
+    /** sNoteMessage */
+
     private String sNoteMessage;           // S-Note Message
+    /** loadIndex */
+
     private String loadIndex;              // Load Index
+    /** analyzeRules */
+
     private String analyzeRules;           // Analyze Rules
+    /** modifyDocLink */
+
     private String modifyDocLink;          // Modify Doc Link
+    /** usingTemplate */
+
     private String usingTemplate;          // Using template
+    /** replacingParameters */
+
     private String replacingParameters;    // Replacing parameters
+    /** generatedDocument */
+
     private String generatedDocument;      // Generated document
+    /** date */
+
     private String date;                   // Date
+    /** hdocVersion */
+
     private String hdocVersion;            // HDoc version
 
     // 默认构造函数

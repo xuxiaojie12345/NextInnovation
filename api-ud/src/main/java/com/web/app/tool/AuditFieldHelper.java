@@ -36,6 +36,12 @@ public final class AuditFieldHelper {
      * @param user    操作用户，为 null 时使用 "SYSTEM"
      * @param process 操作程序名（如 "UD08Add"）
      */
+     /**
+
+      * fillCreateFields
+
+      */
+
     public static void fillCreateFields(BaseEntity entity, String user, String process) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -77,6 +83,12 @@ public final class AuditFieldHelper {
      * @param user    操作用户，为 null 时使用 "SYSTEM"
      * @param process 操作程序名（如 "UD08Update"）
      */
+     /**
+
+      * fillUpdateFields
+
+      */
+
     public static void fillUpdateFields(BaseEntity entity, String user, String process) {
         entity.setUpdateDatetime(LocalDateTime.now());
         entity.setUpdateUser(user != null ? user.trim() : SYSTEM_USER);
@@ -113,6 +125,12 @@ public final class AuditFieldHelper {
      * @param defaultVal  解析失败时返回的默认值
      * @return 解析后的 LocalDateTime，失败时返回 defaultVal
      */
+     /**
+
+      * parseDateTime
+
+      */
+
     public static LocalDateTime parseDateTime(String dateTimeStr, LocalDateTime defaultVal) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return defaultVal;

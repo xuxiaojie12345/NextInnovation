@@ -24,11 +24,19 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/ud12")
+/**
+
+ * UD12Controller
+
+ */
+
 public class UD12Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD12Controller.class);
 
     @Autowired
+    /** ud12Service */
+
     private UD12Service ud12Service;
 
     /**
@@ -39,6 +47,12 @@ public class UD12Controller {
      * @return 市场列表（含marketCode和marketName）
      */
     @GetMapping("/selectmarket")
+    /**
+
+     * selectMarket
+
+     */
+
     public ApiResponse<List<UD12MarketResponse>> selectMarket() {
         logger.info("UD12SelectMarket called - get all markets");
 
@@ -133,6 +147,12 @@ public class UD12Controller {
      * @return 删除结果（文件名和市场代码）
      */
     @PostMapping("/delete")
+    /**
+
+     * deleteFile
+
+     */
+
     public ApiResponse<UD12FileOperationResponse> deleteFile(@RequestBody UD12DeleteRequest request) {
 
         logger.info("UD12DeleteFlie called - market: {}, file: {}", request.getMarket(), request.getFileName());

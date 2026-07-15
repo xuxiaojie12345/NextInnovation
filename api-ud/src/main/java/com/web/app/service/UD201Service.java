@@ -6,6 +6,12 @@ import java.util.Map;
  * UD20-1业务逻辑接口
  * 提供UD20-1UpdateHdocDocumentList方法 - 更新HDOC_DOCUMENT_LIST表
  */
+ /**
+
+  * UD201Service
+
+  */
+
 public interface UD201Service {
 
     /**

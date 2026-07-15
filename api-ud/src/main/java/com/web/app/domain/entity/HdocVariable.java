@@ -4,11 +4,25 @@ package com.web.app.domain.entity;
 /**
  * HDOC_VARIABLES表对应的实体类
  */
+ /**
+
+  * HdocVariable
+
+  */
+
 public class HdocVariable extends BaseEntity {
 
+/** variable */
+
     private String variable;
+    /** type */
+
     private String type;
+    /** description */
+
     private String description;
+    /** userid */
+
     private String userid;
 
     public HdocVariable() {

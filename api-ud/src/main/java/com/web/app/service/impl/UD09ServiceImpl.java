@@ -18,19 +18,39 @@ import java.util.List;
  * 用户自定义规则搜索结果列表与批量删除
  */
 @Service
+/**
+
+ * UD09ServiceImpl
+
+ */
+
 public class UD09ServiceImpl implements UD09Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD09ServiceImpl.class);
 
     @Autowired
+    /** ud09Mapper */
+
     private UD09Mapper ud09Mapper;
 
     @Override
+    /**
+
+     * UD09Search
+
+     */
+
     public List<HdocUserDefinedRules> UD09Search(UD08SearchRequest request) {
         return ud09Mapper.searchUserDefinedRules(request);
     }
 
     @Override
+    /**
+
+     * UD09DeleteSelected
+
+     */
+
     public UD09BatchDeleteResponse UD09DeleteSelected(List<UD09BatchDeleteRequest> requests) {
         int deletedCount = 0;
         int failedCount = 0;

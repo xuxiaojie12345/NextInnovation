@@ -13,14 +13,28 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ud17")
+/**
+
+ * UD17Controller
+
+ */
+
 public class UD17Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD17Controller.class);
 
     @Autowired
+    /** ud17Service */
+
     private UD17Service ud17Service;
 
     @GetMapping("/markets")
+    /**
+
+     * getMarkets
+
+     */
+
     public ApiResponse<List<Map<String, String>>> getMarkets() {
         logger.info("UD17 getMarkets called");
         try {
@@ -32,6 +46,12 @@ public class UD17Controller {
     }
 
     @PostMapping("/UD17HDocUserAdministrationApi")
+    /**
+
+     * processUserAdmin
+
+     */
+
     public ApiResponse<Map<String, Object>> processUserAdmin(@RequestBody UD17Request request) {
         logger.info("UD17 processUserAdmin called - operation: {}, userid: {}", request.getOperation(), request.getUserid());
         if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {

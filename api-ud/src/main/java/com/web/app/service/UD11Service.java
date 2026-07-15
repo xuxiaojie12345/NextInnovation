@@ -10,6 +10,12 @@ import java.util.List;
  * HDOC变量列表检索
  * 对应全体APIのプロンプト.txt 【UD11HdocvariablesApi】
  */
+ /**
+
+  * UD11Service
+
+  */
+
 public interface UD11Service {
 
     /**

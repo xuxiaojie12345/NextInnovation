@@ -3,10 +3,22 @@ package com.web.app.domain;
 /**
  * UD15请求DTO - VIN Plate数据查看与状态更新
  */
+ /**
+
+  * UD15Request
+
+  */
+
 public class UD15Request {
 
+/** chassisNumber */
+
     private String chassisNumber;
+    /** operation */
+
     private String operation;
+    /** updateUser */
+
     private String updateUser;
 
     public String getChassisNumber() {

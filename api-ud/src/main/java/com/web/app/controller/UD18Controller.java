@@ -12,14 +12,28 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ud18")
+/**
+
+ * UD18Controller
+
+ */
+
 public class UD18Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD18Controller.class);
 
     @Autowired
+    /** ud18Service */
+
     private UD18Service ud18Service;
 
     @PostMapping("/UD18HDocUserDocAdministrationApi")
+    /**
+
+     * processUserDoc
+
+     */
+
     public ApiResponse<Map<String, Object>> processUserDoc(@RequestBody UD18Request request) {
         logger.info("UD18 called - operation: {}, userid: {}", request.getOperation(), request.getUserid());
         if (request.getUserid() == null || request.getUserid().trim().isEmpty()) {

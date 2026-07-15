@@ -4,10 +4,22 @@ package com.web.app.domain;
  * UD08删除请求DTO
  * 仅需主键三个字段：productClass、number、market
  */
+ /**
+
+  * UD08DeleteRequest
+
+  */
+
 public class UD08DeleteRequest {
 
+/** productClass */
+
     private String productClass;
+    /** number */
+
     private String number;
+    /** market */
+
     private String market;
 
     public UD08DeleteRequest() {

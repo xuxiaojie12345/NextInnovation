@@ -9,6 +9,12 @@ import java.util.Map;
  * UD15数据访问层 - VIN Plate
  */
 @Mapper
+/**
+
+ * UD15Mapper
+
+ */
+
 public interface UD15Mapper {
 
     /**

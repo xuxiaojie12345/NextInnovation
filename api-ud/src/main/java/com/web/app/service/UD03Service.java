@@ -6,6 +6,12 @@ import java.util.List;
 /**
  * UD03业务逻辑接口
  */
+ /**
+
+  * UD03Service
+
+  */
+
 public interface UD03Service {
 
     /**

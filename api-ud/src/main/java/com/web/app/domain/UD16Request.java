@@ -3,12 +3,28 @@ package com.web.app.domain;
 /**
  * UD16请求DTO - ADCA变更
  */
+ /**
+
+  * UD16Request
+
+  */
+
 public class UD16Request {
 
+/** operation */
+
     private String operation;
+    /** serieChnr */
+
     private String serieChnr;
+    /** desc */
+
     private String desc;
+    /** user */
+
     private String user;
+    /** process */
+
     private String process;
 
     public String getOperation() { return operation; }

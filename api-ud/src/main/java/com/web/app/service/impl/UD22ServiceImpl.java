@@ -9,12 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+/**
+
+ * UD22ServiceImpl
+
+ */
+
 public class UD22ServiceImpl implements UD22Service {
 
     @Autowired
+    /** ud22Mapper */
+
     private UD22Mapper ud22Mapper;
 
     @Override
+    /**
+
+     * getDocumentTypes
+
+     */
+
     public List<Map<String, String>> getDocumentTypes() {
         return ud22Mapper.selectDocumentTypes();
     }

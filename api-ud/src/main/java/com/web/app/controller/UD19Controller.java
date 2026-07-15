@@ -12,14 +12,28 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ud19")
+/**
+
+ * UD19Controller
+
+ */
+
 public class UD19Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD19Controller.class);
 
     @Autowired
+    /** ud19Service */
+
     private UD19Service ud19Service;
 
     @PostMapping("/UD19SearchResultListApi")
+    /**
+
+     * searchUser
+
+     */
+
     public ApiResponse<Map<String, Object>> searchUser(@RequestBody UD19Request request) {
         logger.info("UD19 called - operation: {}", request.getOperation());
         try {

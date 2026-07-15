@@ -10,6 +10,12 @@ import com.web.app.domain.ModifyDocumentQueryResponse;
  * 1. UD05SelectVariableModification - 查询变量列表
  * 2. UD05UpdateHdocAdcaModification - 更新变量值
  */
+ /**
+
+  * UD05Service
+
+  */
+
 public interface UD05Service {
 
     /**

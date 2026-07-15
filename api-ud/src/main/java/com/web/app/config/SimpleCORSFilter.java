@@ -9,6 +9,12 @@ import java.io.IOException;
  * @author ycl
  */
 @Component
+/**
+
+ * SimpleCORSFilter
+
+ */
+
 public class SimpleCORSFilter implements Filter {
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
       throws IOException, ServletException {
@@ -21,8 +27,20 @@ public class SimpleCORSFilter implements Filter {
     chain.doFilter(req, res);
   }
 
+  /**
+
+   * init
+
+   */
+
   public void init(FilterConfig filterConfig) {
   }
+
+  /**
+
+   * destroy
+
+   */
 
   public void destroy() {
   }

@@ -12,6 +12,12 @@ import org.apache.ibatis.annotations.Param;
  * HDOC_REC_DATA_VDA_VARIANTS、HDOC_REC_DATA_KOLA_VARIANT表，获取车辆规格信息。
  */
 @Mapper
+/**
+
+ * UD07Mapper
+
+ */
+
 public interface UD07Mapper {
 
     /**

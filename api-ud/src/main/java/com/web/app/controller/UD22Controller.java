@@ -12,14 +12,28 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ud22")
+/**
+
+ * UD22Controller
+
+ */
+
 public class UD22Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD22Controller.class);
 
     @Autowired
+    /** ud22Service */
+
     private UD22Service ud22Service;
 
     @GetMapping("/getdocumenttypes")
+    /**
+
+     * getDocumentTypes
+
+     */
+
     public ApiResponse<List<Map<String, String>>> getDocumentTypes() {
         logger.info("UD22GetDocumentTypesApi called");
         try {

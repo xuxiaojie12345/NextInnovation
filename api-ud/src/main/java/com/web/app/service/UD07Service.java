@@ -8,6 +8,12 @@ import com.web.app.domain.VehicleSpecificationResponse;
  *
  * 提供获取车辆规格信息的方法
  */
+ /**
+
+  * UD07Service
+
+  */
+
 public interface UD07Service {
 
     /**

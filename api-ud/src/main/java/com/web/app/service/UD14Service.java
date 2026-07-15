@@ -8,6 +8,12 @@ import java.util.Map;
  *
  * 功能：模板文件列表与使用状态查询
  */
+ /**
+
+  * UD14Service
+
+  */
+
 public interface UD14Service {
 
     /**

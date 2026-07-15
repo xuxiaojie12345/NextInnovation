@@ -13,12 +13,26 @@ import java.util.*;
  * UD15SelecthdocsenddatavinplateApi 服务实现类
  */
 @Service
+/**
+
+ * UD15ServiceImpl
+
+ */
+
 public class UD15ServiceImpl implements UD15Service {
 
     @Autowired
+    /** ud15Mapper */
+
     private UD15Mapper ud15Mapper;
 
     @Override
+    /**
+
+     * processVinPlate
+
+     */
+
     public Map<String, Object> processVinPlate(String serie, String chnr, String operation, String updateUser) {
         switch (operation) {
             case "viewInfo":
@@ -35,6 +49,12 @@ public class UD15ServiceImpl implements UD15Service {
                 throw new IllegalArgumentException("Unknown operation: " + operation);
         }
     }
+
+    /**
+
+     * handleViewInfo
+
+     */
 
     private Map<String, Object> handleViewInfo(String serie, String chnr) {
         Map<String, Object> info = ud15Mapper.selectVinPlateInfo(serie, chnr);
@@ -62,6 +82,12 @@ public class UD15ServiceImpl implements UD15Service {
         return result;
     }
 
+    /**
+
+     * handleSetRegenerate
+
+     */
+
     private Map<String, Object> handleSetRegenerate(String serie, String chnr, String updateUser) {
         int rows = ud15Mapper.updateStatus(serie, chnr, "0", updateUser);
         if (rows == 0) {
@@ -71,6 +97,12 @@ public class UD15ServiceImpl implements UD15Service {
         result.put("message", "Status updated successfully.");
         return result;
     }
+
+    /**
+
+     * handleSetOK
+
+     */
 
     private Map<String, Object> handleSetOK(String serie, String chnr, String updateUser) {
         int rows = ud15Mapper.updateStatus(serie, chnr, "1", updateUser);
@@ -82,6 +114,12 @@ public class UD15ServiceImpl implements UD15Service {
         return result;
     }
 
+    /**
+
+     * handleChangeToBasicInfo
+
+     */
+
     private Map<String, Object> handleChangeToBasicInfo(String serie, String chnr, String updateUser) {
         int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "1", updateUser);
         if (rows == 0) {
@@ -91,6 +129,12 @@ public class UD15ServiceImpl implements UD15Service {
         result.put("message", "Status and Type updated successfully.");
         return result;
     }
+
+    /**
+
+     * handleChangeToAdvancedInfo
+
+     */
 
     private Map<String, Object> handleChangeToAdvancedInfo(String serie, String chnr, String updateUser) {
         int rows = ud15Mapper.updateStatusAndType(serie, chnr, "0", "2", updateUser);
@@ -105,6 +149,12 @@ public class UD15ServiceImpl implements UD15Service {
     /**
      * 从XML_DOC中提取PrintItemName值
      */
+     /**
+
+      * parsePrintItems
+
+      */
+
     private String parsePrintItems(String xmlDoc) {
         if (xmlDoc == null || xmlDoc.trim().isEmpty()) return "";
         try {
@@ -128,6 +178,12 @@ public class UD15ServiceImpl implements UD15Service {
     /**
      * 从XML_DOC中提取Variant名与Value
      */
+     /**
+
+      * parseVpData
+
+      */
+
     private String parseVpData(String xmlDoc) {
         if (xmlDoc == null || xmlDoc.trim().isEmpty()) return "";
         try {

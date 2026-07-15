@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
+/**
+
+ * UD22Mapper
+
+ */
+
 public interface UD22Mapper {
     List<Map<String, String>> selectDocumentTypes();
 }

@@ -16,14 +16,28 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api")
+/**
+
+ * UD16Controller
+
+ */
+
 public class UD16Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD16Controller.class);
 
     @Autowired
+    /** ud16Service */
+
     private UD16Service ud16Service;
 
     @PostMapping("/adchange/process")
+    /**
+
+     * processAdChange
+
+     */
+
     public ApiResponse<Map<String, Object>> processAdChange(@RequestBody UD16Request request) {
         logger.info("UD16ADChangeApi called - operation: {}, serieChnr: {}", request.getOperation(), request.getSerieChnr());
 

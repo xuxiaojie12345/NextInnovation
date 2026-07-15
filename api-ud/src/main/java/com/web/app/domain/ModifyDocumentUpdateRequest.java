@@ -5,6 +5,12 @@ package com.web.app.domain;
  * 对应详细设计：DES-ModifyDocument-001 4.1 更新接口
  * 接收serie、chno、variable、modifiedValue参数
  */
+ /**
+
+  * ModifyDocumentUpdateRequest
+
+  */
+
 public class ModifyDocumentUpdateRequest {
 
     /** 底盘系列号 */

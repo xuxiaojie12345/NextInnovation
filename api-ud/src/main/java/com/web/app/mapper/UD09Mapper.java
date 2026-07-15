@@ -10,6 +10,12 @@ import java.util.List;
  * UD09数据访问层
  * 用户自定义规则搜索结果列表与批量删除
  */
+ /**
+
+  * UD09Mapper
+
+  */
+
 public interface UD09Mapper {
 
     /**

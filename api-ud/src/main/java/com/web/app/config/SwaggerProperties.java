@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 
 @ConfigurationProperties("swagger3")
 @Data
+/**
+
+ * SwaggerProperties
+
+ */
+
 public class SwaggerProperties {
 
   public String getBasePackage() {
@@ -76,15 +82,37 @@ public class SwaggerProperties {
 	public void setLicenseUrl(String licenseUrl) {
 		this.licenseUrl = licenseUrl;
 	}
+ /** basePackage */
+
 private String basePackage;
+/** name */
+
   private String name;
+  /** url */
+
   private String url;
+  /** email */
+
   private String email;
+  /** version */
+
   private String version;
+  /** groupName */
+
   private String groupName;
+  /** title */
+
   private String title;
+  /** description */
+
   private String description;
+  /** termsofServiceUrl */
+
   private String termsofServiceUrl;
+  /** license */
+
   private String license;
+  /** licenseUrl */
+
   private String licenseUrl;
 }

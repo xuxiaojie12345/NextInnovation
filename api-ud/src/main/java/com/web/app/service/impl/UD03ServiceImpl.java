@@ -11,9 +11,17 @@ import java.util.List;
  * UD03业务逻辑实现类
  */
 @Service
+/**
+
+ * UD03ServiceImpl
+
+ */
+
 public class UD03ServiceImpl implements UD03Service {
 
     @Autowired
+    /** ud03Mapper */
+
     private UD03Mapper ud03Mapper;
 
     @Override

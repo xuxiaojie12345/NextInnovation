@@ -14,6 +14,12 @@ import java.util.List;
  * 功能：模板上传删除管理
  * 含UD12SelectMarket市场及模板列表查询、UD12UploadFlie文件上传、UD12DeleteFlie文件删除
  */
+ /**
+
+  * UD12Service
+
+  */
+
 public interface UD12Service {
 
     /**

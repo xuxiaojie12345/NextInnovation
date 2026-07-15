@@ -9,6 +9,12 @@ import java.util.List;
  * 对应HDOC_DOCUMENT_LIST表
  */
 @Mapper
+/**
+
+ * UD03Mapper
+
+ */
+
 public interface UD03Mapper {
 
     /**

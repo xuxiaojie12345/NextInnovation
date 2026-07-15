@@ -14,9 +14,17 @@ import org.springframework.stereotype.Service;
  * 功能：根据Userid从HDOC_USER_INFOR表检索用户详细信息
  */
 @Service
+/**
+
+ * UD25ServiceImpl
+
+ */
+
 public class UD25ServiceImpl implements UD25Service {
 
     @Autowired
+    /** userInfoMapper */
+
     private UserInfoMapper userInfoMapper;
 
     /**

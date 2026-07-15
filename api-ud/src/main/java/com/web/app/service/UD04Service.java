@@ -6,6 +6,12 @@ import com.web.app.domain.GenerateDocumentQueryResponse;
  * UD04业务逻辑接口
  * 对应详细设计：DES-GenerateDocumentPage-001
  */
+ /**
+
+  * UD04Service
+
+  */
+
 public interface UD04Service {
 
     /**

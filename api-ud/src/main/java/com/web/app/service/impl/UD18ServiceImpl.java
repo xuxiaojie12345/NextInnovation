@@ -9,12 +9,26 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+/**
+
+ * UD18ServiceImpl
+
+ */
+
 public class UD18ServiceImpl implements UD18Service {
 
     @Autowired
+    /** ud18Mapper */
+
     private UD18Mapper ud18Mapper;
 
     @Override
+    /**
+
+     * processUserDoc
+
+     */
+
     public Map<String, Object> processUserDoc(UD18Request request) {
         String userId = request.getUserid().trim();
         switch (request.getOperation()) {
@@ -31,6 +45,12 @@ public class UD18ServiceImpl implements UD18Service {
         }
     }
 
+    /**
+
+     * handleCheckAuth
+
+     */
+
     private Map<String, Object> handleCheckAuth(String userId) {
         Map<String, Object> result = new LinkedHashMap<>();
         List<String> functions = ud18Mapper.selectFunctionAuth(userId);
@@ -44,6 +64,12 @@ public class UD18ServiceImpl implements UD18Service {
         return result;
     }
 
+    /**
+
+     * handleSelect
+
+     */
+
     private Map<String, Object> handleSelect(String userId) {
         Map<String, Object> result = new LinkedHashMap<>();
         String username = ud18Mapper.selectUsername(userId);
@@ -53,6 +79,12 @@ public class UD18ServiceImpl implements UD18Service {
         return result;
     }
 
+    /**
+
+     * handleDelete
+
+     */
+
     private Map<String, Object> handleDelete(String userId) {
         ud18Mapper.deleteUserDoc(userId);
         Map<String, Object> result = new LinkedHashMap<>();
@@ -60,6 +92,12 @@ public class UD18ServiceImpl implements UD18Service {
         result.put("message", "Document permissions deleted successfully.");
         return result;
     }
+
+    /**
+
+     * handleCreate
+
+     */
 
     private Map<String, Object> handleCreate(String userId, List<String> doctypes) {
         // 先删后增

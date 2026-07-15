@@ -16,14 +16,28 @@ import java.util.Map;
  * 更新HDOC_DOCUMENT_LIST表数据
  */
 @Service
+/**
+
+ * UD201ServiceImpl
+
+ */
+
 public class UD201ServiceImpl implements UD201Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD201ServiceImpl.class);
 
     @Autowired
+    /** ud201Mapper */
+
     private UD201Mapper ud201Mapper;
 
     @Override
+    /**
+
+     * updateHdocDocumentList
+
+     */
+
     public String updateHdocDocumentList(String doctype, Map<String, String> request) {
         // 检查Document type是否存在
         Integer count = ud201Mapper.countByDoctype(doctype);

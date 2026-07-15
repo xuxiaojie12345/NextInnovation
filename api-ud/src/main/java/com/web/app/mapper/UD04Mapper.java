@@ -14,6 +14,12 @@ import org.apache.ibatis.annotations.Param;
  * HDOC_ADCA_MODIFICATION表，获取底盘完整信息
  */
 @Mapper
+/**
+
+ * UD04Mapper
+
+ */
+
 public interface UD04Mapper {
 
     /**

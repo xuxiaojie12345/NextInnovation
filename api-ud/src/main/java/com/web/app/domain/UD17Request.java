@@ -6,13 +6,29 @@ import java.util.Map;
 /**
  * UD17请求DTO - 用户权限管理
  */
+ /**
+
+  * UD17Request
+
+  */
+
 public class UD17Request {
 
+/** userid */
+
     private String userid;
+    /** operation */
+
     private String operation;
+    /** functions */
+
     private List<String> functions;
     private List<Map<String, String>> markets;
+    /** updateUser */
+
     private String updateUser;
+    /** updateProcess */
+
     private String updateProcess;
 
     public String getUserid() { return userid; }

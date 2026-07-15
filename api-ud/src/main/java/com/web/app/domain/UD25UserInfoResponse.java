@@ -5,26 +5,40 @@ package com.web.app.domain;
  * 对应UD25EduUserViewApi返回格式
  * 字段名使用驼峰命名，与前端EDBUserView组件UserInfo接口对齐
  */
+ /**
+
+  * UD25UserInfoResponse
+
+  */
+
 public class UD25UserInfoResponse {
 
     /**
      * 用户ID
      */
+     /** userid */
+
     private String userid;
 
     /**
      * 负责人
      */
+     /** responsible */
+
     private String responsible;
 
     /**
      * 用户职位
      */
+     /** userPosition */
+
     private String userPosition;
 
     /**
      * 邮箱
      */
+     /** email */
+
     private String email;
 
     public String getUserid() {

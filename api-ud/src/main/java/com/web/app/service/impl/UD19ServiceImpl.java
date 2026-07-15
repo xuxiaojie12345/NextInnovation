@@ -9,12 +9,26 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+/**
+
+ * UD19ServiceImpl
+
+ */
+
 public class UD19ServiceImpl implements UD19Service {
 
     @Autowired
+    /** ud19Mapper */
+
     private UD19Mapper ud19Mapper;
 
     @Override
+    /**
+
+     * searchUser
+
+     */
+
     public Map<String, Object> searchUser(UD19Request request) {
         switch (request.getOperation()) {
             case "GET_MARKET_LIST":
@@ -26,6 +40,12 @@ public class UD19ServiceImpl implements UD19Service {
         }
     }
 
+    /**
+
+     * handleGetMarketList
+
+     */
+
     private Map<String, Object> handleGetMarketList() {
         List<Map<String, String>> markets = ud19Mapper.selectAllMarkets();
         Map<String, Object> result = new LinkedHashMap<>();
@@ -33,6 +53,12 @@ public class UD19ServiceImpl implements UD19Service {
         result.put("count", markets.size());
         return result;
     }
+
+    /**
+
+     * handleSearchUser
+
+     */
 
     private Map<String, Object> handleSearchUser(UD19Request request) {
         List<Map<String, Object>> results;

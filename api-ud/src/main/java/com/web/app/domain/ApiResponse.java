@@ -4,10 +4,22 @@ package com.web.app.domain;
  * 通用API响应包装类
  * 统一返回格式：{ code: 200, message: "success", data: T }
  */
+ /**
+
+  * ApiResponse
+
+  */
+
 public class ApiResponse<T> {
     
+/** code */
+
     private Integer code;
+    /** message */
+
     private String message;
+    /** data */
+
     private T data;
 
     public ApiResponse() {
@@ -22,6 +34,12 @@ public class ApiResponse<T> {
     /**
      * 成功响应
      */
+     /**
+
+      * success
+
+      */
+
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(200, "success", data);
     }
@@ -29,6 +47,12 @@ public class ApiResponse<T> {
     /**
      * 失败响应
      */
+     /**
+
+      * error
+
+      */
+
     public static <T> ApiResponse<T> error(Integer code, String message) {
         return new ApiResponse<>(code, message, null);
     }
@@ -36,6 +60,12 @@ public class ApiResponse<T> {
     /**
      * 404 未找到
      */
+     /**
+
+      * notFound
+
+      */
+
     public static <T> ApiResponse<T> notFound(String message) {
         return new ApiResponse<>(404, message, null);
     }
@@ -43,6 +73,12 @@ public class ApiResponse<T> {
     /**
      * 500 服务器错误
      */
+     /**
+
+      * serverError
+
+      */
+
     public static <T> ApiResponse<T> serverError() {
         return new ApiResponse<>(500, "Internal server error", null);
     }

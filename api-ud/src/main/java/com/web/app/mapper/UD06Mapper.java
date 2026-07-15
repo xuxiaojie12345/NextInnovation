@@ -14,6 +14,12 @@ import java.util.List;
  * 获取DOCTYPE、VERS、VARIABLE、NEWVAL等信息。
  */
 @Mapper
+/**
+
+ * UD06Mapper
+
+ */
+
 public interface UD06Mapper {
 
     /**

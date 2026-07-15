@@ -15,6 +15,12 @@ import java.util.List;
  * 若HDOC_ADCA_MODIFICATION中不存在对应变量，则Current value和Modified value均为空。
  */
 @Mapper
+/**
+
+ * UD05Mapper
+
+ */
+
 public interface UD05Mapper {
 
     /**

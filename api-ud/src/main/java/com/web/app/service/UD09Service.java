@@ -11,6 +11,12 @@ import java.util.List;
  * UD09业务逻辑接口
  * 用户自定义规则搜索结果列表与批量删除
  */
+ /**
+
+  * UD09Service
+
+  */
+
 public interface UD09Service {
 
     /**

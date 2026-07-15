@@ -17,6 +17,12 @@ import java.util.List;
  * UD08业务逻辑接口
  * 认证变量管理（Homologation Variables）
  */
+ /**
+
+  * UD08Service
+
+  */
+
 public interface UD08Service {
 
     /**

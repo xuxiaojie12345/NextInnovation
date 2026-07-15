@@ -5,6 +5,12 @@ package com.web.app.domain;
  * 对应详细设计 4.2 / 4.3 Response Success
  * 前端期望格式：{ fileName: "template1.rtf", market: "JPN" }
  */
+ /**
+
+  * UD12FileOperationResponse
+
+  */
+
 public class UD12FileOperationResponse {
 
     /** 文件名 */

@@ -5,6 +5,12 @@ package com.web.app.domain;
  * 对应详细设计：DES-SaveModifications-001
  * 返回修改信息（Doctype、Version、Storing、FOUND UNRELEASED VERSION）
  */
+ /**
+
+  * SaveModificationsQueryResponse
+
+  */
+
 public class SaveModificationsQueryResponse {
 
     /** 底盘系列号 */

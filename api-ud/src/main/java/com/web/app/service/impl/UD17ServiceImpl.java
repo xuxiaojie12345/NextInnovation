@@ -9,17 +9,37 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+/**
+
+ * UD17ServiceImpl
+
+ */
+
 public class UD17ServiceImpl implements UD17Service {
 
     @Autowired
+    /** ud17Mapper */
+
     private UD17Mapper ud17Mapper;
 
     @Override
+    /**
+
+     * getMarkets
+
+     */
+
     public List<Map<String, String>> getMarkets() {
         return ud17Mapper.selectAllMarkets();
     }
 
     @Override
+    /**
+
+     * processUserAdmin
+
+     */
+
     public Map<String, Object> processUserAdmin(UD17Request request) {
         String userid = request.getUserid().trim();
         switch (request.getOperation()) {
@@ -38,6 +58,12 @@ public class UD17ServiceImpl implements UD17Service {
      * User Info处理
      * 查询用户名（HDOC_USER_INFOR），以及功能权限（HDOC_FUNCTION_AUTH）和市场权限（DOC_MARKET_AUTH）
      */
+     /**
+
+      * handleUserInfo
+
+      */
+
     private Map<String, Object> handleUserInfo(String userid) {
         Map<String, Object> result = new LinkedHashMap<>();
         // 查询用户名
@@ -59,6 +85,12 @@ public class UD17ServiceImpl implements UD17Service {
      * Update Role处理
      * 先删除既存数据，后追加新的数据（DELETE + INSERT）
      */
+     /**
+
+      * handleUpdateRole
+
+      */
+
     private Map<String, Object> handleUpdateRole(String userid, UD17Request request) {
         Map<String, Object> result = new LinkedHashMap<>();
         // 检查用户是否存在
@@ -98,6 +130,12 @@ public class UD17ServiceImpl implements UD17Service {
      * Delete Role处理
      * 根据userid删除该用户的所有权限（DOC_MARKET_AUTH, HDOC_FUNCTION_AUTH）
      */
+     /**
+
+      * handleDeleteRole
+
+      */
+
     private Map<String, Object> handleDeleteRole(String userid) {
         // 删除该用户的所有市场权限
         ud17Mapper.deleteAllMarketAuth(userid);

@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
  * 子类只需关注业务字段，无需重复声明 register/update 审计字段
  */
 @Data
+/**
+
+ * BaseEntity
+
+ */
+
 public abstract class BaseEntity {
 
     /** 注册时间 */

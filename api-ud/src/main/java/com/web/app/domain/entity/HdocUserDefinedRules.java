@@ -5,19 +5,49 @@ import java.math.BigDecimal;
 /**
  * HDOC_USER_DEFINED_RULES表对应的实体类
  */
+ /**
+
+  * HdocUserDefinedRules
+
+  */
+
 public class HdocUserDefinedRules extends BaseEntity {
 
+/** pc */
+
     private String pc;
+    /** num */
+
     private BigDecimal num;
+    /** market */
+
     private String market;
+    /** vs */
+
     private String vs;
+    /** vs2 */
+
     private String vs2;
+    /** variable */
+
     private String variable;
+    /** val */
+
     private String val;
+    /** userid */
+
     private String userid;
+    /** upDate */
+
     private String upDate;
+    /** comments */
+
     private String comments;
+    /** addDate */
+
     private String addDate;
+    /** deleteDate */
+
     private String deleteDate;
 
     public HdocUserDefinedRules() {

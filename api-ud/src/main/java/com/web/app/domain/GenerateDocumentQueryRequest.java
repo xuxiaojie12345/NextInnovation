@@ -5,10 +5,22 @@ package com.web.app.domain;
  * 对应详细设计 UD04 - 4.1 UD04SelectGeneratedocumentApi
  * 请求参数包含 chassisSeries、chassisNo 和 documentType
  */
+ /**
+
+  * GenerateDocumentQueryRequest
+
+  */
+
 public class GenerateDocumentQueryRequest {
     
+/** chassisSeries */
+
     private String chassisSeries;
+    /** chassisNo */
+
     private String chassisNo;
+    /** documentType */
+
     private String documentType;
 
     // 默认构造函数

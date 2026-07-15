@@ -24,11 +24,19 @@ import java.util.Map;
 @SuppressWarnings("null")
 @RestController
 @RequestMapping("/api/ud14")
+/**
+
+ * UD14Controller
+
+ */
+
 public class UD14Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD14Controller.class);
 
     @Autowired
+    /** ud14Service */
+
     private UD14Service ud14Service;
 
     /**
@@ -36,6 +44,12 @@ public class UD14Controller {
      * GET /api/ud14/UD14SelectMarketmaster（无参数）
      */
     @GetMapping("/UD14SelectMarketmaster")
+    /**
+
+     * selectMarketMaster
+
+     */
+
     public ApiResponse<Map<String, Object>> selectMarketMaster() {
         logger.info("UD14SelectMarketmaster called");
         try {

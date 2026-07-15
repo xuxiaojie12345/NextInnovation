@@ -8,6 +8,12 @@ import com.web.app.domain.UD25UserInfoResponse;
  *
  * 功能：获取用户详细信息
  */
+ /**
+
+  * UD25Service
+
+  */
+
 public interface UD25Service {
 
     /**

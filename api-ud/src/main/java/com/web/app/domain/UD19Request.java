@@ -3,12 +3,28 @@ package com.web.app.domain;
 /**
  * UD19请求DTO - 多条件用户搜索
  */
+ /**
+
+  * UD19Request
+
+  */
+
 public class UD19Request {
 
+/** operation */
+
     private String operation;
+    /** userid */
+
     private String userid;
+    /** user */
+
     private String user;
+    /** market */
+
     private String market;
+    /** type */
+
     private String type;
 
     public String getOperation() { return operation; }

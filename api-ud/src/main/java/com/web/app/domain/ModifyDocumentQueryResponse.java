@@ -7,6 +7,12 @@ import java.util.List;
  * 对应详细设计：DES-ModifyDocument-001
  * 返回变量列表（Variable、Description、Current value、Modified value）
  */
+ /**
+
+  * ModifyDocumentQueryResponse
+
+  */
+
 public class ModifyDocumentQueryResponse {
 
     /** 底盘编号 */

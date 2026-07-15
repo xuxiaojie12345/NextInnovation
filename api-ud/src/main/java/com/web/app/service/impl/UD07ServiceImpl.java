@@ -22,11 +22,19 @@ import org.slf4j.LoggerFactory;
  * 5. 排序：FUNCTION_GROUP（左补至4位）+ FAMILY_ID（3位）
  */
 @Service
+/**
+
+ * UD07ServiceImpl
+
+ */
+
 public class UD07ServiceImpl implements UD07Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD07ServiceImpl.class);
 
     @Autowired
+    /** ud07Mapper */
+
     private UD07Mapper ud07Mapper;
 
     @Override

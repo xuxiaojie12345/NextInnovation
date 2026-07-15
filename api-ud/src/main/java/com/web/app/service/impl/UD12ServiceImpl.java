@@ -36,6 +36,12 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("null")
 @Service
+/**
+
+ * UD12ServiceImpl
+
+ */
+
 public class UD12ServiceImpl implements UD12Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD12ServiceImpl.class);
@@ -56,12 +62,20 @@ public class UD12ServiceImpl implements UD12Service {
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     @Autowired
+    /** ud12Mapper */
+
     private UD12Mapper ud12Mapper;
 
     /**
      * 初始化时认证网络共享文件夹
      */
     @PostConstruct
+    /**
+
+     * init
+
+     */
+
     public void init() {
         NetworkShareUtil.authenticate(templateRoot, networkUsername, networkPassword);
     }
@@ -79,6 +93,12 @@ public class UD12ServiceImpl implements UD12Service {
      * 对应详细设计 4.1 场景1
      */
     @Override
+    /**
+
+     * selectMarketMaster
+
+     */
+
     public List<UD12MarketResponse> selectMarketMaster() {
         List<MarketMaster> marketMasters = ud12Mapper.selectAllMarketMaster();
 
@@ -97,6 +117,12 @@ public class UD12ServiceImpl implements UD12Service {
      * 从网络共享文件夹读取指定市场目录下的所有模板文件
      */
     @Override
+    /**
+
+     * selectTemplateFiles
+
+     */
+
     public List<UD12TemplateFileResponse> selectTemplateFiles(String marketCode) {
         List<UD12TemplateFileResponse> fileList = new ArrayList<>();
         Path rootPath = getTemplateRootPath();
@@ -141,6 +167,12 @@ public class UD12ServiceImpl implements UD12Service {
      * 3. 将文件保存到网络共享文件夹下的指定市场目录
      */
     @Override
+    /**
+
+     * uploadFile
+
+     */
+
     public UD12FileOperationResponse uploadFile(MultipartFile file, String market) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("NO FILE UPLOADED");
@@ -188,6 +220,12 @@ public class UD12ServiceImpl implements UD12Service {
      * 2. 从网络共享文件夹下指定市场目录删除文件
      */
     @Override
+    /**
+
+     * deleteFile
+
+     */
+
     public UD12FileOperationResponse deleteFile(String market, String fileName) {
         Path rootPath = getTemplateRootPath();
         // 构建文件路径

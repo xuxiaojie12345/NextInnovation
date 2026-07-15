@@ -11,6 +11,12 @@ import java.util.List;
  * 对应全体APIのプロンプト.txt 【UD14SearchresultistApi】
  */
 @Mapper
+/**
+
+ * UD14Mapper
+
+ */
+
 public interface UD14Mapper {
 
     /**

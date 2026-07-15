@@ -25,11 +25,19 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/ud08")
+/**
+
+ * UD08Controller
+
+ */
+
 public class UD08Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD08Controller.class);
 
     @Autowired
+    /** ud08Service */
+
     private UD08Service ud08Service;
 
     /**
@@ -38,6 +46,12 @@ public class UD08Controller {
      * GET /api/ud08/selectproductclassmaster
      */
     @GetMapping("/selectproductclassmaster")
+    /**
+
+     * selectProductClassMaster
+
+     */
+
     public ResponseEntity<List<ProductClassMaster>> selectProductClassMaster() {
         try {
             List<ProductClassMaster> list = ud08Service.selectProductClassMaster();
@@ -54,6 +68,12 @@ public class UD08Controller {
      * GET /api/ud08/selectmarketmaster
      */
     @GetMapping("/selectmarketmaster")
+    /**
+
+     * selectMarketMaster
+
+     */
+
     public ResponseEntity<List<MarketMaster>> selectMarketMaster() {
         try {
             List<MarketMaster> list = ud08Service.selectMarketMaster();
@@ -70,6 +90,12 @@ public class UD08Controller {
      * GET /api/ud08/selecthdocvariables
      */
     @GetMapping("/selecthdocvariables")
+    /**
+
+     * selectHdocVariables
+
+     */
+
     public ResponseEntity<List<HdocVariable>> selectHdocVariables() {
         try {
             List<HdocVariable> list = ud08Service.selectHdocVariables();
@@ -86,6 +112,12 @@ public class UD08Controller {
      * POST /api/ud08/add
      */
     @PostMapping("/add")
+    /**
+
+     * add
+
+     */
+
     public ApiResponse<String> add(@RequestBody UD08AddRequest request) {
         logger.info("UD08Add called - productClass: {}, number: {}, market: {}",
                 request.getProductClass(), request.getNumber(), request.getMarket());
@@ -124,6 +156,12 @@ public class UD08Controller {
      * POST /api/ud08/update
      */
     @PostMapping("/update")
+    /**
+
+     * update
+
+     */
+
     public ApiResponse<String> update(@RequestBody UD08UpdateRequest request) {
         logger.info("UD08Update called - productClass: {}, number: {}, market: {}",
                 request.getProductClass(), request.getNumber(), request.getMarket());
@@ -163,6 +201,12 @@ public class UD08Controller {
      * POST /api/ud08/delete
      */
     @PostMapping("/delete")
+    /**
+
+     * delete
+
+     */
+
     public ApiResponse<String> delete(@RequestBody UD08DeleteRequest request) {
         logger.info("UD08Delete called - productClass: {}, number: {}, market: {}",
                 request.getProductClass(), request.getNumber(), request.getMarket());
@@ -196,6 +240,12 @@ public class UD08Controller {
      * POST /api/ud08/search
      */
     @PostMapping("/search")
+    /**
+
+     * search
+
+     */
+
     public ApiResponse<List<HdocUserDefinedRules>> search(@RequestBody UD08SearchRequest request) {
         logger.info("UD08Search called - productClass: {}, number: {}, market: {}, variable: {}",
                 request.getProductClass(), request.getNumber(), request.getMarket(), request.getVariable());

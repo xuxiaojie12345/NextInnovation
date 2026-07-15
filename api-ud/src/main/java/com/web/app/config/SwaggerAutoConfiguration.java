@@ -22,15 +22,29 @@ import java.util.ArrayList;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties(SwaggerProperties.class)
 @Configuration
+/**
+
+ * SwaggerAutoConfiguration
+
+ */
+
 public class SwaggerAutoConfiguration {
 
   @Autowired
+  /** swaggerProperties */
+
   private SwaggerProperties swaggerProperties;
 
   /**
    * dockect对象对应真实文档
    */
   @Bean
+  /**
+
+   * docket
+
+   */
+
   public Docket docket() {
     // 创建docket对象 指定3.0版本
     Docket docket = new Docket(DocumentationType.OAS_30);// 指定swagger3.0版本
@@ -76,6 +90,12 @@ public class SwaggerAutoConfiguration {
    *
    * @return
    */
+   /**
+
+    * genApiInfo
+
+    */
+
   private ApiInfo genApiInfo() {
     Contact contact = new Contact(swaggerProperties.getName(), swaggerProperties.getUrl(),
         swaggerProperties.getEmail());

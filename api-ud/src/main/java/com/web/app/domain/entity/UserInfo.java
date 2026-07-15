@@ -7,6 +7,12 @@ import java.util.Date;
  * 用户信息实体类
  * 对应数据库表: hdoc_user_infor
  */
+ /**
+
+  * UserInfo
+
+  */
+
 public class UserInfo implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -14,61 +20,85 @@ public class UserInfo implements Serializable {
     /**
      * 用户ID
      */
+     /** userid */
+
     private String userid;
     
     /**
      * 密码
      */
+     /** password */
+
     private String password;
     
     /**
      * 用户名
      */
+     /** username */
+
     private String username;
     
     /**
      * 负责人
      */
+     /** responsible */
+
     private String responsible;
     
     /**
      * 用户职位
      */
+     /** userposition */
+
     private String userposition;
     
     /**
      * 邮箱
      */
+     /** email */
+
     private String email;
     
     /**
      * 注册时间
      */
+     /** registerDatetime */
+
     private Date registerDatetime;
     
     /**
      * 注册用户
      */
+     /** registerUser */
+
     private String registerUser;
     
     /**
      * 注册程序
      */
+     /** registerProcess */
+
     private String registerProcess;
     
     /**
      * 更新时间
      */
+     /** updateDatetime */
+
     private Date updateDatetime;
     
     /**
      * 更新用户
      */
+     /** updateUser */
+
     private String updateUser;
     
     /**
      * 更新程序
      */
+     /** updateProcess */
+
     private String updateProcess;
     
     // Getter and Setter methods

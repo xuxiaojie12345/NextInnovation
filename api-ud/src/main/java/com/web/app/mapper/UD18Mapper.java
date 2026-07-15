@@ -6,6 +6,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
+/**
+
+ * UD18Mapper
+
+ */
+
 public interface UD18Mapper {
 
     List<String> selectFunctionAuth(@Param("userId") String userId);

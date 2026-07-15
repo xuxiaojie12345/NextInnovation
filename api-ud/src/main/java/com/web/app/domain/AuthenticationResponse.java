@@ -6,6 +6,12 @@ import java.io.Serializable;
 /**
  * 认证响应DTO
  */
+ /**
+
+  * AuthenticationResponse
+
+  */
+
 public class AuthenticationResponse implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -13,16 +19,22 @@ public class AuthenticationResponse implements Serializable {
     /**
      * 响应码
      */
+     /** code */
+
     private Integer code;
     
     /**
      * 响应消息
      */
+     /** message */
+
     private String message;
     
     /**
      * 响应数据
      */
+     /** data */
+
     private ResponseData data;
     
     /**
@@ -35,11 +47,15 @@ public class AuthenticationResponse implements Serializable {
         /**
          * 认证成功标志
          */
+         /** success */
+
         private Boolean success;
         
         /**
          * 用户完整信息
          */
+         /** userInfo */
+
         private UserInfo userInfo;
         
         public Boolean getSuccess() {

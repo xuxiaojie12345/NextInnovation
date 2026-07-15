@@ -25,14 +25,28 @@ import java.util.List;
  * 更新HDOC_ADCA_MODIFICATION表的NEWVAL字段。
  */
 @Service
+/**
+
+ * UD05ServiceImpl
+
+ */
+
 public class UD05ServiceImpl implements UD05Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD05ServiceImpl.class);
 
     @Autowired
+    /** ud05Mapper */
+
     private UD05Mapper ud05Mapper;
 
     @Override
+    /**
+
+     * selectVariableModification
+
+     */
+
     public ModifyDocumentQueryResponse selectVariableModification(String serie, String chno) {
         logger.debug("UD05ServiceImpl.selectVariableModification - serie: {}, chno: {}", serie, chno);
 
@@ -58,6 +72,12 @@ public class UD05ServiceImpl implements UD05Service {
     }
 
     @Override
+    /**
+
+     * updateHdocAdcaModification
+
+     */
+
     public boolean updateHdocAdcaModification(String serie, String chno, String variable, String modifiedValue, String updateUser) {
         logger.debug("UD05ServiceImpl.updateHdocAdcaModification - serie: {}, chno: {}, variable: {}, modifiedValue: {}, updateUser: {}",
                 serie, chno, variable, modifiedValue, updateUser);

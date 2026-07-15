@@ -7,6 +7,12 @@ import com.web.app.domain.AuthenticationResponse;
  * UD01服务接口
  * 提供UD01AuthenticationApi接口 - 用户认证
  */
+ /**
+
+  * UD01Service
+
+  */
+
 public interface UD01Service {
     
     /**

@@ -4,9 +4,19 @@ package com.web.app.domain.entity;
 /**
  * PRODUCT_CLASS_MASTER表对应的实体类
  */
+ /**
+
+  * ProductClassMaster
+
+  */
+
 public class ProductClassMaster extends BaseEntity {
 
+/** pc */
+
     private String pc;
+    /** description */
+
     private String description;
 
     public ProductClassMaster() {

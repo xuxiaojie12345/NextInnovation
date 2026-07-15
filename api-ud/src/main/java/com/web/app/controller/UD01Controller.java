@@ -17,9 +17,17 @@ import javax.servlet.http.HttpSession;
 @Api(tags = "认证管理")
 @RestController
 @RequestMapping("/api")
+/**
+
+ * UD01Controller
+
+ */
+
 public class UD01Controller {
     
     @Autowired
+    /** ud01Service */
+
     private UD01Service ud01Service;
     
     /**
@@ -31,6 +39,12 @@ public class UD01Controller {
      */
     @ApiOperation(value = "用户认证", notes = "验证用户名和密码,成功后将用户信息存储到Session")
     @PostMapping("/authentication")
+    /**
+
+     * authenticate
+
+     */
+
     public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request, HttpSession session) {
         // 调用服务层进行认证
         AuthenticationResponse response = ud01Service.authenticate(request);

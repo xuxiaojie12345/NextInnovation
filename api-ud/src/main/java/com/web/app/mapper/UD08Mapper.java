@@ -15,6 +15,12 @@ import java.util.List;
  * 认证变量管理（Homologation Variables）
  */
 @Mapper
+/**
+
+ * UD08Mapper
+
+ */
+
 public interface UD08Mapper {
 
     /**

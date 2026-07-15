@@ -8,6 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * 包含车辆基本信息、发动机/符号信息、S-Note信息
  */
+ /**
+
+  * VehicleSpecificationResponse
+
+  */
+
 public class VehicleSpecificationResponse {
     
     /** 车辆基本信息 */
@@ -48,14 +54,32 @@ public class VehicleSpecificationResponse {
      * 车辆基本信息
      */
     public static class ChassisInfo {
+    /** chassisNo */
+
         private String chassisNo;
+        /** model */
+
         private String model;
+        /** buildWeek */
+
         private String buildWeek;
+        /** productType */
+
         private String productType;
+        /** vin */
+
         private String vin;
+        /** countryOfOperation */
+
         private String countryOfOperation;
+        /** familyId */
+
         private String familyId;
+        /** variantId */
+
         private String variantId;
+        /** sNoteNo */
+
         private String sNoteNo;
 
         public String getChassisNo() {
@@ -136,8 +160,14 @@ public class VehicleSpecificationResponse {
      * 发动机/符号信息
      */
     public static class EngineInfo {
+    /** engineNo */
+
         private String engineNo;
+        /** symbolStr */
+
         private String symbolStr;
+        /** description */
+
         private String description;
 
         public String getEngineNo() {

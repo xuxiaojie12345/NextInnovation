@@ -9,12 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+/**
+
+ * UD21ServiceImpl
+
+ */
+
 public class UD21ServiceImpl implements UD21Service {
 
     @Autowired
+    /** ud21Mapper */
+
     private UD21Mapper ud21Mapper;
 
     @Override
+    /**
+
+     * getMarket
+
+     */
+
     public List<Map<String, String>> getMarket() {
         return ud21Mapper.selectMarket();
     }

@@ -26,29 +26,61 @@ import java.util.List;
  * 认证变量管理（Homologation Variables）
  */
 @Service
+/**
+
+ * UD08ServiceImpl
+
+ */
+
 public class UD08ServiceImpl implements UD08Service {
 
     private static final Logger logger = LoggerFactory.getLogger(UD08ServiceImpl.class);
 
     @Autowired
+    /** ud08Mapper */
+
     private UD08Mapper ud08Mapper;
 
     @Override
+    /**
+
+     * selectProductClassMaster
+
+     */
+
     public List<ProductClassMaster> selectProductClassMaster() {
         return ud08Mapper.selectAllProductClassMaster();
     }
 
     @Override
+    /**
+
+     * selectMarketMaster
+
+     */
+
     public List<MarketMaster> selectMarketMaster() {
         return ud08Mapper.selectAllMarketMaster();
     }
 
     @Override
+    /**
+
+     * selectHdocVariables
+
+     */
+
     public List<HdocVariable> selectHdocVariables() {
         return ud08Mapper.selectAllHdocVariables();
     }
 
     @Override
+    /**
+
+     * UD08Add
+
+     */
+
     public String UD08Add(UD08AddRequest request) {
         String pc = request.getProductClass();
         String num = request.getNumber();
@@ -84,6 +116,12 @@ public class UD08ServiceImpl implements UD08Service {
     }
 
     @Override
+    /**
+
+     * UD08Update
+
+     */
+
     public String UD08Update(UD08UpdateRequest request) {
         String pc = request.getProductClass();
         String num = request.getNumber();
@@ -129,6 +167,12 @@ public class UD08ServiceImpl implements UD08Service {
     }
 
     @Override
+    /**
+
+     * UD08Delete
+
+     */
+
     public String UD08Delete(UD08DeleteRequest request) {
         String pc = request.getProductClass();
         String num = request.getNumber();
@@ -150,6 +194,12 @@ public class UD08ServiceImpl implements UD08Service {
     /**
      * 构建HDOC_USER_DEFINED_RULES实体对象
      */
+     /**
+
+      * buildRecord
+
+      */
+
     private HdocUserDefinedRules buildRecord(String pc, String num, String market, Object request) {
         HdocUserDefinedRules record = new HdocUserDefinedRules();
         record.setPc(pc);
@@ -180,11 +230,23 @@ public class UD08ServiceImpl implements UD08Service {
     }
 
     @Override
+    /**
+
+     * UD08Search
+
+     */
+
     public List<HdocUserDefinedRules> UD08Search(UD08SearchRequest request) {
         return ud08Mapper.searchUserDefinedRules(request);
     }
 
     @Override
+    /**
+
+     * batchDelete
+
+     */
+
     public UD09BatchDeleteResponse batchDelete(List<UD09BatchDeleteRequest> requests) {
         int deletedCount = 0;
         int failedCount = 0;

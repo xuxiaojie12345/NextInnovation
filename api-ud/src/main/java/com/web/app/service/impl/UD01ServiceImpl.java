@@ -12,9 +12,17 @@ import org.springframework.stereotype.Service;
  * UD01服务实现类
  */
 @Service
+/**
+
+ * UD01ServiceImpl
+
+ */
+
 public class UD01ServiceImpl implements UD01Service {
     
     @Autowired
+    /** userInfoMapper */
+
     private UserInfoMapper userInfoMapper;
     
     /**
@@ -24,6 +32,12 @@ public class UD01ServiceImpl implements UD01Service {
      * @return 认证响应(包含成功标志和完整用户信息)
      */
     @Override
+    /**
+
+     * authenticate
+
+     */
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         AuthenticationResponse response = new AuthenticationResponse();
         AuthenticationResponse.ResponseData responseData = new AuthenticationResponse.ResponseData();

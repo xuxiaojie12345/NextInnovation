@@ -19,11 +19,19 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/ud11")
+/**
+
+ * UD11Controller
+
+ */
+
 public class UD11Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD11Controller.class);
 
     @Autowired
+    /** ud11Service */
+
     private UD11Service ud11Service;
 
     /**
@@ -33,6 +41,12 @@ public class UD11Controller {
      * POST /api/ud11/search
      */
     @PostMapping("/search")
+    /**
+
+     * search
+
+     */
+
     public ApiResponse<List<HdocVariable>> search(@RequestBody UD10SearchRequest request) {
         logger.info("UD11Search called - variable: {}, type: {}, description: {}, userid: {}",
                 request.getVariable(), request.getType(), request.getDescription(), request.getUserid());

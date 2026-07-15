@@ -21,11 +21,19 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/ud10")
+/**
+
+ * UD10Controller
+
+ */
+
 public class UD10Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(UD10Controller.class);
 
     @Autowired
+    /** ud10Service */
+
     private UD10Service ud10Service;
 
     /**
@@ -34,6 +42,12 @@ public class UD10Controller {
      * POST /api/ud10/search
      */
     @PostMapping("/search")
+    /**
+
+     * search
+
+     */
+
     public ApiResponse<List<HdocVariable>> search(@RequestBody UD10SearchRequest request) {
         logger.info("UD10Search called - variable: {}, type: {}, description: {}, userid: {}",
                 request.getVariable(), request.getType(), request.getDescription(), request.getUserid());
@@ -52,6 +66,12 @@ public class UD10Controller {
      * GET /api/ud10/hdocvariables/{variable}
      */
     @GetMapping("/hdocvariables/{variable}")
+    /**
+
+     * selectByVariable
+
+     */
+
     public ResponseEntity<HdocVariable> selectByVariable(@PathVariable("variable") String variable) {
         logger.info("UD10SelectByVariable called - variable: {}", variable);
 
@@ -72,6 +92,12 @@ public class UD10Controller {
      * POST /api/ud10/add
      */
     @PostMapping("/add")
+    /**
+
+     * add
+
+     */
+
     public ApiResponse<String> add(@RequestBody UD10Request request) {
         logger.info("UD10Add called - variable: {}, type: {}, description: {}",
                 request.getVariable(), request.getType(), request.getDescription());
@@ -107,6 +133,12 @@ public class UD10Controller {
      * POST /api/ud10/update
      */
     @PostMapping("/update")
+    /**
+
+     * update
+
+     */
+
     public ApiResponse<String> update(@RequestBody UD10Request request) {
         logger.info("UD10Update called - variable: {}, type: {}, description: {}",
                 request.getVariable(), request.getType(), request.getDescription());
@@ -142,6 +174,12 @@ public class UD10Controller {
      * POST /api/ud10/delete
      */
     @PostMapping("/delete")
+    /**
+
+     * delete
+
+     */
+
     public ApiResponse<String> delete(@RequestBody UD10Request request) {
         logger.info("UD10Delete called - variable: {}", request.getVariable());
 
