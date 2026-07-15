@@ -31,11 +31,8 @@ const UploadDeleteTemplate: React.FC = () => {
   // 获取市场列表
   const fetchMarketList = async () => {
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud12UploadDeletetemplat/getMarketList`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud12UploadDeletetemplat/getMarketList`,
       );
 
       if (!response.ok) {
@@ -49,13 +46,7 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Failed to load market list");
       }
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "System error. Please contact administrator.",
-      );
-    }
+    } catch (err) {}
   };
 
   // 处理上传区域的市场选择变化
@@ -84,11 +75,9 @@ const UploadDeleteTemplate: React.FC = () => {
   const fetchTemplateFiles = async (marketCode: string) => {
     try {
       setIsLoading(true);
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
 
       const response = await fetch(
-        `${API_BASE_URL}/api/template/files/${marketCode}`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/template/files/${marketCode}`,
       );
 
       if (!response.ok) {
@@ -102,16 +91,7 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setTemplates([]);
       }
-    } catch (error) {
-      setTemplates([]);
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "System error. Please contact administrator.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // 处理文件选择
@@ -148,18 +128,18 @@ const UploadDeleteTemplate: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       // 构建FormData（确保使用file对象的原始数据）
       const formData = new FormData();
       formData.append("file", selectedFile, selectedFile.name);
       formData.append("market", uploadMarket);
 
-      const response = await fetch(`${API_BASE_URL}/api/template/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/template/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -185,21 +165,7 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Upload failed");
       }
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "System error. Please contact administrator.",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // 删除模板功能
@@ -221,19 +187,19 @@ const UploadDeleteTemplate: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
-      const response = await fetch(`${API_BASE_URL}/api/template/delete`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/template/delete`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            market: deleteMarket,
+            fileName: selectedTemplate,
+          }),
         },
-        body: JSON.stringify({
-          market: deleteMarket,
-          fileName: selectedTemplate,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -254,21 +220,7 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Delete failed");
       }
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "System error. Please contact administrator.",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // 跳转到模板检查页面
@@ -277,41 +229,41 @@ const UploadDeleteTemplate: React.FC = () => {
   };
 
   return (
-    <div className="udt-container">
+    <div className='udt-container'>
       {isLoading && (
-        <div className="udt-loading-overlay">
-          <div className="udt-loading">Uploading...</div>
+        <div className='udt-loading-overlay'>
+          <div className='udt-loading'>Uploading...</div>
         </div>
       )}
       {/* 消息显示 */}
-      {errorMessage && <div className="udt-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='udt-error-message'>{errorMessage}</div>}
       {successMessage && (
-        <div className="udt-success-message">{successMessage}</div>
+        <div className='udt-success-message'>{successMessage}</div>
       )}
 
       {/* HDoc Template Upload区域 */}
-      <div className="udt-section">
-        <h2 className="udt-section-title">HDoc Template Upload</h2>
+      <div className='udt-section'>
+        <h2 className='udt-section-title'>HDoc Template Upload</h2>
 
-        <div className="udt-form-group">
-          <label className="udt-label">Template File:</label>
+        <div className='udt-form-group'>
+          <label className='udt-label'>Template File:</label>
           <input
-            id="template-file-input"
-            type="file"
-            className="udt-file-input"
+            id='template-file-input'
+            type='file'
+            className='udt-file-input'
             onChange={handleFileSelect}
-            accept=".rtf,.docx,.doc,.xlsx,.xls"
+            accept='.rtf,.docx,.doc,.xlsx,.xls'
           />
         </div>
 
-        <div className="udt-form-group">
-          <label className="udt-label">Market:</label>
+        <div className='udt-form-group'>
+          <label className='udt-label'>Market:</label>
           <select
-            className="udt-select"
+            className='udt-select'
             value={uploadMarket}
             onChange={(e) => handleUploadMarketChange(e.target.value)}
           >
-            <option value="">请选择</option>
+            <option value=''>请选择</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -320,9 +272,9 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className="udt-button-row">
+        <div className='udt-button-row'>
           <button
-            className="udt-btn"
+            className='udt-btn'
             onClick={handleUpload}
             disabled={isLoading}
           >
@@ -331,7 +283,7 @@ const UploadDeleteTemplate: React.FC = () => {
         </div>
 
         {/* 提示信息 */}
-        <div className="udt-info-text">
+        <div className='udt-info-text'>
           Before uploading new VIN plate templates, inform
           support.tpi@volvo.com, to make sure that the connection to the cab
           factory will work.
@@ -339,17 +291,17 @@ const UploadDeleteTemplate: React.FC = () => {
       </div>
 
       {/* HDoc Template Delete/Archive区域 */}
-      <div className="udt-section">
-        <h2 className="udt-section-title">HDoc Template Delete/Archive</h2>
+      <div className='udt-section'>
+        <h2 className='udt-section-title'>HDoc Template Delete/Archive</h2>
 
-        <div className="udt-form-group">
-          <label className="udt-label">Market:</label>
+        <div className='udt-form-group'>
+          <label className='udt-label'>Market:</label>
           <select
-            className="udt-select"
+            className='udt-select'
             value={deleteMarket}
             onChange={(e) => handleDeleteMarketChange(e.target.value)}
           >
-            <option value="">请选择</option>
+            <option value=''>请选择</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -358,15 +310,15 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className="udt-form-group">
-          <label className="udt-label">Templates:</label>
+        <div className='udt-form-group'>
+          <label className='udt-label'>Templates:</label>
           <select
-            className="udt-select"
+            className='udt-select'
             value={selectedTemplate}
             onChange={(e) => handleTemplateSelect(e.target.value)}
             disabled={!deleteMarket || isLoading}
           >
-            <option value="">请选择</option>
+            <option value=''>请选择</option>
             {templates.map((item, index) => (
               <option key={index} value={item.fileName}>
                 {item.fileName}
@@ -375,9 +327,9 @@ const UploadDeleteTemplate: React.FC = () => {
           </select>
         </div>
 
-        <div className="udt-button-row">
+        <div className='udt-button-row'>
           <button
-            className="udt-btn"
+            className='udt-btn'
             onClick={handleDelete}
             disabled={isLoading}
           >
@@ -387,26 +339,23 @@ const UploadDeleteTemplate: React.FC = () => {
       </div>
 
       {/* Check your rtf template区域 */}
-      <div className="udt-section">
-        <h3 className="udt-subsection-title">Check your rtf template</h3>
+      <div className='udt-section'>
+        <h3 className='udt-subsection-title'>Check your rtf template</h3>
 
-        <div className="udt-description">
+        <div className='udt-description'>
           In case you have a rtf template you should run a check on it before
           uploading it. After check download the template to your desktop and
           then upload it to your template directory. Use the link below.
         </div>
 
-        <div className="udt-link-row">
-          <a
-            href="#"
-            className="udt-link"
-            onClick={(e) => {
-              e.preventDefault();
-              handleCheckTemplate();
-            }}
+        <div className='udt-link-row'>
+          <button
+            type='button'
+            className='udt-link'
+            onClick={handleCheckTemplate}
           >
             Check Template (Only for rtf files)
-          </a>
+          </button>
         </div>
       </div>
     </div>

@@ -15,9 +15,6 @@ const HDocUserDocAdministration: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
 
-  const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
   // 页面初始化：加载文档列表
   React.useEffect(() => {
     fetchDocumentList();
@@ -28,7 +25,7 @@ const HDocUserDocAdministration: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${API_BASE_URL}/api/ud18HDocUserDocAdministration/getDocumentList`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud18HDocUserDocAdministration/getDocumentList`,
         {
           method: "GET",
           headers: {
@@ -72,7 +69,7 @@ const HDocUserDocAdministration: React.FC = () => {
 
       // 调用API查询用户信息和文档权限
       const response = await fetch(
-        `${API_BASE_URL}/api/ud18HDocUserDocAdministration/getUserFunctionsAndDocuments`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud18HDocUserDocAdministration/getUserFunctionsAndDocuments`,
         {
           method: "POST",
           headers: {
@@ -153,7 +150,7 @@ const HDocUserDocAdministration: React.FC = () => {
 
       // 调用API更新用户文档权限
       const response = await fetch(
-        `${API_BASE_URL}/api/ud18HDocUserDocAdministration/updateUserDocuments`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud18HDocUserDocAdministration/updateUserDocuments`,
         {
           method: "POST",
           headers: {
@@ -186,12 +183,6 @@ const HDocUserDocAdministration: React.FC = () => {
         }
       }
     } catch (error: any) {
-      // 判断是否是网络错误
-      if (error.message === "Failed to fetch") {
-        setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
-      } else {
-        setErrorMessage("系统内部错误，请联系管理员");
-      }
     } finally {
       setIsLoading(false);
     }
@@ -206,25 +197,25 @@ const HDocUserDocAdministration: React.FC = () => {
   };
 
   return (
-    <div className="hudua-container">
+    <div className='hudua-container'>
       {/* 标题 */}
-      <h1 className="hudua-title">HDoc Document Authorization</h1>
+      <h1 className='hudua-title'>HDoc Document Authorization</h1>
 
       {/* 边框容器 */}
-      <div className="hudua-border-box">
+      <div className='hudua-border-box'>
         {/* UserID和User Info区域 */}
-        <div className="hudua-userid-section">
-          <label className="hudua-label">Userid:</label>
+        <div className='hudua-userid-section'>
+          <label className='hudua-label'>Userid:</label>
           <input
-            type="text"
-            className="hudua-input-userid"
+            type='text'
+            className='hudua-input-userid'
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             maxLength={10}
             disabled={isLoading}
           />
           <button
-            className="hudua-button"
+            className='hudua-button'
             onClick={handleUserInfo}
             disabled={isLoading}
           >
@@ -233,15 +224,15 @@ const HDocUserDocAdministration: React.FC = () => {
         </div>
 
         {/* User显示区域 */}
-        <div className="hudua-user-section">
-          <label className="hudua-label">User:</label>
-          <span className="hudua-user-name">{userName}</span>
+        <div className='hudua-user-section'>
+          <label className='hudua-label'>User:</label>
+          <span className='hudua-user-name'>{userName}</span>
         </div>
 
         {/* Document多选列表区域 */}
-        <div className="hudua-document-section">
+        <div className='hudua-document-section'>
           <select
-            className="hudua-document-list"
+            className='hudua-document-list'
             multiple
             value={authorizedDocuments}
             onChange={handleDocumentChange}
@@ -257,9 +248,9 @@ const HDocUserDocAdministration: React.FC = () => {
         </div>
 
         {/* Update按钮区域 */}
-        <div className="hudua-update-section">
+        <div className='hudua-update-section'>
           <button
-            className="hudua-button-update"
+            className='hudua-button-update'
             onClick={handleUpdate}
             disabled={isLoading}
           >
@@ -269,12 +260,12 @@ const HDocUserDocAdministration: React.FC = () => {
 
         {/* 错误消息显示 */}
         {errorMessage && (
-          <div className="hudua-error-message">{errorMessage}</div>
+          <div className='hudua-error-message'>{errorMessage}</div>
         )}
 
         {/* 成功消息显示 */}
         {successMessage && (
-          <div className="hudua-success-message">{successMessage}</div>
+          <div className='hudua-success-message'>{successMessage}</div>
         )}
       </div>
     </div>

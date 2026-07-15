@@ -77,69 +77,57 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
   };
 
   return (
-    <div className="download-quick-guides-container">
+    <div className='download-quick-guides-container'>
       {/* VOLVO Header */}
-      <div className="volvo-header">
+      <div className='volvo-header'>
         <h1>VOLVO</h1>
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className='main-content'>
         {/* Back Link and Title */}
-        <div className="header-section">
-          <button onClick={handleBack} className="back-link">
+        <div className='header-section'>
+          <button onClick={handleBack} className='back-link'>
             Back
           </button>
-          <h3 className="volvo-3p-title">Download and Print Quick Guides</h3>
+          <h3 className='volvo-3p-title'>Download and Print Quick Guides</h3>
         </div>
 
         {/* Quick Guides Grid */}
-        <div className="guides-grid">
+        <div className='guides-grid'>
           {quickGuides.map((guide) => (
-            <div key={guide.id} className="guide-item">
-              <div className="guide-image-container">
+            <div key={guide.id} className='guide-item'>
+              <div className='guide-image-container'>
                 <img
                   src={guide.image}
                   alt={guide.name}
-                  className="guide-thumbnail"
+                  className='guide-thumbnail'
                   onError={(e) => {
                     // 如果图片加载失败，显示占位符
                     e.currentTarget.src = "/image/placeholder-guide.png";
                   }}
                 />
               </div>
-              <a
-                href="#"
-                className="guide-link"
-                onClick={(e) => e.preventDefault()}
-              >
-                {guide.name}
-              </a>
+              <button className='guide-link'>{guide.name}</button>
             </div>
           ))}
         </div>
 
         {/* Note Section */}
-        <div className="note-section">
-          <p className="note-text">
+        <div className='note-section'>
+          <p className='note-text'>
             (Note that the font Volvo Broad is removed from the Quick Guides
             because of problems)
           </p>
         </div>
 
         {/* Volvo 3P Quick Guides Section */}
-        <div className="volvo-3p-section">
-          <h3 className="volvo-3p-title">Volvo 3P Quick Guides</h3>
-          <ul className="volvo-3p-list">
+        <div className='volvo-3p-section'>
+          <h3 className='volvo-3p-title'>Volvo 3P Quick Guides</h3>
+          <ul className='volvo-3p-list'>
             {volvo3PGuides.map((guide, index) => (
               <li key={index}>
-                <a
-                  href="#"
-                  className="volvo-3p-link"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  {guide}
-                </a>
+                <button className='volvo-3p-link'>{guide}</button>
               </li>
             ))}
           </ul>

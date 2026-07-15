@@ -81,7 +81,6 @@ const HomologationVariables: React.FC = () => {
   const [variableList, setVariableList] = useState<VariableItem[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -173,12 +172,9 @@ const HomologationVariables: React.FC = () => {
   // 获取下拉列表数据
   const fetchDropdownData = async () => {
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       // 获取Product class列表
       const pcResponse = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/getProductClassMaster`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/getProductClassMaster`,
       );
       if (pcResponse.ok) {
         const pcData = await pcResponse.json();
@@ -189,7 +185,7 @@ const HomologationVariables: React.FC = () => {
 
       // 获取Market列表
       const marketResponse = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/getMarketMaster`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/getMarketMaster`,
       );
       if (marketResponse.ok) {
         const marketData = await marketResponse.json();
@@ -200,7 +196,7 @@ const HomologationVariables: React.FC = () => {
 
       // 获取Variable列表
       const varResponse = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/getHdocVariables`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/getHdocVariables`,
       );
       if (varResponse.ok) {
         const varData = await varResponse.json();
@@ -208,9 +204,7 @@ const HomologationVariables: React.FC = () => {
           setVariableList(varData.data);
         }
       }
-    } catch (error) {
-      setErrorMessage("系统内部错误，请联系管理员");
-    }
+    } catch (err) {}
   };
 
   // 获取当前用户信息和日期
@@ -232,10 +226,8 @@ const HomologationVariables: React.FC = () => {
         }));
       } else {
         // 如果没有登录用户，尝试从后端 API 获取
-        const API_BASE_URL =
-          process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
         const response = await fetch(
-          `${API_BASE_URL}/api/ud08HomologationVariables/getCurrentUserInfo`,
+          `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/getCurrentUserInfo`,
         );
 
         if (response.ok) {
@@ -475,16 +467,12 @@ const HomologationVariables: React.FC = () => {
 
     // 验证Variable
     if (formData.variable && !(await validateVariable())) return;
-
-    setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/add`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/add`,
         {
           method: "POST",
           headers: {
@@ -519,19 +507,7 @@ const HomologationVariables: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "添加失败");
       }
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error ? error.message : "系统内部错误，请联系管理员",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // Update功能
@@ -541,16 +517,12 @@ const HomologationVariables: React.FC = () => {
 
     // 验证Variable
     if (formData.variable && !(await validateVariable())) return;
-
-    setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/update`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/update`,
         {
           method: "POST",
           headers: {
@@ -584,36 +556,19 @@ const HomologationVariables: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "更新失败");
       }
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error ? error.message : "系统内部错误，请联系管理员",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // Delete功能
   const handleDelete = async () => {
     if (!validateFieldChars()) return;
     if (!validateRequiredFields()) return;
-
-    setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud08HomologationVariables/delete`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud08HomologationVariables/delete`,
         {
           method: "DELETE",
           headers: {
@@ -642,86 +597,66 @@ const HomologationVariables: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "删除失败");
       }
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        setErrorMessage(
-          `无法连接到后端服务，请确认后端服务已启动（${process.env.REACT_APP_API_BASE_URL || "http://localhost:8081"}）`,
-        );
-      } else {
-        setErrorMessage(
-          error instanceof Error ? error.message : "系统内部错误，请联系管理员",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
-  if (isLoading) {
-    return (
-      <div className="hv-container">
-        <div className="hv-loading">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="hv-container">
+    <div className='hv-container'>
       {/* 标题 */}
-      <h1 className="hv-title">Homologation Variables</h1>
+      <h1 className='hv-title'>Homologation Variables</h1>
 
       {/* 边框容器 - 包含按钮和表单 */}
-      <div className="hv-border-box">
+      <div className='hv-border-box'>
         {/* 错误消息显示 */}
-        {errorMessage && <div className="hv-error-message">{errorMessage}</div>}
+        {errorMessage && <div className='hv-error-message'>{errorMessage}</div>}
 
         {/* 成功消息显示 */}
         {successMessage && (
-          <div className="hv-success-message">{successMessage}</div>
+          <div className='hv-success-message'>{successMessage}</div>
         )}
 
         {/* 按钮区域 */}
-        <div className="hv-button-bar">
-          <button className="hv-btn" onClick={handleSearchList}>
+        <div className='hv-button-bar'>
+          <button className='hv-btn' onClick={handleSearchList}>
             Search
           </button>
-          <button className="hv-btn" onClick={handleClear}>
+          <button className='hv-btn' onClick={handleClear}>
             Clear
           </button>
-          <button className="hv-btn" onClick={handleAdd}>
+          <button className='hv-btn' onClick={handleAdd}>
             Add
           </button>
-          <button className="hv-btn" onClick={handleUpdate}>
+          <button className='hv-btn' onClick={handleUpdate}>
             Update
           </button>
-          <button className="hv-btn" onClick={handleDelete}>
+          <button className='hv-btn' onClick={handleDelete}>
             Delete
           </button>
         </div>
 
         {/* 表单区域 */}
-        <div className="hv-form-section">
+        <div className='hv-form-section'>
           {/* Product class */}
-          <div className="hv-form-row">
-            <label className="hv-label-required">*Product class</label>
+          <div className='hv-form-row'>
+            <label className='hv-label-required'>*Product class</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.productClassOperator}
               onChange={(e) =>
                 handleInputChange("productClassOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <select
-              className="hv-select"
+              className='hv-select'
               value={formData.productClass}
               onChange={(e) =>
                 handleInputChange("productClass", e.target.value)
               }
             >
-              <option value="">请选择</option>
+              <option value=''>请选择</option>
               {productClassList.map((item, index) => (
                 <option key={index} value={item.pc}>
                   {item.pc}
@@ -731,22 +666,22 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Number */}
-          <div className="hv-form-row">
-            <label className="hv-label-required">*Number</label>
+          <div className='hv-form-row'>
+            <label className='hv-label-required'>*Number</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.numberOperator}
               onChange={(e) =>
                 handleInputChange("numberOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value=">">&gt;</option>
-              <option value="<">&lt;</option>
+              <option value='='>=</option>
+              <option value='>'>&gt;</option>
+              <option value='<'>&lt;</option>
             </select>
             <input
-              type="text"
-              className="hv-input-short"
+              type='text'
+              className='hv-input-short'
               value={formData.number}
               onChange={(e) => handleInputChange("number", e.target.value)}
               maxLength={10}
@@ -754,24 +689,24 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Market */}
-          <div className="hv-form-row">
-            <label className="hv-label-required">*Market</label>
+          <div className='hv-form-row'>
+            <label className='hv-label-required'>*Market</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.marketOperator}
               onChange={(e) =>
                 handleInputChange("marketOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <select
-              className="hv-select-short"
+              className='hv-select-short'
               value={formData.market}
               onChange={(e) => handleInputChange("market", e.target.value)}
             >
-              <option value="">请选择</option>
+              <option value=''>请选择</option>
               {marketList.map((item, index) => (
                 <option key={index} value={item.market}>
                   {item.market}
@@ -781,21 +716,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variable */}
-          <div className="hv-form-row">
-            <label className="hv-label">Variable</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Variable</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.variableOperator}
               onChange={(e) =>
                 handleInputChange("variableOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-medium"
+              type='text'
+              className='hv-input-medium'
               value={formData.variable}
               onChange={(e) => handleInputChange("variable", e.target.value)}
               maxLength={20}
@@ -803,21 +738,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Value */}
-          <div className="hv-form-row">
-            <label className="hv-label">Value</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Value</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.valueOperator}
               onChange={(e) =>
                 handleInputChange("valueOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-long"
+              type='text'
+              className='hv-input-long'
               value={formData.value}
               onChange={(e) => handleInputChange("value", e.target.value)}
               maxLength={200}
@@ -825,21 +760,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variant string.1 */}
-          <div className="hv-form-row">
-            <label className="hv-label">Variant string.</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Variant string.</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.variantString1Operator}
               onChange={(e) =>
                 handleInputChange("variantString1Operator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-long"
+              type='text'
+              className='hv-input-long'
               value={formData.variantString1}
               onChange={(e) =>
                 handleInputChange("variantString1", e.target.value)
@@ -849,21 +784,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Variant string.2 */}
-          <div className="hv-form-row">
-            <label className="hv-label"></label>
+          <div className='hv-form-row'>
+            <label className='hv-label'></label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.variantString2Operator}
               onChange={(e) =>
                 handleInputChange("variantString2Operator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-long"
+              type='text'
+              className='hv-input-long'
               value={formData.variantString2}
               onChange={(e) =>
                 handleInputChange("variantString2", e.target.value)
@@ -873,21 +808,21 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Comments */}
-          <div className="hv-form-row">
-            <label className="hv-label">Comments</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Comments</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.commentsOperator}
               onChange={(e) =>
                 handleInputChange("commentsOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-long"
+              type='text'
+              className='hv-input-long'
               value={formData.comments}
               onChange={(e) => handleInputChange("comments", e.target.value)}
               maxLength={100}
@@ -895,69 +830,69 @@ const HomologationVariables: React.FC = () => {
           </div>
 
           {/* Add */}
-          <div className="hv-form-row">
-            <label className="hv-label">Add</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Add</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.addDateOperator}
               onChange={(e) =>
                 handleInputChange("addDateOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-short"
+              type='text'
+              className='hv-input-short'
               value={formData.addDate}
               onChange={(e) => handleInputChange("addDate", e.target.value)}
               maxLength={6}
-              placeholder="YYYYMM"
+              placeholder='YYYYMM'
             />
-            <span className="hv-auto-text">YYYYWW</span>
+            <span className='hv-auto-text'>YYYYWW</span>
           </div>
 
           {/* Delete */}
-          <div className="hv-form-row">
-            <label className="hv-label">Delete</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Delete</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.deleteDateOperator}
               onChange={(e) =>
                 handleInputChange("deleteDateOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-short"
+              type='text'
+              className='hv-input-short'
               value={formData.deleteDate}
               onChange={(e) => handleInputChange("deleteDate", e.target.value)}
               maxLength={6}
-              placeholder="YYYYMM"
+              placeholder='YYYYMM'
             />
-            <span className="hv-auto-text">YYYYWW</span>
+            <span className='hv-auto-text'>YYYYWW</span>
           </div>
 
           {/* Created by user */}
-          <div className="hv-form-row">
-            <label className="hv-label">Created by user</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Created by user</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.createdByUserOperator}
               onChange={(e) =>
                 handleInputChange("createdByUserOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value="!=">≠</option>
+              <option value='='>=</option>
+              <option value='!='>≠</option>
             </select>
             <input
-              type="text"
-              className="hv-input-medium"
+              type='text'
+              className='hv-input-medium'
               value={formData.createdByUser}
               onChange={(e) =>
                 handleInputChange("createdByUser", e.target.value)
@@ -965,31 +900,31 @@ const HomologationVariables: React.FC = () => {
               maxLength={16}
               readOnly
             />
-            <span className="hv-auto-text">Automatic</span>
+            <span className='hv-auto-text'>Automatic</span>
           </div>
 
           {/* Date */}
-          <div className="hv-form-row">
-            <label className="hv-label">Date</label>
+          <div className='hv-form-row'>
+            <label className='hv-label'>Date</label>
             <select
-              className="hv-operator-select"
+              className='hv-operator-select'
               value={formData.dateOperator}
               onChange={(e) =>
                 handleInputChange("dateOperator", e.target.value)
               }
             >
-              <option value="=">=</option>
-              <option value=">">&gt;</option>
-              <option value="<">&lt;</option>
+              <option value='='>=</option>
+              <option value='>'>&gt;</option>
+              <option value='<'>&lt;</option>
             </select>
             <input
-              type="text"
-              className="hv-input-short"
+              type='text'
+              className='hv-input-short'
               value={formData.date}
               onChange={(e) => handleInputChange("date", e.target.value)}
               readOnly
             />
-            <span className="hv-auto-text">Automatic</span>
+            <span className='hv-auto-text'>Automatic</span>
           </div>
         </div>
       </div>

@@ -34,7 +34,6 @@ const HomologationVariablesResultList: React.FC = () => {
   // 页面初始化：调用API获取搜索结果
   useEffect(() => {
     fetchSearchResults();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 调用UD08Search API获取搜索结果
@@ -44,11 +43,8 @@ const HomologationVariablesResultList: React.FC = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/search`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/search`,
         {
           method: "POST",
           headers: {
@@ -161,11 +157,8 @@ const HomologationVariablesResultList: React.FC = () => {
         };
       });
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/deleteSelected`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud09DeleteHdocuserdefinedrules/deleteSelected`,
         {
           method: "POST",
           headers: {
@@ -220,45 +213,45 @@ const HomologationVariablesResultList: React.FC = () => {
   };
 
   return (
-    <div className="hvrl-container">
+    <div className='hvrl-container'>
       {/* 标题 */}
-      <h1 className="hvrl-title">Homologation Variables</h1>
+      <h1 className='hvrl-title'>Homologation Variables</h1>
 
       {/* 错误消息 */}
-      {errorMessage && <div className="hvrl-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='hvrl-error-message'>{errorMessage}</div>}
 
       {/* 成功消息 */}
       {successMessage && (
-        <div className="hvrl-success-message">{successMessage}</div>
+        <div className='hvrl-success-message'>{successMessage}</div>
       )}
 
       {/* 边框容器 */}
-      <div className="hvrl-border-box">
+      <div className='hvrl-border-box'>
         {/* 按钮区域 */}
-        <div className="hvrl-button-bar">
+        <div className='hvrl-button-bar'>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleSelect}
             disabled={isLoading}
           >
             Select
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleBack}
             disabled={isLoading}
           >
             Back
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handlePrint}
             disabled={isLoading}
           >
             Print
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleDeleteSelected}
             disabled={isLoading}
           >
@@ -267,31 +260,31 @@ const HomologationVariablesResultList: React.FC = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className="hvrl-table-container">
+        <div className='hvrl-table-container'>
           {isLoading ? (
-            <div className="hvrl-loading">Loading...</div>
+            <div className='hvrl-loading'>Loading...</div>
           ) : (
-            <table className="hvrl-table">
+            <table className='hvrl-table'>
               <thead>
                 <tr>
-                  <th className="hvrl-checkbox-col"></th>
-                  <th className="hvrl-th">*Product class</th>
-                  <th className="hvrl-th">*Number</th>
-                  <th className="hvrl-th">*Market</th>
-                  <th className="hvrl-th">Variable</th>
-                  <th className="hvrl-th">Value</th>
-                  <th className="hvrl-th">Variant string.</th>
-                  <th className="hvrl-th">Comments</th>
-                  <th className="hvrl-th">Add (YYYYWW)</th>
-                  <th className="hvrl-th">Delete (YYYYWW)</th>
-                  <th className="hvrl-th">Created by user (Automatic)</th>
-                  <th className="hvrl-th">Date (Automatic)</th>
+                  <th className='hvrl-checkbox-col'></th>
+                  <th className='hvrl-th'>*Product class</th>
+                  <th className='hvrl-th'>*Number</th>
+                  <th className='hvrl-th'>*Market</th>
+                  <th className='hvrl-th'>Variable</th>
+                  <th className='hvrl-th'>Value</th>
+                  <th className='hvrl-th'>Variant string.</th>
+                  <th className='hvrl-th'>Comments</th>
+                  <th className='hvrl-th'>Add (YYYYWW)</th>
+                  <th className='hvrl-th'>Delete (YYYYWW)</th>
+                  <th className='hvrl-th'>Created by user (Automatic)</th>
+                  <th className='hvrl-th'>Date (Automatic)</th>
                 </tr>
               </thead>
               <tbody>
                 {searchResults.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="hvrl-no-data">
+                    <td colSpan={12} className='hvrl-no-data'>
                       No records found
                     </td>
                   </tr>
@@ -303,38 +296,42 @@ const HomologationVariablesResultList: React.FC = () => {
                         index % 2 === 0 ? "hvrl-row-even" : "hvrl-row-odd"
                       }
                     >
-                      <td className="hvrl-checkbox-col">
+                      <td className='hvrl-checkbox-col'>
                         <input
-                          type="radio"
-                          name="homologation-radio"
+                          type='radio'
+                          name='homologation-radio'
                           checked={selectedRows.includes(index)}
                           onChange={() => handleRadioChange(index)}
                         />
                       </td>
-                      <td className="hvrl-td">{item.pc}</td>
-                      <td className="hvrl-td">{item.num}</td>
-                      <td className="hvrl-td">{item.market}</td>
-                      <td className="hvrl-td">{item.variable}</td>
-                      <td className="hvrl-td">{item.val}</td>
-                      <td className="hvrl-td">
+                      <td className='hvrl-td'>{item.pc}</td>
+                      <td className='hvrl-td'>{item.num}</td>
+                      <td className='hvrl-td'>{item.market}</td>
+                      <td className='hvrl-td'>{item.variable}</td>
+                      <td className='hvrl-td'>{item.val}</td>
+                      <td className='hvrl-td'>
                         {item.vs}
                         {item.vs2 ? `-${item.vs2}` : ""}
                       </td>
-                      <td className="hvrl-td">{item.comments}</td>
-                      <td className="hvrl-td">{item.addDate}</td>
-                      <td className="hvrl-td">{item.deleteDate}</td>
-                      <td className="hvrl-td hvrl-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleUserClick(item.registerUser);
+                      <td className='hvrl-td'>{item.comments}</td>
+                      <td className='hvrl-td'>{item.addDate}</td>
+                      <td className='hvrl-td'>{item.deleteDate}</td>
+                      <td className='hvrl-td hvrl-link'>
+                        <span
+                          onClick={() => handleUserClick(item.registerUser)}
+                          role='button'
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleUserClick(item.registerUser);
+                            }
                           }}
                         >
                           {item.registerUser}
-                        </a>
+                        </span>
                       </td>
-                      <td className="hvrl-td">{item.registerDatetime}</td>
+                      <td className='hvrl-td'>{item.registerDatetime}</td>
                     </tr>
                   ))
                 )}
@@ -344,7 +341,7 @@ const HomologationVariablesResultList: React.FC = () => {
         </div>
 
         {/* 计数显示 */}
-        <div className="hvrl-count">Number of lines found: {count}</div>
+        <div className='hvrl-count'>Number of lines found: {count}</div>
       </div>
     </div>
   );

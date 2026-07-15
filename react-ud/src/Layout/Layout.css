@@ -16,13 +16,6 @@
   border-right: 1px solid #ddd;
 }
 
-/* Layout 側邊欄內 Menu 填滿 sidebar */
-.app-layout-menu .navigation-menu {
-  width: 100%;
-  border: none;
-  margin-left: 0;
-}
-
 .app-layout-content {
   flex: 1;
   min-width: 0;

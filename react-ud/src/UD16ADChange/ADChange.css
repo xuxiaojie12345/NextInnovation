@@ -97,15 +97,6 @@
   flex-wrap: wrap;
 }
 
-/* 初始提示文本 */
-.adc-initial-message {
-  margin-top: 15px;
-  font-size: 13px;
-  color: #000000;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-}
-
 /* 按钮 */
 .adc-btn {
   background-color: #d0d8e8;

@@ -22,9 +22,6 @@ const SearchUser: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
 
-  const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
   // 页面初始化：加载市场列表
   useEffect(() => {
     fetchMarketList();
@@ -34,12 +31,15 @@ const SearchUser: React.FC = () => {
   const fetchMarketList = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/ud19/getmarketlist`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud19/getmarketlist`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch market list");
@@ -52,8 +52,6 @@ const SearchUser: React.FC = () => {
       } else {
         setErrorMessage("获取Market列表失败，请联系管理员");
       }
-    } catch (error) {
-      setErrorMessage("系统内部错误，请联系管理员");
     } finally {
       setIsLoading(false);
     }
@@ -106,9 +104,9 @@ const SearchUser: React.FC = () => {
     setSearchResults([]);
 
     // 确定搜索类型
-    let searchType = permissionType;
-    let hasUserId = userId && userId.trim() !== "";
-    let hasUserName = userName && userName.trim() !== "";
+    const searchType = permissionType;
+    const hasUserId = userId && userId.trim() !== "";
+    const hasUserName = userName && userName.trim() !== "";
 
     // 如果同时输入了UserID和User，优先使用UserID
     if (hasUserId) {
@@ -120,18 +118,21 @@ const SearchUser: React.FC = () => {
       try {
         setIsLoading(true);
 
-        const response = await fetch(`${API_BASE_URL}/api/ud19/searchhdoc`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/ud19/searchhdoc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userid: userId.trim().toUpperCase(),
+              user: "",
+              market: market,
+              searchType: searchType,
+            }),
           },
-          body: JSON.stringify({
-            userid: userId.trim().toUpperCase(),
-            user: "",
-            market: market,
-            searchType: searchType,
-          }),
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to search users");
@@ -149,13 +150,6 @@ const SearchUser: React.FC = () => {
             setErrorMessage(data.msg || "搜索失败，请联系管理员");
           }
         }
-      } catch (error: any) {
-        // 判断是否是网络错误
-        if (error.message === "Failed to fetch") {
-          setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
-        } else {
-          setErrorMessage("系统内部错误，请联系管理员");
-        }
       } finally {
         setIsLoading(false);
       }
@@ -168,18 +162,21 @@ const SearchUser: React.FC = () => {
       try {
         setIsLoading(true);
 
-        const response = await fetch(`${API_BASE_URL}/api/ud19/searchhdoc`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/ud19/searchhdoc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userid: "",
+              user: userName.trim(),
+              market: market,
+              searchType: searchType,
+            }),
           },
-          body: JSON.stringify({
-            userid: "",
-            user: userName.trim(),
-            market: market,
-            searchType: searchType,
-          }),
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to search users");
@@ -198,13 +195,6 @@ const SearchUser: React.FC = () => {
             setErrorMessage(errMsg || "搜索失败，请联系管理员");
           }
         }
-      } catch (error: any) {
-        // 判断是否是网络错误
-        if (error.message === "Failed to fetch") {
-          setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
-        } else {
-          setErrorMessage("系统内部错误，请联系管理员");
-        }
       } finally {
         setIsLoading(false);
       }
@@ -213,18 +203,21 @@ const SearchUser: React.FC = () => {
       try {
         setIsLoading(true);
 
-        const response = await fetch(`${API_BASE_URL}/api/ud19/searchhdoc`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/ud19/searchhdoc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userid: "",
+              user: "",
+              market: market,
+              searchType: searchType,
+            }),
           },
-          body: JSON.stringify({
-            userid: "",
-            user: "",
-            market: market,
-            searchType: searchType,
-          }),
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to search users");
@@ -237,13 +230,6 @@ const SearchUser: React.FC = () => {
         } else {
           setErrorMessage(data.msg || data.message || "搜索失败，请联系管理员");
         }
-      } catch (error: any) {
-        // 判断是否是网络错误
-        if (error.message === "Failed to fetch") {
-          setErrorMessage("无法连接到后端服务，请确认后端服务已启动");
-        } else {
-          setErrorMessage("系统内部错误，请联系管理员");
-        }
       } finally {
         setIsLoading(false);
       }
@@ -251,20 +237,20 @@ const SearchUser: React.FC = () => {
   };
 
   return (
-    <div className="su-container">
+    <div className='su-container'>
       {/* 标题 */}
-      <h1 className="su-title">Search HDoc User</h1>
+      <h1 className='su-title'>Search HDoc User</h1>
 
       {/* 边框容器 */}
-      <div className="su-border-box">
+      <div className='su-border-box'>
         {/* 搜索条件区域 */}
-        <div className="su-search-section">
+        <div className='su-search-section'>
           {/* UserID */}
-          <div className="su-form-row">
-            <label className="su-label">Userid</label>
+          <div className='su-form-row'>
+            <label className='su-label'>Userid</label>
             <input
-              type="text"
-              className="su-input"
+              type='text'
+              className='su-input'
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               maxLength={10}
@@ -273,11 +259,11 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* User */}
-          <div className="su-form-row">
-            <label className="su-label">User</label>
+          <div className='su-form-row'>
+            <label className='su-label'>User</label>
             <input
-              type="text"
-              className="su-input"
+              type='text'
+              className='su-input'
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               maxLength={32}
@@ -286,11 +272,11 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* Market下拉列表 + 权限类型单选框 */}
-          <div className="su-form-row">
-            <label className="su-label">Market</label>
-            <div className="su-market-permission-wrapper">
+          <div className='su-form-row'>
+            <label className='su-label'>Market</label>
+            <div className='su-market-permission-wrapper'>
               <select
-                className="su-select"
+                className='su-select'
                 value={market}
                 onChange={(e) => setMarket(e.target.value)}
                 disabled={isLoading}
@@ -298,7 +284,7 @@ const SearchUser: React.FC = () => {
               >
                 {marketList.length > 0 ? (
                   <>
-                    <option value="">&nbsp;</option>
+                    <option value=''>&nbsp;</option>
                     {marketList.map((item, index) => (
                       <option key={index} value={item.market}>
                         {item.market}
@@ -306,51 +292,51 @@ const SearchUser: React.FC = () => {
                     ))}
                   </>
                 ) : (
-                  <option value="" disabled>
+                  <option value='' disabled>
                     加载中...
                   </option>
                 )}
               </select>
-              <div className="su-permission-inline">
-                <div className="su-radio-group-inline">
+              <div className='su-permission-inline'>
+                <div className='su-radio-group-inline'>
                   <input
-                    type="radio"
-                    id="not-set"
-                    name="permissionType"
-                    value="NOT_SET"
+                    type='radio'
+                    id='not-set'
+                    name='permissionType'
+                    value='NOT_SET'
                     checked={permissionType === "NOT_SET"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor="not-set" className="su-radio-label">
+                  <label htmlFor='not-set' className='su-radio-label'>
                     Not set
                   </label>
                 </div>
-                <div className="su-radio-group-inline">
+                <div className='su-radio-group-inline'>
                   <input
-                    type="radio"
-                    id="rule"
-                    name="permissionType"
-                    value="RULE"
+                    type='radio'
+                    id='rule'
+                    name='permissionType'
+                    value='RULE'
                     checked={permissionType === "RULE"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor="rule" className="su-radio-label">
+                  <label htmlFor='rule' className='su-radio-label'>
                     Rule
                   </label>
                 </div>
-                <div className="su-radio-group-inline">
+                <div className='su-radio-group-inline'>
                   <input
-                    type="radio"
-                    id="template"
-                    name="permissionType"
-                    value="TEMPLATE"
+                    type='radio'
+                    id='template'
+                    name='permissionType'
+                    value='TEMPLATE'
                     checked={permissionType === "TEMPLATE"}
                     onChange={(e) => setPermissionType(e.target.value)}
                     disabled={isLoading}
                   />
-                  <label htmlFor="template" className="su-radio-label">
+                  <label htmlFor='template' className='su-radio-label'>
                     Template
                   </label>
                 </div>
@@ -359,9 +345,9 @@ const SearchUser: React.FC = () => {
           </div>
 
           {/* Search按钮 */}
-          <div className="su-button-section">
+          <div className='su-button-section'>
             <button
-              className="su-button"
+              className='su-button'
               onClick={handleSearch}
               disabled={isLoading}
             >
@@ -372,13 +358,13 @@ const SearchUser: React.FC = () => {
 
         {/* 搜索结果表格 */}
         {searchResults.length > 0 && (
-          <div className="su-result-section">
-            <table className="su-table">
+          <div className='su-result-section'>
+            <table className='su-table'>
               <thead>
                 <tr>
-                  <th className="su-th">Userid</th>
-                  <th className="su-th">User</th>
-                  <th className="su-th">Market</th>
+                  <th className='su-th'>Userid</th>
+                  <th className='su-th'>User</th>
+                  <th className='su-th'>Market</th>
                 </tr>
               </thead>
               <tbody>
@@ -387,9 +373,9 @@ const SearchUser: React.FC = () => {
                     key={index}
                     className={index % 2 === 0 ? "su-tr-even" : "su-tr-odd"}
                   >
-                    <td className="su-td">{result.userid}</td>
-                    <td className="su-td">{result.user}</td>
-                    <td className="su-td">{result.market}</td>
+                    <td className='su-td'>{result.userid}</td>
+                    <td className='su-td'>{result.user}</td>
+                    <td className='su-td'>{result.market}</td>
                   </tr>
                 ))}
               </tbody>
@@ -398,7 +384,7 @@ const SearchUser: React.FC = () => {
         )}
 
         {/* 错误消息显示 */}
-        {errorMessage && <div className="su-error-message">{errorMessage}</div>}
+        {errorMessage && <div className='su-error-message'>{errorMessage}</div>}
       </div>
     </div>
   );

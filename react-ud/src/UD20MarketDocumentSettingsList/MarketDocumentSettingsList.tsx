@@ -4,7 +4,6 @@ import "./MarketDocumentSettingsList.css";
 
 interface DocumentItem {
   doctype: string;
-  description?: string;
   registerUser: string;
   registerDatetime: string;
 }
@@ -33,19 +32,19 @@ const MarketDocumentSettingsList: React.FC = () => {
       setIsLoading(true);
       setErrorMessage("");
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
-      const response = await fetch(`${API_BASE_URL}/api/ud20/getdocumentlist`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud20/getdocumentlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            documentType: searchCriteria.documentType || "",
+            operator: searchCriteria.operator || "=",
+          }),
         },
-        body: JSON.stringify({
-          documentType: searchCriteria.documentType || "",
-          operator: searchCriteria.operator || "=",
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("No data found");
@@ -59,9 +58,6 @@ const MarketDocumentSettingsList: React.FC = () => {
         setDocuments([]);
         setErrorMessage("No data found");
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || "No data found");
-      setDocuments([]);
     } finally {
       setIsLoading(false);
     }
@@ -116,33 +112,33 @@ const MarketDocumentSettingsList: React.FC = () => {
   };
 
   return (
-    <div className="mdsl-container">
+    <div className='mdsl-container'>
       {/* 标题 */}
-      <h1 className="mdsl-title">HDoc - Market Document Settings</h1>
+      <h1 className='mdsl-title'>HDoc - Market Document Settings</h1>
 
       {/* 错误消息 */}
-      {errorMessage && <div className="mdsl-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='mdsl-error-message'>{errorMessage}</div>}
 
       {/* 边框容器 */}
-      <div className="mdsl-border-box">
+      <div className='mdsl-border-box'>
         {/* 按钮区域 */}
-        <div className="mdsl-button-bar">
+        <div className='mdsl-button-bar'>
           <button
-            className="mdsl-btn"
+            className='mdsl-btn'
             onClick={handleSelect}
             disabled={isLoading}
           >
             Select
           </button>
           <button
-            className="mdsl-btn"
+            className='mdsl-btn'
             onClick={handleBack}
             disabled={isLoading}
           >
             Back
           </button>
           <button
-            className="mdsl-btn"
+            className='mdsl-btn'
             onClick={handlePrint}
             disabled={isLoading}
           >
@@ -151,24 +147,24 @@ const MarketDocumentSettingsList: React.FC = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className="mdsl-table-container">
+        <div className='mdsl-table-container'>
           {isLoading ? (
-            <div className="mdsl-loading">Loading...</div>
+            <div className='mdsl-loading'>Loading...</div>
           ) : (
-            <table className="mdsl-table">
+            <table className='mdsl-table'>
               <thead>
                 <tr>
-                  <th className="mdsl-radio-col"></th>
-                  <th className="mdsl-th">Document type</th>
-                  <th className="mdsl-th">Bussines unit</th>
-                  <th className="mdsl-th">User</th>
-                  <th className="mdsl-th">Date</th>
+                  <th className='mdsl-radio-col'></th>
+                  <th className='mdsl-th'>Document type</th>
+                  <th className='mdsl-th'>Bussines unit</th>
+                  <th className='mdsl-th'>User</th>
+                  <th className='mdsl-th'>Date</th>
                 </tr>
               </thead>
               <tbody>
                 {documents.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="mdsl-no-data">
+                    <td colSpan={5} className='mdsl-no-data'>
                       No records found
                     </td>
                   </tr>
@@ -180,20 +176,20 @@ const MarketDocumentSettingsList: React.FC = () => {
                         index % 2 === 0 ? "mdsl-row-even" : "mdsl-row-odd"
                       }
                     >
-                      <td className="mdsl-radio-col">
+                      <td className='mdsl-radio-col'>
                         <input
-                          type="radio"
-                          name="document-radio"
+                          type='radio'
+                          name='document-radio'
                           checked={selectedIndex === index}
                           onChange={() => handleRadioChange(index)}
                         />
                       </td>
-                      <td className="mdsl-td">{item.doctype}</td>
-                      <td className="mdsl-td">VBC</td>
-                      <td className="mdsl-td mdsl-link">
+                      <td className='mdsl-td'>{item.doctype}</td>
+                      <td className='mdsl-td'>VBC</td>
+                      <td className='mdsl-td mdsl-link'>
                         {item.registerUser && item.registerUser !== "-" ? (
                           <button
-                            className="link-button"
+                            className='link-button'
                             onClick={() => handleUserClick(item.registerUser)}
                           >
                             {item.registerUser}
@@ -202,7 +198,7 @@ const MarketDocumentSettingsList: React.FC = () => {
                           "-"
                         )}
                       </td>
-                      <td className="mdsl-td">{item.registerDatetime}</td>
+                      <td className='mdsl-td'>{item.registerDatetime}</td>
                     </tr>
                   ))
                 )}

@@ -97,18 +97,6 @@
   cursor: not-allowed;
 }
 
-/* 错误消息显示 */
-.htc-error-message {
-  margin-top: 15px;
-  padding: 10px 15px;
-  background-color: #fff5f5;
-  border-left: 3px solid #ff4d4f;
-  color: #ff4d4f;
-  font-size: 13px;
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-}
-
 /* 成功消息显示 */
 .htc-success-message {
   margin-top: 15px;
@@ -119,57 +107,6 @@
   font-size: 13px;
   font-family: Arial, sans-serif;
 }
-
-/* 变量列表 */
-.htc-variables-list {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #ffffff;
-  border: 1px solid #b4c7dc;
-}
-
-.htc-variables-list ul {
-  margin: 5px 0 0 0;
-  padding-left: 20px;
-}
-
-.htc-variables-list li {
-  font-size: 12px;
-  color: #000000;
-  margin-bottom: 5px;
-  font-family: "Courier New", monospace;
-}
-
-/* 下载链接行 */
-.htc-download-row {
-  margin-top: 15px;
-  padding: 10px 15px;
-  background-color: #e8eef8;
-  border: 1px solid #b4c7dc;
-}
-
-/* 链接样式 */
-.htc-link {
-  color: #0066cc;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.htc-link:hover {
-  color: #004499;
-  text-decoration: none;
-}
-
-/* 加载状态 */
-.htc-loading {
-  text-align: center;
-  padding: 50px;
-  font-size: 16px;
-  color: #666666;
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
   .htc-container {
@@ -204,17 +141,7 @@
     min-width: 80px;
   }
 
-  .htc-error-message,
-  .htc-success-message {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
   .htc-variables-list li {
     font-size: 11px;
-  }
-
-  .htc-link {
-    font-size: 12px;
   }
 }

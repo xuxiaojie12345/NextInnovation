@@ -144,20 +144,6 @@
   font-style: italic;
 }
 
-/* 链接样式 */
-.mdsl-link a,
-.mdsl-link .link-button {
-  color: #0066cc;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.mdsl-link a:hover,
-.mdsl-link .link-button:hover {
-  color: #004499;
-  text-decoration: none;
-}
-
 /* 按钮样式 - 模拟链接 */
 .link-button {
   background: none;

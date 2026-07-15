@@ -1,4 +1,3 @@
-// ModifyDocument.tsx - UD05模块
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./UD05ModifyDocument.css";
@@ -19,7 +18,6 @@ const ModifyDocument: React.FC = () => {
   const [variables, setVariables] = useState<VariableData[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [documentData, setDocumentData] = useState<any>(null); // 存储从UD04获取的文档数据，包含generatedFilePath
 
   // 页面初始化：获取底盘号和market参数并加载数据
   useEffect(() => {
@@ -58,34 +56,10 @@ const ModifyDocument: React.FC = () => {
       }
       const chassisSeries = chassisNo.substring(0, 4);
       const chassisNoPart = chassisNo.substring(4);
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
-      // 先调用UD04 API获取generatedFilePath（用于下载template）
-      const ud04Response = await fetch(
-        `${API_BASE_URL}/api/UD04/selectGeneratedocument?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (ud04Response.ok) {
-        const ud04Data = await ud04Response.json();
-        if (ud04Data.code === 200 && ud04Data.data) {
-          setDocumentData(ud04Data.data);
-        }
-      } else {
-        console.warn(
-          "Failed to fetch UD04 data, template download may not work",
-        );
-      }
 
       // 调用UD05 API - 初期表示（只获取variables，不获取market和template）
       const response = await fetch(
-        `${API_BASE_URL}/api/UD05/modifyDocumentUnit?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/UD05/modifyDocumentUnit?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
         {
           method: "GET",
           headers: {
@@ -186,10 +160,8 @@ const ModifyDocument: React.FC = () => {
           })),
       };
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/UD05/modifyDocumentSave`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/UD05/modifyDocumentSave`,
         {
           method: "POST",
           headers: {
@@ -206,8 +178,6 @@ const ModifyDocument: React.FC = () => {
       const data = await response.json();
 
       if (data.code === 200) {
-        alert("Document updated successfully!");
-
         // 拆分完整的底盘号为 Chassis series 和 Chassis no
         const chassisSeries = chassisNo.substring(0, 4);
         const chassisNoPart = chassisNo.substring(4);
@@ -227,42 +197,18 @@ const ModifyDocument: React.FC = () => {
     }
   };
 
-  // Template链接点击处理 - 下载Vin Plate的.trf文件
-  const handleDownloadTemplate = () => {
-    if (!documentData?.generatedFilePath) {
-      setErrorMessage("Document file not found. Please try again later.");
-      return;
-    }
-
-    // 触发文件下载
-    const link = document.createElement("a");
-    link.href = documentData.generatedFilePath;
-    link.download = `VIN_PLATE_${chassisNo}.trf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="md-container">
-        <div className="md-loading">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="md-container">
+    <div className='md-container'>
       {/* 标题区域 */}
-      <div className="md-header">
-        <h1 className="md-title">Modify Document</h1>
+      <div className='md-header'>
+        <h1 className='md-title'>Modify Document</h1>
       </div>
 
       {/* 基本信息区域 */}
-      <div className="md-info-section">
-        <div className="md-info-group">
-          <span className="md-label">Chassis no:</span>
-          <span className="md-value md-chassis-no">
+      <div className='md-info-section'>
+        <div className='md-info-group'>
+          <span className='md-label'>Chassis no:</span>
+          <span className='md-value md-chassis-no'>
             {chassisNo.substring(0, 4)}
             <span
               onClick={() => {
@@ -272,7 +218,7 @@ const ModifyDocument: React.FC = () => {
                   );
                 }
               }}
-              className="md-link"
+              className='md-link'
               style={{
                 cursor: "pointer",
                 color: "#0000ff",
@@ -283,47 +229,43 @@ const ModifyDocument: React.FC = () => {
             </span>
           </span>
         </div>
-        <div className="md-info-group">
-          <span className="md-label">Market:</span>
-          <span className="md-value">{market}</span>
+        <div className='md-info-group'>
+          <span className='md-label'>Market:</span>
+          <span className='md-value'>{market}</span>
         </div>
-        <div className="md-info-group">
-          <span className="md-label">Template:</span>
-          <span
-            className="md-link"
-            onClick={handleDownloadTemplate}
-            style={{ cursor: "pointer" }}
-          >
+        <div className='md-info-group'>
+          <span className='md-label'>Template:</span>
+          <span className='md-link' style={{ cursor: "pointer" }}>
             {template}
           </span>
         </div>
       </div>
 
       {/* 错误消息显示 */}
-      {errorMessage && <div className="md-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='md-error-message'>{errorMessage}</div>}
 
       {/* 表格区域 */}
-      <div className="md-table-container">
+      <div className='md-table-container'>
         {/* Save按钮 */}
-        <div className="md-button-bar">
+        <div className='md-button-bar'>
           <button
-            type="button"
+            type='button'
             onClick={handleSave}
             disabled={isLoading}
-            className="md-save-btn"
+            className='md-save-btn'
           >
             Save
           </button>
         </div>
 
         {/* 数据表格 */}
-        <table className="md-table">
+        <table className='md-table'>
           <thead>
             <tr>
-              <th className="md-th">Variable</th>
-              <th className="md-th">Description</th>
-              <th className="md-th">Current value</th>
-              <th className="md-th">Modified value</th>
+              <th className='md-th'>Variable</th>
+              <th className='md-th'>Description</th>
+              <th className='md-th'>Current value</th>
+              <th className='md-th'>Modified value</th>
             </tr>
           </thead>
           <tbody>
@@ -332,18 +274,18 @@ const ModifyDocument: React.FC = () => {
                 key={index}
                 className={index % 2 === 0 ? "md-tr-even" : "md-tr-odd"}
               >
-                <td className="md-td">{variable.variable}</td>
-                <td className="md-td">{variable.description}</td>
-                <td className="md-td">{variable.currentValue}</td>
-                <td className="md-td">
+                <td className='md-td'>{variable.variable}</td>
+                <td className='md-td'>{variable.description}</td>
+                <td className='md-td'>{variable.currentValue}</td>
+                <td className='md-td'>
                   <input
-                    type="text"
+                    type='text'
                     value={variable.modifiedValue}
                     onChange={(e) =>
                       handleModifiedValueChange(index, e.target.value)
                     }
-                    className="md-input"
-                    placeholder=""
+                    className='md-input'
+                    placeholder=''
                     maxLength={500}
                   />
                 </td>

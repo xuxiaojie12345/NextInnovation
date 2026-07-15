@@ -28,9 +28,7 @@ const GenerateHomologationDocument: React.FC = () => {
         setChassisSeries(conditions.chassisSeries || "");
         setChassisNo(conditions.chassisNo || "");
         setDocumentType(conditions.documentType || "");
-      } catch (error) {
-        console.error("Failed to parse last search conditions:", error);
-      }
+      } catch (err) {}
     }
 
     // 调用API获取文档类型列表
@@ -40,9 +38,8 @@ const GenerateHomologationDocument: React.FC = () => {
   // 获取文档类型列表
   const fetchDocumentTypeList = async () => {
     try {
-      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
       const response = await fetch(
-        `${API_BASE_URL}/api/UD03/selectHdocdocumentlist`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/UD03/selectHdocdocumentlist`,
         {
           method: "POST",
           headers: {
@@ -68,38 +65,11 @@ const GenerateHomologationDocument: React.FC = () => {
         if (options.length > 0 && !documentType) {
           setDocumentType(options[0].value);
         }
-      } else {
-        // 使用备用数据
-        setFallbackDocumentTypes();
       }
-    } catch (error) {
-      setErrorMessage("Failed to load document types. Please try again.");
-      // API调用失败时，使用备用数据
-      setFallbackDocumentTypes();
-    }
+    } catch (err) {}
   };
 
   // 备用文档类型数据（当API调用失败时使用）
-  const setFallbackDocumentTypes = () => {
-    const fallbackTypes = [
-      "VIN_PLATE",
-      "COC",
-      "TYPE_APPROVAL",
-      "HOMOLOGATION_CERTIFICATE",
-    ];
-
-    const options = fallbackTypes.map((type: string) => ({
-      value: type,
-      label: type,
-    }));
-
-    setDocumentTypeList(options);
-
-    // 默认选中第一个选项
-    if (!documentType && options.length > 0) {
-      setDocumentType(options[0].value);
-    }
-  };
 
   // 验证表单
   const validateForm = (): boolean => {
@@ -160,10 +130,7 @@ const GenerateHomologationDocument: React.FC = () => {
 
       // 使用React Router的navigate进行页面跳转
       navigate(targetUrl);
-    } catch (error) {
-      setErrorMessage("System error. Please contact administrator.");
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // Reset按钮处理
@@ -224,65 +191,66 @@ const GenerateHomologationDocument: React.FC = () => {
   };
 
   return (
-    <div className="ghd-container">
+    <div className='ghd-container'>
       {/* 标题区域 */}
-      <div className="ghd-header">
-        <h1 className="ghd-title">HDoc - Generate Homologation Document</h1>
+      <div className='ghd-header'>
+        <h1 className='ghd-title'>HDoc - Generate Homologation Document</h1>
       </div>
-
+      {/* 错误信息显示区域 */}
+      {errorMessage && <div className='ghd-error-message'>{errorMessage}</div>}
       {/* 主内容区域 */}
-      <div className="ghd-main-content">
-        <form onSubmit={handleSubmit} className="ghd-form">
+      <div className='ghd-main-content'>
+        <form onSubmit={handleSubmit} className='ghd-form'>
           {/* Chassis series输入框 */}
-          <div className="ghd-input-group">
-            <label className="ghd-label">
+          <div className='ghd-input-group'>
+            <label className='ghd-label'>
               Chassis series <span style={{ color: "red" }}>*</span>
             </label>
             <input
-              type="text"
-              id="chassisSeries"
-              name="chassisSeries"
+              type='text'
+              id='chassisSeries'
+              name='chassisSeries'
               value={chassisSeries}
               onChange={handleChassisSeriesChange}
               maxLength={5}
               disabled={isLoading}
-              className="ghd-input-field"
-              placeholder="Enter chassis series"
+              className='ghd-input-field'
+              placeholder='Enter chassis series'
             />
           </div>
 
           {/* Chassis no输入框 */}
-          <div className="ghd-input-group">
-            <label className="ghd-label">
+          <div className='ghd-input-group'>
+            <label className='ghd-label'>
               Chassis no <span style={{ color: "red" }}>*</span>
             </label>
             <input
-              type="text"
-              id="chassisNo"
-              name="chassisNo"
+              type='text'
+              id='chassisNo'
+              name='chassisNo'
               value={chassisNo}
               onChange={handleChassisNoChange}
               maxLength={10}
               disabled={isLoading}
-              className="ghd-input-field"
-              placeholder="Enter chassis number"
+              className='ghd-input-field'
+              placeholder='Enter chassis number'
             />
           </div>
 
           {/* Document type下拉列表 */}
-          <div className="ghd-input-group">
-            <label className="ghd-label">
+          <div className='ghd-input-group'>
+            <label className='ghd-label'>
               Document type <span style={{ color: "red" }}>*</span>
             </label>
             <select
-              id="documentType"
-              name="documentType"
+              id='documentType'
+              name='documentType'
               value={documentType}
               onChange={handleDocumentTypeChange}
               disabled={isLoading}
-              className="ghd-select-field"
+              className='ghd-select-field'
             >
-              <option value="">Please select</option>
+              <option value=''>Please select</option>
               {documentTypeList.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -290,44 +258,39 @@ const GenerateHomologationDocument: React.FC = () => {
               ))}
             </select>
           </div>
-
-          {/* 错误信息显示区域 */}
-          {errorMessage && (
-            <div className="ghd-error-message">{errorMessage}</div>
-          )}
         </form>
       </div>
 
       {/* 底部按钮区域 */}
-      <div className="ghd-footer">
+      <div className='ghd-footer'>
         <button
-          type="button"
+          type='button'
           disabled={isLoading}
           onClick={handleSubmit}
-          className="ghd-button ghd-submit-btn"
+          className='ghd-button ghd-submit-btn'
         >
           {isLoading ? "Submitting..." : "Submit"}
         </button>
         <button
-          type="button"
+          type='button'
           onClick={handleReset}
           disabled={isLoading}
-          className="ghd-button ghd-reset-btn"
+          className='ghd-button ghd-reset-btn'
         >
           Reset
         </button>
         <button
-          type="button"
+          type='button'
           onClick={handleHelp}
           disabled={isLoading}
-          className="ghd-button ghd-help-btn"
+          className='ghd-button ghd-help-btn'
         >
           Help
         </button>
       </div>
 
       {/* 支持邮箱信息 */}
-      <div className="ghd-support-info">
+      <div className='ghd-support-info'>
         <p>HDoc support: support.tpi@volvo.com</p>
       </div>
     </div>

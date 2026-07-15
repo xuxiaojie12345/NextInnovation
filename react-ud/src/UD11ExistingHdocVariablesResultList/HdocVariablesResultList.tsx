@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./HdocVariablesResultList.css";
 
+interface SearchCriteria {
+  [key: string]: any;
+}
+
 interface SearchResultItem {
   variable: string;
   type: string;
@@ -15,7 +19,8 @@ const HdocVariablesResultList: React.FC = () => {
   const navigate = useNavigate();
 
   // 从state中获取前画面传递的搜索条件
-  const searchCriteria = location.state?.searchCriteria;
+  const searchCriteria: SearchCriteria | undefined = location.state
+    ?.searchCriteria as SearchCriteria | undefined;
 
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -47,11 +52,8 @@ const HdocVariablesResultList: React.FC = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud10Hdocvariables/search`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud10Hdocvariables/search`,
         {
           method: "POST",
           headers: {
@@ -74,15 +76,7 @@ const HdocVariablesResultList: React.FC = () => {
         setSearchResults([]);
         setCount(0);
       }
-    } catch (error: any) {
-      setErrorMessage(
-        error.message || "System error. Please contact administrator.",
-      );
-      setSearchResults([]);
-      setCount(0);
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // 处理单选选择
@@ -205,52 +199,52 @@ const HdocVariablesResultList: React.FC = () => {
   };
 
   return (
-    <div className="hvrl-container">
+    <div className='hvrl-container'>
       {/* 标题 */}
-      <h1 className="hvrl-title">Existing HDoc Variables</h1>
+      <h1 className='hvrl-title'>Existing HDoc Variables</h1>
 
       {/* 错误消息 */}
-      {errorMessage && <div className="hvrl-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='hvrl-error-message'>{errorMessage}</div>}
 
       {/* 成功消息 */}
       {successMessage && (
-        <div className="hvrl-success-message">{successMessage}</div>
+        <div className='hvrl-success-message'>{successMessage}</div>
       )}
 
       {/* 边框容器 */}
-      <div className="hvrl-border-box">
+      <div className='hvrl-border-box'>
         {/* 按钮区域 */}
-        <div className="hvrl-button-bar">
+        <div className='hvrl-button-bar'>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleSelect}
             disabled={isLoading}
           >
             Select
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleBack}
             disabled={isLoading}
           >
             Back
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handlePrint}
             disabled={isLoading}
           >
             Print
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleExcel}
             disabled={isLoading}
           >
             Down
           </button>
           <button
-            className="hvrl-btn"
+            className='hvrl-btn'
             onClick={handleExcel}
             disabled={isLoading}
           >
@@ -259,23 +253,23 @@ const HdocVariablesResultList: React.FC = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className="hvrl-table-container">
+        <div className='hvrl-table-container'>
           {isLoading ? (
-            <div className="hvrl-loading">Loading...</div>
+            <div className='hvrl-loading'>Loading...</div>
           ) : (
-            <table className="hvrl-table">
+            <table className='hvrl-table'>
               <thead>
                 <tr>
-                  <th className="hvrl-checkbox-col"></th>
-                  <th className="hvrl-th">*Variable</th>
-                  <th className="hvrl-th">Type</th>
-                  <th className="hvrl-th">Description</th>
-                  <th className="hvrl-th">
+                  <th className='hvrl-checkbox-col'></th>
+                  <th className='hvrl-th'>*Variable</th>
+                  <th className='hvrl-th'>Type</th>
+                  <th className='hvrl-th'>Description</th>
+                  <th className='hvrl-th'>
                     Created by user
                     <br />
                     (Automatic)
                   </th>
-                  <th className="hvrl-th">
+                  <th className='hvrl-th'>
                     Date
                     <br />
                     (Automatic)
@@ -285,7 +279,7 @@ const HdocVariablesResultList: React.FC = () => {
               <tbody>
                 {searchResults.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="hvrl-no-data">
+                    <td colSpan={6} className='hvrl-no-data'>
                       No records found
                     </td>
                   </tr>
@@ -297,18 +291,18 @@ const HdocVariablesResultList: React.FC = () => {
                         index % 2 === 0 ? "hvrl-row-even" : "hvrl-row-odd"
                       }
                     >
-                      <td className="hvrl-checkbox-col">
+                      <td className='hvrl-checkbox-col'>
                         <input
-                          type="radio"
-                          name="hdoc-variable-radio"
+                          type='radio'
+                          name='hdoc-variable-radio'
                           checked={selectedRow === index}
                           onChange={() => handleRadioChange(index)}
                         />
                       </td>
-                      <td className="hvrl-td">{item.variable}</td>
-                      <td className="hvrl-td">{item.type}</td>
-                      <td className="hvrl-td">{item.description}</td>
-                      <td className="hvrl-td hvrl-link">
+                      <td className='hvrl-td'>{item.variable}</td>
+                      <td className='hvrl-td'>{item.type}</td>
+                      <td className='hvrl-td'>{item.description}</td>
+                      <td className='hvrl-td hvrl-link'>
                         <span
                           onClick={() => handleUserClick(item.createdByUser)}
                           style={{
@@ -320,7 +314,7 @@ const HdocVariablesResultList: React.FC = () => {
                           {item.createdByUser}
                         </span>
                       </td>
-                      <td className="hvrl-td">{item.date}</td>
+                      <td className='hvrl-td'>{item.date}</td>
                     </tr>
                   ))
                 )}
@@ -330,7 +324,7 @@ const HdocVariablesResultList: React.FC = () => {
         </div>
 
         {/* 计数显示 */}
-        <div className="hvrl-count">Number of lines found: {count}</div>
+        <div className='hvrl-count'>Number of lines found: {count}</div>
       </div>
     </div>
   );

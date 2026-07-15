@@ -24,7 +24,6 @@ const GenerateDocument: React.FC = () => {
   const navigate = useNavigate();
   const [documentData, setDocumentData] = useState<DocumentData | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [chassisNo, setChassisNo] = useState("");
 
   // 页面初始化：获取底盘号并调用API
@@ -34,7 +33,6 @@ const GenerateDocument: React.FC = () => {
 
   // 获取文档数据
   const fetchDocumentData = async () => {
-    setIsLoading(true);
     setErrorMessage("");
 
     try {
@@ -58,7 +56,6 @@ const GenerateDocument: React.FC = () => {
 
       if (!fullChassisNo) {
         setErrorMessage("Chassis number is required.");
-        setIsLoading(false);
         return;
       }
 
@@ -71,10 +68,8 @@ const GenerateDocument: React.FC = () => {
       const chassisNoPart = fullChassisNo.substring(4);
 
       // 调用UD04 API（分开传递两个参数）
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/UD04/selectGeneratedocument?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/UD04/selectGeneratedocument?chassisSeries=${encodeURIComponent(chassisSeries)}&chassisNo=${encodeURIComponent(chassisNoPart)}`,
         {
           method: "GET",
           headers: {
@@ -108,8 +103,6 @@ const GenerateDocument: React.FC = () => {
       } else {
         setErrorMessage("System error. Please contact administrator.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -140,9 +133,7 @@ const GenerateDocument: React.FC = () => {
 
       // 释放 blob URL
       window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      setErrorMessage("Document file not found");
-    }
+    } catch (err) {}
   };
 
   // 跳转到Modify Document页面
@@ -159,31 +150,22 @@ const GenerateDocument: React.FC = () => {
       );
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="gd-container">
-        <div className="gd-loading">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="gd-container">
+    <div className='gd-container'>
       {/* 主内容区域 - 带边框的容器 */}
-      <div className="gd-main-content">
+      <div className='gd-main-content'>
         {/* 标题区域 */}
-        <div className="gd-header">
-          <h1 className="gd-title">Generate document</h1>
+        <div className='gd-header'>
+          <h1 className='gd-title'>Generate document</h1>
         </div>
 
         {/* 错误消息显示 */}
-        {errorMessage && <div className="gd-error-message">{errorMessage}</div>}
+        {errorMessage && <div className='gd-error-message'>{errorMessage}</div>}
 
         {/* Chassis no - 可点击的链接 */}
-        <div className="gd-info-group">
-          <span className="gd-label chassis-no-label">Chassis no:</span>
-          <span className="gd-value">
+        <div className='gd-info-group'>
+          <span className='gd-label chassis-no-label'>Chassis no:</span>
+          <span className='gd-value'>
             {chassisNo.substring(0, 4)}
             <span
               onClick={() => {
@@ -193,7 +175,7 @@ const GenerateDocument: React.FC = () => {
                   );
                 }
               }}
-              className="gd-link"
+              className='gd-link'
               style={{
                 cursor: "pointer",
                 color: "#0000ff",
@@ -204,67 +186,67 @@ const GenerateDocument: React.FC = () => {
             </span>
           </span>
           {/* Ordernumber */}
-          <div className="gd-info-group">
-            <span className="gd-label">Ordernumber:</span>
-            <span className="gd-value">{documentData?.ordernumber || "-"}</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Ordernumber:</span>
+            <span className='gd-value'>{documentData?.ordernumber || "-"}</span>
           </div>
 
           {/* Build week */}
-          <div className="gd-info-group">
-            <span className="gd-label">Build week:</span>
-            <span className="gd-value">{documentData?.build || "-"}</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Build week:</span>
+            <span className='gd-value'>{documentData?.build || "-"}</span>
           </div>
 
           {/* Spec week */}
-          <div className="gd-info-group">
-            <span className="gd-label">Spec week:</span>
-            <span className="gd-value">{documentData?.spec || "-"}</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Spec week:</span>
+            <span className='gd-value'>{documentData?.spec || "-"}</span>
           </div>
 
           {/* Market */}
-          <div className="gd-info-group">
-            <span className="gd-label">Market:</span>
-            <span className="gd-value">
+          <div className='gd-info-group'>
+            <span className='gd-label'>Market:</span>
+            <span className='gd-value'>
               {documentData?.countryOfOperation || "-"}
             </span>
           </div>
 
           {/* Master Market */}
-          <div className="gd-info-group">
-            <span className="gd-label">Master Market:</span>
-            <span className="gd-value">-EU</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Master Market:</span>
+            <span className='gd-value'>-EU</span>
           </div>
 
           {/* S-Note NO */}
-          <div className="gd-info-group gd-snote-section">
-            <div className="gd-snote-no">
+          <div className='gd-info-group gd-snote-section'>
+            <div className='gd-snote-no'>
               {documentData?.customerAdap || "-"}
             </div>
           </div>
 
           {/* S-Note Message - 红色显示 */}
           {documentData?.customerAdap && documentData.customerAdap !== "-" && (
-            <div className="gd-info-group gd-snote-message">
+            <div className='gd-info-group gd-snote-message'>
               The S-Notes above can affect homologation documents.
             </div>
           )}
 
           {/* Load Index */}
-          <div className="gd-info-group">
-            <span className="gd-label">Load index:</span>
-            <span className="gd-value">{documentData?.loadIndex || "-"}</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Load index:</span>
+            <span className='gd-value'>{documentData?.loadIndex || "-"}</span>
           </div>
 
           {/* Analyze Rulesリンク */}
-          <div className="gd-info-group">
-            <span className="gd-link">Analyze Rules</span>
+          <div className='gd-info-group'>
+            <span className='gd-link'>Analyze Rules</span>
           </div>
 
           {/* ADCA变更提示 - 红色可点击リンク */}
           {documentData?.act === "Y" && (
-            <div className="gd-info-group">
+            <div className='gd-info-group'>
               <span
-                className="gd-link gd-adca-warning-link"
+                className='gd-link gd-adca-warning-link'
                 onClick={handleModifyDocument}
               >
                 After def change detected. Document need to be modified.
@@ -273,25 +255,25 @@ const GenerateDocument: React.FC = () => {
           )}
 
           {/* Using template */}
-          <div className="gd-info-group">
-            <span className="gd-label">Using template:</span>
-            <span className="gd-value">{documentData?.template || "-"}</span>
+          <div className='gd-info-group'>
+            <span className='gd-label'>Using template:</span>
+            <span className='gd-value'>{documentData?.template || "-"}</span>
           </div>
 
           {/* Replacing parameters */}
           {documentData?.variable && documentData.variable !== "-" && (
-            <div className="gd-info-group gd-replacing-params">
-              <div className="gd-param-label">Replacing parameters</div>
-              <div className="gd-param-value">
+            <div className='gd-info-group gd-replacing-params'>
+              <div className='gd-param-label'>Replacing parameters</div>
+              <div className='gd-param-value'>
                 {documentData.variable}: {documentData.newval}
               </div>
             </div>
           )}
 
           {/* Generated documentリンク */}
-          <div className="gd-info-group">
+          <div className='gd-info-group'>
             <span
-              className="gd-link gd-download-link"
+              className='gd-link gd-download-link'
               onClick={handleDownloadDocument}
             >
               Generated document
@@ -299,17 +281,17 @@ const GenerateDocument: React.FC = () => {
           </div>
 
           {/* 底部情報区域 - 在边框容器内 */}
-          <div className="gd-footer">
-            <div className="gd-info-group">
-              <span className="gd-label">Date:</span>
-              <span className="gd-value">
+          <div className='gd-footer'>
+            <div className='gd-info-group'>
+              <span className='gd-label'>Date:</span>
+              <span className='gd-value'>
                 {documentData?.serverTime || "-"}
               </span>
             </div>
 
-            <div className="gd-info-group">
-              <span className="gd-label">HDoc version:</span>
-              <span className="gd-value">
+            <div className='gd-info-group'>
+              <span className='gd-label'>HDoc version:</span>
+              <span className='gd-value'>
                 {documentData?.programVersion || "-"}
               </span>
             </div>

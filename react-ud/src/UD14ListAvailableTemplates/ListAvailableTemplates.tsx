@@ -18,7 +18,6 @@ const ListAvailableTemplates: React.FC = () => {
   const [templateFiles, setTemplateFiles] = useState<TemplateFile[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   // 页面初始化：加载市场列表
   useEffect(() => {
@@ -28,11 +27,8 @@ const ListAvailableTemplates: React.FC = () => {
   // 获取市场列表
   const fetchMarketList = async () => {
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud14Searchresultist/getmarkets`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud14Searchresultist/getmarkets`,
       );
 
       if (!response.ok) {
@@ -46,13 +42,7 @@ const ListAvailableTemplates: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Failed to load market list");
       }
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "System error. Please contact administrator.",
-      );
-    }
+    } catch (err) {}
   };
 
   // 处理市场选择变化
@@ -71,17 +61,13 @@ const ListAvailableTemplates: React.FC = () => {
   // 获取指定市场下的模板文件列表
   const fetchTemplateFiles = async (marketCode: string) => {
     try {
-      setIsLoading(true);
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       // 构建请求参数
       const requestBody = {
         Market: marketCode,
       };
 
       const response = await fetch(
-        `${API_BASE_URL}/api/ud14Searchresultist/getvariablesbymarket`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud14Searchresultist/getvariablesbymarket`,
         {
           method: "POST",
           headers: {
@@ -110,16 +96,7 @@ const ListAvailableTemplates: React.FC = () => {
       } else {
         setTemplateFiles([]);
       }
-    } catch (error) {
-      setTemplateFiles([]);
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "System error. Please contact administrator.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   // 下载文件功能
@@ -130,10 +107,7 @@ const ListAvailableTemplates: React.FC = () => {
     }
 
     try {
-      setIsLoading(true);
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-      const downloadUrl = `${API_BASE_URL}/api/ud14Searchresultist/download/${selectedMarket}/${encodeURIComponent(filename)}`;
+      const downloadUrl = `${process.env.REACT_APP_API_BASE_URL}/api/ud14Searchresultist/download/${selectedMarket}/${encodeURIComponent(filename)}`;
 
       const response = await fetch(downloadUrl);
 
@@ -153,35 +127,29 @@ const ListAvailableTemplates: React.FC = () => {
       window.URL.revokeObjectURL(url);
 
       setSuccessMessage(`File ${filename} downloaded successfully.`);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Failed to download file.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (err) {}
   };
 
   return (
-    <div className="lat-container">
+    <div className='lat-container'>
       {/* 消息显示 */}
-      {errorMessage && <div className="lat-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='lat-error-message'>{errorMessage}</div>}
       {successMessage && (
-        <div className="lat-success-message">{successMessage}</div>
+        <div className='lat-success-message'>{successMessage}</div>
       )}
 
       {/* List Templates区域 */}
-      <div className="lat-section">
-        <h2 className="lat-section-title">List Templates</h2>
+      <div className='lat-section'>
+        <h2 className='lat-section-title'>List Templates</h2>
 
-        <div className="lat-form-group">
-          <label className="lat-label">Select Market:</label>
+        <div className='lat-form-group'>
+          <label className='lat-label'>Select Market:</label>
           <select
-            className="lat-select"
+            className='lat-select'
             value={selectedMarket}
             onChange={(e) => handleMarketChange(e.target.value)}
           >
-            <option value="-">-</option>
+            <option value='-'>-</option>
             {marketList.map((item, index) => (
               <option key={index} value={item.market}>
                 {item.market}
@@ -191,21 +159,21 @@ const ListAvailableTemplates: React.FC = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className="lat-table-wrapper">
-          <table className="lat-table">
+        <div className='lat-table-wrapper'>
+          <table className='lat-table'>
             <thead>
               <tr>
-                <th className="lat-th-icon"></th>
-                <th className="lat-th-filename">Filename</th>
-                <th className="lat-th-used">Used</th>
-                <th className="lat-th-lastmod">Last Mod,</th>
-                <th className="lat-th-size">Size</th>
+                <th className='lat-th-icon'></th>
+                <th className='lat-th-filename'>Filename</th>
+                <th className='lat-th-used'>Used</th>
+                <th className='lat-th-lastmod'>Last Mod,</th>
+                <th className='lat-th-size'>Size</th>
               </tr>
             </thead>
             <tbody>
               {templateFiles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="lat-empty-row">
+                  <td colSpan={5} className='lat-empty-row'>
                     &nbsp;
                   </td>
                 </tr>
@@ -215,13 +183,13 @@ const ListAvailableTemplates: React.FC = () => {
                     key={index}
                     className={index % 2 === 0 ? "lat-even-row" : "lat-odd-row"}
                   >
-                    <td className="lat-td-icon">
+                    <td className='lat-td-icon'>
                       {/* 文件图标占位符 */}
-                      <span className="lat-file-icon">📄</span>
+                      <span className='lat-file-icon'>📄</span>
                     </td>
-                    <td className="lat-td-filename">
+                    <td className='lat-td-filename'>
                       <span
-                        className="lat-filename-link"
+                        className='lat-filename-link'
                         onClick={() => handleDownload(file.filename)}
                         style={{
                           cursor: "pointer",
@@ -232,9 +200,9 @@ const ListAvailableTemplates: React.FC = () => {
                         {file.filename}
                       </span>
                     </td>
-                    <td className="lat-td-used">{file.used}</td>
-                    <td className="lat-td-lastmod">{file.lastMod}</td>
-                    <td className="lat-td-size">{file.size}</td>
+                    <td className='lat-td-used'>{file.used}</td>
+                    <td className='lat-td-lastmod'>{file.lastMod}</td>
+                    <td className='lat-td-size'>{file.size}</td>
                   </tr>
                 ))
               )}

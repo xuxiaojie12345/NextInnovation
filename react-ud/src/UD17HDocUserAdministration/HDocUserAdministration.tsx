@@ -59,7 +59,6 @@ const HDocUserAdministration: React.FC = () => {
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   // 页面初始化：加载市场列表数据
   useEffect(() => {
@@ -69,11 +68,8 @@ const HDocUserAdministration: React.FC = () => {
   // 获取市场列表
   const fetchMarketList = async () => {
     try {
-      setIsLoading(true);
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/ud17HDocUserAdministration/getMarketList`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/getMarketList`,
         {
           method: "GET",
           headers: {
@@ -92,10 +88,7 @@ const HDocUserAdministration: React.FC = () => {
       } else {
         setErrorMessage("获取市场列表失败，请联系管理员");
       }
-    } catch (error) {
-      setErrorMessage("系统内部错误，请联系管理员");
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -114,16 +107,12 @@ const HDocUserAdministration: React.FC = () => {
     }
 
     try {
-      setIsLoading(true);
       setErrorMessage("");
       setSuccessMessage("");
 
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       // 调用API获取用户信息
       const response = await fetch(
-        `${API_BASE_URL}/api/ud17HDocUserAdministration/getUserInfo`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/getUserInfo`,
         {
           method: "POST",
           headers: {
@@ -154,22 +143,15 @@ const HDocUserAdministration: React.FC = () => {
           "We didn't recognize the userid you entered. Please try again.",
         );
       }
-    } catch (error) {
-      setErrorMessage(
-        "We didn't recognize the userid you entered. Please try again.",
-      );
     } finally {
-      setIsLoading(false);
     }
   };
 
   // 获取用户权限配置
   const fetchUserPermissions = async (userId: string, userName?: string) => {
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const response = await fetch(
-        `${API_BASE_URL}/api/ud17HDocUserAdministration/getUserPermissions`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/getUserPermissions`,
         {
           method: "POST",
           headers: {
@@ -295,9 +277,7 @@ const HDocUserAdministration: React.FC = () => {
 
         setFormData(updatedFormData);
       }
-    } catch (error) {
-      setErrorMessage("获取用户权限失败，请联系管理员");
-    }
+    } catch (err) {}
   };
 
   // 处理角色复选框变化
@@ -337,13 +317,10 @@ const HDocUserAdministration: React.FC = () => {
     }
 
     try {
-      setIsLoading(true);
       setErrorMessage("");
       setSuccessMessage("");
 
       // 构建请求数据
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const currentUser = localStorage.getItem("currentUser") || "";
 
       // 角色→TYPE代码(MARKET_AUTH) / FUNCTION描述(FUNCTION_AUTH) 映射
@@ -400,7 +377,7 @@ const HDocUserAdministration: React.FC = () => {
 
       // Step1: 先删除该用户的所有权限
       const deleteResponse = await fetch(
-        `${API_BASE_URL}/api/ud17HDocUserAdministration/deleteRole`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/deleteRole`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -429,7 +406,7 @@ const HDocUserAdministration: React.FC = () => {
           role.markets.forEach((market) => {
             roleUpdatePromises.push(
               fetch(
-                `${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
+                `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
@@ -448,18 +425,21 @@ const HDocUserAdministration: React.FC = () => {
         } else if (checked && !role.hasMarkets) {
           // 有market但没选market → 只注册FUNCTION
           roleUpdatePromises.push(
-            fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: formData.userId,
-                market: "",
-                type: "",
-                bu: "",
-                function: role.funcDesc,
-                updateUser: currentUser,
-              }),
-            }),
+            fetch(
+              `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  userId: formData.userId,
+                  market: "",
+                  type: "",
+                  bu: "",
+                  function: role.funcDesc,
+                  updateUser: currentUser,
+                }),
+              },
+            ),
           );
         }
       });
@@ -467,42 +447,47 @@ const HDocUserAdministration: React.FC = () => {
       // User Admin（无market）
       if (formData.userAdminChecked) {
         roleUpdatePromises.push(
-          fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: formData.userId,
-              market: "",
-              type: "",
-              bu: "",
-              function: "User Administrator",
-              updateUser: currentUser,
-            }),
-          }),
+          fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: formData.userId,
+                market: "",
+                type: "",
+                bu: "",
+                function: "User Administrator",
+                updateUser: currentUser,
+              }),
+            },
+          ),
         );
       }
 
       // Manage Variable List（无market）
       if (formData.manageVariableListChecked) {
         roleUpdatePromises.push(
-          fetch(`${API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: formData.userId,
-              market: "",
-              type: "",
-              bu: "",
-              function: "Manage Variable List",
-              updateUser: currentUser,
-            }),
-          }),
+          fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/updateRole`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: formData.userId,
+                market: "",
+                type: "",
+                bu: "",
+                function: "Manage Variable List",
+                updateUser: currentUser,
+              }),
+            },
+          ),
         );
       }
 
       if (roleUpdatePromises.length === 0) {
         setErrorMessage("请至少选择一个角色权限");
-        setIsLoading(false);
         return;
       }
 
@@ -515,10 +500,7 @@ const HDocUserAdministration: React.FC = () => {
       } else {
         setErrorMessage("部分权限更新失败，请联系管理员");
       }
-    } catch (error) {
-      setErrorMessage("系统内部错误，请联系管理员");
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -535,16 +517,12 @@ const HDocUserAdministration: React.FC = () => {
     }
 
     try {
-      setIsLoading(true);
       setErrorMessage("");
       setSuccessMessage("");
-
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
       const currentUser = localStorage.getItem("currentUser") || "";
 
       const response = await fetch(
-        `${API_BASE_URL}/api/ud17HDocUserAdministration/deleteRole`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud17HDocUserAdministration/deleteRole`,
         {
           method: "DELETE",
           headers: {
@@ -586,10 +564,7 @@ const HDocUserAdministration: React.FC = () => {
       } else {
         setErrorMessage("删除失败，请联系管理员");
       }
-    } catch (error) {
-      setErrorMessage("系统内部错误，请联系管理员");
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -604,46 +579,42 @@ const HDocUserAdministration: React.FC = () => {
     });
   };
 
-  if (isLoading) {
-    return <div className="hvua-loading">加载中...</div>;
-  }
-
   return (
-    <div className="hvua-container">
+    <div className='hvua-container'>
       {/* 标题 */}
-      <h2 className="hvua-title">HDoc User Admin</h2>
+      <h2 className='hvua-title'>HDoc User Admin</h2>
 
       {/* 错误消息 */}
-      {errorMessage && <div className="hvua-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='hvua-error-message'>{errorMessage}</div>}
 
       {/* 成功消息 */}
       {successMessage && (
-        <div className="hvua-success-message">{successMessage}</div>
+        <div className='hvua-success-message'>{successMessage}</div>
       )}
 
       {/* 边框容器 */}
-      <div className="hvua-border-box">
+      <div className='hvua-border-box'>
         {/* 搜索区域 */}
-        <div className="hvua-search-section">
-          <div className="hvua-form-row">
-            <label className="hvua-label-required">Userid</label>
+        <div className='hvua-search-section'>
+          <div className='hvua-form-row'>
+            <label className='hvua-label-required'>Userid</label>
             <input
-              type="text"
-              className="hvua-input-short"
+              type='text'
+              className='hvua-input-short'
               value={formData.userId}
               onChange={handleUserIdChange}
-              placeholder="v0c6900"
+              placeholder='v0c6900'
             />
-            <button className="hvua-btn hvua-btn-info" onClick={handleUserInfo}>
+            <button className='hvua-btn hvua-btn-info' onClick={handleUserInfo}>
               USER INFO
             </button>
           </div>
 
-          <div className="hvua-form-row">
-            <label className="hvua-label-required">User</label>
+          <div className='hvua-form-row'>
+            <label className='hvua-label-required'>User</label>
             <input
-              type="text"
-              className="hvua-input-medium"
+              type='text'
+              className='hvua-input-medium'
               value={formData.userName}
               readOnly
             />
@@ -651,13 +622,13 @@ const HDocUserAdministration: React.FC = () => {
         </div>
 
         {/* 角色权限配置区域 - 横向排列 */}
-        <div className="hvua-roles-section">
+        <div className='hvua-roles-section'>
           {/* Standard User */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="standardUser"
+                type='checkbox'
+                id='standardUser'
                 checked={formData.standardUserChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -666,13 +637,13 @@ const HDocUserAdministration: React.FC = () => {
                   )
                 }
               />
-              <label htmlFor="standardUser" className="hvua-checkbox-label">
+              <label htmlFor='standardUser' className='hvua-checkbox-label'>
                 Standard User
               </label>
             </div>
             <select
               multiple
-              className="hvua-select-single"
+              className='hvua-select-single'
               value={formData.standardUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -685,28 +656,28 @@ const HDocUserAdministration: React.FC = () => {
               }}
               disabled={!formData.standardUserChecked}
             >
-              <option value="-EU">-EU</option>
+              <option value='-EU'>-EU</option>
             </select>
           </div>
 
           {/* Rule Admin */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="ruleAdmin"
+                type='checkbox'
+                id='ruleAdmin'
                 checked={formData.ruleAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange("ruleAdminChecked", e.target.checked)
                 }
               />
-              <label htmlFor="ruleAdmin" className="hvua-checkbox-label">
+              <label htmlFor='ruleAdmin' className='hvua-checkbox-label'>
                 Rule Admin
               </label>
             </div>
             <select
               multiple
-              className="hvua-select-multiple"
+              className='hvua-select-multiple'
               value={formData.ruleAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -725,11 +696,11 @@ const HDocUserAdministration: React.FC = () => {
           </div>
 
           {/* Template Admin */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="templateAdmin"
+                type='checkbox'
+                id='templateAdmin'
                 checked={formData.templateAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -738,13 +709,13 @@ const HDocUserAdministration: React.FC = () => {
                   )
                 }
               />
-              <label htmlFor="templateAdmin" className="hvua-checkbox-label">
+              <label htmlFor='templateAdmin' className='hvua-checkbox-label'>
                 Template Admin
               </label>
             </div>
             <select
               multiple
-              className="hvua-select-multiple"
+              className='hvua-select-multiple'
               value={formData.templateAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -768,11 +739,11 @@ const HDocUserAdministration: React.FC = () => {
           </div>
 
           {/* Document Auth Admin */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="documentAuthAdmin"
+                type='checkbox'
+                id='documentAuthAdmin'
                 checked={formData.documentAuthAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -782,15 +753,15 @@ const HDocUserAdministration: React.FC = () => {
                 }
               />
               <label
-                htmlFor="documentAuthAdmin"
-                className="hvua-checkbox-label"
+                htmlFor='documentAuthAdmin'
+                className='hvua-checkbox-label'
               >
                 Document Auth Admin
               </label>
             </div>
             <select
               multiple
-              className="hvua-select-multiple"
+              className='hvua-select-multiple'
               value={formData.documentAuthAdminMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -814,28 +785,28 @@ const HDocUserAdministration: React.FC = () => {
           </div>
 
           {/* User Admin */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="userAdmin"
+                type='checkbox'
+                id='userAdmin'
                 checked={formData.userAdminChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange("userAdminChecked", e.target.checked)
                 }
               />
-              <label htmlFor="userAdmin" className="hvua-checkbox-label">
+              <label htmlFor='userAdmin' className='hvua-checkbox-label'>
                 User Admin
               </label>
             </div>
           </div>
 
           {/* Adaptation user */}
-          <div className="hvua-role-group">
-            <div className="hvua-form-row">
+          <div className='hvua-role-group'>
+            <div className='hvua-form-row'>
               <input
-                type="checkbox"
-                id="adaptationUser"
+                type='checkbox'
+                id='adaptationUser'
                 checked={formData.adaptationUserChecked}
                 onChange={(e) =>
                   handleRoleCheckboxChange(
@@ -844,13 +815,13 @@ const HDocUserAdministration: React.FC = () => {
                   )
                 }
               />
-              <label htmlFor="adaptationUser" className="hvua-checkbox-label">
+              <label htmlFor='adaptationUser' className='hvua-checkbox-label'>
                 Adaptation use
               </label>
             </div>
             <select
               multiple
-              className="hvua-select-single"
+              className='hvua-select-single'
               value={formData.adaptationUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -863,17 +834,17 @@ const HDocUserAdministration: React.FC = () => {
               }}
               disabled={!formData.adaptationUserChecked}
             >
-              <option value="-EU">-EU</option>
+              <option value='-EU'>-EU</option>
             </select>
           </div>
         </div>
 
         {/* Manage Variable List */}
-        <div className="hvua-function-section">
-          <div className="hvua-form-row">
-            <label className="hvua-label">Manage Variable List</label>
+        <div className='hvua-function-section'>
+          <div className='hvua-form-row'>
+            <label className='hvua-label'>Manage Variable List</label>
             <input
-              type="checkbox"
+              type='checkbox'
               checked={formData.manageVariableListChecked}
               onChange={(e) =>
                 handleRoleCheckboxChange(
@@ -886,12 +857,12 @@ const HDocUserAdministration: React.FC = () => {
         </div>
 
         {/* Market super user */}
-        <div className="hvua-super-user-section">
-          <div className="hvua-form-row">
-            <label className="hvua-label">Market super user</label>
+        <div className='hvua-super-user-section'>
+          <div className='hvua-form-row'>
+            <label className='hvua-label'>Market super user</label>
             <select
               multiple
-              className="hvua-select-multiple"
+              className='hvua-select-multiple'
               value={formData.marketSuperUserMarkets}
               onChange={(e) => {
                 const selectedOptions = Array.from(
@@ -915,15 +886,15 @@ const HDocUserAdministration: React.FC = () => {
         </div>
 
         {/* 操作按钮区域 */}
-        <div className="hvua-button-bar">
+        <div className='hvua-button-bar'>
           <button
-            className="hvua-btn hvua-btn-primary"
+            className='hvua-btn hvua-btn-primary'
             onClick={handleUpdateRole}
           >
             Update Role
           </button>
           <button
-            className="hvua-btn hvua-btn-danger"
+            className='hvua-btn hvua-btn-danger'
             onClick={handleDeleteRole}
           >
             Delete Role

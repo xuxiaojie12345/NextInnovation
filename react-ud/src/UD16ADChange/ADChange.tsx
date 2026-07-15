@@ -47,18 +47,18 @@ const ADChange: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
-      const response = await fetch(`${API_BASE_URL}/api/ud16/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud16/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ serieChnr, desc, updateUser: currentUser }),
         },
-        body: JSON.stringify({ serieChnr, desc, updateUser: currentUser }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("系统错误，请稍后重试");
@@ -79,8 +79,6 @@ const ADChange: React.FC = () => {
           setErrorMessage(result.msg || "添加失败，请联系管理员");
         }
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);
     }
@@ -107,18 +105,18 @@ const ADChange: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const currentUser = localStorage.getItem("currentUser") || "";
 
-      const response = await fetch(`${API_BASE_URL}/api/ud16/delete`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud16/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ serieChnr, updateUser: currentUser }),
         },
-        body: JSON.stringify({ serieChnr, updateUser: currentUser }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("系统错误，请稍后重试");
@@ -133,8 +131,6 @@ const ADChange: React.FC = () => {
       } else {
         setErrorMessage(result.msg || "删除失败，请联系管理员");
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);
     }
@@ -153,11 +149,8 @@ const ADChange: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
-
       const response = await fetch(
-        `${API_BASE_URL}/api/ud16/check?serieChnr=${encodeURIComponent(serieChnr)}`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/ud16/check?serieChnr=${encodeURIComponent(serieChnr)}`,
         {
           method: "GET",
           headers: {
@@ -184,68 +177,66 @@ const ADChange: React.FC = () => {
       } else {
         setErrorMessage(result.msg || "检查失败，请联系管理员");
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || "系统错误，请稍后重试");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="adc-container">
+    <div className='adc-container'>
       {/* 消息显示 */}
       {successMessage && (
-        <div className="adc-success-message">{successMessage}</div>
+        <div className='adc-success-message'>{successMessage}</div>
       )}
-      {errorMessage && <div className="adc-error-message">{errorMessage}</div>}
+      {errorMessage && <div className='adc-error-message'>{errorMessage}</div>}
 
       {/* 画面标题 */}
-      <h2 className="adc-section-title">AD Change</h2>
+      <h2 className='adc-section-title'>AD Change</h2>
 
       {/* 输入区域 */}
-      <div className="adc-section">
+      <div className='adc-section'>
         {/* Serie-Chnr输入 */}
-        <div className="adc-form-group">
-          <label className="adc-label">Serie-Chnr</label>
+        <div className='adc-form-group'>
+          <label className='adc-label'>Serie-Chnr</label>
           <input
-            type="text"
-            className="adc-input"
+            type='text'
+            className='adc-input'
             value={serieChnr}
             onChange={(e) => handleSerieChnrChange(e.target.value)}
-            placeholder="Enter Serie-Chnr"
+            placeholder='Enter Serie-Chnr'
             disabled={isLoading}
             maxLength={15}
           />
         </div>
 
         {/* Desc输入 */}
-        <div className="adc-form-group">
-          <label className="adc-label">Desc</label>
+        <div className='adc-form-group'>
+          <label className='adc-label'>Desc</label>
           <input
-            type="text"
-            className="adc-input-desc"
+            type='text'
+            className='adc-input-desc'
             value={desc}
             onChange={(e) => handleDescChange(e.target.value)}
-            placeholder="Enter description"
+            placeholder='Enter description'
             disabled={isLoading}
             maxLength={4000}
           />
         </div>
 
         {/* 按钮行 */}
-        <div className="adc-button-row">
-          <button className="adc-btn" onClick={handleAdd} disabled={isLoading}>
+        <div className='adc-button-row'>
+          <button className='adc-btn' onClick={handleAdd} disabled={isLoading}>
             ADD
           </button>
           <button
-            className="adc-btn"
+            className='adc-btn'
             onClick={handleDelete}
             disabled={isLoading}
           >
             DELETE
           </button>
           <button
-            className="adc-btn"
+            className='adc-btn'
             onClick={handleCheck}
             disabled={isLoading}
           >
@@ -253,13 +244,6 @@ const ADChange: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* 初始提示信息 */}
-      {!errorMessage && !successMessage && !isLoading && (
-        <p className="adc-initial-message">
-          Please enter a Serie-Chnr to add, delete or check an AD Change record.
-        </p>
-      )}
     </div>
   );
 };
