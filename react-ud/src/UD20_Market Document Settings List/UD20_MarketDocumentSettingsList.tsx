@@ -61,7 +61,6 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('获取文档列表失败:', error);
       setMessage('获取文档列表失败，请稍后重试');
       setMessageType('error');
     } finally {

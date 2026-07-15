@@ -20,7 +20,6 @@ const UD24_UDHDoc: React.FC = () => {
     try {
       navigate("/UD23");
     } catch (error) {
-      console.error("页面跳转失败:", error);
       alert("页面跳转失败，请稍后重试");
     }
   };
@@ -32,7 +31,6 @@ const UD24_UDHDoc: React.FC = () => {
     try {
       navigate("/UD22");
     } catch (error) {
-      console.error("页面跳转失败:", error);
       alert("页面跳转失败，请稍后重试");
     }
   };
@@ -44,7 +42,6 @@ const UD24_UDHDoc: React.FC = () => {
     try {
       navigate("/UD21");
     } catch (error) {
-      console.error("页面跳转失败:", error);
       alert("页面跳转失败，请稍后重试");
     }
   };
@@ -56,7 +53,6 @@ const UD24_UDHDoc: React.FC = () => {
     try {
       navigate("/UD201");
     } catch (error) {
-      console.error("页面跳转失败:", error);
       alert("页面跳转失败，请稍后重试");
     }
   };

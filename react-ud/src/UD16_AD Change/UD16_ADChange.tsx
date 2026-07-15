@@ -123,7 +123,6 @@ const UD16_ADChange: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('添加AD Change失败:', error);
 
       if (error.response) {
         const statusCode = error.response.status;
@@ -200,7 +199,6 @@ const UD16_ADChange: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('删除AD Change失败:', error);
 
       if (error.response) {
         const statusCode = error.response.status;
@@ -274,7 +272,6 @@ const UD16_ADChange: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('检查AD Change失败:', error);
 
       if (error.response) {
         const statusCode = error.response.status;

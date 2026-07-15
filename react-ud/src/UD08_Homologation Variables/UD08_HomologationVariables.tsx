@@ -107,7 +107,6 @@ const UD08_HomologationVariables: React.FC = () => {
           setMarketOptions(marketList);
         }
       } catch (error) {
-        console.error('加载主数据失败:', error);
         setMessage('系统内部错误，请联系系统管理员');
         setMessageType('error');
       }
@@ -416,7 +415,6 @@ const UD08_HomologationVariables: React.FC = () => {
       }
       return true;
     } catch (error) {
-      console.error('Variable存在性校验失败:', error);
       setMessage('系统内部错误，请联系系统管理员');
       setMessageType('error');
       return false;
@@ -485,7 +483,6 @@ const UD08_HomologationVariables: React.FC = () => {
         setMessageType('error');
       }
     } catch (error: any) {
-      console.error('新增操作失败:', error);
       // 处理后端返回的业务错误
       if (error.response?.data?.message) {
         setMessage(error.response.data.message);
@@ -559,7 +556,6 @@ const UD08_HomologationVariables: React.FC = () => {
         setMessageType('error');
       }
     } catch (error: any) {
-      console.error('更新操作失败:', error);
       if (error.response?.data?.message) {
         setMessage(error.response.data.message);
       } else {
@@ -621,7 +617,6 @@ const UD08_HomologationVariables: React.FC = () => {
         setMessageType('error');
       }
     } catch (error: any) {
-      console.error('删除操作失败:', error);
       if (error.response?.data?.message) {
         setMessage(error.response.data.message);
       } else {

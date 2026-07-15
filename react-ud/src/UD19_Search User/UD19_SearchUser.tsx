@@ -66,7 +66,6 @@ const UD19_SearchUser: React.FC = () => {
         setMarketOptions(response.data.data);
       }
     } catch (error) {
-      console.error('获取Market列表失败:', error);
     }
   };
 
@@ -96,7 +95,6 @@ const UD19_SearchUser: React.FC = () => {
    * 处理Market下拉框变化
    */
   const handleMarketChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('UD19 Market选择变化:', e.target.value);
     setSelectedMarket(e.target.value);
   };
 
@@ -159,7 +157,6 @@ const UD19_SearchUser: React.FC = () => {
         const tableData: SearchUserItem[] = responseData?.datatable || [];
         const count = responseData?.count || tableData.length;
 
-        console.log('UD19_SearchUser:', responseData);
         setSearchResults(tableData);
 
         if (count > 0) {
@@ -178,7 +175,6 @@ const UD19_SearchUser: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('搜索用户失败:', error);
       setMessageType('error');
       setSearchResults([]);
 

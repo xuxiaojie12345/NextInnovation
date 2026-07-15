@@ -161,7 +161,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
         setMessageType('error');
       }
     } catch (error: any) {
-      console.error('更新失败:', error);
       if (error.response?.status === 404) {
         setMessage('Document type does not exists. Please enter the correct content.');
       } else {

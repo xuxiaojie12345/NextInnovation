@@ -206,7 +206,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
         },
       });
     } catch (error) {
-      console.error('UD04画面跳转失败:', error);
       setMessage('页面跳转失败，请稍后重试');
     }
   };
@@ -231,7 +230,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
       // 页面跳转：跳转到UD24 HDoc Help页面
       navigate('/UD24');
     } catch (error) {
-      console.error('UD24画面跳转失败:', error);
       setMessage('页面跳转失败，请稍后重试');
     }
   };

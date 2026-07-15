@@ -155,7 +155,6 @@ const UD15_VinPlate: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('获取VIN Plate信息失败:', error);
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {
@@ -254,7 +253,6 @@ const UD15_VinPlate: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error(`${config.successMsg}操作失败:`, error);
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {
@@ -308,7 +306,6 @@ const UD15_VinPlate: React.FC = () => {
       }
     } catch (error) {
       // 刷新失败不影响主操作的消息显示
-      console.error('刷新VIN Plate信息失败:', error);
     }
   };
 

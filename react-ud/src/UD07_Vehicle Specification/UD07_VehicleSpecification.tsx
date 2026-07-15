@@ -61,7 +61,6 @@ const UD07_VehicleSpecification: React.FC = () => {
     const routeState = location.state as any;
     const chassisSeries = routeState?.chassisSeries || routeState?.chassisSerie || '';
     const chassisNo = routeState?.chassisNo || '';
-    console.log('UD07车辆规格页面接收参数:', chassisSeries, chassisNo);
     if (!chassisSeries || !chassisNo) {
       setState(prev => ({
         ...prev,
@@ -93,7 +92,6 @@ const UD07_VehicleSpecification: React.FC = () => {
 
       if (response.data?.code === 200 && response.data?.data) {
         const data = response.data.data;
-        console.log('UD07车辆规格数据:', data);
 
         const kolaVariants = data.kolaVariants || [];
         // 构建一一对应的symbol+description列表
@@ -129,7 +127,6 @@ const UD07_VehicleSpecification: React.FC = () => {
         }));
       }
     } catch (error: any) {
-      console.error('获取UD07车辆规格数据失败:', error);
       let errorMessage = 'System error. Please try again later.';
       if (error.code === 'ECONNABORTED') {
         errorMessage = 'Request timeout. Please check your network.';

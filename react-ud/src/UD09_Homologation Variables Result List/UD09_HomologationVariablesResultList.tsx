@@ -119,7 +119,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
           setMessageType('error');
         }
       } catch (error: any) {
-        console.error('检索失败:', error);
         setResults([]);
         setMessage('系统内部错误，请联系系统管理员');
         setMessageType('error');
@@ -281,7 +280,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
         setResults(mappedResults);
       }
     } catch (error: any) {
-      console.error('删除操作失败:', error);
       setMessage(error.message || 'Data does not exist, Please enter the correct content');
       setMessageType('error');
     } finally {

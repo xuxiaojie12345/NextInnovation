@@ -52,7 +52,6 @@ const UD21_MarketsInHDoc: React.FC = () => {
       }
     } catch (error) {
       // 异常处理 - 网络超时/数据库连接失败
-      console.error('获取市场列表失败:', error);
       setMessage('获取市场列表失败，请稍后重试');
       setMessageType('error');
     } finally {

@@ -42,7 +42,6 @@ const UD25_EDBUserView: React.FC = () => {
       }
 
       setIsLoading(true);
-      console.log('userId...'+userId);
       try {
         // 调用API获取用户信息
         // 注意：参数名须与后端 @RequestParam 一致（userId，非userID）
@@ -65,7 +64,6 @@ const UD25_EDBUserView: React.FC = () => {
         }
       } catch (error) {
         // 对应设计书 3.2 校验详细规格表 - No.2 API调用失败
-        console.error('获取用户信息失败:', error);
         setMessage('获取用户信息失败');
         setMessageType('error');
       } finally {

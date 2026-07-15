@@ -159,7 +159,6 @@ const UD04_GenerateDocument: React.FC = () => {
       } else {
         // 对应设计书 5. 异常处理 - 数据不存在 / 业务错误
         // 服务器返回了业务错误（code != 200），记录服务器返回的错误详情
-        console.error('API业务错误:', response.data?.messageList || response.data);
         setState(prev => ({
           ...prev,
           message: 'We can not get the data. Please try again.',
@@ -169,27 +168,21 @@ const UD04_GenerateDocument: React.FC = () => {
     } catch (error: any) {
       // ==================== 5. 异常处理 ====================
       // 对应设计书 5. 异常处理表
-      console.error('获取文档数据失败:', error);
-      
       let errorMessage: string;
       
       if (error.code === 'ECONNABORTED') {
         // 请求超时 — 超时异常
-        console.error('请求超时');
         errorMessage = 'Request timeout. Please check your network.';
       } else if (error.response) {
         // 服务器返回了错误状态码（4xx, 5xx）
         const status = error.response.status;
-        console.error('服务器返回错误状态:', status, error.response.data);
         // 服务器内部错误(500)、未授权(401)等统一显示 System error
         errorMessage = 'System error. Please try again later.';
       } else if (error.request) {
         // 请求已发出但没有收到响应 — 网络异常
-        console.error('网络异常: 未收到服务器响应');
         errorMessage = 'System error. Please try again later.';
       } else {
         // API取得异常等其他异常
-        console.error('API取得异常:', error.message);
         errorMessage = 'System error. Please try again later.';
       }
       
@@ -227,7 +220,6 @@ const UD04_GenerateDocument: React.FC = () => {
         });
       } catch (error) {
         // 对应设计书 5. 异常处理 - 画面迁移异常
-        console.error('UD05跳转失败:', error);
         setState(prev => ({
           ...prev,
           message: 'System error. Please try again later.',
@@ -259,7 +251,6 @@ const UD04_GenerateDocument: React.FC = () => {
         });
       } catch (error) {
         // 对应设计书 5. 异常处理 - 画面迁移异常
-        console.error('UD07跳转失败:', error);
         setState(prev => ({
           ...prev,
           message: 'System error. Please try again later.',
@@ -274,7 +265,6 @@ const UD04_GenerateDocument: React.FC = () => {
    */
   const handleGeneratedDocClick = () => {
     // TODO: 实现文档下载或查看功能
-    console.log('下载或查看生成的文档');
     // 可以打开新窗口或触发下载
   };
 
@@ -284,7 +274,6 @@ const UD04_GenerateDocument: React.FC = () => {
    */
   const handleAnalyzeRulesClick = () => {
     // TODO: 实现分析规则功能
-    console.log('分析规则');
   };
 
   // ==================== 渲染 UI ====================

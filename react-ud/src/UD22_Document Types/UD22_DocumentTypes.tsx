@@ -57,7 +57,6 @@ const UD22_DocumentTypes: React.FC = () => {
       }
     } catch (error) {
       // 对应设计书 5. 异常处理
-      console.error('获取文档类型列表失败:', error);
       setMessage('获取文档类型列表失败，请稍后重试');
       setMessageType('error');
     } finally {

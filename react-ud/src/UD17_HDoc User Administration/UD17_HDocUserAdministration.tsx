@@ -111,7 +111,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
         setMarketSelections(initialMarkets);
       }
     } catch (error) {
-      console.error('获取市场列表失败:', error);
     }
   };
 
@@ -199,7 +198,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
         // 步骤4(续): 解析authList，通过type代码映射到对应的checkbox
         const authList: Array<{ market: string; type: string; BU?: string }> = response.data.authList || [];
-        console.log('UD17 authList:', JSON.stringify(authList));
 
         // 设置角色勾选状态：根据type代码映射到checkbox key
         const newCheckedRoles: Record<string, boolean> = {};
@@ -227,8 +225,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
           }
         });
 
-        console.log('UD17 newCheckedRoles:', JSON.stringify(newCheckedRoles));
-        console.log('UD17 newMarkets:', JSON.stringify(newMarkets));
         setCheckedRoles(newCheckedRoles);
         setMarketSelections(newMarkets);
 
@@ -244,7 +240,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('查询用户信息失败:', error);
 
       if (error.response) {
         const statusCode = error.response.status;
@@ -316,18 +311,11 @@ const UD17_HDocUserAdministration: React.FC = () => {
         }
       });
 
-      console.log('UD17 发送更新请求体:', JSON.stringify({
-        userId: userID.trim(),
-        functionAuths,
-      }));
-
       // PUT /api/ud17/updaterole（全体API設計: PUT）
       const response = await apiClient.put('/api/ud17/updaterole', {
         userId: userID.trim(),
         functionAuths,
       });
-
-      console.log('UD17 更新响应:', JSON.stringify(response.data));
 
       // 结果处理
       // 后端返回格式：{ code: "200", success: true, message: "用户权限更新成功" }
@@ -341,7 +329,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('更新用户权限失败:', error);
       setMessageType('error');
 
       if (error.response) {
@@ -412,7 +399,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理
-      console.error('删除用户权限失败:', error);
       setMessageType('error');
 
       if (error.response) {

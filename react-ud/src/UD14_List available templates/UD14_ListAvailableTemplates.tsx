@@ -93,7 +93,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理：网络连接失败或服务器内部错误
-      console.error('获取Market列表失败:', error);
       if (error.response && error.response.status >= 500) {
         setMessage('服务器内部错误，请联系管理员');
       } else if (error.code === 'ECONNABORTED') {
@@ -141,7 +140,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       }
     } catch (error: any) {
       // 异常处理（网络错误、超时等HTTP层面的异常）
-      console.error('获取文件列表失败:', error);
       setFileList([]);
       if (error.code === 'ECONNABORTED') {
         setMessage('请求超时，请稍后重试');
@@ -196,7 +194,6 @@ const UD14_ListAvailableTemplates: React.FC = () => {
       setMessage(''); // 清除旧消息
     } catch (error: any) {
       // 异常处理
-      console.error('文件下载失败:', error);
       if (error.response) {
         const statusCode = error.response.status;
         if (statusCode === 404) {

@@ -57,11 +57,8 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       const response = await apiClient.get('/api/ud20/getdocumentlist');
       if (response.data?.code === 200 && Array.isArray(response.data?.data)) {
         setDocumentList(response.data.data);
-      } else {
-        console.warn('UD18 文档列表响应格式异常:', response.data);
       }
     } catch (error) {
-      console.error('获取文档列表失败:', error);
       setMessageType('error');
       setMessage('获取文档列表失败');
     }
@@ -174,7 +171,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
         }
       } catch (docErr) {
         // 无文档权限时忽略
-        console.warn('查询用户文档权限失败:', docErr);
       }
 
       // 5. 结果处理 - 多个文档权限全部高亮
@@ -185,7 +181,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
     } catch (error: any) {
       // 异常处理
-      console.error('查询用户信息失败:', error);
 
       if (error.response) {
         const statusCode = error.response.status;
@@ -302,7 +297,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       setMessage('');
     } catch (error: any) {
       // 异常处理
-      console.error('更新用户文档权限失败:', error);
       setMessageType('error');
 
       if (error.response) {

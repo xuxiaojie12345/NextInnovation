@@ -84,7 +84,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
           setMessageType('error');
         }
       } catch (error) {
-        console.error('检索失败:', error);
         setResults([]);
         setMessage('获取检索结果失败');
         setMessageType('error');
