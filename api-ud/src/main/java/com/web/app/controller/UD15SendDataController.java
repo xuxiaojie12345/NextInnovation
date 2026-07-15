@@ -1,6 +1,5 @@
 package com.web.app.controller;
 
-import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.UD15SendDataService;
 import java.util.*;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc/ud15")
 @CrossOrigin(origins = "*")
-public class UD15SendDataController extends BaseController {
+public class UD15SendDataController {
 
   @Autowired
   private UD15SendDataService ud15SendDataService;
@@ -23,19 +22,22 @@ public class UD15SendDataController extends BaseController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (isParamMissing(serie) || isParamMissing(chnr)) {
-        return badRequest("Serie and CHNR are required.");
+      if (serie == null || chnr == null) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "Serie and CHNR are required."));
       }
 
       Map<String, Object> data = ud15SendDataService.viewInfo(serie, chnr);
       if (data != null) {
-        return ok(data);
+        return ResponseEntity.ok(ApiResponse.success(data));
       } else {
-        String chassisNo = serie + " " + chnr;
-        return notFound("Chassis number " + chassisNo + " not found.");
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
+        return ResponseEntity.status(404)
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
-      return systemError();
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
   }
 
@@ -46,20 +48,25 @@ public class UD15SendDataController extends BaseController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (isParamMissing(serie) || isParamMissing(chnr)) {
-        return badRequest("Serie and CHNR are required.");
+      if (serie == null || chnr == null) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "Serie and CHNR are required."));
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.setRegenerate(serie, chnr, currentUser);
       if (result > 0) {
-        return ok(null, MessageConstants.STATUS_REGENERATE);
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Status updated to regenerate.");
+        return ResponseEntity.ok(resp);
       } else {
-        String chassisNo = serie + " " + chnr;
-        return notFound("Chassis number " + chassisNo + " not found.");
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
+        return ResponseEntity.status(404)
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
-      return systemError();
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
   }
 
@@ -69,20 +76,25 @@ public class UD15SendDataController extends BaseController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (isParamMissing(serie) || isParamMissing(chnr)) {
-        return badRequest("Serie and CHNR are required.");
+      if (serie == null || chnr == null) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "Serie and CHNR are required."));
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.setOK(serie, chnr, currentUser);
       if (result > 0) {
-        return ok(null, MessageConstants.STATUS_OK);
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Status updated to OK.");
+        return ResponseEntity.ok(resp);
       } else {
-        String chassisNo = serie + " " + chnr;
-        return notFound("Chassis number " + chassisNo + " not found.");
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
+        return ResponseEntity.status(404)
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
-      return systemError();
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
   }
 
@@ -93,20 +105,25 @@ public class UD15SendDataController extends BaseController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (isParamMissing(serie) || isParamMissing(chnr)) {
-        return badRequest("Serie and CHNR are required.");
+      if (serie == null || chnr == null) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "Serie and CHNR are required."));
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.changeToBasicInfo(serie, chnr, currentUser);
       if (result > 0) {
-        return ok(null, MessageConstants.TYPE_CHANGED_TO_BASIC);
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Type changed to Basic Info.");
+        return ResponseEntity.ok(resp);
       } else {
-        String chassisNo = serie + " " + chnr;
-        return notFound("Chassis number " + chassisNo + " not found.");
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
+        return ResponseEntity.status(404)
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
-      return systemError();
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
   }
 
@@ -117,20 +134,25 @@ public class UD15SendDataController extends BaseController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (isParamMissing(serie) || isParamMissing(chnr)) {
-        return badRequest("Serie and CHNR are required.");
+      if (serie == null || chnr == null) {
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "Serie and CHNR are required."));
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
       int result = ud15SendDataService.changeToAdvancedInfo(serie, chnr, currentUser);
       if (result > 0) {
-        return ok(null, MessageConstants.TYPE_CHANGED_TO_ADVANCED);
+        ApiResponse<Object> resp = ApiResponse.success(null);
+        resp.setMessage("Type changed to Advanced Info.");
+        return ResponseEntity.ok(resp);
       } else {
-        String chassisNo = serie + " " + chnr;
-        return notFound("Chassis number " + chassisNo + " not found.");
+        String chassisNo = (chnr == null || chnr.isEmpty()) ? serie : serie + " " + chnr;
+        return ResponseEntity.status(404)
+            .body(ApiResponse.error(404, "Chassis number " + chassisNo + " not found."));
       }
     } catch (Exception e) {
-      return systemError();
+      return ResponseEntity.status(500)
+          .body(ApiResponse.error(500, "System error. Please contact administrator."));
     }
   }
 }
