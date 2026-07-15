@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.SaveModificationsService;
 import java.util.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class SaveModificationsController {
+public class SaveModificationsController extends BaseController {
 
   @Autowired
   private SaveModificationsService saveModificationsService;
@@ -21,9 +22,8 @@ public class SaveModificationsController {
     try {
       String serie = request.get("serie");
       String chno = request.get("chno");
-      if (serie == null || chno == null) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Invalid chassis information."));
+      if (isParamMissing(serie) || isParamMissing(chno)) {
+        return badRequest(MessageConstants.INVALID_CHASSIS_INFO);
       }
       List<Map<String, Object>> list = saveModificationsService.selectModificationData(serie, chno);
 
@@ -34,7 +34,6 @@ public class SaveModificationsController {
         data.put("version", String.valueOf(first.get("VERS")));
 
         List<Map<String, String>> modifications = new ArrayList<>();
-        boolean hasUnreleased = false;
         for (Map<String, Object> item : list) {
           Map<String, String> mod = new LinkedHashMap<>();
           mod.put("variable", (String) item.get("VARIABLE"));
@@ -42,17 +41,16 @@ public class SaveModificationsController {
           modifications.add(mod);
         }
         data.put("modifications", modifications);
-        data.put("hasUnreleasedVersion", hasUnreleased);
+        data.put("hasUnreleasedVersion", false);
       } else {
         data.put("doctype", "");
         data.put("version", "");
         data.put("modifications", new ArrayList<>());
         data.put("hasUnreleasedVersion", false);
       }
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

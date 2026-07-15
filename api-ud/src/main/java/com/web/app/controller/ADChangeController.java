@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.entity.HdocAdcaChange;
 import com.web.app.service.ADChangeService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc/adca")
 @CrossOrigin(origins = "*")
-public class ADChangeController {
+public class ADChangeController extends BaseController {
 
   @Autowired
   private ADChangeService adChangeService;
@@ -23,9 +24,8 @@ public class ADChangeController {
       String serie = request.get("serie");
       String chnr = request.get("chnr");
 
-      if (serie == null || chnr == null) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Serie and CHNR are required."));
+      if (isParamMissing(serie) || isParamMissing(chnr)) {
+        return badRequest(MessageConstants.SERIE_CHNR_REQUIRED);
       }
 
       HdocAdcaChange record = adChangeService.findBySerieAndChnr(serie, chnr);
@@ -41,10 +41,9 @@ public class ADChangeController {
         data.put("act", null);
         data.put("bu", null);
       }
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -59,9 +58,8 @@ public class ADChangeController {
       String reason = request.get("reason");
       String updateUser = request.get("updateUser");
 
-      if (serie == null || chnr == null || act == null) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Serie, CHNR and ACT are required."));
+      if (isParamMissing(serie) || isParamMissing(chnr) || isParamMissing(act)) {
+        return badRequest(MessageConstants.SERIE_CHNR_ACT_REQUIRED);
       }
 
       int result = adChangeService.insert(serie, chnr, act, bu, reason, updateUser);
@@ -70,14 +68,12 @@ public class ADChangeController {
         data.put("serie", serie);
         data.put("chnr", chnr);
         data.put("act", act);
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ok(data);
       } else {
-        return ResponseEntity.status(500)
-            .body(ApiResponse.error(500, "Failed to insert ADCA change record."));
+        return systemError(MessageConstants.FAILED_TO_INSERT_ADCA);
       }
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -91,11 +87,10 @@ public class ADChangeController {
       int updateCount = adChangeService.updateAllActToN(serie, chnr, updateUser);
       Map<String, Object> data = new HashMap<>();
       data.put("updateCount", String.valueOf(updateCount));
-      data.put("updateContent", "ACT status has been set to N for all records.");
-      return ResponseEntity.ok(ApiResponse.success(data));
+      data.put("updateContent", MessageConstants.ACT_STATUS_UPDATED);
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

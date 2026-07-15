@@ -10,17 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class MenuController {
+public class MenuController extends BaseController {
 
   @PostMapping("/menu")
   public ResponseEntity<ApiResponse<List<MenuItem>>> getMenu(@RequestParam String userId) {
     try {
-      // 根据用户ID获取菜单权限（这里简化为固定菜单）
       List<MenuItem> menuItems = getMainMenuItems(userId);
-      return ResponseEntity.ok(ApiResponse.success(menuItems));
+      return ok(menuItems);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -34,7 +32,6 @@ public class MenuController {
     loginItem.setName("Login");
     loginItem.setPath("/login");
     loginItem.setIcon("user");
-    loginItem.setHasPermission(true);
     items.add(loginItem);
 
     MenuItem documentTypesItem = new MenuItem();
@@ -42,7 +39,6 @@ public class MenuController {
     documentTypesItem.setName("Document Types");
     documentTypesItem.setPath("/document-types");
     documentTypesItem.setIcon("file");
-    documentTypesItem.setHasPermission(true);
     items.add(documentTypesItem);
 
     MenuItem marketDocumentSettingsItem = new MenuItem();
@@ -50,7 +46,6 @@ public class MenuController {
     marketDocumentSettingsItem.setName("Market Document Settings");
     marketDocumentSettingsItem.setPath("/market-document-settings");
     marketDocumentSettingsItem.setIcon("setting");
-    marketDocumentSettingsItem.setHasPermission(true);
     items.add(marketDocumentSettingsItem);
 
     MenuItem homologationVariablesItem = new MenuItem();
@@ -58,7 +53,6 @@ public class MenuController {
     homologationVariablesItem.setName("Homologation Variables");
     homologationVariablesItem.setPath("/homologation-variables");
     homologationVariablesItem.setIcon("variable");
-    homologationVariablesItem.setHasPermission(true);
     items.add(homologationVariablesItem);
 
     MenuItem hdocUserAdministrationItem = new MenuItem();
@@ -66,7 +60,6 @@ public class MenuController {
     hdocUserAdministrationItem.setName("HDoc User Administration");
     hdocUserAdministrationItem.setPath("/hdoc-user-admin");
     hdocUserAdministrationItem.setIcon("admin");
-    hdocUserAdministrationItem.setHasPermission(true);
     items.add(hdocUserAdministrationItem);
 
     MenuItem hdocUserDocAdministrationItem = new MenuItem();
@@ -74,7 +67,6 @@ public class MenuController {
     hdocUserDocAdministrationItem.setName("HDoc User Doc Administration");
     hdocUserDocAdministrationItem.setPath("/hdoc-user-doc-admin");
     hdocUserDocAdministrationItem.setIcon("doc-admin");
-    hdocUserDocAdministrationItem.setHasPermission(true);
     items.add(hdocUserDocAdministrationItem);
 
     MenuItem adChangeItem = new MenuItem();
@@ -82,7 +74,6 @@ public class MenuController {
     adChangeItem.setName("AD Change");
     adChangeItem.setPath("/ad-change");
     adChangeItem.setIcon("change");
-    adChangeItem.setHasPermission(true);
     items.add(adChangeItem);
 
     MenuItem vehicleSpecificationItem = new MenuItem();
@@ -90,7 +81,6 @@ public class MenuController {
     vehicleSpecificationItem.setName("Vehicle Specification");
     vehicleSpecificationItem.setPath("/vehicle-specification");
     vehicleSpecificationItem.setIcon("car");
-    vehicleSpecificationItem.setHasPermission(true);
     items.add(vehicleSpecificationItem);
 
     MenuItem vinPlateItem = new MenuItem();
@@ -98,7 +88,6 @@ public class MenuController {
     vinPlateItem.setName("Vin Plate");
     vinPlateItem.setPath("/vin-plate");
     vinPlateItem.setIcon("plate");
-    vinPlateItem.setHasPermission(true);
     items.add(vinPlateItem);
 
     MenuItem uploadDeleteTemplateItem = new MenuItem();
@@ -106,7 +95,6 @@ public class MenuController {
     uploadDeleteTemplateItem.setName("Upload & Delete Template");
     uploadDeleteTemplateItem.setPath("/upload-delete-template");
     uploadDeleteTemplateItem.setIcon("upload");
-    uploadDeleteTemplateItem.setHasPermission(true);
     items.add(uploadDeleteTemplateItem);
 
     return items;

@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.VehicleSpecificationService;
 import java.util.Map;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class VehicleSpecificationController {
+public class VehicleSpecificationController extends BaseController {
 
   @Autowired
   private VehicleSpecificationService vehicleSpecificationService;
@@ -21,20 +22,17 @@ public class VehicleSpecificationController {
     try {
       String serie = request.get("serie");
       String chno = request.get("chno");
-      if (serie == null || chno == null) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Invalid chassis information."));
+      if (isParamMissing(serie) || isParamMissing(chno)) {
+        return badRequest(MessageConstants.INVALID_CHASSIS_INFO);
       }
       Map<String, Object> data = vehicleSpecificationService.getVehicleSpecification(serie, chno);
       if (data != null) {
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ok(data);
       } else {
-        return ResponseEntity.status(404)
-            .body(ApiResponse.error(404, "No vehicle data found for the given chassis number."));
+        return notFound(MessageConstants.VEHICLE_DATA_NOT_FOUND);
       }
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

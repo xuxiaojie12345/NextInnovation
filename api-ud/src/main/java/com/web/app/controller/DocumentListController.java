@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class DocumentListController {
+public class DocumentListController extends BaseController {
 
   @Autowired
   private DocumentListService documentListService;
@@ -20,10 +20,9 @@ public class DocumentListController {
   public ResponseEntity<ApiResponse<List<DocumentTypeListResponse>>> getDocumentTypes() {
     try {
       List<DocumentTypeListResponse> list = documentListService.getHdocdocumentlist();
-      return ResponseEntity.ok(ApiResponse.success(list));
+      return ok(list);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }
