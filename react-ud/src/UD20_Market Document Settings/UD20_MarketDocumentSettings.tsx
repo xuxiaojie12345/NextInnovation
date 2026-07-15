@@ -119,7 +119,6 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.3 - 返回前页面
    */
   const handleBack = useCallback(() => {
     navigate('/UD24');
@@ -140,7 +139,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
     setMessage('');
 
     try {
-      // 对应设计书 4.1 - POST /api/ud201/updatedocument
+      // POST /api/ud201/updatedocument
       const registerUser = localStorage.getItem('userID') || 'SYSTEM';
       const response = await apiClient.post('/api/ud201/updatedocument', {
         doctype: documentType.trim(),

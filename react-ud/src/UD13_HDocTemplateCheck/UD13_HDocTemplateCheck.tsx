@@ -17,7 +17,6 @@ import "./UD13_HDocTemplateCheck.css";
  */
 const UD13_HDocTemplateCheck: React.FC = () => {
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 选择的文件
   const [isChecked, setIsChecked] = useState<boolean>(false);         // 是否已执行检查
@@ -43,7 +42,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
 
   /**
    * 处理文件选择
-   * 对应设计书 3.1.1 初始显示流程 - 文件格式校验
    * 
    * @param {React.ChangeEvent<HTMLInputElement>} e - 文件选择事件对象
    */
@@ -54,7 +52,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
       const fileName = file.name.toLowerCase();
 
       // 校验文件格式：仅支持RTF
-      // 对应设计书 5. 异常处理 - 文件格式错误
       if (!fileName.endsWith(ALLOWED_FILE_EXTENSION)) {
         setMessage("只支持RTF格式文件");
         setMessageType("error");
@@ -94,15 +91,11 @@ const UD13_HDocTemplateCheck: React.FC = () => {
 
   /**
    * 点击 Check 按钮执行模板检查
-   * 对应设计书 3.1.2 Check按钮处理流程
-   * 
-   * 注意：当前版本机能不实装，仅做文件选择校验和占位处理
    */
   const handleCheck = async () => {
    
 
     // 当前版本 Check 机能不实装
-    // 对应设计书 3.1.2：机能不实装
     setMessage("Check 机能未实装（当前版本暂不支持）");
     setMessageType("error");
     setIsChecked(false);
@@ -110,15 +103,12 @@ const UD13_HDocTemplateCheck: React.FC = () => {
 
   /**
    * 点击 Download checked template 链接
-   * 对应设计书 3.1.3 Download checked template 链接点击流程
-   * 
    * 注意：当前版本机能不实装
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownload = (e: React.MouseEvent) => {
     e.preventDefault();
     // 当前版本 Download 机能不实装
-    // 对应设计书 3.1.3：机能不实装
     setMessage("Download 机能未实装（当前版本暂不支持）");
     setMessageType("error");
   };
@@ -145,12 +135,9 @@ const UD13_HDocTemplateCheck: React.FC = () => {
             <div className="ud13-form-group">
               <label className="ud13-label">Template File</label>
               <div className="ud13-blue-border-box">
-                <input
-                  id="ud13TemplateFileInput"
-                  type="file"
+                <input id="ud13TemplateFileInput" type="file" 
                   className="ud13-file-input"
-                  accept=".rtf"
-                  onChange={handleFileChange}
+                  accept=".rtf" onChange={handleFileChange}
                   disabled={isLoading}
                 />
               </div>
@@ -170,8 +157,7 @@ const UD13_HDocTemplateCheck: React.FC = () => {
           {/* Check 按钮（表单外部） */}
           <div className="ud13-btn-outer">
             <div className="ud13-blue-border-box ud13-btn-box">
-              <button
-                className="ud13-btn ud13-btn-check"
+              <button className="ud13-btn ud13-btn-check"
                 onClick={handleCheck}
                 disabled={isLoading}
               >
@@ -181,7 +167,6 @@ const UD13_HDocTemplateCheck: React.FC = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

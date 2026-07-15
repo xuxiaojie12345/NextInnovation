@@ -13,9 +13,6 @@ const apiClient = axios.create({
     ? '' // 生产环境使用相对路径，通过nginx等反向代理
     : 'http://localhost:8081', // 开发环境直接连接后端服务器
   timeout: 30000, // 30秒超时
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 /**
@@ -24,6 +21,10 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
+    // 如果是FormData上传，删除Content-Type让浏览器自动设置带boundary的multipart头
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     // 可以在这里添加token等认证信息
     const token = localStorage.getItem('token');
     if (token) {

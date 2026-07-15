@@ -107,7 +107,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Select 按钮点击
-   * 对应设计书 3.1.2 Select 按钮处理流程
    */
   const handleSelect = useCallback(() => {
     if (selectedIndex === null) {
@@ -138,7 +137,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Down 按钮点击
-   * 对应设计书 3.1.3 Down 按钮处理流程
    */
   const handleDown = useCallback(() => {
     if (selectedIndex === null) {
@@ -159,7 +157,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.4 Back 按钮处理流程
    */
   const handleBack = useCallback(() => {
     const formData = (location.state as any)?.formData;
@@ -168,7 +165,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Print 按钮点击
-   * 对应设计书 3.1.5 Print 按钮处理流程
    */
   const handlePrint = useCallback(() => {
     if (results.length === 0) {
@@ -181,7 +177,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Excel 按钮点击
-   * 对应设计书 3.1.6 Excel 按钮处理流程 - 前端生成CSV
    */
   const handleExcel = useCallback(() => {
     try {
@@ -211,7 +206,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Created by user 点击
-   * 对应设计书 3.1.7 用户链接点击处理流程
    */
   const handleUserLinkClick = (userId: string) => {
     navigate('/UD25', { state: { userId } });
@@ -219,7 +213,6 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
 
   // ==================== 渲染 ====================
   const count = results.length;
-
   return (
     <div className="ud11-container">
       <div className="ud11-title">Existing HDoc Variables</div>
@@ -263,15 +256,11 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
                   </tr>
                 ) : (
                   results.map((record, index) => (
-                    <tr
-                      key={`${record.variable}-${index}`}
+                    <tr key={`${record.variable}-${index}`}
                       className={selectedIndex === index ? 'ud11-row--selected' : ''}
                     >
                       <td className="ud11-td--center">
-                        <input
-                          type="radio"
-                          name="ud11-selection"
-                          className="ud11-radio"
+                        <input type="radio" name="ud11-selection" className="ud11-radio"
                           checked={selectedIndex === index}
                           onChange={() => handleRadioChange(index)}
                         />

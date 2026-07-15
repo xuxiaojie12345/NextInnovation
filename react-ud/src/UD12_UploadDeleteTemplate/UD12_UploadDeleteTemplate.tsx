@@ -353,10 +353,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
             <div className="ud12-form-group">
               <label className="ud12-label">Template File</label>
               <div className="ud12-blue-border-box">
-                <input
-                  id="templateFileInput"
-                  type="file"
-                  className="ud12-file-input"
+                <input id="templateFileInput" type="file" className="ud12-file-input"
                   onChange={handleFileChange}
                   disabled={isUploadLoading}
                 />
@@ -367,9 +364,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
             <div className="ud12-form-group">
               <label className="ud12-label">Market</label>
               <div className="ud12-blue-border-box">
-                <select
-                  className="ud12-select"
-                  value={uploadMarket}
+                <select className="ud12-select" value={uploadMarket}
                   onChange={handleUploadMarketChange}
                   disabled={isUploadLoading || isMarketLoading}
                 >
@@ -388,11 +383,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
           {/* 上传按钮（表单外部） */}
           <div className="ud12-btn-outer">
             <div className="ud12-blue-border-box ud12-btn-box">
-              <button
-                className="ud12-btn ud12-btn-upload"
-                onClick={handleUploadFile}
-                disabled={isUploadLoading}
-              >
+              <button className="ud12-btn ud12-btn-upload" onClick={handleUploadFile} disabled={isUploadLoading} >
                 {isUploadLoading ? "Uploading..." : "Upload file"}
               </button>
             </div>
@@ -415,9 +406,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
             <div className="ud12-form-group">
               <label className="ud12-label">Market</label>
               <div className="ud12-blue-border-box">
-                <select
-                  className="ud12-select"
-                  value={deleteMarket}
+                <select className="ud12-select" value={deleteMarket}
                   onChange={handleDeleteMarketChange}
                   disabled={isDeleteLoading || isMarketLoading}
                 >
@@ -435,9 +424,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
             <div className="ud12-form-group">
               <label className="ud12-label">Templates</label>
               <div className="ud12-blue-border-box">
-                <select
-                  className="ud12-select"
-                  value={selectedTemplate}
+                <select className="ud12-select" value={selectedTemplate}
                   onChange={handleTemplateChange}
                   disabled={isDeleteLoading || isTemplateLoading || templateOptions.length === 0}
                 >
@@ -459,8 +446,7 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
           {/* 删除按钮（表单外部） */}
           <div className="ud12-btn-outer">
             <div className="ud12-blue-border-box ud12-btn-box">
-              <button
-                className="ud12-btn ud12-btn-delete"
+              <button className="ud12-btn ud12-btn-delete"
                 onClick={handleDeleteTemplate}
                 disabled={isDeleteLoading}
               >
@@ -487,7 +473,6 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
           </div>
         </div>
 
- 
       {/* ==================== 确认删除对话框 ==================== */}
       {showConfirmModal && (
         <div className="ud12-modal-overlay">
@@ -502,16 +487,10 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
               </p>
             </div>
             <div className="ud12-modal-footer">
-              <button
-                className="ud12-btn ud12-btn-cancel"
-                onClick={cancelDelete}
-              >
+              <button className="ud12-btn ud12-btn-cancel" onClick={cancelDelete} >
                 Cancel
               </button>
-              <button
-                className="ud12-btn ud12-btn-confirm"
-                onClick={confirmDelete}
-              >
+              <button className="ud12-btn ud12-btn-confirm" onClick={confirmDelete} >
                 OK
               </button>
             </div>

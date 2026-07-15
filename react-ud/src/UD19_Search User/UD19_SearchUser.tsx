@@ -74,22 +74,20 @@ const UD19_SearchUser: React.FC = () => {
 
   /**
    * 处理 UserID 输入变化
-   * 限制：只允许半角英数字，最大长度10字符
    */
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (USER_ID_REGEX.test(val) && val.length <= MAX_USER_ID_LENGTH) {
+    if (USER_ID_REGEX.test(val)) {
       setUserId(val);
     }
   };
 
   /**
    * 处理用户名输入变化
-   * 限制：只允许半角英数字，最大长度32字符
    */
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (USER_REGEX.test(val) && val.length <= MAX_USERNAME_LENGTH) {
+    if (USER_REGEX.test(val)) {
       setUsername(val);
     }
   };
@@ -104,7 +102,6 @@ const UD19_SearchUser: React.FC = () => {
 
   /**
    * 处理搜索类型单选框变化
-   * 对应设计书 3.1.5~3.1.7 - 搜索类型切换
    *
    * @param type - 搜索类型
    */
@@ -116,13 +113,6 @@ const UD19_SearchUser: React.FC = () => {
 
   /**
    * 搜索用户
-   *
-   * 处理流程：
-   * 1. 前置处理：获取所有搜索条件
-   * 2. 空值校验：至少需要一个搜索条件
-   * 3. 格式校验：UserID和用户名格式检查
-   * 4. 调用API搜索
-   * 5. 结果处理：显示DataTable
    */
   const handleSearch = async () => {
     const trimmedUserId = userId.trim();
@@ -159,7 +149,6 @@ const UD19_SearchUser: React.FC = () => {
       }
 
       // 调用搜索API
-      // GET /api/ud19/search
       const response = await apiClient.get('/api/ud19/search', {
         params,
       });
@@ -192,7 +181,6 @@ const UD19_SearchUser: React.FC = () => {
       console.error('搜索用户失败:', error);
       setMessageType('error');
       setSearchResults([]);
-    //   setResultCount(0);
 
       if (error.response) {
         const statusCode = error.response.status;

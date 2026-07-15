@@ -731,41 +731,11 @@ const UD08_HomologationVariables: React.FC = () => {
       <div className="ud08-content">
         {/* 操作按钮行（所有按钮在一行，对应图片顶部布局） */}
         <div className="ud08-button-row">
-          <button
-            className="ud08-btn ud08-btn--search"
-            onClick={handleSearch}
-            disabled={isLoading}
-          >
-            Search
-          </button>
-          <button
-            className="ud08-btn ud08-btn--clear"
-            onClick={handleClear}
-            disabled={isLoading}
-          >
-            Clear
-          </button>
-          <button
-            className="ud08-btn ud08-btn--add"
-            onClick={handleAdd}
-            disabled={isLoading}
-          >
-            Add
-          </button>
-          <button
-            className="ud08-btn ud08-btn--update"
-            onClick={handleUpdate}
-            disabled={isLoading}
-          >
-            Update
-          </button>
-          <button
-            className="ud08-btn ud08-btn--delete"
-            onClick={handleDelete}
-            disabled={isLoading}
-          >
-            Delete
-          </button>
+          <button className="ud08-btn ud08-btn--search" onClick={handleSearch} disabled={isLoading}>Search</button>
+          <button className="ud08-btn ud08-btn--clear" onClick={handleClear} disabled={isLoading}>Clear</button>
+          <button className="ud08-btn ud08-btn--add" onClick={handleAdd} disabled={isLoading}>Add</button>
+          <button className="ud08-btn ud08-btn--update" onClick={handleUpdate} disabled={isLoading}>Update</button>
+          <button className="ud08-btn ud08-btn--delete" onClick={handleDelete} disabled={isLoading}>Delete</button>
         </div>
 
         {/* 检索条件字段 */}

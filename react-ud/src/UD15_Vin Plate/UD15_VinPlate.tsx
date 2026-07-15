@@ -102,33 +102,21 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 获取VIN Plate详细信息
-   *
-   * 处理流程：
-   * 1. 前置处理：获取底盘号并拆分为chassisSerie和chassisNo
-   * 2. 空值校验：检查底盘号是否为空
-   * 3. 长度校验：检查底盘号是否超过15字符
-   * 4. API调用：GET /api/ud15/info
-   * 5. 结果处理：成功时显示详细信息，失败时显示错误消息
    */
   const handleViewInfo = async () => {
     // 1. 前置处理：获取输入值并去除首尾空格
     const trimmedChassis = chassisNumber.trim();
 
     // 2. 空值校验（前端校验）
-    // 对应设计书 3.2 校验详细规格表 No.1
     if (!trimmedChassis) {
       showMessage('请输入底盘号', 'error');
       return; // 终止流程
     }
-
     // 4. 拆分底盘号
     const { chassisSerie, chassisNo } = splitChassisNumber(trimmedChassis);
-
     // 5. API调用（后端校验）
-    // 对应设计书 4.1 UD15ViewInfo - GET /api/ud15/info
     setIsLoading(true);
     showMessage('', 'info');
-
     try {
       const response = await apiClient.get('/api/ud15/info', {
         params: {
@@ -256,19 +244,16 @@ const UD15_VinPlate: React.FC = () => {
       // 5. 结果处理
       if (response.data && response.data.code === 200) {
         // 成功
-        // 对应设计书 3.2 校验详细规格表 成功分支
         showMessage(config.successMsg, 'success');
         // 刷新显示区域：重新查询VIN Plate信息
         handleRefreshInfo(chassisSerie, chassisNo, trimmedChassis);
       } else {
         // 失败
-        // 对应设计书 3.2 校验详细规格表 No.5, No.7, No.9, No.11
         const errorMsg = response.data?.msg || `Chassis number ${trimmedChassis} not found.`;
         showMessage(errorMsg, 'warning');
       }
     } catch (error: any) {
       // 异常处理
-      // 对应设计书 5. 异常处理
       console.error(`${config.successMsg}操作失败:`, error);
       if (error.response) {
         const statusCode = error.response.status;
@@ -331,19 +316,14 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 处理 Chassis number 输入变化
-   * 限制：最大长度15字符
    * 用户体验优化：用户重新输入时清空错误提示
    *
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
    */
   const handleChassisNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (val.length <= MAX_CHASSIS_LENGTH) {
-      setChassisNumber(val);
-      // 用户体验优化：用户重新输入时清空错误提示
-      if (message) {
-        setMessage('');
-      }
+    setChassisNumber(e.target.value);
+    if (message) {
+      setMessage('');
     }
   };
 
@@ -366,7 +346,6 @@ const UD15_VinPlate: React.FC = () => {
         <h1 className='ud15-title'>VIN Plate</h1>
 
         {/* 消息显示区域 */}
-        {/* 对应设计书 2.1 控件属性表 No.7 message area */}
         {message && (
           <div className={`ud15-message ud15-message--${messageType}`}>
             {message}
@@ -376,16 +355,11 @@ const UD15_VinPlate: React.FC = () => {
         {/* 输入区域 */}
         <div className='ud15-input-section'>
           {/* Chassis number 输入框 */}
-          {/* 对应设计书 2.1 控件属性表 No.1 Chassis number */}
           <div className='ud15-form-group'>
             <label htmlFor='chassisNumber'>
               Chassis number
             </label>
-            <input
-              id='chassisNumber'
-              type='text'
-              className='ud15-input'
-              value={chassisNumber}
+            <input id='chassisNumber' type='text' className='ud15-input' value={chassisNumber}
               onChange={handleChassisNumberChange}
               onKeyDown={handleKeyDown}
               placeholder='请输入底盘号'
@@ -396,43 +370,12 @@ const UD15_VinPlate: React.FC = () => {
         </div>
 
         {/* 按钮区域 - 所有按钮排成一行 */}
-        {/* 对应设计书 2.1 控件属性表 No.2~No.6 */}
         <div className='ud15-button-group'>
-          <button
-            className='ud15-btn'
-            onClick={handleViewInfo}
-            disabled={isLoading}
-          >
-            View Info
-          </button>
-          <button
-            className='ud15-btn'
-            onClick={() => handleStatusUpdate('regenerate')}
-            disabled={isLoading}
-          >
-            Set Regenerate
-          </button>
-          <button
-            className='ud15-btn'
-            onClick={() => handleStatusUpdate('setok')}
-            disabled={isLoading}
-          >
-            Set OK
-          </button>
-          <button
-            className='ud15-btn'
-            onClick={() => handleStatusUpdate('changebasic')}
-            disabled={isLoading}
-          >
-            Change to Basic Info
-          </button>
-          <button
-            className='ud15-btn'
-            onClick={() => handleStatusUpdate('changeadvanced')}
-            disabled={isLoading}
-          >
-            Change to Advanced Info
-          </button>
+          <button className='ud15-btn' onClick={handleViewInfo} disabled={isLoading}>View Info</button>
+          <button className='ud15-btn' onClick={() => handleStatusUpdate('regenerate')} disabled={isLoading}>Set Regenerate</button>
+          <button className='ud15-btn' onClick={() => handleStatusUpdate('setok')} disabled={isLoading}>Set OK</button>
+          <button className='ud15-btn' onClick={() => handleStatusUpdate('changebasic')} disabled={isLoading}>Change to Basic Info</button>
+          <button className='ud15-btn' onClick={() => handleStatusUpdate('changeadvanced')} disabled={isLoading}>Change to Advanced Info</button>
         </div>
 
         {/* 加载状态提示 */}
@@ -441,7 +384,6 @@ const UD15_VinPlate: React.FC = () => {
         )}
 
         {/* 输出区域 - VIN Plate详细信息 */}
-        {/* 对应设计书 6.2 UI细节 - 未检索时显示提示文字 */}
         {!plateInfo && !isLoading && (
           <div className='ud15-info-prompt'>
             Please enter a chassis number
@@ -452,68 +394,49 @@ const UD15_VinPlate: React.FC = () => {
             {/* 信息列表区域 - 单列布局 */}
             <div className='ud15-info-list'>
               {/* Chassis number - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.8 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Chassis number</span>
                 <span className='ud15-info-value'>{plateInfo.chassisNumber}</span>
               </div>
 
               {/* Plate type - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.9 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Plate type</span>
                 <span className='ud15-info-value'>{plateInfo.plateType || '-'}</span>
               </div>
 
               {/* Status - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.10 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Status</span>
                 <span className='ud15-info-value'>{plateInfo.status || '-'}</span>
               </div>
 
               {/* Error Message - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.11 - 从MSG字段获取 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Error Message</span>
                 <span className='ud15-info-value'>{plateInfo.errorMessage || '-'}</span>
               </div>
 
               {/* Def. (Register Datetime) - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.12 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Def.</span>
                 <span className='ud15-info-value'>{plateInfo.registerDatetime || '-'}</span>
               </div>
 
               {/* Data ready (Doc Ready) - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.13 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Data ready</span>
                 <span className='ud15-info-value'>{plateInfo.docReady || '-'}</span>
               </div>
 
               {/* Sent to CAB factory (Doc Sent) - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.14 */}
               <div className='ud15-info-row'>
                 <span className='ud15-info-label'>Sent to CAB factory</span>
                 <span className='ud15-info-value'>{plateInfo.docSent || '-'}</span>
               </div>
-
-              {/* PrintItemName - 输出 */}
-              {/* 对应设计书 2.1 控件属性表 No.15 Print items */}
-              {/* <div className='ud15-info-row'>
-                <span className='ud15-info-label'>PrintItemName</span>
-                <span className='ud15-info-value'>
-                  {plateInfo.printItems && plateInfo.printItems.length > 0
-                    ? plateInfo.printItems[0]
-                    : '-'}
-                </span>
-              </div> */}
             </div>
 
             {/* PrintItemName 区域 */}
-            {/* 对应设计书 2.1 控件属性表 No.15 Print items - XML_DOC中的PrintItemName名及其值 */}
             <div className='ud15-vp-section'>
               <h3 className='ud15-section-title'>PrintItemName</h3>
               {plateInfo.printItems && plateInfo.printItems.length > 0 ? (

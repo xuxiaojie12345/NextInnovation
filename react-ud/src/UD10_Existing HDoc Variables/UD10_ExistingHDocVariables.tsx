@@ -165,7 +165,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.4 Back 按钮处理流程
    */
   const handleBack = useCallback(() => {
     navigate('/Menu');
@@ -173,7 +172,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 执行前端校验 - Variable必填检查
-   * 对应设计书 3.2 校验详细规格表 No.1/3/5
    *
    * @returns {boolean} 校验是否通过
    */
@@ -188,7 +186,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Add 按钮点击
-   * 对应设计书 3.1.5 Add 按钮处理流程
    */
   const handleAdd = useCallback(async () => {
     if (!validateVariableRequired()) return;
@@ -229,7 +226,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Update 按钮点击
-   * 对应设计书 3.1.6 Update 按钮处理流程
    */
   const handleUpdate = useCallback(async () => {
     if (!validateVariableRequired()) return;
@@ -266,7 +262,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Delete 按钮点击
-   * 对应设计书 3.1.7 Delete 按钮处理流程
    */
   const handleDelete = useCallback(async () => {
     if (!validateVariableRequired()) return;
@@ -296,9 +291,6 @@ const UD10_ExistingHDocVariables: React.FC = () => {
 
   /**
    * 处理 Excel 按钮点击
-   * 对应设计书 3.1.8 Excel 按钮处理流程
-   *
-   * 前端生成CSV文件并下载
    */
   const handleExcel = useCallback(() => {
     try {
@@ -351,7 +343,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       {/* 主内容区域 */}
       <div className="ud10-content">
         
-        {/* 操作按钮行（对应设计书 2.1 序号6~12） */}
+        {/* 操作按钮行 */}
         <div className="ud10-button-row">
           <button className="ud10-btn ud10-btn--search" onClick={handleSearch} disabled={isLoading}>Search</button>
           <button className="ud10-btn ud10-btn--clear" onClick={handleClear} disabled={isLoading}>Clear</button>
@@ -362,7 +354,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
           <button className="ud10-btn ud10-btn--excel" onClick={handleExcel} disabled={isLoading}>Excel</button>
         </div>
         
-        {/* Variable 输入框（对应设计书 2.1 序号1） */}
+        {/* Variable 输入框 */}
         <div className="ud10-row">
           <span className="ud10-label">*Variable</span>
           <select className="ud10-compare-select" value={variableOp} onChange={(e) => setVariableOp(e.target.value)}>
@@ -385,7 +377,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
           />
         </div>
 
-        {/* Type 下拉框（对应设计书 2.1 序号2） */}
+        {/* Type 下拉框*/}
         <div className="ud10-row">
           <span className="ud10-label">Type</span>
           <select className="ud10-compare-select" value={typeOp} onChange={(e) => setTypeOp(e.target.value)}>
@@ -405,7 +397,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
           </select>
         </div>
 
-        {/* Description 输入框（对应设计书 2.1 序号3） */}
+        {/* Description 输入框*/}
         <div className="ud10-row">
           <span className="ud10-label">Description</span>
           <select className="ud10-compare-select" value={descriptionOp} onChange={(e) => setDescriptionOp(e.target.value)}>
@@ -427,7 +419,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
           />
         </div>
 
-        {/* Created by user 输入框（对应设计书 2.1 序号4）- 活性状态 */}
+        {/* Created by user 输入框 */}
         <div className="ud10-row">
           <span className="ud10-label">Created by user</span>
           <select className="ud10-compare-select" value={createdByUserOp} onChange={(e) => setCreatedByUserOp(e.target.value)}>
@@ -435,16 +427,14 @@ const UD10_ExistingHDocVariables: React.FC = () => {
               <option key={op} value={op}>{op}</option>
             ))}
           </select>
-          <input
-            className="ud10-input"
-            type="text"
-            value={displayCreatedByUser}
+          <input className="ud10-input" type="text" value={displayCreatedByUser}
             onChange={(e) => setDisplayCreatedByUser(e.target.value)}
             placeholder=""
           />
+          <span className="ud10-suffix">Automatic</span>
         </div>
 
-        {/* Date 输入框（对应设计书 2.1 序号5）- 活性状态 */}
+        {/* Date 输入框 */}
         <div className="ud10-row">
           <span className="ud10-label">Date</span>
           <select className="ud10-compare-select" value={registerDateOp} onChange={(e) => setRegisterDateOp(e.target.value)}>
@@ -452,13 +442,11 @@ const UD10_ExistingHDocVariables: React.FC = () => {
               <option key={op} value={op}>{op}</option>
             ))}
           </select>
-          <input
-            className="ud10-input"
-            type="text"
-            value={displayDate}
+          <input className="ud10-input" type="text" value={displayDate}
             onChange={(e) => setDisplayDate(e.target.value)}
             placeholder=""
           />
+          <span className="ud10-suffix">Automatic</span>
         </div>
 
       </div>

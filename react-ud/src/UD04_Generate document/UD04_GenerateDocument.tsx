@@ -295,7 +295,6 @@ const UD04_GenerateDocument: React.FC = () => {
         <h1 className='page-title'>Generate Document</h1>
 
         {/* エラーメッセージエリア */}
-        {/* 对应设计文档 2.1 控件属性表 No.17 */}
         {state.message && (
           <div className='error-message-area'>
             {state.message}
@@ -315,11 +314,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* Chassis no */}
             <div className='result-item'>
               <label className='result-label-chassisNo'>Chassis no:</label>
-              <span 
-                className='result-value link-blue'
-                onClick={handleChassisNoClick}
-                style={{ cursor: 'pointer' }}
-              >
+              <span  className='result-value link-blue' onClick={handleChassisNoClick} style={{ cursor: 'pointer' }}>
                 {state.chassisNo || '-'}
               </span>
             </div>
@@ -397,11 +392,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {/* Analyze Rules */}
             <div className='result-item'>
               <label className='result-label'>Analyze Rules:</label>
-              <span 
-                className='result-value link-blue'
-                onClick={handleAnalyzeRulesClick}
-                style={{ cursor: 'pointer' }}
-              >
+              <span  className='result-value link-blue' onClick={handleAnalyzeRulesClick} style={{ cursor: 'pointer' }} >
                 Analyze Rules
               </span>
             </div>
@@ -415,11 +406,7 @@ const UD04_GenerateDocument: React.FC = () => {
             {state.act === 'Y' && (
               <div className='result-item'>
                 <label className='result-label'>Modify Doc:</label>
-                <span 
-                  className='result-value link-red'
-                  onClick={handleModifyDocClick}
-                  style={{ cursor: 'pointer' }}
-                >
+                <span  className='result-value link-red' onClick={handleModifyDocClick} style={{ cursor: 'pointer' }} >
                   After def change detected. Document need to be modified.
                 </span>
               </div>
@@ -447,10 +434,9 @@ const UD04_GenerateDocument: React.FC = () => {
             
             {/* Generated document */}
             <div className='result-item'>
-              <label className='result-value-GeneratedDocument'
-                onClick={handleGeneratedDocClick}
-                style={{ cursor: 'pointer' }}>Generated document:</label>
-              
+              <label className='result-value-GeneratedDocument' onClick={handleGeneratedDocClick} style={{ cursor: 'pointer' }}>
+                Generated document:
+              </label>
             </div>
 
             {/* 空白行 */}

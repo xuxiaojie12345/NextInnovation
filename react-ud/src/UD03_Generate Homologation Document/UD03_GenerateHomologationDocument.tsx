@@ -72,8 +72,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
   /**
    * 获取Document type列表
-   * 对应设计书 4.1 UD03SelectHdocdocumentlistApi
-   * Method: GET, Endpoint: /api/ud03/getHdocDocumentList
    */
   const fetchDocumentTypeList = async () => {
     setIsLoading(true);
@@ -103,14 +101,14 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
   /**
    * 处理 Chassis series 输入变化
-   * 限制：只允许半角英字，最大长度5字符
+   * 限制：只允许半角英字
    * 用户体验优化：用户重新输入时清空错误提示
    * 
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
    */
   const handleChassisSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角英字（maxLength已在HTML控件中控制）
+    // 正则校验：只允许半角英字
     if (CHASSIS_SERIES_REGEX.test(val)) {
       setChassisSeries(val);
       // 用户体验优化：用户重新输入时清空错误提示
@@ -120,7 +118,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
   /**
    * 处理 Chassis no 输入变化
-   * 限制：只允许半角数字，最大长度10字符
+   * 限制：只允许半角数字
    * 用户体验优化：用户重新输入时清空错误提示
    * 
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
@@ -150,7 +148,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
    */
   const handleSubmit = async () => {
     // 1. 前置处理（正则已禁止输入空格，无需trim）
-    // 2. 空値校验（前端校验）
+    // 2. 空值校验（前端校验）
     if (!chassisSeries) {
       setMessage('Chassis series is required.');
       chassisSeriesRef.current?.focus();
@@ -215,26 +213,22 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
   /**
    * 点击 Reset 按钮重置流程
-   * 对应设计书 3.1.3 Reset 按钮处理流程
    */
   const handleReset = () => {
-    // 全ての入力フィールドをクリア
+    // 清空所有输入字段
     setChassisSeries('');
     setChassisNo('');
     setDocumentType('');
-    
-    // エラーメッセージをクリア
+    // 清空错误消息
     setMessage('');
   };
 
   /**
    * 点击 Help 按钮跳转帮助页面
-   * 对应设计书 3.1.4 Help 按钮处理流程
    */
   const handleHelp = () => {
     try {
-      // 画面遷移：UD24 HDoc Help 画面へ遷移
-      // 对应设计书 5. 异常处理 - 网络异常导致路由失败
+      // 页面跳转：跳转到UD24 HDoc Help页面
       navigate('/UD24');
     } catch (error) {
       console.error('UD24画面跳转失败:', error);
@@ -246,18 +240,17 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
   return (
     <div className='ud03-container'>
       <div className='ud03-content'>
-        {/* ページタイトル */}
+        {/* 页面标题 */}
         <h1 className='page-title'>HDoc - Generate Homologation Document</h1>
 
-        {/* エラーメッセージエリア */}
+        {/* 消息显示区域 */}
         <div className='error-message-area'>
           {message}
         </div>
 
-        {/* フォームエリア */}
+        {/* 表单区域 */}
         <div className='form-section'>
-          {/* Chassis series 入力ボックス */}
-          {/* 对应设计书 2.1 コントロール属性表 No.1 */}
+          {/* Chassis series 输入框 */}
           <div className='form-group'>
             <label htmlFor='chassisSeries'>Chassis series <span className='required'>*</span></label>
             <input
@@ -273,8 +266,7 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
             />
           </div>
 
-          {/* Chassis no 入力ボックス */}
-          {/* 对应設計書 2.1 コントロール属性表 No.2 */}
+          {/* Chassis no 输入框 */}
           <div className='form-group'>
             <label htmlFor='chassisNo'>Chassis no <span className='required'>*</span></label>
             <input
@@ -291,7 +283,6 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
           </div>
 
           {/* Document type ドロップダウン */}
-          {/* 对应設計書 2.1 コントロール属性表 No.3 */}
           <div className='form-group'>
             <label htmlFor='documentType'>Document type <span className='required'>*</span></label>
             <select
@@ -313,43 +304,23 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
 
         </div>
 
-        {/* ボタングループ */}
+        {/* 按钮组 */}
         <div className='button-group'>
-          {/* Submit ボタン */}
-          {/* 对应設計書 2.1 コントロール属性表 No.4 */}
-          <button 
-            type='button' 
-            className='btn btn-submit' 
-            onClick={handleSubmit}
-            disabled={isLoading}                      // ロード中はボタンを無効化
-          >
+          {/* Submit 按钮 */}
+          <button type='button' className='btn btn-submit' onClick={handleSubmit} disabled={isLoading}>
             Submit
           </button>
-
-          {/* Reset ボタン */}
-          {/* 对应設計書 2.1 コントロール属性表 No.5 */}
-          <button 
-            type='button' 
-            className='btn btn-reset' 
-            onClick={handleReset}
-            disabled={isLoading}                      // ロード中はボタンを無効化
-          >
+          {/* Reset 按钮 */}
+          <button type='button' className='btn btn-reset' onClick={handleReset} disabled={isLoading}>
             Reset
           </button>
-
-          {/* Help ボタン */}
-          {/* 对应設計書 2.1 コントロール属性表 No.6 */}
-          <button 
-            type='button' 
-            className='btn btn-help' 
-            onClick={handleHelp}
-            disabled={isLoading}                      // ロード中はボタンを無効化
-          >
+          {/* Help 按钮 */}
+          <button type='button' className='btn btn-help' onClick={handleHelp} disabled={isLoading}>
             Help
           </button>
         </div>
 
-        {/* フッターサポート情報 */}
+        {/* 页脚支持信息 */}
         <div className='support-info'>
           HDoc support: support.tpi@document.com
         </div>

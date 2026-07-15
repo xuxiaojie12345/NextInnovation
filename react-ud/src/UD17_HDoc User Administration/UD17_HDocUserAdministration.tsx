@@ -488,13 +488,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
               autoComplete='off'
             />
           </div>
-          <button
-            className='ud17-btn-info'
-            onClick={handleUserInfo}
-            disabled={isLoading}
-          >
-            {isLoading ? '处理中...' : 'User Info'}
-          </button>
+          <button className='ud17-btn-info' onClick={handleUserInfo} disabled={isLoading}>{isLoading ? '处理中...' : 'User Info'}</button>
         </div>
 
         {/* User输入框 - 显示在UserID下方 */}
@@ -599,7 +593,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
               {ROLE_CONFIGS.filter((r) => r.key === 'Manage Variable List').map((role) => (
                 <div key={role.key} className='ud17-checkbox-item'>
                   <div className='ud17-checkbox-wrapper'>
-                    {/* <label htmlFor={`chk-${role.key}`}>{role.label}</label> */}
                     <input
                       type='checkbox'
                       id={`chk-${role.key}`}
@@ -621,7 +614,6 @@ const UD17_HDocUserAdministration: React.FC = () => {
             <div className='ud17-checkbox-row ud17-row2'>
               {ROLE_CONFIGS.filter((r) => r.key === 'Market Super User').map((role) => (
                 <div key={role.key} className='ud17-checkbox-item-inline'>
-                  {/* <span className='ud17-role-label'>{role.label}</span> */}
                   {role.hasMarket && (
                     <select
                       className='ud17-market-select'
@@ -647,20 +639,10 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
       {/* 操作按钮 */}
         <div className='ud17-actions'>
-          <button
-            className='ud17-btn-update'
-            onClick={handleUpdateRole}
-            disabled={isLoading}
-          >
-            {isLoading ? '处理中...' : 'Update Role'}
-          </button>
-          <button
-            className='ud17-btn-delete'
-            onClick={handleDeleteRole}
-            disabled={isLoading}
-          >
-            {isLoading ? '处理中...' : 'Delete Role'}
-          </button>
+          <button className='ud17-btn-update' onClick={handleUpdateRole} 
+          disabled={isLoading}> {isLoading ? '处理中...' : 'Update Role'}</button>
+          <button className='ud17-btn-delete' onClick={handleDeleteRole} 
+          disabled={isLoading}> {isLoading ? '处理中...' : 'Delete Role'}</button>
         </div>
     </div> 
      

@@ -104,13 +104,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
   /**
    * 查询用户信息
-   * 处理流程：
-   * 1. 前置处理：获取UserID并去除首尾空格
-   * 2. 空值校验（前端校验）
-   * 3. 调用UD18CheckAuthApi检查用户是否存在
-   * 4. 若存在，调用AuthenticationApi获取用户名
-   * 5. 调用UD18GetUserDocApi查询用户当前文档权限
-   * 6. 结果处理
    */
   const handleUserInfo = async () => {
     // 1. 前置处理：去除首尾空格
@@ -122,13 +115,11 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       setMessage('请输入UserID');
       return;
     }
-    // 对应设计书 3.2 校验详细规格表 No.2
     if (!USER_ID_REGEX.test(trimmedUserID)) {
       setMessageType('error');
       setMessage('UserID只能包含半角英数字');
       return;
     }
-    // 对应设计书 3.2 校验详细规格表 No.3
     if (trimmedUserID.length > MAX_USER_ID_LENGTH) {
       setMessageType('error');
       setMessage('UserID最大长度为10字符');
@@ -144,7 +135,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
     try {
       // 步骤1：调用UD18CheckAuthApi检查用户是否存在
-      //  GET /api/ud18/checkauth?userId=xxx
       const authResponse = await apiClient.get('/api/ud18/checkauth', {
         params: { userId: trimmedUserID },
       });
@@ -160,7 +150,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       }
 
       // 步骤3：若存在，调用AuthenticationApi获取用户名
-      // let displayName = trimmedUserID;
       try {
         const authUserResponse = await apiClient.get("/api/ud01/authentication", {
           params: { userId: trimmedUserID },
@@ -175,7 +164,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       }
 
       // 步骤4：调用UD18GetUserDocApi查询用户当前文档权限（返回doctypes列表）
-      // GET /api/ud18/getuserdoc?userId=xxx
       let currentDocs: string[] = [];
       try {
         const docResponse = await apiClient.get('/api/ud18/getuserdoc', {
@@ -190,7 +178,6 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
       }
 
       // 5. 结果处理 - 多个文档权限全部高亮
-      // setUserName(displayName);
       setSelectedDocs(currentDocs);
       setIsQueried(true);
       setMessageType('success');
@@ -225,26 +212,16 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
   /**
    * 更新用户文档权限
-   * 对应设计书 3.1.3 Update按钮处理流程
-   *
-   * 处理流程：
-   * 1. 空值校验（前端校验）
-   * 2. 检查用户是否存在
-   * 3. 检查文档权限是否已存在
-   * 4. 不存在则新增，存在则先删后增
-   * 5. 结果处理
    */
   const handleUpdate = async () => {
     const trimmedUserID = userID.trim();
 
-    // 对应设计书 3.2 校验详细规格表 No.5
     if (!trimmedUserID) {
       setMessageType('error');
       setMessage('请输入UserID');
       return;
     }
 
-    // 对应设计书 3.2 校验详细规格表 No.6
     if (!isQueried) {
       setMessageType('error');
       setMessage('请先查询用户信息');
@@ -262,13 +239,11 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
     try {
       // 步骤1：检查用户是否存在
-      // 对应设计书 4.2 - GET /api/ud18/checkauth
       const authResponse = await apiClient.get('/api/ud18/checkauth', {
         params: { userId: trimmedUserID },
       });
 
       if (authResponse.data?.data?.exists !== true) {
-        // 对应设计书 3.2 校验详细规格表 No.7
         setMessageType('error');
         setMessage("We didn't recognize the userid you entered. Please try again.");
         setIsLoading(false);
@@ -359,11 +334,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
       {/* 消息显示区域  */}
       {message && (
-        <div
-          className={`ud18-message ${
-            messageType === 'success' ? 'ud18-message-success' : 'ud18-message-error'
-          }`}
-        >
+        <div className={`ud18-message ${ messageType === 'success' ? 'ud18-message-success' : 'ud18-message-error' }`} >
           {message}
         </div>
       )}
@@ -374,9 +345,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
         <div className='ud18-search-row'>
           <div className='ud18-search-group'>
             <label htmlFor='ud18-userid'>UserID:</label>
-            <input id='ud18-userid' type='text' value={userID}
-              onChange={handleUserIDChange}
-              placeholder=''
+            <input id='ud18-userid' type='text' value={userID} onChange={handleUserIDChange} placeholder=''
               disabled={isLoading}
               maxLength={MAX_USER_ID_LENGTH}
               inputMode='text'
@@ -385,11 +354,7 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
               autoComplete='off'
             />
           </div>
-          <button
-            className='ud18-btn-info'
-            onClick={handleUserInfo}
-            disabled={isLoading}
-          >
+          <button className='ud18-btn-info' onClick={handleUserInfo} disabled={isLoading} >
             {isLoading ? '处理中...' : 'User Info'}
           </button>
         </div>
@@ -402,13 +367,11 @@ const UD18_HDocUserDocAdministration: React.FC = () => {
 
         {/* Document 多选下拉框 */}
         <div className='ud18-doc-section'>
-          <select id='ud18-document' className='ud18-document-select'
-            multiple
+          <select id='ud18-document' className='ud18-document-select' multiple
             value={selectedDocs}
             onChange={handleDocumentChange}
             disabled={isLoading}
-            size={Math.max(4, documentList.length + 1)}
-          >
+            size={Math.max(4, documentList.length + 1)} >
             {documentList.length === 0 && (
               <option value='' disabled>-- 暂无可用文档 --</option>
             )}

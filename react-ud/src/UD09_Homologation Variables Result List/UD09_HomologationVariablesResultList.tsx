@@ -5,7 +5,6 @@ import './UD09_HomologationVariablesResultList.css';
 
 /**
  * 检索结果记录接口
- * 对应设计书 2.1 控件属性表 和 6.1 状态管理
  */
 interface ResultRecord {
   productClass: string;
@@ -43,7 +42,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
   const location = useLocation();
 
   // ==================== 状态管理 ====================
-  // 对应设计书 6.1 状态管理
   const [results, setResults] = useState<ResultRecord[]>([]);  // 检索结果列表
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null); // 选中的行索引（单选）
   const [message, setMessage] = useState<string>('');          // 消息
@@ -52,7 +50,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 将 API 返回的日期字符串格式化为 yyyy-MM-DD
-   * 处理 ISO 格式 (2026-07-13T12:00:00.000Z) 和已有格式
    */
   const formatDateStr = (dateStr: string): string => {
     if (!dateStr) return '';
@@ -67,13 +64,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
   useEffect(() => {
     /**
      * 画面加载时执行检索
-     * 对应设计书 3.1.1 初始显示流程
-     *
-     * 处理流程：
-     * 1. 从UD08传递的location.state中获取检索条件
-     * 2. 调用API查询HDOC_USER_DEFINED_RULES表
-     * 3. 按照 Product Class, Market, Number 排序显示
-     * 4. VS和VS2通过逗号","拼接显示在Variant string.列
      */
     const fetchResults = async () => {
       setIsLoading(true);
@@ -90,7 +80,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
           const dataList = response.data.data || [];
 
           // 将API返回的数据映射为前端展示格式
-          // 对应设计书 2.1 - Variant string. 列由 VS 和 VS2 拼接显示
+          // Variant string. 列由 VS 和 VS2 拼接显示
           const mappedResults: ResultRecord[] = dataList.map((item: any) => ({
             productClass: item.productClass || '',
             number: item.number !== null && item.number !== undefined ? String(item.number) : '',
@@ -145,7 +135,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理Radio选择变更（单选，可取消选中）
-   * 对应设计书 2.1 序号1 - Radio控件
    *
    * @param index - 选中的行索引
    */
@@ -156,12 +145,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Select 按钮点击
-   * 对应设计书 3.1.2 Select 操作流程
-   *
-   * 校验规则：
-   * 1. 未勾选任何记录 → 显示错误"请选择至少一条记录"
-   * 2. 勾选多条记录 → 显示错误"只能选择一条记录"
-   * 3. 选中一条记录 → 携带数据跳转到UD08画面
    */
   const handleSelect = useCallback(() => {
     // 校验：未选中任何记录
@@ -202,9 +185,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Back 按钮点击
-   * 对应设计书 3.1.3 Back 操作流程
-   *
-   * 画面迁移到前画面 UD08_Homologation Variables
    */
   const handleBack = useCallback(() => {
     // 从location.state中取出UD08传来的formData，回传给UD08恢复输入数据
@@ -214,11 +194,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Print 按钮点击
-   * 对应设计书 3.1.4 Print 操作流程
-   *
-   * 校验规则：
-   * 1. 无检索结果 → 显示错误"没有可打印的数据"
-   * 2. 有数据 → 调用浏览器打印功能
    */
   const handlePrint = useCallback(() => {
     // 校验：无数据可打印
@@ -234,12 +209,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Delete selected 按钮点击
-   * 对应设计书 3.1.5 Delete selected 操作流程
-   *
-   * 校验规则：
-   * 1. 未勾选任何记录 → 显示错误"请选择至少一条要删除的记录"
-   * 2. 逐条调用删除API
-   * 3. 删除成功后刷新列表
    */
   const handleDeleteSelected = useCallback(async () => {
     // 校验：未选中任何记录
@@ -322,12 +291,6 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
   /**
    * 处理 Created by user 点击事件
-   * 对应设计书 3.1.6 用户链接跳转流程
-   *
-   * 处理流程：
-   * 1. 获取该记录的注册用户ID
-   * 2. 画面迁移到 UD25_EDB User View 画面
-   * 3. 传递用户ID参数
    *
    * @param userId - 用户ID
    */
@@ -352,36 +315,11 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
 
       {/* 主内容区域 */}
       <div className="ud09-content">
-        {/* 操作按钮（对应设计书 2.1 序号14~17）- 置于表格上方 */}
         <div className="ud09-button-row">
-          <button
-            className="ud09-btn ud09-btn--primary"
-            onClick={handleSelect}
-            disabled={isLoading}
-          >
-            Select
-          </button>
-          <button
-            className="ud09-btn ud09-btn--default"
-            onClick={handleBack}
-            disabled={isLoading}
-          >
-            Back
-          </button>
-          <button
-            className="ud09-btn ud09-btn--default"
-            onClick={handlePrint}
-            disabled={isLoading}
-          >
-            Print
-          </button>
-          <button
-            className="ud09-btn ud09-btn--danger"
-            onClick={handleDeleteSelected}
-            disabled={isLoading}
-          >
-            Delete selected
-          </button>
+          <button className="ud09-btn ud09-btn--primary" onClick={handleSelect} disabled={isLoading}>Select</button>
+          <button className="ud09-btn ud09-btn--default" onClick={handleBack} disabled={isLoading}>Back</button>
+          <button className="ud09-btn ud09-btn--default" onClick={handlePrint} disabled={isLoading}>Print</button>
+          <button className="ud09-btn ud09-btn--danger" onClick={handleDeleteSelected} disabled={isLoading}>Delete selected</button>
         </div>
 
         {/* 数据表格 */}
@@ -421,10 +359,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
                     >
                       {/* RadioButton 列（对应设计书 2.1 序号1）- 单选且可取消选中 */}
                       <td className="ud09-td--center">
-                        <input
-                          type="radio"
-                          name="ud09-selection"
-                          className="ud09-radio"
+                        <input type="radio"  name="ud09-selection" className="ud09-radio"
                           checked={selectedIndex === index}
                           onClick={() => handleRadioChange(index)}
                           readOnly
@@ -442,8 +377,7 @@ const UD09_HomologationVariablesResultList: React.FC = () => {
                       <td>{record.deleteDate}</td>
                       {/* Created by user 链接（对应设计书 2.1 序号11 + 3.1.6） */}
                       <td>
-                        <span
-                          className="ud09-user-link"
+                        <span className="ud09-user-link"
                           onClick={() => handleUserLinkClick(record.createdByUser)}
                           title="点击查看用户详情"
                         >
