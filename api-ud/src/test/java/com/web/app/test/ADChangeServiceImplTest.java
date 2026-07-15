@@ -170,29 +170,23 @@ class ADChangeServiceImplTest {
     @Test
     @DisplayName("Mapper 返回更新的记录数（>0）→ 应返回该数字")
     void shouldReturnUpdateCountWhenGreaterThanZero() {
-      // Arrange
-      when(adChangeMapper.updateAllActToN(UPDATE_USER)).thenReturn(5);
+      when(adChangeMapper.updateAllActToN(SERIE, CHNR, UPDATE_USER)).thenReturn(5);
 
-      // Act
-      int result = adChangeService.updateAllActToN(UPDATE_USER);
+      int result = adChangeService.updateAllActToN(SERIE, CHNR, UPDATE_USER);
 
-      // Assert
       assertEquals(5, result);
-      verify(adChangeMapper).updateAllActToN(UPDATE_USER);
+      verify(adChangeMapper).updateAllActToN(SERIE, CHNR, UPDATE_USER);
     }
 
     @Test
     @DisplayName("Mapper 返回 0（无记录更新）→ 应返回 0")
     void shouldReturnZeroWhenNoRecordsUpdated() {
-      // Arrange
-      when(adChangeMapper.updateAllActToN(UPDATE_USER)).thenReturn(0);
+      when(adChangeMapper.updateAllActToN(SERIE, CHNR, UPDATE_USER)).thenReturn(0);
 
-      // Act
-      int result = adChangeService.updateAllActToN(UPDATE_USER);
+      int result = adChangeService.updateAllActToN(SERIE, CHNR, UPDATE_USER);
 
-      // Assert
       assertEquals(0, result);
-      verify(adChangeMapper).updateAllActToN(UPDATE_USER);
+      verify(adChangeMapper).updateAllActToN(SERIE, CHNR, UPDATE_USER);
     }
   }
 }
