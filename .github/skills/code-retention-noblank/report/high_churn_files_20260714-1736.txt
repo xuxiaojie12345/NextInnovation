@@ -1,0 +1,30 @@
+react-ud/src/Menu/Menu.tsx	流失率:52.79%	修改:48次	新增:2472	删除:1305
+react-ud/src/Login/Login.tsx	流失率:77.31%	修改:39次	新增:2393	删除:1850
+react-ud/src/Login/Login.test.tsx	流失率:578.59%	修改:12次	新增:654	删除:3784
+react-ud/src/AdCaChange/AdCaChange.css	流失率:78.03%	修改:9次	新增:132	删除:103
+react-ud/src/MarketDocumentSettingsResultList/MarketDocumentSettingsResultList.css	流失率:53.37%	修改:9次	新增:208	删除:111
+api-ud/src/main/resources/mapper/UD19Mapper.xml	流失率:51.28%	修改:9次	新增:117	删除:60
+react-ud/src/index.tsx	流失率:52.63%	修改:6次	新增:38	删除:20
+react-ud/src/App.css	流失率:74.47%	修改:4次	新增:47	删除:35
+react-ud/src/Test/Test.tsx	流失率:191.67%	修改:4次	新增:12	删除:23
+api-ud/src/main/java/com/web/app/dto/HdocVariablesResponse.java	流失率:57.58%	修改:4次	新增:33	删除:19
+api-ud/src/main/java/com/web/app/config/SwaggerAutoConfiguration.java	流失率:63.01%	修改:4次	新增:219	删除:138
+api-ud/src/main/java/com/web/app/config/SwaggerProperties.java	流失率:58.58%	修改:4次	新增:268	删除:157
+react-ud/src/ExistingHDocVariablesResult List/UD11.tsx	流失率:100.0%	修改:4次	新增:285	删除:285
+api-ud/src/main/java/com/web/app/controller/UserGuideController.java	流失率:71.08%	修改:3次	新增:166	删除:118
+api-ud/src/main/java/com/web/app/dto/HdocVariablesRequest.java	流失率:100.0%	修改:3次	新增:13	删除:13
+api-ud/src/main/java/com/web/app/dto/UserInfoDTO.java	流失率:100.0%	修改:3次	新增:14	删除:14
+react-ud/src/App.test.tsx	流失率:100.0%	修改:3次	新增:13	删除:13
+react-ud/src/index.css	流失率:100.0%	修改:3次	新增:18	删除:18
+react-ud/src/reportWebVitals.ts	流失率:100.0%	修改:3次	新增:17	删除:17
+react-ud/src/setupTests.ts	流失率:100.0%	修改:3次	新增:6	删除:6
+react-ud/src/DownloadPrintQuickGuides/DownloadPrintQuickGuides.tsx	流失率:61.72%	修改:3次	新增:256	删除:158
+react-ud/src/ExistingHDocVariablesResult List/UD11.css	流失率:100.0%	修改:3次	新增:207	删除:207
+react-ud/src/GenerateDocument/GenerateDocument.test.tsx	流失率:100.0%	修改:2次	新增:239	删除:239
+api-ud/src/main/java/com/web/app/controller/UD201UpdateHdocDocumentController.java	流失率:100.0%	修改:2次	新增:36	删除:36
+api-ud/src/main/java/com/web/app/dto/UD201UpdateHdocDocumentResponse.java	流失率:100.0%	修改:2次	新增:54	删除:54
+api-ud/src/main/java/com/web/app/mapper/UD201UpdateHdocDocumentMapper.java	流失率:100.0%	修改:2次	新增:30	删除:30
+api-ud/src/main/java/com/web/app/service/UD201UpdateHdocDocumentService.java	流失率:100.0%	修改:2次	新增:24	删除:24
+api-ud/src/main/java/com/web/app/service/impl/UD201UpdateHdocDocumentServiceImpl.java	流失率:100.0%	修改:2次	新增:54	删除:54
+api-ud/src/main/resources/mapper/UD201UpdateHdocDocumentMapper.xml	流失率:100.0%	修改:2次	新增:15	删除:15
+react-ud/src/Login_x/LoginPage.css	流失率:100.0%	修改:2次	新增:227	删除:227

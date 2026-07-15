@@ -37,6 +37,19 @@
   padding: 20px;
 }
 
+.ud16-page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+.ud16-success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
 .ud16-card {
   width: 100%;
   max-width: 600px;
@@ -44,13 +57,6 @@
   border: 1px solid #d0d0d0;
   padding: 20px 24px 24px;
   box-sizing: border-box;
-}
-
-.ud16-page-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #003057;
-  margin: 0 0 16px 0;
 }
 
 /* ---- 消息 ---- */
@@ -62,22 +68,16 @@
   font-weight: 500;
 }
 
-.ud16-success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
+.ud16-warning {
+  color: #d46b08;
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
 }
 
 .ud16-error {
   color: #d32f2f;
   background-color: #fff1f0;
   border: 1px solid #ffccc7;
-}
-
-.ud16-warning {
-  color: #d46b08;
-  background-color: #fff7e6;
-  border: 1px solid #ffd591;
 }
 
 /* ---- 输入区域 ---- */
@@ -94,6 +94,14 @@
   align-items: center;
   margin-bottom: 10px;
   gap: 8px;
+}
+
+.ud16-input:focus {
+  border-color: #003057;
+}
+
+.ud16-input-desc {
+  max-width: 350px;
 }
 
 .ud16-label {
@@ -118,14 +126,6 @@
   box-sizing: border-box;
 }
 
-.ud16-input:focus {
-  border-color: #003057;
-}
-
-.ud16-input-desc {
-  max-width: 350px;
-}
-
 /* ---- 按钮行 ---- */
 .ud16-button-row {
   display: flex;
@@ -133,6 +133,18 @@
   padding-top: 10px;
   margin-top: 6px;
   border-top: 1px solid #b8d4e8;
+}
+
+.ud16-btn:hover:not(:disabled) {
+  background-color: #d4e4f0;
+  border-color: #5a8aaa;
+}
+
+.ud16-btn:disabled {
+  background-color: #dce8f0;
+  color: #7a9eb3;
+  border-color: #b0c8d8;
+  cursor: not-allowed;
 }
 
 .ud16-btn {
@@ -148,16 +160,4 @@
   color: #003057;
   transition: background-color 0.15s ease;
   border-radius: 2px;
-}
-
-.ud16-btn:hover:not(:disabled) {
-  background-color: #d4e4f0;
-  border-color: #5a8aaa;
-}
-
-.ud16-btn:disabled {
-  background-color: #dce8f0;
-  color: #7a9eb3;
-  border-color: #b0c8d8;
-  cursor: not-allowed;
 }
