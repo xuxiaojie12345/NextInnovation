@@ -9,17 +9,17 @@ import lombok.Data;
  */
 @Data
 public class HdocAdcaChange {
-    private String serie;           // SERIE
-    private String chnr;            // CHNR
-    private String act;             // ACT (Y/N)
-    private String bu;              // BU
-    private String reason;          // REASON
-    private String registerDatetime;// REGISTER_DATETIME
-    private String registerUser;    // REGISTER_USER
-    private String registerProcess; // REGISTER_PROCESS
-    private String updateDatetime;  // UPDATE_DATETIME
-    private String updateUser;      // UPDATE_USER
-    private String updateProcess;   // UPDATE_PROCESS
+    private String serie;           
+    private String chnr;            
+    private String act;             
+    private String bu;             
+    private String reason;          
+    private String registerDatetime;
+    private String registerUser;    
+    private String registerProcess; 
+    private String updateDatetime;  
+    private String updateUser;     
+    private String updateProcess;   
 
     // 前端传入字段
     @JsonProperty("serieChnr")

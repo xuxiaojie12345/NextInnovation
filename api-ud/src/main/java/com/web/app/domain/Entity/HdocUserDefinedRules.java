@@ -8,22 +8,22 @@ import lombok.Data;
  */
 @Data
 public class HdocUserDefinedRules {
-    private String pc;              // Product class
-    private Integer num;            // Number
-    private String market;          // Market
-    private String vs;              // Variant string.1
-    private String vs2;             // Variant string.2
-    private String variable;        // Variable
-    private String val;             // Value
-    private String userid;          // User ID
-    private String upDate;          // Update date (YYYYMM)
-    private String comments;        // Comments
-    private String addDate;         // Add date (YYYYMM)
-    private String deleteDate;      // Delete date (YYYYMM)
-    private String registerDatetime;// Register datetime
-    private String registerUser;    // Register user
-    private String registerProcess; // Register process
-    private String updateDatetime;  // Update datetime
-    private String updateUser;      // Update user
-    private String updateProcess;   // Update process
+    private String pc;         
+    private Integer num;   
+    private String market;   
+    private String vs;          
+    private String vs2;        
+    private String variable;   
+    private String val;      
+    private String userid;  
+    private String upDate;     
+    private String comments;      
+    private String addDate;     
+    private String deleteDate;     
+    private String registerDatetime;
+    private String registerUser;  
+    private String registerProcess;
+    private String updateDatetime; 
+    private String updateUser;  
+    private String updateProcess;  
 }
