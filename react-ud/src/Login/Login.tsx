@@ -107,10 +107,10 @@ const Login: React.FC = () => {
       {/* 左侧信息面板 */}
       <div className="login-info-panel">
         <div className="left-content">
-          <h1>
-            <strong>EDB</strong> Engineering Database
-          </h1>
-          <p>Use Outlook id and password</p>
+          <div style={{fontSize: "4em", fontWeight: "normal", margin: "0.67em 0 0.34em 0"}}>
+            <span style={{fontWeight: "bold"}}>EDB</span> Engineering Database
+          </div>
+          <p style={{marginLeft: "250px"}}>Use Outlook id and password</p>
           <p>
             Support, authorization request or improvement suggestions, send mail
             to: Support TPI
@@ -119,7 +119,7 @@ const Login: React.FC = () => {
       </div>
 
       {/* 右侧登录表单 */}
-      <div className="login-form-panel">
+      <div className="login-form-panel" style={{marginLeft: "-300px"}}>
         <div className="login-form">
           <form onSubmit={handleSubmit} autoComplete="off">
             <div className="form-group">

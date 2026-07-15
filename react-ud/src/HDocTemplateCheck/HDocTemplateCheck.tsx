@@ -1,11 +1,12 @@
 import React from "react";
+import { Modal } from "antd";
 import "../common/css/common.css";
 import "./HDocTemplateCheck.css";
 
 // 模板检查组件
 const HDocTemplateCheck: React.FC = () => {
   const handleCheck = () => {
-    alert("功能尚未实现");
+    Modal.info({ title: "Info", content: "功能尚未实现", transitionName: "" });
   };
 
   return (

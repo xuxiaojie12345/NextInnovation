@@ -124,11 +124,7 @@ const MarketDocumentSettingsResultList: React.FC = () => {
         <tbody>
           <tr>
             <td className="btn-cell">
-              <button
-                className="btn"
-                onClick={handleSelect}
-                disabled={selectedIdx < 0}
-              >
+              <button className="btn" onClick={handleSelect}>
                 Select
               </button>
               <button className="btn" onClick={handleBack}>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import "../common/css/common.css";
 import "./DownloadAndPrintQuickGuides.css";
 
@@ -64,7 +65,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
                 <div
                   className="dpg-link-item"
                   key={name}
-                  onClick={() => alert('暂时不支持文件下载')}
+                  onClick={() => Modal.info({ title: "Info", content: "暂时不支持文件下载", transitionName: "" })}
                 >
                   <span className="dpg-link-arrow">•</span>
                   <span className="dpg-link">{name}</span>
@@ -78,7 +79,7 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
                 <div
                   className="dpg-link-item"
                   key={name}
-                  onClick={() => alert('暂不支持文件下载')}
+                  onClick={() => Modal.info({ title: "Info", content: "暂不支持文件下载", transitionName: "" })}
                 >
                   <span className="dpg-link-arrow">•</span>
                   <span className="dpg-link">{name}</span>

@@ -119,12 +119,12 @@ const SaveModifications: React.FC = () => {
         </span>
       </div>
 
-      <div className="save-mod-info-row">
+      <div className="save-mod-info-row" style={{ marginBottom: "3px", marginTop: "5px" }}>
         <span className="info-label">FOUND UNRELEASED VERSION:</span>
         <span className="info-value">{meta?.version || ""}</span>
       </div>
 
-      <div className="save-mod-message">VERSION IS RELEASED</div>
+      <div className="save-mod-message" style={{ marginBottom: 0 }}>VERSION IS RELEASED</div>
 
       <div className="save-mod-actions" style={{ marginTop: "20px" }}>
         <button className="btn btn-primary" onClick={handleClose}>

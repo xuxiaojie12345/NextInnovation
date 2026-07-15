@@ -203,6 +203,7 @@ const HomologationVariablesResultList: React.FC = () => {
               >
                 Print
               </button>
+              <div style={{ width: "100px" }} />
               <button
                 className="btn btn-delete"
                 onClick={handleDeleteSelected}

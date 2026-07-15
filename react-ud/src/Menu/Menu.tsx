@@ -102,8 +102,8 @@ const Menu: React.FC = () => {
 
   return (
     <div className="menu-root">
-      <div className="menu-topbar">
-        <div className="topbar-title">Generate Document</div>
+      <div className="menu-topbar no-print">
+        <div className="topbar-title">HDoc System</div>
       </div>
       <aside className="menu-sidebar print-hide-sidebar">
         <nav className="sidebar-nav">
@@ -142,7 +142,12 @@ const Menu: React.FC = () => {
 
       <div className="sidebar-footer print-hide-sidebar">
         <div className="user-info">
-          <span className="user-icon">👤</span>
+          <span className="user-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </span>
           <span className="user-name">{username}</span>
         </div>
         <div className="footer-actions">

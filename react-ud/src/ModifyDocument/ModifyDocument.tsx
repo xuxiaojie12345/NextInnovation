@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { api } from "../services/api";
 import "../common/css/common.css";
 import "./ModifyDocument.css";
@@ -129,7 +130,7 @@ const ModifyDocument: React.FC = () => {
   if (errorMessage && variables.length === 0) {
     return (
       <div className="modify-doc-container">
-        <div className="modify-doc-error">{errorMessage}</div>
+        <div className="msg-error">{errorMessage}</div>
         <button className="btn btn-secondary" onClick={() => navigate(-1)}>
           Back
         </button>
@@ -175,13 +176,15 @@ const ModifyDocument: React.FC = () => {
       <div className="modify-doc-template">
         <span
           className="modify-doc-template-link"
-          onClick={() => alert("Template download not implemented.")}
+          onClick={() => Modal.info({ title: "Info", content: "Template download not implemented.", transitionName: "" })}
         >
           Template:aus/Download Template File
         </span>
       </div>
 
-      <div className="modify-doc-error">{errorMessage}</div>
+      {errorMessage && (
+      <div className="msg-error">{errorMessage}</div>
+      )}
 
       {variables.length > 0 ? (
         <React.Fragment>

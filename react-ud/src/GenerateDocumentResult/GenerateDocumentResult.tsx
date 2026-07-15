@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { api } from "../services/api";
 import "../common/css/common.css";
 import "./GenerateDocumentResult.css";
@@ -147,7 +148,7 @@ const GenerateDocumentResult: React.FC = () => {
 
   return (
     <div className="gen-doc-result-container">
-      <h1 className="gen-doc-result-title">Generate document</h1>
+      <h1 className="gen-doc-result-title no-print">Generate document</h1>
 
       {/* 文档详情 */}
       <div className="info-list">
@@ -227,7 +228,7 @@ const GenerateDocumentResult: React.FC = () => {
           <span className="info-value">
             <span
               className="link-like"
-              onClick={() => alert("Analyze Rules clicked")}
+              onClick={() => Modal.info({ title: "Info", content: "Analyze Rules clicked", transitionName: "" })}
             >
               Analyze Rules
             </span>
@@ -275,7 +276,7 @@ const GenerateDocumentResult: React.FC = () => {
             <span
               className="link-like"
               style={{ textDecorationColor: "#000d72", color: "#000d72" }}
-              onClick={() => alert("Generated document clicked")}
+              onClick={() => Modal.info({ title: "Info", content: "Generated document clicked", transitionName: "" })}
             >
               <strong>Generated document</strong>
             </span>

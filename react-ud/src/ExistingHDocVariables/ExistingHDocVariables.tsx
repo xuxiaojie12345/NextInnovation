@@ -268,6 +268,23 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
+    // Variable 存在性校验
+    try {
+      const checkRes = await api.post<{ exists: boolean }>(
+        "/ud08/checkVariable",
+        {
+          variable: variable.trim(),
+        },
+      );
+      if (checkRes.code === 200 && !checkRes.data?.exists) {
+        setMessage("Variant does not exists. Please enter the correct content");
+        return;
+      }
+    } catch {
+      setMessage("System error. Please contact administrator.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await api.post("/variables/delete", {

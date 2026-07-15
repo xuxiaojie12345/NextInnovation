@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { api } from "../services/api";
 import { sharedPrint } from "../common/utils";
 import "../common/css/common.css";
@@ -139,7 +140,7 @@ const ExistingHDocVariablesResultList: React.FC = () => {
    * Down 操作：跳转到 Homologation Variables 页面并携带选中记录的 Variable
    */
   const handleDown = () => {
-    window.alert("暂定不实装");
+    Modal.info({ title: "Info", content: "暂定不实装", transitionName: "" });
   };
 
   /**
