@@ -3,7 +3,6 @@ export interface MenuItem {
   name: string;
   path: string;
   icon: string;
-  hasPermission: boolean;
 }
 
 export interface MenuResponse {

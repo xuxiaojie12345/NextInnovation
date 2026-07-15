@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.TemplateService;
 import java.io.File;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/hdoc/template")
 @CrossOrigin(origins = "*")
-public class TemplateController {
+public class TemplateController extends BaseController {
 
   @Value("${file.template.uploadDir}")
   private String uploadDir;
@@ -31,10 +32,9 @@ public class TemplateController {
       List<String> marketList = templateService.selectAllMarkets();
       Map<String, Object> data = new HashMap<>();
       data.put("marketList", marketList);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -43,19 +43,18 @@ public class TemplateController {
       @RequestParam("file") MultipartFile file, @RequestParam("market") String market) {
     try {
       if (file.isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "File is empty."));
+        return badRequest(MessageConstants.FILE_IS_EMPTY);
       }
-      if (market == null || market.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "Market is required."));
+      if (isParamMissing(market)) {
+        return badRequest("Market is required.");
       }
 
       String message = templateService.uploadFile(file, market);
       Map<String, Object> response = new HashMap<>();
       response.put("message", message);
-      return ResponseEntity.ok(ApiResponse.success(response));
+      return ok(response);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -65,20 +64,19 @@ public class TemplateController {
       String fileName = request.get("fileName");
       String market = request.get("market");
 
-      if (fileName == null || fileName.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "File name is required."));
+      if (isParamMissing(fileName)) {
+        return badRequest("File name is required.");
       }
-      if (market == null || market.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "Market is required."));
+      if (isParamMissing(market)) {
+        return badRequest("Market is required.");
       }
 
       String message = templateService.deleteFile(fileName, market);
       Map<String, Object> response = new HashMap<>();
       response.put("message", message);
-      return ResponseEntity.ok(ApiResponse.success(response));
+      return ok(response);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -87,8 +85,8 @@ public class TemplateController {
       @RequestBody Map<String, String> request) {
     try {
       String market = request.get("market");
-      if (market == null || market.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "Market is required."));
+      if (isParamMissing(market)) {
+        return badRequest("Market is required.");
       }
 
       String dirPath = uploadDir + "/" + market;
@@ -102,7 +100,6 @@ public class TemplateController {
                     file -> {
                       Map<String, Object> fileInfo = new HashMap<>();
                       fileInfo.put("filename", file.getName());
-                      // 最后修改时间 yyyy-MM-dd HH:mm
                       long lastModified = file.lastModified();
                       if (lastModified > 0) {
                         java.text.SimpleDateFormat sdf =
@@ -111,7 +108,6 @@ public class TemplateController {
                       } else {
                         fileInfo.put("lastMod", "-");
                       }
-                      // 文件大小 KB
                       long fileSize = file.length();
                       String sizeStr =
                           fileSize > 0 ? String.format("%.1f", fileSize / 1024.0) + " KB" : "-";
@@ -120,15 +116,14 @@ public class TemplateController {
                     })
                 .collect(Collectors.toList());
       } else {
-        return ResponseEntity.ok(ApiResponse.error(400, "Market folder not found."));
+        return badRequest(MessageConstants.MARKET_FOLDER_NOT_FOUND);
       }
 
       Map<String, Object> data = new HashMap<>();
       data.put("templateList", templates);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -138,11 +133,11 @@ public class TemplateController {
       String fileName = request.get("fileName");
       String market = request.get("market");
 
-      if (fileName == null || fileName.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "File name is required."));
+      if (isParamMissing(fileName)) {
+        return badRequest("File name is required.");
       }
-      if (market == null || market.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "Market is required."));
+      if (isParamMissing(market)) {
+        return badRequest("Market is required.");
       }
 
       Resource resource = templateService.downloadFile(fileName, market);
@@ -152,7 +147,7 @@ public class TemplateController {
           .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
           .body(resource);
     } catch (Exception e) {
-      return ResponseEntity.status(500).body(ApiResponse.error(500, "File not found."));
+      return systemError(MessageConstants.FILE_NOT_FOUND);
     }
   }
 }

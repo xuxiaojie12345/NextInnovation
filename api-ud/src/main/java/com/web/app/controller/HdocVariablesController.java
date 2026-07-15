@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.HdocVariablesService;
 import java.util.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class HdocVariablesController {
+public class HdocVariablesController extends BaseController {
 
   @Autowired
   private HdocVariablesService hdocVariablesService;
@@ -25,9 +26,8 @@ public class HdocVariablesController {
       String type = request.get("type");
       String description = request.get("description");
 
-      if (variable == null || variable.trim().isEmpty()) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Variable name is required."));
+      if (isParamMissing(variable)) {
+        return badRequest("Variable name is required.");
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
@@ -35,13 +35,12 @@ public class HdocVariablesController {
       if (result > 0) {
         Map<String, String> data = new HashMap<>();
         data.put("variable", variable);
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ok(data);
       } else {
-        return ResponseEntity.status(500).body(ApiResponse.error(500, "Failed to add variable."));
+        return systemError(MessageConstants.FAILED_TO_ADD_VARIABLE);
       }
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -53,9 +52,8 @@ public class HdocVariablesController {
       String type = request.get("type");
       String description = request.get("description");
 
-      if (variable == null || variable.trim().isEmpty()) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Variable name is required."));
+      if (isParamMissing(variable)) {
+        return badRequest("Variable name is required.");
       }
 
       String currentUser = request.getOrDefault("currentUser", "SYSTEM");
@@ -63,13 +61,12 @@ public class HdocVariablesController {
       if (result > 0) {
         Map<String, String> data = new HashMap<>();
         data.put("variable", variable);
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ok(data);
       } else {
-        return ResponseEntity.status(404).body(ApiResponse.error(404, "Variable not found."));
+        return notFound("Variable not found.");
       }
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -78,22 +75,20 @@ public class HdocVariablesController {
       @RequestBody Map<String, String> request) {
     try {
       String variable = request.get("variable");
-      if (variable == null || variable.trim().isEmpty()) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Variable name is required."));
+      if (isParamMissing(variable)) {
+        return badRequest("Variable name is required.");
       }
 
       int result = hdocVariablesService.deleteVariable(variable);
       if (result > 0) {
         Map<String, String> data = new HashMap<>();
         data.put("variable", variable);
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ok(data);
       } else {
-        return ResponseEntity.status(404).body(ApiResponse.error(404, "Variable not found."));
+        return notFound("Variable not found.");
       }
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -122,10 +117,9 @@ public class HdocVariablesController {
 
       Map<String, Object> data = new HashMap<>();
       data.put("list", list);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -159,7 +153,7 @@ public class HdocVariablesController {
 
       return ResponseEntity.ok().headers(headers).body(csv.toString());
     } catch (Exception e) {
-      return ResponseEntity.status(500).body(ApiResponse.error(500, "CSV导出失败"));
+      return systemError("CSV导出失败");
     }
   }
 
