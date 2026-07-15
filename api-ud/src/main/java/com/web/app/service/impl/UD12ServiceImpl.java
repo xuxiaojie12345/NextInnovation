@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
  * - UD12UploadFlie: 文件上传到网络共享文件夹 //172.17.0.63/hdoc/template/upload
  * - UD12DeleteFlie: 从网络共享文件夹删除模板文件
  */
+@SuppressWarnings("null")
 @Service
 public class UD12ServiceImpl implements UD12Service {
 

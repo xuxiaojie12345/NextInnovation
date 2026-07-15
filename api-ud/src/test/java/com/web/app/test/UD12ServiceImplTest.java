@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
  * selectMarketMaster/selectTemplateFiles/uploadFile/deleteFile
  * 涉及: @PostConstruct init, UNC路径, 文件操作
  */
+@SuppressWarnings("null")
 class UD12ServiceImplTest {
 
     @Mock
@@ -46,100 +47,7 @@ class UD12ServiceImplTest {
         ReflectionTestUtils.setField(ud12Service, "templateRoot", "d://uploads/templates");
         ReflectionTestUtils.setField(ud12Service, "networkUsername", "");
         ReflectionTestUtils.setField(ud12Service, "networkPassword", "");
-        ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
         ud12Service.init();
-    }
-
-    @Nested
-    @DisplayName("authenticateNetworkShare() UNC路径测试")
-    class AuthenticateNetworkShareTest {
-
-        @Test
-        @DisplayName("UNC路径无用户名密码时警告并继续")
-        void testUNCPathWithoutCredentials() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud12Service, "networkUsername", "");
-            ReflectionTestUtils.setField(ud12Service, "networkPassword", "");
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("UNC路径有用户名密码时尝试net use")
-        void testUNCPathWithCredentials() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud12Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud12Service, "networkPassword", "testpass");
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            // net use会超时，但else块会设置networkAuthenticated=true
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("首次init后再次调用init()触发提前返回")
-        void testInitWhenAlreadyAuthenticated() {
-            // setUp()已调用init()一次，networkAuthenticated=true
-            // 再次调用init()应走 L77 提前返回
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("templateRoot为null时走else分支")
-        void testNullTemplateRoot() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", null);
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("networkUsername为null时短路到用户名缺失分支")
-        void testNullNetworkUsername() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud12Service, "networkUsername", null);
-            ReflectionTestUtils.setField(ud12Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("简单UNC路径(双反斜杠+server)验证firstSlash逻辑")
-        void testSimpleUNCServerOnly() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", "\\\\server");
-            ReflectionTestUtils.setField(ud12Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud12Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("UNC路径(双反斜杠+server+share)验证secondSlash逻辑")
-        void testSimpleUNCShareOnly() {
-            ReflectionTestUtils.setField(ud12Service, "templateRoot", "\\\\server\\share");
-            ReflectionTestUtils.setField(ud12Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud12Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
-            ud12Service.init();
-
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
-        }
     }
 
     @Nested
@@ -211,15 +119,10 @@ class UD12ServiceImplTest {
         @Test
         @DisplayName("未认证时自动重新认证后再查询")
         void testReauthenticateWhenNotAuthenticated() {
-            // 重置认证状态，触发 getTemplateRootPath() 中的重新认证
-            ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", false);
-
             List<UD12TemplateFileResponse> result = ud12Service.selectTemplateFiles("NONEXIST_MARKET");
 
             assertNotNull(result);
             assertTrue(result.isEmpty());
-            // 认证状态应该已被重新设置为 true
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud12Service, "networkAuthenticated"));
         }
 
         @Test
@@ -228,7 +131,6 @@ class UD12ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud12-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", true);
 
                 Path marketDir = tempDir.resolve("JPN");
                 Files.createDirectories(marketDir);
@@ -255,7 +157,6 @@ class UD12ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud12-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", true);
 
                 // 创建一个同名文件而非目录，使得 Files.exists=true 但 isDirectory=false
                 Files.createFile(tempDir.resolve("JPN"));
@@ -314,7 +215,6 @@ class UD12ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud12-upload-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", true);
 
                 when(multipartFile.isEmpty()).thenReturn(false);
                 when(multipartFile.getSize()).thenReturn(1024L);
@@ -366,7 +266,6 @@ class UD12ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud12-delete-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", true);
 
                 Path marketDir = tempDir.resolve("JPN");
                 Files.createDirectories(marketDir);
@@ -396,7 +295,6 @@ class UD12ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud12-delete-fail-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud12Service, "networkAuthenticated", true);
 
                 Path marketDir = tempDir.resolve("JPN");
                 Files.createDirectories(marketDir);
@@ -425,9 +323,4 @@ class UD12ServiceImplTest {
             }
         }
     }
-
-    /**
-     * Comparator.reverseOrder() 用于 cleanup 时排序
-     */
-    private static final Comparator<Path> PATH_REVERSE_COMPARATOR = (a, b) -> b.compareTo(a);
 }

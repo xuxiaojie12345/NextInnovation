@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * 功能：模板文件列表与使用状态查询
  * 从网络共享文件夹 //172.17.0.63/hdoc/template/upload 读取文件列表
  */
+@SuppressWarnings("null")
 @Service
 public class UD14ServiceImpl implements UD14Service {
 

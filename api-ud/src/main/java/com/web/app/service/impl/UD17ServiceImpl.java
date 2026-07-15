@@ -3,8 +3,6 @@ package com.web.app.service.impl;
 import com.web.app.domain.UD17Request;
 import com.web.app.mapper.UD17Mapper;
 import com.web.app.service.UD17Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +10,6 @@ import java.util.*;
 
 @Service
 public class UD17ServiceImpl implements UD17Service {
-
-    private static final Logger logger = LoggerFactory.getLogger(UD17ServiceImpl.class);
 
     @Autowired
     private UD17Mapper ud17Mapper;

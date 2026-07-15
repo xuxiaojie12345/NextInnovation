@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +21,7 @@ import java.util.Map;
  * 1. UD14SelectMarketmaster - 市场列表查询
  * 2. UD14SelectHdocuserdefinedrules - 模板文件列表及使用状态查询
  */
+@SuppressWarnings("null")
 @RestController
 @RequestMapping("/api/ud14")
 public class UD14Controller {

@@ -59,7 +59,9 @@ public final class NetworkShareUtil {
 
             log.info("Authenticating network share: {}", shareRoot);
 
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = new ProcessBuilder(command)
+                    .redirectErrorStream(false)
+                    .start();
 
             // 等待 net use 完成，最多 5 秒超时
             boolean completed = process.waitFor(5, TimeUnit.SECONDS);

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
  * UD18ServiceImpl 单元测试
  * processUserDoc: switch 4种operation + 循环doctypes
  */
+@SuppressWarnings("unchecked")
 class UD18ServiceImplTest {
 
     @Mock

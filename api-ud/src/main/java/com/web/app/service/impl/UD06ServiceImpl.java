@@ -1,7 +1,6 @@
 package com.web.app.service.impl;
 
 import com.web.app.domain.SaveModificationsQueryResponse;
-import com.web.app.domain.SaveModificationsQueryResponse.StoringInfo;
 import com.web.app.mapper.UD06Mapper;
 import com.web.app.service.UD06Service;
 import org.springframework.beans.factory.annotation.Autowired;

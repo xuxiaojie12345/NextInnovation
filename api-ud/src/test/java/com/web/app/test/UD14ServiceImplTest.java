@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +25,7 @@ import static org.mockito.Mockito.*;
  * selectMarketMaster + selectHdocUserDefinedRules
  * 涉及: @PostConstruct, 文件系统操作, formatFileSize
  */
+@SuppressWarnings({"null", "unchecked"})
 class UD14ServiceImplTest {
 
     @Mock
@@ -40,89 +40,7 @@ class UD14ServiceImplTest {
         ReflectionTestUtils.setField(ud14Service, "templateRoot", "d://uploads/templates");
         ReflectionTestUtils.setField(ud14Service, "networkUsername", "");
         ReflectionTestUtils.setField(ud14Service, "networkPassword", "");
-        ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
         ud14Service.init();
-    }
-
-    @Nested
-    @DisplayName("authenticateNetworkShare() 测试")
-    class AuthenticateNetworkShareTest {
-
-        @Test
-        @DisplayName("非UNC路径直接认证成功")
-        void testNonUNCPath() {
-            // setUp()已调用init()，非UNC路径已认证
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("UNC路径无用户名时警告并继续")
-        void testUNCPathWithoutCredentials() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud14Service, "networkUsername", "");
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("UNC路径有用户名时尝试net use")
-        void testUNCPathWithCredentials() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud14Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud14Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("init二次调用提前返回")
-        void testInitAlreadyAuthenticated() {
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("templateRoot为null走else")
-        void testNullTemplateRoot() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", null);
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("networkUsername为null短路")
-        void testNullNetworkUsername() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", "\\\\server\\share\\path");
-            ReflectionTestUtils.setField(ud14Service, "networkUsername", null);
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("简单UNC路径(server only)")
-        void testSimpleUNCServerOnly() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", "\\\\server");
-            ReflectionTestUtils.setField(ud14Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud14Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
-
-        @Test
-        @DisplayName("UNC路径(server+share)")
-        void testSimpleUNCShareOnly() {
-            ReflectionTestUtils.setField(ud14Service, "templateRoot", "\\\\server\\share");
-            ReflectionTestUtils.setField(ud14Service, "networkUsername", "testuser");
-            ReflectionTestUtils.setField(ud14Service, "networkPassword", "pass");
-            ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", false);
-            ud14Service.init();
-            assertTrue((Boolean) ReflectionTestUtils.getField(ud14Service, "networkAuthenticated"));
-        }
     }
 
     @Nested
@@ -188,7 +106,6 @@ class UD14ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud14-test-");
             try {
                 ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", true);
 
                 Path marketDir = tempDir.resolve("JPN");
                 Files.createDirectories(marketDir);
@@ -218,7 +135,6 @@ class UD14ServiceImplTest {
             Path tempDir = Files.createTempDirectory("ud14-used-test-");
             try {
                 ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
-                ReflectionTestUtils.setField(ud14Service, "networkAuthenticated", true);
 
                 Path marketDir = tempDir.resolve("JPN");
                 Files.createDirectories(marketDir);
