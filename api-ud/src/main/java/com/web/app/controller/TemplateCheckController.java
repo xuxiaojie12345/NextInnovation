@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/hdoc/template")
 @CrossOrigin(origins = "*")
-public class TemplateCheckController {
+public class TemplateCheckController extends BaseController {
 
   @Value("${file.template.checkResultDir}")
   private String checkResultDir;
@@ -28,14 +29,11 @@ public class TemplateCheckController {
       @RequestParam("file") MultipartFile file) {
     try {
       if (file.isEmpty()) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "ERROR: Unable to access file!"));
+        return badRequest("ERROR: Unable to access file!");
       }
 
-      // 读取文件内容
       String content = new String(file.getBytes(), StandardCharsets.UTF_8);
 
-      // 解析 $变量名$ 格式的变量
       Pattern pattern = Pattern.compile("\\$([^\\$]+)\\$");
       Matcher matcher = pattern.matcher(content);
       List<String> variables = new ArrayList<>();
@@ -49,15 +47,12 @@ public class TemplateCheckController {
       int variableCount = variables.size();
 
       if (variableCount == 0) {
-        return ResponseEntity.status(422)
-            .body(ApiResponse.error(422, "ERROR: The file content is incorrect!"));
+        return unprocessableEntity("ERROR: The file content is incorrect!");
       }
 
-      // 生成校验结果文件
       String resultId = UUID.randomUUID().toString().replace("-", "");
       String downloadUrl = "/api/v1/hdoc/template/check/result/" + resultId;
 
-      // 保存校验结果到文件
       File dir = new File(checkResultDir);
       if (!dir.exists()) dir.mkdirs();
 
@@ -75,10 +70,9 @@ public class TemplateCheckController {
       data.put("variables", variables);
       data.put("downloadUrl", downloadUrl);
 
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -87,7 +81,7 @@ public class TemplateCheckController {
     try {
       Path filePath = Paths.get(checkResultDir, id + ".csv");
       if (!Files.exists(filePath)) {
-        return ResponseEntity.status(404).body(ApiResponse.error(404, "Result file not found."));
+        return notFound("Result file not found.");
       }
 
       byte[] content = Files.readAllBytes(filePath);
@@ -101,8 +95,7 @@ public class TemplateCheckController {
           .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
           .body(content);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

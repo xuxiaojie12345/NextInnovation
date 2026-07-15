@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.UD08HomologationVariablesService;
 import java.util.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc/ud09")
 @CrossOrigin(origins = "*")
-public class UD09Controller {
+public class UD09Controller extends BaseController {
 
   private static final Logger log = LoggerFactory.getLogger(UD09Controller.class);
 
@@ -173,11 +174,10 @@ public class UD09Controller {
         ruleList.add(item);
       }
       data.put("ruleList", ruleList);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
       log.error("search error", e);
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -190,7 +190,7 @@ public class UD09Controller {
       @SuppressWarnings("unchecked")
       List<Map<String, Object>> records = (List<Map<String, Object>>) request.get("records");
       if (records == null || records.isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "No records to delete."));
+        return badRequest("No records to delete.");
       }
 
       List<Map<String, Object>> rules = new ArrayList<>();
@@ -205,11 +205,10 @@ public class UD09Controller {
       int count = service.deleteSelectedRules(rules);
       Map<String, Object> data = new HashMap<>();
       data.put("deleteCount", count);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
       log.error("deleteSelected error", e);
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

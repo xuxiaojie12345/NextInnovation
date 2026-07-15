@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.UserDocService;
 import java.util.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class UserDocController {
+public class UserDocController extends BaseController {
 
   @Autowired
   private UserDocService userDocService;
@@ -20,17 +21,15 @@ public class UserDocController {
       @RequestBody Map<String, String> request) {
     try {
       String userid = request.get("userid");
-      if (userid == null || userid.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "User ID is required."));
+      if (isParamMissing(userid)) {
+        return badRequest(MessageConstants.USER_ID_REQUIRED);
       }
-
       userDocService.deleteUserDoc(userid);
       Map<String, Object> data = new HashMap<>();
       data.put("userId", userid);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -41,23 +40,19 @@ public class UserDocController {
       String userid = (String) request.get("userid");
       String doctype = (String) request.get("doctype");
       String currentUser = (String) request.getOrDefault("currentUser", "SYSTEM");
-
-      if (userid == null || userid.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "User ID is required."));
+      if (isParamMissing(userid)) {
+        return badRequest(MessageConstants.USER_ID_REQUIRED);
       }
-      if (doctype == null || doctype.trim().isEmpty()) {
-        return ResponseEntity.badRequest()
-            .body(ApiResponse.error(400, "Document type is required."));
+      if (isParamMissing(doctype)) {
+        return badRequest("Document type is required.");
       }
-
       userDocService.createUserDoc(userid, doctype, currentUser);
       Map<String, Object> data = new HashMap<>();
       data.put("userId", userid);
       data.put("docType", doctype);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -66,18 +61,16 @@ public class UserDocController {
       @RequestBody Map<String, String> request) {
     try {
       String userid = request.get("userid");
-      if (userid == null || userid.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "User ID is required."));
+      if (isParamMissing(userid)) {
+        return badRequest(MessageConstants.USER_ID_REQUIRED);
       }
-
       int count = userDocService.selectFunctionAuthCount(userid);
       Map<String, Object> data = new HashMap<>();
       data.put("userId", userid);
       data.put("authCount", count);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -86,18 +79,16 @@ public class UserDocController {
       @RequestBody Map<String, String> request) {
     try {
       String userid = request.get("userid");
-      if (userid == null || userid.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "User ID is required."));
+      if (isParamMissing(userid)) {
+        return badRequest(MessageConstants.USER_ID_REQUIRED);
       }
-
       List<String> docTypeList = userDocService.selectUserDoc(userid);
       Map<String, Object> data = new HashMap<>();
       data.put("userId", userid);
       data.put("docTypeList", docTypeList != null ? docTypeList : new ArrayList<>());
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }

@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.dto.UserGuideLink;
 import java.util.ArrayList;
@@ -10,16 +11,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc")
 @CrossOrigin(origins = "*")
-public class UserGuideController {
+public class UserGuideController extends BaseController {
 
-  /** 获取 User Guide 帮助链接列表（基于权限过滤） GET /api/v1/hdoc/user-guide/links */
   @GetMapping("/user-guide/links")
   public ResponseEntity<ApiResponse<List<UserGuideLink>>> getHelpLinks() {
     try {
       List<UserGuideLink> links = getDefaultHelpLinks();
-      return ResponseEntity.ok(ApiResponse.success(links));
+      return ok(links);
     } catch (Exception e) {
-      return ResponseEntity.status(500).body(ApiResponse.error(500, "无法加载帮助菜单，请稍后重试"));
+      return systemError("无法加载帮助菜单，请稍后重试");
     }
   }
 

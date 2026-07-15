@@ -1,5 +1,6 @@
 package com.web.app.controller;
 
+import com.web.app.constant.MessageConstants;
 import com.web.app.dto.ApiResponse;
 import com.web.app.service.UD19Service;
 import java.util.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/hdoc/ud19")
 @CrossOrigin(origins = "*")
-public class UD19Controller {
+public class UD19Controller extends BaseController {
 
   @Autowired
   private UD19Service ud19Service;
@@ -21,10 +22,9 @@ public class UD19Controller {
       List<String> marketList = ud19Service.selectAllMarkets();
       Map<String, Object> data = new HashMap<>();
       data.put("marketList", marketList);
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 
@@ -40,10 +40,9 @@ public class UD19Controller {
       List<Map<String, Object>> hdocList = ud19Service.searchHdoc(userid, user, market, check);
       Map<String, Object> data = new HashMap<>();
       data.put("hdocList", hdocList != null ? hdocList : new ArrayList<>());
-      return ResponseEntity.ok(ApiResponse.success(data));
+      return ok(data);
     } catch (Exception e) {
-      return ResponseEntity.status(500)
-          .body(ApiResponse.error(500, "System error. Please contact administrator."));
+      return systemError();
     }
   }
 }
