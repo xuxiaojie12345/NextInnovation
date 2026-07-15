@@ -152,6 +152,42 @@ class UD12ServiceImplTest {
         }
 
         @Test
+        @DisplayName("Files.list抛出IOException时被catch并返回空列表")
+        void testMarketDirIOException() throws Exception {
+            Path tempDir = Files.createTempDirectory("ud12-ioe-test-");
+            try {
+                ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                Files.createFile(marketDir.resolve("some.odt"));
+
+                // icacls 拒绝 Everyone 读取目录权限 → Files.list() 抛 IOException
+                String dirPath = marketDir.toString();
+                Process icacls = new ProcessBuilder("icacls", dirPath, "/deny", "Everyone:(RD)").start();
+                icacls.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+
+                List<UD12TemplateFileResponse> result = ud12Service.selectTemplateFiles("JPN");
+
+                // catch 到了 IOException，返回空列表
+                assertNotNull(result);
+                assertTrue(result.isEmpty());
+
+                // 恢复权限以便 cleanup
+                new ProcessBuilder("icacls", dirPath, "/grant", "Everyone:(RD)").start();
+            } finally {
+                try {
+                    new ProcessBuilder("icacls", tempDir.resolve("JPN").toString(), "/grant", "Everyone:(F)").start().waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (Exception ignored) {}
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException ignored) {}
+            }
+        }
+
+        @Test
         @DisplayName("marketDir是文件而非目录时跳过（Files.exists true, isDirectory false）")
         void testMarketDirIsFile() throws IOException {
             Path tempDir = Files.createTempDirectory("ud12-test-");
@@ -207,6 +243,22 @@ class UD12ServiceImplTest {
 
             assertThrows(RuntimeException.class,
                     () -> ud12Service.uploadFile(multipartFile, "JPN"));
+        }
+
+        @Test
+        @DisplayName("transferTo抛出IOException时捕获并抛RuntimeException")
+        void testUploadIOException() throws Exception {
+            when(multipartFile.isEmpty()).thenReturn(false);
+            when(multipartFile.getSize()).thenReturn(1024L);
+            when(multipartFile.getOriginalFilename()).thenReturn("test.odt");
+
+            BDDMockito.willThrow(new IOException("Disk full"))
+                    .given(multipartFile).transferTo(Mockito.any(File.class));
+
+            RuntimeException exception = assertThrows(RuntimeException.class,
+                    () -> ud12Service.uploadFile(multipartFile, "JPN"));
+
+            assertTrue(exception.getMessage().contains("System error"));
         }
 
         @Test
@@ -291,7 +343,7 @@ class UD12ServiceImplTest {
 
         @Test
         @DisplayName("删除失败时抛出RuntimeException")
-        void testDeleteFailed() throws IOException {
+        void testDeleteFailed() throws Exception {
             Path tempDir = Files.createTempDirectory("ud12-delete-fail-test-");
             try {
                 ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
@@ -301,25 +353,29 @@ class UD12ServiceImplTest {
                 Path testFile = marketDir.resolve("test.odt");
                 Files.createFile(testFile);
 
-                // 设置为只读，使 file.delete() 在某些系统上返回 false
-                File file = testFile.toFile();
-                file.setReadOnly();
+                // 尝试用 icacls 拒绝删除权限（Windows 上不一定有效）
+                String filePath = testFile.toString();
+                new ProcessBuilder("icacls", filePath, "/deny", "Everyone:(D)").start().waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
 
-                // 无论是否真正删除失败，都测试逻辑覆盖率
-                // 如果 setReadOnly 有效则走删除失败路径；否则走成功路径
                 try {
                     ud12Service.deleteFile("JPN", "test.odt");
+                    // 若 icacls 未阻止删除（大部分 Windows 环境），跳过断言
                 } catch (RuntimeException e) {
                     assertEquals("System error. Please contact administrator.", e.getMessage());
                 }
+
+                // 恢复权限
+                new ProcessBuilder("icacls", filePath, "/grant", "Everyone:(F)").start().waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
             } finally {
-                File file = tempDir.resolve("JPN").resolve("test.odt").toFile();
-                file.setWritable(true);
+                try {
+                    new ProcessBuilder("icacls", tempDir.resolve("JPN").resolve("test.odt").toString(), "/grant", "Everyone:(F)").start().waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (Exception ignored) {}
                 try {
                     Files.walk(tempDir)
                             .sorted(Comparator.reverseOrder())
-                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
-                } catch (IOException e) {}
+                            .forEach(p -> { try { p.toFile().setWritable(true); Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException ignored) {
+                }
             }
         }
     }

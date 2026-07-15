@@ -130,6 +130,93 @@ class UD14ServiceImplTest {
         }
 
         @Test
+        @DisplayName("marketDir是文件而非目录时返回空列表（else分支）")
+        void testMarketDirIsFile() throws IOException {
+            Path tempDir = Files.createTempDirectory("ud14-file-test-");
+            try {
+                ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
+
+                // 创建同名文件而非目录 → Files.exists=true, isDirectory=false
+                Files.createFile(tempDir.resolve("JPN"));
+
+                Map<String, Object> result = ud14Service.selectHdocUserDefinedRules("JPN");
+
+                assertEquals(0, result.get("totalCount"));
+                assertTrue(((List<?>) result.get("files")).isEmpty());
+            } finally {
+                Files.deleteIfExists(tempDir.resolve("JPN"));
+                Files.deleteIfExists(tempDir);
+            }
+        }
+
+        @Test
+        @DisplayName("Files.list抛出IOException时被catch并返回空列表")
+        void testMarketDirIOException() throws Exception {
+            Path tempDir = Files.createTempDirectory("ud14-ioe-test-");
+            try {
+                ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                Files.createFile(marketDir.resolve("some.odt"));
+
+                // icacls 拒绝 Everyone 读取目录权限 → Files.list() 抛 IOException
+                new ProcessBuilder("icacls", marketDir.toString(), "/deny", "Everyone:(RD)")
+                        .start().waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+
+                Map<String, Object> result = ud14Service.selectHdocUserDefinedRules("JPN");
+
+                assertEquals(0, result.get("totalCount"));
+                assertTrue(((List<?>) result.get("files")).isEmpty());
+
+                // 恢复权限以便 cleanup
+                new ProcessBuilder("icacls", marketDir.toString(), "/grant", "Everyone:(RD)")
+                        .start().waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+            } finally {
+                try {
+                    new ProcessBuilder("icacls", tempDir.resolve("JPN").toString(), "/grant", "Everyone:(F)")
+                            .start().waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (Exception ignored) {}
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException ignored) {}
+            }
+        }
+
+        @Test
+        @DisplayName("多个文件时按文件名排序并返回")
+        void testMultipleFilesSorted() throws IOException {
+            Path tempDir = Files.createTempDirectory("ud14-sort-test-");
+            try {
+                ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                Files.createFile(marketDir.resolve("b_file.odt"));
+                Files.createFile(marketDir.resolve("a_file.odt"));
+                Files.createFile(marketDir.resolve("c_file.odt"));
+
+                when(ud14Mapper.countByMarketAndFileName(anyString(), anyString())).thenReturn(0);
+
+                Map<String, Object> result = ud14Service.selectHdocUserDefinedRules("JPN");
+
+                List<Map<String, Object>> files = (List<Map<String, Object>>) result.get("files");
+                assertEquals(3, files.size());
+                assertEquals("a_file.odt", files.get(0).get("filename"));
+                assertEquals("b_file.odt", files.get(1).get("filename"));
+                assertEquals("c_file.odt", files.get(2).get("filename"));
+            } finally {
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException e) {}
+            }
+        }
+
+        @Test
         @DisplayName("文件引用计数>0时used字段为TEMPLATE-VIN-PLATE")
         void testFileUsed() throws IOException {
             Path tempDir = Files.createTempDirectory("ud14-used-test-");
@@ -153,6 +240,57 @@ class UD14ServiceImplTest {
                             .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
                 } catch (IOException e) {}
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("loadFileAsResource() 方法测试")
+    class LoadFileAsResourceTest {
+
+        @Test
+        @DisplayName("文件存在可读时返回Resource")
+        void testLoadSuccess() throws IOException {
+            Path tempDir = Files.createTempDirectory("ud14-load-test-");
+            try {
+                ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                Path testFile = marketDir.resolve("test.odt");
+                Files.write(testFile, "hello".getBytes());
+
+                org.springframework.core.io.Resource resource =
+                        ud14Service.loadFileAsResource("JPN", "test.odt");
+
+                assertNotNull(resource);
+                assertTrue(resource.exists());
+                assertTrue(resource.isReadable());
+                assertEquals("test.odt", resource.getFilename());
+            } finally {
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException e) {}
+            }
+        }
+
+        @Test
+        @DisplayName("文件不存在时抛出RuntimeException")
+        void testLoadFileNotFound() {
+            RuntimeException exception = assertThrows(RuntimeException.class,
+                    () -> ud14Service.loadFileAsResource("JPN", "nonexistent.odt"));
+
+            String msg = exception.getMessage();
+            assertTrue(msg.contains("not found") || msg.contains("Failed to load"),
+                    "Expected 'not found' or 'Failed to load' in: " + msg);
+        }
+
+        @Test
+        @DisplayName("market为null时抛出异常")
+        void testLoadWithNullMarket() {
+            assertThrows(Exception.class,
+                    () -> ud14Service.loadFileAsResource(null, "test.odt"));
         }
     }
 

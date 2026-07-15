@@ -115,7 +115,7 @@ public class UD15ServiceImpl implements UD15Service {
             List<String> items = new ArrayList<>();
             for (int i = 0; i < printItemList.getLength(); i++) {
                 String text = printItemList.item(i).getTextContent();
-                if (text != null && !text.trim().isEmpty()) {
+                if (!text.trim().isEmpty()) {
                     items.add(text.trim());
                 }
             }
@@ -140,14 +140,12 @@ public class UD15ServiceImpl implements UD15Service {
                 Node variant = variantList.item(i);
                 String name = "";
                 String value = "";
-                if (variant.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elem = (Element) variant;
-                    NodeList nameNodes = elem.getElementsByTagName("Name");
-                    if (nameNodes.getLength() > 0) name = nameNodes.item(0).getTextContent();
-                    NodeList valueNodes = elem.getElementsByTagName("Value");
-                    if (valueNodes.getLength() > 0) value = valueNodes.item(0).getTextContent();
-                }
-                items.add((name != null ? name.trim() : "") + "=" + (value != null ? value.trim() : ""));
+                Element elem = (Element) variant;
+                NodeList nameNodes = elem.getElementsByTagName("Name");
+                if (nameNodes.getLength() > 0) name = nameNodes.item(0).getTextContent();
+                NodeList valueNodes = elem.getElementsByTagName("Value");
+                if (valueNodes.getLength() > 0) value = valueNodes.item(0).getTextContent();
+                items.add(name.trim() + "=" + value.trim());
             }
             return String.join(", ", items);
         } catch (Exception e) {

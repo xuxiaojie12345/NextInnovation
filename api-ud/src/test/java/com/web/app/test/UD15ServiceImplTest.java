@@ -132,6 +132,20 @@ class UD15ServiceImplTest {
         }
 
         @Test
+        @DisplayName("viewInfo - REGISTER_DATETIME为null时短路到空值")
+        void testViewInfoNullDatetime() {
+            Map<String, Object> dbInfo = new LinkedHashMap<>();
+            dbInfo.put("REGISTER_DATETIME", null);
+
+            when(ud15Mapper.selectVinPlateInfo("SERIE1", "CHNR1")).thenReturn(dbInfo);
+
+            Map<String, Object> result = ud15Service.processVinPlate("SERIE1", "CHNR1", "viewInfo", null);
+
+            // regDatetime != null 为 false，短路，regDatetime 保持 null
+            assertNull(result.get("def"));
+        }
+
+        @Test
         @DisplayName("viewInfo - REGISTER_DATETIME含T时只保留日期部分")
         void testViewInfoDatetimeWithT() {
             Map<String, Object> dbInfo = new LinkedHashMap<>();
