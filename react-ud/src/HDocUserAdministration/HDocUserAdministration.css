@@ -1,0 +1,249 @@
+.hua-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.hua-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.hua-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.hua-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.hua-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hua-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: huaFadeIn 0.25s ease-in;
+}
+
+.hua-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.hua-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.hua-input-row {
+  margin-bottom: 12px;
+}
+
+.hua-field {
+  width: 100%;
+}
+
+.hua-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.hua-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.hua-input.ant-input {
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  height: 34px;
+  font-size: 13px;
+  color: #333333;
+  flex: 1;
+}
+
+.hua-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.hua-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.hua-user-row {
+  margin-bottom: 16px;
+  padding: 8px 10px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+}
+
+.hua-user-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-right: 8px;
+}
+
+.hua-user-value {
+  font-size: 13px;
+  color: #333333;
+}
+
+.hua-user-placeholder {
+  color: #999999;
+}
+
+.hua-permissions-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.hua-permission-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hua-permission-row:last-child {
+  border-bottom: none;
+}
+
+.hua-perm-check {
+  flex: 0 0 220px;
+  font-size: 13px;
+}
+
+.hua-perm-check .ant-checkbox-wrapper {
+  font-size: 13px;
+}
+
+.hua-perm-market {
+  flex: 1;
+}
+
+.hua-select.ant-select {
+  font-size: 13px;
+}
+
+.hua-select.ant-select .ant-select-selector {
+  border-radius: 3px !important;
+  border-color: #d0d0d0 !important;
+  height: 30px !important;
+}
+
+.hua-select.ant-select .ant-select-selection-item {
+  line-height: 28px !important;
+  font-size: 13px;
+}
+
+.hua-market-super-label {
+  font-size: 13px;
+  color: #333333;
+}
+
+.hua-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hua-btn {
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-width: 110px;
+  padding: 0 16px !important;
+}
+
+.hua-btn-info {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+}
+
+.hua-btn-info:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.hua-btn-update {
+  background-color: #52c41a !important;
+  border-color: #52c41a !important;
+  color: #ffffff !important;
+}
+
+.hua-btn-update:hover {
+  background-color: #45a818 !important;
+  border-color: #45a818 !important;
+}
+
+.hua-btn-delete {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: #ffffff !important;
+}
+
+.hua-btn-delete:hover {
+  background-color: #d9363e !important;
+  border-color: #d9363e !important;
+}
+
+.hua-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.hua-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.hua-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes huaFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

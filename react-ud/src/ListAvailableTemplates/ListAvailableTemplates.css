@@ -1,0 +1,153 @@
+.lat-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.lat-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.lat-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.lat-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.lat-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.lat-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: latFadeIn 0.25s ease-in;
+}
+
+.lat-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.lat-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.lat-market-row {
+  margin-bottom: 16px;
+}
+
+.lat-field {
+  max-width: 350px;
+}
+
+.lat-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.lat-select.ant-select {
+  width: 100%;
+}
+
+.lat-select .ant-select-selector {
+  border-radius: 3px !important;
+  border: 1px solid #d0d0d0 !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  color: #333333 !important;
+}
+
+.lat-select .ant-select-selector:hover {
+  border-color: #4096ff !important;
+}
+
+.lat-select.ant-select-focused .ant-select-selector {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+.lat-table-section {
+  margin-top: 8px;
+}
+
+.lat-table {
+  font-size: 13px;
+}
+
+.lat-table .ant-table-thead > tr > th {
+  background-color: #f5f5f5;
+  color: #333333;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.lat-table .ant-table-tbody > tr > td {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #333333;
+}
+
+.lat-file-link {
+  color: #1a73e8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lat-file-link:hover {
+  text-decoration: underline;
+  color: #1557b0;
+}
+
+.lat-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.lat-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.lat-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes latFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

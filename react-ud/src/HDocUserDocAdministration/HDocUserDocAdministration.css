@@ -1,0 +1,249 @@
+.hud-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.hud-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.hud-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.hud-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.hud-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 720px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hud-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: hudFadeIn 0.25s ease-in;
+}
+
+.hud-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.hud-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.hud-input-row {
+  margin-bottom: 12px;
+}
+
+.hud-field {
+  width: 100%;
+}
+
+.hud-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.hud-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.hud-input.ant-input {
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  height: 34px;
+  font-size: 13px;
+  color: #333333;
+  flex: 1;
+}
+
+.hud-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.hud-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.hud-user-row {
+  margin-bottom: 16px;
+  padding: 8px 10px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+}
+
+.hud-user-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-right: 8px;
+}
+
+.hud-user-value {
+  font-size: 13px;
+  color: #333333;
+}
+
+.hud-user-placeholder {
+  color: #999999;
+}
+
+.hud-doc-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  margin-bottom: 16px;
+}
+
+.hud-doc-header-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555555;
+}
+
+.hud-doc-col-check {
+  flex: 0 0 200px;
+}
+
+.hud-doc-col-bu {
+  flex: 1;
+}
+
+.hud-doc-col-user {
+  flex: 0 0 100px;
+}
+
+.hud-doc-col-date {
+  flex: 0 0 170px;
+}
+
+.hud-doc-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.hud-doc-row {
+  display: flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  color: #333333;
+}
+
+.hud-doc-row:last-child {
+  border-bottom: none;
+}
+
+.hud-doc-row .ant-checkbox-wrapper {
+  font-size: 13px;
+}
+
+.hud-doc-empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #999999;
+}
+
+.hud-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hud-btn {
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-width: 110px;
+  padding: 0 16px !important;
+}
+
+.hud-btn-info {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+}
+
+.hud-btn-info:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.hud-btn-update {
+  background-color: #52c41a !important;
+  border-color: #52c41a !important;
+  color: #ffffff !important;
+}
+
+.hud-btn-update:hover {
+  background-color: #45a818 !important;
+  border-color: #45a818 !important;
+}
+
+.hud-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.hud-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.hud-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes hudFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

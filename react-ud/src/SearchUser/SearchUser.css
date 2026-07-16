@@ -1,0 +1,217 @@
+.sru-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sru-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.sru-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.sru-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.sru-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 780px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sru-message {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 4px;
+  animation: sruFadeIn 0.25s ease-in;
+}
+
+.sru-message-error {
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.sru-message-success {
+  color: #52c41a;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.sru-search-section {
+  margin-bottom: 8px;
+}
+
+.sru-form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.sru-field {
+  flex: 1;
+}
+
+.sru-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.sru-input.ant-input {
+  border-radius: 3px;
+  border: 1px solid #d0d0d0;
+  height: 34px;
+  font-size: 13px;
+  color: #333333;
+  width: 100%;
+}
+
+.sru-input.ant-input:hover {
+  border-color: #4096ff;
+}
+
+.sru-input.ant-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.sru-select.ant-select {
+  width: 100%;
+}
+
+.sru-select.ant-select .ant-select-selector {
+  border-radius: 3px !important;
+  border-color: #d0d0d0 !important;
+  height: 34px !important;
+}
+
+.sru-select.ant-select .ant-select-selection-item {
+  line-height: 32px !important;
+  font-size: 13px;
+}
+
+.sru-radio-group {
+  display: flex;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.sru-radio-group .ant-radio-wrapper {
+  font-size: 13px;
+}
+
+.sru-search-btn-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.sru-btn {
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-width: 110px;
+  padding: 0 24px !important;
+}
+
+.sru-btn-search {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+.sru-btn-search:hover {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+}
+
+.sru-results-section {
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+}
+
+.sru-count-row {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.sru-count-label {
+  font-weight: 600;
+  color: #333333;
+}
+
+.sru-count-value {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+.sru-table .ant-table-thead > tr > th {
+  background-color: #f5f5f5;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555555;
+  padding: 7px 12px !important;
+}
+
+.sru-table .ant-table-tbody > tr > td {
+  font-size: 13px;
+  color: #333333;
+  padding: 6px 12px !important;
+}
+
+.sru-table .ant-table-tbody > tr:hover > td {
+  background-color: #f0f7ff;
+}
+
+.sru-table .ant-table-empty .ant-table-tbody > tr > td {
+  font-size: 13px;
+  color: #999999;
+}
+
+.sru-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.sru-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.sru-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes sruFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
