@@ -793,14 +793,16 @@ test.describe("UD02 Menu Page - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-    const disabledItem = page.locator("li.menu-item.disabled").first();
-    console.log(
-      "Disabled item:",
-      await disabledItem.locator("span.item-label").textContent(),
-    );
+    // 选择非点击项（没有 clickable 类的 menu-item）
+    const disabledItem = page.locator("li.menu-item:not(.clickable)").first();
+    const itemLabel = await disabledItem
+      .locator("span.item-label")
+      .textContent()
+      .catch(() => "(none)");
+    console.log("Non-clickable item:", itemLabel);
     await disabledItem.click();
     await page.waitForTimeout(500);
-    console.log("After disabled click, URL:", page.url());
+    console.log("After click, URL:", page.url());
     await page.screenshot({
       path: getScreenshotPath("19_权限校验_无权限访问", "002_クリック後"),
       type: "jpeg",
@@ -1075,7 +1077,7 @@ test.describe("UD02 Menu Page - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-    await page.locator("li.menu-item.disabled").first().click();
+    await page.locator("li.menu-item:not(.clickable)").first().click();
     await page.waitForTimeout(500);
     console.log("After disabled click, URL:", page.url());
     await page.screenshot({

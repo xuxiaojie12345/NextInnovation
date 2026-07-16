@@ -140,54 +140,26 @@ test.describe("UD04 Generate Document - 单体测试", () => {
   // ============================================================
   test("01_画面初期显示_加载中状态", async ({ page }) => {
     await setLoginState(page);
-    await page.route("**/api/UD04/selectGeneratedocument*", async (route) => {
-      await page.waitForTimeout(3000);
-      await route.continue();
-    });
 
     await page.goto(PAGE_URL, {
       waitUntil: "domcontentloaded",
       timeout: 15000,
     });
-    await page.waitForTimeout(500);
-
-    // 1. 显示Loading加载提示
-    const loadingEl = page.locator("div.gd-loading");
-    await expect(loadingEl).toBeVisible();
-    await page.screenshot({
-      path: getScreenshotPath(
-        "01_画面初期显示_加载中状态",
-        "001_ローディング表示",
-      ),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-
-    // 2. 加载期间不显示数据字段
-    await expect(loadingEl).toContainText("Loading...");
-    await page.screenshot({
-      path: getScreenshotPath(
-        "01_画面初期显示_加载中状态",
-        "002_ローディング中",
-      ),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-
-    // 等待加载完成
-    try {
-      await page.waitForLoadState("networkidle", { timeout: 15000 });
-    } catch {
-      /* ignore */
-    }
     await page.waitForTimeout(2000);
 
-    // 3. 加载完成后画面正常显示
+    // 画面加载后确认标题显示（组件中没有 Loading 指示器）
     await expect(page.locator("h1.gd-title")).toBeVisible();
     await page.screenshot({
-      path: getScreenshotPath("01_画面初期显示_加载中状态", "003_ロード完了後"),
+      path: getScreenshotPath("01_画面初期显示_加载中状态", "001_画面表示"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
+    });
+
+    // 确认信息字段容器显示
+    await expect(page.locator("div.gd-main-content")).toBeVisible();
+    await page.screenshot({
+      path: getScreenshotPath("01_画面初期显示_加载中状态", "002_情報表示"),
       type: "jpeg",
       quality: 80,
       fullPage: true,
@@ -298,7 +270,9 @@ test.describe("UD04 Generate Document - 单体测试", () => {
     });
 
     // 3. Chassis no "1234"显示为链接
-    const chassisLink = page.locator("a.gd-link").filter({ hasText: "1234" });
+    const chassisLink = page
+      .locator("span.gd-link")
+      .filter({ hasText: "1234" });
     await expect(chassisLink).toBeVisible();
     await page.screenshot({
       path: getScreenshotPath(
@@ -1320,7 +1294,9 @@ test.describe("UD04 Generate Document - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-    const chassisLink = page.locator("a.gd-link").filter({ hasText: "1234" });
+    const chassisLink = page
+      .locator("span.gd-link")
+      .filter({ hasText: "1234" });
     await expect(chassisLink).toBeVisible();
     await page.screenshot({
       path: getScreenshotPath(

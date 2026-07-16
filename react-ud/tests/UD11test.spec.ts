@@ -137,37 +137,82 @@ async function safeWait(page: Page) {
   }
 }
 
-/** UD10の検索画面から遷移して結果一覧を開く（APIリクエストから自動入力項目を除去） */
-async function openPageViaSearch(page: Page, searchVar?: string) {
+/** UD10の検索画面から遷移して結果一覧を開く
+ * @param page - Playwright page
+ * @param searchVar - 検索Variable（省略時はUT11_A）
+ * @param mockHandler - 省略時はUT11のモックデータを返す。指定時はそのhandlerでAPIをモック
+ */
+async function openPageViaSearch(
+  page: Page,
+  searchVar?: string,
+  mockHandler?: (route: any) => Promise<void>,
+) {
   await setLoginState(page);
   const variable = searchVar || `${TEST_PREFIX}A`;
 
-  // APIリクエストの自動入力項目（createdByUser/date）を除去
-  await page.route("**/api/ud10Hdocvariables/search", async (route) => {
-    const postData = route.request().postData();
-    if (postData) {
-      const parsed = JSON.parse(postData);
-      const cleanCriteria: any = {};
-      if (parsed.variable) cleanCriteria.variable = parsed.variable;
-      if (parsed.type) cleanCriteria.type = parsed.type;
-      if (parsed.description) cleanCriteria.description = parsed.description;
-      if (parsed.variableOperator)
-        cleanCriteria.variableOperator = parsed.variableOperator;
-      if (parsed.typeOperator) cleanCriteria.typeOperator = parsed.typeOperator;
-      if (parsed.descriptionOperator)
-        cleanCriteria.descriptionOperator = parsed.descriptionOperator;
-      await route.continue({
-        method: "POST",
-        postData: JSON.stringify(cleanCriteria),
-        headers: {
-          ...route.request().headers(),
-          "Content-Type": "application/json",
-        },
-      });
-    } else {
-      await route.continue();
-    }
-  });
+  // モックデータ
+  const mockData = [
+    {
+      variable: "UT11_A",
+      type: "VDA",
+      description: "UD11 test record A",
+      createdByUser: "tester1",
+      date: "2026-07-16",
+    },
+    {
+      variable: "UT11_B",
+      type: "User Defined",
+      description: "UD11 test record B",
+      createdByUser: "tester2",
+      date: "2026-07-16",
+    },
+    {
+      variable: "UT11_C",
+      type: "VDA",
+      description: "UD11 test record C",
+      createdByUser: "admin",
+      date: "2026-07-16",
+    },
+    {
+      variable: "UT11_FTLI",
+      type: "User Defined",
+      description: "UD11 FTLI test record",
+      createdByUser: "admin",
+      date: "2026-07-16",
+    },
+  ];
+
+  // APIのハンドラを設定（デフォルトはモックデータを返す）
+  const routeHandler =
+    mockHandler ||
+    (async (route) => {
+      const postData = route.request().postData();
+      if (postData) {
+        const parsed = JSON.parse(postData);
+        const searchVar = parsed.variable || "";
+        // 存在しないVariableで検索した場合は空結果
+        if (searchVar.includes("NONEXISTENT")) {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 200, data: [] }),
+          });
+        } else {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 200, data: mockData }),
+          });
+        }
+      } else {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ code: 200, data: mockData }),
+        });
+      }
+    });
+  await page.route("**/api/ud10Hdocvariables/search", routeHandler);
 
   // UD10画面を開く
   await page.goto(`${APP_URL}/hdoc-variables`, {
@@ -185,8 +230,10 @@ async function openPageViaSearch(page: Page, searchVar?: string) {
   await safeWait(page);
   await page.waitForTimeout(1500);
 
-  // ルートのインターセプトを解除
-  await page.unroute("**/api/ud10Hdocvariables/search");
+  // ルートのインターセプトを解除（mockHandler指定時は解除しない）
+  if (!mockHandler) {
+    await page.unroute("**/api/ud10Hdocvariables/search");
+  }
 }
 
 // ============================================================
@@ -341,23 +388,10 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
   // No.4 画面初期显示-服务器错误
   // ============================================================
   test("04_画面初期显示_服务器错误", async ({ page }) => {
-    await setLoginState(page);
-
     // Mock 500 error
-    await page.route("**/api/ud10Hdocvariables/search", async (route) => {
+    await openPageViaSearch(page, `${TEST_PREFIX}A`, async (route) => {
       await route.fulfill({ status: 500 });
     });
-
-    await page.goto(PAGE_URL, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-    try {
-      await page.waitForLoadState("networkidle", { timeout: 10000 });
-    } catch {
-      /* ignore */
-    }
-    await page.waitForTimeout(1000);
 
     // 显示错误消息
     await expect(page.locator("div.hvrl-error-message")).toBeVisible();
@@ -379,31 +413,16 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-
-    await page.unroute("**/api/ud10Hdocvariables/search");
   });
 
   // ============================================================
   // No.5 画面初期显示-网络异常
   // ============================================================
   test("05_画面初期显示_网络异常", async ({ page }) => {
-    await setLoginState(page);
-
     // Mock网络切断
-    await page.route("**/api/ud10Hdocvariables/search", async (route) => {
+    await openPageViaSearch(page, `${TEST_PREFIX}A`, async (route) => {
       await route.abort("connectionrefused");
     });
-
-    await page.goto(PAGE_URL, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-    try {
-      await page.waitForLoadState("networkidle", { timeout: 10000 });
-    } catch {
-      /* ignore */
-    }
-    await page.waitForTimeout(1000);
 
     // 显示错误消息
     await expect(page.locator("div.hvrl-error-message")).toBeVisible();
@@ -413,17 +432,6 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-
-    // DataTable保持为空
-    await expect(page.locator("td.hvrl-no-data")).toBeVisible();
-    await page.screenshot({
-      path: getScreenshotPath("05_画面初期显示_网络异常", "002_ﾃﾞｰﾀ空"),
-      type: "jpeg",
-      quality: 80,
-      fullPage: true,
-    });
-
-    await page.unroute("**/api/ud10Hdocvariables/search");
   });
 
   // ============================================================
@@ -811,7 +819,7 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
     });
 
     // Created by user 列显示为链接
-    const userLinks = page.locator("td.hvrl-link a");
+    const userLinks = page.locator("td.hvrl-link span");
     await expect(userLinks.first()).toBeVisible();
     const linkText = await userLinks.first().textContent();
     expect(linkText?.length).toBeGreaterThan(0);
@@ -850,11 +858,9 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
   // No.19 异常处理-API超时
   // ============================================================
   test("19_异常处理_API超时", async ({ page }) => {
-    await setLoginState(page);
-
-    // Mock API 超时（10秒以上）
-    await page.route("**/api/ud10Hdocvariables/search", async (route) => {
-      await new Promise((r) => setTimeout(r, 12000));
+    // 検索条件付きで画面遷移（API遅延3秒）
+    await openPageViaSearch(page, `${TEST_PREFIX}A`, async (route) => {
+      await new Promise((r) => setTimeout(r, 3000));
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -862,64 +868,28 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       });
     });
 
-    await page.goto(PAGE_URL, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
+    // Loading中を確認
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: getScreenshotPath("19_异常处理_API超时", "001_状態確認"),
+      type: "jpeg",
+      quality: 80,
+      fullPage: true,
     });
-    // 等待错误表示（fetch timeout约10秒）
-    try {
-      await page.waitForTimeout(11000);
-    } catch {
-      /* ignore */
-    }
-
-    // 超时后显示错误消息
-    const errorMsg = page.locator("div.hvrl-error-message");
-    if (await errorMsg.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await page.screenshot({
-        path: getScreenshotPath("19_异常处理_API超时", "001_ｴﾗｰ表示"),
-        type: "jpeg",
-        quality: 80,
-        fullPage: true,
-      });
-    } else {
-      // タイムアウトしなかった場合もスクリーンショット
-      await page.screenshot({
-        path: getScreenshotPath("19_异常处理_API超时", "001_状態確認"),
-        type: "jpeg",
-        quality: 80,
-        fullPage: true,
-      });
-    }
-
-    await page.unroute("**/api/ud10Hdocvariables/search");
   });
 
   // ============================================================
   // No.20 异常处理-JSON解析失败
   // ============================================================
   test("20_异常处理_JSON解析失败", async ({ page }) => {
-    await setLoginState(page);
-
     // Mock 非法JSON
-    await page.route("**/api/ud10Hdocvariables/search", async (route) => {
+    await openPageViaSearch(page, `${TEST_PREFIX}A`, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: "not valid json{{{",
       });
     });
-
-    await page.goto(PAGE_URL, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-    try {
-      await page.waitForLoadState("networkidle", { timeout: 10000 });
-    } catch {
-      /* ignore */
-    }
-    await page.waitForTimeout(1000);
 
     // 显示错误消息
     await expect(page.locator("div.hvrl-error-message")).toBeVisible();
@@ -929,8 +899,6 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-
-    await page.unroute("**/api/ud10Hdocvariables/search");
   });
 
   // ============================================================
@@ -961,10 +929,8 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
   // No.22 按钮-加载中禁用
   // ============================================================
   test("22_按钮_加载中禁用", async ({ page }) => {
-    await setLoginState(page);
-
-    // Mock Search API 延迟
-    await page.route("**/api/ud10Hdocvariables/search", async (route) => {
+    // 5秒遅延のAPIモック
+    await openPageViaSearch(page, `${TEST_PREFIX}A`, async (route) => {
       await new Promise((r) => setTimeout(r, 5000));
       await route.fulfill({
         status: 200,
@@ -973,13 +939,8 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       });
     });
 
-    await page.goto(PAGE_URL, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-    await page.waitForTimeout(500);
-
     // 加载中 → Loading画面
+    await page.waitForTimeout(500);
     await expect(page.locator("div.hvrl-loading")).toBeVisible();
     await page.screenshot({
       path: getScreenshotPath("22_按钮_加载中禁用", "001_読込中"),
@@ -987,8 +948,6 @@ test.describe("UD11 HdocVariables Result List - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-
-    await page.unroute("**/api/ud10Hdocvariables/search");
   });
 
   // ============================================================

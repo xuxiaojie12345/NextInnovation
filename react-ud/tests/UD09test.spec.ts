@@ -173,7 +173,7 @@ async function openPage(page: Page, mockData?: any) {
       body: JSON.stringify({ code: 200, msg: "success", data }),
     });
   });
-  await page.goto(PAGE_URL, { waitUntil: "domcontentloaded", timeout: 15000 });
+  await page.goto(PAGE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
   try {
     await page.waitForLoadState("networkidle", { timeout: 10000 });
   } catch {
@@ -630,7 +630,7 @@ test.describe("UD09 Homologation Variables Result List - 单体测试", () => {
       quality: 80,
       fullPage: true,
     });
-    const link = page.locator("td.hvrl-td.hvrl-link a").first();
+    const link = page.locator("td.hvrl-td.hvrl-link span").first();
     await expect(link).toBeVisible();
     expect(await link.textContent()).toBeTruthy();
     await page.screenshot({

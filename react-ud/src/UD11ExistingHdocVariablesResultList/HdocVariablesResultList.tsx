@@ -76,7 +76,15 @@ const HdocVariablesResultList: React.FC = () => {
         setSearchResults([]);
         setCount(0);
       }
-    } catch (err) {}
+    } catch (err: any) {
+      setErrorMessage(
+        err.message || "System error. Please contact administrator.",
+      );
+      setSearchResults([]);
+      setCount(0);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 处理单选选择

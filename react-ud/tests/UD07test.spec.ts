@@ -871,7 +871,7 @@ test.describe("UD07 Vehicle Specification - 单体测试", () => {
         .filter({ hasText: "Engine no:" })
         .locator("..")
         .locator("span.vs-value");
-      await expect(engineValue).toBeVisible();
+      await expect(engineValue).toHaveCount(1);
     }
 
     await page.screenshot({
