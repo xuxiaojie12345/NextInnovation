@@ -148,6 +148,7 @@ class VehicleSpecificationServiceImplTest {
             when(mapper.selectKolaList("FAM001", "VAR001")).thenReturn(rawKolaList);
 
             Map<String, Object> result = service.getVehicleSpecification("FH", "12345");
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> kolaList = (List<Map<String, Object>>) result.get("kolaList");
             assertEquals(2, kolaList.size());
             assertEquals("S1", kolaList.get(0).get("symbol"));

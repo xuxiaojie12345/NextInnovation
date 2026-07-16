@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Modal } from 'antd';
 import { api } from "../services/api";
 import "../common/css/common.css";
 import "./ExistingHDocVariables.css";
@@ -264,9 +265,18 @@ const ExistingHDocVariables: React.FC = () => {
       return;
     }
 
-    if (!window.confirm("Do you really want to delete this variant?")) {
-      return;
-    }
+    const confirmed = await new Promise<boolean>((resolve) => {
+      Modal.confirm({
+        title: 'Confirm',
+        content: 'Do you really want to delete this variant?',
+        okText: 'Yes',
+        cancelText: 'No',
+        transitionName: '',
+        onOk: () => resolve(true),
+        onCancel: () => resolve(false),
+      });
+    });
+    if (!confirmed) return;
 
     // Variable 存在性校验
     try {

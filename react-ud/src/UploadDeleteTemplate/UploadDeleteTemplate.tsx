@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { api } from "../services/api";
 import "../common/css/common.css";
 import "./UploadDeleteTemplate.css";
@@ -132,9 +133,18 @@ const UploadDeleteTemplate: React.FC = () => {
       return;
     }
 
-    if (!window.confirm("Do you really want to delete template?")) {
-      return;
-    }
+    const confirmed = await new Promise<boolean>((resolve) => {
+      Modal.confirm({
+        title: 'Confirm',
+        content: 'Do you really want to delete template?',
+        okText: 'Yes',
+        cancelText: 'No',
+        transitionName: '',
+        onOk: () => resolve(true),
+        onCancel: () => resolve(false),
+      });
+    });
+    if (!confirmed) return;
 
     setIsLoading(true);
     try {
