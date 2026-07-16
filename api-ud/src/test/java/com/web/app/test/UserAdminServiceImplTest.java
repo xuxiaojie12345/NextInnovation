@@ -149,6 +149,26 @@ class UserAdminServiceImplTest {
             verify(userAdminMapper, never()).insertMarketAuth(anyString(), anyString(), anyString(), anyString());
         }
 
+        @Test void shouldSkipDuplicateFunctionAuth() {
+            List<Map<String, String>> authList = new ArrayList<>();
+            Map<String, String> auth1 = new HashMap<>();
+            auth1.put("function", "RULES");
+            auth1.put("market", "JP");
+            authList.add(auth1);
+            Map<String, String> auth2 = new HashMap<>();
+            auth2.put("function", "RULES");  // Same function - should be deduplicated
+            auth2.put("market", "US");
+            authList.add(auth2);
+            when(userAdminMapper.insertFunctionAuth(anyString(), anyString(), anyString())).thenReturn(1);
+            when(userAdminMapper.insertMarketAuth(anyString(), anyString(), anyString(), anyString())).thenReturn(1);
+            int count = service.updateUserRole("user1", authList, "admin");
+            assertEquals(2, count);
+            // insertFunctionAuth should only be called once for "RULES" (deduplicated)
+            verify(userAdminMapper, times(1)).insertFunctionAuth(anyString(), eq("RULES"), anyString());
+            // insertMarketAuth should be called for both JP and US
+            verify(userAdminMapper, times(2)).insertMarketAuth(anyString(), anyString(), anyString(), anyString());
+        }
+
         @Test void shouldHandleDefaultFunctionInTypeMapping() {
             List<Map<String, String>> authList = new ArrayList<>();
             Map<String, String> auth = new HashMap<>();

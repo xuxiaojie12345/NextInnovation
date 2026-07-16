@@ -11,7 +11,6 @@ interface AuthItem {
 // 用户管理组件
 const HDocUserAdministration: React.FC = () => {
   const [userid, setUserid] = useState("");
-  const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [markets, setMarkets] = useState<string[]>([]);
 
@@ -60,7 +59,6 @@ const HDocUserAdministration: React.FC = () => {
 
   const resetForm = () => {
     setUsername("");
-    setPassword("");
     setStandardUser(false);
     setStandardMarket([]);
     setRuleAdmin(false);
@@ -198,7 +196,6 @@ const HDocUserAdministration: React.FC = () => {
           return;
         }
         setUsername(res.data.username || "");
-        setPassword(res.data.password || "");
         applyAuthList(res.data.authList || []);
       } else {
         setMessage(

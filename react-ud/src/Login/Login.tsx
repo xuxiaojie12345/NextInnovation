@@ -22,7 +22,7 @@ const Login: React.FC = () => {
     const passwordVal = password.trim();
 
     // 前端校验
-    if (useridVal.length == 0 || passwordVal.length == 0) {
+    if (useridVal.length === 0 || passwordVal.length === 0) {
       setMessage("Username and password are required.");
       return;
     }

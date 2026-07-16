@@ -99,6 +99,34 @@ class VehicleSpecificationServiceImplTest {
             assertEquals("FALLBACK_MODEL", result.get("model"));
         }
 
+        @Test void shouldReturnEmptyKolaListWhenVariantIdNull() {
+            Map<String, Object> baseData = new LinkedHashMap<>();
+            baseData.put("model", "FH16");
+            baseData.put("BUILD", "2024-W01");
+            baseData.put("FAMILY_ID", "FAM001");
+            // VARIANT_ID is null - deliberately not set
+
+            when(mapper.selectVehicleBase("FH", "12345")).thenReturn(baseData);
+
+            Map<String, Object> result = service.getVehicleSpecification("FH", "12345");
+            assertNotNull(result);
+            assertTrue(((List<?>) result.get("kolaList")).isEmpty());
+        }
+
+        @Test void shouldReturnEmptyKolaListWhenFamilyIdNull() {
+            Map<String, Object> baseData = new LinkedHashMap<>();
+            baseData.put("model", "FH16");
+            baseData.put("BUILD", "2024-W01");
+            baseData.put("VARIANT_ID", "VAR001");
+            // FAMILY_ID is null - deliberately not set
+
+            when(mapper.selectVehicleBase("FH", "12345")).thenReturn(baseData);
+
+            Map<String, Object> result = service.getVehicleSpecification("FH", "12345");
+            assertNotNull(result);
+            assertTrue(((List<?>) result.get("kolaList")).isEmpty());
+        }
+
         @Test void shouldTransformKolaListItems() {
             Map<String, Object> baseData = new LinkedHashMap<>();
             baseData.put("model", "FH16");

@@ -69,7 +69,7 @@ const HDocUserDocAdministration: React.FC = () => {
         },
       );
 
-      if (authRes.code == 200 && authRes.data?.authCount === 0) {
+      if (authRes.code === 200 && authRes.data?.authCount === 0) {
         throw new Error(
           "We didn't recognize the userid you entered. Please try again.",
         );
@@ -131,7 +131,7 @@ const HDocUserDocAdministration: React.FC = () => {
         },
       );
 
-      if (authRes.code == 200 && authRes.data?.authCount === 0) {
+      if (authRes.code === 200 && authRes.data?.authCount === 0) {
         throw new Error(
           "We didn't recognize the userid you entered. Please try again.",
         );
