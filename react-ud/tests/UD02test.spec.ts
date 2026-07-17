@@ -24,17 +24,14 @@ const APP_URL = "http://localhost:3000";
 const MENU_URL = `${APP_URL}/Menu`;
 
 // ============================================================
-// 截图计数器
+// 截图计数器（全局顺序编号）
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD02画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -54,13 +51,15 @@ async function setupTestData() {
       const count = (rows as any[])[0]?.cnt || 0;
       if (count === 0) {
         await conn.execute(
-          `INSERT INTO hdoc_user_infor (USERID, PASSWORDS, USERNAME, PERMISS, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
-           VALUES (?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+          `INSERT INTO hdoc_user_infor (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+           VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
           [
             "yann",
             "Pass123",
             "Test User",
-            "ADMIN",
+            "",
+            "",
+            "",
             "TEST",
             "PLAYWRIGHT",
             "TEST",
@@ -143,10 +142,6 @@ test.describe("UD02 Menu Page - 单体测试", () => {
 
   test.afterAll(async () => {
     await clearTestData();
-  });
-
-  test.beforeEach(() => {
-    screenshotCounter = {};
   });
 
   // ============================================================

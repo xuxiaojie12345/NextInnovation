@@ -27,15 +27,12 @@ const PAGE_URL_NO_CHASSIS = `${APP_URL}/vehicle-specification`;
 // ============================================================
 // 截图计数器
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD07画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -209,8 +206,8 @@ test.describe("UD07 Vehicle Specification - 单体测试", () => {
     await clearTestData();
   });
 
-  test.beforeEach(() => {
-    screenshotCounter = {};
+  test.beforeAll(() => {
+    screenshotCounter = 0;
   });
 
   // ============================================================

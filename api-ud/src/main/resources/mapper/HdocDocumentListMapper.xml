@@ -52,6 +52,7 @@
         WHERE ma.USERID = #{userid} AND ma.`TYPE` IN (
             SELECT 
                 CASE fa.`FUNCTION`
+                    WHEN 'USER' THEN 'U'
                     WHEN 'User Administrator' THEN 'A'
                     WHEN 'RULES' THEN 'R'
                     WHEN 'TEMPLATE' THEN 'T'

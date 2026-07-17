@@ -92,7 +92,11 @@ const VinPlate: React.FC = () => {
       } else {
         setErrorMessage(result.msg || "Chassis number not found.");
       }
-    } catch (err) {}
+    } catch (err) {
+      setErrorMessage("System error. Please contact administrator.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Set Regenerate功能：将Status更新为'0'

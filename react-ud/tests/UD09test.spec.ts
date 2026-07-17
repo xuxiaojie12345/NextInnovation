@@ -12,11 +12,10 @@ const SCREENSHOT_DIR =
 const APP_URL = "http://localhost:3000";
 const PAGE_URL = `${APP_URL}/homologation-variables-result-list`;
 
-let screenshotCounter: { [key: string]: number } = {};
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) screenshotCounter[testName] = 0;
-  screenshotCounter[testName]++;
-  return `${SCREENSHOT_DIR}/${testName}_${String(screenshotCounter[testName]).padStart(3, "0")}_${stepName}.jpeg`;
+let screenshotCounter = 0;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  return `${SCREENSHOT_DIR}/UD09画面ピクチャー${String(screenshotCounter).padStart(3, "0")}.jpeg`;
 }
 
 let dbAvailable = false;
@@ -195,8 +194,8 @@ test.describe("UD09 Homologation Variables Result List - 单体测试", () => {
   test.afterAll(async () => {
     await clearTestData();
   });
-  test.beforeEach(() => {
-    screenshotCounter = {};
+  test.beforeAll(() => {
+    screenshotCounter = 0;
   });
 
   test("01_画面初期显示_基本元素", async ({ page }) => {

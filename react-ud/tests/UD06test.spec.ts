@@ -29,15 +29,12 @@ const APP_URL_NO_BOTH = `${APP_URL}/save-modifications`;
 // ============================================================
 // 截图计数器
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD06画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -63,7 +60,7 @@ async function setupTestData() {
       const count = (rows as any[])[0]?.cnt || 0;
       if (count === 0) {
         await conn.execute(
-          `INSERT INTO HDOC_ADCA_MODIFICATION
+          `INSERT IGNORE INTO HDOC_ADCA_MODIFICATION
            (SERIE, CHNO, DOCTYPE, LANG, VARIABLE, VERS, NEWVAL, STA, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
@@ -149,7 +146,7 @@ async function openPage(page: Page, url: string = PAGE_URL) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD06 Save Modifications - 单体测试", () => {
+test.describe.serial("UD06 Save Modifications - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });
@@ -158,8 +155,8 @@ test.describe("UD06 Save Modifications - 单体测试", () => {
     await clearTestData();
   });
 
-  test.beforeEach(() => {
-    screenshotCounter = {};
+  test.beforeAll(() => {
+    screenshotCounter = 0;
   });
 
   // ============================================================

@@ -26,15 +26,12 @@ const PAGE_URL = `${APP_URL}/hdoc-variables`;
 // ============================================================
 // 截图计数器
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD10画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -87,7 +84,7 @@ async function setupTestData() {
       ];
       for (const r of testRecords) {
         await conn.execute(
-          `INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, USERID, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+          `INSERT IGNORE INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, USERID, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
            VALUES (?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
           [
             r.variable,
@@ -149,7 +146,7 @@ async function openPage(page: Page) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
+test.describe.serial("UD10 Existing HDoc Variables - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });
@@ -158,8 +155,8 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
     await clearTestData();
   });
 
-  test.beforeEach(() => {
-    screenshotCounter = {};
+  test.beforeAll(() => {
+    screenshotCounter = 0;
   });
 
   // ============================================================
@@ -380,8 +377,8 @@ test.describe("UD10 Existing HDoc Variables - 单体测试", () => {
   test("05_Search_无条件搜索", async ({ page }) => {
     await openPage(page);
 
-    // 入力Variableに広く一致する値を設定
-    await page.locator("input.hv-input-medium").fill(`${TEST_VAR_PREFIX}%`);
+    // 使用存在的变量名搜索（后端使用=精确匹配，不支持%通配符）
+    await page.locator("input.hv-input-medium").fill(`${TEST_VAR_PREFIX}EXIST`);
     await page.screenshot({
       path: getScreenshotPath("05_Search_无条件搜索", "001_条件入力"),
       type: "jpeg",

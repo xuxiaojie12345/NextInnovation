@@ -46,7 +46,9 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Failed to load market list");
       }
-    } catch (err) {}
+    } catch (err) {
+      setErrorMessage("Failed to load market list");
+    }
   };
 
   // 处理上传区域的市场选择变化
@@ -91,7 +93,11 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setTemplates([]);
       }
-    } catch (err) {}
+    } catch (err) {
+      setTemplates([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 处理文件选择
@@ -165,7 +171,11 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Upload failed");
       }
-    } catch (err) {}
+    } catch (err) {
+      setErrorMessage("Upload failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 删除模板功能
@@ -220,7 +230,11 @@ const UploadDeleteTemplate: React.FC = () => {
       } else {
         setErrorMessage(data.msg || "Delete failed");
       }
-    } catch (err) {}
+    } catch (err: any) {
+      setErrorMessage(err.message || "Delete failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 跳转到模板检查页面

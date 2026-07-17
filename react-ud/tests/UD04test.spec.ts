@@ -26,15 +26,12 @@ const PAGE_URL = `${APP_URL}/generate-document?chassisNo=yann1234`;
 // ============================================================
 // 截图计数器
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD04画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -42,16 +39,137 @@ function getScreenshotPath(testName: string, stepName: string): string {
 // ============================================================
 let dbAvailable = false;
 
+const TEST_SERIE = "yann";
+const TEST_CHNR = "1234";
+
 async function setupTestData() {
   try {
     const conn = await mysql.createConnection(DB_CONFIG);
     dbAvailable = true;
     try {
-      await conn.execute(
-        "DELETE FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE LIKE ?",
-        ["TEST_%"],
+      const db = conn as any;
+
+      // 清除旧的测试数据
+      await db.execute(
+        "DELETE FROM HDOC_ADCA_MODIFICATION WHERE SERIE = ? AND CHNO = ?",
+        [TEST_SERIE, TEST_CHNR],
       );
-      await conn.execute(
+      await db.execute(
+        "DELETE FROM HDOC_ADCA_CHANGE WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_VDA_GENERAL WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_OM WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_KOLA_TIRE_MASTER WHERE PARTNO = ?",
+        ["UD04TYRE"],
+      );
+      await db.execute("DELETE FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE LIKE ?", [
+        "TEST_%",
+      ]);
+
+      const now = new Date();
+      const transTs = "UD04_TRANS_TS";
+
+      // 1. HDOC_REC_DATA_VDA_GENERAL（主表，其他表通过SERIE/CHNR/TRANS_TS关联）
+      await db.execute(
+        `INSERT IGNORE INTO HDOC_REC_DATA_VDA_GENERAL (SERIE, CHNR, TRANS_TS, VIN, COUNTRY_OF_OPERATION, PC, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+         VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+        [
+          TEST_SERIE,
+          TEST_CHNR,
+          transTs,
+          "VIN" + TEST_SERIE + TEST_CHNR,
+          "JP",
+          "T1",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+        ],
+      );
+
+      // 2. HDOC_REC_DATA_OM（SERIE+CHNR关联VDA）
+      await db.execute(
+        `INSERT IGNORE INTO HDOC_REC_DATA_OM (ORDERNUMBER, TRANS_TS, SERIE, CHNR, BUILD, SPEC, CUSTOMER_ADAP, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+        [
+          "ORD_" + TEST_SERIE + TEST_CHNR,
+          transTs,
+          TEST_SERIE,
+          TEST_CHNR,
+          1,
+          100,
+          "CUST_ADAP",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+        ],
+      );
+
+      // 3. HDOC_REC_DATA_KOLA_TIRE_MASTER（TRANS_TS关联VDA）
+      await db.execute(
+        `INSERT IGNORE INTO HDOC_REC_DATA_KOLA_TIRE_MASTER (PARTNO, TDIM, BRAND, LOAD_INDEX, TRANS_TS, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+         VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+        [
+          "UD04TYRE",
+          "TDIM_VAL",
+          "BRAND_VAL",
+          "LI_VAL",
+          transTs,
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+        ],
+      );
+
+      // 4. HDOC_ADCA_CHANGE（SERIE+CHNR关联VDA）
+      await db.execute(
+        `INSERT IGNORE INTO HDOC_ADCA_CHANGE (SERIE, CHNR, ACT, BU, REASON, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+         VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+        [
+          TEST_SERIE,
+          TEST_CHNR,
+          "Y",
+          "BU01",
+          "UD04 test",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+        ],
+      );
+
+      // 5. HDOC_ADCA_MODIFICATION（SERIE+CHNO关联VDA，STA='0'）
+      await db.execute(
+        `INSERT IGNORE INTO HDOC_ADCA_MODIFICATION (SERIE, CHNO, DOCTYPE, LANG, VARIABLE, VERS, NEWVAL, STA, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+        [
+          TEST_SERIE,
+          TEST_CHNR,
+          "VIN_PLATE",
+          "EN",
+          "TEST_VAR",
+          1,
+          "NEW_VAL",
+          "0",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+          "PLAYWRIGHT",
+        ],
+      );
+
+      // 6. HDOC_DOCUMENT_LIST（文档类型）
+      await db.execute(
         `INSERT IGNORE INTO HDOC_DOCUMENT_LIST (DOCTYPE, Description, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
          VALUES (?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
         [
@@ -63,7 +181,8 @@ async function setupTestData() {
           "PLAYWRIGHT",
         ],
       );
-      console.log("DB test data setup ok");
+
+      console.log("UD04 test data inserted for all 5 tables");
     } finally {
       await conn.end();
     }
@@ -78,10 +197,31 @@ async function clearTestData() {
   try {
     const conn = await mysql.createConnection(DB_CONFIG);
     try {
-      await conn.execute(
-        "DELETE FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE LIKE ?",
-        ["TEST_%"],
+      const db = conn as any;
+      await db.execute(
+        "DELETE FROM HDOC_ADCA_MODIFICATION WHERE SERIE = ? AND CHNO = ?",
+        [TEST_SERIE, TEST_CHNR],
       );
+      await db.execute(
+        "DELETE FROM HDOC_ADCA_CHANGE WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_VDA_GENERAL WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_OM WHERE SERIE = ? AND CHNR = ?",
+        [TEST_SERIE, TEST_CHNR],
+      );
+      await db.execute(
+        "DELETE FROM HDOC_REC_DATA_KOLA_TIRE_MASTER WHERE PARTNO = ?",
+        ["UD04TYRE"],
+      );
+      await db.execute("DELETE FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE LIKE ?", [
+        "TEST_%",
+      ]);
+      console.log("UD04 test data cleaned");
     } finally {
       await conn.end();
     }
@@ -122,7 +262,7 @@ async function openPage(page: Page) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD04 Generate Document - 单体测试", () => {
+test.describe.serial("UD04 Generate Document - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });
@@ -131,8 +271,8 @@ test.describe("UD04 Generate Document - 单体测试", () => {
     await clearTestData();
   });
 
-  test.beforeEach(() => {
-    screenshotCounter = {};
+  test.beforeAll(() => {
+    screenshotCounter = 0;
   });
 
   // ============================================================

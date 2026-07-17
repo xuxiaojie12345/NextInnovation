@@ -23,17 +23,14 @@ const SCREENSHOT_DIR =
 const APP_URL = "http://localhost:3000";
 
 // ============================================================
-// 截图计数器
+// 截图计数器（全局顺序编号）
 // ============================================================
-let screenshotCounter: { [key: string]: number } = {};
+let screenshotCounter = 0;
 
-function getScreenshotPath(testName: string, stepName: string): string {
-  if (!screenshotCounter[testName]) {
-    screenshotCounter[testName] = 0;
-  }
-  screenshotCounter[testName]++;
-  const seq = String(screenshotCounter[testName]).padStart(3, "0");
-  return `${SCREENSHOT_DIR}/${testName}_${seq}_${stepName}.jpeg`;
+function getScreenshotPath(_testName: string, _stepName: string): string {
+  screenshotCounter++;
+  const seq = String(screenshotCounter).padStart(3, "0");
+  return `${SCREENSHOT_DIR}/UD01画面ピクチャー${seq}.jpeg`;
 }
 
 // ============================================================
@@ -53,13 +50,15 @@ async function setupTestData() {
       const count = (rows as any[])[0]?.cnt || 0;
       if (count === 0) {
         await conn.execute(
-          `INSERT INTO hdoc_user_infor (USERID, PASSWORD, USERNAME, PERMISS, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
-           VALUES (?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+          `INSERT INTO hdoc_user_infor (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+           VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
           [
             "admin",
             "Pass@123",
             "Admin User",
-            "ADMIN",
+            "",
+            "",
+            "",
             "TEST",
             "PLAYWRIGHT",
             "TEST",
@@ -96,10 +95,6 @@ async function openLoginPage(page: Page) {
 test.describe("UD01 Login Page - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
-  });
-
-  test.beforeEach(() => {
-    screenshotCounter = {};
   });
 
   // ============================================================
