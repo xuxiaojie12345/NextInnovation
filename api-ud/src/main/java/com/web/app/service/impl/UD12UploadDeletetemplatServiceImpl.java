@@ -67,16 +67,40 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
                     .start().waitFor();
 
             // 建立新的认证连接
-            Process process = new ProcessBuilder("cmd.exe", "/c",
-                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
-                    .start();
-            int exitCode = process.waitFor();
+            int exitCode = executeNetUse(serverShare, fileServerPassword, fileServerUsername);
 
             if (exitCode == 0) {
                 authenticated = true;
             }
         } catch (Exception e) {
         }
+    }
+
+    /**
+     * 创建目录（protected 可见，便于测试 mock）
+     */
+    protected boolean createDirectories(File directory) {
+        return directory.mkdirs();
+    }
+
+    /**
+     * 检查目录是否可写（protected 可见，便于测试 mock）
+     */
+    protected boolean isDirectoryWritable(File directory) {
+        return directory.canWrite();
+    }
+
+    /**
+     * 执行 net use 命令（protected 可见，便于测试 mock）
+     */
+    protected int executeNetUse(String serverShare, String password, String username) throws Exception {
+        // 先尝试断开已有连接
+        new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
+                .start().waitFor();
+        Process process = new ProcessBuilder("cmd.exe", "/c",
+                "net use " + serverShare + " " + password + " /user:" + username)
+                .start();
+        return process.waitFor();
     }
 
     @Override
@@ -105,14 +129,14 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             String marketDir = uploadFolder + File.separator + market.trim();
             File directory = new File(marketDir);
             if (!directory.exists()) {
-                boolean created = directory.mkdirs();
+                boolean created = createDirectories(directory);
                 if (!created) {
                     return UD12UploadDeletetemplatResponse.error(500,
                             "无法创建目录，请确认服务器共享路径可访问: " + marketDir);
                 }
             }
             // 确认目录有写权限
-            if (!directory.canWrite()) {
+            if (!isDirectoryWritable(directory)) {
                 return UD12UploadDeletetemplatResponse.error(500,
                         "目录无写入权限，请检查共享路径权限: " + marketDir);
             }
@@ -185,13 +209,11 @@ public class UD12UploadDeletetemplatServiceImpl implements UD12UploadDeletetempl
             // 获取文件夹下的所有文件名
             File[] files = marketDir.listFiles();
             List<String> fileNames = new ArrayList<>();
-            if (files != null) {
-                fileNames = Arrays.stream(files)
-                        .filter(File::isFile)
-                        .map(File::getName)
-                        .sorted()
-                        .collect(Collectors.toList());
-            }
+            fileNames = Arrays.stream(files)
+                    .filter(File::isFile)
+                    .map(File::getName)
+                    .sorted()
+                    .collect(Collectors.toList());
 
             return UD12UploadDeletetemplatResponse.success("查询成功", fileNames);
         } catch (Exception e) {

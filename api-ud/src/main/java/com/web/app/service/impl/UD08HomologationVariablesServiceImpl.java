@@ -131,9 +131,9 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
                 String origPc = request.getOriginalProductClass() != null ? request.getOriginalProductClass() : "";
                 String origNum = request.getOriginalNumber() != null ? String.valueOf(request.getOriginalNumber()) : "";
                 String origMkt = request.getOriginalMarket() != null ? request.getOriginalMarket() : "";
-                String curPc = request.getProductClass() != null ? request.getProductClass() : "";
-                String curNum = request.getNumber() != null ? String.valueOf(request.getNumber()) : "";
-                String curMkt = request.getMarket() != null ? request.getMarket() : "";
+                String curPc = request.getProductClass();
+                String curNum = String.valueOf(request.getNumber());
+                String curMkt = request.getMarket();
                 pkChanged = !origPc.equals(curPc) || !origNum.equals(curNum) || !origMkt.equals(curMkt);
             }
 
@@ -204,7 +204,7 @@ public class UD08HomologationVariablesServiceImpl implements UD08HomologationVar
     private HdocUserDefinedRules buildRuleFromRequest(UD08HomologationVariablesRequest request) {
         HdocUserDefinedRules rule = new HdocUserDefinedRules();
         rule.setPc(request.getProductClass());
-        rule.setNum(request.getNumber() != null ? request.getNumber().longValue() : null);
+        rule.setNum(request.getNumber().longValue());
         rule.setMarket(request.getMarket());
         rule.setVariable(request.getVariable());
         rule.setVal(request.getValue());

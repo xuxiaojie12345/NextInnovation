@@ -75,11 +75,7 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 return UD05ModifyDocumentResponse.error(400, validationError);
             }
 
-            int totalUpdated = 0;
             for (ModifyItem item : request.getModifiedItems()) {
-                if (item == null) {
-                    continue;
-                }
                 String variable = item.getVariable();
                 String currentValue = item.getCurrentValue();
                 String modifiedValue = item.getModifiedValue();
@@ -95,12 +91,8 @@ public class UD05ModifyDocumentServiceImpl implements UD05ModifyDocumentService 
                 if (updatedRows <= 0) {
                     throw new RuntimeException("Update failed for variable: " + variable);
                 }
-                totalUpdated += updatedRows;
             }
 
-            if (totalUpdated <= 0) {
-                return UD05ModifyDocumentResponse.error(500, "No records were updated.");
-            }
             return UD05ModifyDocumentResponse.successNoData("Update successful");
         } catch (Exception e) {
             return UD05ModifyDocumentResponse.error(500, "System error. Please try again later.");

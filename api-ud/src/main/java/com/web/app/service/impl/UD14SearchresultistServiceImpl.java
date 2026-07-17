@@ -63,16 +63,26 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
                     .start().waitFor();
 
             // 建立新的认证连接
-            Process process = new ProcessBuilder("cmd.exe", "/c",
-                    "net use " + serverShare + " " + fileServerPassword + " /user:" + fileServerUsername)
-                    .start();
-            int exitCode = process.waitFor();
+            int exitCode = executeNetUse(serverShare, fileServerPassword, fileServerUsername);
 
             if (exitCode == 0) {
                 authenticated = true;
             }
         } catch (Exception e) {
         }
+    }
+
+    /**
+     * 执行 net use 命令（protected 可见，便于测试 mock）
+     */
+    protected int executeNetUse(String serverShare, String password, String username) throws Exception {
+        // 先尝试断开已有连接
+        new ProcessBuilder("cmd.exe", "/c", "net use " + serverShare + " /delete /y")
+                .start().waitFor();
+        Process process = new ProcessBuilder("cmd.exe", "/c",
+                "net use " + serverShare + " " + password + " /user:" + username)
+                .start();
+        return process.waitFor();
     }
 
     @Override
@@ -138,24 +148,22 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
             List<UD14SearchresultistResponse.FileData> fileDataList = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        String filename = file.getName();
+            for (File file : files) {
+                if (file.isFile()) {
+                    String filename = file.getName();
 
-                        // 根据市场和文件名查询HDOC_USER_DEFINED_RULES表
-                        // SQL条件：MARKET = #{market} AND VAL = #{market}/{fileName}
-                        String variable = ud14Mapper.selectVariableByMarketAndFile(market, filename);
-                        boolean isUsed = (variable != null);
+                    // 根据市场和文件名查询HDOC_USER_DEFINED_RULES表
+                    // SQL条件：MARKET = #{market} AND VAL = #{market}/{fileName}
+                    String variable = ud14Mapper.selectVariableByMarketAndFile(market, filename);
+                    boolean isUsed = (variable != null);
 
-                        // 格式化文件大小
-                        String size = formatFileSize(file.length());
-                        // 格式化最后修改时间
-                        String lastMod = sdf.format(new Date(file.lastModified()));
+                    // 格式化文件大小
+                    String size = formatFileSize(file.length());
+                    // 格式化最后修改时间
+                    String lastMod = sdf.format(new Date(file.lastModified()));
 
-                        fileDataList.add(new UD14SearchresultistResponse.FileData(
-                                filename, isUsed, variable, lastMod, size));
-                    }
+                    fileDataList.add(new UD14SearchresultistResponse.FileData(
+                            filename, isUsed, variable, lastMod, size));
                 }
             }
 
@@ -175,12 +183,13 @@ public class UD14SearchresultistServiceImpl implements UD14SearchresultistServic
     private String formatFileSize(long bytes) {
         if (bytes <= 0)
             return "0 B";
-        final String[] units = { "B", "KB", "MB", "GB" };
+        final String[] units = { "B", "KB", "MB" };
         int unitIndex = 0;
         double size = bytes;
-        while (size >= 1024 && unitIndex < units.length - 1) {
+        while (size >= 1024) {
             size /= 1024;
-            unitIndex++;
+            if (++unitIndex >= units.length - 1)
+                break;
         }
         return String.format("%.1f %s", size, units[unitIndex]);
     }
