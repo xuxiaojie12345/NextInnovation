@@ -114,6 +114,8 @@ const UploadDeleteTemplate: React.FC = () => {
           "templateFile",
         ) as HTMLInputElement;
         if (fileInput) fileInput.value = "";
+      } else if (res.code === 500 || res.code === 401) {
+        setMessage("System error. Please contact administrator.");
       } else {
         setMessage(res.message || "File upload failed. Please try again.");
       }
@@ -167,6 +169,8 @@ const UploadDeleteTemplate: React.FC = () => {
         if (listRes.code === 200 && listRes.data) {
           setTemplates(listRes.data.templateList || []);
         }
+      } else if (res.code === 500 || res.code === 401) {
+        setMessage("System error. Please contact administrator.");
       } else {
         setMessage(res.message || "File deletion failed. Please try again.");
       }

@@ -21,10 +21,10 @@ const ss = createScreenshot('UD14');
 const $container         = (p: Page) => p.locator('.lat-container');
 const $header            = (p: Page) => p.locator('.lat-header');
 const $title             = (p: Page) => p.locator('.lat-header h1');
-const $form              = (p: Page) => p.locator('.lat-form');
-const $row               = (p: Page) => p.locator('.lat-row');
-const $label             = (p: Page) => p.locator('.lat-label');
-const $select            = (p: Page) => p.locator('.lat-select');
+const $form              = (p: Page) => p.locator('.f-form');
+const $row               = (p: Page) => p.locator('.f-row');
+const $label             = (p: Page) => p.locator('.f-label');
+const $select            = (p: Page) => p.locator('.f-input');
 const $tableSection      = (p: Page) => p.locator('.lat-table-section');
 const $table             = (p: Page) => p.locator('.lat-table');
 const $thHeaders         = (p: Page) => p.locator('.lat-table thead th');
@@ -554,7 +554,7 @@ test.describe('UD14 List Available Templates', () => {
     await page.unroute('**/api/v1/hdoc/template/listTemplates');
     await ss(page, 'network error', '23');
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText('Market folder not found');
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
     await ss(page, 'error message', '23');
   });
 

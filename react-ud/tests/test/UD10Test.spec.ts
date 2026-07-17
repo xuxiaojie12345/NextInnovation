@@ -218,102 +218,131 @@ test.describe('UD10 Existing HDoc Variables', () => {
     await ss(page, 'options confirmed', '13');
   });
 
-  test('14-Type-select', async ({ page }) => {
+  test('14-Type-VDA-select', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '14');
     await $typeSelect(page).selectOption('VDA');
     await ss(page, 'selected VDA', '14');
     await expect($typeSelect(page)).toHaveValue('VDA');
-    await $typeSelect(page).selectOption('User Defined');
-    await ss(page, 'selected User Defined', '14');
-    await expect($typeSelect(page)).toHaveValue('User Defined');
-    await ss(page, 'select confirmed', '14');
+    await ss(page, 'VDA confirmed', '14');
   });
 
-  // TC15~16: Description
-  test('15-Description-maxLength', async ({ page }) => {
+  test('15-Type-User-Defined-select', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '15');
+    await $typeSelect(page).selectOption('User Defined');
+    await ss(page, 'selected User Defined', '15');
+    await expect($typeSelect(page)).toHaveValue('User Defined');
+    await ss(page, 'User Defined confirmed', '15');
+  });
+
+  // TC16~17: Description
+  test('16-Description-maxLength', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'after', '16');
     await $descInput(page).fill('A'.repeat(101));
-    await ss(page, 'after fill', '15');
+    await ss(page, 'after fill', '16');
     const actual = await $descInput(page).inputValue();
     expect(actual.length).toBeLessThanOrEqual(100);
     console.log('  desc length: ' + actual.length);
-    await ss(page, 'maxLength confirmed', '15');
+    await ss(page, 'maxLength confirmed', '16');
   });
 
-  test('16-Description-allowed', async ({ page }) => {
+  test('17-Description-allowed', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '16');
+    await ss(page, 'after', '17');
     await $descInput(page).fill('Test variable description 123');
-    await ss(page, 'after fill', '16');
+    await ss(page, 'after fill', '17');
     await expect($descInput(page)).toHaveValue('Test variable description 123');
-    await ss(page, 'allowed chars confirmed', '16');
+    await ss(page, 'allowed chars confirmed', '17');
   });
 
-  // TC17~22: Search
-  test('17-Search-empty', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'before click', '17');
-    await $btnSearch(page).click();
-    await ss(page, 'after click', '17');
-    await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('请输入至少一个搜索条件');
-    await ss(page, 'empty confirmed', '17');
-  });
-
-  test('18-Search-by-variable', async ({ page }) => {
-    await insertTestData('UD10_SV_' + Date.now(), 'VDA', 'test');
+  // TC18~19: Created by user
+  test('18-CreatedBy-maxLength', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '18');
-    await $varInput(page).fill(testDataCreated[0]);
-    await ss(page, 'before click', '18');
-    await $btnSearch(page).click();
-    await ss(page, 'after click', '18');
-    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
-    await ss(page, 'search done', '18');
+    await $createdInput(page).fill('A'.repeat(17));
+    await ss(page, 'after fill', '18');
+    const actual = await $createdInput(page).inputValue();
+    expect(actual.length).toBeLessThanOrEqual(16);
+    console.log('  createdBy length after 17 chars: ' + actual.length);
+    await ss(page, 'maxLength confirmed', '18');
   });
 
-  test('19-Search-by-type', async ({ page }) => {
+  test('19-CreatedBy-allowed-chars', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '19');
-    await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '19');
-    await $btnSearch(page).click();
-    await ss(page, 'after click', '19');
-    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
-    await ss(page, 'search done', '19');
+    await $createdInput(page).fill('admin_user_01');
+    await ss(page, 'after fill', '19');
+    await expect($createdInput(page)).toHaveValue('admin_user_01');
+    const align = await $createdInput(page).evaluate(el => getComputedStyle(el).textAlign);
+    expect(['left', 'start']).toContain(align);
+    await ss(page, 'allowed chars confirmed', '19');
   });
 
-  test('20-Search-multi-condition', async ({ page }) => {
-    const v = 'UD10_MC_' + Date.now();
-    await insertTestData(v, 'VDA', 'multi test');
+  // TC20~25: Search
+  test('20-Search-empty', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '20');
-    await $varInput(page).fill(v);
-    await $typeSelect(page).selectOption('VDA');
-    await $descInput(page).fill('multi test');
     await ss(page, 'before click', '20');
     await $btnSearch(page).click();
     await ss(page, 'after click', '20');
-    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
-    await ss(page, 'search done', '20');
+    await expect($err(page)).toBeVisible();
+    await expect($err(page)).toContainText('请输入至少一个搜索条件');
+    await ss(page, 'empty confirmed', '20');
   });
 
-  test('21-Search-loading-state', async ({ page }) => {
+  test('21-Search-by-variable', async ({ page }) => {
+    await insertTestData('UD10_SV_' + Date.now(), 'VDA', 'test');
     await navigateToPage(page);
     await ss(page, 'after', '21');
-    await $varInput(page).fill('TEST_VAR');
+    await $varInput(page).fill(testDataCreated[0]);
     await ss(page, 'before click', '21');
+    await $btnSearch(page).click();
+    await ss(page, 'after click', '21');
+    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
+    await ss(page, 'search done', '21');
+  });
+
+  test('22-Search-by-type', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'after', '22');
+    await $typeSelect(page).selectOption('VDA');
+    await ss(page, 'before click', '22');
+    await $btnSearch(page).click();
+    await ss(page, 'after click', '22');
+    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
+    await ss(page, 'search done', '22');
+  });
+
+  test('23-Search-multi-condition', async ({ page }) => {
+    const v = 'UD10_MC_' + Date.now();
+    await insertTestData(v, 'VDA', 'multi test');
+    await navigateToPage(page);
+    await ss(page, 'after', '23');
+    await $varInput(page).fill(v);
+    await $typeSelect(page).selectOption('VDA');
+    await $descInput(page).fill('multi test');
+    await ss(page, 'before click', '23');
+    await $btnSearch(page).click();
+    await ss(page, 'after click', '23');
+    try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
+    await ss(page, 'search done', '23');
+  });
+
+  test('24-Search-loading-state', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'after', '24');
+    await $varInput(page).fill('TEST_VAR');
+    await ss(page, 'before click', '24');
     await page.evaluate(() => { (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click(); });
-    try { await expect($btnSearch(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '21'); }
+    try { await expect($btnSearch(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '24'); }
     catch { console.log('  fast response'); }
     try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
   });
 
-  test('22-Search-prevent-duplicate', async ({ page }) => {
+  test('25-Search-prevent-duplicate', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '22');
+    await ss(page, 'after', '25');
     await $varInput(page).fill('TEST_VAR');
     await $btnSearch(page).click();
     await page.waitForTimeout(500);
@@ -322,107 +351,107 @@ test.describe('UD10 Existing HDoc Variables', () => {
       await $btnSearch(page).click({ timeout: 2000 }).catch(() => {});
       await $btnSearch(page).click({ timeout: 2000 }).catch(() => {});
     }
-    try { await expect($btnSearch(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'disabled', '22'); }
+    try { await expect($btnSearch(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'disabled', '25'); }
     catch { console.log('  fast response'); }
     try { await page.waitForURL('**/existing-hdoc-vars/result', { timeout: 10000 }); } catch { /* ok */ }
   });
 
-  // TC23~24: Clear
-  test('23-Clear-all-fields', async ({ page }) => {
+  // TC26~27: Clear
+  test('26-Clear-all-fields', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '23');
+    await ss(page, 'after', '26');
     await $varInput(page).fill('VAR001');
     await $typeSelect(page).selectOption('VDA');
     await $descInput(page).fill('test desc');
     await $createdInput(page).fill('admin');
     await $dateInput(page).fill('2023-10-15');
-    await ss(page, 'before clear', '23');
+    await ss(page, 'before clear', '26');
     await $btnClear(page).click();
-    await ss(page, 'after clear', '23');
+    await ss(page, 'after clear', '26');
     await expect($varInput(page)).toHaveValue('');
     await expect($typeSelect(page)).toHaveValue('');
     await expect($descInput(page)).toHaveValue('');
     await expect($createdInput(page)).toHaveValue('');
     await expect($dateInput(page)).toHaveValue('');
-    await ss(page, 'clear confirmed', '23');
+    await ss(page, 'clear confirmed', '26');
   });
 
-  test('24-Clear-error-msg', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '24');
-    await $btnSearch(page).click();
-    await expect($err(page)).toBeVisible();
-    await ss(page, 'error shown', '24');
-    await $btnClear(page).click();
-    await ss(page, 'after clear', '24');
-    await expect($err(page)).not.toBeVisible();
-    await ss(page, 'msg cleared', '24');
-  });
-
-  // TC25: Back
-  test('25-Back-button', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '25');
-    await ss(page, 'before click', '25');
-    await $btnBack(page).click();
-    await ss(page, 'after click', '25');
-    await page.waitForTimeout(2000);
-    console.log('  URL after back: ' + page.url());
-    await ss(page, 'back confirmed', '25');
-  });
-
-  // TC26~32: Add
-  test('26-Add-empty-variable', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '26');
-    await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '26');
-    await $btnAdd(page).click();
-    await ss(page, 'after click', '26');
-    await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('Variable为必填项');
-    await ss(page, 'confirmed', '26');
-  });
-
-  test('27-Add-empty-type', async ({ page }) => {
-    const tv = 'UD10_ET_' + Date.now();
+  test('27-Clear-error-msg', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '27');
-    await $varInput(page).fill(tv);
-    await $descInput(page).fill('test');
-    await ss(page, 'before click', '27');
-    await $btnAdd(page).click();
-    await ss(page, 'after click', '27');
+    await $btnSearch(page).click();
     await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('请选择变量类型');
-    await ss(page, 'confirmed', '27');
+    await ss(page, 'error shown', '27');
+    await $btnClear(page).click();
+    await ss(page, 'after clear', '27');
+    await expect($err(page)).not.toBeVisible();
+    await ss(page, 'msg cleared', '27');
   });
 
-  test('28-Add-duplicate', async ({ page }) => {
-    const dv = 'UD10_DUP_' + Date.now();
-    await insertTestData(dv, 'VDA', 'dup');
+  // TC28: Back
+  test('28-Back-button', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '28');
-    await $varInput(page).fill(dv);
-    await $typeSelect(page).selectOption('VDA');
     await ss(page, 'before click', '28');
-    await $btnAdd(page).click();
+    await $btnBack(page).click();
     await ss(page, 'after click', '28');
     await page.waitForTimeout(2000);
-    if (await $err(page).isVisible()) console.log('  err: ' + (await $err(page).textContent()));
-    await ss(page, 'confirmed', '28');
+    console.log('  URL after back: ' + page.url());
+    await ss(page, 'back confirmed', '28');
   });
 
-  test('29-Add-success', async ({ page }) => {
-    const nv = 'UD10_ADD_' + Date.now();
+  // TC29~35: Add
+  test('29-Add-empty-variable', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'after', '29');
-    await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await $descInput(page).fill('Add test variable');
     await ss(page, 'before click', '29');
     await $btnAdd(page).click();
     await ss(page, 'after click', '29');
+    await expect($err(page)).toBeVisible();
+    await expect($err(page)).toContainText('Variable为必填项');
+    await ss(page, 'confirmed', '29');
+  });
+
+  test('30-Add-empty-type', async ({ page }) => {
+    const tv = 'UD10_ET_' + Date.now();
+    await navigateToPage(page);
+    await ss(page, 'after', '30');
+    await $varInput(page).fill(tv);
+    await $descInput(page).fill('test');
+    await ss(page, 'before click', '30');
+    await $btnAdd(page).click();
+    await ss(page, 'after click', '30');
+    await expect($err(page)).toBeVisible();
+    await expect($err(page)).toContainText('请选择变量类型');
+    await ss(page, 'confirmed', '30');
+  });
+
+  test('31-Add-duplicate', async ({ page }) => {
+    const dv = 'UD10_DUP_' + Date.now();
+    await insertTestData(dv, 'VDA', 'dup');
+    await navigateToPage(page);
+    await ss(page, 'after', '31');
+    await $varInput(page).fill(dv);
+    await $typeSelect(page).selectOption('VDA');
+    await ss(page, 'before click', '31');
+    await $btnAdd(page).click();
+    await ss(page, 'after click', '31');
+    await page.waitForTimeout(2000);
+    if (await $err(page).isVisible()) console.log('  err: ' + (await $err(page).textContent()));
+    await ss(page, 'confirmed', '31');
+  });
+
+  test('32-Add-success', async ({ page }) => {
+    const nv = 'UD10_ADD_' + Date.now();
+    await navigateToPage(page);
+    await ss(page, 'after', '32');
+    await $varInput(page).fill(nv);
+    await $typeSelect(page).selectOption('VDA');
+    await $descInput(page).fill('Add test variable');
+    await ss(page, 'before click', '32');
+    await $btnAdd(page).click();
+    await ss(page, 'after click', '32');
     await page.waitForTimeout(2000);
     if (await $successMsg(page).isVisible()) {
       console.log('  success: ' + (await $successMsg(page).textContent()));
@@ -440,90 +469,90 @@ test.describe('UD10 Existing HDoc Variables', () => {
     } else if (await $err(page).isVisible()) {
       console.log('  err: ' + (await $err(page).textContent()));
     }
-    await ss(page, 'confirmed', '29');
+    await ss(page, 'confirmed', '32');
   });
 
-  test('30-Add-loading-state', async ({ page }) => {
+  test('33-Add-loading-state', async ({ page }) => {
     const nv = 'UD10_LD_' + Date.now();
     await navigateToPage(page);
-    await ss(page, 'after', '30');
+    await ss(page, 'after', '33');
     await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '30');
+    await ss(page, 'before click', '33');
     await page.evaluate(() => { (document.querySelector('.btn-cell button:nth-child(4)') as HTMLButtonElement)?.click(); });
-    try { await expect($btnAdd(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '30'); }
+    try { await expect($btnAdd(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '33'); }
     catch { console.log('  fast'); }
     await page.waitForTimeout(3000);
   });
 
-  test('31-Add-prevent-duplicate-click', async ({ page }) => {
+  test('34-Add-prevent-duplicate-click', async ({ page }) => {
     const nv = 'UD10_RP_' + Date.now();
     await navigateToPage(page);
-    await ss(page, 'after', '31');
+    await ss(page, 'after', '34');
     await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '31');
+    await ss(page, 'before click', '34');
     await $btnAdd(page).click();
     await $btnAdd(page).click();
     await $btnAdd(page).click();
-    try { await expect($btnAdd(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'disabled', '31'); }
+    try { await expect($btnAdd(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'disabled', '34'); }
     catch { console.log('  fast'); }
     await page.waitForTimeout(3000);
   });
 
-  test('32-Add-API-failure', async ({ page }) => {
+  test('35-Add-API-failure', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '32');
+    await ss(page, 'after', '35');
     await page.route('**/api/v1/hdoc/variables/add', route => route.abort());
     const nv = 'UD10_FAIL_' + Date.now();
     await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '32');
+    await ss(page, 'before click', '35');
     await $btnAdd(page).click();
-    await ss(page, 'after click', '32');
+    await ss(page, 'after click', '35');
     await page.waitForTimeout(2000);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     console.log('  err: ' + (await $err(page).textContent()));
     await page.unroute('**/api/v1/hdoc/variables/add');
-    await ss(page, 'confirmed', '32');
+    await ss(page, 'confirmed', '35');
   });
 
-  // TC33~37: Update
-  test('33-Update-empty-variable', async ({ page }) => {
+  // TC36~40: Update
+  test('36-Update-empty-variable', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '33');
-    await ss(page, 'before click', '33');
+    await ss(page, 'after', '36');
+    await ss(page, 'before click', '36');
     await $btnUpdate(page).click();
-    await ss(page, 'after click', '33');
+    await ss(page, 'after click', '36');
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Variable为必填项');
-    await ss(page, 'confirmed', '33');
+    await ss(page, 'confirmed', '36');
   });
 
-  test('34-Update-not-exists', async ({ page }) => {
+  test('37-Update-not-exists', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '34');
+    await ss(page, 'after', '37');
     await $varInput(page).fill('NON_EXIST_VAR_UD10');
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '34');
+    await ss(page, 'before click', '37');
     await $btnUpdate(page).click();
-    await ss(page, 'after click', '34');
+    await ss(page, 'after click', '37');
     await page.waitForTimeout(2000);
     if (await $err(page).isVisible()) console.log('  err: ' + (await $err(page).textContent()));
-    await ss(page, 'confirmed', '34');
+    await ss(page, 'confirmed', '37');
   });
 
-  test('35-Update-success', async ({ page }) => {
+  test('38-Update-success', async ({ page }) => {
     const uv = 'UD10_UPD_' + Date.now();
     await insertTestData(uv, 'VDA', 'original');
     await navigateToPage(page);
-    await ss(page, 'after', '35');
+    await ss(page, 'after', '38');
     await $varInput(page).fill(uv);
     await $typeSelect(page).selectOption('User Defined');
     await $descInput(page).fill('UPDATED_DESC');
-    await ss(page, 'before click', '35');
+    await ss(page, 'before click', '38');
     await $btnUpdate(page).click();
-    await ss(page, 'after click', '35');
+    await ss(page, 'after click', '38');
     await page.waitForTimeout(2000);
     if (await $successMsg(page).isVisible()) {
       console.log('  success: ' + (await $successMsg(page).textContent()));
@@ -536,195 +565,75 @@ test.describe('UD10 Existing HDoc Variables', () => {
     } else if (await $err(page).isVisible()) {
       console.log('  err: ' + (await $err(page).textContent()));
     }
-    await ss(page, 'confirmed', '35');
+    await ss(page, 'confirmed', '38');
   });
 
-  test('36-Update-loading-state', async ({ page }) => {
+  test('39-Update-loading-state', async ({ page }) => {
     const uv = 'UD10_UL_' + Date.now();
     await insertTestData(uv, 'VDA', 'test');
     await navigateToPage(page);
-    await ss(page, 'after', '36');
+    await ss(page, 'after', '39');
     await $varInput(page).fill(uv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '36');
+    await ss(page, 'before click', '39');
     await page.evaluate(() => { const b = document.querySelectorAll('.btn-cell button'); if (b[4]) (b[4] as HTMLButtonElement).click(); });
-    try { await expect($btnUpdate(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '36'); }
+    try { await expect($btnUpdate(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '39'); }
     catch { console.log('  fast'); }
     await page.waitForTimeout(3000);
   });
 
-  test('37-Update-API-failure', async ({ page }) => {
+  test('40-Update-API-failure', async ({ page }) => {
     const uv = 'UD10_UF_' + Date.now();
     await insertTestData(uv, 'VDA', 'test');
     await navigateToPage(page);
-    await ss(page, 'after', '37');
+    await ss(page, 'after', '40');
     await page.route('**/api/v1/hdoc/variables/update', route => route.abort());
     await $varInput(page).fill(uv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '37');
+    await ss(page, 'before click', '40');
     await $btnUpdate(page).click();
-    await ss(page, 'after click', '37');
+    await ss(page, 'after click', '40');
     await page.waitForTimeout(2000);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     console.log('  err: ' + (await $err(page).textContent()));
     await page.unroute('**/api/v1/hdoc/variables/update');
-    await ss(page, 'confirmed', '37');
-  });
-
-  // TC38~43: Delete
-  test('38-Delete-empty-variable', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '38');
-    await ss(page, 'before click', '38');
-    await $btnDelete(page).click();
-    await ss(page, 'after click', '38');
-    await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('Variable为必填项');
-    await ss(page, 'confirmed', '38');
-  });
-
-  test('39-Delete-not-exists', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '39');
-    await $varInput(page).fill('NON_EXIST_VAR_UD10_DEL');
-    await ss(page, 'before click', '39');
-    await $btnDelete(page).click();
-    await ss(page, 'after click', '39');
-    await page.waitForTimeout(2000);
-    if (await $err(page).isVisible()) console.log('  err: ' + (await $err(page).textContent()));
-    await ss(page, 'confirmed', '39');
-  });
-
-  test('40-Delete-confirm-dialog', async ({ page }) => {
-    const dv = 'UD10_DLG_' + Date.now();
-    await insertTestData(dv, 'VDA', 'dialog test');
-    await navigateToPage(page);
-    await ss(page, 'after', '40');
-    await $varInput(page).fill(dv);
-    await $typeSelect(page).selectOption('VDA');
-    // 取消 Ant Design Modal（点击取消按钮）
-    await page.waitForTimeout(500);
-    const cancelBtn40 = page.locator('.ant-modal-confirm-btns .ant-btn:not(.ant-btn-primary)');
-    if (await cancelBtn40.isVisible().catch(() => false)) {
-      await cancelBtn40.click();
-    }
-    await ss(page, 'before click', '40');
-    await $btnDelete(page).click();
-    await ss(page, 'after click', '40');
-    await page.waitForTimeout(1000);
-    const db = await queryDB('SELECT VARIABLE FROM HDOC_VARIABLES WHERE VARIABLE = ?', [dv]);
-    expect(db && db.length > 0 ? db.length : 0).toBeGreaterThanOrEqual(1);
-    console.log('  data still exists after cancel');
     await ss(page, 'confirmed', '40');
   });
 
-  test('41-Delete-success', async ({ page }) => {
-    const dv = 'UD10_DEL_' + Date.now();
-    await insertTestData(dv, 'VDA', 'to delete');
+  // TC47: Excel
+  test('47-Excel-export', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '41');
-    await $varInput(page).fill(dv);
-    await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '41');
-    await $btnDelete(page).click();
-    await ss(page, 'after click', '41');
-    // 接受 Ant Design Modal（点击 OK 按钮）
-    await page.waitForTimeout(500);
-    const okBtn41 = page.locator('.ant-modal-confirm-btns .ant-btn-primary');
-    if (await okBtn41.isVisible().catch(() => false)) {
-      await okBtn41.click();
-    }
-    await ss(page, 'after confirm', '41');
-    await page.waitForTimeout(2000);
-    if (await $successMsg(page).isVisible()) {
-      console.log('  success: ' + (await $successMsg(page).textContent()));
-      await expect($varInput(page)).toHaveValue('');
-    } else if (await $err(page).isVisible()) {
-      console.log('  err: ' + (await $err(page).textContent()));
-    }
-    await ss(page, 'done', '41');
-  });
-
-  test('42-Delete-loading-state', async ({ page }) => {
-    const dv = 'UD10_DL_' + Date.now();
-    await insertTestData(dv, 'VDA', 'test');
-    await navigateToPage(page);
-    await ss(page, 'after', '42');
-    await $varInput(page).fill(dv);
-    await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '42');
-    page.once('dialog', async (dialog) => { await dialog.accept(); });
-    await $btnDelete(page).click();
-    // Ant Design Modal 弹出后自动关闭 - 改为点击 Modal OK 按钮
-    await page.waitForTimeout(500);
-    const okBtn42 = page.locator('.ant-modal-confirm-btns .ant-btn-primary');
-    if (await okBtn42.isVisible().catch(() => false)) {
-      await okBtn42.click();
-    }
-    await page.waitForTimeout(1000);
-    try { await expect($btnDelete(page)).toBeDisabled({ timeout: 2000 }); await ss(page, 'loading', '42'); }
-    catch { console.log('  fast'); }
-    await page.waitForTimeout(3000);
-  });
-
-  test('43-Delete-API-failure', async ({ page }) => {
-    const dv = 'UD10_DF_' + Date.now();
-    await insertTestData(dv, 'VDA', 'test');
-    await navigateToPage(page);
-    await ss(page, 'after', '43');
-    await page.route('**/api/v1/hdoc/variables/delete', route => route.abort());
-    await $varInput(page).fill(dv);
-    await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '43');
-    await $btnDelete(page).click();
-    await ss(page, 'after click', '43');
-    // 确认 Ant Design Modal
-    await page.waitForTimeout(500);
-    const okBtn43 = page.locator('.ant-modal-confirm-btns .ant-btn-primary');
-    if (await okBtn43.isVisible().catch(() => false)) {
-      await okBtn43.click();
-    }
-    await page.waitForTimeout(2000);
-    await expect($err(page)).toBeVisible({ timeout: 10000 });
-    console.log('  err: ' + (await $err(page).textContent()));
-    await page.unroute('**/api/v1/hdoc/variables/delete');
-    await ss(page, 'confirmed', '43');
-  });
-
-  // TC44: Excel
-  test('44-Excel-export', async ({ page }) => {
-    await navigateToPage(page);
-    await ss(page, 'after', '44');
-    await ss(page, 'before click', '44');
+    await ss(page, 'after', '47');
+    await ss(page, 'before click', '47');
     await $btnExcel(page).click();
-    await ss(page, 'after click', '44');
+    await ss(page, 'after click', '47');
     await page.waitForTimeout(2000);
     if (await $successMsg(page).isVisible()) console.log('  success: ' + (await $successMsg(page).textContent()));
     else if (await $err(page).isVisible()) console.log('  err: ' + (await $err(page).textContent()));
-    await ss(page, 'done', '44');
+    await ss(page, 'done', '47');
   });
 
-  // TC45~46: Exception handling
-  test('45-Network-error-on-add', async ({ page }) => {
+// TC48~49: Exception handling
+  test('48-Network-error-on-add', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '45');
+    await ss(page, 'after', '48');
     await page.route('**/api/v1/hdoc/variables/add', route => route.abort('internetdisconnected'));
     const nv = 'UD10_NET_' + Date.now();
     await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '45');
+    await ss(page, 'before click', '48');
     await $btnAdd(page).click();
-    await ss(page, 'after click', '45');
+    await ss(page, 'after click', '48');
     await page.waitForTimeout(2000);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     console.log('  err: ' + (await $err(page).textContent()));
     await page.unroute('**/api/v1/hdoc/variables/add');
-    await ss(page, 'confirmed', '45');
+    await ss(page, 'confirmed', '48');
   });
 
-  test('46-API-timeout', async ({ page }) => {
+  test('49-API-timeout', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '46');
+    await ss(page, 'after', '49');
     await page.route('**/api/v1/hdoc/variables/add', async route => {
       await new Promise(r => setTimeout(r, 15000));
       await route.abort();
@@ -732,78 +641,78 @@ test.describe('UD10 Existing HDoc Variables', () => {
     const nv = 'UD10_TO_' + Date.now();
     await $varInput(page).fill(nv);
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '46');
+    await ss(page, 'before click', '49');
     await $btnAdd(page).click();
-    await ss(page, 'after click', '46');
+    await ss(page, 'after click', '49');
     try { await expect($err(page)).toBeVisible({ timeout: 20000 }); console.log('  err: ' + (await $err(page).textContent())); }
     catch { console.log('  timeout handling differs'); }
     try { await page.unroute('**/api/v1/hdoc/variables/add'); } catch { /* ignore */ }
-    await ss(page, 'done', '46');
+    await ss(page, 'done', '49');
   });
 
-  // TC47~48: Message display
-  test('47-Error-style', async ({ page }) => {
+  // TC50~51: Message display
+  test('50-Error-style', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '47');
+    await ss(page, 'after', '50');
     await $btnSearch(page).click();
-    await ss(page, 'after click', '47');
+    await ss(page, 'after click', '50');
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('请输入至少一个搜索条件');
     const color = await $err(page).evaluate(el => getComputedStyle(el).color);
     console.log('  color: ' + color);
     const rgb = color.match(/\d+/g);
     if (rgb) { expect(parseInt(rgb[0])).toBeGreaterThan(parseInt(rgb[1])); expect(parseInt(rgb[0])).toBeGreaterThan(parseInt(rgb[2])); }
-    await ss(page, 'confirmed', '47');
+    await ss(page, 'confirmed', '50');
   });
 
-  test('48-Clear-removes-error', async ({ page }) => {
+  test('51-Clear-removes-error', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '48');
+    await ss(page, 'after', '51');
     await $btnSearch(page).click();
     await expect($err(page)).toBeVisible();
-    await ss(page, 'error shown', '48');
+    await ss(page, 'error shown', '51');
     await $btnClear(page).click();
-    await ss(page, 'after clear', '48');
+    await ss(page, 'after clear', '51');
     await expect($err(page)).not.toBeVisible();
-    await ss(page, 'confirmed', '48');
+    await ss(page, 'confirmed', '51');
   });
 
-  // TC49~51: Security
-  test('49-Unauthenticated-access', async ({ page }) => {
+  // TC52~54: Security
+  test('52-Unauthenticated-access', async ({ page }) => {
     await page.goto('http://localhost:3000', { waitUntil: 'load' });
     await page.evaluate(() => localStorage.clear());
     await page.goto('http://localhost:3000/menu/existing-hdoc-vars', { waitUntil: 'load' });
-    await ss(page, 'after navigate', '49');
+    await ss(page, 'after navigate', '52');
     await expect(page).toHaveURL(/\/login/);
-    await ss(page, 'confirmed', '49');
+    await ss(page, 'confirmed', '52');
   });
 
-  test('50-SQL-injection', async ({ page }) => {
+  test('53-SQL-injection', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'after', '50');
+    await ss(page, 'after', '53');
     await $varInput(page).fill("' OR '1'='1");
     await $typeSelect(page).selectOption('VDA');
-    await ss(page, 'before click', '50');
+    await ss(page, 'before click', '53');
     await $btnSearch(page).click();
-    await ss(page, 'after click', '50');
+    await ss(page, 'after click', '53');
     await page.waitForTimeout(2000);
     if (await $err(page).isVisible()) {
       const t = await $err(page).textContent() || '';
       expect(t).not.toContain('SQL');
     }
-    await ss(page, 'confirmed', '50');
+    await ss(page, 'confirmed', '53');
   });
 
-  test('51-XSS-protection', async ({ page }) => {
+  test('54-XSS-protection', async ({ page }) => {
     let dialogCount = 0;
     page.on('dialog', () => { dialogCount++; });
     await navigateToPage(page);
-    await ss(page, 'after', '51');
+    await ss(page, 'after', '54');
     await $varInput(page).fill('<script>alert(1)</script>');
-    await ss(page, 'after input', '51');
+    await ss(page, 'after input', '54');
     expect(dialogCount).toBe(0);
     console.log('  dialogs: ' + dialogCount);
-    await ss(page, 'confirmed', '51');
+    await ss(page, 'confirmed', '54');
   });
 
 });

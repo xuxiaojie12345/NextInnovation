@@ -4,7 +4,7 @@
  * 测试式样书: tests/测试式样书/テスト式样書UD15.md (v1.0)
  * 测试前提: 前后端均已启动，使用真实 API
  * 截图保存: tests/test/Image/UD15/
- * 测试用例数: 41
+ * 测试用例数: 45
  * 执行模式: serial（串行执行）
  */
 
@@ -20,15 +20,15 @@ const $container     = (p: Page) => p.locator('.vp-container');
 const $header        = (p: Page) => p.locator('.vp-header h1');
 const $err           = (p: Page) => p.locator('.vp-error');
 const $successMsg    = (p: Page) => p.locator('.vp-success');
-const $input         = (p: Page) => p.locator('.vp-input');
-const $label         = (p: Page) => p.locator('.vp-label');
+const $input         = (p: Page) => p.locator('.f-input');
+const $label         = (p: Page) => p.locator('.f-label');
 const $inputSection  = (p: Page) => p.locator('.vp-input-section');
-const $btnRow        = (p: Page) => p.locator('.vp-btn-row');
-const $btnViewInfo   = (p: Page) => p.locator('.vp-btn-row button').filter({ hasText: 'View Info' });
-const $btnRegenerate = (p: Page) => p.locator('.vp-btn-row button').filter({ hasText: 'Set Regenerate' });
-const $btnSetOk      = (p: Page) => p.locator('.vp-btn-row button').filter({ hasText: 'Set OK' });
-const $btnBasic      = (p: Page) => p.locator('.vp-btn-row button').filter({ hasText: 'Change to Basic Info' });
-const $btnAdvanced   = (p: Page) => p.locator('.vp-btn-row button').filter({ hasText: 'Change to Advanced Info' });
+const $btnRow        = (p: Page) => p.locator('.btn-row');
+const $btnViewInfo   = (p: Page) => p.locator('.btn-row button').filter({ hasText: 'View Info' });
+const $btnRegenerate = (p: Page) => p.locator('.btn-row button').filter({ hasText: 'Set Regenerate' });
+const $btnSetOk      = (p: Page) => p.locator('.btn-row button').filter({ hasText: 'Set OK' });
+const $btnBasic      = (p: Page) => p.locator('.btn-row button').filter({ hasText: 'Change to Basic Info' });
+const $btnAdvanced   = (p: Page) => p.locator('.btn-row button').filter({ hasText: 'Change to Advanced Info' });
 const $infoSection   = (p: Page) => p.locator('.vp-info-section');
 const $infoTable     = (p: Page) => p.locator('.vp-info-table');
 const $infoLabels    = (p: Page) => p.locator('.vp-info-label');
@@ -371,23 +371,28 @@ test.describe('UD15 Vin Plate', () => {
     const rows = await queryDB('SELECT STATUS FROM HDOC_SEND_DATA_VIN_PLATE WHERE SERIE=? AND CHNR=?', [TEST_SERIE, TEST_CHNR]);
     if (rows && rows.length > 0) {
       console.log('  DB STATUS after regenerate: ' + rows[0].STATUS);
-      expect(rows[0].STATUS).toBe('0');
+      expect(rows[0].STATUS).toBe(0);
     }
     await cleanupTestData();
     await ss(page, 'regenerate verified', '18');
   });
 
   test('19 - Set Regenerate chassis not exist', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/setRegenerate', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 404, message: '再生状态设置失败', data: null }),
+      });
+    });
     await navigateToPage(page);
     await ss(page, 'page display', '19');
-    await $input(page).fill('NONEXIST CHASSIS');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
     await $btnRegenerate(page).click();
     await page.waitForTimeout(2000);
-    const errVisible = await $err(page).isVisible().catch(() => false);
-    if (errVisible) {
-      const errText = await $err(page).textContent();
-      console.log('  Error: ' + errText);
-    }
+    await page.unroute('**/api/v1/hdoc/ud15/setRegenerate');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('再生状态设置失败');
     await ss(page, 'regenerate not exist', '19');
   });
 
@@ -434,23 +439,28 @@ test.describe('UD15 Vin Plate', () => {
     const rows = await queryDB('SELECT STATUS FROM HDOC_SEND_DATA_VIN_PLATE WHERE SERIE=? AND CHNR=?', [TEST_SERIE, TEST_CHNR]);
     if (rows && rows.length > 0) {
       console.log('  DB STATUS after setok: ' + rows[0].STATUS);
-      expect(rows[0].STATUS).toBe('1');
+      expect(rows[0].STATUS).toBe(1);
     }
     await cleanupTestData();
     await ss(page, 'setok verified', '22');
   });
 
   test('23 - Set OK chassis not exist', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/setOK', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 404, message: 'OK状态设置失败', data: null }),
+      });
+    });
     await navigateToPage(page);
     await ss(page, 'page display', '23');
-    await $input(page).fill('NONEXIST CHASSIS');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
     await $btnSetOk(page).click();
     await page.waitForTimeout(2000);
-    const errVisible = await $err(page).isVisible().catch(() => false);
-    if (errVisible) {
-      const errText = await $err(page).textContent();
-      console.log('  Error: ' + errText);
-    }
+    await page.unroute('**/api/v1/hdoc/ud15/setOK');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('OK状态设置失败');
     await ss(page, 'setok not exist', '23');
   });
 
@@ -497,7 +507,7 @@ test.describe('UD15 Vin Plate', () => {
     const rows = await queryDB('SELECT STATUS, TYPE FROM HDOC_SEND_DATA_VIN_PLATE WHERE SERIE=? AND CHNR=?', [TEST_SERIE, TEST_CHNR]);
     if (rows && rows.length > 0) {
       console.log('  DB STATUS=' + rows[0].STATUS + ' TYPE=' + rows[0].TYPE);
-      expect(rows[0].STATUS).toBe('0');
+      expect(rows[0].STATUS).toBe(0);
       expect(rows[0].TYPE).toBe('1');
     }
     await cleanupTestData();
@@ -505,16 +515,21 @@ test.describe('UD15 Vin Plate', () => {
   });
 
   test('27 - Basic Info chassis not exist', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/changeToBasicInfo', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 404, message: 'Basic Info 更改失败', data: null }),
+      });
+    });
     await navigateToPage(page);
     await ss(page, 'page display', '27');
-    await $input(page).fill('NONEXIST CHASSIS');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
     await $btnBasic(page).click();
     await page.waitForTimeout(2000);
-    const errVisible = await $err(page).isVisible().catch(() => false);
-    if (errVisible) {
-      const errText = await $err(page).textContent();
-      console.log('  Error: ' + errText);
-    }
+    await page.unroute('**/api/v1/hdoc/ud15/changeToBasicInfo');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('Basic Info 更改失败');
     await ss(page, 'basic not exist', '27');
   });
 
@@ -561,7 +576,7 @@ test.describe('UD15 Vin Plate', () => {
     const rows = await queryDB('SELECT STATUS, TYPE FROM HDOC_SEND_DATA_VIN_PLATE WHERE SERIE=? AND CHNR=?', [TEST_SERIE, TEST_CHNR]);
     if (rows && rows.length > 0) {
       console.log('  DB STATUS=' + rows[0].STATUS + ' TYPE=' + rows[0].TYPE);
-      expect(rows[0].STATUS).toBe('0');
+      expect(rows[0].STATUS).toBe(0);
       expect(rows[0].TYPE).toBe('2');
     }
     await cleanupTestData();
@@ -569,16 +584,21 @@ test.describe('UD15 Vin Plate', () => {
   });
 
   test('31 - Advanced Info chassis not exist', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/changeToAdvancedInfo', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 404, message: 'Advanced Info変更失败', data: null }),
+      });
+    });
     await navigateToPage(page);
     await ss(page, 'page display', '31');
-    await $input(page).fill('NONEXIST CHASSIS');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
     await $btnAdvanced(page).click();
     await page.waitForTimeout(2000);
-    const errVisible = await $err(page).isVisible().catch(() => false);
-    if (errVisible) {
-      const errText = await $err(page).textContent();
-      console.log('  Error: ' + errText);
-    }
+    await page.unroute('**/api/v1/hdoc/ud15/changeToAdvancedInfo');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('Advanced Info変更失败');
     await ss(page, 'advanced not exist', '31');
   });
 
@@ -602,7 +622,7 @@ test.describe('UD15 Vin Plate', () => {
   });
 
   // -----------------------------------------------------------
-  // 异常处理 (TC33~35)
+  // 异常处理 (TC33~39)
   // -----------------------------------------------------------
   test('33 - Network error on View Info', async ({ page }) => {
     await page.route('**/api/v1/hdoc/ud15/viewInfo', route => route.abort());
@@ -651,60 +671,144 @@ test.describe('UD15 Vin Plate', () => {
     await ss(page, 'xml result', '35');
   });
 
-  // -----------------------------------------------------------
-  // 消息显示 (TC36~37)
-  // -----------------------------------------------------------
-  test('36 - Error message style', async ({ page }) => {
+  test('36 - Set Regenerate 500 error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/setRegenerate', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'System error. Please contact administrator.', data: null }),
+      });
+    });
+    await insertTestData();
     await navigateToPage(page);
     await ss(page, 'page display', '36');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
+    await $btnRegenerate(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/ud15/setRegenerate');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await cleanupTestData();
+    await ss(page, 'regenerate 500', '36');
+  });
+
+  test('37 - Set OK 500 error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/setOK', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'System error. Please contact administrator.', data: null }),
+      });
+    });
+    await insertTestData();
+    await navigateToPage(page);
+    await ss(page, 'page display', '37');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
+    await $btnSetOk(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/ud15/setOK');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await cleanupTestData();
+    await ss(page, 'setok 500', '37');
+  });
+
+  test('38 - Basic Info 500 error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/changeToBasicInfo', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'System error. Please contact administrator.', data: null }),
+      });
+    });
+    await insertTestData();
+    await navigateToPage(page);
+    await ss(page, 'page display', '38');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
+    await $btnBasic(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/ud15/changeToBasicInfo');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await cleanupTestData();
+    await ss(page, 'basic 500', '38');
+  });
+
+  test('39 - Advanced Info 500 error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/ud15/changeToAdvancedInfo', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'System error. Please contact administrator.', data: null }),
+      });
+    });
+    await insertTestData();
+    await navigateToPage(page);
+    await ss(page, 'page display', '39');
+    await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
+    await $btnAdvanced(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/ud15/changeToAdvancedInfo');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await cleanupTestData();
+    await ss(page, 'advanced 500', '39');
+  });
+
+  // -----------------------------------------------------------
+  // 消息显示 (TC40~41)
+  // -----------------------------------------------------------
+  test('40 - Error message style', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'page display', '40');
     await $btnViewInfo(page).click();
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Chassis number is required.');
     const errColor = await $err(page).evaluate(el => getComputedStyle(el).color);
     console.log('  Error color: ' + errColor);
-    await ss(page, 'error style', '36');
+    await ss(page, 'error style', '40');
   });
 
-  test('37 - Message clear on new operation', async ({ page }) => {
+  test('41 - Message clear on new operation', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'page display', '37');
+    await ss(page, 'page display', '41');
     // 触发第一次错误
     await $btnViewInfo(page).click();
     await expect($err(page)).toBeVisible();
     const firstErr = await $err(page).textContent();
     console.log('  First error: ' + firstErr);
-    await ss(page, 'first error', '37');
+    await ss(page, 'first error', '41');
     // 触发第二次错误
     await $btnViewInfo(page).click();
     await page.waitForTimeout(500);
     await expect($err(page)).toBeVisible();
     const secondErr = await $err(page).textContent();
     console.log('  Second error: ' + secondErr);
-    await ss(page, 'second error', '37');
+    await ss(page, 'second error', '41');
   });
 
   // -----------------------------------------------------------
-  // 安全性 (TC38~41)
+  // 安全性 (TC42~45)
   // -----------------------------------------------------------
-  test('38 - Unauthenticated access', async ({ page }) => {
+  test('42 - Unauthenticated access', async ({ page }) => {
     await page.goto(PAGE_URL, { waitUntil: 'load' });
     await page.evaluate(() => {
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
     });
-    await ss(page, 'localStorage cleared', '38');
+    await ss(page, 'localStorage cleared', '42');
     await page.goto(PAGE_URL + '/menu/vin-plate', { waitUntil: 'load' });
     await page.waitForTimeout(2000);
     const url = page.url();
     console.log('  URL: ' + url);
-    await ss(page, 'unauthenticated', '38');
+    await ss(page, 'unauthenticated', '42');
     expect(url.includes('/login')).toBe(true);
   });
 
-  test('39 - SQL injection protection', async ({ page }) => {
+  test('43 - SQL injection protection', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'page display', '39');
+    await ss(page, 'page display', '43');
     await $input(page).fill("' OR '1'='1");
     await $btnViewInfo(page).click();
     await page.waitForTimeout(2000);
@@ -715,12 +819,12 @@ test.describe('UD15 Vin Plate', () => {
       expect(errText.toLowerCase()).not.toContain('sql');
       expect(errText.toLowerCase()).not.toContain('syntax');
     }
-    await ss(page, 'sql injection', '39');
+    await ss(page, 'sql injection', '43');
   });
 
-  test('40 - XSS protection', async ({ page }) => {
+  test('44 - XSS protection', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'page display', '40');
+    await ss(page, 'page display', '44');
     let alertTriggered = false;
     page.on('dialog', dialog => {
       alertTriggered = true;
@@ -730,17 +834,17 @@ test.describe('UD15 Vin Plate', () => {
     await $btnViewInfo(page).click();
     await page.waitForTimeout(2000);
     expect(alertTriggered).toBe(false);
-    await ss(page, 'xss protection', '40');
+    await ss(page, 'xss protection', '44');
   });
 
-  test('41 - Multiple buttons simultaneous', async ({ page }) => {
+  test('45 - Multiple buttons simultaneous', async ({ page }) => {
     await page.route('**/api/v1/hdoc/ud15/viewInfo', async route => {
       await new Promise(r => setTimeout(r, 3000));
       await route.continue();
     });
     await insertTestData();
     await navigateToPage(page);
-    await ss(page, 'page display', '41');
+    await ss(page, 'page display', '45');
     await $input(page).fill(TEST_SERIE + ' ' + TEST_CHNR);
     // 快速点击多个按钮
     await $btnViewInfo(page).click();
@@ -755,7 +859,7 @@ test.describe('UD15 Vin Plate', () => {
     await page.unroute('**/api/v1/hdoc/ud15/viewInfo');
     await cleanupTestData();
     await page.waitForTimeout(1000);
-    await ss(page, 'multiple buttons', '41');
+    await ss(page, 'multiple buttons', '45');
   });
 
 });

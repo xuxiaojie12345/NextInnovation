@@ -4,7 +4,7 @@
  * 测试式样书: tests/测试式样书/テスト式样書UD12.md (v1.0)
  * 测试前提: 前后端均已启动，使用真实 API（无 Mock）
  * 截图保存: tests/test/Image/UD12/
- * 测试用例数: 37
+ * 测试用例数: 44
  * 执行模式: serial（串行执行）
  */
 
@@ -21,6 +21,7 @@ const ss = createScreenshot('UD12');
 const $container          = (p: Page) => p.locator('.udt-container');
 const $err                = (p: Page) => p.locator('.udt-error');
 const $successMsg         = (p: Page) => p.locator('.udt-success');
+const $uploadTitle        = (p: Page) => p.locator('.udt-header h1');
 const $sectionTitle       = (p: Page) => p.locator('.udt-section-title');
 const $notice             = (p: Page) => p.locator('.udt-notice');
 const $linkArea           = (p: Page) => p.locator('.udt-link-area');
@@ -35,6 +36,13 @@ const $btnUpload          = (p: Page) => p.locator('.udt-section').first().locat
 const $deleteMarketSelect = (p: Page) => p.locator('.udt-section').last().locator('.udt-select').first();
 const $templateSelect     = (p: Page) => p.locator('.udt-section').last().locator('.udt-select').last();
 const $btnDelete          = (p: Page) => p.locator('.udt-section').last().locator('button').filter({ hasText: 'Delete' });
+
+// Ant Design Modal
+const $modal             = (p: Page) => p.locator('.ant-modal-confirm');
+const $modalTitle        = (p: Page) => p.locator('.ant-modal-confirm-title');
+const $modalContent      = (p: Page) => p.locator('.ant-modal-confirm-content');
+const $modalOkBtn        = (p: Page) => p.locator('.ant-modal-confirm-btns .ant-btn-primary');
+const $modalCancelBtn    = (p: Page) => p.locator('.ant-modal-confirm-btns .ant-btn:not(.ant-btn-primary)');
 
 // ============================================================
 // 导航辅助函数
@@ -58,8 +66,8 @@ test.describe('UD12 Upload Delete Template', () => {
     await navigateToPage(page);
     await ss(page, 'page display', '01');
     await expect($container(page)).toBeVisible();
-    await expect($sectionTitle(page).first()).toBeVisible();
-    await expect($sectionTitle(page).last()).toBeVisible();
+    await expect($uploadTitle(page)).toBeVisible();
+    await expect($sectionTitle(page)).toBeVisible();
     await expect($linkArea(page)).toBeVisible();
     await ss(page, 'layout', '01');
   });
@@ -67,7 +75,7 @@ test.describe('UD12 Upload Delete Template', () => {
   test('02 - Upload area controls', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'page display', '02');
-    await expect($sectionTitle(page).first()).toContainText('HDoc Template Upload');
+    await expect($uploadTitle(page)).toContainText('HDoc Template Upload');
     await expect($fileInput(page)).toBeVisible();
     await expect($uploadMarketSelect(page)).toBeVisible();
     const mktVal = await $uploadMarketSelect(page).inputValue();
@@ -81,7 +89,7 @@ test.describe('UD12 Upload Delete Template', () => {
   test('03 - Delete area controls', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'page display', '03');
-    await expect($sectionTitle(page).last()).toContainText('HDoc Template Delete/Archive');
+    await expect($sectionTitle(page)).toContainText('HDoc Template Delete/Archive');
     await expect($deleteMarketSelect(page)).toBeVisible();
     const mktVal = await $deleteMarketSelect(page).inputValue();
     expect(mktVal).toBe('');
@@ -361,7 +369,7 @@ test.describe('UD12 Upload Delete Template', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 500, message: 'File upload failed. Please try again.' }),
+        body: JSON.stringify({ code: 400, message: 'File upload failed. Please try again.' }),
       });
     });
     await navigateToPage(page);
@@ -461,15 +469,13 @@ test.describe('UD12 Upload Delete Template', () => {
       const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
       if (firstTpl) {
         await $templateSelect(page).selectOption(firstTpl);
-        let dialogMsg = '';
-        page.on('dialog', dialog => {
-          dialogMsg = dialog.message();
-          dialog.dismiss();
-        });
+        // Ant Design Modal.confirm，非浏览器原生 dialog
         await $btnDelete(page).click();
-        await page.waitForTimeout(500);
-        console.log('  Dialog: ' + dialogMsg);
-        expect(dialogMsg).toContain('Do you really want to delete template?');
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        const modalContent = await $modalContent(page).textContent();
+        console.log('  Dialog: ' + modalContent);
+        expect(modalContent).toContain('Do you really want to delete template?');
+        await $modalCancelBtn(page).click();
       }
     }
     await ss(page, 'delete confirm', '26');
@@ -492,8 +498,10 @@ test.describe('UD12 Upload Delete Template', () => {
       const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
       if (firstTpl) {
         await $templateSelect(page).selectOption(firstTpl);
-        page.on('dialog', dialog => dialog.accept());
+        // Ant Design Modal.confirm 点击确定
         await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
         await page.waitForTimeout(1500);
       }
     }
@@ -507,7 +515,7 @@ test.describe('UD12 Upload Delete Template', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 500, message: 'File deletion failed. Please try again.' }),
+        body: JSON.stringify({ code: 400, message: 'File deletion failed. Please try again.' }),
       });
     });
     await navigateToPage(page);
@@ -519,8 +527,10 @@ test.describe('UD12 Upload Delete Template', () => {
       const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
       if (firstTpl) {
         await $templateSelect(page).selectOption(firstTpl);
-        page.on('dialog', dialog => dialog.accept());
+        // Ant Design Modal.confirm 点击确定
         await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
         await page.waitForTimeout(1500);
       }
     }
@@ -544,8 +554,10 @@ test.describe('UD12 Upload Delete Template', () => {
       const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
       if (firstTpl) {
         await $templateSelect(page).selectOption(firstTpl);
-        page.on('dialog', dialog => dialog.accept());
+        // Ant Design Modal.confirm 点击确定
         await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
         try {
           await expect($btnDelete(page)).toBeDisabled({ timeout: 2000 });
         } catch {
@@ -572,8 +584,10 @@ test.describe('UD12 Upload Delete Template', () => {
       const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
       if (firstTpl) {
         await $templateSelect(page).selectOption(firstTpl);
-        page.on('dialog', dialog => dialog.accept());
+        // Ant Design Modal.confirm 点击确定
         await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
         await expect($btnDelete(page)).toBeDisabled({ timeout: 2000 });
       }
     }
@@ -599,7 +613,7 @@ test.describe('UD12 Upload Delete Template', () => {
   });
 
   // -----------------------------------------------------------
-  // 异常处理 (TC32~33)
+  // 异常处理 (TC32~37)
   // -----------------------------------------------------------
 
   test('32 - Market load failure', async ({ page }) => {
@@ -631,26 +645,146 @@ test.describe('UD12 Upload Delete Template', () => {
     await ss(page, 'upload network error', '33');
   });
 
-  // -----------------------------------------------------------
-  // 消息显示 (TC34)
-  // -----------------------------------------------------------
-
-  test('34 - Error and Success message style', async ({ page }) => {
+  test('34 - Upload 500 server error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/template/upload', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'Internal Server Error' }),
+      });
+    });
     await navigateToPage(page);
     await ss(page, 'page display', '34');
+    const fc = page.waitForEvent('filechooser');
+    await $fileInput(page).click();
+    const chooser = await fc;
+    await chooser.setFiles({ name: 'test_template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
+    const firstOpt = await $uploadMarketSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+    if (firstOpt) await $uploadMarketSelect(page).selectOption(firstOpt);
+    await $btnUpload(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/template/upload');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await expect($btnUpload(page)).toBeEnabled();
+    await ss(page, 'upload 500 error', '34');
+  });
+
+  test('35 - Delete 500 server error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/template/delete', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'Internal Server Error' }),
+      });
+    });
+    await navigateToPage(page);
+    await ss(page, 'page display', '35');
+    const firstOpt = await $deleteMarketSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+    if (firstOpt) {
+      await $deleteMarketSelect(page).selectOption(firstOpt);
+      await page.waitForTimeout(1500);
+      const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+      if (firstTpl) {
+        await $templateSelect(page).selectOption(firstTpl);
+        // Ant Design Modal.confirm 点击确定
+        await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
+        await page.waitForTimeout(2000);
+      }
+    }
+    await page.unroute('**/api/v1/hdoc/template/delete');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await expect($btnDelete(page)).toBeEnabled();
+    await ss(page, 'delete 500 error', '35');
+  });
+
+  test('36 - Upload 401 auth error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/template/upload', async route => {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 401, message: 'Unauthorized' }),
+      });
+    });
+    await navigateToPage(page);
+    await ss(page, 'page display', '36');
+    const fc = page.waitForEvent('filechooser');
+    await $fileInput(page).click();
+    const chooser = await fc;
+    await chooser.setFiles({ name: 'test_template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
+    const firstOpt = await $uploadMarketSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+    if (firstOpt) await $uploadMarketSelect(page).selectOption(firstOpt);
+    await $btnUpload(page).click();
+    await page.waitForTimeout(2000);
+    await page.unroute('**/api/v1/hdoc/template/upload');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await expect($btnUpload(page)).toBeEnabled();
+    await ss(page, 'upload 401 error', '36');
+  });
+
+  test('37 - Delete 401 auth error', async ({ page }) => {
+    await page.route('**/api/v1/hdoc/template/delete', async route => {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 401, message: 'Unauthorized' }),
+      });
+    });
+    await navigateToPage(page);
+    await ss(page, 'page display', '37');
+    const firstOpt = await $deleteMarketSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+    if (firstOpt) {
+      await $deleteMarketSelect(page).selectOption(firstOpt);
+      await page.waitForTimeout(1500);
+      const firstTpl = await $templateSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+      if (firstTpl) {
+        await $templateSelect(page).selectOption(firstTpl);
+        // Ant Design Modal.confirm 点击确定
+        await $btnDelete(page).click();
+        await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+        await $modalOkBtn(page).click();
+        await page.waitForTimeout(2000);
+      }
+    }
+    await page.unroute('**/api/v1/hdoc/template/delete');
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toContainText('System error. Please contact administrator.');
+    await expect($btnDelete(page)).toBeEnabled();
+    await ss(page, 'delete 401 error', '37');
+  });
+
+  // -----------------------------------------------------------
+  // 消息显示 (TC38~39)
+  // -----------------------------------------------------------
+
+  test('38 - Error message display', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'page display', '38');
     // 触发错误消息
     await $btnUpload(page).click();
     await expect($err(page)).toBeVisible();
+    await expect($err(page)).toHaveText('NO FILE UPLOADED');
     const errColor = await $err(page).evaluate(el => getComputedStyle(el).color);
     console.log('  Error color: ' + errColor);
-    // 触发成功消息（通过 route 拦截）
+    // 确认错误消息为红色，成功消息不显示
+    await expect($successMsg(page)).not.toBeVisible();
+    await ss(page, 'error message', '38');
+  });
+
+  test('39 - Success message display', async ({ page }) => {
     await page.route('**/api/v1/hdoc/template/upload', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 200, message: 'Success' }),
+        body: JSON.stringify({ code: 200, message: 'TEMPLATE test_template.rtf WAS SUCCESSFULLY UPLOADED TO MARKET JPN' }),
       });
     });
+    await navigateToPage(page);
+    await ss(page, 'page display', '39');
     const fc = page.waitForEvent('filechooser');
     await $fileInput(page).click();
     const chooser = await fc;
@@ -661,16 +795,19 @@ test.describe('UD12 Upload Delete Template', () => {
     await page.waitForTimeout(1500);
     await page.unroute('**/api/v1/hdoc/template/upload');
     await expect($successMsg(page)).toBeVisible({ timeout: 10000 });
+    await expect($successMsg(page)).toContainText('TEMPLATE test_template.rtf WAS SUCCESSFULLY UPLOADED TO MARKET');
     const sucColor = await $successMsg(page).evaluate(el => getComputedStyle(el).color);
     console.log('  Success color: ' + sucColor);
-    await ss(page, 'message styles', '34');
+    // 确认成功消息为绿色，错误消息不显示
+    await expect($err(page)).not.toBeVisible();
+    await ss(page, 'success message', '39');
   });
 
   // -----------------------------------------------------------
-  // 安全性 (TC35~37)
+  // 安全性 (TC40~42)
   // -----------------------------------------------------------
 
-  test('35 - Unauthenticated access', async ({ page }) => {
+  test('40 - Unauthenticated access', async ({ page }) => {
     await page.goto(PAGE_URL, { waitUntil: 'load' });
     await page.evaluate(() => {
       localStorage.removeItem('token');
@@ -682,12 +819,12 @@ test.describe('UD12 Upload Delete Template', () => {
     const url = page.url();
     console.log('  Current URL: ' + url);
     if (url.includes('/login')) console.log('  Redirected to login');
-    await ss(page, 'unauthenticated', '35');
+    await ss(page, 'unauthenticated', '40');
   });
 
-  test('36 - Path traversal protection', async ({ page }) => {
+  test('41 - Path traversal protection', async ({ page }) => {
     await navigateToPage(page);
-    await ss(page, 'page display', '36');
+    await ss(page, 'page display', '41');
     // selectOption 只能选择 option 中存在的值，../ 不在列表中
     // 使用 evaluate 直接注入路径遍历值模拟攻击
     await $uploadMarketSelect(page).evaluate(el => {
@@ -703,20 +840,65 @@ test.describe('UD12 Upload Delete Template', () => {
     await page.waitForTimeout(500);
     const val = await $uploadMarketSelect(page).inputValue();
     console.log('  Selected market: ' + val);
-    await ss(page, 'path traversal', '36');
+    await ss(page, 'path traversal', '41');
   });
 
-  test('37 - File type restriction', async ({ page }) => {
+  test('42 - File type restriction', async ({ page }) => {
     // 前端没有文件类型限制，检查后端是否能正确处理
     await navigateToPage(page);
-    await ss(page, 'page display', '37');
+    await ss(page, 'page display', '42');
     const fc = page.waitForEvent('filechooser');
     await $fileInput(page).click();
     const chooser = await fc;
     await chooser.setFiles({ name: 'malicious.exe', mimeType: 'application/octet-stream', buffer: Buffer.from('bad') });
     const fileName = await $fileInput(page).evaluate(el => (el as HTMLInputElement).files?.[0]?.name);
     console.log('  Selected file: ' + fileName);
-    await ss(page, 'file type', '37');
+    await ss(page, 'file type', '42');
+  });
+
+  // -----------------------------------------------------------
+  // 字段校验 (TC43~44)
+  // -----------------------------------------------------------
+
+  test('43 - Market option allowed chars and max length', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'page display', '43');
+    // 获取所有非空 Market option 值
+    const optionValues = await $uploadMarketSelect(page).locator('option:not([value=""])').evaluateAll(
+      opts => opts.map(opt => (opt as HTMLOptionElement).value)
+    );
+    console.log('  Market values: ' + optionValues.join(', '));
+    expect(optionValues.length).toBeGreaterThan(0);
+    // 验证每个 Market 值：半角英字，不超过3字符
+    for (const val of optionValues) {
+      expect(val).toMatch(/^[A-Za-z0-9-]+$/);
+      expect(val.length).toBeLessThanOrEqual(3);
+    }
+    await ss(page, 'market constraints', '43');
+  });
+
+  test('44 - Template filename allowed chars', async ({ page }) => {
+    await navigateToPage(page);
+    await ss(page, 'page display', '44');
+    const firstOpt = await $deleteMarketSelect(page).locator('option:not([value=""])').first().getAttribute('value');
+    if (firstOpt) {
+      await $deleteMarketSelect(page).selectOption(firstOpt);
+      await page.waitForTimeout(1500);
+      // 获取所有非空 Template option 值（文件名）
+      const templateValues = await $templateSelect(page).locator('option:not([value=""])').evaluateAll(
+        opts => opts.map(opt => (opt as HTMLOptionElement).value)
+      );
+      console.log('  Template values: ' + templateValues.join(', '));
+      if (templateValues.length > 0) {
+        for (const val of templateValues) {
+          // 文件名仅包含半角英字、数字、点、下划线、连字符
+          expect(val).toMatch(/^[A-Za-z0-9._-]+$/);
+        }
+      } else {
+        console.log('  No templates found for this market');
+      }
+    }
+    await ss(page, 'template constraints', '44');
   });
 
 });

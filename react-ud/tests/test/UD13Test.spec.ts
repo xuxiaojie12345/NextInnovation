@@ -25,7 +25,11 @@ const $form         = (p: Page) => p.locator('.htc-form');
 const $formTable    = (p: Page) => p.locator('.htc-form-table');
 const $label        = (p: Page) => p.locator('.htc-label');
 const $fileInput    = (p: Page) => p.locator('.htc-value input[type="file"]');
-const $btnCheck     = (p: Page) => p.locator('.htc-btn-row .btn');
+const $btnCheck     = (p: Page) => p.locator('.btn-tr .btn');
+
+// Ant Design Modal
+const $modalContent  = (p: Page) => p.locator('.ant-modal-confirm-content');
+const $modalOkBtn    = (p: Page) => p.locator('.ant-modal-confirm-btns .ant-btn-primary');
 
 // ============================================================
 // 导航辅助函数
@@ -161,17 +165,15 @@ test.describe('UD13 HDoc Template Check', () => {
   test('09 - Check without file', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'page display', '09');
-    // 注册 dialog 事件监听
-    let dialogMsg = '';
-    page.on('dialog', dialog => {
-      dialogMsg = dialog.message();
-      dialog.accept();
-    });
+    // Ant Design Modal.info，非浏览器原生 dialog
     await $btnCheck(page).click();
-    await page.waitForTimeout(500);
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    const modalText = await $modalContent(page).textContent();
+    console.log('  Modal message: ' + modalText);
+    expect(modalText).toContain('功能尚未实现');
+    await $modalOkBtn(page).click();
+    await expect($modalContent(page)).not.toBeVisible();
     await ss(page, 'check clicked', '09');
-    console.log('  Dialog message: ' + dialogMsg);
-    expect(dialogMsg).toContain('机能未实装');
   });
 
   test('10 - Check with file selected', async ({ page }) => {
@@ -188,16 +190,14 @@ test.describe('UD13 HDoc Template Check', () => {
     });
     await ss(page, 'file selected', '10');
     // 点击 Check
-    let dialogMsg = '';
-    page.on('dialog', dialog => {
-      dialogMsg = dialog.message();
-      dialog.accept();
-    });
     await $btnCheck(page).click();
-    await page.waitForTimeout(500);
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    const modalText = await $modalContent(page).textContent();
+    console.log('  Modal message: ' + modalText);
+    expect(modalText).toContain('功能尚未实现');
+    await $modalOkBtn(page).click();
+    await expect($modalContent(page)).not.toBeVisible();
     await ss(page, 'check with file', '10');
-    console.log('  Dialog message: ' + dialogMsg);
-    expect(dialogMsg).toContain('机能未实装');
   });
 
   test('11 - Prevent duplicate submit', async ({ page }) => {
@@ -213,23 +213,21 @@ test.describe('UD13 HDoc Template Check', () => {
       buffer: Buffer.from('test'),
     });
     await ss(page, 'file selected', '11');
-    // 连续点击多次
-    let dialogCount = 0;
-    page.on('dialog', dialog => {
-      dialogCount++;
-      dialog.accept();
-    });
+    // 连续点击多次，每次应弹出 Modal
     await $btnCheck(page).click();
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    await $modalOkBtn(page).click();
     await page.waitForTimeout(200);
     await $btnCheck(page).click();
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    await $modalOkBtn(page).click();
     await page.waitForTimeout(200);
     await $btnCheck(page).click();
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    await $modalOkBtn(page).click();
     await page.waitForTimeout(500);
     await ss(page, 'multiple clicks', '11');
-    console.log('  Dialog triggered count: ' + dialogCount);
-    // 机能未实装，每次点击都会触发 alert
-    expect(dialogCount).toBeGreaterThanOrEqual(3);
-    expect(dialogCount).toBe(3);
+    console.log('  All 3 clicks succeeded');
   });
 
   // -----------------------------------------------------------
@@ -281,17 +279,6 @@ test.describe('UD13 HDoc Template Check', () => {
   test('14 - XSS protection in filename', async ({ page }) => {
     await navigateToPage(page);
     await ss(page, 'page display', '14');
-    // 注册 dialog 监听，确认 XSS 未执行
-    let alertTriggered = false;
-    page.on('dialog', dialog => {
-      const msg = dialog.message();
-      console.log('  Dialog: ' + msg);
-      // XSS 的 alert(1) 不应触发，只允许 "机能未实装"
-      if (msg.includes('alert')) {
-        alertTriggered = true;
-      }
-      dialog.accept();
-    });
     // 选择文件名包含 XSS 代码的文件
     const fc = page.waitForEvent('filechooser');
     await $fileInput(page).click();
@@ -304,12 +291,17 @@ test.describe('UD13 HDoc Template Check', () => {
     await ss(page, 'xss file selected', '14');
     const fileName = await $fileInput(page).evaluate(el => (el as HTMLInputElement).files?.[0]?.name || '');
     console.log('  Selected file name: ' + fileName);
-    // XSS 代码不应执行
-    expect(alertTriggered).toBe(false);
-    // 点击 Check 按钮（应弹出 "机能未实装" 而非 XSS 的 alert）
+    // XSS 文件名被正确显示为文本
+    expect(fileName).toContain('<script>');
+    // 点击 Check 按钮，确认 Modal 内容中不包含可执行的 XSS
     await $btnCheck(page).click();
-    await page.waitForTimeout(500);
-    expect(alertTriggered).toBe(false);
+    await expect($modalContent(page)).toBeVisible({ timeout: 5000 });
+    const modalText = await $modalContent(page).textContent();
+    console.log('  Modal content: ' + modalText);
+    expect(modalText).toContain('功能尚未实现');
+    // modalText 是 textContent，不会包含可执行脚本
+    expect(modalText).not.toContain('alert(1)');
+    await $modalOkBtn(page).click();
     await ss(page, 'xss not executed', '14');
   });
 

@@ -5,7 +5,7 @@
  * 测试前提: 前后端均已启动，使用真实 API（无 Mock）
  * 数据库验证: 通过 SQL 查询确认数据
  * 截图保存: tests/test/Image/UD11/
- * 测试用例数: 36
+ * 测试用例数: 38
  * 执行模式: serial（串行执行）
  */
 
@@ -84,14 +84,14 @@ async function cleanTestData(variable: string) {
 const $container    = (p: Page) => p.locator('.ehvr-container');
 const $header       = (p: Page) => p.locator('.ehvr-header h1');
 const $err          = (p: Page) => p.locator('.ehvr-error');
-const $loading      = (p: Page) => p.locator('.ehvr-empty p');
-const $emptyMsg     = (p: Page) => p.locator('.ehvr-empty');
-const $count        = (p: Page) => p.locator('.ehvr-count');
-const $btnSelect    = (p: Page) => p.locator('.ehvr-btn-cell button').filter({ hasText: /^Select$/ });
-const $btnDown      = (p: Page) => p.locator('.ehvr-btn-cell button').filter({ hasText: /^Down$/ });
-const $btnBack      = (p: Page) => p.locator('.ehvr-btn-cell button').filter({ hasText: /^Back$/ });
-const $btnPrint     = (p: Page) => p.locator('.ehvr-btn-cell button').filter({ hasText: /^Print$/ });
-const $btnExcel     = (p: Page) => p.locator('.ehvr-btn-cell button').filter({ hasText: /^Excel$/ });
+const $loading      = (p: Page) => p.locator('.empty-placeholder');
+const $emptyMsg     = (p: Page) => p.locator('.empty-placeholder');
+const $count        = (p: Page) => p.locator('.result-count');
+const $btnSelect    = (p: Page) => p.locator('.btn-cell button').filter({ hasText: /^Select$/ });
+const $btnDown      = (p: Page) => p.locator('.btn-cell button').filter({ hasText: /^Down$/ });
+const $btnBack      = (p: Page) => p.locator('.btn-cell button').filter({ hasText: /^Back$/ });
+const $btnPrint     = (p: Page) => p.locator('.btn-cell button').filter({ hasText: /^Print$/ });
+const $btnExcel     = (p: Page) => p.locator('.btn-cell button').filter({ hasText: /^Excel$/ });
 const $table        = (p: Page) => p.locator('.ehvr-table');
 const $tableRows    = (p: Page) => p.locator('.ehvr-table tbody tr');
 const $thHeader     = (p: Page, col: number) => p.locator('.ehvr-table thead th').nth(col);
@@ -476,7 +476,7 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
   });
 
   // -----------------------------------------------------------
-  // Print按钮点击事件 (TC24)
+  // Print按钮点击事件 (TC24~25)
   // -----------------------------------------------------------
 
   test('24 - Print button triggers browser print', async ({ page }) => {
@@ -492,36 +492,74 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
     await cleanMultipleTestData();
   });
 
-  // -----------------------------------------------------------
-  // Excel按钮点击事件 (TC25~26)
-  // -----------------------------------------------------------
-
-  test('25 - Excel CSV export with data', async ({ page }) => {
+  test('25 - Print button failure (browser blocked)', async ({ page }) => {
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
     await ss(page, 'page display', '25');
-    await $btnExcel(page).click();
+    // 模拟 window.print 被覆盖（浏览器不支持）
+    await page.evaluate(() => { window.print = () => { throw new Error('Print blocked'); }; });
+    let printError = false;
+    page.on('pageerror', () => { printError = true; });
+    await $btnPrint(page).click();
     await page.waitForTimeout(1000);
-    await ss(page, 'excel export', '25');
+    console.log('  Print error occurred: ' + printError);
+    // 系统不应崩溃
+    await expect($container(page)).toBeVisible();
+    await ss(page, 'print failure', '25');
     await cleanMultipleTestData();
   });
 
-  test('26 - Excel CSV export no data', async ({ page }) => {
-    await navigateToResultList(page, 'NONEXIST_VAR');
+  // -----------------------------------------------------------
+  // Excel按钮点击事件 (TC26~28)
+  // -----------------------------------------------------------
+
+  test('26 - Excel CSV export with data', async ({ page }) => {
+    await insertMultipleTestData();
+    await navigateToResultList(page, 'UD11_VAR_A');
     await ss(page, 'page display', '26');
     await $btnExcel(page).click();
     await page.waitForTimeout(1000);
-    await ss(page, 'excel no data', '26');
+    await ss(page, 'excel export', '26');
+    await cleanMultipleTestData();
+  });
+
+  test('27 - Excel CSV export no data', async ({ page }) => {
+    await navigateToResultList(page, 'NONEXIST_VAR');
+    await ss(page, 'page display', '27');
+    await $btnExcel(page).click();
+    await page.waitForTimeout(1000);
+    await ss(page, 'excel no data', '27');
+  });
+
+  test('28 - Excel CSV export failure (API error)', async ({ page }) => {
+    await insertMultipleTestData();
+    await page.route('**/api/v1/hdoc/variables/export', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: 'CSV导出失败，请联系管理员' }),
+      });
+    });
+    await navigateToResultList(page, 'UD11_VAR_A');
+    await ss(page, 'page display', '28');
+    await $btnExcel(page).click();
+    await page.waitForTimeout(1000);
+    await page.unroute('**/api/v1/hdoc/variables/export');
+    if (await $err(page).isVisible().catch(() => false)) {
+      console.log('  Error: ' + (await $err(page).textContent()));
+    }
+    await ss(page, 'excel failure', '28');
+    await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // Created by user链接点击 (TC27)
+  // Created by user链接点击 (TC29)
   // -----------------------------------------------------------
 
-  test('27 - Created by user link navigates to EDB User View', async ({ page }) => {
+  test('29 - Created by user link navigates to EDB User View', async ({ page }) => {
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
-    await ss(page, 'page display', '27');
+    await ss(page, 'page display', '29');
     await expect($linkUser(page, 0)).toBeVisible();
     const userText = await $linkUser(page, 0).textContent();
     console.log('  Link text: ' + userText);
@@ -531,15 +569,15 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
     const url = page.url();
     console.log('  Navigated to: ' + url);
     expect(url).toContain('edb-user-view');
-    await ss(page, 'link navigation', '27');
+    await ss(page, 'link navigation', '29');
     await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // 异常处理 (TC28~30)
+  // 异常处理 (TC30~32)
   // -----------------------------------------------------------
 
-  test('28 - Load results failure', async ({ page }) => {
+  test('30 - Load results failure', async ({ page }) => {
     await page.route('**/api/v1/hdoc/variables/search', async route => {
       await route.fulfill({
         status: 200,
@@ -549,59 +587,59 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
     });
     await navigateToResultList(page, 'UD11_VAR_A');
     await page.unroute('**/api/v1/hdoc/variables/search');
-    await ss(page, 'page display', '28');
+    await ss(page, 'page display', '30');
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     await expect($err(page)).toContainText('Failed to fetch results.');
-    await ss(page, 'load failure', '28');
+    await ss(page, 'load failure', '30');
   });
 
-  test('29 - Network error', async ({ page }) => {
+  test('31 - Network error', async ({ page }) => {
     await page.route('**/api/v1/hdoc/variables/search', route => route.abort());
     await navigateToResultList(page, 'TEST');
     await page.unroute('**/api/v1/hdoc/variables/search');
-    await ss(page, 'page display', '29');
+    await ss(page, 'page display', '31');
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     await expect($err(page)).toContainText('System error. Please contact administrator.');
-    await ss(page, 'network error', '29');
+    await ss(page, 'network error', '31');
   });
 
-  test('30 - API timeout', async ({ page }) => {
+  test('32 - API timeout', async ({ page }) => {
     await page.route('**/api/v1/hdoc/variables/search', async route => {
       await new Promise(r => setTimeout(r, 15000));
       await route.continue();
     });
     await navigateToResultList(page, 'TEST');
     await page.unroute('**/api/v1/hdoc/variables/search');
-    await ss(page, 'page display', '30');
+    await ss(page, 'page display', '32');
     if (await $err(page).isVisible().catch(() => false)) {
       await expect($err(page)).toContainText('System error. Please contact administrator.');
     } else {
       console.log('  API may have completed after timeout');
     }
-    await ss(page, 'API timeout', '30');
+    await ss(page, 'API timeout', '32');
   });
 
   // -----------------------------------------------------------
-  // 消息显示 (TC31~32)
+  // 消息显示 (TC33~34)
   // -----------------------------------------------------------
 
-  test('31 - Error message color', async ({ page }) => {
+  test('33 - Error message color', async ({ page }) => {
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
-    await ss(page, 'page display', '31');
+    await ss(page, 'page display', '33');
     await $btnSelect(page).click();
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Please select a record first.');
     const color = await $err(page).evaluate(el => getComputedStyle(el).color);
     console.log('  Error color: ' + color);
-    await ss(page, 'error style', '31');
+    await ss(page, 'error style', '33');
     await cleanMultipleTestData();
   });
 
-  test('32 - Error message overwrite on new action', async ({ page }) => {
+  test('34 - Error message overwrite on new action', async ({ page }) => {
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
-    await ss(page, 'page display', '32');
+    await ss(page, 'page display', '34');
     await $btnSelect(page).click();
     await expect($err(page)).toBeVisible();
     const msg1 = await $err(page).textContent();
@@ -609,15 +647,15 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
     await expect($err(page)).toBeVisible();
     const msg2 = await $err(page).textContent();
     console.log('  Msg1: ' + msg1 + ', Msg2: ' + msg2);
-    await ss(page, 'message overwrite', '32');
+    await ss(page, 'message overwrite', '34');
     await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // 安全性 (TC33~36)
+  // 安全性 (TC35~38)
   // -----------------------------------------------------------
 
-  test('33 - Unauthenticated access', async ({ page }) => {
+  test('35 - Unauthenticated access', async ({ page }) => {
     await page.goto(PAGE_URL, { waitUntil: 'load' });
     await page.evaluate(() => {
       localStorage.removeItem('token');
@@ -629,43 +667,43 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
     const url = page.url();
     console.log('  Current URL: ' + url);
     if (url.includes('/login')) console.log('  Redirected to login');
-    await ss(page, 'unauthenticated', '33');
+    await ss(page, 'unauthenticated', '35');
   });
 
-  test('34 - SQL injection protection', async ({ page }) => {
+  test('36 - SQL injection protection', async ({ page }) => {
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
-    await ss(page, 'page display', '34');
+    await ss(page, 'page display', '36');
     await expect($container(page)).toBeVisible();
     if (await $err(page).isVisible().catch(() => false)) {
       const errText = await $err(page).textContent();
       expect(errText).not.toContain('SQL');
       expect(errText).not.toContain('syntax');
     }
-    await ss(page, 'SQL injection', '34');
+    await ss(page, 'SQL injection', '36');
     await cleanMultipleTestData();
   });
 
-  test('35 - XSS protection', async ({ page }) => {
+  test('37 - XSS protection', async ({ page }) => {
     let dialogCount = 0;
     page.on('dialog', () => { dialogCount++; });
     await insertMultipleTestData();
     await navigateToResultList(page, 'UD11_VAR_A');
-    await ss(page, 'page display', '35');
+    await ss(page, 'page display', '37');
     await expect($container(page)).toBeVisible();
     expect(dialogCount).toBe(0);
     console.log('  Dialog count: ' + dialogCount);
-    await ss(page, 'XSS protection', '35');
+    await ss(page, 'XSS protection', '37');
     await cleanMultipleTestData();
   });
 
-  test('36 - XSS in search results', async ({ page }) => {
+  test('38 - XSS in search results', async ({ page }) => {
     let dialogCount = 0;
     page.on('dialog', () => { dialogCount++; });
     // 插入含 XSS 的测试数据
     await insertTestData('<script>alert(1)</script>', 'VDA', 'XSS test');
     await navigateToResultList(page, '<script>alert(1)</script>');
-    await ss(page, 'page display', '36');
+    await ss(page, 'page display', '38');
     // XSS 代码不应执行
     expect(dialogCount).toBe(0);
     console.log('  Dialog count: ' + dialogCount);
@@ -673,7 +711,7 @@ test.describe('UD11 Existing HDoc Variables Result List', () => {
       const displayVar = await $cell(page, 0, 1).textContent();
       console.log('  Displayed Variable: ' + displayVar);
     }
-    await ss(page, 'XSS search result', '36');
+    await ss(page, 'XSS search result', '38');
     await cleanTestData('<script>alert(1)</script>');
   });
 

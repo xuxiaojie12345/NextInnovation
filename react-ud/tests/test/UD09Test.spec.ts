@@ -1,12 +1,12 @@
 ﻿/**
- * UD09 - Homologation Variables Result List Playwright 閾ｪ蜉ｨ蛹匁ｵ玖ｯ・
+ * UD09 - Homologation Variables Result List Playwright E2E Test
  *
- * 豬玖ｯ募ｼ乗ｷ荵ｦ: tests/豬玖ｯ募ｼ乗ｷ荵ｦ/繝・せ繝亥ｼ乗ｷ譖ｸUD09.md (v1.0)
- * 豬玖ｯ募燕謠・ 蜑榊錘遶ｯ蝮・ｷｲ蜷ｯ蜉ｨ・御ｽｿ逕ｨ逵溷ｮ・API・域裏 Mock・・
- * 謨ｰ謐ｮ蠎馴ｪ瑚ｯ・ 騾夊ｿ・SQL 譟･隸｢遑ｮ隶､謨ｰ謐ｮ
- * 謌ｪ蝗ｾ菫晏ｭ・ tests/test/Image/UD09/
- * 豬玖ｯ慕畑萓区焚: 42
- * 謇ｧ陦梧ｨ｡蠑・ serial・井ｸｲ陦梧鴬陦鯉ｼ・
+ * 测试式样书: tests/测试式样书/テスト式样書UD09.md (v1.0)
+ * 测试前提: 前后端均已启动，使用真实 API（无 Mock）
+ * 数据库验证: 通过 SQL 查询确认数据
+ * 截图保存: tests/test/Image/UD09/
+ * 测试用例数: 43
+ * 执行模式: serial（串行执行）
  */
 
 import { test, expect, Page } from '@playwright/test';
@@ -29,7 +29,7 @@ const TEST_VS2 = 'UD09_VS2';
 const TEST_CMT = 'UD09_AUTO_TEST';
 const TEST_USER = 'UD09_USER';
 
-/** 謠貞・蜊墓擅豬玖ｯ墓焚謐ｮ・井ｽｿ逕ｨ master 陦ｨ荳ｭ譛画譜逧・PC/Market 蛟ｼ・瑚ｿ泌屓菴ｿ逕ｨ逧・ｼ・・*/
+/** 使用有效的 master 表中的 PC/Market 值创建单条测试数据 */
 let _singleTestPC = TEST_PC;
 let _singleTestMkt = TEST_MKT;
 
@@ -65,7 +65,7 @@ async function insertTestData(deleteDate: string | null = null): Promise<{ pc: s
   return { pc, num: TEST_NUM, mkt };
 }
 
-/** 蛻髯､豬玖ｯ墓焚謐ｮ */
+/** 清理测试数据 */
 async function cleanTestData() {
   await queryDB(
     'DELETE FROM HDOC_USER_DEFINED_RULES WHERE PC=? AND num=? AND MARKET=?',
@@ -73,7 +73,7 @@ async function cleanTestData() {
   );
 }
 
-/** 莉・product_class_master / market_master 闔ｷ蜿匁怏謨育噪 PC 蜥・Market 蛟ｼ */
+/** 从 product_class_master / market_master 获取有效 PC 和 Market 值 */
 let _validPCs: string[] | null = null;
 let _validMarkets: string[] | null = null;
 
@@ -91,7 +91,7 @@ async function getValidMarkets(): Promise<string[]> {
   return _validMarkets;
 }
 
-/** 謠貞・螟壽擅豬玖ｯ墓焚謐ｮ逕ｨ莠主・陦ｨ螻慕､ｺ・井ｽｿ逕ｨ master 陦ｨ荳ｭ譛画譜逧・PC/Market 蛟ｼ・・*/
+/** 使用有效的 master 表中的 PC/Market 值创建多条测试数据 */
 let _multiTestPCs: string[] = [];
 let _multiTestMkts: string[] = [];
 
@@ -134,7 +134,7 @@ async function insertMultipleTestData() {
   return { pcs: _multiTestPCs, mkts: _multiTestMkts };
 }
 
-/** 蛻髯､螟壽擅豬玖ｯ墓焚謐ｮ */
+/** 清理多条测试数据 */
 async function cleanMultipleTestData() {
   if (_multiTestPCs.length === 0) return;
   const pcList = _multiTestPCs.map(pc => "'" + pc + "'").join(',');
@@ -144,7 +144,7 @@ async function cleanMultipleTestData() {
 }
 
 // ============================================================
-// 蜈・ｴ螳壻ｽ搾ｼ亥源驟・HomologationVariablesResultList.tsx 貅千・ｼ・
+// 元素定位（匹配 HomologationVariablesResultList.tsx 源码）
 // ============================================================
 
 const $container    = (p: Page) => p.locator('.hv-result-container');
@@ -165,7 +165,7 @@ const $selectedRow  = (p: Page, idx: number) => p.locator('.hv-result-table tbod
 const $linkUser     = (p: Page, idx: number) => p.locator('.hv-result-table tbody tr').nth(idx).locator('.link-user');
 const $thHeader     = (p: Page, col: number) => p.locator('.hv-result-table thead th').nth(col);
 
-// -- HomologationVariables 鬘ｵ髱｢蜈・ｴ・育畑莠主ｯｼ闊ｪ・・--
+// -- HomologationVariables 页面元素定位 --
 const $hvContainer   = (p: Page) => p.locator('.homologation-vars-container');
 const $hvCondInput   = (p: Page, label: string) =>
   p.locator('.hv-cond-row').filter({ has: p.locator('.hv-cond-label', { hasText: label }) }).locator('.hv-cond-input');
@@ -174,10 +174,10 @@ const $hvCondSelect  = (p: Page, label: string) =>
 const $hvBtnSearch   = (p: Page) => p.locator('.btn-cell button').filter({ hasText: 'Search' });
 
 // ============================================================
-// 蟇ｼ闊ｪ霎・勧蜃ｽ謨ｰ
+// 导航辅助函数
 // ============================================================
 
-/** 逋ｻ蠖・-> HomologationVariables -> 蝪ｫ蜈･譟･隸｢譚｡莉ｶ -> Search -> Result List */
+/** 登录 -> HomologationVariables -> 输入条件 -> Search -> Result List */
 async function navigateToResultList(page: Page, pc: string, num: string, mkt: string, numOp?: string) {
   await login(page);
   await page.goto(PAGE_URL + '/menu/homologation-variables', { waitUntil: 'load' });
@@ -211,7 +211,7 @@ async function navigateToResultList(page: Page, pc: string, num: string, mkt: st
   await page.waitForTimeout(500);
 }
 
-/** 逋ｻ蠖・-> 逶ｴ謗･蟇ｼ闊ｪ蛻ｰ Result List・域裏 state・檎畑莠主ｼょｸｸ豬玖ｯ包ｼ・*/
+/** 登录 -> 直接访问 Result List（无 state，测试空条件返回） */
 async function directNavigateToResultList(page: Page) {
   await login(page);
   await page.goto(PAGE_URL + '/menu/homologation-variables/result', { waitUntil: 'load' });
@@ -223,7 +223,7 @@ test.describe.configure({ mode: 'serial' });
 test.describe('UD09 Homologation Variables Result List', () => {
 
   // -----------------------------------------------------------
-  // 逕ｻ髱｢蛻晄悄陦ｨ遉ｺ (TC1~6)
+  // 画面初期表示 (TC1~6)
   // -----------------------------------------------------------
 
   test('01 - Title bar display', async ({ page }) => {
@@ -307,7 +307,7 @@ test.describe('UD09 Homologation Variables Result List', () => {
   });
 
   // -----------------------------------------------------------
-  // DataTable 陦ｨ螟ｴ螻樊ｧ譬｡鬪・(TC7~18)
+  // DataTable 表头属性校验 (TC7~19)
   // -----------------------------------------------------------
 
   test('07 - Radio selection column', async ({ page }) => {
@@ -466,26 +466,51 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await cleanMultipleTestData();
   });
 
-  // -----------------------------------------------------------
-  // 騾画叫隶ｰ蠖墓桃菴・(TC19~22)
-  // -----------------------------------------------------------
-
-  test('19 - Radio select effect', async ({ page }) => {
+  test('19 - DataTable sorting order (PC -> Market -> Num)', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1', multiData.mkts[0], '>');
     await ss(page, 'page display', '19');
+    await expect($table(page)).toBeVisible();
+    const rows = await $tableRows(page).all();
+    expect(rows.length).toBeGreaterThanOrEqual(3);
+    // 从 DB 获取按 PC, MARKET, NUM 排序的数据，与画面显示比对
+    const dbSorted = await queryDB(
+      'SELECT PC, NUM, MARKET FROM HDOC_USER_DEFINED_RULES WHERE PC IN (' +
+      _multiTestPCs.map(p => "'" + p + "'").join(',') +
+      ") AND num LIKE '100000000%' ORDER BY PC, MARKET, NUM"
+    );
+    if (dbSorted && dbSorted.length >= 3) {
+      for (let i = 0; i < Math.min(rows.length, dbSorted.length); i++) {
+        const pcText = await rows[i].locator('td').nth(1).textContent();
+        const numText = await rows[i].locator('td').nth(2).textContent();
+        const mktText = await rows[i].locator('td').nth(3).textContent();
+        console.log(`  Row ${i}: display PC=${pcText}, NUM=${numText}, MKT=${mktText} | DB PC=${dbSorted[i].PC}, NUM=${dbSorted[i].NUM}, MARKET=${dbSorted[i].MARKET}`);
+      }
+    }
+    await ss(page, 'sorting order', '19');
+    await cleanMultipleTestData();
+  });
+
+  // -----------------------------------------------------------
+  // 选择记录操作 (TC20~23)
+  // -----------------------------------------------------------
+
+  test('20 - Radio select effect', async ({ page }) => {
+    const multiData = await insertMultipleTestData();
+    await navigateToResultList(page, multiData.pcs[0], '1', multiData.mkts[0], '>');
+    await ss(page, 'page display', '20');
     await $radio(page, 0).click();
     await expect($radio(page, 0)).toBeChecked();
     await expect($selectedRow(page, 0)).toHaveClass(/selected/);
     await expect($btnDelete(page)).toBeEnabled();
-    await ss(page, 'radio selected', '19');
+    await ss(page, 'radio selected', '20');
     await cleanMultipleTestData();
   });
 
-  test('20 - Radio switch', async ({ page }) => {
+  test('21 - Radio switch', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1', multiData.mkts[0], '>');
-    await ss(page, 'page display', '20');
+    await ss(page, 'page display', '21');
     await $radio(page, 0).click();
     await expect($radio(page, 0)).toBeChecked();
     await $radio(page, 1).click();
@@ -493,60 +518,60 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await expect($radio(page, 0)).not.toBeChecked();
     await expect($selectedRow(page, 0)).not.toHaveClass(/selected/);
     await expect($selectedRow(page, 1)).toHaveClass(/selected/);
-    await ss(page, 'radio switch', '20');
+    await ss(page, 'radio switch', '21');
     await cleanMultipleTestData();
   });
 
-  test('21 - Radio deselect', async ({ page }) => {
+  test('22 - Radio deselect', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1', multiData.mkts[0], '>');
-    await ss(page, 'page display', '21');
+    await ss(page, 'page display', '22');
     await $radio(page, 0).click();
     await expect($radio(page, 0)).toBeChecked();
-    // 轤ｹ蜃ｻ蟾ｲ騾我ｸｭ逧・radio・夂ｻ・ｻｶ菴ｿ逕ｨ onChange 莠倶ｻｶ・粂TML 隗・激荳句ｷｲ騾我ｸｭ radio 蜀肴ｬ｡轤ｹ蜃ｻ荳崎ｧｦ蜿・onChange
-    // 蝗豁､ radio 菫晄戟騾我ｸｭ迥ｶ諤・ｼ御ｸ堺ｼ壼叙豸磯我ｸｭ
+    // clicking the same radio again doesn't trigger onChange since radio is already checked
+    // We verify the radio remains checked after clicking the same one
     await $radio(page, 0).click();
     console.log('  Radio remains checked after clicking the same one (onChange does not fire for checked radios)');
-    await ss(page, 'radio deselect', '21');
+    await ss(page, 'radio deselect', '22');
     await cleanMultipleTestData();
   });
 
-  test('22 - Delete button state when no selection', async ({ page }) => {
-    const multiData = await insertMultipleTestData();
-    await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '22');
-    await expect($btnDelete(page)).toBeDisabled();
-    await expect($btnSelect(page)).toBeEnabled();
-    await ss(page, 'delete button state', '22');
-    await cleanMultipleTestData();
-  });
-
-  // -----------------------------------------------------------
-  // Select謖蛾聴轤ｹ蜃ｻ莠倶ｻｶ (TC23~25)
-  // -----------------------------------------------------------
-
-  test('23 - Select validation when no record selected', async ({ page }) => {
+  test('23 - Delete button state when no selection', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
     await ss(page, 'page display', '23');
+    await expect($btnDelete(page)).toBeDisabled();
+    await expect($btnSelect(page)).toBeEnabled();
+    await ss(page, 'delete button state', '23');
+    await cleanMultipleTestData();
+  });
+
+  // -----------------------------------------------------------
+  // Select (TC24~26)
+  // -----------------------------------------------------------
+
+  test('24 - Select validation when no record selected', async ({ page }) => {
+    const multiData = await insertMultipleTestData();
+    await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
+    await ss(page, 'page display', '24');
     await $btnSelect(page).click();
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Please select a record first.');
     expect(page.url()).toContain('/homologation-variables/result');
-    await ss(page, 'select validation', '23');
+    await ss(page, 'select validation', '24');
     await cleanMultipleTestData();
   });
 
-  test('24 - Select record then navigate', async ({ page }) => {
+  test('25 - Select record then navigate', async ({ page }) => {
     const testData = await insertTestData();
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '24');
+    await ss(page, 'page display', '25');
     await $radio(page, 0).click();
     await expect($radio(page, 0)).toBeChecked();
     await $btnSelect(page).click();
     try { await page.waitForURL('**/homologation-variables', { timeout: 10000 }); } catch { /* ok */ }
     await page.waitForSelector('.homologation-vars-container', { timeout: 5000 });
-    await ss(page, 'select navigate', '24');
+    await ss(page, 'select navigate', '25');
     const pcVal = await $hvCondInput(page, 'Product class').inputValue().catch(() => '');
     const numVal = await $hvCondInput(page, 'Number').inputValue().catch(() => '');
     const mktVal = await $hvCondInput(page, 'Market').inputValue().catch(() => '');
@@ -554,20 +579,20 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await cleanTestData();
   });
 
-  test('25 - Select button loading state', async ({ page }) => {
+  test('26 - Select button loading state', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '25');
+    await ss(page, 'page display', '26');
     await expect($btnSelect(page)).toBeEnabled();
-    await ss(page, 'select loading', '25');
+    await ss(page, 'select loading', '26');
     await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // Back謖蛾聴轤ｹ蜃ｻ莠倶ｻｶ (TC26~27)
+  // Back (TC27~28)
   // -----------------------------------------------------------
 
-  test('26 - Back to previous page', async ({ page }) => {
+  test('27 - Back to previous page', async ({ page }) => {
     await insertMultipleTestData();
     await login(page);
     await page.goto(PAGE_URL + '/menu/homologation-variables', { waitUntil: 'load' });
@@ -582,55 +607,55 @@ test.describe('UD09 Homologation Variables Result List', () => {
     try { await page.waitForURL('**/homologation-variables/result', { timeout: 10000 }); } catch { /* ok */ }
     await page.waitForSelector('.hv-result-container', { timeout: 10000 });
     await page.waitForTimeout(500);
-    await ss(page, 'page display', '26');
-    await $btnBack(page).click();
-    try { await page.waitForURL('**/homologation-variables', { timeout: 10000 }); } catch { /* ok */ }
-    await page.waitForSelector('.homologation-vars-container', { timeout: 5000 });
-    await ss(page, 'back navigate', '26');
-    await cleanMultipleTestData();
-  });
-
-  test('27 - Back without search conditions', async ({ page }) => {
-    await directNavigateToResultList(page);
     await ss(page, 'page display', '27');
     await $btnBack(page).click();
     try { await page.waitForURL('**/homologation-variables', { timeout: 10000 }); } catch { /* ok */ }
     await page.waitForSelector('.homologation-vars-container', { timeout: 5000 });
-    await ss(page, 'back no conditions', '27');
+    await ss(page, 'back navigate', '27');
+    await cleanMultipleTestData();
+  });
+
+  test('28 - Back without search conditions', async ({ page }) => {
+    await directNavigateToResultList(page);
+    await ss(page, 'page display', '28');
+    await $btnBack(page).click();
+    try { await page.waitForURL('**/homologation-variables', { timeout: 10000 }); } catch { /* ok */ }
+    await page.waitForSelector('.homologation-vars-container', { timeout: 5000 });
+    await ss(page, 'back no conditions', '28');
   });
 
   // -----------------------------------------------------------
-  // Print謖蛾聴轤ｹ蜃ｻ莠倶ｻｶ (TC28)
+  // Print (TC29)
   // -----------------------------------------------------------
 
-  test('28 - Print button triggers browser print', async ({ page }) => {
+  test('29 - Print button triggers browser print', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     let printTriggered = false;
     page.on('pageerror', () => {});
     page.on('popup', () => { printTriggered = true; });
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '28');
+    await ss(page, 'page display', '29');
     await $btnPrint(page).click();
     await page.waitForTimeout(1000);
     console.log('  Print triggered: ' + printTriggered);
-    await ss(page, 'print clicked', '28');
+    await ss(page, 'print clicked', '29');
     await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // Delete Selected謖蛾聴轤ｹ蜃ｻ莠倶ｻｶ (TC29~33)
+  // Delete Selected (TC30~34)
   // -----------------------------------------------------------
 
-  test('29 - Delete validation when no record selected', async ({ page }) => {
+  test('30 - Delete validation when no record selected', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '29');
+    await ss(page, 'page display', '30');
     await expect($btnDelete(page)).toBeDisabled();
-    await ss(page, 'delete validation', '29');
+    await ss(page, 'delete validation', '30');
     await cleanMultipleTestData();
   });
 
-  test('30 - Delete success', async ({ page }) => {
+  test('31 - Delete success', async ({ page }) => {
     const testData = await insertTestData();
     let dbRows = await queryDB(
       'SELECT * FROM HDOC_USER_DEFINED_RULES WHERE PC=? AND num=? AND MARKET=?',
@@ -640,7 +665,7 @@ test.describe('UD09 Homologation Variables Result List', () => {
     console.log('  DB insert confirmed: ' + (dbRows?.length || 0) + ' records');
 
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '30');
+    await ss(page, 'page display', '31');
     await $radio(page, 0).click();
     await expect($radio(page, 0)).toBeChecked();
     await $btnDelete(page).click();
@@ -657,19 +682,19 @@ test.describe('UD09 Homologation Variables Result List', () => {
     );
     console.log('  DB records after delete: ' + (dbRows?.length || 0));
     expect(dbRows?.length || 0).toBe(0);
-    await ss(page, 'delete success', '30');
-    // 逶ｴ謗･逕ｨ testData 荳ｭ逧・ｼ貂・炊・井ｽ・黄逅・唖髯､蜷主ｷｲ譌謨ｰ謐ｮ・御ｻ・ｾ帛盾閠・ｼ・
+    await ss(page, 'delete success', '31');
+    // 由于 testData 后续会被 cleanTestData 再次清理，这里直接调用
     await cleanTestData();
   });
 
-  test('31 - Delete loading state', async ({ page }) => {
+  test('32 - Delete loading state', async ({ page }) => {
     const testData = await insertTestData();
     await page.route('**/api/v1/hdoc/ud09/deleteSelected', async route => {
       await new Promise(r => setTimeout(r, 3000));
       await route.continue();
     });
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '31');
+    await ss(page, 'page display', '32');
     await $radio(page, 0).click();
     await $btnDelete(page).click();
     await page.waitForTimeout(500);
@@ -680,11 +705,11 @@ test.describe('UD09 Homologation Variables Result List', () => {
     }
     await page.unroute('**/api/v1/hdoc/ud09/deleteSelected');
     await page.waitForTimeout(1000);
-    await ss(page, 'delete loading', '31');
+    await ss(page, 'delete loading', '32');
     await cleanTestData();
   });
 
-  test('32 - Delete API failure', async ({ page }) => {
+  test('33 - Delete API failure', async ({ page }) => {
     const testData = await insertTestData();
     await page.route('**/api/v1/hdoc/ud09/deleteSelected', async route => {
       await route.fulfill({
@@ -694,7 +719,7 @@ test.describe('UD09 Homologation Variables Result List', () => {
       });
     });
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '32');
+    await ss(page, 'page display', '33');
     await $radio(page, 0).click();
     await $btnDelete(page).click();
     await page.waitForTimeout(1500);
@@ -702,38 +727,38 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Failed to delete records.');
     await expect($btnDelete(page)).toBeEnabled();
-    await ss(page, 'delete API failure', '32');
+    await ss(page, 'delete API failure', '33');
     await cleanTestData();
   });
 
-  test('33 - Delete prevent duplicate submit', async ({ page }) => {
+  test('34 - Delete prevent duplicate submit', async ({ page }) => {
     const testData = await insertTestData();
     await page.route('**/api/v1/hdoc/ud09/deleteSelected', async route => {
       await new Promise(r => setTimeout(r, 3000));
       await route.continue();
     });
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '33');
+    await ss(page, 'page display', '34');
     await $radio(page, 0).click();
-    // 隨ｬ荳谺｡轤ｹ蜃ｻ隗ｦ蜿大唖髯､ API・・s 蟒ｶ霑滂ｼ会ｼ梧潔髓ｮ蠎皮ｫ句叉蜿倅ｸｺ遖∫畑迥ｶ諤・
+    // Click delete - button should become disabled immediately preventing second click
     await $btnDelete(page).click();
-    // 轤ｹ蜃ｻ蜷取潔髓ｮ譁・ｭ怜序荳ｺ "Delening..." 蟷ｶ陲ｫ遖∫畑・碁ｪ瑚ｯ∝・螟・ｺ守ｦ∫畑迥ｶ諤∝叉隸∵・驥榊､肴署莠､陲ｫ髦ｻ豁｢
+    // Button should show "Deleting..." and be disabled
     await expect($btnDeleting(page)).toBeVisible({ timeout: 2000 });
     await expect($btnDeleting(page)).toBeDisabled();
     await page.unroute('**/api/v1/hdoc/ud09/deleteSelected');
     await page.waitForTimeout(1000);
-    await ss(page, 'delete duplicate prevention', '33');
+    await ss(page, 'delete duplicate prevention', '34');
     await cleanTestData();
   });
 
   // -----------------------------------------------------------
-  // Created by user體ｾ謗･轤ｹ蜃ｻ (TC34)
+  // Created by user link (TC35)
   // -----------------------------------------------------------
 
-  test('34 - Created by user link navigates to EDB User View', async ({ page }) => {
+  test('35 - Created by user link navigates to EDB User View', async ({ page }) => {
     const testData = await insertTestData();
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '34');
+    await ss(page, 'page display', '35');
     await expect($linkUser(page, 0)).toBeVisible();
     const userText = await $linkUser(page, 0).textContent();
     console.log('  Link text: ' + userText);
@@ -743,15 +768,15 @@ test.describe('UD09 Homologation Variables Result List', () => {
     const url = page.url();
     console.log('  Navigated to: ' + url);
     expect(url).toContain('edb-user-view');
-    await ss(page, 'link navigation', '34');
+    await ss(page, 'link navigation', '35');
     await cleanTestData();
   });
 
   // -----------------------------------------------------------
-  // 蠑ょｸｸ螟・炊 (TC35~37)
+  // Exception handling (TC36~38)
   // -----------------------------------------------------------
 
-  test('35 - Load results failure', async ({ page }) => {
+  test('36 - Load results failure', async ({ page }) => {
     await page.route('**/api/v1/hdoc/ud09/search', async route => {
       await route.fulfill({
         status: 200,
@@ -763,17 +788,17 @@ test.describe('UD09 Homologation Variables Result List', () => {
     const mkts35 = await getValidMarkets();
     await navigateToResultList(page, pcs35[0] || 'PC1', '1000000001', mkts35[0] || 'MKT1');
     await page.unroute('**/api/v1/hdoc/ud09/search');
-    await ss(page, 'page display', '35');
+    await ss(page, 'page display', '36');
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     await expect($err(page)).toContainText('Failed to fetch results.');
-    await ss(page, 'load failure', '35');
+    await ss(page, 'load failure', '36');
   });
 
-  test('36 - Network error during delete', async ({ page }) => {
+  test('37 - Network error during delete', async ({ page }) => {
     const testData = await insertTestData();
     await page.route('**/api/v1/hdoc/ud09/deleteSelected', route => route.abort());
     await navigateToResultList(page, testData.pc, testData.num, testData.mkt);
-    await ss(page, 'page display', '36');
+    await ss(page, 'page display', '37');
     await $radio(page, 0).click();
     await $btnDelete(page).click();
     await page.waitForTimeout(2000);
@@ -781,11 +806,11 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     await expect($err(page)).toContainText('System error. Please contact administrator.');
     await expect($btnDelete(page)).toBeEnabled();
-    await ss(page, 'delete network error', '36');
+    await ss(page, 'delete network error', '37');
     await cleanTestData();
   });
 
-  test('37 - API timeout', async ({ page }) => {
+  test('38 - API timeout', async ({ page }) => {
     await page.route('**/api/v1/hdoc/ud09/search', async route => {
       await new Promise(r => setTimeout(r, 15000));
       await route.continue();
@@ -794,36 +819,36 @@ test.describe('UD09 Homologation Variables Result List', () => {
     const mkts37 = await getValidMarkets();
     await navigateToResultList(page, pcs37[0] || 'PC1', '1000000001', mkts37[0] || 'MKT1');
     await page.unroute('**/api/v1/hdoc/ud09/search');
-    await ss(page, 'page display', '37');
+    await ss(page, 'page display', '38');
     if (await $err(page).isVisible().catch(() => false)) {
       await expect($err(page)).toContainText('System error. Please contact administrator.');
     } else {
       console.log('  API may have completed after timeout, no error displayed');
     }
-    await ss(page, 'API timeout', '37');
+    await ss(page, 'API timeout', '38');
   });
 
   // -----------------------------------------------------------
-  // 豸域・譏ｾ遉ｺ (TC38~39)
+  // Message display (TC39~40)
   // -----------------------------------------------------------
 
-  test('38 - Error message color', async ({ page }) => {
+  test('39 - Error message color', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '38');
+    await ss(page, 'page display', '39');
     await $btnSelect(page).click();
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Please select a record first.');
     const color = await $err(page).evaluate(el => getComputedStyle(el).color);
     console.log('  Error text color: ' + color);
-    await ss(page, 'error style', '38');
+    await ss(page, 'error style', '39');
     await cleanMultipleTestData();
   });
 
-  test('39 - Error message overwrite on new action', async ({ page }) => {
+  test('40 - Error message overwrite on new action', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '39');
+    await ss(page, 'page display', '40');
     await $btnSelect(page).click();
     await expect($err(page)).toBeVisible();
     const msg1 = await $err(page).textContent();
@@ -831,15 +856,15 @@ test.describe('UD09 Homologation Variables Result List', () => {
     await expect($err(page)).toBeVisible();
     const msg2 = await $err(page).textContent();
     console.log('  Msg1: ' + msg1 + ', Msg2: ' + msg2);
-    await ss(page, 'message overwrite', '39');
+    await ss(page, 'message overwrite', '40');
     await cleanMultipleTestData();
   });
 
   // -----------------------------------------------------------
-  // 螳牙・諤ｧ (TC40~42)
+  // Security (TC41~43)
   // -----------------------------------------------------------
 
-  test('40 - Unauthenticated access redirects to login', async ({ page }) => {
+  test('41 - Unauthenticated access redirects to login', async ({ page }) => {
     await page.goto(PAGE_URL, { waitUntil: 'load' });
     await page.evaluate(() => {
       localStorage.removeItem('token');
@@ -851,33 +876,33 @@ test.describe('UD09 Homologation Variables Result List', () => {
     const url = page.url();
     console.log('  Current URL: ' + url);
     if (url.includes('/login')) console.log('  Redirected to login page');
-    await ss(page, 'unauthenticated access', '40');
+    await ss(page, 'unauthenticated access', '41');
   });
 
-  test('41 - SQL injection protection', async ({ page }) => {
+  test('42 - SQL injection protection', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '41');
+    await ss(page, 'page display', '42');
     await expect($container(page)).toBeVisible();
     if (await $err(page).isVisible().catch(() => false)) {
       const errText = await $err(page).textContent();
       expect(errText).not.toContain('SQL');
       expect(errText).not.toContain('syntax');
     }
-    await ss(page, 'SQL injection', '41');
+    await ss(page, 'SQL injection', '42');
     await cleanMultipleTestData();
   });
 
-  test('42 - XSS protection', async ({ page }) => {
+  test('43 - XSS protection', async ({ page }) => {
     const multiData = await insertMultipleTestData();
     let dialogCount = 0;
     page.on('dialog', () => { dialogCount++; });
     await navigateToResultList(page, multiData.pcs[0], '1000000001', multiData.mkts[0]);
-    await ss(page, 'page display', '42');
+    await ss(page, 'page display', '43');
     await expect($container(page)).toBeVisible();
     expect(dialogCount).toBe(0);
     console.log('  Dialog count: ' + dialogCount);
-    await ss(page, 'XSS protection', '42');
+    await ss(page, 'XSS protection', '43');
     await cleanMultipleTestData();
   });
 

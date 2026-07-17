@@ -74,6 +74,7 @@ const AdCaChange: React.FC = () => {
         chnr,
         act: "Y",
         bu: "UD",
+        reason: desc.trim(),
         updateUser,
       });
 
@@ -163,6 +164,8 @@ const AdCaChange: React.FC = () => {
         } else {
           setMessage("Record not found.");
         }
+      } else if (res.code === 500 || res.code === 401) {
+        setMessage("System error. Please contact administrator.");
       } else {
         setMessage("Record not found.");
       }
