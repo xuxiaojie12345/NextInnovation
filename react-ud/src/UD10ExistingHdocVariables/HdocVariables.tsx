@@ -102,7 +102,19 @@ const HdocVariables: React.FC = () => {
       if (loggedInUser) {
         // 使用登录的用户 ID
         const now = new Date();
-        const dateTime = now.toISOString().slice(0, 19).replace("T", " ");
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        const dateTime =
+          now.getFullYear() +
+          "-" +
+          pad(now.getMonth() + 1) +
+          "-" +
+          pad(now.getDate()) +
+          " " +
+          pad(now.getHours()) +
+          ":" +
+          pad(now.getMinutes()) +
+          ":" +
+          pad(now.getSeconds());
 
         setFormData((prev) => ({
           ...prev,

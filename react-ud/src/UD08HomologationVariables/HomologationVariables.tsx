@@ -216,7 +216,19 @@ const HomologationVariables: React.FC = () => {
       if (loggedInUser) {
         // 使用登录的用户 ID
         const now = new Date();
-        const dateTime = now.toISOString().slice(0, 19).replace("T", " ");
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        const dateTime =
+          now.getFullYear() +
+          "-" +
+          pad(now.getMonth() + 1) +
+          "-" +
+          pad(now.getDate()) +
+          " " +
+          pad(now.getHours()) +
+          ":" +
+          pad(now.getMinutes()) +
+          ":" +
+          pad(now.getSeconds());
 
         setFormData((prev) => ({
           ...prev,
@@ -247,7 +259,19 @@ const HomologationVariables: React.FC = () => {
     } catch (error) {
       // 如果获取失败，使用默认值（只填充 Created by user 和 Date）
       const now = new Date();
-      const dateTime = now.toISOString().slice(0, 19).replace("T", " ");
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const dateTime =
+        now.getFullYear() +
+        "-" +
+        pad(now.getMonth() + 1) +
+        "-" +
+        pad(now.getDate()) +
+        " " +
+        pad(now.getHours()) +
+        ":" +
+        pad(now.getMinutes()) +
+        ":" +
+        pad(now.getSeconds());
 
       setFormData((prev) => ({
         ...prev,
