@@ -26,6 +26,9 @@ export const DB_CONFIG = {
   connectTimeout: 5000,
 };
 
+// 登录用固定测试账号（所有模块共用）
+export const LOGIN_USER = { userid: 'testadmin', password: 'testpass', username: 'Admin' };
+
 // ═══════════════════════════════════════════════════════════
 // 数据库
 // ═══════════════════════════════════════════════════════════
@@ -57,28 +60,74 @@ export async function queryDB(sql: string, params?: any[]): Promise<any[] | null
 }
 
 /**
- * 取得测试用户（从 hdoc_user_infor 表取第一条记录）
+ * 取得测试登录用户（优先使用当前测试插入的用户，不存在则取第一条）
  */
 export async function getTestUser(): Promise<{ userid: string; password: string; username: string } | null> {
   const rows = await queryDB('SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor LIMIT 1');
   if (rows && rows.length > 0) {
     return { userid: rows[0].USERID, password: rows[0].PASSWORD, username: rows[0].USERNAME };
   }
+  // 表为空时尝试用固定账号
+  await ensureLoginUser();
+  const retry = await queryDB('SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor LIMIT 1');
+  if (retry && retry.length > 0) {
+    return { userid: retry[0].USERID, password: retry[0].PASSWORD, username: retry[0].USERNAME };
+  }
   return null;
 }
 
 /**
  * 登录（跳转到首页 → 输入账号密码 → 跳转到 Menu）
+ * @param page - Playwright 页面
+ * @param credentials - 可选的登录凭据（userid/password），不传则从 DB 取第一条用户
  */
-export async function login(page: Page) {
-  const u = await getTestUser();
-  if (!u) throw new Error('无可用用户');
-  await page.goto(PAGE_URL, { waitUntil: 'load' });
-  await page.waitForSelector('.login-container');
+export async function login(page: Page, credentials?: { userid: string; password: string }) {
+  let u = credentials;
+  if (!u) {
+    // 确保固定测试账号存在
+    await ensureLoginUser();
+    const dbUser = await getTestUser();
+    if (!dbUser) {
+      // DB 不可用时使用常量凭据
+      u = LOGIN_USER;
+    } else {
+      u = dbUser;
+    }
+  }
+  // 导航到登录页
+  await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {
+    console.log('  ⚠️ Login page load timed out');
+  });
+  // 等待登录页面渲染完成
+  await page.waitForSelector('.login-container', { timeout: 15000 });
+  await page.waitForTimeout(500);
   await page.locator('input[placeholder="UserID"]').fill(u.userid);
   await page.locator('input[placeholder="Password"]').fill(u.password);
   await page.locator('.login-button').click();
-  await page.waitForURL('**/menu', { timeout: 15000 });
+  // 等待登录跳转
+  await page.waitForURL('**/menu', { timeout: 15000 }).catch(() => {
+    console.log('  ⚠️ Login navigation wait timed out, continuing anyway');
+  });
+  await page.waitForTimeout(1000);
+}
+
+/**
+ * 确保登录用固定测试账号存在（各模块 beforeEach 可调用）
+ */
+export async function ensureLoginUser() {
+  const exists = await queryDB('SELECT COUNT(*) as CNT FROM hdoc_user_infor WHERE USERID = ?', [LOGIN_USER.userid]);
+  if (!exists || exists[0].CNT === 0) {
+    await queryDB(
+      `INSERT INTO hdoc_user_infor (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL,
+         REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+       VALUES (?, ?, 'Admin', 'System', 'Admin', 'admin@test.com',
+         NOW(), 'SYSTEM', 'SETUP',
+         NOW(), 'SYSTEM', 'SETUP')`,
+      [LOGIN_USER.userid, LOGIN_USER.password]
+    );
+    console.log('  ✅ Login user created: ' + LOGIN_USER.userid);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════

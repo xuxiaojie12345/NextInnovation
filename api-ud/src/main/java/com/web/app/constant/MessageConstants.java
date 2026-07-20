@@ -55,6 +55,7 @@ public final class MessageConstants {
   public static final String FAILED_TO_ADD_VARIABLE = "Failed to add variable.";
   public static final String FAILED_TO_ADD_RULE = "Failed to add rule.";
   public static final String FAILED_TO_INSERT_ADCA = "Failed to insert ADCA change record.";
+  public static final String FAILED_TO_UPDATE_ADCA = "更新失败";
   public static final String VARIABLES_UPDATED_SUCCESS = "Variables updated successfully.";
 
   // ═══════════════════════════════════════════

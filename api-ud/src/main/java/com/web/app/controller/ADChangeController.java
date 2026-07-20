@@ -85,6 +85,9 @@ public class ADChangeController extends BaseController {
       String chnr = request.get("chnr");
       String updateUser = request.get("updateUser");
       int updateCount = adChangeService.updateAllActToN(serie, chnr, updateUser);
+      if (updateCount == 0) {
+        return notFound(MessageConstants.FAILED_TO_UPDATE_ADCA);
+      }
       Map<String, Object> data = new HashMap<>();
       data.put("updateCount", String.valueOf(updateCount));
       data.put("updateContent", MessageConstants.ACT_STATUS_UPDATED);
