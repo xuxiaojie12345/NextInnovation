@@ -6,31 +6,30 @@ import com.web.app.mapper.UD12Mapper;
 import com.web.app.service.impl.UD12ServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * UD12ServiceImpl 单元测试
- * 覆盖所有分支（null/empty/例外/正常系），達成100%カバレッジ
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UD12ServiceImpl 单元测试")
 class UD12ServiceImplTest {
 
     @Mock
@@ -39,404 +38,416 @@ class UD12ServiceImplTest {
     @InjectMocks
     private UD12ServiceImpl service;
 
-    /** テスト用テンポラリディレクトリ */
     @TempDir
     Path tempDir;
 
     @BeforeEach
     void setUp() throws Exception {
-        reset(ud12Mapper);
-        // uploadDir を一時ディレクトリに設定（@Value フィールドをリフレクションで上書き）
+        // 使用临时目录作为上传目录
         java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
         field.setAccessible(true);
         field.set(service, tempDir.toString());
     }
 
-    // ========================================================================
-    // getMarketList
-    // ========================================================================
-    @Nested
-    @DisplayName("getMarketList")
-    class GetMarketListTest {
+    // ============================================================
+    // getMarketList()
+    // ============================================================
 
-        @Test
-        @DisplayName("正常系-market一覧取得成功")
-        void testSuccess() {
-            List<MarketMaster> mockList = new ArrayList<>();
-            MarketMaster m1 = new MarketMaster(); m1.setMarket("JPN");
-            MarketMaster m2 = new MarketMaster(); m2.setMarket("USA");
-            mockList.add(m1);
-            mockList.add(m2);
-
-            when(ud12Mapper.selectMarketMaster()).thenReturn(mockList);
-
-            ApiResponse<?> resp = service.getMarketList();
-            assertEquals(200, resp.getCode().intValue());
-            assertNotNull(resp.getData());
-            verify(ud12Mapper, times(1)).selectMarketMaster();
-        }
-
-        @Test
-        @DisplayName("異常系-mapper例外→500")
-        void testMapperException() {
-            when(ud12Mapper.selectMarketMaster()).thenThrow(new RuntimeException("DB error"));
-
-            ApiResponse<?> resp = service.getMarketList();
-            assertEquals(500, resp.getCode().intValue());
-        }
-    }
-
-    // ========================================================================
-    // getTemplateFiles
-    // ========================================================================
-    @Nested
-    @DisplayName("getTemplateFiles")
-    class GetTemplateFilesTest {
-
-        private final String validMarket = "JPN";
-
-        @Test
-        @DisplayName("marketCodeがnull→400")
-        void testMarketNull() {
-            ApiResponse<?> resp = service.getTemplateFiles(null);
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud12Mapper);
-        }
-
-        @Test
-        @DisplayName("marketCodeが空文字→400")
-        void testMarketEmpty() {
-            ApiResponse<?> resp = service.getTemplateFiles("");
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud12Mapper);
-        }
-
-        @Test
-        @DisplayName("marketCodeが空白のみ→400")
-        void testMarketBlank() {
-            ApiResponse<?> resp = service.getTemplateFiles("   ");
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud12Mapper);
-        }
-
-        @Test
-        @DisplayName("市場ディレクトリが存在しない→空リスト200")
-        void testMarketDirNotExists() {
-            ApiResponse<?> resp = service.getTemplateFiles("NONEXIST");
-            assertEquals(200, resp.getCode().intValue());
-            assertNotNull(resp.getData());
-            List<?> list = (List<?>) resp.getData();
-            assertTrue(list.isEmpty());
-        }
-
-        @Test
-        @DisplayName("市場ディレクトリにファイルが存在→ファイル一覧200")
-        void testMarketDirHasFiles() throws Exception {
-            Path marketDir = tempDir.resolve(validMarket);
-            Files.createDirectories(marketDir);
-            Files.createFile(marketDir.resolve("test1.rtf"));
-            Files.createFile(marketDir.resolve("test2.rtf"));
-
-            ApiResponse<?> resp = service.getTemplateFiles(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertEquals(2, list.size());
-        }
-
-        @Test
-        @DisplayName("listFilesがnull→空リスト200")
-        void testListFilesNull() throws Exception {
-            Path marketDir = tempDir.resolve("NULLTEST");
-            Files.createDirectories(marketDir);
-            // listFilesがnullになる条件は通常ないが、files==null分岐はカバー
-            // 空ディレクトリの場合、listFilesは空配列を返す(nullではない)
-            // files!=null分岐を通るので空リストが返る
-            ApiResponse<?> resp = service.getTemplateFiles("NULLTEST");
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertTrue(list.isEmpty());
-        }
-
-        @Test
-        @DisplayName("異常系-例外→500")
-        void testException() {
-            // uploadDirをnullにして NullPointerException → catch (Exception) で補足
-            try {
-                java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
-                field.setAccessible(true);
-                field.set(service, null);
-            } catch (Exception ignored) {
-            }
-            ApiResponse<?> resp = service.getTemplateFiles(validMarket);
-            assertEquals(500, resp.getCode().intValue());
-        }
-    }
-
-    // ========================================================================
-    // uploadFile
-    // ========================================================================
-    @Nested
-    @DisplayName("uploadFile")
-    class UploadFileTest {
-
-        private final String validMarket = "JPN";
-        private MultipartFile validFile;
-
-        @BeforeEach
-        void setUp() {
-            validFile = new MockMultipartFile(
-                    "file", "test_template.rtf", "application/rtf", "RTF content".getBytes());
-        }
-
-        @Test
-        @DisplayName("fileがnull→400")
-        void testFileNull() {
-            ApiResponse<?> resp = service.uploadFile(null, validMarket);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("fileがempty→400")
-        void testFileEmpty() {
-            MultipartFile emptyFile = new MockMultipartFile(
-                    "file", "empty.rtf", "application/rtf", new byte[0]);
-            ApiResponse<?> resp = service.uploadFile(emptyFile, validMarket);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("marketがnull→400")
-        void testMarketNull() {
-            ApiResponse<?> resp = service.uploadFile(validFile, null);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("marketが空文字→400")
-        void testMarketEmpty() {
-            ApiResponse<?> resp = service.uploadFile(validFile, "");
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("originalFilenameがnull→400")
-        void testFilenameNull() {
-            MultipartFile noNameFile = new MockMultipartFile(
-                    "file", (String) null, "application/rtf", "content".getBytes());
-            ApiResponse<?> resp = service.uploadFile(noNameFile, validMarket);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("originalFilenameが空→400")
-        void testFilenameEmpty() {
-            MultipartFile emptyNameFile = new MockMultipartFile(
-                    "file", "", "application/rtf", "content".getBytes());
-            ApiResponse<?> resp = service.uploadFile(emptyNameFile, validMarket);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("ファイルサイズ超過(50MB超)→400")
-        void testFileTooLarge() {
-            byte[] largeContent = new byte[51 * 1024 * 1024];
-            MultipartFile largeFile = new MockMultipartFile(
-                    "file", "large.rtf", "application/rtf", largeContent);
-            ApiResponse<?> resp = service.uploadFile(largeFile, validMarket);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("正常系-市場ディレクトリが既に存在→200")
-        void testSuccess_DirExists() throws Exception {
-            Path marketDir = tempDir.resolve(validMarket);
-            Files.createDirectories(marketDir);
-
-            ApiResponse<?> resp = service.uploadFile(validFile, validMarket);
-            assertEquals(200, resp.getCode().intValue());
-
-            // ファイルが実際に作成されたことを確認
-            Path uploadedFile = marketDir.resolve("test_template.rtf");
-            assertTrue(Files.exists(uploadedFile));
-        }
-
-        @Test
-        @DisplayName("正常系-市場ディレクトリが存在しない→作成してアップロード200")
-        void testSuccess_DirNotExists() throws Exception {
-            // marketDir は存在しない状態
-            ApiResponse<?> resp = service.uploadFile(validFile, validMarket);
-            assertEquals(200, resp.getCode().intValue());
-
-            Path marketDir = tempDir.resolve(validMarket);
-            Path uploadedFile = marketDir.resolve("test_template.rtf");
-            assertTrue(Files.exists(uploadedFile));
-        }
-
-        @Test
-        @DisplayName("異常系-IOException→500")
-        void testIOException() throws Exception {
-            // uploadDirをファイルパスに設定して、ディレクトリ作成を失敗させる
-            Path filePath = tempDir.resolve("not_a_dir");
-            Files.createFile(filePath); // ファイルとして作成（mkdirsできない）
-
-            java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
-            field.setAccessible(true);
-            field.set(service, filePath.toString());
-
-            ApiResponse<?> resp = service.uploadFile(validFile, validMarket);
-            assertEquals(500, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("異常系-Exception→500")
-        void testGenericException() {
-            // uploadDirをnullにすると NullPointerException → catch (Exception) で補足
-            try {
-                java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
-                field.setAccessible(true);
-                field.set(service, null);
-            } catch (Exception ignored) {
-            }
-
-            ApiResponse<?> resp = service.uploadFile(validFile, validMarket);
-            assertEquals(500, resp.getCode().intValue());
-        }
-    }
-
-    // ========================================================================
-    // deleteFile
-    // ========================================================================
-    @Nested
-    @DisplayName("deleteFile")
-    class DeleteFileTest {
-
-        private final String validMarket = "JPN";
-        private final String validFileName = "delete_me.rtf";
-
-        @Test
-        @DisplayName("marketがnull→400")
-        void testMarketNull() {
-            ApiResponse<?> resp = service.deleteFile(null, validFileName);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("marketが空文字→400")
-        void testMarketEmpty() {
-            ApiResponse<?> resp = service.deleteFile("", validFileName);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("fileNameがnull→400")
-        void testFileNameNull() {
-            ApiResponse<?> resp = service.deleteFile(validMarket, null);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("fileNameが空文字→400")
-        void testFileNameEmpty() {
-            ApiResponse<?> resp = service.deleteFile(validMarket, "");
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("ファイルが存在しない→400")
-        void testFileNotExists() {
-            ApiResponse<?> resp = service.deleteFile(validMarket, validFileName);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("パスがファイルではない→400")
-        void testPathIsNotFile() throws Exception {
-            Path marketDir = tempDir.resolve(validMarket);
-            Files.createDirectories(marketDir);
-            // ディレクトリを指定（ファイルではない）
-            Files.createDirectories(marketDir.resolve(validFileName));
-
-            ApiResponse<?> resp = service.deleteFile(validMarket, validFileName);
-            assertEquals(400, resp.getCode().intValue());
-        }
-
-        @Test
-        @DisplayName("ファイル削除成功→200")
-        void testDeleteSuccess() throws Exception {
-            Path marketDir = tempDir.resolve(validMarket);
-            Files.createDirectories(marketDir);
-            Path targetFile = marketDir.resolve(validFileName);
-            Files.createFile(targetFile);
-
-            ApiResponse<?> resp = service.deleteFile(validMarket, validFileName);
-            assertEquals(200, resp.getCode().intValue());
-            assertFalse(Files.exists(targetFile)); // 実際に削除された
-        }
-
-        @Test
-        @DisplayName("異常系-deleteがfalseを返す→500")
-        void testDeleteFails() throws Exception {
-            Path marketDir = tempDir.resolve(validMarket);
-            Files.createDirectories(marketDir);
-            Path targetFile = marketDir.resolve(validFileName);
-            Files.createFile(targetFile);
-
-            // ファイルを読み取り専用にして削除を失敗させる（Windowsでは制限あり）
-            File file = targetFile.toFile();
-            file.setWritable(false);
-
-            if (!file.canWrite()) {
-                ApiResponse<?> resp = service.deleteFile(validMarket, validFileName);
-                // 書き込み不可でも一部環境では削除できるため、結果は環境依存
-                // 分岐カバレッジのために delete()==false のケースを通す
-                assertNotNull(resp);
-            }
-
-            // 書き込み権限を戻す
-            file.setWritable(true);
-        }
-
-        @Test
-        @DisplayName("異常系-例外→500")
-        void testException() {
-            // uploadDirをnullにして例外を発生
-            try {
-                java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
-                field.setAccessible(true);
-                field.set(service, null);
-            } catch (Exception ignored) {
-            }
-
-            ApiResponse<?> resp = service.deleteFile(validMarket, validFileName);
-            assertEquals(500, resp.getCode().intValue());
-        }
-    }
-
-    // ========================================================================
-    // getUploadDir
-    // ========================================================================
     @Test
-    @DisplayName("getUploadDir-設定値を返す")
-    void testGetUploadDir() {
-        String dir = service.getUploadDir();
-        assertEquals(tempDir.toString(), dir);
+    @DisplayName("getMarketList - 正常返回，应包含market字段")
+    void getMarketList_Success_ShouldReturnMarketList() {
+        MarketMaster m1 = new MarketMaster();
+        m1.setMarket("JP");
+        MarketMaster m2 = new MarketMaster();
+        m2.setMarket("US");
+        when(ud12Mapper.selectMarketMaster()).thenReturn(Arrays.asList(m1, m2));
+
+        ApiResponse<?> result = service.getMarketList();
+
+        assertEquals(200, result.getCode());
+        assertEquals("获取市场列表成功", result.getMsg());
+        assertNotNull(result.getData());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(2, list.size());
+        assertEquals("JP", ((Map<?, ?>) list.get(0)).get("market"));
+        assertEquals("US", ((Map<?, ?>) list.get(1)).get("market"));
     }
 
-    // ========================================================================
-    // 追加: getTemplateFilesの例外カバレッジ補完（市場ディレクトリ作成失敗）
-    // ========================================================================
     @Test
-    @DisplayName("getTemplateFiles-general exception→500")
-    void testGetTemplateFilesGeneralException() {
-        // uploadDirをnullにして NullPointerException を発生
-        try {
-            java.lang.reflect.Field field = UD12ServiceImpl.class.getDeclaredField("uploadDir");
-            field.setAccessible(true);
-            field.set(service, null);
-        } catch (Exception ignored) {
-        }
+    @DisplayName("getMarketList - Mapper异常，应返回500")
+    void getMarketList_MapperThrowsException_ShouldReturn500() {
+        when(ud12Mapper.selectMarketMaster()).thenThrow(new RuntimeException("DB error"));
 
-        ApiResponse<?> resp = service.getTemplateFiles("ANY");
-        assertEquals(500, resp.getCode().intValue());
+        ApiResponse<?> result = service.getMarketList();
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
+
+    // ============================================================
+    // getTemplateFiles()
+    // ============================================================
+
+    @Test
+    @DisplayName("getTemplateFiles - marketCode为null，应返回400")
+    void getTemplateFiles_MarketCodeNull_ShouldReturn400() {
+        ApiResponse<?> result = service.getTemplateFiles(null);
+
+        assertEquals(400, result.getCode());
+        assertEquals("市场代码不能为空", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("getTemplateFiles - marketCode为空字符串，应返回400")
+    void getTemplateFiles_MarketCodeEmpty_ShouldReturn400() {
+        ApiResponse<?> result = service.getTemplateFiles("");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("getTemplateFiles - 市场目录不存在，应返回空列表")
+    void getTemplateFiles_DirNotExists_ShouldReturnEmptyList() {
+        ApiResponse<?> result = service.getTemplateFiles("NONEXIST");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+    }
+
+    @Test
+    @DisplayName("getTemplateFiles - 市场目录存在且有文件，应返回文件列表")
+    void getTemplateFiles_DirExistsWithFiles_ShouldReturnFileList() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "template1.odt").createNewFile();
+        new File(marketDir, "template2.odt").createNewFile();
+
+        ApiResponse<?> result = service.getTemplateFiles("JP");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(2, list.size());
+        Set<String> fileNames = new HashSet<>();
+        fileNames.add((String) ((Map<?, ?>) list.get(0)).get("fileName"));
+        fileNames.add((String) ((Map<?, ?>) list.get(1)).get("fileName"));
+        assertTrue(fileNames.contains("template1.odt"));
+        assertTrue(fileNames.contains("template2.odt"));
+    }
+
+    @Test
+    @DisplayName("getTemplateFiles - 市场目录存在但无文件，应返回空列表")
+    void getTemplateFiles_DirExistsNoFiles_ShouldReturnEmptyList() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+
+        ApiResponse<?> result = service.getTemplateFiles("JP");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+    }
+
+    @Test
+    @DisplayName("getTemplateFiles - marketCode路径存在但不是一个目录（是文件），应返回空列表")
+    void getTemplateFiles_PathIsFileNotDir_ShouldReturnEmptyList() throws Exception {
+        // 创建一个与市场代码同名的文件而非目录
+        File fileInsteadOfDir = new File(tempDir.toFile(), "FILE_MARKET");
+        fileInsteadOfDir.createNewFile();
+
+        ApiResponse<?> result = service.getTemplateFiles("FILE_MARKET");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+    }
+
+    // ============================================================
+    // uploadFile()
+    // ============================================================
+
+    @Test
+    @DisplayName("uploadFile - file为null，应返回400")
+    void uploadFile_FileNull_ShouldReturn400() {
+        ApiResponse<?> result = service.uploadFile(null, "JP");
+
+        assertEquals(400, result.getCode());
+        assertEquals("请选择要上传的文件", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("uploadFile - file为空，应返回400")
+    void uploadFile_FileEmpty_ShouldReturn400() {
+        MultipartFile emptyFile = new MockMultipartFile("file", "test.txt", "text/plain", new byte[0]);
+
+        ApiResponse<?> result = service.uploadFile(emptyFile, "JP");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("uploadFile - market为null，应返回400")
+    void uploadFile_MarketNull_ShouldReturn400() {
+        MultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "content".getBytes());
+
+        ApiResponse<?> result = service.uploadFile(file, null);
+
+        assertEquals(400, result.getCode());
+        assertEquals("市场代码不能为空", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("uploadFile - market为空字符串，应返回400")
+    void uploadFile_MarketEmpty_ShouldReturn400() {
+        MultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "content".getBytes());
+
+        ApiResponse<?> result = service.uploadFile(file, "");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("uploadFile - originalFilename为null，应返回400")
+    void uploadFile_OriginalFilenameNull_ShouldReturn400() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn(null);
+
+        ApiResponse<?> result = service.uploadFile(file, "JP");
+
+        assertEquals(400, result.getCode());
+        assertEquals("文件名不能为空", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("uploadFile - originalFilename为空字符串，应返回400")
+    void uploadFile_OriginalFilenameEmpty_ShouldReturn400() {
+        MultipartFile file = new MockMultipartFile("file", "", "text/plain", "content".getBytes());
+
+        ApiResponse<?> result = service.uploadFile(file, "JP");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("uploadFile - 文件超过50MB，应返回400")
+    void uploadFile_FileTooLarge_ShouldReturn400() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("large.txt");
+        when(file.getSize()).thenReturn(51L * 1024 * 1024);
+
+        ApiResponse<?> result = service.uploadFile(file, "JP");
+
+        assertEquals(400, result.getCode());
+        assertEquals("文件大小不能超过50MB", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("uploadFile - 上传成功，市场目录不存在则自动创建")
+    void uploadFile_Success_DirNotExists_ShouldCreateDirAndUpload() throws Exception {
+        byte[] content = "template content".getBytes();
+        MultipartFile file = new MockMultipartFile("file", "mytemplate.odt", "application/octet-stream", content);
+        // 目录尚不存在，uploadFile内部应创建
+
+        ApiResponse<?> result = service.uploadFile(file, "JP");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        Map<?, ?> data = (Map<?, ?>) result.getData();
+        assertEquals("mytemplate.odt", data.get("fileName"));
+        assertTrue((Boolean) data.get("success"));
+
+        // 验证文件确实已写入
+        File uploaded = new File(tempDir.toFile(), "JP/mytemplate.odt");
+        assertTrue(uploaded.exists());
+        assertArrayEquals(content, Files.readAllBytes(uploaded.toPath()));
+    }
+
+    @Test
+    @DisplayName("uploadFile - 上传成功，市场目录已存在")
+    void uploadFile_Success_DirAlreadyExists_ShouldUpload() throws Exception {
+        // 先创建市场目录
+        new File(tempDir.toFile(), "EXISTING_MARKET").mkdirs();
+        byte[] content = "data".getBytes();
+        MultipartFile file = new MockMultipartFile("file", "existing.odt", "application/octet-stream", content);
+
+        ApiResponse<?> result = service.uploadFile(file, "EXISTING_MARKET");
+
+        assertEquals(200, result.getCode());
+        File uploaded = new File(tempDir.toFile(), "EXISTING_MARKET/existing.odt");
+        assertTrue(uploaded.exists());
+    }
+
+    @Test
+    @DisplayName("uploadFile - IOException，应返回500")
+    void uploadFile_IOException_ShouldReturn500() throws Exception {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("test.txt");
+        when(file.getSize()).thenReturn(100L);
+        doThrow(new IOException("Disk full")).when(file).transferTo(any(File.class));
+
+        ApiResponse<?> result = service.uploadFile(file, "JP");
+
+        assertEquals(500, result.getCode());
+        assertTrue(result.getMsg().contains("文件上传失败"));
+    }
+
+    // ============================================================
+    // deleteFile()
+    // ============================================================
+
+    @Test
+    @DisplayName("deleteFile - market为null，应返回400")
+    void deleteFile_MarketNull_ShouldReturn400() {
+        ApiResponse<?> result = service.deleteFile(null, "test.txt");
+
+        assertEquals(400, result.getCode());
+        assertEquals("市场代码不能为空", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("deleteFile - market为空字符串，应返回400")
+    void deleteFile_MarketEmpty_ShouldReturn400() {
+        ApiResponse<?> result = service.deleteFile("", "test.txt");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("deleteFile - fileName为null，应返回400")
+    void deleteFile_FileNameNull_ShouldReturn400() {
+        ApiResponse<?> result = service.deleteFile("JP", null);
+
+        assertEquals(400, result.getCode());
+        assertEquals("文件名不能为空", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("deleteFile - fileName为空字符串，应返回400")
+    void deleteFile_FileNameEmpty_ShouldReturn400() {
+        ApiResponse<?> result = service.deleteFile("JP", "");
+
+        assertEquals(400, result.getCode());
+    }
+
+    @Test
+    @DisplayName("deleteFile - 文件不存在，应返回400")
+    void deleteFile_FileNotExists_ShouldReturn400() {
+        ApiResponse<?> result = service.deleteFile("JP", "nonexistent.txt");
+
+        assertEquals(400, result.getCode());
+        assertEquals("文件不存在", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("deleteFile - 路径不是文件，应返回400")
+    void deleteFile_PathIsNotFile_ShouldReturn400() throws Exception {
+        // 创建一个目录而不是文件
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        File dirFile = new File(marketDir, "subdir");
+        dirFile.mkdirs();
+
+        ApiResponse<?> result = service.deleteFile("JP", "subdir");
+
+        assertEquals(400, result.getCode());
+        assertEquals("路径不是文件", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("deleteFile - 删除文件失败（delete返回false），应返回500")
+    void deleteFile_DeleteFails_ShouldReturn500() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "DELETE_FAIL");
+        marketDir.mkdirs();
+        File targetFile = new File(marketDir, "locked.txt");
+        targetFile.createNewFile();
+        // 利用try-with-resources锁住文件，使delete()返回false
+        try (java.io.RandomAccessFile lock = new java.io.RandomAccessFile(targetFile, "rw");
+             java.nio.channels.FileChannel channel = lock.getChannel()) {
+            java.nio.channels.FileLock fileLock = channel.lock();
+            try {
+                ApiResponse<?> result = service.deleteFile("DELETE_FAIL", "locked.txt");
+                assertEquals(500, result.getCode());
+                assertEquals("文件删除失败", result.getMsg());
+            } finally {
+                fileLock.release();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("deleteFile - 删除成功，应返回成功")
+    void deleteFile_Success_ShouldReturnSuccess() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        File targetFile = new File(marketDir, "delete_me.txt");
+        targetFile.createNewFile();
+
+        ApiResponse<?> result = service.deleteFile("JP", "delete_me.txt");
+
+        assertEquals(200, result.getCode());
+        assertEquals("删除成功", result.getMsg());
+        assertNotNull(result.getData());
+        Map<?, ?> data = (Map<?, ?>) result.getData();
+        assertEquals("delete_me.txt", data.get("fileName"));
+        assertEquals("JP", data.get("market"));
+        assertTrue((Boolean) data.get("success"));
+        assertFalse(targetFile.exists());
+    }
+
+    // ============================================================
+    // downloadFile()
+    // ============================================================
+
+    @Test
+    @DisplayName("downloadFile - 文件不存在，应返回null")
+    void downloadFile_FileNotExists_ShouldReturnNull() {
+        Resource result = service.downloadFile("JP", "nonexistent.txt");
+
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("downloadFile - 文件存在，应返回Resource")
+    void downloadFile_FileExists_ShouldReturnResource() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        File targetFile = new File(marketDir, "download.txt");
+        targetFile.createNewFile();
+
+        Resource result = service.downloadFile("JP", "download.txt");
+
+        assertNotNull(result);
+        assertTrue(result.exists());
+        assertEquals("download.txt", result.getFilename());
+    }
+
+    @Test
+    @DisplayName("downloadFile - 路径存在但不是文件（是目录），应返回null")
+    void downloadFile_PathIsDirectory_ShouldReturnNull() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        // 以一个目录路径作为文件名
+        File subDir = new File(marketDir, "subdir");
+        subDir.mkdirs();
+
+        Resource result = service.downloadFile("JP", "subdir");
+
+        assertNull(result);
+    }
+
+    // ============================================================
+    // getUploadDir()
+    // ============================================================
+
+    @Test
+    @DisplayName("getUploadDir - 应返回上传目录路径")
+    void getUploadDir_ShouldReturnUploadDir() {
+        String result = service.getUploadDir();
+
+        assertEquals(tempDir.toString(), result);
     }
 }

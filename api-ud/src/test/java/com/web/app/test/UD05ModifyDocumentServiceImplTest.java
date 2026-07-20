@@ -5,10 +5,11 @@ import com.web.app.domain.UD05ModifyDocumentResponse;
 import com.web.app.domain.UD05ModifyDocumentSaveRequest;
 import com.web.app.mapper.HdocAdcaModificationMapper;
 import com.web.app.service.impl.UD05ModifyDocumentServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,11 +24,9 @@ import static org.mockito.Mockito.*;
 
 /**
  * UD05ModifyDocumentServiceImpl 单元测试
- *
- * 覆盖所有分支（100%覆盖率）
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UD05ModifyDocumentServiceImpl 单元测试")
 class UD05ModifyDocumentServiceImplTest {
 
     @Mock
@@ -36,420 +35,482 @@ class UD05ModifyDocumentServiceImplTest {
     @InjectMocks
     private UD05ModifyDocumentServiceImpl service;
 
-    private static final String VALID_SERIE = "JPCT";
-    private static final String VALID_CHNO = "013945";
-    private static final String VAR_NAME = "AXLE_CONF3";
-    private static final String NEW_VAL = "555";
+    @Captor
+    private ArgumentCaptor<String> chassisSeriesCaptor;
 
-    private UD05ModifyDocumentResponse.VariableItem mockVarItem;
+    @Captor
+    private ArgumentCaptor<String> chassisNoCaptor;
 
-    @BeforeEach
-    void setUp() {
-        reset(hdocAdcaModificationMapper);
+    @Captor
+    private ArgumentCaptor<String> variableCaptor;
 
-        mockVarItem = UD05ModifyDocumentResponse.VariableItem.builder()
-                .variable(VAR_NAME)
-                .description("Axle Configuration")
-                .currentValue("444")
-                .newval(NEW_VAL)
-                .build();
-    }
+    @Captor
+    private ArgumentCaptor<String> newvalCaptor;
+
+    @Captor
+    private ArgumentCaptor<String> updateUserCaptor;
 
     // ============================================================
-    // getModifyDocument - validateInitialRequest 分支测试
+    // getModifyDocument() — validateInitialRequest 参数校验分支
     // ============================================================
 
     @Test
-    @DisplayName("getModifyDocument-ChassisSeries为null-返回400")
-    void testGetModifyDocument_ChassisSeriesNull() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(null, VALID_CHNO);
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisSeries为null，应返回400")
+    void getModifyDocument_ChassisSeriesNull_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(null, "ABC123");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis series is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisSeries为空字符串-返回400")
-    void testGetModifyDocument_ChassisSeriesEmpty() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("", VALID_CHNO);
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisSeries为空字符串，应返回400")
+    void getModifyDocument_ChassisSeriesEmpty_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("", "ABC123");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis series is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisSeries长度不为4-返回400")
-    void testGetModifyDocument_ChassisSeriesLengthNot4() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("JPC", VALID_CHNO);
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisSeries为空白字符串，应返回400")
+    void getModifyDocument_ChassisSeriesBlank_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("   ", "ABC123");
+
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis series is required.", result.getMsg());
+        verifyNoInteractions(hdocAdcaModificationMapper);
+    }
+
+    @Test
+    @DisplayName("getModifyDocument - chassisSeries长度不等于4，应返回400")
+    void getModifyDocument_ChassisSeriesLengthNot4_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABC", "ABC123");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis series must be 4 characters.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisNo为null-返回400")
-    void testGetModifyDocument_ChassisNoNull() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, null);
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisNo为null，应返回400")
+    void getModifyDocument_ChassisNoNull_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", null);
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisNo为空字符串-返回400")
-    void testGetModifyDocument_ChassisNoEmpty() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, "");
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisNo为空字符串，应返回400")
+    void getModifyDocument_ChassisNoEmpty_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisNo超过10字符-返回400")
-    void testGetModifyDocument_ChassisNoExceedsMaxLength() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, "01234567890");
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisNo为空白字符串，应返回400")
+    void getModifyDocument_ChassisNoBlank_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "   ");
+
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis no is required.", result.getMsg());
+        verifyNoInteractions(hdocAdcaModificationMapper);
+    }
+
+    @Test
+    @DisplayName("getModifyDocument - chassisNo超过10个字符，应返回400")
+    void getModifyDocument_ChassisNoTooLong_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "12345678901");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no must not exceed 10 characters.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisSeries含非法字符-返回400")
-    void testGetModifyDocument_ChassisSeriesInvalidChars() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("JP_T", VALID_CHNO);
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisSeries包含非法字符，应返回400")
+    void getModifyDocument_ChassisSeriesInvalidChars_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("AB_D", "123456");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis series contains invalid characters.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("getModifyDocument-ChassisNo含非法字符-返回400")
-    void testGetModifyDocument_ChassisNoInvalidChars() {
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, "0139_5");
-        assertEquals(400, result.getCode().intValue());
+    @DisplayName("getModifyDocument - chassisNo包含非法字符，应返回400")
+    void getModifyDocument_ChassisNoInvalidChars_ShouldReturn400() {
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "123-456");
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no contains invalid characters.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     // ============================================================
-    // getModifyDocument - 数据库查询分支测试
+    // getModifyDocument() — 数据库查询分支
     // ============================================================
 
     @Test
-    @DisplayName("getModifyDocument-Mapper返回null列表-返回200空列表")
-    void testGetModifyDocument_VariablesNull() {
-        when(hdocAdcaModificationMapper.selectVariantInfo(VALID_SERIE, VALID_CHNO))
-                .thenReturn(null);
+    @DisplayName("getModifyDocument - Mapper返回null，应返回成功且variables为空列表")
+    void getModifyDocument_VariablesNull_ShouldReturnSuccessWithEmptyList() {
+        when(hdocAdcaModificationMapper.selectVariantInfo("ABCD", "123456")).thenReturn(null);
 
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, VALID_CHNO);
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "123456");
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertNotNull(result.getData());
+        assertEquals("", result.getData().getMarket());
+        assertEquals("aus/UD_TEST.odt", result.getData().getTemplate());
         assertNotNull(result.getData().getVariables());
         assertTrue(result.getData().getVariables().isEmpty());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .selectVariantInfo(VALID_SERIE, VALID_CHNO);
+        verify(hdocAdcaModificationMapper, times(1)).selectVariantInfo("ABCD", "123456");
     }
 
     @Test
-    @DisplayName("getModifyDocument-Mapper返回空列表-返回200空列表")
-    void testGetModifyDocument_VariablesEmpty() {
-        when(hdocAdcaModificationMapper.selectVariantInfo(VALID_SERIE, VALID_CHNO))
-                .thenReturn(new ArrayList<>());
+    @DisplayName("getModifyDocument - Mapper返回空列表，应返回成功且variables为空列表")
+    void getModifyDocument_VariablesEmpty_ShouldReturnSuccessWithEmptyList() {
+        when(hdocAdcaModificationMapper.selectVariantInfo("ABCD", "123456")).thenReturn(Collections.emptyList());
 
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, VALID_CHNO);
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "123456");
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertNotNull(result.getData());
         assertNotNull(result.getData().getVariables());
         assertTrue(result.getData().getVariables().isEmpty());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .selectVariantInfo(VALID_SERIE, VALID_CHNO);
+        verify(hdocAdcaModificationMapper, times(1)).selectVariantInfo("ABCD", "123456");
     }
 
     @Test
-    @DisplayName("getModifyDocument-查询成功-返回200含数据")
-    void testGetModifyDocument_Success() {
-        List<UD05ModifyDocumentResponse.VariableItem> varList = Collections.singletonList(mockVarItem);
-        when(hdocAdcaModificationMapper.selectVariantInfo(VALID_SERIE, VALID_CHNO))
-                .thenReturn(varList);
+    @DisplayName("getModifyDocument - Mapper返回非空列表，应返回成功包含数据")
+    void getModifyDocument_VariablesNotEmpty_ShouldReturnSuccessWithData() {
+        UD05ModifyDocumentResponse.VariableItem item = UD05ModifyDocumentResponse.VariableItem.builder()
+                .variable("VAR001")
+                .description("Test Variable")
+                .currentValue("OLD")
+                .newval("NEW")
+                .build();
+        when(hdocAdcaModificationMapper.selectVariantInfo("ABCD", "123456")).thenReturn(Arrays.asList(item));
 
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, VALID_CHNO);
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "123456");
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertNotNull(result.getData());
         assertEquals(1, result.getData().getVariables().size());
-        assertEquals(VAR_NAME, result.getData().getVariables().get(0).getVariable());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .selectVariantInfo(VALID_SERIE, VALID_CHNO);
+        assertEquals("VAR001", result.getData().getVariables().get(0).getVariable());
+        verify(hdocAdcaModificationMapper, times(1)).selectVariantInfo("ABCD", "123456");
     }
 
     @Test
-    @DisplayName("getModifyDocument-Mapper抛出异常-返回500")
-    void testGetModifyDocument_Exception() {
-        when(hdocAdcaModificationMapper.selectVariantInfo(VALID_SERIE, VALID_CHNO))
+    @DisplayName("getModifyDocument - Mapper抛出异常，应返回500")
+    void getModifyDocument_MapperThrowsException_ShouldReturn500() {
+        when(hdocAdcaModificationMapper.selectVariantInfo("ABCD", "123456"))
                 .thenThrow(new RuntimeException("DB error"));
 
-        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument(VALID_SERIE, VALID_CHNO);
+        ApiResponse<UD05ModifyDocumentResponse> result = service.getModifyDocument("ABCD", "123456");
 
-        assertEquals(500, result.getCode().intValue());
+        assertEquals(500, result.getCode());
         assertEquals("System error. Please contact administrator.", result.getMsg());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .selectVariantInfo(VALID_SERIE, VALID_CHNO);
+        verify(hdocAdcaModificationMapper, times(1)).selectVariantInfo("ABCD", "123456");
     }
 
     // ============================================================
-    // saveModifyDocument - validateSaveRequest 分支测试
+    // saveModifyDocument() — validateSaveRequest 参数校验分支
     // ============================================================
 
     @Test
-    @DisplayName("saveModifyDocument-基础校验失败-返回400")
-    void testSaveModifyDocument_BaseValidationFails() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(null);
-        req.setChassisNo(VALID_CHNO);
+    @DisplayName("saveModifyDocument - chassisSeries为null，应返回400")
+    void saveModifyDocument_ChassisSeriesNull_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries(null);
+        request.setChassisNo("123456");
+        request.setVariables(Collections.singletonList(new UD05ModifyDocumentSaveRequest.VariableItem()));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(400, result.getCode().intValue());
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis series is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Variables列表为null-返回400")
-    void testSaveModifyDocument_VariablesNull() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-        req.setVariables(null);
+    @DisplayName("saveModifyDocument - chassisNo为null，应返回400")
+    void saveModifyDocument_ChassisNoNull_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo(null);
+        request.setVariables(Collections.singletonList(new UD05ModifyDocumentSaveRequest.VariableItem()));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(400, result.getCode().intValue());
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis no is required.", result.getMsg());
+        verifyNoInteractions(hdocAdcaModificationMapper);
+    }
+
+    @Test
+    @DisplayName("saveModifyDocument - variables为null，应返回400")
+    void saveModifyDocument_VariablesNull_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setVariables(null);
+
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
         assertEquals("Variables list is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Variables列表为空-返回400")
-    void testSaveModifyDocument_VariablesEmpty() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-        req.setVariables(new ArrayList<>());
+    @DisplayName("saveModifyDocument - variables为空列表，应返回400")
+    void saveModifyDocument_VariablesEmpty_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setVariables(Collections.emptyList());
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(400, result.getCode().intValue());
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
         assertEquals("Variables list is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Variable名称为null-返回400")
-    void testSaveModifyDocument_VariableNameNull() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-
+    @DisplayName("saveModifyDocument - variable名称为null，应返回400")
+    void saveModifyDocument_VariableNameNull_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
         item.setVariable(null);
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
+        item.setNewval("NEWVAL");
+        request.setVariables(Collections.singletonList(item));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(400, result.getCode().intValue());
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
         assertEquals("Variable name at index 0 is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Variable名称为空-返回400")
-    void testSaveModifyDocument_VariableNameEmpty() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-
+    @DisplayName("saveModifyDocument - variable名称为空字符串，应返回400")
+    void saveModifyDocument_VariableNameEmpty_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
         item.setVariable("");
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
+        item.setNewval("NEWVAL");
+        request.setVariables(Collections.singletonList(item));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(400, result.getCode().intValue());
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
+        assertEquals("Variable name at index 0 is required.", result.getMsg());
+        verifyNoInteractions(hdocAdcaModificationMapper);
+    }
+
+    @Test
+    @DisplayName("saveModifyDocument - variable名称为空白字符串，应返回400")
+    void saveModifyDocument_VariableNameBlank_ShouldReturn400() {
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
+        item.setVariable("   ");
+        item.setNewval("NEWVAL");
+        request.setVariables(Collections.singletonList(item));
+
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        assertEquals(400, result.getCode());
         assertEquals("Variable name at index 0 is required.", result.getMsg());
         verifyNoInteractions(hdocAdcaModificationMapper);
     }
 
     // ============================================================
-    // saveModifyDocument - 更新处理分支测试
+    // saveModifyDocument() — 业务更新逻辑分支
     // ============================================================
 
     @Test
-    @DisplayName("saveModifyDocument-更新成功-结果大于0-计数增加")
-    void testSaveModifyDocument_UpdateSuccess() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-        req.setUpdateUser("test_user");
+    @DisplayName("saveModifyDocument - newval有值且updateUser为null，应使用SYSTEM并调用Mapper")
+    void saveModifyDocument_NewvalNotEmptyUpdateUserNull_ShouldUseDefaultSystem() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser(null);
 
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
+        item.setVariable("VAR001");
+        item.setNewval("NEW_VALUE");
+        request.setVariables(Collections.singletonList(item));
 
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "test_user"))
-                .thenReturn(1);
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "test_user");
+        // 验证
+        assertEquals(200, result.getCode());
+        assertEquals("操作成功", result.getMsg());
+        verify(hdocAdcaModificationMapper, times(1)).updateNewval("ABCD", "123456", "VAR001", "NEW_VALUE", "SYSTEM");
     }
 
     @Test
-    @DisplayName("saveModifyDocument-更新结果等于0-不计数")
-    void testSaveModifyDocument_UpdateResultZero() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
+    @DisplayName("saveModifyDocument - newval有值且updateUser有值，应使用指定用户并调用Mapper")
+    void saveModifyDocument_NewvalNotEmptyAndUpdateUserProvided_ShouldUseGivenUser() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
 
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
+        item.setVariable("VAR001");
+        item.setNewval("NEW_VALUE");
+        request.setVariables(Collections.singletonList(item));
 
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM"))
-                .thenReturn(0);
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM");
+        // 验证
+        assertEquals(200, result.getCode());
+        verify(hdocAdcaModificationMapper, times(1)).updateNewval("ABCD", "123456", "VAR001", "NEW_VALUE", "admin");
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Newval为null-跳过更新")
-    void testSaveModifyDocument_NewvalNull() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
+    @DisplayName("saveModifyDocument - newval为null，应跳过更新")
+    void saveModifyDocument_NewvalNull_ShouldSkipUpdate() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
 
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
+        item.setVariable("VAR001");
         item.setNewval(null);
-        req.setVariables(Collections.singletonList(item));
+        request.setVariables(Collections.singletonList(item));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        verify(hdocAdcaModificationMapper, never())
-                .updateNewval(anyString(), anyString(), anyString(), anyString(), anyString());
+        // 验证
+        assertEquals(200, result.getCode());
+        verify(hdocAdcaModificationMapper, never()).updateNewval(any(), any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Newval为空字符串-跳过更新")
-    void testSaveModifyDocument_NewvalEmpty() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
+    @DisplayName("saveModifyDocument - newval为空字符串，应跳过更新")
+    void saveModifyDocument_NewvalEmpty_ShouldSkipUpdate() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
 
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
+        item.setVariable("VAR001");
         item.setNewval("");
-        req.setVariables(Collections.singletonList(item));
+        request.setVariables(Collections.singletonList(item));
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        verify(hdocAdcaModificationMapper, never())
-                .updateNewval(anyString(), anyString(), anyString(), anyString(), anyString());
+        // 验证
+        assertEquals(200, result.getCode());
+        verify(hdocAdcaModificationMapper, never()).updateNewval(any(), any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("saveModifyDocument-UpdateUser为null-使用默认SYSTEM")
-    void testSaveModifyDocument_UpdateUserNull() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-        req.setUpdateUser(null);
+    @DisplayName("saveModifyDocument - newval为空白字符串，应跳过更新")
+    void saveModifyDocument_NewvalBlank_ShouldSkipUpdate() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
 
         UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
+        item.setVariable("VAR001");
+        item.setNewval("   ");
+        request.setVariables(Collections.singletonList(item));
 
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM"))
-                .thenReturn(1);
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM");
+        // 验证
+        assertEquals(200, result.getCode());
+        verify(hdocAdcaModificationMapper, never()).updateNewval(any(), any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("saveModifyDocument-Mapper抛出异常-返回500")
-    void testSaveModifyDocument_Exception() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
-
-        UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item.setVariable(VAR_NAME);
-        item.setNewval(NEW_VAL);
-        req.setVariables(Collections.singletonList(item));
-
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM"))
-                .thenThrow(new RuntimeException("DB error"));
-
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(500, result.getCode().intValue());
-        assertEquals("System error. Please contact administrator.", result.getMsg());
-
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, VAR_NAME, NEW_VAL, "SYSTEM");
-    }
-
-    @Test
-    @DisplayName("saveModifyDocument-多个变量-部分更新成功")
-    void testSaveModifyDocument_MultipleVariables() {
-        UD05ModifyDocumentSaveRequest req = new UD05ModifyDocumentSaveRequest();
-        req.setChassisSeries(VALID_SERIE);
-        req.setChassisNo(VALID_CHNO);
+    @DisplayName("saveModifyDocument - 多个变量，部分有值部分无值，应只更新有值的")
+    void saveModifyDocument_MultipleVariablesMixed_ShouldUpdateOnlyNonEmptyNewvals() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
 
         UD05ModifyDocumentSaveRequest.VariableItem item1 = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item1.setVariable("VAR1");
+        item1.setVariable("VAR001");
         item1.setNewval("VAL1");
 
         UD05ModifyDocumentSaveRequest.VariableItem item2 = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item2.setVariable("VAR2");
-        item2.setNewval(null); // 跳过
+        item2.setVariable("VAR002");
+        item2.setNewval(null);  // 应跳过
 
         UD05ModifyDocumentSaveRequest.VariableItem item3 = new UD05ModifyDocumentSaveRequest.VariableItem();
-        item3.setVariable("VAR3");
+        item3.setVariable("VAR003");
         item3.setNewval("VAL3");
 
-        req.setVariables(Arrays.asList(item1, item2, item3));
+        request.setVariables(Arrays.asList(item1, item2, item3));
 
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, "VAR1", "VAL1", "SYSTEM"))
-                .thenReturn(1);
-        when(hdocAdcaModificationMapper.updateNewval(VALID_SERIE, VALID_CHNO, "VAR3", "VAL3", "SYSTEM"))
-                .thenReturn(1);
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
 
-        ApiResponse<Void> result = service.saveModifyDocument(req);
-        assertEquals(200, result.getCode().intValue());
+        // 验证
+        assertEquals(200, result.getCode());
+        verify(hdocAdcaModificationMapper, times(1)).updateNewval("ABCD", "123456", "VAR001", "VAL1", "admin");
+        verify(hdocAdcaModificationMapper, times(1)).updateNewval("ABCD", "123456", "VAR003", "VAL3", "admin");
+        verify(hdocAdcaModificationMapper, never()).updateNewval(any(), any(), eq("VAR002"), any(), any());
+        verify(hdocAdcaModificationMapper, times(2)).updateNewval(any(), any(), any(), any(), any());
+    }
 
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, "VAR1", "VAL1", "SYSTEM");
-        verify(hdocAdcaModificationMapper, never())
-                .updateNewval(VALID_SERIE, VALID_CHNO, "VAR2", null, "SYSTEM");
-        verify(hdocAdcaModificationMapper, times(1))
-                .updateNewval(VALID_SERIE, VALID_CHNO, "VAR3", "VAL3", "SYSTEM");
+    @Test
+    @DisplayName("saveModifyDocument - Mapper抛出异常，应返回500")
+    void saveModifyDocument_MapperThrowsException_ShouldReturn500() {
+        // 准备
+        UD05ModifyDocumentSaveRequest request = new UD05ModifyDocumentSaveRequest();
+        request.setChassisSeries("ABCD");
+        request.setChassisNo("123456");
+        request.setUpdateUser("admin");
+
+        UD05ModifyDocumentSaveRequest.VariableItem item = new UD05ModifyDocumentSaveRequest.VariableItem();
+        item.setVariable("VAR001");
+        item.setNewval("NEWVAL");
+        request.setVariables(Collections.singletonList(item));
+
+        when(hdocAdcaModificationMapper.updateNewval("ABCD", "123456", "VAR001", "NEWVAL", "admin"))
+                .thenThrow(new RuntimeException("Update failed"));
+
+        // 执行
+        ApiResponse<Void> result = service.saveModifyDocument(request);
+
+        // 验证
+        assertEquals(500, result.getCode());
+        assertEquals("System error. Please contact administrator.", result.getMsg());
+        verify(hdocAdcaModificationMapper, times(1)).updateNewval("ABCD", "123456", "VAR001", "NEWVAL", "admin");
     }
 }

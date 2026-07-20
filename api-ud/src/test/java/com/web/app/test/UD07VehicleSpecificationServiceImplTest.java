@@ -6,7 +6,6 @@ import com.web.app.domain.UD07VehicleSpecificationResponse;
 import com.web.app.mapper.HdocRecDataKolaVariantMapper;
 import com.web.app.mapper.HdocRecDataOmMapper;
 import com.web.app.service.impl.UD07VehicleSpecificationServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +20,9 @@ import static org.mockito.Mockito.*;
 
 /**
  * UD07VehicleSpecificationServiceImpl 单元测试
- *
- * 覆盖所有分支（100%覆盖率）
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UD07VehicleSpecificationServiceImpl 单元测试")
 class UD07VehicleSpecificationServiceImplTest {
 
     @Mock
@@ -37,317 +34,355 @@ class UD07VehicleSpecificationServiceImplTest {
     @InjectMocks
     private UD07VehicleSpecificationServiceImpl service;
 
-    private static final String FULL_CHASSIS = "JPCT013945";
-    private static final String SERIE = "JPCT";
-    private static final String CHNR = "013945";
+    private UD07VehicleSpecificationRequest buildRequest(String chassisNo) {
+        UD07VehicleSpecificationRequest request = new UD07VehicleSpecificationRequest();
+        request.setChassisNo(chassisNo);
+        return request;
+    }
 
-    private Map<String, Object> mockVehicleBaseInfo;
-
-    @BeforeEach
-    void setUp() {
-        reset(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
-
-        mockVehicleBaseInfo = new HashMap<>();
-        mockVehicleBaseInfo.put("model", "IDO");
-        mockVehicleBaseInfo.put("builtWeek", "2016173");
-        mockVehicleBaseInfo.put("vin", "xxxxxxxxxxxxxxxxx");
-        mockVehicleBaseInfo.put("productType", "TRUCK");
-        mockVehicleBaseInfo.put("countryOfOperation", "IDO");
-        mockVehicleBaseInfo.put("customerAdap", "S1810111");
-        mockVehicleBaseInfo.put("familyId", "DPX123");
-        mockVehicleBaseInfo.put("variantId", "VAR001");
+    private Map<String, Object> buildBaseInfo(String familyId, String variantId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("model", "ModelX");
+        map.put("builtWeek", "202630");
+        map.put("customerAdap", "S-NOTE-001");
+        map.put("productType", "CAR");
+        map.put("vin", "WBA1234567890");
+        map.put("countryOfOperation", "JP");
+        map.put("familyId", familyId);
+        map.put("variantId", variantId);
+        return map;
     }
 
     // ============================================================
-    // validateRequest 分支测试
+    // validateRequest — 参数校验分支
     // ============================================================
 
     @Test
-    @DisplayName("validateRequest-ChassisNo为null-返回400")
-    void testValidate_ChassisNoNull() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(null);
+    @DisplayName("参数校验 - chassisNo为null，应返回400")
+    void getVehicleSpecification_ChassisNoNull_ShouldReturn400() {
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(buildRequest(null));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(400, result.getCode().intValue());
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no不能为空", result.getMsg());
         verifyNoInteractions(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("validateRequest-ChassisNo为空字符串-返回400")
-    void testValidate_ChassisNoEmpty() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo("");
+    @DisplayName("参数校验 - chassisNo为空字符串，应返回400")
+    void getVehicleSpecification_ChassisNoEmpty_ShouldReturn400() {
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(buildRequest(""));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(400, result.getCode().intValue());
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no不能为空", result.getMsg());
         verifyNoInteractions(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("validateRequest-ChassisNo长度不足4位-返回400")
-    void testValidate_ChassisNoTooShort() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo("ABC");
+    @DisplayName("参数校验 - chassisNo为空白字符串，应返回400")
+    void getVehicleSpecification_ChassisNoBlank_ShouldReturn400() {
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(buildRequest("   "));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(400, result.getCode().intValue());
-        assertEquals("Chassis no长度不足，至少需要4位", result.getMsg());
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis no不能为空", result.getMsg());
         verifyNoInteractions(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("validateRequest-ChassisNo前4位非字母-返回400")
-    void testValidate_ChassisNoSerieNotAlpha() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo("1234ABCD");
+    @DisplayName("参数校验 - chassisNo长度小于4，应返回400")
+    void getVehicleSpecification_ChassisNoLengthLessThan4_ShouldReturn400() {
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(buildRequest("ABC"));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(400, result.getCode().intValue());
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis no长度不足,至少需要4位", result.getMsg());
+        verifyNoInteractions(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
+    }
+
+    @Test
+    @DisplayName("参数校验 - chassisNo前4位不是字母，应返回400")
+    void getVehicleSpecification_ChassisNoFirst4NotLetters_ShouldReturn400() {
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(buildRequest("1234ABC"));
+
+        assertEquals(400, result.getCode());
         assertEquals("Chassis no前4位必须为字母", result.getMsg());
         verifyNoInteractions(hdocRecDataOmMapper, hdocRecDataKolaVariantMapper);
     }
 
     // ============================================================
-    // getVehicleSpecification - 车辆信息查询分支测试
+    // getVehicleSpecification — 车辆基础信息查询分支
     // ============================================================
 
     @Test
-    @DisplayName("车辆基础信息为null-返回404")
-    void testGetVehicleSpecification_BaseInfoNull() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 车辆基础信息为null，应返回404")
+    void getVehicleSpecification_BaseInfoNull_ShouldReturn404() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(null);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(null);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(404, result.getCode().intValue());
+        assertEquals(404, result.getCode());
         assertEquals("未找到对应的车辆信息", result.getMsg());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
+        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo("ABCD", "123");
         verifyNoInteractions(hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("车辆基础信息为空Map-返回404")
-    void testGetVehicleSpecification_BaseInfoEmpty() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 车辆基础信息为空Map，应返回404")
+    void getVehicleSpecification_BaseInfoEmpty_ShouldReturn404() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(new HashMap<>());
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(new HashMap<>());
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-        assertEquals(404, result.getCode().intValue());
+        assertEquals(404, result.getCode());
         assertEquals("未找到对应的车辆信息", result.getMsg());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
+        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo("ABCD", "123");
         verifyNoInteractions(hdocRecDataKolaVariantMapper);
     }
 
+    // ============================================================
+    // getVehicleSpecification — familyId/variantId为空判断分支
+    // ============================================================
+
     @Test
-    @DisplayName("familyId为空-跳过变体查询-engineNo默认N/A")
-    void testGetVehicleSpecification_FamilyIdEmpty() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - familyId为null，跳過变体查询，engineNo为N/A")
+    void getVehicleSpecification_FamilyIdNull_ShouldSkipVariantQuery() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo(null, "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
-        Map<String, Object> baseInfo = new HashMap<>(mockVehicleBaseInfo);
-        baseInfo.put("familyId", "");
-        baseInfo.put("variantId", "VAR001");
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(baseInfo);
-
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertNotNull(result.getData());
-        assertEquals("N/A", result.getData().getEngineNo());
+        assertNotNull(result.getData().getVariantInfo());
         assertTrue(result.getData().getVariantInfo().getList().isEmpty());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
+        assertEquals("N/A", result.getData().getEngineNo());
+        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo("ABCD", "123");
         verifyNoInteractions(hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("variantId为null-跳过变体查询-engineNo默认N/A")
-    void testGetVehicleSpecification_VariantIdNull() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - familyId为空字符串，跳过变体查询，engineNo为N/A")
+    void getVehicleSpecification_FamilyIdEmpty_ShouldSkipVariantQuery() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
-        Map<String, Object> baseInfo = new HashMap<>(mockVehicleBaseInfo);
-        baseInfo.put("variantId", null);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(baseInfo);
-
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-
-        assertEquals(200, result.getCode().intValue());
-        assertEquals("N/A", result.getData().getEngineNo());
+        assertEquals(200, result.getCode());
         assertTrue(result.getData().getVariantInfo().getList().isEmpty());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
+        assertEquals("N/A", result.getData().getEngineNo());
         verifyNoInteractions(hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("变体查询返回null-变体列表为空-engineNo默认N/A")
-    void testGetVehicleSpecification_VariantListNull() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - variantId为null，跳过变体查询，engineNo为N/A")
+    void getVehicleSpecification_VariantIdNull_ShouldSkipVariantQuery() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", null);
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001")).thenReturn(null);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-
-        assertEquals(200, result.getCode().intValue());
-        assertEquals("N/A", result.getData().getEngineNo());
+        assertEquals(200, result.getCode());
         assertTrue(result.getData().getVariantInfo().getList().isEmpty());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
-        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("DPX123", "VAR001");
+        assertEquals("N/A", result.getData().getEngineNo());
+        verifyNoInteractions(hdocRecDataKolaVariantMapper);
     }
 
     @Test
-    @DisplayName("变体查询返回空列表-变体列表为空-engineNo默认N/A")
-    void testGetVehicleSpecification_VariantListEmpty() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - variantId为空字符串，跳过变体查询，engineNo为N/A")
+    void getVehicleSpecification_VariantIdEmpty_ShouldSkipVariantQuery() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001")).thenReturn(new ArrayList<>());
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-
-        assertEquals(200, result.getCode().intValue());
-        assertEquals("N/A", result.getData().getEngineNo());
+        assertEquals(200, result.getCode());
         assertTrue(result.getData().getVariantInfo().getList().isEmpty());
+        assertEquals("N/A", result.getData().getEngineNo());
+        verifyNoInteractions(hdocRecDataKolaVariantMapper);
+    }
 
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
-        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("DPX123", "VAR001");
+    // ============================================================
+    // getVehicleSpecification — 变体查询结果分支
+    // ============================================================
+
+    @Test
+    @DisplayName("查询 - 变体列表为null，应返回空列表，engineNo为N/A")
+    void getVehicleSpecification_VariantListNull_ShouldReturnEmptyList() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001")).thenReturn(null);
+
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData().getVariantInfo().getList());
+        assertTrue(result.getData().getVariantInfo().getList().isEmpty());
+        assertEquals("N/A", result.getData().getEngineNo());
+        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("FAM001", "VAR001");
     }
 
     @Test
-    @DisplayName("变体查询成功-symbolPrefix有值-engineNo取值正确")
-    void testGetVehicleSpecification_VariantSuccess() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 变体列表为空，应返回空列表，engineNo为N/A")
+    void getVehicleSpecification_VariantListEmpty_ShouldReturnEmptyList() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001")).thenReturn(new ArrayList<>());
+
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
+
+        assertEquals(200, result.getCode());
+        assertTrue(result.getData().getVariantInfo().getList().isEmpty());
+        assertEquals("N/A", result.getData().getEngineNo());
+        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("FAM001", "VAR001");
+    }
+
+    @Test
+    @DisplayName("查询 - 变体列表非空且symbolPrefix有值，engineNo取symbolPrefix值")
+    void getVehicleSpecification_VariantListNotEmptyAndSymbolPrefixPresent_ShouldUseEngineNo() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
         Map<String, Object> variant = new HashMap<>();
-        variant.put("symbolPrefix", "ENG123456");
-        variant.put("description", "Engine Description");
-        variant.put("functionGroup", "0001");
+        variant.put("symbolPrefix", "ENG-123");
+        variant.put("description", "Engine variant");
+        variant.put("functionGroup", "FG01");
+        List<Map<String, Object>> variantList = Collections.singletonList(variant);
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001")).thenReturn(variantList);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001"))
-                .thenReturn(Collections.singletonList(variant));
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
-
-        assertEquals(200, result.getCode().intValue());
-        assertEquals("ENG123456", result.getData().getEngineNo());
+        assertEquals(200, result.getCode());
         assertEquals(1, result.getData().getVariantInfo().getList().size());
-        assertEquals("ENG123456", result.getData().getVariantInfo().getList().get(0).getSymbol());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
-        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("DPX123", "VAR001");
+        assertEquals("ENG-123", result.getData().getVariantInfo().getList().get(0).getSymbol());
+        assertEquals("Engine variant", result.getData().getVariantInfo().getList().get(0).getDescription());
+        assertEquals("FG01", result.getData().getVariantInfo().getList().get(0).getFunctionGroup());
+        assertEquals("ENG-123", result.getData().getEngineNo());
+        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("FAM001", "VAR001");
     }
 
     @Test
-    @DisplayName("变体查询成功-symbolPrefix为null-engineNo显示N/A")
-    void testGetVehicleSpecification_SymbolPrefixNull() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 变体列表非空但symbolPrefix为null，engineNo为N/A")
+    void getVehicleSpecification_SymbolPrefixNull_ShouldReturnEngineNoNA() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
         Map<String, Object> variant = new HashMap<>();
         variant.put("symbolPrefix", null);
         variant.put("description", "Desc");
-        variant.put("functionGroup", "0001");
-
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001"))
+        variant.put("functionGroup", "FG01");
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001"))
                 .thenReturn(Collections.singletonList(variant));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
+        assertEquals(1, result.getData().getVariantInfo().getList().size());
         assertEquals("N/A", result.getData().getEngineNo());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
-        verify(hdocRecDataKolaVariantMapper, times(1)).selectVariantList("DPX123", "VAR001");
     }
 
     @Test
-    @DisplayName("变体查询成功-symbolPrefix为空字符串-engineNo显示N/A")
-    void testGetVehicleSpecification_SymbolPrefixEmpty() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 变体列表非空但symbolPrefix为空字符串，engineNo为N/A")
+    void getVehicleSpecification_SymbolPrefixEmpty_ShouldReturnEngineNoNA() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
         Map<String, Object> variant = new HashMap<>();
         variant.put("symbolPrefix", "");
         variant.put("description", "Desc");
-        variant.put("functionGroup", "0001");
-
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001"))
+        variant.put("functionGroup", "FG01");
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001"))
                 .thenReturn(Collections.singletonList(variant));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertEquals("N/A", result.getData().getEngineNo());
     }
 
     @Test
-    @DisplayName("Mapper抛出异常-返回500")
-    void testGetVehicleSpecification_Exception() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - 变体列表非空但symbolPrefix为空白，engineNo为N/A")
+    void getVehicleSpecification_SymbolPrefixBlank_ShouldReturnEngineNoNA() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123")).thenReturn(baseInfo);
 
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR))
-                .thenThrow(new RuntimeException("DB error"));
+        Map<String, Object> variant = new HashMap<>();
+        variant.put("symbolPrefix", "   ");
+        variant.put("description", "Desc");
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001"))
+                .thenReturn(Collections.singletonList(variant));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        assertEquals(500, result.getCode().intValue());
-        assertEquals("系统内部错误，请联系管理员", result.getMsg());
-
-        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo(SERIE, CHNR);
-        verifyNoInteractions(hdocRecDataKolaVariantMapper);
+        assertEquals(200, result.getCode());
+        assertEquals("N/A", result.getData().getEngineNo());
     }
 
     @Test
-    @DisplayName("完整成功路径-获取所有车辆信息")
-    void testGetVehicleSpecification_FullSuccess() {
-        UD07VehicleSpecificationRequest req = new UD07VehicleSpecificationRequest();
-        req.setChassisNo(FULL_CHASSIS);
+    @DisplayName("查询 - chassisNo带空格（如JPCT 013945），应正确拆分serie和chnr")
+    void getVehicleSpecification_ChassisNoWithSpaces_ShouldTrimCorrectly() {
+        // "JPCT 013945" → trim → "JPCT 013945", serie="JPCT", chnr=" 013945".trim()="013945"
+        UD07VehicleSpecificationRequest request = buildRequest("JPCT 013945");
+        Map<String, Object> baseInfo = buildBaseInfo("FAM001", "VAR001");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("JPCT", "013945")).thenReturn(baseInfo);
 
         Map<String, Object> variant = new HashMap<>();
-        variant.put("symbolPrefix", "SYM12345");
-        variant.put("description", "Test Desc");
-        variant.put("functionGroup", "0001");
-
-        when(hdocRecDataOmMapper.selectVehicleBaseInfo(SERIE, CHNR)).thenReturn(mockVehicleBaseInfo);
-        when(hdocRecDataKolaVariantMapper.selectVariantList("DPX123", "VAR001"))
+        variant.put("symbolPrefix", "ENG456");
+        variant.put("description", "Engine");
+        when(hdocRecDataKolaVariantMapper.selectVariantList("FAM001", "VAR001"))
                 .thenReturn(Collections.singletonList(variant));
 
-        ApiResponse<UD07VehicleSpecificationResponse> result = service.getVehicleSpecification(req);
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
 
-        assertEquals(200, result.getCode().intValue());
+        assertEquals(200, result.getCode());
         assertNotNull(result.getData().getVehicleInfo());
-        assertEquals("IDO", result.getData().getVehicleInfo().getModel());
-        assertEquals("2016173", result.getData().getVehicleInfo().getBuiltWeek());
-        assertEquals("TRUCK", result.getData().getVehicleInfo().getProductType());
-        assertEquals("xxxxxxxxxxxxxxxxx", result.getData().getVehicleInfo().getVin());
-        assertEquals("IDO", result.getData().getVehicleInfo().getCountryOfOperation());
-        assertEquals("S1810111", result.getData().getVehicleInfo().getCustomerAdap());
-        assertEquals("DPX123", result.getData().getVehicleInfo().getFamilyId());
+        assertEquals("ModelX", result.getData().getVehicleInfo().getModel());
+        assertEquals("FAM001", result.getData().getVehicleInfo().getFamilyId());
         assertEquals("VAR001", result.getData().getVehicleInfo().getVariantId());
-        assertEquals("SYM12345", result.getData().getEngineNo());
-        assertEquals(1, result.getData().getVariantInfo().getList().size());
-        assertEquals("SYM12345", result.getData().getVariantInfo().getList().get(0).getSymbol());
-        assertEquals("Test Desc", result.getData().getVariantInfo().getList().get(0).getDescription());
-        assertEquals("0001", result.getData().getVariantInfo().getList().get(0).getFunctionGroup());
+        assertEquals("ENG456", result.getData().getEngineNo());
+        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo("JPCT", "013945");
+    }
+
+    @Test
+    @DisplayName("查询 - Mapper抛出异常，应返回500")
+    void getVehicleSpecification_MapperThrowsException_ShouldReturn500() {
+        UD07VehicleSpecificationRequest request = buildRequest("ABCD123");
+        when(hdocRecDataOmMapper.selectVehicleBaseInfo("ABCD", "123"))
+                .thenThrow(new RuntimeException("DB error"));
+
+        ApiResponse<UD07VehicleSpecificationResponse> result =
+                service.getVehicleSpecification(request);
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+        verify(hdocRecDataOmMapper, times(1)).selectVehicleBaseInfo("ABCD", "123");
     }
 }

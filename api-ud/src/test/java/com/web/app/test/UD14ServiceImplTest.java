@@ -6,7 +6,6 @@ import com.web.app.mapper.UD14Mapper;
 import com.web.app.service.impl.UD14ServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -14,21 +13,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Files;
+import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * UD14ServiceImpl 单元测试
- * 覆盖 getMarkets / getVariablesByMarket / formatFileSize の全分支
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UD14ServiceImpl 单元测试")
 class UD14ServiceImplTest {
 
     @Mock
@@ -42,257 +38,266 @@ class UD14ServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        reset(ud14Mapper);
-        // uploadDir を一時ディレクトリに設定
         java.lang.reflect.Field field = UD14ServiceImpl.class.getDeclaredField("uploadDir");
         field.setAccessible(true);
         field.set(service, tempDir.toString());
     }
 
-    // ========================================================================
-    // getMarkets
-    // ========================================================================
-    @Nested
-    @DisplayName("getMarkets")
-    class GetMarketsTest {
+    // ============================================================
+    // getMarkets()
+    // ============================================================
 
-        @Test
-        @DisplayName("正常系-市場一覧取得成功")
-        void testSuccess() {
-            List<MarketMaster> mockList = new ArrayList<>();
-            MarketMaster m1 = new MarketMaster(); m1.setMarket("JPN");
-            MarketMaster m2 = new MarketMaster(); m2.setMarket("USA");
-            mockList.add(m1);
-            mockList.add(m2);
+    @Test
+    @DisplayName("getMarkets - 正常返回市场列表")
+    void getMarkets_Success_ShouldReturnMarketList() {
+        MarketMaster m1 = new MarketMaster();
+        m1.setMarket("JP");
+        MarketMaster m2 = new MarketMaster();
+        m2.setMarket("US");
+        when(ud14Mapper.selectMarketMaster()).thenReturn(Arrays.asList(m1, m2));
 
-            when(ud14Mapper.selectMarketMaster()).thenReturn(mockList);
+        ApiResponse<?> result = service.getMarkets();
 
-            ApiResponse<?> resp = service.getMarkets();
-            assertEquals(200, resp.getCode().intValue());
-            assertNotNull(resp.getData());
-            verify(ud14Mapper, times(1)).selectMarketMaster();
-        }
-
-        @Test
-        @DisplayName("異常系-mapper例外→500")
-        void testMapperException() {
-            when(ud14Mapper.selectMarketMaster()).thenThrow(new RuntimeException("DB error"));
-            ApiResponse<?> resp = service.getMarkets();
-            assertEquals(500, resp.getCode().intValue());
-        }
+        assertEquals(200, result.getCode());
+        assertEquals("获取市场列表成功", result.getMsg());
+        assertNotNull(result.getData());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(2, list.size());
+        assertEquals("JP", ((Map<?, ?>) list.get(0)).get("market"));
+        assertEquals("US", ((Map<?, ?>) list.get(1)).get("market"));
     }
 
-    // ========================================================================
-    // getVariablesByMarket
-    // ========================================================================
-    @Nested
-    @DisplayName("getVariablesByMarket")
-    class GetVariablesByMarketTest {
+    @Test
+    @DisplayName("getMarkets - Mapper返回null，应返回空列表")
+    void getMarkets_MapperReturnsNull_ShouldReturnEmptyList() {
+        when(ud14Mapper.selectMarketMaster()).thenReturn(null);
 
-        private final String validMarket = "JPN";
+        ApiResponse<?> result = service.getMarkets();
 
-        @Test
-        @DisplayName("marketがnull→400")
-        void testMarketNull() {
-            ApiResponse<?> resp = service.getVariablesByMarket(null);
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud14Mapper);
-        }
-
-        @Test
-        @DisplayName("marketが空文字→400")
-        void testMarketEmpty() {
-            ApiResponse<?> resp = service.getVariablesByMarket("");
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud14Mapper);
-        }
-
-        @Test
-        @DisplayName("marketが空白のみ→400")
-        void testMarketBlank() {
-            ApiResponse<?> resp = service.getVariablesByMarket("   ");
-            assertEquals(400, resp.getCode().intValue());
-            verifyNoInteractions(ud14Mapper);
-        }
-
-        @Test
-        @DisplayName("市場ディレクトリが存在しない→空リスト200")
-        void testMarketDirNotExists() {
-            ApiResponse<?> resp = service.getVariablesByMarket("NONEXIST");
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertTrue(list.isEmpty());
-            verifyNoInteractions(ud14Mapper);
-        }
-
-        @Test
-        @DisplayName("市場ディレクトリが存在するが空→空リスト200")
-        void testMarketDirEmpty() throws Exception {
-            Files.createDirectories(tempDir.resolve(validMarket));
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertTrue(list.isEmpty());
-            verifyNoInteractions(ud14Mapper);
-        }
-
-        @Test
-        @DisplayName("ファイル存在-mapperが変数を返す→usedに連結文字列200")
-        void testFilesWithVariables() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve(validMarket));
-            Files.createFile(marketDir.resolve("template1.rtf"));
-
-            List<String> variables = new ArrayList<>();
-            variables.add("VAR_A");
-            variables.add("VAR_B");
-            when(ud14Mapper.selectVariablesByVal(eq(validMarket), eq("JPN/template1.rtf")))
-                    .thenReturn(variables);
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertEquals(1, list.size());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> fileInfo = (Map<String, Object>) list.get(0);
-            assertEquals("template1.rtf", fileInfo.get("filename"));
-            assertEquals("VAR_A VAR_B", fileInfo.get("used"));
-            assertNotNull(fileInfo.get("lastMod"));
-            assertNotNull(fileInfo.get("size"));
-
-            verify(ud14Mapper, times(1)).selectVariablesByVal(validMarket, "JPN/template1.rtf");
-        }
-
-        @Test
-        @DisplayName("ファイル存在-mapperが空リスト→usedは空文字200")
-        void testFilesWithEmptyVariables() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve(validMarket));
-            Files.createFile(marketDir.resolve("template1.rtf"));
-
-            when(ud14Mapper.selectVariablesByVal(eq(validMarket), eq("JPN/template1.rtf")))
-                    .thenReturn(new ArrayList<>());
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertEquals(1, list.size());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> fileInfo = (Map<String, Object>) list.get(0);
-            assertEquals("", fileInfo.get("used"));
-
-            verify(ud14Mapper, times(1)).selectVariablesByVal(validMarket, "JPN/template1.rtf");
-        }
-
-        @Test
-        @DisplayName("ファイル存在-mapperがnull→usedは空文字200")
-        void testFilesWithNullVariables() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve(validMarket));
-            Files.createFile(marketDir.resolve("template1.rtf"));
-
-            when(ud14Mapper.selectVariablesByVal(eq(validMarket), eq("JPN/template1.rtf")))
-                    .thenReturn(null);
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertEquals(1, list.size());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> fileInfo = (Map<String, Object>) list.get(0);
-            assertEquals("", fileInfo.get("used"));
-
-            verify(ud14Mapper, times(1)).selectVariablesByVal(validMarket, "JPN/template1.rtf");
-        }
-
-        @Test
-        @DisplayName("複数ファイル-mapperがファイルごとに呼ばれる200")
-        void testMultipleFiles() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve(validMarket));
-            Files.createFile(marketDir.resolve("a.rtf"));
-            Files.createFile(marketDir.resolve("b.rtf"));
-            Files.createFile(marketDir.resolve("c.rtf"));
-
-            when(ud14Mapper.selectVariablesByVal(eq(validMarket), anyString()))
-                    .thenReturn(new ArrayList<>());
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(200, resp.getCode().intValue());
-            List<?> list = (List<?>) resp.getData();
-            assertEquals(3, list.size());
-
-            verify(ud14Mapper, times(3)).selectVariablesByVal(eq(validMarket), anyString());
-        }
-
-        @Test
-        @DisplayName("異常系-例外→500")
-        void testException() {
-            // uploadDirをnullにしてNullPointerException → catch補足
-            try {
-                java.lang.reflect.Field field = UD14ServiceImpl.class.getDeclaredField("uploadDir");
-                field.setAccessible(true);
-                field.set(service, null);
-            } catch (Exception ignored) {
-            }
-
-            ApiResponse<?> resp = service.getVariablesByMarket(validMarket);
-            assertEquals(500, resp.getCode().intValue());
-        }
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        assertTrue(((List<?>) result.getData()).isEmpty());
     }
 
-    // ========================================================================
-    // formatFileSize（privateメソッドはgetVariablesByMarket経由で検証）
-    // ========================================================================
-    @Nested
-    @DisplayName("formatFileSize（getVariablesByMarket経由）")
-    class FormatFileSizeTest {
+    @Test
+    @DisplayName("getMarkets - Mapper异常，应返回500")
+    void getMarkets_MapperThrowsException_ShouldReturn500() {
+        when(ud14Mapper.selectMarketMaster()).thenThrow(new RuntimeException("DB error"));
 
-        @Test
-        @DisplayName("1B未満→'X B'")
-        void testBytes() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve("SIZE"));
-            // 1バイトのファイルを作成
-            Files.write(marketDir.resolve("small.txt"), new byte[]{65});
+        ApiResponse<?> result = service.getMarkets();
 
-            ApiResponse<?> resp = service.getVariablesByMarket("SIZE");
-            List<?> list = (List<?>) resp.getData();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> info = (Map<String, Object>) list.get(0);
-            String size = (String) info.get("size");
-            assertTrue(size.endsWith(" B"));
-        }
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
 
-        @Test
-        @DisplayName("1KB~1MB未満→'X.X KB'")
-        void testKB() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve("SIZEKB"));
-            // 約10KBのファイルを作成
-            byte[] content = new byte[10 * 1024];
-            Files.write(marketDir.resolve("medium.txt"), content);
+    // ============================================================
+    // getVariablesByMarket() — 参数校验
+    // ============================================================
 
-            ApiResponse<?> resp = service.getVariablesByMarket("SIZEKB");
-            List<?> list = (List<?>) resp.getData();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> info = (Map<String, Object>) list.get(0);
-            String size = (String) info.get("size");
-            assertTrue(size.endsWith(" KB"), "Expected KB format but got: " + size);
-        }
+    @Test
+    @DisplayName("getVariablesByMarket - market为null，应返回400")
+    void getVariablesByMarket_MarketNull_ShouldReturn400() {
+        ApiResponse<?> result = service.getVariablesByMarket(null);
 
-        @Test
-        @DisplayName("1MB以上→'X.X MB'")
-        void testMB() throws Exception {
-            Path marketDir = Files.createDirectories(tempDir.resolve("SIZEMB"));
-            // 約2MBのファイルを作成
-            byte[] content = new byte[2 * 1024 * 1024];
-            Files.write(marketDir.resolve("large.txt"), content);
+        assertEquals(400, result.getCode());
+        assertEquals("市场代码不能为空", result.getMsg());
+        verifyNoInteractions(ud14Mapper);
+    }
 
-            ApiResponse<?> resp = service.getVariablesByMarket("SIZEMB");
-            List<?> list = (List<?>) resp.getData();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> info = (Map<String, Object>) list.get(0);
-            String size = (String) info.get("size");
-            assertTrue(size.endsWith(" MB"), "Expected MB format but got: " + size);
-        }
+    @Test
+    @DisplayName("getVariablesByMarket - market为空字符串，应返回400")
+    void getVariablesByMarket_MarketEmpty_ShouldReturn400() {
+        ApiResponse<?> result = service.getVariablesByMarket("");
+
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud14Mapper);
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - market为空白字符串，应返回400")
+    void getVariablesByMarket_MarketBlank_ShouldReturn400() {
+        ApiResponse<?> result = service.getVariablesByMarket("   ");
+
+        assertEquals(400, result.getCode());
+        assertEquals("市场代码不能为空", result.getMsg());
+        verifyNoInteractions(ud14Mapper);
+    }
+
+    // ============================================================
+    // getVariablesByMarket() — 文件目录不存在
+    // ============================================================
+
+    @Test
+    @DisplayName("getVariablesByMarket - 市场目录不存在，应返回空列表")
+    void getVariablesByMarket_DirNotExists_ShouldReturnEmptyList() {
+        ApiResponse<?> result = service.getVariablesByMarket("NONEXIST");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+        verifyNoInteractions(ud14Mapper);
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 市场路径存在但不是目录（是文件），应返回空列表")
+    void getVariablesByMarket_PathIsFileNotDir_ShouldReturnEmptyList() throws Exception {
+        File fileInsteadOfDir = new File(tempDir.toFile(), "FILE_MARKET");
+        fileInsteadOfDir.createNewFile();
+
+        ApiResponse<?> result = service.getVariablesByMarket("FILE_MARKET");
+
+        assertEquals(200, result.getCode());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+        verifyNoInteractions(ud14Mapper);
+    }
+
+    // ============================================================
+    // getVariablesByMarket() — 目录存在，文件列表处理
+    // ============================================================
+
+    @Test
+    @DisplayName("getVariablesByMarket - 目录存在且无文件，应返回空列表")
+    void getVariablesByMarket_DirExistsNoFiles_ShouldReturnEmptyList() throws Exception {
+        new File(tempDir.toFile(), "JP").mkdirs();
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(200, result.getCode());
+        assertTrue(((List<?>) result.getData()).isEmpty());
+        verifyNoInteractions(ud14Mapper);
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 目录存在且有文件但variables为null，used应为空字符串")
+    void getVariablesByMarket_FileExistsVariablesNull_ShouldReturnEmptyUsed() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "test.odt").createNewFile();
+        when(ud14Mapper.selectVariablesByVal("JP", "JP/test.odt")).thenReturn(null);
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(200, result.getCode());
+        assertNotNull(result.getData());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(1, list.size());
+        Map<?, ?> fileInfo = (Map<?, ?>) list.get(0);
+        assertEquals("test.odt", fileInfo.get("filename"));
+        assertEquals("", fileInfo.get("used"));
+        assertNotNull(fileInfo.get("lastMod"));
+        assertNotNull(fileInfo.get("size"));
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 目录存在且有文件但variables为空列表，used应为空字符串")
+    void getVariablesByMarket_FileExistsVariablesEmpty_ShouldReturnEmptyUsed() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "test.odt").createNewFile();
+        when(ud14Mapper.selectVariablesByVal("JP", "JP/test.odt")).thenReturn(new ArrayList<>());
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(1, list.size());
+        assertEquals("", ((Map<?, ?>) list.get(0)).get("used"));
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 目录存在且有文件且variables非空，used应包含变量名")
+    void getVariablesByMarket_FileExistsVariablesNotEmpty_ShouldReturnUsed() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "test.odt").createNewFile();
+        when(ud14Mapper.selectVariablesByVal("JP", "JP/test.odt")).thenReturn(Arrays.asList("VAR001", "VAR002"));
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(1, list.size());
+        assertEquals("VAR001 VAR002", ((Map<?, ?>) list.get(0)).get("used"));
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 多个文件，应返回多个文件信息")
+    void getVariablesByMarket_MultipleFiles_ShouldReturnAllFiles() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "a.odt").createNewFile();
+        new File(marketDir, "b.odt").createNewFile();
+        when(ud14Mapper.selectVariablesByVal(eq("JP"), anyString())).thenReturn(new ArrayList<>());
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertEquals(2, list.size());
+        verify(ud14Mapper, times(2)).selectVariablesByVal(eq("JP"), anyString());
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - Mapper异常，应返回500")
+    void getVariablesByMarket_MapperThrowsException_ShouldReturn500() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "JP");
+        marketDir.mkdirs();
+        new File(marketDir, "test.odt").createNewFile();
+        when(ud14Mapper.selectVariablesByVal("JP", "JP/test.odt"))
+                .thenThrow(new RuntimeException("DB error"));
+
+        ApiResponse<?> result = service.getVariablesByMarket("JP");
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
+
+    // ============================================================
+    // formatFileSize() — 通过文件大小间接测试
+    // ============================================================
+
+    @Test
+    @DisplayName("getVariablesByMarket - 文件大小格式化测试（小于1KB）")
+    void formatFileSize_LessThan1KB_ShouldReturnBytes() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "SZ");
+        marketDir.mkdirs();
+        // 创建500字节的文件
+        java.nio.file.Files.write(new File(marketDir, "small.txt").toPath(), new byte[500]);
+
+        ApiResponse<?> result = service.getVariablesByMarket("SZ");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertEquals("500 B", ((Map<?, ?>) list.get(0)).get("size"));
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 文件大小格式化测试（1KB~1MB）")
+    void formatFileSize_Between1KBAnd1MB_ShouldReturnKB() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "SZ");
+        marketDir.mkdirs();
+        // 创建50KB的文件
+        java.nio.file.Files.write(new File(marketDir, "med.txt").toPath(), new byte[50 * 1024]);
+
+        ApiResponse<?> result = service.getVariablesByMarket("SZ");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertTrue(((String) ((Map<?, ?>) list.get(0)).get("size")).endsWith(" KB"));
+    }
+
+    @Test
+    @DisplayName("getVariablesByMarket - 文件大小格式化测试（大于1MB）")
+    void formatFileSize_GreaterThan1MB_ShouldReturnMB() throws Exception {
+        File marketDir = new File(tempDir.toFile(), "SZ");
+        marketDir.mkdirs();
+        // 创建2MB的文件
+        java.nio.file.Files.write(new File(marketDir, "large.txt").toPath(), new byte[2 * 1024 * 1024]);
+
+        ApiResponse<?> result = service.getVariablesByMarket("SZ");
+
+        assertEquals(200, result.getCode());
+        List<?> list = (List<?>) result.getData();
+        assertTrue(((String) ((Map<?, ?>) list.get(0)).get("size")).endsWith(" MB"));
     }
 }

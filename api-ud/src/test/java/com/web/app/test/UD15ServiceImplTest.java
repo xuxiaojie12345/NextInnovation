@@ -4,9 +4,7 @@ import com.web.app.domain.ApiResponse;
 import com.web.app.domain.Entity.HdocSendDataVinPlate;
 import com.web.app.mapper.UD15Mapper;
 import com.web.app.service.impl.UD15ServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,329 +18,404 @@ import static org.mockito.Mockito.*;
 
 /**
  * UD15ServiceImpl 单元测试
- * 覆盖 viewInfo / setRegenerate / setOk / changeToBasicInfo / changeToAdvancedInfo
- * および内部メソッド updateStatus / updateStatusAndType の全分支
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UD15ServiceImpl 单元测试")
 class UD15ServiceImplTest {
 
-    @Mock private UD15Mapper ud15Mapper;
-    @InjectMocks private UD15ServiceImpl service;
+    @Mock
+    private UD15Mapper ud15Mapper;
 
-    private HdocSendDataVinPlate validReq;
-    private HdocSendDataVinPlate validRecord;
+    @InjectMocks
+    private UD15ServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        reset(ud15Mapper);
-
-        validReq = new HdocSendDataVinPlate();
-        validReq.setSerie("JPCT");
-        validReq.setChnr("013945");
-        validReq.setUpdateUser("admin");
-
-        validRecord = new HdocSendDataVinPlate();
-        validRecord.setType("VIN_PLATE");
-        validRecord.setStatus("1");
-        validRecord.setMsg("");
-        validRecord.setRegisterDatetime("2026-01-15 10:30:00");
-        validRecord.setDocReady("2026-01-16 14:00:00");
-        validRecord.setDocSent("2026-01-17 09:00:00");
-        validRecord.setXmlDoc("<root><item/></root>");
+    private HdocSendDataVinPlate createRequest(String serie, String chnr, String updateUser) {
+        HdocSendDataVinPlate r = new HdocSendDataVinPlate();
+        r.setSerie(serie);
+        r.setChnr(chnr);
+        r.setUpdateUser(updateUser);
+        return r;
     }
 
-    // ========================================================================
-    // viewInfo
-    // ========================================================================
-    @Nested
-    @DisplayName("viewInfo")
-    class ViewInfoTest {
-
-        @Test @DisplayName("chnrがnull→400")
-        void testChnrNull() {
-            validReq.setChnr(null);
-            assertEquals(400, service.viewInfo(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
-
-        @Test @DisplayName("chnrが空→400")
-        void testChnrEmpty() {
-            validReq.setChnr("");
-            assertEquals(400, service.viewInfo(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
-
-        @Test @DisplayName("chnrが空白→400")
-        void testChnrBlank() {
-            validReq.setChnr("   ");
-            assertEquals(400, service.viewInfo(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
-
-        @Test @DisplayName("recordがnull→400 not found")
-        void testRecordNotFound() {
-            when(ud15Mapper.selectByChnr("JPCT", "013945")).thenReturn(null);
-            ApiResponse<?> resp = service.viewInfo(validReq);
-            assertEquals(400, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("not found"));
-        }
-
-        @Test @DisplayName("正常系-serieあり→chassisNumber=serie-chnr")
-        void testSuccessWithSerie() {
-            when(ud15Mapper.selectByChnr("JPCT", "013945")).thenReturn(validRecord);
-            ApiResponse<?> resp = service.viewInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>) resp.getData();
-            assertEquals("JPCT-013945", data.get("chassisNumber"));
-            assertEquals("VIN_PLATE", data.get("type"));
-            assertEquals("1", data.get("status"));
-            assertEquals("", data.get("msg"));
-            assertEquals("2026-01-15 10:30:00", data.get("registerDatetime"));
-            assertEquals("2026-01-16 14:00:00", data.get("docReady"));
-            assertEquals("2026-01-17 09:00:00", data.get("docSent"));
-            assertEquals("<root><item/></root>", data.get("xmlDoc"));
-        }
-
-        @Test @DisplayName("正常系-serieがnull→chassisNumber=chnrのみ")
-        void testSuccessSerieNull() {
-            validReq.setSerie(null);
-            when(ud15Mapper.selectByChnr("", "013945")).thenReturn(validRecord);
-            ApiResponse<?> resp = service.viewInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>) resp.getData();
-            assertEquals("013945", data.get("chassisNumber"));
-        }
-
-        @Test @DisplayName("正常系-serieが空→chassisNumber=chnrのみ")
-        void testSuccessSerieEmpty() {
-            validReq.setSerie("");
-            when(ud15Mapper.selectByChnr("", "013945")).thenReturn(validRecord);
-            ApiResponse<?> resp = service.viewInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>) resp.getData();
-            assertEquals("013945", data.get("chassisNumber"));
-        }
-
-        @Test @DisplayName("正常系-recordのフィールドがnull→空文字に変換")
-        void testSuccessRecordFieldsNull() {
-            HdocSendDataVinPlate nullRecord = new HdocSendDataVinPlate();
-            nullRecord.setType(null);
-            nullRecord.setStatus(null);
-            nullRecord.setMsg(null);
-            nullRecord.setRegisterDatetime(null);
-            nullRecord.setDocReady(null);
-            nullRecord.setDocSent(null);
-            nullRecord.setXmlDoc(null);
-
-            when(ud15Mapper.selectByChnr("JPCT", "013945")).thenReturn(nullRecord);
-            ApiResponse<?> resp = service.viewInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>) resp.getData();
-            assertEquals("", data.get("type"));
-            assertEquals("", data.get("status"));
-            assertEquals("", data.get("msg"));
-            assertEquals("", data.get("registerDatetime"));
-            assertEquals("", data.get("docReady"));
-            assertEquals("", data.get("docSent"));
-            assertEquals("", data.get("xmlDoc"));
-        }
-
-        @Test @DisplayName("異常系-mapper例外→500")
-        void testException() {
-            when(ud15Mapper.selectByChnr("JPCT", "013945")).thenThrow(new RuntimeException("DB error"));
-            assertEquals(500, service.viewInfo(validReq).getCode().intValue());
-        }
+    private HdocSendDataVinPlate createVinPlateRecord() {
+        HdocSendDataVinPlate r = new HdocSendDataVinPlate();
+        r.setSerie("ABCD");
+        r.setChnr("123456");
+        r.setType("1");
+        r.setStatus("0");
+        r.setMsg("test msg");
+        r.setRegisterDatetime("2026-07-20 10:00:00");
+        r.setDocReady("Y");
+        r.setDocSent("N");
+        r.setXmlDoc("<xml/>");
+        r.setUpdateUser("admin");
+        return r;
     }
 
-    // ========================================================================
-    // setRegenerate / setOk（updateStatus経由）
-    // ========================================================================
-    @Nested
-    @DisplayName("setRegenerate / setOk（updateStatus）")
-    class UpdateStatusTest {
+    // ============================================================
+    // viewInfo() — 参数校验
+    // ============================================================
 
-        @Test @DisplayName("setRegenerate-chnrがnull→400")
-        void testRegenerateChnrNull() {
-            validReq.setChnr(null);
-            assertEquals(400, service.setRegenerate(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
+    @Test
+    @DisplayName("viewInfo - chnr为null，应返回400")
+    void viewInfo_ChnrNull_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", null, "admin");
 
-        @Test @DisplayName("setRegenerate-chnrが空→400")
-        void testRegenerateChnrEmpty() {
-            validReq.setChnr("");
-            assertEquals(400, service.setRegenerate(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
+        ApiResponse<?> result = service.viewInfo(r);
 
-        @Test @DisplayName("setRegenerate-count=0→400 记录不存在")
-        void testRegenerateCountZero() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(0);
-            assertEquals(400, service.setRegenerate(validReq).getCode().intValue());
-            verify(ud15Mapper, never()).updateStatus(any(), any(), any(), any(), any());
-        }
-
-        @Test @DisplayName("setRegenerate-updateUserがnull→SYSTEMで更新成功")
-        void testRegenerateUserNull() {
-            validReq.setUpdateUser(null);
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "0", "SYSTEM", "UD15_REGENERATE")).thenReturn(1);
-
-            ApiResponse<?> resp = service.setRegenerate(validReq);
-            assertEquals(200, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("设置重新生成成功"));
-            verify(ud15Mapper).updateStatus("JPCT", "013945", "0", "SYSTEM", "UD15_REGENERATE");
-        }
-
-        @Test @DisplayName("setRegenerate-updateUserが空→SYSTEMで更新成功")
-        void testRegenerateUserEmpty() {
-            validReq.setUpdateUser("");
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "0", "SYSTEM", "UD15_REGENERATE")).thenReturn(1);
-
-            assertEquals(200, service.setRegenerate(validReq).getCode().intValue());
-            verify(ud15Mapper).updateStatus("JPCT", "013945", "0", "SYSTEM", "UD15_REGENERATE");
-        }
-
-        @Test @DisplayName("setRegenerate-正常系→200 设置重新生成成功")
-        void testRegenerateSuccess() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "0", "admin", "UD15_REGENERATE")).thenReturn(1);
-
-            ApiResponse<?> resp = service.setRegenerate(validReq);
-            assertEquals(200, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("设置重新生成成功"));
-        }
-
-        @Test @DisplayName("setRegenerate-updateStatusが0→500 更新失败")
-        void testRegenerateUpdateFails() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "0", "admin", "UD15_REGENERATE")).thenReturn(0);
-
-            assertEquals(500, service.setRegenerate(validReq).getCode().intValue());
-        }
-
-        @Test @DisplayName("setOk-正常系→200 设置OK成功")
-        void testSetOkSuccess() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "1", "admin", "UD15_SET_OK")).thenReturn(1);
-
-            ApiResponse<?> resp = service.setOk(validReq);
-            assertEquals(200, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("设置OK成功"));
-        }
-
-        @Test @DisplayName("setOk-updateStatusが0→500")
-        void testSetOkUpdateFails() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatus("JPCT", "013945", "1", "admin", "UD15_SET_OK")).thenReturn(0);
-
-            assertEquals(500, service.setOk(validReq).getCode().intValue());
-        }
-
-        @Test @DisplayName("updateStatus-例外→500")
-        void testUpdateStatusException() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenThrow(new RuntimeException());
-            assertEquals(500, service.setRegenerate(validReq).getCode().intValue());
-        }
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis number不能为空", result.getMsg());
+        verifyNoInteractions(ud15Mapper);
     }
 
-    // ========================================================================
-    // changeToBasicInfo / changeToAdvancedInfo（updateStatusAndType経由）
-    // ========================================================================
-    @Nested
-    @DisplayName("changeToBasicInfo / changeToAdvancedInfo（updateStatusAndType）")
-    class UpdateStatusAndTypeTest {
+    @Test
+    @DisplayName("viewInfo - chnr为空字符串，应返回400")
+    void viewInfo_ChnrEmpty_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "", "admin");
 
-        @Test @DisplayName("changeToBasic-chnrがnull→400")
-        void testBasicChnrNull() {
-            validReq.setChnr(null);
-            assertEquals(400, service.changeToBasicInfo(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
+        ApiResponse<?> result = service.viewInfo(r);
 
-        @Test @DisplayName("changeToBasic-chnrが空→400")
-        void testBasicChnrEmpty() {
-            validReq.setChnr("");
-            assertEquals(400, service.changeToBasicInfo(validReq).getCode().intValue());
-            verifyNoInteractions(ud15Mapper);
-        }
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis number不能为空", result.getMsg());
+        verifyNoInteractions(ud15Mapper);
+    }
 
-        @Test @DisplayName("changeToBasic-count=0→400 记录不存在")
-        void testBasicCountZero() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(0);
-            assertEquals(400, service.changeToBasicInfo(validReq).getCode().intValue());
-        }
+    @Test
+    @DisplayName("viewInfo - chnr为空白字符串，应返回400")
+    void viewInfo_ChnrBlank_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "   ", "admin");
 
-        @Test @DisplayName("changeToBasic-正常系→200 切换到基础信息成功")
-        void testBasicSuccess() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "1", "admin", "UD15_CHANGE_BASIC")).thenReturn(1);
+        ApiResponse<?> result = service.viewInfo(r);
 
-            ApiResponse<?> resp = service.changeToBasicInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("切换到基础信息成功"));
-        }
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud15Mapper);
+    }
 
-        @Test @DisplayName("changeToBasic-updateStatusAndTypeが0→500")
-        void testBasicUpdateFails() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "1", "admin", "UD15_CHANGE_BASIC")).thenReturn(0);
+    // ============================================================
+    // viewInfo() — 业务逻辑
+    // ============================================================
 
-            assertEquals(500, service.changeToBasicInfo(validReq).getCode().intValue());
-        }
+    @Test
+    @DisplayName("viewInfo - serie为null，使用空字符串查询，记录不存在返回400")
+    void viewInfo_SerieNullRecordNotFound_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest(null, "123456", "admin");
+        when(ud15Mapper.selectByChnr("", "123456")).thenReturn(null);
 
-        @Test @DisplayName("changeToAdvanced-正常系→200 切换到高级信息成功")
-        void testAdvancedSuccess() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "2", "admin", "UD15_CHANGE_ADVANCED")).thenReturn(1);
+        ApiResponse<?> result = service.viewInfo(r);
 
-            ApiResponse<?> resp = service.changeToAdvancedInfo(validReq);
-            assertEquals(200, resp.getCode().intValue());
-            assertTrue(resp.getMsg().contains("切换到高级信息成功"));
-        }
+        assertEquals(400, result.getCode());
+        assertEquals("Chassis number 123456 not found.", result.getMsg());
+        verify(ud15Mapper, times(1)).selectByChnr("", "123456");
+    }
 
-        @Test @DisplayName("changeToAdvanced-updateStatusAndTypeが0→500")
-        void testAdvancedUpdateFails() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "2", "admin", "UD15_CHANGE_ADVANCED")).thenReturn(0);
+    @Test
+    @DisplayName("viewInfo - serie有值，记录存在，应返回完整信息")
+    void viewInfo_SerieProvidedRecordExists_ShouldReturnFullInfo() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.selectByChnr("ABCD", "123456")).thenReturn(createVinPlateRecord());
 
-            assertEquals(500, service.changeToAdvancedInfo(validReq).getCode().intValue());
-        }
+        ApiResponse<?> result = service.viewInfo(r);
 
-        @Test @DisplayName("changeToAdvanced-updateUserがnull→SYSTEM")
-        void testAdvancedUserNull() {
-            validReq.setUpdateUser(null);
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED")).thenReturn(1);
+        assertEquals(200, result.getCode());
+        assertEquals("查看VIN Plate信息成功", result.getMsg());
+        assertNotNull(result.getData());
+        Map<?, ?> data = (Map<?, ?>) result.getData();
+        assertEquals("ABCD-123456", data.get("chassisNumber"));
+        assertEquals("1", data.get("type"));
+        assertEquals("0", data.get("status"));
+        assertEquals("test msg", data.get("msg"));
+        assertEquals("2026-07-20 10:00:00", data.get("registerDatetime"));
+        assertEquals("Y", data.get("docReady"));
+        assertEquals("N", data.get("docSent"));
+        assertEquals("<xml/>", data.get("xmlDoc"));
+    }
 
-            assertEquals(200, service.changeToAdvancedInfo(validReq).getCode().intValue());
-            verify(ud15Mapper).updateStatusAndType("JPCT", "013945", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED");
-        }
+    @Test
+    @DisplayName("viewInfo - serie为空字符串，chassisNumber应只包含chnr")
+    void viewInfo_SerieEmpty_ShouldReturnChassisNumberWithoutSerie() {
+        HdocSendDataVinPlate r = createRequest("", "123456", "admin");
+        when(ud15Mapper.selectByChnr("", "123456")).thenReturn(createVinPlateRecord());
 
-        @Test @DisplayName("changeToAdvanced-updateUserが空→SYSTEM")
-        void testAdvancedUserEmpty() {
-            validReq.setUpdateUser("");
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenReturn(1);
-            when(ud15Mapper.updateStatusAndType("JPCT", "013945", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED")).thenReturn(1);
+        ApiResponse<?> result = service.viewInfo(r);
 
-            assertEquals(200, service.changeToAdvancedInfo(validReq).getCode().intValue());
-            verify(ud15Mapper).updateStatusAndType("JPCT", "013945", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED");
-        }
+        assertEquals(200, result.getCode());
+        assertEquals("123456", ((Map<?, ?>) result.getData()).get("chassisNumber"));
+    }
 
-        @Test @DisplayName("updateStatusAndType-例外→500")
-        void testException() {
-            when(ud15Mapper.countByChnr("JPCT", "013945")).thenThrow(new RuntimeException());
-            assertEquals(500, service.changeToBasicInfo(validReq).getCode().intValue());
-        }
+    @Test
+    @DisplayName("viewInfo - serie为null但有记录，chassisNumber应只包含chnr")
+    void viewInfo_SerieNullButRecordExists_ShouldUseChnrOnly() {
+        HdocSendDataVinPlate r = createRequest(null, "123456", "admin");
+        HdocSendDataVinPlate record = createVinPlateRecord();
+        record.setSerie("ABCD");
+        when(ud15Mapper.selectByChnr("", "123456")).thenReturn(record);
+
+        ApiResponse<?> result = service.viewInfo(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("123456", ((Map<?, ?>) result.getData()).get("chassisNumber"));
+    }
+
+    @Test
+    @DisplayName("viewInfo - 记录中各字段为null，应用空字符串替代")
+    void viewInfo_RecordFieldsNull_ShouldUseEmptyString() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        HdocSendDataVinPlate record = new HdocSendDataVinPlate();
+        record.setSerie("ABCD");
+        record.setChnr("123456");
+        // type/status等字段均为null
+        when(ud15Mapper.selectByChnr("ABCD", "123456")).thenReturn(record);
+
+        ApiResponse<?> result = service.viewInfo(r);
+
+        assertEquals(200, result.getCode());
+        Map<?, ?> data = (Map<?, ?>) result.getData();
+        assertEquals("", data.get("type"));
+        assertEquals("", data.get("status"));
+        assertEquals("", data.get("msg"));
+        assertEquals("", data.get("registerDatetime"));
+        assertEquals("", data.get("docReady"));
+        assertEquals("", data.get("docSent"));
+        assertEquals("", data.get("xmlDoc"));
+    }
+
+    @Test
+    @DisplayName("viewInfo - Mapper异常，应返回500")
+    void viewInfo_MapperThrowsException_ShouldReturn500() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.selectByChnr("ABCD", "123456")).thenThrow(new RuntimeException("DB error"));
+
+        ApiResponse<?> result = service.viewInfo(r);
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
+
+    // ============================================================
+    // setRegenerate() — 通过updateStatus实现
+    // ============================================================
+
+    @Test
+    @DisplayName("setRegenerate - chnr为null，应返回400")
+    void setRegenerate_ChnrNull_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", null, "admin");
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud15Mapper);
+    }
+
+    @Test
+    @DisplayName("setRegenerate - chnr为空白字符串，应返回400")
+    void setRegenerate_ChnrBlank_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "   ", "admin");
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud15Mapper);
+    }
+
+    @Test
+    @DisplayName("setRegenerate - 记录不存在，应返回400")
+    void setRegenerate_NotFound_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(0);
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(400, result.getCode());
+        assertEquals("记录不存在", result.getMsg());
+        verify(ud15Mapper, never()).updateStatus(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("setRegenerate - serie为null使用空串，updateUser空字符串使用SYSTEM")
+    void setRegenerate_SerieNullAndUserEmpty_ShouldUseDefaults() {
+        HdocSendDataVinPlate r = createRequest(null, "123456", "");
+        when(ud15Mapper.countByChnr("", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatus("", "123456", "0", "SYSTEM", "UD15_REGENERATE")).thenReturn(1);
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("设置重新生成成功", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("setRegenerate - updateUser为空白字符串，应使用SYSTEM")
+    void setRegenerate_UserBlank_ShouldUseSystem() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "   ");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatus("ABCD", "123456", "0", "SYSTEM", "UD15_REGENERATE")).thenReturn(1);
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("设置重新生成成功", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("setRegenerate - 更新成功，应返回成功消息")
+    void setRegenerate_Success_ShouldReturnSuccess() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatus("ABCD", "123456", "0", "admin", "UD15_REGENERATE")).thenReturn(1);
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("设置重新生成成功", result.getMsg());
+        assertNotNull(result.getData());
+    }
+
+    @Test
+    @DisplayName("setRegenerate - 更新返回0，应返回500")
+    void setRegenerate_UpdateReturnsZero_ShouldReturn500() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatus("ABCD", "123456", "0", "admin", "UD15_REGENERATE")).thenReturn(0);
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(500, result.getCode());
+        assertEquals("更新失败，请重试", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("setRegenerate - Mapper异常，应返回500")
+    void setRegenerate_MapperThrowsException_ShouldReturn500() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenThrow(new RuntimeException("DB error"));
+
+        ApiResponse<?> result = service.setRegenerate(r);
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
+
+    // ============================================================
+    // setOk() — 通过updateStatus(status="1")实现
+    // ============================================================
+
+    @Test
+    @DisplayName("setOk - 更新成功，应返回设置OK成功")
+    void setOk_Success_ShouldReturnSuccess() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatus("ABCD", "123456", "1", "admin", "UD15_SET_OK")).thenReturn(1);
+
+        ApiResponse<?> result = service.setOk(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("设置OK成功", result.getMsg());
+    }
+
+    // ============================================================
+    // changeToBasicInfo() — 通过updateStatusAndType(type="1")实现
+    // ============================================================
+
+    @Test
+    @DisplayName("changeToBasicInfo - chnr为空字符串，应返回400")
+    void changeToBasicInfo_ChnrEmpty_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "", "admin");
+
+        ApiResponse<?> result = service.changeToBasicInfo(r);
+
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud15Mapper);
+    }
+
+    @Test
+    @DisplayName("changeToBasicInfo - 记录不存在，应返回400")
+    void changeToBasicInfo_NotFound_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(0);
+
+        ApiResponse<?> result = service.changeToBasicInfo(r);
+
+        assertEquals(400, result.getCode());
+        assertEquals("记录不存在", result.getMsg());
+        verify(ud15Mapper, never()).updateStatusAndType(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("changeToBasicInfo - 更新成功，应返回切换到基础信息成功")
+    void changeToBasicInfo_Success_ShouldReturnBasicMsg() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatusAndType("ABCD", "123456", "0", "1", "admin", "UD15_CHANGE_BASIC")).thenReturn(1);
+
+        ApiResponse<?> result = service.changeToBasicInfo(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("切换到基础信息成功", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("changeToBasicInfo - 更新返回0，应返回500")
+    void changeToBasicInfo_UpdateReturnsZero_ShouldReturn500() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatusAndType("ABCD", "123456", "0", "1", "admin", "UD15_CHANGE_BASIC")).thenReturn(0);
+
+        ApiResponse<?> result = service.changeToBasicInfo(r);
+
+        assertEquals(500, result.getCode());
+        assertEquals("更新失败，请重试", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("changeToBasicInfo - Mapper异常，应返回500")
+    void changeToBasicInfo_MapperThrowsException_ShouldReturn500() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "admin");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenThrow(new RuntimeException("DB error"));
+
+        ApiResponse<?> result = service.changeToBasicInfo(r);
+
+        assertEquals(500, result.getCode());
+        assertEquals("系统内部错误，请联系管理员", result.getMsg());
+    }
+
+    // ============================================================
+    // changeToAdvancedInfo() — 通过updateStatusAndType(type="2")实现
+    // ============================================================
+
+    @Test
+    @DisplayName("changeToAdvancedInfo - updateUser为null，使用SYSTEM")
+    void changeToAdvancedInfo_UserNull_ShouldUseSystem() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", null);
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatusAndType("ABCD", "123456", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED")).thenReturn(1);
+
+        ApiResponse<?> result = service.changeToAdvancedInfo(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("切换到高级信息成功", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("changeToAdvancedInfo - updateUser为空白字符串，使用SYSTEM")
+    void changeToAdvancedInfo_UserBlank_ShouldUseSystem() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "123456", "   ");
+        when(ud15Mapper.countByChnr("ABCD", "123456")).thenReturn(1);
+        when(ud15Mapper.updateStatusAndType("ABCD", "123456", "0", "2", "SYSTEM", "UD15_CHANGE_ADVANCED")).thenReturn(1);
+
+        ApiResponse<?> result = service.changeToAdvancedInfo(r);
+
+        assertEquals(200, result.getCode());
+        assertEquals("切换到高级信息成功", result.getMsg());
+    }
+
+    @Test
+    @DisplayName("changeToAdvancedInfo - chnr为空白字符串，应返回400")
+    void changeToAdvancedInfo_ChnrBlank_ShouldReturn400() {
+        HdocSendDataVinPlate r = createRequest("ABCD", "   ", "admin");
+
+        ApiResponse<?> result = service.changeToAdvancedInfo(r);
+
+        assertEquals(400, result.getCode());
+        verifyNoInteractions(ud15Mapper);
     }
 }

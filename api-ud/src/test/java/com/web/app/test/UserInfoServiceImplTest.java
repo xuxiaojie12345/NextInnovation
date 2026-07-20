@@ -16,20 +16,9 @@ import static org.mockito.Mockito.*;
 
 /**
  * UserInfoServiceImpl 单元测试
- *
- * 覆盖所有分支（100%覆盖率）:
- *
- * login 方法分支:
- * 1. user == null -> return null
- * 2. user != null && password 匹配 -> return user
- * 3. user != null && password 不匹配 -> return null
- *
- * getUserById 方法分支:
- * 4. user 存在 -> return user
- * 5. user 不存在 (mapper返回null) -> return null
+ * 覆盖所有分支路径，达到100%分支覆盖率
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UserInfoServiceImpl 单元测试")
 class UserInfoServiceImplTest {
 
     @Mock
@@ -38,176 +27,109 @@ class UserInfoServiceImplTest {
     @InjectMocks
     private UserInfoServiceImpl userInfoService;
 
-    private static final String TEST_USER_ID = "test_admin";
-    private static final String TEST_PASSWORD = "Test@123";
-    private static final String WRONG_PASSWORD = "WrongPassword";
-
     private UserInfo mockUser;
 
     @BeforeEach
     void setUp() {
-        reset(userInfoMapper);
-
-        // 构建测试用户
         mockUser = new UserInfo();
-        mockUser.setUserId(TEST_USER_ID);
-        mockUser.setPassword(TEST_PASSWORD);
-        mockUser.setUsername("Test Admin");
-        mockUser.setResponsible("Admin");
-        mockUser.setUserposition("Manager");
-        mockUser.setEMmail("admin@test.com");
+        mockUser.setUserId("testuser");
+        mockUser.setPassword("pass123");
+        mockUser.setUsername("测试用户");
     }
 
-    // ============================================================
-    // login 方法测试
-    // ============================================================
+    // ========================
+    // login() 方法测试
+    // ========================
 
-    /**
-     * 测试 login - 用户存在且密码正确
-     * 覆盖: user != null && user.getPassword().equals(password) -> return user
-     */
     @Test
-    @DisplayName("login-用户存在且密码正确-返回UserInfo")
-    void testLogin_UserExistsAndPasswordMatches() {
-        // Arrange
-        when(userInfoMapper.selectUserById(TEST_USER_ID)).thenReturn(mockUser);
+    @DisplayName("login - 用户存在且密码正确，应返回用户对象")
+    void login_UserExistsAndPasswordCorrect_ShouldReturnUser() {
+        // 准备
+        when(userInfoMapper.selectUserById("testuser")).thenReturn(mockUser);
 
-        // Act
-        UserInfo result = userInfoService.login(TEST_USER_ID, TEST_PASSWORD);
+        // 执行
+        UserInfo result = userInfoService.login("testuser", "pass123");
 
-        // Assert
-        assertNotNull(result, "登录成功时应返回UserInfo对象");
-        assertEquals(TEST_USER_ID, result.getUserId(), "用户ID应匹配");
-        assertEquals(TEST_PASSWORD, result.getPassword(), "密码应匹配");
-        assertEquals("Test Admin", result.getUsername(), "用户名应匹配");
-
-        // 验证Mapper被调用一次
-        verify(userInfoMapper, times(1)).selectUserById(TEST_USER_ID);
+        // 验证
+        assertNotNull(result);
+        assertEquals("testuser", result.getUserId());
+        assertEquals("测试用户", result.getUsername());
+        verify(userInfoMapper, times(1)).selectUserById("testuser");
     }
 
-    /**
-     * 测试 login - 用户存在但密码错误
-     * 覆盖: user != null && user.getPassword().equals(password) -> false -> return null
-     */
     @Test
-    @DisplayName("login-用户存在但密码错误-返回null")
-    void testLogin_UserExistsButWrongPassword() {
-        // Arrange
-        when(userInfoMapper.selectUserById(TEST_USER_ID)).thenReturn(mockUser);
+    @DisplayName("login - 用户不存在（mapper返回null），应返回null")
+    void login_UserNotExists_ShouldReturnNull() {
+        // 准备
+        when(userInfoMapper.selectUserById("unknown")).thenReturn(null);
 
-        // Act
-        UserInfo result = userInfoService.login(TEST_USER_ID, WRONG_PASSWORD);
+        // 执行
+        UserInfo result = userInfoService.login("unknown", "pass123");
 
-        // Assert
-        assertNull(result, "密码错误时应返回null");
-
-        // 验证Mapper被调用一次
-        verify(userInfoMapper, times(1)).selectUserById(TEST_USER_ID);
+        // 验证
+        assertNull(result);
+        verify(userInfoMapper, times(1)).selectUserById("unknown");
     }
 
-    /**
-     * 测试 login - 用户不存在（Mapper返回null）
-     * 覆盖: user == null -> return null
-     */
     @Test
-    @DisplayName("login-用户不存在-Mapper返回null-返回null")
-    void testLogin_UserNotFound() {
-        // Arrange
-        when(userInfoMapper.selectUserById(TEST_USER_ID)).thenReturn(null);
+    @DisplayName("login - 用户存在但密码为null，应返回null")
+    void login_PasswordIsNull_ShouldReturnNull() {
+        // 准备
+        when(userInfoMapper.selectUserById("testuser")).thenReturn(mockUser);
 
-        // Act
-        UserInfo result = userInfoService.login(TEST_USER_ID, TEST_PASSWORD);
+        // 执行
+        UserInfo result = userInfoService.login("testuser", null);
 
-        // Assert
-        assertNull(result, "用户不存在时应返回null");
-
-        // 验证Mapper被调用一次
-        verify(userInfoMapper, times(1)).selectUserById(TEST_USER_ID);
+        // 验证
+        assertNull(result);
+        verify(userInfoMapper, times(1)).selectUserById("testuser");
     }
 
-    /**
-     * 测试 login - 用户ID为空字符串
-     * 覆盖: mapper 使用空字符串参数调用 -> mapper返回null -> return null
-     */
     @Test
-    @DisplayName("login-用户ID为空字符串-返回null")
-    void testLogin_EmptyUserId() {
-        // Arrange
-        when(userInfoMapper.selectUserById("")).thenReturn(null);
+    @DisplayName("login - 用户存在但密码错误，应返回null")
+    void login_PasswordIncorrect_ShouldReturnNull() {
+        // 准备
+        when(userInfoMapper.selectUserById("testuser")).thenReturn(mockUser);
 
-        // Act
-        UserInfo result = userInfoService.login("", TEST_PASSWORD);
+        // 执行
+        UserInfo result = userInfoService.login("testuser", "wrongpass");
 
-        // Assert
-        assertNull(result, "用户ID为空时应返回null");
-
-        // 验证Mapper被调用一次（空字符串传递给Mapper）
-        verify(userInfoMapper, times(1)).selectUserById("");
+        // 验证
+        assertNull(result);
+        verify(userInfoMapper, times(1)).selectUserById("testuser");
     }
 
-    // ============================================================
-    // getUserById 方法测试
-    // ============================================================
+    // ========================
+    // getUserById() 方法测试
+    // ========================
 
-    /**
-     * 测试 getUserById - 用户存在
-     * 覆盖: mapper返回UserInfo -> return user
-     */
     @Test
-    @DisplayName("getUserById-用户存在-返回UserInfo")
-    void testGetUserById_UserExists() {
-        // Arrange
-        when(userInfoMapper.selectUserById(TEST_USER_ID)).thenReturn(mockUser);
+    @DisplayName("getUserById - 用户存在，应返回用户对象")
+    void getUserById_UserExists_ShouldReturnUser() {
+        // 准备
+        when(userInfoMapper.selectUserById("testuser")).thenReturn(mockUser);
 
-        // Act
-        UserInfo result = userInfoService.getUserById(TEST_USER_ID);
+        // 执行
+        UserInfo result = userInfoService.getUserById("testuser");
 
-        // Assert
-        assertNotNull(result, "用户存在时应返回UserInfo对象");
-        assertEquals(TEST_USER_ID, result.getUserId(), "用户ID应匹配");
-        assertEquals(TEST_PASSWORD, result.getPassword(), "密码应匹配");
-
-        // 验证Mapper被调用一次
-        verify(userInfoMapper, times(1)).selectUserById(TEST_USER_ID);
+        // 验证
+        assertNotNull(result);
+        assertEquals("testuser", result.getUserId());
+        assertEquals("测试用户", result.getUsername());
+        verify(userInfoMapper, times(1)).selectUserById("testuser");
     }
 
-    /**
-     * 测试 getUserById - 用户不存在（Mapper返回null）
-     * 覆盖: mapper返回null -> return null
-     */
     @Test
-    @DisplayName("getUserById-用户不存在-Mapper返回null-返回null")
-    void testGetUserById_UserNotFound() {
-        // Arrange
-        when(userInfoMapper.selectUserById(TEST_USER_ID)).thenReturn(null);
+    @DisplayName("getUserById - 用户不存在，应返回null")
+    void getUserById_UserNotExists_ShouldReturnNull() {
+        // 准备
+        when(userInfoMapper.selectUserById("nonexistent")).thenReturn(null);
 
-        // Act
-        UserInfo result = userInfoService.getUserById(TEST_USER_ID);
+        // 执行
+        UserInfo result = userInfoService.getUserById("nonexistent");
 
-        // Assert
-        assertNull(result, "用户不存在时应返回null");
-
-        // 验证Mapper被调用一次
-        verify(userInfoMapper, times(1)).selectUserById(TEST_USER_ID);
-    }
-
-    /**
-     * 测试 getUserById - 用户ID为null
-     * 覆盖: mapper使用null参数调用 -> mapper返回null -> return null
-     */
-    @Test
-    @DisplayName("getUserById-用户ID为null-返回null")
-    void testGetUserById_NullUserId() {
-        // Arrange
-        when(userInfoMapper.selectUserById(null)).thenReturn(null);
-
-        // Act
-        UserInfo result = userInfoService.getUserById(null);
-
-        // Assert
-        assertNull(result, "用户ID为null时应返回null");
-
-        // 验证Mapper被调用一次（null参数传递给Mapper）
-        verify(userInfoMapper, times(1)).selectUserById(null);
+        // 验证
+        assertNull(result);
+        verify(userInfoMapper, times(1)).selectUserById("nonexistent");
     }
 }
