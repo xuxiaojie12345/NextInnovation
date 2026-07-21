@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocFunctionAuthMapper">
+    <select id="selectByUserId" resultType="com.web.app.entity.HdocFunctionAuth">
+        SELECT * FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userId}
+    </select>
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(1) FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userId}
+    </select>
+    <insert id="insert" parameterType="com.web.app.entity.HdocFunctionAuth">
+        INSERT INTO HDOC_FUNCTION_AUTH (USERID, FUNCTIONCODE) VALUES (#{userId}, #{functionCode})
+    </insert>
+    <delete id="deleteByUserId">
+        DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = #{userId}
+    </delete>
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO HDOC_FUNCTION_AUTH (USERID, FUNCTIONCODE) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.functionCode})
+        </foreach>
+    </insert>
+</mapper>

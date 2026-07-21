@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocUserDocMapper">
+    <select id="selectByUserId" resultType="com.web.app.entity.HdocUserDoc">
+        SELECT * FROM HDOC_USER_DOC WHERE USERID = #{userId}
+    </select>
+    <delete id="deleteByUserId">
+        DELETE FROM HDOC_USER_DOC WHERE USERID = #{userId}
+    </delete>
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO HDOC_USER_DOC (USERID, DOCTYPE) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.doctype})
+        </foreach>
+    </insert>
+</mapper>

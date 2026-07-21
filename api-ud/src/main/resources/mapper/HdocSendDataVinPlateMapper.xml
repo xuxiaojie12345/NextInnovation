@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocSendDataVinPlateMapper">
+    <select id="selectByChassisNo" resultType="com.web.app.entity.HdocSendDataVinPlate">
+        SELECT * FROM HDOC_SEND_DATA_VIN_PLATE WHERE CHASSIS_NO = #{chassisNo}
+    </select>
+    <update id="updateStatus">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status} WHERE CHASSIS_NO = #{chassisNo}
+    </update>
+    <update id="updateStatusAndType">
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status}, TYPE = #{type} WHERE CHASSIS_NO = #{chassisNo}
+    </update>
+</mapper>

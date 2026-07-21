@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocRecDataVdaVariantsMapper">
+    <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataVdaVariants">
+        SELECT * FROM HDOC_REC_DATA_VDA_VARIANTS WHERE CHASSIS_NO = #{chassisNo}
+    </select>
+</mapper>

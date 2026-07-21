@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocAdcaModificationMapper">
+    <select id="selectBySerieAndChassisNo" resultType="com.web.app.entity.HdocAdcaModification">
+        SELECT * FROM HDOC_ADCA_MODIFICATION WHERE SERIE = #{serie} AND CHNO = #{chassisNo}
+    </select>
+    <select id="selectByChassisNo" resultType="com.web.app.entity.HdocAdcaModification">
+        SELECT * FROM HDOC_ADCA_MODIFICATION WHERE CHNO = #{chassisNo}
+    </select>
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO HDOC_ADCA_MODIFICATION (SERIE, CHNO, DOCTYPE, LANG, VARIABLE, VERS, NEWVAL)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.serie}, #{item.chno}, #{item.doctype}, #{item.lang}, #{item.variable}, #{item.vers}, #{item.newval})
+        </foreach>
+    </insert>
+    <delete id="deleteBySerieAndChassisNo">
+        DELETE FROM HDOC_ADCA_MODIFICATION WHERE SERIE = #{serie} AND CHNO = #{chassisNo}
+    </delete>
+</mapper>

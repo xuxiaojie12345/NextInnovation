@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocMarketAuthMapper">
+    <select id="selectByUserId" resultType="com.web.app.entity.HdocMarketAuth">
+        SELECT * FROM HDOC_MARKET_AUTH WHERE USERID = #{userId}
+    </select>
+    <delete id="deleteByUserId">
+        DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userId}
+    </delete>
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO HDOC_MARKET_AUTH (USERID, MARKET) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.market})
+        </foreach>
+    </insert>
+</mapper>

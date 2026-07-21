@@ -1,0 +1,125 @@
+.usg-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.usg-header {
+  background-color: #003366;
+  padding: 18px 40px;
+  text-align: left;
+}
+
+.usg-header-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.usg-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.usg-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 24px 30px 20px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.usg-subtitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #003366;
+  margin: 0 0 18px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #003366;
+}
+
+.usg-links {
+  margin-bottom: 24px;
+}
+
+.usg-link-row {
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+
+.usg-link {
+  color: #1a73e8;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.usg-link:hover {
+  text-decoration: underline;
+  color: #1557b0;
+}
+
+.usg-other-section {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+}
+
+.usg-checkbox {
+  display: block;
+  font-size: 13px;
+}
+
+.usg-checkbox .ant-checkbox-wrapper {
+  font-size: 13px;
+}
+
+.usg-other-content {
+  margin-top: 12px;
+  padding: 14px 18px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #333333;
+  animation: usgFadeIn 0.25s ease-in;
+}
+
+.usg-other-content a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.usg-other-content a:hover {
+  text-decoration: underline;
+}
+
+.usg-footer {
+  background-color: #003366;
+  padding: 12px 40px;
+  text-align: left;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.usg-footer-link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.usg-footer-link:hover {
+  color: #e0e0e0;
+}
+
+@keyframes usgFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

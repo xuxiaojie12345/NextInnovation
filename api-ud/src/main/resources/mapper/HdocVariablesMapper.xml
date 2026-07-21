@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocVariablesMapper">
+    <select id="selectAll" resultType="com.web.app.entity.HdocVariables">
+        SELECT * FROM HDOC_VARIABLES
+    </select>
+    <select id="selectByCondition" resultType="com.web.app.entity.HdocVariables">
+        SELECT * FROM HDOC_VARIABLES WHERE 1=1
+        <if test="variable != null and variable != ''"> AND VARIABLE LIKE CONCAT('%', #{variable}, '%') </if>
+        <if test="type != null and type != ''"> AND TYPE = #{type} </if>
+        <if test="description != null and description != ''"> AND DESCRIPTION LIKE CONCAT('%', #{description}, '%') </if>
+        <if test="createdByUser != null and createdByUser != ''"> AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%') </if>
+        <if test="dateFrom != null and dateFrom != ''"> AND REGISTER_DATETIME &gt;= #{dateFrom} </if>
+        <if test="dateTo != null and dateTo != ''"> AND REGISTER_DATETIME &lt;= #{dateTo} </if>
+    </select>
+    <insert id="insert" parameterType="com.web.app.entity.HdocVariables">
+        INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION) VALUES (#{variable}, #{type}, #{description})
+    </insert>
+    <update id="update" parameterType="com.web.app.entity.HdocVariables">
+        UPDATE HDOC_VARIABLES SET TYPE = #{type}, DESCRIPTION = #{description} WHERE VARIABLE = #{variable}
+    </update>
+    <delete id="deleteByVariable">
+        DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </delete>
+</mapper>

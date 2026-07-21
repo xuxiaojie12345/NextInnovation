@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.app.mapper.HdocRecDataKolaVariantMapper">
+    <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataKolaVariant">
+        SELECT * FROM HDOC_REC_DATA_KOLA_VARIANT WHERE VARIANTS LIKE CONCAT('%', #{chassisNo}, '%')
+    </select>
+</mapper>
