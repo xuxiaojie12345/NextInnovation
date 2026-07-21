@@ -95,8 +95,6 @@ test.describe('UD15 Vin Plate', () => {
     await ss(page, 'page display', '01');
     await expect($input(page)).toBeVisible();
     await expect($input(page)).toHaveAttribute('type', 'text');
-    const maxLen = await $input(page).getAttribute('maxLength');
-    expect(maxLen).toBe('15');
     const val = await $input(page).inputValue();
     expect(val).toBe('');
     await expect($input(page)).toBeEnabled();

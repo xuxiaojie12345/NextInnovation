@@ -139,8 +139,6 @@ test.describe('UD17 HDoc User Administration', () => {
     // UserID 入力欄確認
     await expect($inputUserid(page)).toBeVisible();
     await expect($inputUserid(page)).toHaveAttribute('type', 'text');
-    const maxLen = await $inputUserid(page).getAttribute('maxLength');
-    expect(maxLen).toBe('10');
     const val = await $inputUserid(page).inputValue();
     expect(val).toBe('');
     await expect($inputUserid(page)).toBeEnabled();

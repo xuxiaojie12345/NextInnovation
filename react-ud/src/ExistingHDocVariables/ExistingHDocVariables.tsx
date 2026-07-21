@@ -465,7 +465,7 @@ const ExistingHDocVariables: React.FC = () => {
 
         {/* Type */}
         <div className="f-row">
-          <span className="f-label required">Type</span>
+          <span className="f-label">Type</span>
           {renderOpSelect("Type", typeOp, setTypeOp)}
           <select
             className="f-input ehv-select"

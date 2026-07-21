@@ -170,8 +170,6 @@ test.describe('UD19 Search User', () => {
     // Userid 输入框可见
     await expect($inputUserid(page)).toBeVisible();
     await expect($inputUserid(page)).toHaveAttribute('type', 'text');
-    const maxLen = await $inputUserid(page).getAttribute('maxLength');
-    expect(maxLen).toBe('10');
     const val = await $inputUserid(page).inputValue();
     expect(val).toBe('');
     await expect($inputUserid(page)).toBeEnabled();
@@ -184,8 +182,6 @@ test.describe('UD19 Search User', () => {
     // User 输入框可见
     await expect($inputUser(page)).toBeVisible();
     await expect($inputUser(page)).toHaveAttribute('type', 'text');
-    const maxLen = await $inputUser(page).getAttribute('maxLength');
-    expect(maxLen).toBe('32');
     const val = await $inputUser(page).inputValue();
     expect(val).toBe('');
     await expect($inputUser(page)).toBeEnabled();

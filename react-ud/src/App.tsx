@@ -103,6 +103,15 @@ const App: React.FC = () => {
             element={<HDocUserDocAdministration />}
           />
           <Route path="edb-user-view" element={<EDBUserView />} />
+          {/* 未匹配的子路由显示 404 提示 */}
+          <Route
+            path="*"
+            element={
+              <div style={{ padding: 20, color: '#333', fontSize: 20, fontWeight: 'bold' }}>
+                Page not found.
+              </div>
+            }
+          />
         </Route>
         <Route path="/" element={<Login />} />
       </Routes>

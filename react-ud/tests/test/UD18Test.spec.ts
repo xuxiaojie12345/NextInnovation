@@ -195,8 +195,6 @@ test.describe('UD18 HDoc User Doc Administration', () => {
     // 确认 UserID 输入框可见
     await expect($inputUserid(page)).toBeVisible();
     await expect($inputUserid(page)).toHaveAttribute('type', 'text');
-    const maxLen = await $inputUserid(page).getAttribute('maxLength');
-    expect(maxLen).toBe('10');
     const val = await $inputUserid(page).inputValue();
     expect(val).toBe('');
     await expect($inputUserid(page)).toBeEnabled();

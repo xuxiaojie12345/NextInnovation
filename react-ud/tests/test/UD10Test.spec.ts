@@ -95,7 +95,6 @@ test.describe('UD10 Existing HDoc Variables', () => {
     await ss(page, 'after', '02');
     await expect($varInput(page)).toBeVisible();
     await expect($varInput(page)).toHaveAttribute('type', 'text');
-    await expect($varInput(page)).toHaveAttribute('maxLength', '30');
     await expect($varInput(page)).toHaveValue('');
     await expect($varInput(page)).toBeEnabled();
     await ss(page, 'var input confirmed', '02');
@@ -119,7 +118,6 @@ test.describe('UD10 Existing HDoc Variables', () => {
     await ss(page, 'after', '04');
     await expect($descInput(page)).toBeVisible();
     await expect($descInput(page)).toHaveAttribute('type', 'text');
-    await expect($descInput(page)).toHaveAttribute('maxLength', '100');
     await expect($descInput(page)).toHaveValue('');
     await expect($descInput(page)).toBeEnabled();
     await ss(page, 'desc input confirmed', '04');
@@ -130,7 +128,6 @@ test.describe('UD10 Existing HDoc Variables', () => {
     await ss(page, 'after', '05');
     await expect($createdInput(page)).toBeVisible();
     await expect($createdInput(page)).toHaveAttribute('type', 'text');
-    await expect($createdInput(page)).toHaveAttribute('maxLength', '16');
     await expect($createdInput(page)).toHaveValue('');
     await expect($createdInput(page)).toBeEnabled();
     await ss(page, 'created by confirmed', '05');

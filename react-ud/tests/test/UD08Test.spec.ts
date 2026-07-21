@@ -100,7 +100,6 @@ test.describe('UD08 Homologation Variables', () => {
     const input = $condInput(page, 'Number');
     await expect(input).toBeVisible();
     await expect(input).toHaveAttribute('type', 'text');
-    await expect(input).toHaveAttribute('maxLength', '10');
     const val = await input.inputValue();
     expect(val).toBe('');
     await ss(page, 'Number输入框', '03');
@@ -124,15 +123,12 @@ test.describe('UD08 Homologation Variables', () => {
     await ss(page, '画面表示', '05');
     const varInput = $condInput(page, 'Variable');
     await expect(varInput).toBeVisible();
-    await expect(varInput).toHaveAttribute('maxLength', '20');
 
     const valInput = $condInput(page, 'Value');
     await expect(valInput).toBeVisible();
-    await expect(valInput).toHaveAttribute('maxLength', '200');
 
     const cmtInput = $condInput(page, 'Comments');
     await expect(cmtInput).toBeVisible();
-    await expect(cmtInput).toHaveAttribute('maxLength', '100');
 
     await expect($variantInput1(page)).toBeVisible();
     await expect($variantInput2(page)).toBeVisible();

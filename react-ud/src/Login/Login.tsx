@@ -113,7 +113,7 @@ const Login: React.FC = () => {
           <p style={{marginLeft: "250px"}}>Use Outlook id and password</p>
           <p>
             Support, authorization request or improvement suggestions, send mail
-            to: Support TPI
+            to: <span style={{ textDecoration: "underline" }}>Support TPI</span>
           </p>
         </div>
       </div>

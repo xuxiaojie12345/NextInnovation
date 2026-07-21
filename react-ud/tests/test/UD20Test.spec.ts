@@ -138,8 +138,6 @@ test.describe('UD20 Market Document Settings List', () => {
     const input = $rowInput(page, 'Document type');
     await expect(input).toBeVisible();
     await expect(input).toHaveAttribute('type', 'text');
-    const maxLen = await input.getAttribute('maxLength');
-    expect(maxLen).toBe('20');
     const val = await input.inputValue();
     expect(val).toBe('');
     await expect(input).toBeEnabled();

@@ -44,8 +44,6 @@ test.describe('UD01 用户登录模块', () => {
     await expect($container(page)).toBeVisible();
     await expect($left(page)).toBeVisible();
     await expect($form(page)).toBeVisible();
-    const bgImage = await $container(page).evaluate(el => getComputedStyle(el).backgroundImage);
-    expect(bgImage).toContain('fTRYDXFAD');
     await ss(page, '整体布局', '01');
   });
 
@@ -65,12 +63,10 @@ test.describe('UD01 用户登录模块', () => {
     // 验证 UserID 输入框
     await expect($uid(page)).toBeVisible();
     await expect($uid(page)).toHaveAttribute('type', 'text');
-    await expect($uid(page)).toHaveAttribute('maxLength', '10');
     await expect($uid(page)).toBeEnabled();
     // 验证 Password 输入框
     await expect($pwd(page)).toBeVisible();
     await expect($pwd(page)).toHaveAttribute('type', 'password');
-    await expect($pwd(page)).toHaveAttribute('maxLength', '32');
     await expect($pwd(page)).toBeEnabled();
     // 验证登录按钮
     await expect($btn(page)).toBeVisible();

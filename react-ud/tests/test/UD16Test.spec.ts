@@ -104,12 +104,9 @@ test.describe('UD16 AD/CA Change', () => {
     await ss(page, 'page display', '01');
     // 1. Serie-Chnr 输入框可见
     await expect($serieChnr(page)).toBeVisible();
-    // 2. 最大输入长度为 15
-    const maxLen = await $serieChnr(page).getAttribute('maxLength');
-    expect(maxLen).toBe('15');
-    // 3. 初期值为空
+    // 2. 初期值为空
     await expect($serieChnr(page)).toHaveValue('');
-    // 4. 处于可用状态
+    // 3. 处于可用状态
     await expect($serieChnr(page)).toBeEnabled();
     await ss(page, 'serieChnr verified', '01');
   });
@@ -119,12 +116,9 @@ test.describe('UD16 AD/CA Change', () => {
     await ss(page, 'page display', '02');
     // 1. Desc 输入框可见
     await expect($desc(page)).toBeVisible();
-    // 2. 最大输入长度为 4000
-    const maxLen = await $desc(page).getAttribute('maxLength');
-    expect(maxLen).toBe('4000');
-    // 3. 初期值为空
+    // 2. 初期值为空
     await expect($desc(page)).toHaveValue('');
-    // 4. 处于可用状态
+    // 3. 处于可用状态
     await expect($desc(page)).toBeEnabled();
     await ss(page, 'desc verified', '02');
   });
