@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初始化-正常表示</td>
 <td style="text-align:left">1. 访问 UD19 页面<br>2. 确认画面表示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示 Header<br>2. 显示"Search HDoc User"标题<br>3. Userid/User 输入框为空<br>4. Market 下拉列表显示选项<br>5. Not set/Rule/Template 单选按钮未选中<br>6. Search 按钮可用<br>7. 结果表格为空</td>
+<td style="text-align:left">1. 显示 Header<br>2. 显示"Search HDoc User"标题<br>3. Userid/User 输入框为空<br>4. Market 下拉列表显示选项<br>5. Not set单选按钮选中<br>6. Search 按钮可用<br>7. 结果表格为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -82,59 +82,7 @@
 <td style="text-align:left">画面初始化-控件状态</td>
 <td style="text-align:left">1. 访问页面<br>2. 确认各控件的初期状态</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. Userid 输入框可输入（最大10字符，仅半角英数字）<br>2. User 输入框可输入（最大32字符，仅半角英数字）<br>3. Market 下拉列表默认空选项<br>4. COUNT 显示为 0</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-</tbody>
-</table>
-<h3 id="查询条件校验">查询条件校验 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预想结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:left">条件冲突-Userid+Rule</td>
-<td style="text-align:left">1. 输入 Userid<br>2. 勾选 Rule<br>3. 点击 Search<br>4. 确认结果</td>
-<td style="text-align:left">Userid: <code>t009667</code></td>
-<td style="text-align:left">1. 显示错误消息："请只选择一种查询方式"<br>2. 不调用 API</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">4</td>
-<td style="text-align:left">条件冲突-User+Template</td>
-<td style="text-align:left">1. 输入用户名<br>2. 勾选 Template<br>3. 点击 Search<br>4. 确认结果</td>
-<td style="text-align:left">User: <code>John</code></td>
-<td style="text-align:left">1. 显示错误消息："请只选择一种查询方式"<br>2. 不调用 API</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:left">条件冲突-Not set+Userid</td>
-<td style="text-align:left">1. 勾选 Not set<br>2. 输入 Userid<br>3. 点击 Search<br>4. 确认结果</td>
-<td style="text-align:left">Userid: <code>t009667</code></td>
-<td style="text-align:left">1. 显示错误消息："请只选择一种查询方式"<br>2. 不调用 API</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:left">无查询条件</td>
-<td style="text-align:left">1. 所有条件为空<br>2. 点击 Search<br>3. 确认结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示错误消息："请只选择一种查询方式"<br>2. 不调用 API</td>
+<td style="text-align:left">1. Userid 输入框可输入<br>2. User 输入框可输入<br>3. Market 下拉列表默认空选项<br>4. COUNT 显示为 0</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -155,7 +103,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">7</td>
+<td style="text-align:center">3</td>
 <td style="text-align:left">Userid查询-正常</td>
 <td style="text-align:left">1. 输入有效 Userid<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -164,7 +112,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">8</td>
+<td style="text-align:center">4</td>
 <td style="text-align:left">Userid查询-无结果</td>
 <td style="text-align:left">1. 输入不存在的 Userid<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">Userid: <code>XXXX</code></td>
@@ -189,7 +137,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">9</td>
+<td style="text-align:center">5</td>
 <td style="text-align:left">用户名查询-正常</td>
 <td style="text-align:left">1. 输入有效用户名<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">User: <code>Kurt Bjork</code></td>
@@ -198,7 +146,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">10</td>
+<td style="text-align:center">6</td>
 <td style="text-align:left">用户名查询-无结果</td>
 <td style="text-align:left">1. 输入不存在的用户名<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">User: <code>Nonexistent</code></td>
@@ -223,7 +171,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">11</td>
+<td style="text-align:center">7</td>
 <td style="text-align:left">Not set 搜索</td>
 <td style="text-align:left">1. 勾选 Not set<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -232,7 +180,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">12</td>
+<td style="text-align:center">8</td>
 <td style="text-align:left">Rule 搜索</td>
 <td style="text-align:left">1. 勾选 Rule<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -241,7 +189,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">13</td>
+<td style="text-align:center">9</td>
 <td style="text-align:left">Template 搜索</td>
 <td style="text-align:left">1. 勾选 Template<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -266,7 +214,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">14</td>
+<td style="text-align:center">10</td>
 <td style="text-align:left">Market 筛选</td>
 <td style="text-align:left">1. 选择 Market<br>2. 点击 Search<br>3. 确认结果</td>
 <td style="text-align:left">Market: <code>-EU</code></td>
@@ -291,7 +239,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">15</td>
+<td style="text-align:center">11</td>
 <td style="text-align:left">结果表格-各列表示</td>
 <td style="text-align:left">1. 执行任一查询获得结果<br>2. 确认表格各列</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -300,7 +248,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">16</td>
+<td style="text-align:center">12</td>
 <td style="text-align:left">COUNT 计数显示</td>
 <td style="text-align:left">1. 执行查询获得结果<br>2. 确认 COUNT 显示</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -325,7 +273,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">17</td>
+<td style="text-align:center">13</td>
 <td style="text-align:left">搜索中按钮禁用</td>
 <td style="text-align:left">1. 输入查询条件<br>2. 点击 Search<br>3. 在 API 响应前检查按钮状态</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -334,7 +282,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">18</td>
+<td style="text-align:center">14</td>
 <td style="text-align:left">搜索中防止重复提交</td>
 <td style="text-align:left">1. 输入查询条件<br>2. 点击 Search<br>3. 在 API 响应前再次点击</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -343,7 +291,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">19</td>
+<td style="text-align:center">15</td>
 <td style="text-align:left">消息清空-新查询清除旧消息</td>
 <td style="text-align:left">1. 触发条件冲突错误<br>2. 确认错误消息显示<br>3. 修改为有效条件后再查询</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -352,7 +300,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">16</td>
 <td style="text-align:left">连续查询-切换条件</td>
 <td style="text-align:left">1. Userid 查询后<br>2. 切换为 Rule 查询<br>3. 确认结果</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -377,7 +325,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">21</td>
+<td style="text-align:center">17</td>
 <td style="text-align:left">异常处理-网络断开</td>
 <td style="text-align:left">1. 模拟网络断开<br>2. 输入查询条件<br>3. 点击 Search<br>4. 确认结果</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -386,7 +334,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">22</td>
+<td style="text-align:center">18</td>
 <td style="text-align:left">异常处理-请求超时</td>
 <td style="text-align:left">1. 模拟 API 响应超时<br>2. 输入查询条件<br>3. 点击 Search<br>4. 等待超时</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -395,7 +343,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">23</td>
+<td style="text-align:center">19</td>
 <td style="text-align:left">异常处理-数据库连接失败</td>
 <td style="text-align:left">1. 模拟数据库异常<br>2. 输入查询条件<br>3. 点击 Search<br>4. 确认结果</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>
@@ -404,7 +352,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">24</td>
+<td style="text-align:center">20</td>
 <td style="text-align:left">异常处理-查询失败</td>
 <td style="text-align:left">1. 模拟 API 返回错误<br>2. 输入查询条件<br>3. 点击 Search<br>4. 确认结果</td>
 <td style="text-align:left">Userid: <code>t009667</code></td>

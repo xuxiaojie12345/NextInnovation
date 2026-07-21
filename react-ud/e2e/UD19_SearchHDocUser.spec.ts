@@ -98,6 +98,25 @@ test.describe("Search HDoc User (UD19) 测试", () => {
 
     test("[2] 画面初始化-控件状态", async ({ page }) => {
       const t = "画面初始化-控件状态";
+      await page.route(
+        "**/api/UD19SearchResultListApi/UD19SelectMarketMaster",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 200,
+              data: {
+                markets: [
+                  { market: "JPN" },
+                  { market: "USA" },
+                  { market: "CHN" },
+                ],
+              },
+            }),
+          });
+        },
+      );
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
       await expect(getUserIdInput(page)).toBeEnabled();
@@ -108,62 +127,14 @@ test.describe("Search HDoc User (UD19) 测试", () => {
         await page.locator(".ud19-market-list select option").count(),
       ).toBeGreaterThanOrEqual(1);
       await takeStepScreenshot(page, t);
-    });
-  });
-
-  test.describe("查询条件校验", () => {
-    test("[3] 条件冲突-Userid+Rule", async ({ page }) => {
-      const t = "条件冲突-Userid+Rule";
-      await navigateToUD19(page);
-      await takeStepScreenshot(page, t);
-      await getUserIdInput(page).fill("t009667");
-      await getRadio(page, "Rule").click();
-      await getBtnSearch(page).click();
-      await page.waitForTimeout(500);
-      await expect(getMessage(page)).toBeVisible();
-      await expect(getMessage(page)).toContainText("请只选择一种查询方式");
-      await takeStepScreenshot(page, t);
-    });
-
-    test("[4] 条件冲突-User+Template", async ({ page }) => {
-      const t = "条件冲突-User+Template";
-      await navigateToUD19(page);
-      await takeStepScreenshot(page, t);
-      await getUserNameInput(page).fill("John");
-      await getRadio(page, "Template").click();
-      await getBtnSearch(page).click();
-      await page.waitForTimeout(500);
-      await expect(getMessage(page)).toBeVisible();
-      await expect(getMessage(page)).toContainText("请只选择一种查询方式");
-      await takeStepScreenshot(page, t);
-    });
-
-    test("[5] 条件冲突-Not set+Userid", async ({ page }) => {
-      const t = "条件冲突-Not set+Userid";
-      await navigateToUD19(page);
-      await takeStepScreenshot(page, t);
-      await getRadio(page, "Not set").click();
-      await getUserIdInput(page).fill("t009667");
-      await getBtnSearch(page).click();
-      await page.waitForTimeout(500);
-      await expect(getMessage(page)).toBeVisible();
-      await expect(getMessage(page)).toContainText("请只选择一种查询方式");
-      await takeStepScreenshot(page, t);
-    });
-
-    test("[6] 无查询条件", async ({ page }) => {
-      const t = "无查询条件";
-      await navigateToUD19(page);
-      await takeStepScreenshot(page, t);
-      await getBtnSearch(page).click();
-      await page.waitForTimeout(500);
-      await expect(getMessage(page)).toBeVisible();
-      await takeStepScreenshot(page, t);
+      await page.unroute(
+        "**/api/UD19SearchResultListApi/UD19SelectMarketMaster",
+      );
     });
   });
 
   test.describe("Userid 查询", () => {
-    test("[7] Userid查询-正常", async ({ page }) => {
+    test("[3] Userid查询-正常", async ({ page }) => {
       const t = "Userid查询-正常";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -187,7 +158,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[8] Userid查询-无结果", async ({ page }) => {
+    test("[4] Userid查询-无结果", async ({ page }) => {
       const t = "Userid查询-无结果";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -200,7 +171,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("用户名查询", () => {
-    test("[9] 用户名查询-正常", async ({ page }) => {
+    test("[5] 用户名查询-正常", async ({ page }) => {
       const t = "用户名查询-正常";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -217,7 +188,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[10] 用户名查询-无结果", async ({ page }) => {
+    test("[6] 用户名查询-无结果", async ({ page }) => {
       const t = "用户名查询-无结果";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -230,7 +201,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("Radiobox 筛选", () => {
-    test("[11] Not set 搜索", async ({ page }) => {
+    test("[7] Not set 搜索", async ({ page }) => {
       const t = "Not set搜索";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -246,7 +217,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[12] Rule 搜索", async ({ page }) => {
+    test("[8] Rule 搜索", async ({ page }) => {
       const t = "Rule搜索";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -262,7 +233,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[13] Template 搜索", async ({ page }) => {
+    test("[9] Template 搜索", async ({ page }) => {
       const t = "Template搜索";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -280,7 +251,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("Market 筛选", () => {
-    test("[14] Market 筛选", async ({ page }) => {
+    test("[10] Market 筛选", async ({ page }) => {
       const t = "Market筛选";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -304,7 +275,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("查询结果表示", () => {
-    test("[15] 结果表格-各列表示", async ({ page }) => {
+    test("[11] 结果表格-各列表示", async ({ page }) => {
       const t = "结果表格-各列表示";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -331,7 +302,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[16] COUNT 计数显示", async ({ page }) => {
+    test("[12] COUNT 计数显示", async ({ page }) => {
       const t = "COUNT计数显示";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -350,7 +321,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("UI交互", () => {
-    test("[17] 搜索中按钮禁用", async ({ page }) => {
+    test("[13] 搜索中按钮禁用", async ({ page }) => {
       const t = "搜索中按钮禁用";
       let resolveRoute: (value: unknown) => void;
       const routePromise = new Promise((r) => {
@@ -384,7 +355,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[18] 搜索中防止重复提交", async ({ page }) => {
+    test("[14] 搜索中防止重复提交", async ({ page }) => {
       const t = "搜索中防止重复提交";
       let apiCallCount = 0;
       let resolveRoute: (value: unknown) => void;
@@ -422,33 +393,46 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[19] 消息清空-新查询清除旧消息", async ({ page }) => {
+    test("[15] 消息清空-新查询清除旧消息", async ({ page }) => {
       const t = "消息清空-新查询清除旧消息";
+      await page.route(
+        "**/api/UD19SearchResultListApi/search",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 200,
+              users: [{ userid: "t009667", user: "Test User", market: "-EU" }],
+            }),
+          });
+        },
+      );
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
-      // 触发条件冲突错误
-      await getUserIdInput(page).fill("t009667");
-      await getRadio(page, "Rule").click();
+      // 触发空条件校验错误
       await getBtnSearch(page).click();
       await page.waitForTimeout(500);
       await expect(getMessage(page)).toBeVisible();
-      await expect(getMessage(page)).toContainText("请只选择一种查询方式");
+      await expect(getMessage(page)).toContainText(
+        "请输入查询条件或选择筛选方式",
+      );
       await takeStepScreenshot(page, t);
-      // 清除 Userid，保留 Rule radio（此时只有一种查询条件，应通过校验）
-      await getUserIdInput(page).clear();
-      await page.waitForTimeout(300);
+      // 输入有效条件重新查询，旧消息应被清除
+      await getUserIdInput(page).fill("t009667");
       await getBtnSearch(page).click();
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(2000);
       const msg = getMessage(page);
       const msgVis = await msg.isVisible().catch(() => false);
       if (msgVis) {
         const txt = await msg.textContent().catch(() => "");
-        expect(txt).not.toContain("请只选择一种查询方式");
+        expect(txt).not.toContain("请输入查询条件或选择筛选方式");
       }
       await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[20] 连续查询-切换条件", async ({ page }) => {
+    test("[16] 连续查询-切换条件", async ({ page }) => {
       const t = "连续查询-切换条件";
       await navigateToUD19(page);
       await takeStepScreenshot(page, t);
@@ -473,7 +457,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
   });
 
   test.describe("异常处理", () => {
-    test("[21] 异常处理-网络断开", async ({ page }) => {
+    test("[17] 异常处理-网络断开", async ({ page }) => {
       const t = "异常处理-网络断开";
       await page.route(
         "**/api/UD19SearchResultListApi/search",
@@ -492,7 +476,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[22] 异常处理-请求超时", async ({ page }) => {
+    test("[18] 异常处理-请求超时", async ({ page }) => {
       const t = "异常处理-请求超时";
       test.setTimeout(60000);
       await page.route(
@@ -515,7 +499,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[23] 异常处理-数据库连接失败", async ({ page }) => {
+    test("[19] 异常处理-数据库连接失败", async ({ page }) => {
       const t = "异常处理-数据库连接失败";
       await page.route(
         "**/api/UD19SearchResultListApi/search",
@@ -541,7 +525,7 @@ test.describe("Search HDoc User (UD19) 测试", () => {
       await page.unroute("**/api/UD19SearchResultListApi/search");
     });
 
-    test("[24] 异常处理-查询失败", async ({ page }) => {
+    test("[20] 异常处理-查询失败", async ({ page }) => {
       const t = "异常处理-查询失败";
       await page.route(
         "**/api/UD19SearchResultListApi/search",

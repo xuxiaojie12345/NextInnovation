@@ -32,6 +32,29 @@ async function navigateToUD22(page: Page) {
   await page.waitForSelector(".ud22-container", { timeout: 15000 });
 }
 
+/**
+ * 设置 Document Types API Mock（返回示例文档类型列表）
+ */
+async function setupDocumentTypesMock(page: Page) {
+  await page.route(
+    "**/api/UD22DocumentTypesApi/document-types",
+    async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: 200,
+          data: [
+            { doctype: "VIN-PLATE", description: "VIN Plate Template" },
+            { doctype: "PDF-DOC", description: "PDF Document" },
+            { doctype: "WORD-DOC", description: "Word Document for Testing" },
+          ],
+        }),
+      });
+    },
+  );
+}
+
 test.describe("Document Types (UD22) 测试", () => {
   test.beforeEach(async () => {
     screenshotCounter = 1;
@@ -55,6 +78,7 @@ test.describe("Document Types (UD22) 测试", () => {
   test.describe("画面初始化", () => {
     test("[1] 画面初始化-正常表示", async ({ page }) => {
       const t = "画面初始化-正常表示";
+      await setupDocumentTypesMock(page);
       await navigateToUD22(page);
       await takeStepScreenshot(page, t);
       await expect(page.locator(".ud22-header")).toBeVisible();
@@ -121,6 +145,7 @@ test.describe("Document Types (UD22) 测试", () => {
   test.describe("表格表示", () => {
     test("[4] 表格表示-正常数据显示", async ({ page }) => {
       const t = "表格表示-正常数据显示";
+      await setupDocumentTypesMock(page);
       await navigateToUD22(page);
       await takeStepScreenshot(page, t);
       await expect(page.locator(".ud22-table thead th").nth(0)).toHaveText(
@@ -136,6 +161,7 @@ test.describe("Document Types (UD22) 测试", () => {
 
     test("[5] 表格表示-Key列最大长度", async ({ page }) => {
       const t = "表格表示-Key列最大长度";
+      await setupDocumentTypesMock(page);
       await navigateToUD22(page);
       await takeStepScreenshot(page, t);
       const cells = page.locator(".ud22-table tbody td").first();
@@ -146,6 +172,7 @@ test.describe("Document Types (UD22) 测试", () => {
 
     test("[6] 表格表示-Description长文本折行", async ({ page }) => {
       const t = "表格表示-Description长文本折行";
+      await setupDocumentTypesMock(page);
       await navigateToUD22(page);
       await takeStepScreenshot(page, t);
       const descCells = page.locator(".ud22-table tbody td").nth(1);

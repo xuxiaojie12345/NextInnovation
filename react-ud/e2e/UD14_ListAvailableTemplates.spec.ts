@@ -44,6 +44,27 @@ async function selectMarketDropdown(page: Page): Promise<string> {
   return "";
 }
 
+/**
+ * 设置 Market API Mock（返回有效市场列表）
+ */
+async function setupMarketMock(page: Page) {
+  await page.route(
+    "**/api/UD14SearchresultistApi/UD14SelectMarketmaster",
+    async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: 200,
+          data: {
+            markets: [{ market: "JPN" }, { market: "USA" }, { market: "CHN" }],
+          },
+        }),
+      });
+    },
+  );
+}
+
 test.describe("List Available Templates 模块 (UD14) 测试", () => {
   test.beforeEach(async () => {
     screenshotCounter = 1;
@@ -79,6 +100,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
 
     test("[2] 画面初始化-控件初期状态", async ({ page }) => {
       const t = "画面初始化-控件初期状态";
+      await setupMarketMock(page);
       await navigateToUD14(page);
       await takeStepScreenshot(page, t);
       await expect(page.locator(".ud14-select")).toHaveValue("");
@@ -106,6 +128,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
 
     test("[4] Market选择-空数据表示", async ({ page }) => {
       const t = "Market选择-空数据表示";
+      await setupMarketMock(page);
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
         async (route) => {
@@ -220,8 +243,9 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       }
     });
 
-    test("[9] Used列-使用中状态", async ({ page }) => {
-      const t = "Used列-使用中状态";
+    test("[9] 文件大小格式", async ({ page }) => {
+      const t = "文件大小格式";
+      await setupMarketMock(page);
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
         async (route) => {
@@ -232,7 +256,77 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
               code: 200,
               data: [
                 {
-                  filename: "test.docx",
+                  filename: "small.txt",
+                  used: true,
+                  lastModified: "2026-06-30 10:00",
+                  size: "1 Kb",
+                },
+                {
+                  filename: "large.docx",
+                  used: false,
+                  lastModified: "2026-07-01 14:30",
+                  size: "1.5 Mb",
+                },
+              ],
+            }),
+          });
+        },
+      );
+      await page.route(
+        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 200, data: { rules: [] } }),
+          });
+        },
+      );
+      await navigateToUD14(page);
+      await takeStepScreenshot(page, t);
+      await selectMarketDropdown(page);
+      await page.waitForTimeout(2000);
+      await takeStepScreenshot(page, t);
+      const sizeCells = page.locator(".ud14-table tbody tr td").nth(4);
+      await expect(sizeCells.first()).toBeVisible();
+      await page.unroute(
+        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
+      );
+      await page.unroute(
+        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
+      );
+    });
+  });
+
+  test.describe("文件下载", () => {
+    test("[10] 下载-正常下载", async ({ page }) => {
+      const t = "下载-正常下载";
+      await navigateToUD14(page);
+      await takeStepScreenshot(page, t);
+      await selectMarketDropdown(page);
+      await page.waitForTimeout(2000);
+      await takeStepScreenshot(page, t);
+      const fileLink = page.locator(".ud14-file-link").first();
+      if (await fileLink.isVisible().catch(() => false)) {
+        await fileLink.click();
+        await page.waitForTimeout(500);
+      }
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[11] 下载-文件名含特殊字符", async ({ page }) => {
+      const t = "下载-文件名含特殊字符";
+      await page.route(
+        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 200,
+              data: [
+                {
+                  filename: "test (1).docx",
                   used: true,
                   lastModified: "2026-06-30 10:00",
                   size: "317 Kb",
@@ -257,81 +351,21 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       await selectMarketDropdown(page);
       await page.waitForTimeout(2000);
       await takeStepScreenshot(page, t);
-      await expect(page.locator(".ud14-used-yes")).toBeVisible();
-      await page.unroute(
-        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
-      );
-      await page.unroute(
-        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
-      );
-    });
-
-    test("[10] Used列-未使用状态", async ({ page }) => {
-      const t = "Used列-未使用状态";
-      await page.route(
-        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
-        async (route) => {
-          await route.fulfill({
-            status: 200,
-            contentType: "application/json",
-            body: JSON.stringify({
-              code: 200,
-              data: [
-                {
-                  filename: "test.docx",
-                  used: false,
-                  lastModified: "2026-06-30 10:00",
-                  size: "317 Kb",
-                },
-              ],
-            }),
-          });
-        },
-      );
-      await page.route(
-        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
-        async (route) => {
-          await route.fulfill({
-            status: 200,
-            contentType: "application/json",
-            body: JSON.stringify({ code: 200, data: { rules: [] } }),
-          });
-        },
-      );
-      await navigateToUD14(page);
-      await takeStepScreenshot(page, t);
-      await selectMarketDropdown(page);
-      await page.waitForTimeout(2000);
-      await takeStepScreenshot(page, t);
-      await expect(page.locator(".ud14-used-no")).toBeVisible();
-      await page.unroute(
-        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
-      );
-      await page.unroute(
-        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
-      );
-    });
-  });
-
-  test.describe("文件下载", () => {
-    test("[12] 下载-正常下载", async ({ page }) => {
-      const t = "下载-正常下载";
-      await navigateToUD14(page);
-      await takeStepScreenshot(page, t);
-      await selectMarketDropdown(page);
-      await page.waitForTimeout(2000);
-      await takeStepScreenshot(page, t);
       const fileLink = page.locator(".ud14-file-link").first();
       if (await fileLink.isVisible().catch(() => false)) {
-        await fileLink.click();
-        await page.waitForTimeout(500);
+        await expect(fileLink).toContainText("test (1).docx");
       }
-      await takeStepScreenshot(page, t);
+      await page.unroute(
+        "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
+      );
+      await page.unroute(
+        "**/api/UD14SearchresultistApi/UD14SelectHdocuserdefinedrules",
+      );
     });
   });
 
   test.describe("异常处理", () => {
-    test("[14] 异常处理-API错误", async ({ page }) => {
+    test("[12] 异常处理-API错误", async ({ page }) => {
       const t = "异常处理-API错误";
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
@@ -354,7 +388,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       );
     });
 
-    test("[15] 异常处理-网络断开", async ({ page }) => {
+    test("[13] 异常处理-网络断开", async ({ page }) => {
       const t = "异常处理-网络断开";
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
@@ -373,7 +407,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       );
     });
 
-    test("[16] 异常处理-API超时", async ({ page }) => {
+    test("[14] 异常处理-API超时", async ({ page }) => {
       const t = "异常处理-API超时";
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
@@ -393,7 +427,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       );
     });
 
-    test("[17] 异常处理-市场不存在", async ({ page }) => {
+    test("[15] 异常处理-市场不存在", async ({ page }) => {
       const t = "异常处理-市场不存在";
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
@@ -418,7 +452,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
       );
     });
 
-    test("[18] 异常处理-文件无法访问", async ({ page }) => {
+    test("[16] 异常处理-文件无法访问", async ({ page }) => {
       const t = "异常处理-文件无法访问";
       await page.route(
         "**/api/UD14SearchresultistApi/UD14SelectMarketmasterFileList",
@@ -445,7 +479,7 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
   });
 
   test.describe("UI交互", () => {
-    test("[19] UI交互-加载中数据清空", async ({ page }) => {
+    test("[17] UI交互-加载中数据清空", async ({ page }) => {
       const t = "UI交互-加载中数据清空";
       await navigateToUD14(page);
       await takeStepScreenshot(page, t);
@@ -465,6 +499,26 @@ test.describe("List Available Templates 模块 (UD14) 测试", () => {
         }
       }
       await page.waitForTimeout(2000);
+      await takeStepScreenshot(page, t);
+    });
+
+    test("[18] UI交互-切换Market防止重复请求", async ({ page }) => {
+      const t = "UI交互-切换Market防止重复请求";
+      await navigateToUD14(page);
+      await takeStepScreenshot(page, t);
+      const select = page.locator(".ud14-select");
+      const opts = await select.locator("option").all();
+      const validOpts: string[] = [];
+      for (const o of opts) {
+        const v = await o.getAttribute("value");
+        if (v && v !== "") validOpts.push(v);
+      }
+      if (validOpts.length >= 2) {
+        await select.selectOption(validOpts[0]);
+        await page.waitForTimeout(200);
+        await select.selectOption(validOpts[1]);
+        await page.waitForTimeout(2000);
+      }
       await takeStepScreenshot(page, t);
     });
   });

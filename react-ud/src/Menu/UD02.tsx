@@ -68,6 +68,7 @@ const MENU_STRUCTURE: MenuGroup[] = [
         label: "Update user defined variables (rules)",
         path: "/UD08",
       },
+      { label: "Template Check", path: "/UD13" },
       { label: "VPPS Vin plate", path: "/UD15" },
       { label: "AD/CA Change", path: "/UD16" },
       { label: "Existing HDoc variables", path: "/UD10" },

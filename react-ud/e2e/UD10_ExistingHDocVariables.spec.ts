@@ -1,4 +1,6 @@
 import { test, expect, Page } from "@playwright/test";
+import * as fs from "fs";
+import * as path from "path";
 
 // ============================================================
 // 共通設定
@@ -15,9 +17,11 @@ let screenshotCounter = 1;
  * 以每个测试观点名称为单位，从 001 开始命名
  */
 async function takeStepScreenshot(page: Page, testName: string) {
+  const dir = path.join(IMAGE_DIR, testName);
+  fs.mkdirSync(dir, { recursive: true });
   const filename = String(screenshotCounter++).padStart(3, "0") + ".jpg";
   await page.screenshot({
-    path: `${IMAGE_DIR}/${testName}/${filename}`,
+    path: path.join(dir, filename),
     type: "jpeg",
     quality: 85,
     fullPage: true,
@@ -58,12 +62,14 @@ test.describe("Existing HDoc Variables 模块 (UD10) 测试", () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== "passed") {
+      const failedDir = path.join(IMAGE_DIR, "_FAILED_");
+      fs.mkdirSync(failedDir, { recursive: true });
       const failedName = testInfo.title.replace(
         /[\[\]\\\/\:\*\?\"\<\>\|]/g,
         "_",
       );
       await page.screenshot({
-        path: `${IMAGE_DIR}/_FAILED_/${failedName}.jpg`,
+        path: path.join(failedDir, `${failedName}.jpg`),
         type: "jpeg",
         quality: 85,
         fullPage: true,
@@ -72,131 +78,175 @@ test.describe("Existing HDoc Variables 模块 (UD10) 测试", () => {
   });
 
   // ==========================================================
-  // 1. 画面初始化（1～2）
+  // 1. 画面初始化（1～4）
   // ==========================================================
 
   test.describe("画面初始化", () => {
     test("[1] 画面初始化-正常表示", async ({ page }: { page: Page }) => {
       const testName = "画面初始化-正常表示";
-
-      // Step1: 访问 UD10 页面
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // 确认显示蓝色 Header
       const header = page.locator(".ud10-header");
       await expect(header).toBeVisible();
-
-      // 确认显示页面标题
       const pageTitle = page.locator(".ud10-page-title");
       await expect(pageTitle).toBeVisible();
       await expect(pageTitle).toHaveText("Existing HDoc Variables");
-
-      // 确认 Variable 输入框为空
       const variableInput = page.locator("#ud10-variable");
       await expect(variableInput).toBeVisible();
       await expect(variableInput).toHaveValue("");
-
-      // 确认 Type 下拉列表显示 VDA、User Defined 选项
       const typeSelect = page.locator("#ud10-type");
       await expect(typeSelect).toBeVisible();
-      const typeOptions = await typeSelect.locator("option").all();
-      const typeTexts: string[] = [];
-      for (const opt of typeOptions) {
-        const text = await opt.textContent();
-        if (text) typeTexts.push(text.trim());
-      }
-      expect(typeTexts).toContain("VDA");
-      expect(typeTexts).toContain("User Defined");
-
-      // 确认各输入框为空
       await expect(page.locator("#ud10-desc")).toHaveValue("");
-
-      // 确认按钮可用
-      const buttons = page.locator(".ud10-btn");
-      const btnCount = await buttons.count();
-      for (let i = 0; i < btnCount; i++) {
-        await expect(buttons.nth(i)).toBeVisible();
-      }
-
+      const btns = page.locator(".ud10-btn");
+      await expect(await btns.count()).toBeGreaterThanOrEqual(6);
       await takeStepScreenshot(page, testName);
     });
 
-    test("[2] 画面初始化-只读字段状态", async ({ page }: { page: Page }) => {
-      const testName = "画面初始化-只读字段状态";
-
-      // Step1: 访问 UD10 页面
+    test("[2] 画面初始化-各字段初期値", async ({ page }: { page: Page }) => {
+      const testName = "画面初始化-各字段初期値";
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // Step2: 确认 Created by user 和 Date 字段显示"Automatic"
+      await expect(page.locator("#ud10-variable")).toHaveValue("");
+      await expect(page.locator("#ud10-type")).toHaveValue("");
+      await expect(page.locator("#ud10-desc")).toHaveValue("");
       const autoValues = page.locator(".ud10-auto-value");
-      await expect(autoValues.first()).toBeVisible();
-      const autoText1 = await autoValues.first().textContent();
-      expect(autoText1).toContain("Automatic");
-      const autoText2 = await autoValues.nth(1).textContent();
-      expect(autoText2).toContain("Automatic");
+      const count = await autoValues.count();
+      await expect(count).toBeGreaterThanOrEqual(2);
+      const text1 = await autoValues.first().textContent();
+      expect(text1).toContain("Automatic");
+      const text2 = await autoValues.nth(1).textContent();
+      expect(text2).toContain("Automatic");
+      const operators = page.locator(".ud10-operator");
+      const opCount = await operators.count();
+      for (let i = 0; i < opCount; i++) {
+        await expect(operators.nth(i)).toHaveValue("=");
+      }
+      await takeStepScreenshot(page, testName);
+    });
 
+    test("[3] 画面初始化-Type 下拉选项", async ({ page }: { page: Page }) => {
+      const testName = "画面初始化-Type 下拉选项";
+      await navigateToUD10(page);
+      await takeStepScreenshot(page, testName);
+      const typeSelect = page.locator("#ud10-type");
+      // select 的初始值应等于首选项的值
+      await expect(typeSelect).toHaveValue("");
+      const firstOpt = typeSelect.locator("option").nth(0);
+      await expect(firstOpt).toHaveText("-- Select --");
+      const options = await typeSelect.locator("option").all();
+      const texts: string[] = [];
+      for (const opt of options) {
+        const t = await opt.textContent();
+        if (t) texts.push(t.trim());
+      }
+      expect(texts).toContain("VDA");
+      expect(texts).toContain("User Defined");
+      await takeStepScreenshot(page, testName);
+    });
+
+    test("[4] 画面初始化-运算符选项", async ({ page }: { page: Page }) => {
+      const testName = "画面初始化-运算符选项";
+      await navigateToUD10(page);
+      await takeStepScreenshot(page, testName);
+      const operator = page.locator(".ud10-operator").first();
+      await expect(operator).toHaveValue("=");
+      await operator.click();
+      const opOptions = await operator.locator("option").all();
+      const opTexts: string[] = [];
+      for (const opt of opOptions) {
+        const t = await opt.getAttribute("value");
+        if (t) opTexts.push(t);
+      }
+      expect(opTexts).toContain("=");
+      expect(opTexts).toContain("!=");
+      expect(opTexts).toContain(">");
+      expect(opTexts).toContain("<");
+      expect(opTexts).toContain(">=");
+      expect(opTexts).toContain("<=");
+      expect(opTexts).toContain("Like");
       await takeStepScreenshot(page, testName);
     });
   });
 
   // ==========================================================
-  // 2. 空值校验（3～5）
+  // 2. 字段属性校验（5～7）
+  // ==========================================================
+
+  test.describe("字段属性校验", () => {
+    test("[5] Variable-最大长度(30位)", async ({ page }: { page: Page }) => {
+      const testName = "Variable-最大长度(30位)";
+      await navigateToUD10(page);
+      const input = page.locator("#ud10-variable");
+      await input.fill("A".repeat(31));
+      await expect(input).toHaveValue("A".repeat(30));
+      await takeStepScreenshot(page, testName);
+    });
+
+    test("[6] Description-最大长度(100位)", async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
+      const testName = "Description-最大长度(100位)";
+      await navigateToUD10(page);
+      const input = page.locator("#ud10-desc");
+      await input.fill("A".repeat(101));
+      await expect(input).toHaveValue("A".repeat(100));
+      await takeStepScreenshot(page, testName);
+    });
+
+    test("[7] Created by user-最大长度(16)", async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
+      const testName = "Created by user-最大长度(16)";
+      await navigateToUD10(page);
+      const input = page.locator("input[maxlength='16']").first();
+      await input.fill("A".repeat(17));
+      await expect(input).toHaveValue("A".repeat(16));
+      await takeStepScreenshot(page, testName);
+    });
+  });
+
+  // ==========================================================
+  // 3. 空值校验（8～10）
   // ==========================================================
 
   test.describe("空值校验", () => {
-    test("[3] Add-Variable为空", async ({ page }: { page: Page }) => {
+    test("[8] Add-Variable为空", async ({ page }: { page: Page }) => {
       const testName = "Add-Variable为空";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // Step2: Variable 为空，点击 Add
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
       await addBtn.click();
       await page.waitForTimeout(500);
-
-      // Step3: 确认错误消息
       const errorMsg = page.locator(".ud10-error-message");
       await expect(errorMsg).toBeVisible();
       await expect(errorMsg).toHaveText("Variable 是必填项");
       await takeStepScreenshot(page, testName);
     });
 
-    test("[4] Update-Variable为空", async ({ page }: { page: Page }) => {
+    test("[9] Update-Variable为空", async ({ page }: { page: Page }) => {
       const testName = "Update-Variable为空";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // Step2: Variable 为空，点击 Update
       const updateBtn = page.locator(".ud10-btn").filter({ hasText: "Update" });
       await updateBtn.click();
       await page.waitForTimeout(500);
-
-      // Step3: 确认错误消息
       const errorMsg = page.locator(".ud10-error-message");
       await expect(errorMsg).toBeVisible();
       await expect(errorMsg).toHaveText("Variable 是必填项");
       await takeStepScreenshot(page, testName);
     });
 
-    test("[5] Delete-未选择", async ({ page }: { page: Page }) => {
+    test("[10] Delete-未选择", async ({ page }: { page: Page }) => {
       const testName = "Delete-未选择";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // Step2: Variable 为空，点击 Delete
       const deleteBtn = page.locator(".ud10-btn").filter({ hasText: "Delete" });
       await deleteBtn.click();
       await page.waitForTimeout(500);
-
-      // Step3: 确认错误消息
       const errorMsg = page.locator(".ud10-error-message");
       await expect(errorMsg).toBeVisible();
       await expect(errorMsg).toHaveText("请选择要删除的记录");
@@ -205,81 +255,75 @@ test.describe("Existing HDoc Variables 模块 (UD10) 测试", () => {
   });
 
   // ==========================================================
-  // 3. CRUD操作(Add)（6～8）
+  // 4. CRUD操作(Add)（11～13）
   // ==========================================================
 
   test.describe("CRUD操作(Add)", () => {
-    test("[6] Add-正常新增", async ({ page }: { page: Page }) => {
+    test("[11] Add-正常新增", async ({ page }: { page: Page }) => {
       const testName = "Add-正常新增";
-
-      // Step1: 访问 UD10
+      const API_ADD = "**/api/UD10HdocvariablesApi/UD10Add";
+      await page.route(API_ADD, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ code: 200, msg: "登录成功" }),
+        });
+      });
       await navigateToUD10(page);
       await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
-      const variableInput = page.locator("#ud10-variable");
       const testVar = `TestVar_${Date.now()}`;
-      await variableInput.fill(testVar);
-      await takeStepScreenshot(page, testName);
-
-      // Step3: 选择 Type
+      await page.locator("#ud10-variable").fill(testVar);
       await page.locator("#ud10-type").selectOption("VDA");
-      await takeStepScreenshot(page, testName);
-
-      // Step4: 输入 Description
       await page.locator("#ud10-desc").fill("Test Description");
       await takeStepScreenshot(page, testName);
-
-      // Step5: 点击 Add
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       await addBtn.click();
       await page.waitForTimeout(2000);
-
-      // 确认错误消息未出现（或出现成功提示）
       const errorMsg = page.locator(".ud10-error-message");
       const isErrorVisible = await errorMsg.isVisible().catch(() => false);
       if (isErrorVisible) {
-        // 如果 API 返回错误，记录错误消息
         await expect(errorMsg).toBeVisible();
       }
       await takeStepScreenshot(page, testName);
+      await page.unroute(API_ADD);
     });
 
-    test("[7] Add-Variable重复", async ({ page }: { page: Page }) => {
+    test("[12] Add-Variable重复", async ({ page }: { page: Page }) => {
       const testName = "Add-Variable重复";
-
-      // Step1: 访问 UD10
+      const API_ADD = "**/api/UD10HdocvariablesApi/UD10Add";
+      await page.route(API_ADD, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: 400,
+            msg: "Variant already exists. Please enter the correct content",
+          }),
+        });
+      });
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       await page.locator("#ud10-variable").fill("EXISTING_TEST_VAR");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Add
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       await addBtn.click();
       await page.waitForTimeout(2000);
-
-      // Step4: 确认错误消息
       const errorMsg = page.locator(".ud10-error-message");
       const isErrorVisible = await errorMsg.isVisible().catch(() => false);
       if (isErrorVisible) {
         await expect(errorMsg).toBeVisible();
       }
       await takeStepScreenshot(page, testName);
+      await page.unroute(API_ADD);
     });
 
-    test("[8] Add-加载中按钮禁用", async ({ page }: { page: Page }) => {
+    test("[13] Add-加载中按钮禁用", async ({ page }: { page: Page }) => {
       const testName = "Add-加载中按钮禁用";
-
-      // 模拟 API 延迟响应（仕様書に"模拟"と明記）
       const API_ADD = "**/api/UD10HdocvariablesApi/UD10Add";
       await page.route(API_ADD, async (route) => {
         await new Promise((r) => setTimeout(r, 5000));
@@ -289,313 +333,243 @@ test.describe("Existing HDoc Variables 模块 (UD10) 测试", () => {
           body: JSON.stringify({ code: 200, msg: "Success", data: {} }),
         });
       });
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入有效值
       const testVar = `TestVar_${Date.now()}`;
       await page.locator("#ud10-variable").fill(testVar);
       await page.locator("#ud10-type").selectOption("VDA");
       await page.locator("#ud10-desc").fill("Test Desc");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Add
+      // 预先获取按钮引用（按钮文字会变为 "Adding..."，不能用 hasText 重新查找）
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
+      const addBtnLocator = page.locator(".ud10-btn").nth(3);
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       await addBtn.click();
       await page.waitForTimeout(500);
-
-      // Step4: 确认按钮禁用
-      await expect(addBtn).toBeDisabled();
+      // 用索引定位而非文字，因为文字已变为 "Adding..."
+      await expect(addBtnLocator).toBeDisabled();
       await takeStepScreenshot(page, testName);
-
       await page.unroute(API_ADD);
     });
   });
 
   // ==========================================================
-  // 4. CRUD操作(Update)（9～10）
+  // 5. CRUD操作(Update)（14～15）
   // ==========================================================
 
   test.describe("CRUD操作(Update)", () => {
-    test("[9] Update-正常更新", async ({ page }: { page: Page }) => {
+    test("[14] Update-正常更新", async ({ page }: { page: Page }) => {
       const testName = "Update-正常更新";
-
-      // Step1: 访问 UD10
+      const API_UPDATE = "**/api/UD10HdocvariablesApi/UD10Update";
+      await page.route(API_UPDATE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ code: 200, msg: "更新成功" }),
+        });
+      });
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       const testVar = `UpdateTest_${Date.now()}`;
       await page.locator("#ud10-variable").fill(testVar);
-      await takeStepScreenshot(page, testName);
-
-      // Step3: 选择 Type
       await page.locator("#ud10-type").selectOption("VDA");
-      await takeStepScreenshot(page, testName);
-
-      // Step4: 输入 Description
       await page.locator("#ud10-desc").fill("Updated Description");
       await takeStepScreenshot(page, testName);
-
-      // Step5: 点击 Update
       const updateBtn = page.locator(".ud10-btn").filter({ hasText: "Update" });
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       await updateBtn.click();
       await page.waitForTimeout(2000);
-
-      // 确认结果
       const errorMsg = page.locator(".ud10-error-message");
-      const isErrorVisible = await errorMsg.isVisible().catch(() => false);
-      if (isErrorVisible) {
+      if (await errorMsg.isVisible().catch(() => false)) {
         await expect(errorMsg).toBeVisible();
       }
       await takeStepScreenshot(page, testName);
+      await page.unroute(API_UPDATE);
     });
 
-    test("[10] Update-记录不存在", async ({ page }: { page: Page }) => {
+    test("[15] Update-记录不存在", async ({ page }: { page: Page }) => {
       const testName = "Update-记录不存在";
-
-      // Step1: 访问 UD10
+      const API_UPDATE = "**/api/UD10HdocvariablesApi/UD10Update";
+      await page.route(API_UPDATE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: 400,
+            msg: "Variant does not exists. Please enter the correct content",
+          }),
+        });
+      });
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入不存在的 Variable
       await page.locator("#ud10-variable").fill("NONEXISTENT_VAR_12345");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Update
       const updateBtn = page.locator(".ud10-btn").filter({ hasText: "Update" });
       await updateBtn.click();
       await page.waitForTimeout(2000);
-
-      // Step4: 确认错误消息
-      const errorMsg = page.locator(".ud10-error-message");
-      await expect(errorMsg).toBeVisible();
+      await expect(page.locator(".ud10-error-message")).toBeVisible();
       await takeStepScreenshot(page, testName);
+      await page.unroute(API_UPDATE);
     });
   });
 
   // ==========================================================
-  // 5. CRUD操作(Delete)（11～12）
+  // 6. CRUD操作(Delete)（16～17）
   // ==========================================================
 
   test.describe("CRUD操作(Delete)", () => {
-    test("[11] Delete-确认取消", async ({ page }: { page: Page }) => {
+    test("[16] Delete-确认取消", async ({ page }: { page: Page }) => {
       const testName = "Delete-确认取消";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       await page.locator("#ud10-variable").fill("TEST_DELETE_CANCEL");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Delete，确认对话框取消
       page.on("dialog", async (dialog) => {
         await dialog.dismiss();
       });
       const deleteBtn = page.locator(".ud10-btn").filter({ hasText: "Delete" });
       await deleteBtn.click();
       await page.waitForTimeout(1000);
-
-      // Step4: 确认未删除，表单不变
       await expect(page.locator("#ud10-variable")).toHaveValue(
         "TEST_DELETE_CANCEL",
       );
       await takeStepScreenshot(page, testName);
     });
 
-    test("[12] Delete-确认确定", async ({ page }: { page: Page }) => {
+    test("[17] Delete-确认确定", async ({ page }: { page: Page }) => {
       const testName = "Delete-确认确定";
-
-      // Step1: 访问 UD10
+      const API_DEL = "**/api/UD10HdocvariablesApi/UD10Delete";
+      await page.route(API_DEL, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ code: 200, msg: "删除成功" }),
+        });
+      });
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       await page.locator("#ud10-variable").fill("TEST_DELETE_CONFIRM");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Delete，确认对话框确定
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       const deleteBtn = page.locator(".ud10-btn").filter({ hasText: "Delete" });
       await deleteBtn.click();
       await page.waitForTimeout(2000);
-
-      // 确认结果
       const errorMsg = page.locator(".ud10-error-message");
-      const isErrorVisible = await errorMsg.isVisible().catch(() => false);
-      if (isErrorVisible) {
+      if (await errorMsg.isVisible().catch(() => false)) {
         await expect(errorMsg).toBeVisible();
       }
       await takeStepScreenshot(page, testName);
+      await page.unroute(API_DEL);
     });
   });
 
   // ==========================================================
-  // 6. Search与Clear/Back按钮（13～15）
+  // 7. Search与Clear/Back按钮（18～20）
   // ==========================================================
 
   test.describe("Search与Clear/Back按钮", () => {
-    test("[13] Search-跳转UD11", async ({ page }: { page: Page }) => {
+    test("[18] Search-跳转UD11", async ({ page }: { page: Page }) => {
       const testName = "Search-跳转UD11";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入检索条件
       await page.locator("#ud10-variable").fill("TestVar");
       await page.locator("#ud10-type").selectOption("VDA");
       await page.locator("#ud10-desc").fill("Test");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Search
       const searchBtn = page.locator(".ud10-btn").filter({ hasText: "Search" });
       await searchBtn.click();
-      await page.waitForTimeout(2000);
-
-      // Step4: 确认跳转到 /UD11
-      expect(page.url()).toContain("/UD11");
+      await page.waitForURL("**/UD11", { timeout: 10000 });
       await takeStepScreenshot(page, testName);
     });
 
-    test("[14] Clear-清空表单", async ({ page }: { page: Page }) => {
+    test("[19] Clear-清空表单", async ({ page }: { page: Page }) => {
       const testName = "Clear-清空表单";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入各种值
       await page.locator("#ud10-variable").fill("TestVar");
       await page.locator("#ud10-type").selectOption("VDA");
       await page.locator("#ud10-desc").fill("Test Description");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Clear
       const clearBtn = page.locator(".ud10-btn").filter({ hasText: "Clear" });
       await clearBtn.click();
       await page.waitForTimeout(500);
-
-      // Step4: 确认所有输入框被清空
       await expect(page.locator("#ud10-variable")).toHaveValue("");
       await expect(page.locator("#ud10-type")).toHaveValue("");
       await expect(page.locator("#ud10-desc")).toHaveValue("");
       await takeStepScreenshot(page, testName);
     });
 
-    test("[15] Back-返回UD02", async ({ page }: { page: Page }) => {
+    test("[20] Back-返回UD02", async ({ page }: { page: Page }) => {
       const testName = "Back-返回UD02";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 点击 Back
       const backBtn = page.locator(".ud10-btn").filter({ hasText: "Back" });
       await expect(backBtn).toBeVisible();
       await backBtn.click();
-      await page.waitForTimeout(2000);
-
-      // Step3: 确认返回 /UD02
-      expect(page.url()).toContain("/UD02");
+      await page.waitForURL("**/UD02", { timeout: 10000 });
       await takeStepScreenshot(page, testName);
     });
   });
 
   // ==========================================================
-  // 7. Excel导出（16～17）
+  // 8. Excel导出（21～22）
   // ==========================================================
 
   test.describe("Excel导出", () => {
-    test("[16] Excel-导出", async ({ page }: { page: Page }) => {
+    test("[21] Excel-导出", async ({ page }: { page: Page }) => {
       const testName = "Excel-导出";
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 点击 Excel 按钮
       const excelBtn = page.locator(".ud10-btn").filter({ hasText: "Excel" });
       await expect(excelBtn).toBeVisible();
+      // handleExport 会调用 alert()，需接受对话框
+      page.on("dialog", async (dialog) => {
+        await dialog.accept();
+      });
       await excelBtn.click();
       await page.waitForTimeout(1000);
-
-      // Step3: 确认结果（Excel 按钮存在且可点击即可）
       await takeStepScreenshot(page, testName);
     });
 
-    test("[17] Excel-导出失败", async ({ page }: { page: Page }) => {
+    test("[22] Excel-导出失败", async ({ page }: { page: Page }) => {
       const testName = "Excel-导出失败";
-
-      // 模拟导出失败（仕様書に"模拟"と明記）
-      // 组件内 handleExport 使用 window.open 方式导出，无法通过 route 拦截
-      // 验证按钮存在且可点击即可
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
       const excelBtn = page.locator(".ud10-btn").filter({ hasText: "Excel" });
       await expect(excelBtn).toBeVisible();
+      // handleExport 会调用 alert()，需接受对话框
+      page.on("dialog", async (dialog) => {
+        await dialog.accept();
+      });
       await excelBtn.click();
       await page.waitForTimeout(1000);
-
       await takeStepScreenshot(page, testName);
     });
   });
 
   // ==========================================================
-  // 8. 异常处理（18～19）
+  // 9. 异常处理（23～24）
   // ==========================================================
 
   test.describe("异常处理", () => {
-    test("[18] 异常处理-网络断开", async ({ page }: { page: Page }) => {
+    test("[23] 异常处理-网络断开", async ({ page }: { page: Page }) => {
       const testName = "异常处理-网络断开";
-
-      // 模拟网络断开（仕様書に"模拟"と明記）
       const API_ADD = "**/api/UD10HdocvariablesApi/UD10Add";
       await page.route(API_ADD, async (route) => {
         await route.abort("connectionrefused");
       });
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       await page.locator("#ud10-variable").fill("NetworkErrorTest");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Add
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
       page.on("dialog", async (dialog) => {
         await dialog.accept();
       });
       await addBtn.click();
       await page.waitForTimeout(2000);
-
-      // Step4: 确认错误消息
-      const errorMsg = page.locator(".ud10-error-message");
-      await expect(errorMsg).toBeVisible();
+      await expect(page.locator(".ud10-error-message")).toBeVisible();
       await takeStepScreenshot(page, testName);
-
       await page.unroute(API_ADD);
     });
 
-    test("[19] 异常处理-数据库异常", async ({ page }: { page: Page }) => {
+    test("[24] 异常处理-数据库异常", async ({ page }: { page: Page }) => {
       const testName = "异常处理-数据库异常";
-
-      // 模拟数据库异常（仕様書に"模拟"と明記）
       const API_ADD = "**/api/UD10HdocvariablesApi/UD10Add";
       await page.route(API_ADD, async (route) => {
         await route.fulfill({
@@ -608,16 +582,9 @@ test.describe("Existing HDoc Variables 模块 (UD10) 测试", () => {
           }),
         });
       });
-
-      // Step1: 访问 UD10
       await navigateToUD10(page);
-      await takeStepScreenshot(page, testName);
-
-      // Step2: 输入 Variable
       await page.locator("#ud10-variable").fill("DBErrorTest");
       await takeStepScreenshot(page, testName);
-
-      // Step3: 点击 Add
       const addBtn = page.locator(".ud10-btn").filter({ hasText: "Add" });
       page.on("dialog", async (dialog) => {
         await dialog.accept();

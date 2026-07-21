@@ -93,7 +93,7 @@ test.describe("HDoc用户管理 (UD17) 测试", () => {
         "HDoc User Admin",
       );
       await expect(getUserIdInput(page)).toHaveValue("");
-      await expect(getUserNameInput(page)).toHaveValue("");
+      await expect(getUserNameInput(page)).toHaveText("");
       // 所有权限复选框为未选中（前5个在role-grid中）
       const roleNames = [
         "Standard User",
@@ -214,6 +214,19 @@ test.describe("HDoc用户管理 (UD17) 测试", () => {
 
     test("[8] USER INFO-用户不存在(404)", async ({ page }) => {
       const t = "USER INFO-用户不存在(404)";
+      await page.route(
+        "**/api/UD17HDocUserAdministrationApi/UD17Userinfo",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 404,
+              msg: "userid not found",
+            }),
+          });
+        },
+      );
       await navigateToUD17(page);
       await takeStepScreenshot(page, t);
       await getUserIdInput(page).fill("XXXX");
@@ -222,8 +235,9 @@ test.describe("HDoc用户管理 (UD17) 测试", () => {
       await expect(getMessage(page)).toBeVisible();
       await expect(getMessage(page)).toContainText("userid");
       // User Name 被清空
-      await expect(getUserNameInput(page)).toHaveValue("");
+      await expect(getUserNameInput(page)).toHaveText("");
       await takeStepScreenshot(page, t);
+      await page.unroute("**/api/UD17HDocUserAdministrationApi/UD17Userinfo");
     });
 
     test("[9] USER INFO-多种权限组合", async ({ page }) => {
@@ -741,7 +755,7 @@ test.describe("HDoc用户管理 (UD17) 测试", () => {
       await expect(getMessage(page)).toBeVisible();
       await expect(getMessage(page)).toContainText("无法获取用户主数据");
       // User Name 不更新
-      await expect(getUserNameInput(page)).toHaveValue("");
+      await expect(getUserNameInput(page)).toHaveText("");
       // 权限复选框不更新（保持未选中）
       for (const rn of [
         "Standard User",

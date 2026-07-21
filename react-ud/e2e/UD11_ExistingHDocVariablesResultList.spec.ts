@@ -161,49 +161,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[2] 画面初始化-加载中状态", async ({ page }: { page: Page }) => {
-      const testName = "画面初始化-加载中状态";
-
-      // 通过 UD10 跳转到 UD11（真实 API 调用）
-      // 登录
-      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
-      await seedSession(page);
-      await page.goto(UD10_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector(".ud10-container", { timeout: 15000 });
-
-      // 填写检索条件
-      await page.locator("#ud10-variable").fill("Test");
-      await page.waitForTimeout(300);
-
-      // 点击 Search 跳转到 UD11
-      await page.locator(".ud10-btn").filter({ hasText: "Search" }).click();
-
-      // Step2: 在 API 响应返回前确认加载中状态
-      // UD11 初始渲染时 isLoading=true，会显示 loading 指示器
-      try {
-        await page.waitForSelector(".ud11-loading", { timeout: 5000 });
-        const loadingMsg = page.locator(".ud11-loading");
-        await expect(loadingMsg).toBeVisible();
-        await expect(loadingMsg).toHaveText("Loading...");
-        await takeStepScreenshot(page, testName);
-
-        // 等待加载完成
-        await page.waitForSelector(
-          ".ud11-table, .ud11-error-message, .ud11-td-empty",
-          { timeout: 15000 },
-        );
-        await takeStepScreenshot(page, testName);
-      } catch {
-        // API 响应太快，loading 状态已消失，直接截图当前状态
-        await page.waitForSelector(
-          ".ud11-table, .ud11-error-message, .ud11-td-empty",
-          { timeout: 15000 },
-        );
-        await takeStepScreenshot(page, testName);
-      }
-    });
-
-    test("[3] 画面初始化-加载失败", async ({ page }: { page: Page }) => {
+    test("[2] 画面初始化-加载失败", async ({ page }: { page: Page }) => {
       const testName = "画面初始化-加载失败";
 
       // 模拟 API 返回错误状态码（仕様書に"模拟"と明記）
@@ -238,7 +196,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await page.unroute(API_SEARCH);
     });
 
-    test("[4] 画面初始化-空数据表示", async ({ page }: { page: Page }) => {
+    test("[3] 画面初始化-空数据表示", async ({ page }: { page: Page }) => {
       const testName = "画面初始化-空数据表示";
 
       // 模拟 API 返回空列表（仕様書に"模拟"と明記）
@@ -288,11 +246,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 2. 检索结果表示（5～8）
+  // 2. 检索结果表示（4～6）
   // ==========================================================
 
   test.describe("检索结果表示", () => {
-    test("[5] 表格表示", async ({ page }: { page: Page }) => {
+    test("[4] 表格表示", async ({ page }: { page: Page }) => {
       const testName = "表格表示";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -334,7 +292,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[6] 默认排序确认", async ({ page }: { page: Page }) => {
+    test("[5] 默认排序确认", async ({ page }: { page: Page }) => {
       const testName = "默认排序确认";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -357,7 +315,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[7] Created by user-正常跳转", async ({ page }: { page: Page }) => {
+    test("[6] Created by user-正常跳转", async ({ page }: { page: Page }) => {
       const testName = "Created by user-正常跳转";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -380,39 +338,14 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
         test.skip();
       }
     });
-
-    test("[8] Created by user-用户不存在", async ({ page }: { page: Page }) => {
-      const testName = "Created by user-用户不存在";
-
-      // 模拟用户不存在场景（仕様書に"模拟"と明記）
-      // 先正常导航到 UD11
-      await navigateToUD11viaUD10(page);
-      await page.waitForSelector(".ud11-table", { timeout: 15000 });
-      await takeStepScreenshot(page, testName);
-
-      // 点击用户链接（如果存在）
-      const userLinks = page.locator(".ud11-user-link");
-      const linkCount = await userLinks.count();
-      if (linkCount > 0) {
-        await userLinks.first().click();
-        await page.waitForTimeout(2000);
-
-        // 确认跳转到 /UD25
-        expect(page.url()).toContain("/UD25");
-        await takeStepScreenshot(page, testName);
-      } else {
-        await takeStepScreenshot(page, testName);
-        test.skip();
-      }
-    });
   });
 
   // ==========================================================
-  // 3. Select按钮（9～11）
+  // 3. Select按钮（7～9）
   // ==========================================================
 
   test.describe("Select按钮", () => {
-    test("[9] Select-未选择时", async ({ page }: { page: Page }) => {
+    test("[7] Select-未选择时", async ({ page }: { page: Page }) => {
       const testName = "Select-未选择时";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -432,7 +365,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[10] Select-选择后返回", async ({ page }: { page: Page }) => {
+    test("[8] Select-选择后返回", async ({ page }: { page: Page }) => {
       const testName = "Select-选择后返回";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -464,7 +397,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       }
     });
 
-    test("[11] Select-选择中loading", async ({ page }: { page: Page }) => {
+    test("[9] Select-选择中loading", async ({ page }: { page: Page }) => {
       const testName = "Select-选择中loading";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -498,11 +431,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 4. Down按钮（12～14）
+  // 4. Down按钮（10～12）
   // ==========================================================
 
   test.describe("Down按钮", () => {
-    test("[12] Down-未选择时", async ({ page }: { page: Page }) => {
+    test("[10] Down-未选择时", async ({ page }: { page: Page }) => {
       const testName = "Down-未选择时";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -522,7 +455,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[13] Down-选择后跳转", async ({ page }: { page: Page }) => {
+    test("[11] Down-选择后跳转", async ({ page }: { page: Page }) => {
       const testName = "Down-选择后跳转";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -552,7 +485,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       }
     });
 
-    test("[14] Down-选择中loading", async ({ page }: { page: Page }) => {
+    test("[12] Down-选择中loading", async ({ page }: { page: Page }) => {
       const testName = "Down-选择中loading";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -584,11 +517,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 5. Back按钮（15）
+  // 5. Back按钮（13）
   // ==========================================================
 
   test.describe("Back按钮", () => {
-    test("[15] Back-返回UD10", async ({ page }: { page: Page }) => {
+    test("[13] Back-返回UD10", async ({ page }: { page: Page }) => {
       const testName = "Back-返回UD10";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -610,11 +543,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 6. Print按钮（16）
+  // 6. Print按钮（14）
   // ==========================================================
 
   test.describe("Print按钮", () => {
-    test("[16] Print-打印", async ({ page }: { page: Page }) => {
+    test("[14] Print-打印", async ({ page }: { page: Page }) => {
       const testName = "Print-打印";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -634,11 +567,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 7. Excel按钮（17～19）
+  // 7. Excel按钮（15～17）
   // ==========================================================
 
   test.describe("Excel按钮", () => {
-    test("[17] Excel-导出成功", async ({ page }: { page: Page }) => {
+    test("[15] Excel-导出成功", async ({ page }: { page: Page }) => {
       const testName = "Excel-导出成功";
 
       // Step1: 从 UD10 跳转到 UD11
@@ -654,7 +587,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[18] Excel-导出失败", async ({ page }: { page: Page }) => {
+    test("[16] Excel-导出失败", async ({ page }: { page: Page }) => {
       const testName = "Excel-导出失败";
 
       // 组件内 handleExport 使用 window.open 方式导出，无法通过 route 拦截
@@ -670,7 +603,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await takeStepScreenshot(page, testName);
     });
 
-    test("[19] Excel-导出中loading", async ({ page }: { page: Page }) => {
+    test("[17] Excel-导出中loading", async ({ page }: { page: Page }) => {
       const testName = "Excel-导出中loading";
 
       // 组件内 handleExport 使用 window.open 方式，无 loading 状态
@@ -688,11 +621,11 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
   });
 
   // ==========================================================
-  // 8. 异常处理（20～22）
+  // 8. 异常处理（18～20）
   // ==========================================================
 
   test.describe("异常处理", () => {
-    test("[20] 异常处理-网络连接失败", async ({ page }: { page: Page }) => {
+    test("[18] 异常处理-网络连接失败", async ({ page }: { page: Page }) => {
       const testName = "异常处理-网络连接失败";
 
       // 模拟网络断开（仕様書に"模拟"と明記）
@@ -719,7 +652,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await page.unroute(API_SEARCH);
     });
 
-    test("[21] 异常处理-API超时", async ({ page }: { page: Page }) => {
+    test("[19] 异常处理-API超时", async ({ page }: { page: Page }) => {
       const testName = "异常处理-API超时";
 
       // 模拟 API 响应超时（仕様書に"模拟"と明記）
@@ -748,7 +681,7 @@ test.describe("Homologation Variables Search Result 模块 (UD11) 测试", () =>
       await page.unroute(API_SEARCH);
     });
 
-    test("[22] 异常处理-数据库异常", async ({ page }: { page: Page }) => {
+    test("[20] 异常处理-数据库异常", async ({ page }: { page: Page }) => {
       const testName = "异常处理-数据库异常";
 
       // 模拟数据库异常（仕様書に"模拟"と明記）

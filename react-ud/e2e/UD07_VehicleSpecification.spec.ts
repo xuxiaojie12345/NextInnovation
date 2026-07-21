@@ -170,25 +170,21 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
     test("[4] 基本信息显示", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "基本信息显示";
-
       const hasError = await page.locator(".ud07-error").isVisible();
       if (!hasError) {
-        const labelTexts = [
+        const labels = page.locator(".ud07-info-label");
+        await expect(labels.first()).toBeVisible({ timeout: 5000 });
+        const textArr = [
           "Chassis no:",
           "Model:",
           "Built week:",
           "Product type:",
           "VIN:",
-          "Engine no:",
+          "Symbol:",
           "Country of Operation:",
         ];
-        for (const text of labelTexts) {
-          const label = page.locator(".ud07-info-label").filter({
-            hasText: new RegExp(
-              `^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
-            ),
-          });
-          await expect(label).toBeVisible({ timeout: 5000 });
+        for (const text of textArr) {
+          await expect(labels.filter({ hasText: text }).first()).toBeVisible();
         }
       }
       await takeStepScreenshot(page, testName);

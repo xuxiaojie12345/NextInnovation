@@ -87,10 +87,18 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       ).toBeEnabled();
       await takeStepScreenshot(page, t);
     });
+
+    test("[3] 画面初始化-错误消息非表示", async ({ page }) => {
+      const t = "画面初始化-错误消息非表示";
+      await navigateToUD15(page);
+      await takeStepScreenshot(page, t);
+      await expect(page.locator(".ud15-error")).not.toBeVisible();
+      await takeStepScreenshot(page, t);
+    });
   });
 
   test.describe("空值校验", () => {
-    test("[3] 空值校验-Chassis为空", async ({ page }) => {
+    test("[4] 空值校验-Chassis为空", async ({ page }) => {
       const t = "空值校验-Chassis为空";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -103,7 +111,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[4] 空值校验-全角空格", async ({ page }) => {
+    test("[5] 空值校验-全角空格", async ({ page }) => {
       const t = "空值校验-全角空格";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -114,7 +122,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[5] 空值校验-各按钮均触发空值检查", async ({ page }) => {
+    test("[6] 空值校验-各按钮均触发空值检查", async ({ page }) => {
       const t = "空值校验-各按钮均触发空值检查";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -135,7 +143,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("View Info 功能", () => {
-    test("[6] View Info-正常", async ({ page }) => {
+    test("[7] View Info-正常", async ({ page }) => {
       const t = "View Info-正常";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -151,7 +159,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
         await expect(suc).toBeVisible();
     });
 
-    test("[7] View Info-底盘不存在(404)", async ({ page }) => {
+    test("[8] View Info-底盘不存在(404)", async ({ page }) => {
       const t = "View Info-底盘不存在(404)";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -166,7 +174,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("Set Regenerate 功能", () => {
-    test("[8] Set Regenerate-正常", async ({ page }) => {
+    test("[9] Set Regenerate-正常", async ({ page }) => {
       const t = "Set Regenerate-正常";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -179,7 +187,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[9] Set Regenerate-API失败", async ({ page }) => {
+    test("[10] Set Regenerate-API失败", async ({ page }) => {
       const t = "Set Regenerate-API失败";
       await page.route(
         "**/api/UD15SelecthdocsenddatavinplateApi/UD15SetRegenerate",
@@ -208,7 +216,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("Set OK 功能", () => {
-    test("[10] Set OK-正常", async ({ page }) => {
+    test("[11] Set OK-正常", async ({ page }) => {
       const t = "Set OK-正常";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -218,7 +226,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[11] Set OK-API失败", async ({ page }) => {
+    test("[12] Set OK-API失败", async ({ page }) => {
       const t = "Set OK-API失败";
       await page.route(
         "**/api/UD15SelecthdocsenddatavinplateApi/UD15SetOK",
@@ -242,7 +250,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("Change to Basic 功能", () => {
-    test("[12] Change to Basic-正常", async ({ page }) => {
+    test("[13] Change to Basic-正常", async ({ page }) => {
       const t = "Change to Basic-正常";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -255,7 +263,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[13] Change to Basic-API失败", async ({ page }) => {
+    test("[14] Change to Basic-API失败", async ({ page }) => {
       const t = "Change to Basic-API失败";
       await page.route(
         "**/api/UD15SelecthdocsenddatavinplateApi/UD15ChangetoBasicInfo",
@@ -284,7 +292,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("Change to Advanced 功能", () => {
-    test("[14] Change to Advanced-正常", async ({ page }) => {
+    test("[15] Change to Advanced-正常", async ({ page }) => {
       const t = "Change to Advanced-正常";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -297,7 +305,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[15] Change to Advanced-API失败", async ({ page }) => {
+    test("[16] Change to Advanced-API失败", async ({ page }) => {
       const t = "Change to Advanced-API失败";
       await page.route(
         "**/api/UD15SelecthdocsenddatavinplateApi/UD15ChangetoAdvancedInfo",
@@ -326,7 +334,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("UI交互", () => {
-    test("[16] 操作中按钮禁用", async ({ page }) => {
+    test("[17] 操作中按钮禁用", async ({ page }) => {
       const t = "操作中按钮禁用";
       // 延迟 API 响应使 disabled 状态可见
       await page.route(/UD15ViewInfo/, async (route) => {
@@ -354,7 +362,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await page.unroute(/UD15ViewInfo/);
     });
 
-    test("[17] 操作中防止重复提交", async ({ page }) => {
+    test("[18] 操作中防止重复提交", async ({ page }) => {
       const t = "操作中防止重复提交";
       await page.route(/UD15ViewInfo/, async (route) => {
         await new Promise((r) => setTimeout(r, 3000));
@@ -379,7 +387,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       );
     });
 
-    test("[18] 消息清空-新操作清除旧消息", async ({ page }) => {
+    test("[19] 消息清空-新操作清除旧消息", async ({ page }) => {
       const t = "消息清空-新操作清除旧消息";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -401,7 +409,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[19] 连续操作-先View Info后更新", async ({ page }) => {
+    test("[20] 连续操作-先View Info后更新", async ({ page }) => {
       const t = "连续操作-先View Info后更新";
       await navigateToUD15(page);
       await takeStepScreenshot(page, t);
@@ -421,7 +429,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
   });
 
   test.describe("异常处理", () => {
-    test("[20] 异常处理-网络断开", async ({ page }) => {
+    test("[21] 异常处理-网络断开", async ({ page }) => {
       const t = "异常处理-网络断开";
       await page.route(/UD15ViewInfo/, async (route) => {
         await route.abort("connectionrefused");
@@ -438,7 +446,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       );
     });
 
-    test("[21] 异常处理-API超时", async ({ page }) => {
+    test("[22] 异常处理-API超时", async ({ page }) => {
       const t = "异常处理-API超时";
       await page.route(/UD15ViewInfo/, async (route) => {
         await new Promise((r) => setTimeout(r, 25000));
@@ -456,7 +464,7 @@ test.describe("Vin Plate 模块 (UD15) 测试", () => {
       );
     });
 
-    test("[22] 异常处理-服务器500错误", async ({ page }) => {
+    test("[23] 异常处理-服务器500错误", async ({ page }) => {
       const t = "异常处理-服务器500错误";
       await page.route(/UD15ViewInfo/, async (route) => {
         await route.fulfill({

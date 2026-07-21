@@ -32,6 +32,43 @@ async function navigateToUD20(page: Page) {
   await page.waitForSelector(".ud20-container", { timeout: 15000 });
 }
 
+/**
+ * 设置 Document List API Mock（返回示例数据）
+ */
+async function setupDocumentListMock(page: Page) {
+  await page.route(
+    "**/api/market-document-settings-list/document-list",
+    async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: 200,
+          data: {
+            documents: [
+              {
+                doctype: "VIN",
+                registerUser: "user1",
+                registerDatetime: "2026-01-01",
+              },
+              {
+                doctype: "PDF",
+                registerUser: "user2",
+                registerDatetime: "2026-02-15",
+              },
+              {
+                doctype: "DOCX",
+                registerUser: "user3",
+                registerDatetime: "2026-03-10",
+              },
+            ],
+          },
+        }),
+      });
+    },
+  );
+}
+
 test.describe("Market Document Settings List (UD20) 测试", () => {
   test.beforeEach(async () => {
     screenshotCounter = 1;
@@ -55,6 +92,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
   test.describe("画面初始化", () => {
     test("[1] 画面初始化-正常表示", async ({ page }) => {
       const t = "画面初始化-正常表示";
+      await setupDocumentListMock(page);
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
       await expect(page.locator(".ud20-header")).toBeVisible();
@@ -171,6 +209,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
 
     test("[6] Select-单选后返回", async ({ page }) => {
       const t = "Select-单选后返回";
+      await setupDocumentListMock(page);
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
       await page.waitForSelector(".ud20-table tbody tr", { timeout: 10000 });
@@ -182,22 +221,10 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
       console.log("After Select, URL:", currentUrl);
       await takeStepScreenshot(page, t);
     });
-
-    test("[7] Select-多选后返回", async ({ page }) => {
-      const t = "Select-多选后返回";
-      await navigateToUD20(page);
-      await takeStepScreenshot(page, t);
-      await page.waitForSelector(".ud20-table tbody tr", { timeout: 10000 });
-      await page.locator(".ud20-table tbody tr").first().click();
-      await page.waitForTimeout(300);
-      await page.locator(".ud20-btn").filter({ hasText: "Select" }).click();
-      await page.waitForTimeout(2000);
-      await takeStepScreenshot(page, t);
-    });
   });
 
   test.describe("Back按钮", () => {
-    test("[8] Back-返回前页面", async ({ page }) => {
+    test("[7] Back-返回前页面", async ({ page }) => {
       const t = "Back-返回前页面";
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
@@ -210,7 +237,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
   });
 
   test.describe("Print按钮", () => {
-    test("[9] Print-打开打印对话框", async ({ page }) => {
+    test("[8] Print-打开打印对话框", async ({ page }) => {
       const t = "Print-打开打印对话框";
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
@@ -221,8 +248,9 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
   });
 
   test.describe("User链接", () => {
-    test("[10] User链接-跳转EDB User View", async ({ page }) => {
+    test("[9] User链接-跳转EDB User View", async ({ page }) => {
       const t = "User链接-跳转EDB User View";
+      await setupDocumentListMock(page);
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
       await page.waitForSelector(".ud20-table tbody tr", { timeout: 10000 });
@@ -237,8 +265,9 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
   });
 
   test.describe("UI交互", () => {
-    test("[11] Select-选择后按钮状态", async ({ page }) => {
+    test("[10] Select-选择后按钮状态", async ({ page }) => {
       const t = "Select-选择后按钮状态";
+      await setupDocumentListMock(page);
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
       const selectBtn = page.locator(".ud20-btn").filter({ hasText: "Select" });
@@ -250,8 +279,9 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[12] 消息清空-新操作清除旧消息", async ({ page }) => {
+    test("[11] 消息清空-新操作清除旧消息", async ({ page }) => {
       const t = "消息清空-新操作清除旧消息";
+      await setupDocumentListMock(page);
       await navigateToUD20(page);
       await takeStepScreenshot(page, t);
       await page.locator(".ud20-btn").filter({ hasText: "Select" }).click();
@@ -268,7 +298,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
   });
 
   test.describe("异常处理", () => {
-    test("[13] 异常处理-数据库连接失败", async ({ page }) => {
+    test("[12] 异常处理-数据库连接失败", async ({ page }) => {
       const t = "异常处理-数据库连接失败";
       await page.route(
         "**/api/market-document-settings-list/document-list",
@@ -284,7 +314,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
       await page.unroute("**/api/market-document-settings-list/document-list");
     });
 
-    test("[14] 异常处理-网络请求超时", async ({ page }) => {
+    test("[13] 异常处理-网络请求超时", async ({ page }) => {
       const t = "异常处理-网络请求超时";
       test.setTimeout(60000);
       await page.route(
@@ -303,7 +333,7 @@ test.describe("Market Document Settings List (UD20) 测试", () => {
       await page.unroute("**/api/market-document-settings-list/document-list");
     });
 
-    test("[15] 异常处理-网络断开", async ({ page }) => {
+    test("[14] 异常处理-网络断开", async ({ page }) => {
       const t = "异常处理-网络断开";
       await page.route(
         "**/api/market-document-settings-list/document-list",

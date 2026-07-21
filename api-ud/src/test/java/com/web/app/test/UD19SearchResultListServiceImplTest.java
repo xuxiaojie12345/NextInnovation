@@ -81,7 +81,7 @@ class UD19SearchResultListServiceImplTest {
         row.put("userid", "testuser");
         mockResult.add(row);
 
-        when(userPermissionMapper.searchHdocUsers("testuser", null, null)).thenReturn(mockResult);
+        when(userPermissionMapper.searchHdocUsers("testuser", null, null, null)).thenReturn(mockResult);
 
         UD19SearchResultListResponse response = service.searchHdoc(req);
         assertEquals(200, response.getCode());
@@ -92,7 +92,7 @@ class UD19SearchResultListServiceImplTest {
         List<Map<String, Object>> users = (List<Map<String, Object>>) data.get("users");
         assertEquals(1, users.size());
 
-        verify(userPermissionMapper).searchHdocUsers("testuser", null, null);
+        verify(userPermissionMapper).searchHdocUsers("testuser", null, null, null);
     }
 
     // -------------------------------------------------------
@@ -105,10 +105,10 @@ class UD19SearchResultListServiceImplTest {
         UD19SearchResultListRequest req = new UD19SearchResultListRequest();
         req.setUser("Test User");
 
-        when(userPermissionMapper.searchHdocUsers(null, "Test User", null)).thenReturn(Collections.emptyList());
+        when(userPermissionMapper.searchHdocUsers(null, "Test User", null, null)).thenReturn(Collections.emptyList());
 
         service.searchHdoc(req);
-        verify(userPermissionMapper).searchHdocUsers(null, "Test User", null);
+        verify(userPermissionMapper).searchHdocUsers(null, "Test User", null, null);
     }
 
     // -------------------------------------------------------
@@ -121,10 +121,10 @@ class UD19SearchResultListServiceImplTest {
         UD19SearchResultListRequest req = new UD19SearchResultListRequest();
         req.setNotSet("true");
 
-        when(userPermissionMapper.searchHdocUsers(null, null, null)).thenReturn(Collections.emptyList());
+        when(userPermissionMapper.searchHdocUsers(null, null, null, null)).thenReturn(Collections.emptyList());
 
         service.searchHdoc(req);
-        verify(userPermissionMapper).searchHdocUsers(null, null, null);
+        verify(userPermissionMapper).searchHdocUsers(null, null, null, null);
     }
 
     // -------------------------------------------------------
@@ -137,10 +137,10 @@ class UD19SearchResultListServiceImplTest {
         UD19SearchResultListRequest req = new UD19SearchResultListRequest();
         req.setRule("true");
 
-        when(userPermissionMapper.searchHdocUsers(null, null, "Rule Admin")).thenReturn(Collections.emptyList());
+        when(userPermissionMapper.searchHdocUsers(null, null, "Rule Admin", null)).thenReturn(Collections.emptyList());
 
         service.searchHdoc(req);
-        verify(userPermissionMapper).searchHdocUsers(null, null, "Rule Admin");
+        verify(userPermissionMapper).searchHdocUsers(null, null, "Rule Admin", null);
     }
 
     // -------------------------------------------------------
@@ -153,10 +153,10 @@ class UD19SearchResultListServiceImplTest {
         UD19SearchResultListRequest req = new UD19SearchResultListRequest();
         req.setTemplate("true");
 
-        when(userPermissionMapper.searchHdocUsers(null, null, "Template Admin")).thenReturn(Collections.emptyList());
+        when(userPermissionMapper.searchHdocUsers(null, null, "Template Admin", null)).thenReturn(Collections.emptyList());
 
         service.searchHdoc(req);
-        verify(userPermissionMapper).searchHdocUsers(null, null, "Template Admin");
+        verify(userPermissionMapper).searchHdocUsers(null, null, "Template Admin", null);
     }
 
     // -------------------------------------------------------
@@ -173,14 +173,14 @@ class UD19SearchResultListServiceImplTest {
         // hasUserid=false, hasRule=true → function="Rule Admin"
 
         List<Map<String, Object>> mockResult = new ArrayList<>();
-        when(userPermissionMapper.searchHdocUsers(null, null, "Rule Admin")).thenReturn(mockResult);
+        when(userPermissionMapper.searchHdocUsers(null, null, "Rule Admin", null)).thenReturn(mockResult);
 
         UD19SearchResultListResponse response = service.searchHdoc(req);
         assertEquals(200, response.getCode());
 
         Map<String, Object> data = (Map<String, Object>) response.getData();
         assertEquals(0, data.get("count"));
-        verify(userPermissionMapper).searchHdocUsers(null, null, "Rule Admin");
+        verify(userPermissionMapper).searchHdocUsers(null, null, "Rule Admin", null);
     }
 
     // -------------------------------------------------------
@@ -194,10 +194,10 @@ class UD19SearchResultListServiceImplTest {
         req.setUser("");
         req.setTemplate("true");
 
-        when(userPermissionMapper.searchHdocUsers(null, null, "Template Admin")).thenReturn(Collections.emptyList());
+        when(userPermissionMapper.searchHdocUsers(null, null, "Template Admin", null)).thenReturn(Collections.emptyList());
 
         service.searchHdoc(req);
-        verify(userPermissionMapper).searchHdocUsers(null, null, "Template Admin");
+        verify(userPermissionMapper).searchHdocUsers(null, null, "Template Admin", null);
     }
 
     // -------------------------------------------------------
@@ -211,7 +211,7 @@ class UD19SearchResultListServiceImplTest {
         UD19SearchResultListRequest req = new UD19SearchResultListRequest();
         req.setUserid("testuser");
 
-        when(userPermissionMapper.searchHdocUsers("testuser", null, null)).thenReturn(null);
+        when(userPermissionMapper.searchHdocUsers("testuser", null, null, null)).thenReturn(null);
 
         UD19SearchResultListResponse response = service.searchHdoc(req);
         assertEquals(200, response.getCode());

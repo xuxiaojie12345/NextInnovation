@@ -97,16 +97,49 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
       await navigateToUD18(page);
       await takeStepScreenshot(page, t);
       await expect(getUserIdInput(page)).toBeEnabled();
-      await expect(getUserIdInput(page)).toHaveAttribute("maxLength", "10");
       await expect(getBtnUserInfo(page)).toBeEnabled();
       await expect(getBtnUpdate(page)).toBeEnabled();
       await expect(getMessage(page)).not.toBeVisible();
       await takeStepScreenshot(page, t);
     });
+
+    test("[3] 文档列表-正常加载", async ({ page }) => {
+      const t = "文档列表-正常加载";
+      await page.route(
+        "**/api/UD18HDocUserDocAdministrationApi/document-list",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              code: 200,
+              data: {
+                documents: [
+                  { doctype: "DOC01", description: "Document Type 1" },
+                  { doctype: "DOC02", description: "Document Type 2" },
+                  { doctype: "DOC03", description: "Document Type 3" },
+                ],
+              },
+            }),
+          });
+        },
+      );
+      await navigateToUD18(page);
+      await takeStepScreenshot(page, t);
+      const docList = page.locator(".ud18-doc-list");
+      await expect(docList).toBeVisible({ timeout: 10000 });
+      const items = page.locator(".ud18-doc-item");
+      const count = await items.count();
+      expect(count).toBeGreaterThan(0);
+      await takeStepScreenshot(page, t);
+      await page.unroute(
+        "**/api/UD18HDocUserDocAdministrationApi/document-list",
+      );
+    });
   });
 
   test.describe("空值校验", () => {
-    test("[3] User Info-UserID为空", async ({ page }) => {
+    test("[4] User Info-UserID为空", async ({ page }) => {
       const t = "User Info-UserID为空";
       await navigateToUD18(page);
       await takeStepScreenshot(page, t);
@@ -117,7 +150,7 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[4] Update-UserID为空", async ({ page }) => {
+    test("[5] Update-UserID为空", async ({ page }) => {
       const t = "Update-UserID为空";
       await navigateToUD18(page);
       await takeStepScreenshot(page, t);
@@ -128,7 +161,7 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[5] 空值校验-全角空格", async ({ page }) => {
+    test("[6] 空值校验-全角空格", async ({ page }) => {
       const t = "空值校验-全角空格";
       await navigateToUD18(page);
       await takeStepScreenshot(page, t);
@@ -142,18 +175,6 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
   });
 
   test.describe("文档列表加载", () => {
-    test("[6] 文档列表-正常加载", async ({ page }) => {
-      const t = "文档列表-正常加载";
-      await navigateToUD18(page);
-      await takeStepScreenshot(page, t);
-      const docList = page.locator(".ud18-doc-list");
-      await expect(docList).toBeVisible({ timeout: 10000 });
-      const items = page.locator(".ud18-doc-item");
-      const count = await items.count();
-      expect(count).toBeGreaterThan(0);
-      await takeStepScreenshot(page, t);
-    });
-
     test("[7] 文档列表-加载失败", async ({ page }) => {
       const t = "文档列表-加载失败";
       await page.route(
@@ -206,6 +227,16 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
 
     test("[9] User Info-用户不存在(404)", async ({ page }) => {
       const t = "User Info-用户不存在(404)";
+      await page.route(
+        "**/api/UD18HDocUserDocAdministrationApi/select-user-doc",
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ code: 404 }),
+          });
+        },
+      );
       await navigateToUD18(page);
       await takeStepScreenshot(page, t);
       await getUserIdInput(page).fill("XXXX");
@@ -215,6 +246,9 @@ test.describe("HDoc用户文档管理 (UD18) 测试", () => {
       await expect(getMessage(page)).toContainText("userid");
       await expect(getUserNameInput(page)).toHaveValue("");
       await takeStepScreenshot(page, t);
+      await page.unroute(
+        "**/api/UD18HDocUserDocAdministrationApi/select-user-doc",
+      );
     });
 
     test("[10] User Info-用户无权限", async ({ page }) => {

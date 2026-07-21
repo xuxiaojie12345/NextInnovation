@@ -27,6 +27,29 @@ async function takeStepScreenshot(page: Page, testName: string) {
 }
 
 /**
+ * 设置 Document Types API Mock（返回示例文档类型列表）
+ */
+async function setupDocTypesMock(page: Page) {
+  await page.route(API_DOC_TYPES, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          documentTypes: [
+            { code: "CERTIFICATE", name: "Certificate of Homologation" },
+            { code: "VIN-PLATE", name: "VIN Plate" },
+            { code: "REPORT", name: "Test Report" },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/**
  * セッション情報を localStorage に設定（実際のログイン処理の代わり）
  * 実API呼び出しのために、認証済み状態を作る
  */
@@ -45,6 +68,8 @@ async function seedSession(page: Page) {
  * 実APIを呼び出し、Document Type 下拉列表が取得されるのを待つ
  */
 async function navigateToUD03(page: Page) {
+  // 设置 Document Types API Mock，确保下拉列表有数据
+  await setupDocTypesMock(page);
   // 先にログイン画面へ遷移（同一オリジンであることを保証）
   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
   // セッションを設定
@@ -129,10 +154,25 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
       await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
       await seedSession(page);
 
+      // 先解除 navigateToUD03 中设置的 mock
+      await page.unroute(API_DOC_TYPES);
       // API をインターセプトして応答を遅延させる
       await page.route(API_DOC_TYPES, async (route) => {
         await new Promise((r) => setTimeout(r, 3000));
-        await route.continue();
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: 200,
+            msg: "success",
+            data: {
+              documentTypes: [
+                { code: "CERTIFICATE", name: "Certificate of Homologation" },
+                { code: "VIN-PLATE", name: "VIN Plate" },
+              ],
+            },
+          }),
+        });
       });
 
       // UD03 へ遷移（API応答が遅延するためLoading状態が見える）
@@ -181,6 +221,9 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
     }) => {
       screenshotCounter = 1;
       const testName = "画面初始化-下拉列表加载失败";
+
+      // 先解除 navigateToUD03 中设置的 mock
+      await page.unroute(API_DOC_TYPES);
 
       // 新規ページでAPIをモック（エラーを返す）
       await page.goto(LOGIN_URL, { waitUntil: "networkidle" });

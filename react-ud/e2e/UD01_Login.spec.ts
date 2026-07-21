@@ -411,7 +411,7 @@ test.describe("Login 模块 (UD01) 测试", () => {
           body: JSON.stringify({
             code: 200,
             msg: "success",
-            user: { userId: "x001", name: "Test User", password: "123456" },
+            data: { userId: "x001", name: "Test User" },
           }),
         });
       });

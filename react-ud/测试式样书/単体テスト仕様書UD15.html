@@ -73,7 +73,7 @@
 <td style="text-align:left">画面初始化-正常表示</td>
 <td style="text-align:left">1. 访问 UD15 页面<br>2. 确认画面表示</td>
 <td style="text-align:left">无</td>
-<td style="text-align:left">1. 显示 Header<br>2. 显示"Vin Plate"标题<br>3. Chassis number 输入框为空<br>4. 各按钮可用<br>5. ErrorMessage 为空</td>
+<td style="text-align:left">1. 显示 Header<br>2. 显示"Vin Plate"标题<br>3. Chassis number 输入框为空<br>4. 各按钮（View Info,Set Regenerate,Set OK,Change to Basic Info,Change to Advanced Info）可用<br>5. ErrorMessage 为空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -83,6 +83,15 @@
 <td style="text-align:left">1. 访问页面<br>2. 确认各控件的初期状态</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. Chassis number 输入框可输入<br>2. View Info 按钮可用<br>3. Set Regenerate 按钮可用<br>4. Set OK 按钮可用<br>5. Change to Basic 按钮可用<br>6. Change to Advanced 按钮可用</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:left">画面初始化-错误消息非表示</td>
+<td style="text-align:left">1. 访问页面<br>2. 确认错误消息区域</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. ErrorMessage 区域为空<br>2. 不显示"Please enter a chassis number."<br>3. 该错误消息仅在空值时提交按钮后显示</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -103,8 +112,8 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">3</td>
-<td style="text-align:left">空值校验-Chassis为空</td>
+<td style="text-align:center">4</td>
+<td style="text-align:left">空值校验-Chassis为空，View Info按钮</td>
 <td style="text-align:left">1. Chassis number 为空<br>2. 点击 View Info<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. 显示错误消息："Please enter a chassis number."<br>2. 不调用 API<br>3. 焦点停留在输入框</td>
@@ -112,7 +121,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">4</td>
+<td style="text-align:center">5</td>
 <td style="text-align:left">空值校验-全角空格</td>
 <td style="text-align:left">1. 输入全角空格<br>2. 点击任意按钮<br>3. 确认结果</td>
 <td style="text-align:left">空格</td>
@@ -121,7 +130,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">5</td>
+<td style="text-align:center">6</td>
 <td style="text-align:left">空值校验-各按钮均触发空值检查</td>
 <td style="text-align:left">1. Chassis number 为空<br>2. 分别点击各按钮检查<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -146,7 +155,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">6</td>
+<td style="text-align:center">7</td>
 <td style="text-align:left">View Info-正常</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击 View Info<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -155,7 +164,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">7</td>
+<td style="text-align:center">8</td>
 <td style="text-align:left">View Info-底盘不存在(404)</td>
 <td style="text-align:left">1. 输入不存在的 Chassis number<br>2. 点击 View Info<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>XXXX</code></td>
@@ -180,16 +189,16 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">8</td>
+<td style="text-align:center">9</td>
 <td style="text-align:left">Set Regenerate-正常</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击 Set Regenerate<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
-<td style="text-align:left">1. 调用 POST API<br>2. 显示成功消息："状态已更新为新增"<br>3. Chassis number 输入框被清空</td>
+<td style="text-align:left">1. 调用 POST API<br>2. 该 Chassis 的 Status 更新为 <code>'0'</code>（新規追加）<br>3. 显示成功消息："状态已更新为新增"<br>4. Chassis number 输入框被清空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">9</td>
+<td style="text-align:center">10</td>
 <td style="text-align:left">Set Regenerate-API失败</td>
 <td style="text-align:left">1. 模拟 API 返回错误<br>2. 输入有效 Chassis number<br>3. 点击 Set Regenerate</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -214,16 +223,16 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">10</td>
+<td style="text-align:center">11</td>
 <td style="text-align:left">Set OK-正常</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击 Set OK<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
-<td style="text-align:left">1. 调用 POST API<br>2. 显示成功消息："状态已更新为XML已生成"<br>3. Chassis number 输入框被清空</td>
+<td style="text-align:left">1. 调用 POST API<br>2. 该 Chassis 的 Status 更新为 <code>'1'</code>（xml doc 作成済み）<br>3. 显示成功消息："状态已更新为XML已生成"<br>4. Chassis number 输入框被清空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">11</td>
+<td style="text-align:center">12</td>
 <td style="text-align:left">Set OK-API失败</td>
 <td style="text-align:left">1. 模拟 API 返回错误<br>2. 输入有效 Chassis number<br>3. 点击 Set OK</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -248,16 +257,16 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">12</td>
+<td style="text-align:center">13</td>
 <td style="text-align:left">Change to Basic-正常</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击 Change to Basic<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
-<td style="text-align:left">1. 调用 POST API<br>2. 显示成功消息："切换到基础信息成功"<br>3. Chassis number 输入框被清空</td>
+<td style="text-align:left">1. 调用 POST API<br>2. 该 Chassis 的 Status 更新为 <code>'0'</code>（新規追加）、TYPE 更新为 <code>'1'</code>（basic）<br>3. 显示成功消息："切换到基础信息成功"<br>4. Chassis number 输入框被清空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">13</td>
+<td style="text-align:center">14</td>
 <td style="text-align:left">Change to Basic-API失败</td>
 <td style="text-align:left">1. 模拟 API 返回错误<br>2. 输入有效 Chassis number<br>3. 点击 Change to Basic</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -282,16 +291,16 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">14</td>
+<td style="text-align:center">15</td>
 <td style="text-align:left">Change to Advanced-正常</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击 Change to Advanced<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
-<td style="text-align:left">1. 调用 POST API<br>2. 显示成功消息："切换到高级信息成功"<br>3. Chassis number 输入框被清空</td>
+<td style="text-align:left">1. 调用 POST API<br>2. 该 Chassis 的 Status 更新为 <code>'0'</code>（新規追加）、TYPE 更新为 <code>'2'</code>（ADVANCED (with weights)）<br>3. 显示成功消息："切换到高级信息成功"<br>4. Chassis number 输入框被清空</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">15</td>
+<td style="text-align:center">16</td>
 <td style="text-align:left">Change to Advanced-API失败</td>
 <td style="text-align:left">1. 模拟 API 返回错误<br>2. 输入有效 Chassis number<br>3. 点击 Change to Advanced</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -316,7 +325,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">16</td>
+<td style="text-align:center">17</td>
 <td style="text-align:left">操作中按钮禁用</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击任意按钮<br>3. 在 API 响应前检查按钮状态</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -325,7 +334,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">17</td>
+<td style="text-align:center">18</td>
 <td style="text-align:left">操作中防止重复提交</td>
 <td style="text-align:left">1. 输入有效 Chassis number<br>2. 点击按钮<br>3. 在 API 响应前再次点击按钮</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -334,7 +343,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">18</td>
+<td style="text-align:center">19</td>
 <td style="text-align:left">消息清空-新操作清除旧消息</td>
 <td style="text-align:left">1. 触发一个错误（空值提交）<br>2. 确认错误消息显示<br>3. 输入有效 Chassis number 后再执行操作<br>4. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -343,7 +352,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">19</td>
+<td style="text-align:center">20</td>
 <td style="text-align:left">连续操作-先View Info后更新</td>
 <td style="text-align:left">1. 先点击 View Info（成功）<br>2. 再点击 Set Regenerate<br>3. 确认结果</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -368,7 +377,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">21</td>
 <td style="text-align:left">异常处理-网络断开</td>
 <td style="text-align:left">1. 模拟网络断开<br>2. 输入有效 Chassis number<br>3. 执行任意操作<br>4. 确认</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -377,7 +386,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
+<td style="text-align:center">22</td>
 <td style="text-align:left">异常处理-API超时</td>
 <td style="text-align:left">1. 模拟 API 响应超时<br>2. 输入有效 Chassis number<br>3. 执行操作<br>4. 等待超时</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>
@@ -386,7 +395,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">22</td>
+<td style="text-align:center">23</td>
 <td style="text-align:left">异常处理-服务器500错误</td>
 <td style="text-align:left">1. 模拟 API 返回 500 错误<br>2. 输入有效 Chassis number<br>3. 执行操作<br>4. 确认</td>
 <td style="text-align:left">Chassis: <code>JPCT 013945</code></td>

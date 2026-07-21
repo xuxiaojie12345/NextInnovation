@@ -210,40 +210,6 @@
 </tr>
 </tbody>
 </table>
-<h3 id="下载功能">下载功能 </h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th style="text-align:left">测试对象</th>
-<th style="text-align:left">操作步骤</th>
-<th style="text-align:left">设定值</th>
-<th style="text-align:left">预想结果</th>
-<th style="text-align:left">确认结果</th>
-<th style="text-align:left">确认时间</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">13</td>
-<td style="text-align:left">下载-正常下载</td>
-<td style="text-align:left">1. 校验成功后点击下载链接<br>2. 确认文件下载</td>
-<td style="text-align:left">文件: <code>$AXLE_CONF$</code></td>
-<td style="text-align:left">1. 触发文件下载<br>2. 文件名为 "checked_template.rtf"<br>3. 文件内容与校验时读取的内容一致</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">14</td>
-<td style="text-align:left">下载-重新校验后下载</td>
-<td style="text-align:left">1. 首次校验成功后<br>2. 选择新文件再次校验成功<br>3. 点击下载</td>
-<td style="text-align:left">1次目: <code>$VAR1$</code><br>2次目: <code>$VAR2$</code></td>
-<td style="text-align:left">1. 第二次校验成功后，下载链接更新为新文件内容<br>2. 下载的文件为最新校验的文件</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-</tbody>
-</table>
 <h3 id="ui交互">UI交互 </h3>
 <table>
 <thead>
@@ -259,7 +225,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">15</td>
+<td style="text-align:center">13</td>
 <td style="text-align:left">校验中按钮禁用</td>
 <td style="text-align:left">1. 选择文件后点击 Check<br>2. 在校验中检查按钮状态</td>
 <td style="text-align:left">文件: <code>$AXLE_CONF$</code></td>
@@ -268,7 +234,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">16</td>
+<td style="text-align:center">14</td>
 <td style="text-align:left">校验中防止重复提交</td>
 <td style="text-align:left">1. 选择文件后点击 Check<br>2. 在 API 响应前再次点击 Check<br>3. 校验次数</td>
 <td style="text-align:left">文件: <code>$AXLE_CONF$</code></td>
@@ -277,7 +243,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">17</td>
+<td style="text-align:center">15</td>
 <td style="text-align:left">连续校验-先失败后成功</td>
 <td style="text-align:left">1. 先选择空文件点击 Check（失败）<br>2. 再选择含变量文件点击 Check</td>
 <td style="text-align:left">1次目: 空文件<br>2次目: <code>$VAR$</code></td>
@@ -286,7 +252,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">18</td>
+<td style="text-align:center">16</td>
 <td style="text-align:left">连续校验-先成功后失败</td>
 <td style="text-align:left">1. 先选择含变量文件点击 Check（成功）<br>2. 再选择空文件点击 Check</td>
 <td style="text-align:left">1次目: <code>$VAR$</code><br>2次目: 空文件</td>
@@ -295,7 +261,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">19</td>
+<td style="text-align:center">17</td>
 <td style="text-align:left">消息清空-新操作清除旧消息</td>
 <td style="text-align:left">1. 触发一个错误（空值提交）<br>2. 再次执行其他操作<br>3. 确认旧消息是否清除</td>
 <td style="text-align:left">无</td>
@@ -320,7 +286,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">18</td>
 <td style="text-align:left">消息类型-Error样式</td>
 <td style="text-align:left">1. 触发空值校验（文件未选择）<br>2. 确认消息显示样式</td>
 <td style="text-align:left">无</td>
@@ -329,7 +295,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
+<td style="text-align:center">19</td>
 <td style="text-align:left">消息类型-Success样式</td>
 <td style="text-align:left">1. 校验成功后<br>2. 确认 SuccessMessage 的显示样式</td>
 <td style="text-align:left">文件: <code>$AXLE_CONF$</code></td>
@@ -354,7 +320,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">22</td>
+<td style="text-align:center">20</td>
 <td style="text-align:left">安全性-Blob URL不暴露路径</td>
 <td style="text-align:left">1. 校验成功后<br>2. 检查下载链接的 URL</td>
 <td style="text-align:left">同上</td>

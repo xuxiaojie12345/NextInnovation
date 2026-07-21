@@ -255,54 +255,8 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
     });
   });
 
-  test.describe("下载功能", () => {
-    test("[13] 下载-正常下载", async ({ page }) => {
-      const t = "下载-正常下载";
-      await navigateToUD13viaUD12(page);
-      await takeStepScreenshot(page, t);
-      await page.locator("#ud13-file-input").setInputFiles({
-        name: "test.rtf",
-        mimeType: "text/rtf",
-        buffer: Buffer.from("$AXLE_CONF$"),
-      });
-      await page.locator(".ud13-btn").filter({ hasText: "Check" }).click();
-      await page.waitForTimeout(500);
-      await expect(page.locator(".ud13-download-link")).toBeVisible();
-      await page.locator(".ud13-download-link").click();
-      await page.waitForTimeout(500);
-      await takeStepScreenshot(page, t);
-    });
-
-    test("[14] 下载-重新校验后下载", async ({ page }) => {
-      const t = "下载-重新校验后下载";
-      await navigateToUD13viaUD12(page);
-      await takeStepScreenshot(page, t);
-      // 首次校验
-      await page.locator("#ud13-file-input").setInputFiles({
-        name: "v1.rtf",
-        mimeType: "text/rtf",
-        buffer: Buffer.from("$VAR1$"),
-      });
-      await page.locator(".ud13-btn").filter({ hasText: "Check" }).click();
-      await page.waitForTimeout(500);
-      await expect(page.locator(".ud13-success")).toBeVisible();
-      // 第二次校验
-      await page.locator("#ud13-file-input").setInputFiles({
-        name: "v2.rtf",
-        mimeType: "text/rtf",
-        buffer: Buffer.from("$VAR2$"),
-      });
-      await page.locator(".ud13-btn").filter({ hasText: "Check" }).click();
-      await page.waitForTimeout(500);
-      await expect(page.locator(".ud13-download-link")).toBeVisible();
-      await page.locator(".ud13-download-link").click();
-      await page.waitForTimeout(500);
-      await takeStepScreenshot(page, t);
-    });
-  });
-
   test.describe("UI交互", () => {
-    test("[15] 校验中按钮禁用", async ({ page }) => {
+    test("[13] 校验中按钮禁用", async ({ page }) => {
       const t = "校验中按钮禁用";
       // 延迟 FileReader.readAsText 300ms，让 React 有时间渲染 disabled 状态
       await page.addInitScript(() => {
@@ -326,7 +280,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[16] 校验中防止重复提交", async ({ page }) => {
+    test("[14] 校验中防止重复提交", async ({ page }) => {
       const t = "校验中防止重复提交";
       // 延迟 FileReader 确保 loading 状态可见
       await page.addInitScript(() => {
@@ -350,7 +304,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[17] 连续校验-先失败后成功", async ({ page }) => {
+    test("[15] 连续校验-先失败后成功", async ({ page }) => {
       const t = "连续校验-先失败后成功";
       await navigateToUD13viaUD12(page);
       await takeStepScreenshot(page, t);
@@ -377,7 +331,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[18] 连续校验-先成功后失败", async ({ page }) => {
+    test("[16] 连续校验-先成功后失败", async ({ page }) => {
       const t = "连续校验-先成功后失败";
       await navigateToUD13viaUD12(page);
       await takeStepScreenshot(page, t);
@@ -403,7 +357,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[19] 消息清空-新操作清除旧消息", async ({ page }) => {
+    test("[17] 消息清空-新操作清除旧消息", async ({ page }) => {
       const t = "消息清空-新操作清除旧消息";
       await navigateToUD13viaUD12(page);
       await takeStepScreenshot(page, t);
@@ -421,7 +375,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
   });
 
   test.describe("消息显示", () => {
-    test("[20] 消息类型-Error样式", async ({ page }) => {
+    test("[18] 消息类型-Error样式", async ({ page }) => {
       const t = "消息类型-Error样式";
       await navigateToUD13viaUD12(page);
       await takeStepScreenshot(page, t);
@@ -431,7 +385,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
       await takeStepScreenshot(page, t);
     });
 
-    test("[21] 消息类型-Success样式", async ({ page }) => {
+    test("[19] 消息类型-Success样式", async ({ page }) => {
       const t = "消息类型-Success样式";
       await navigateToUD13viaUD12(page);
       await takeStepScreenshot(page, t);
@@ -448,7 +402,7 @@ test.describe("HDoc Template Check 模块 (UD13) 测试", () => {
   });
 
   test.describe("安全性", () => {
-    test("[22] 安全性-Blob URL不暴露路径", async ({ page }) => {
+    test("[20] 安全性-Blob URL不暴露路径", async ({ page }) => {
       const t = "安全性-Blob URL不暴露路径";
       // 拦截 URL.createObjectURL 记录 Blob URL
       await page.addInitScript(() => {

@@ -71,7 +71,7 @@
 <tr>
 <td style="text-align:center">1</td>
 <td style="text-align:left">画面初始化-下拉列表</td>
-<td style="text-align:left">1. 访问 UD08 页面<br>2. 确认下拉列表</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 点击Product class 下拉列<br>3. 点击Market 下拉列<br>4. 确认下拉列表</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. Product class 下拉列表显示 API 获取的选项<br>2. Market 下拉列表显示 API 获取的选项<br>3. Variable 下拉列表显示 API 获取的选项<br>4. 关键字段带星号标识必填项</td>
 <td style="text-align:left"></td>
@@ -95,6 +95,193 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:left">画面初始化-各字段初期値（空）</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 确认各输入框的初期値</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Product class 为未选择状态<br>2. Number 为空<br>3. Market 为未选择状态<br>4. Variable 为空<br>5. Value 为空<br>6. Variant string.1 为空<br>7. Variant string.2 为空<br>8. Comments 为空<br>9. Add 为空<br>10. Delete 为空</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:left">画面初始化-运算符初期値（"="）</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 确认各字段的运算符下拉框</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 所有字段的运算符默认显示 "="<br>2. 运算符下拉框可选值：=, !=, &gt;, &lt;, &gt;=, &lt;=, Like</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left">画面初始化-Product class 下拉选项</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 点击 Product class 下拉框<br>3. 确认选项列表</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 第一项为 "-- Select --"<br>2. 后续显示 API 返回的选项<br>3. 选项数量大于 0</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:left">画面初始化-Market 下拉选项</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 点击 Market 下拉框<br>3. 确认选项列表</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 第一项为 "-- Select --"<br>2. 后续显示 API 返回的选项<br>3. 选项数量大于 0</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:left">画面初始化-Created by user 初期値</td>
+<td style="text-align:left">1. 登录成功后访问 UD08<br>2. 确认 Created by user 输入框的值</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Created by user 自动填入当前登录用户的 ID<br>2. 右侧显示 "Automatic" 提示文字<br>3. 输入框可手动修改</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:left">画面初始化-Date 初期値</td>
+<td style="text-align:left">1. 登录成功后访问 UD08<br>2. 确认 Date 输入框的值</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Date 自动填入当前系统时间（格式：YYYY-MM-DD HH:mm）<br>2. 右侧显示 "Automatic" 提示文字<br>3. 输入框可手动修改</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:left">画面初始化-Add 提示文字</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 确认 Add 字段右侧的提示文字</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Add 输入框右侧显示 "YYYYWW" 灰色斜体提示文字<br>2. 提示文字不可编辑</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:left">画面初始化-Delete 提示文字</td>
+<td style="text-align:left">1. 访问 UD08 页面<br>2. 确认 Delete 字段右侧的提示文字</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. Delete 输入框右侧显示 "YYYYWW" 灰色斜体提示文字<br>2. 提示文字不可编辑</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="字段属性校验">字段属性校验 </h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th style="text-align:left">测试对象</th>
+<th style="text-align:left">操作步骤</th>
+<th style="text-align:left">设定值</th>
+<th style="text-align:left">预想结果</th>
+<th style="text-align:left">确认结果</th>
+<th style="text-align:left">确认时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:left">Number-最大长度(10位)</td>
+<td style="text-align:left">1. Number 输入框输入 10 位数字<br>2. 继续输入第 11 位字符</td>
+<td style="text-align:left">1234567890</td>
+<td style="text-align:left">1. 可输入 10 位数字<br>2. 第 11 位字符无法输入<br>3. 输入框值仍为 10 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:left">Number-数字输入限制</td>
+<td style="text-align:left">1. Number 输入框输入非数字字符<br>2. 确认输入结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 非数字字符被自动过滤<br>2. 输入框中仅保留数字</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:left">Number-边界值（空值）</td>
+<td style="text-align:left">1. Number 输入框保持空<br>2. 点击 Add<br>3. 确认结果</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">1. 显示错误消息："Number 是必填项"</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:left">Variable-最大长度(20位)</td>
+<td style="text-align:left">1. Variable 输入框输入 20 个字符<br>2. 继续输入第 21 位字符</td>
+<td style="text-align:left">20 位字符串</td>
+<td style="text-align:left">1. 可输入 20 个字符<br>2. 第 21 位字符无法输入<br>3. 输入框值仍为 20 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">16</td>
+<td style="text-align:left">Value-最大长度(200位)</td>
+<td style="text-align:left">1. Value 输入框输入 200 个字符<br>2. 继续输入第 201 位字符</td>
+<td style="text-align:left">200 位字符串</td>
+<td style="text-align:left">1. 可输入 200 个字符<br>2. 第 201 位字符无法输入<br>3. 输入框值仍为 200 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">17</td>
+<td style="text-align:left">Variant string.1-最大长度(100)</td>
+<td style="text-align:left">1. Variant string.1 输入 100 个字符<br>2. 继续输入第 101 位字符</td>
+<td style="text-align:left">100 位字符串</td>
+<td style="text-align:left">1. 可输入 100 个字符<br>2. 第 101 位字符无法输入<br>3. 输入框值仍为 100 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">18</td>
+<td style="text-align:left">Variant string.2-最大长度(100)</td>
+<td style="text-align:left">1. Variant string.2 输入 100 个字符<br>2. 继续输入第 101 位字符</td>
+<td style="text-align:left">100 位字符串</td>
+<td style="text-align:left">1. 可输入 100 个字符<br>2. 第 101 位字符无法输入<br>3. 输入框值仍为 100 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">19</td>
+<td style="text-align:left">Comments-最大长度(100)</td>
+<td style="text-align:left">1. Comments 输入框输入 100 个字符<br>2. 继续输入第 101 位字符</td>
+<td style="text-align:left">100 位字符串</td>
+<td style="text-align:left">1. 可输入 100 个字符<br>2. 第 101 位字符无法输入<br>3. 输入框值仍为 100 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">20</td>
+<td style="text-align:left">Add-最大长度(6位)</td>
+<td style="text-align:left">1. Add 输入框输入 6 个字符<br>2. 继续输入第 7 位字符</td>
+<td style="text-align:left">6 位字符串</td>
+<td style="text-align:left">1. 可输入 6 个字符<br>2. 第 7 位字符无法输入<br>3. 输入框值仍为 6 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">21</td>
+<td style="text-align:left">Delete-最大长度(6位)</td>
+<td style="text-align:left">1. Delete 输入框输入 6 个字符<br>2. 继续输入第 7 位字符</td>
+<td style="text-align:left">6 位字符串</td>
+<td style="text-align:left">1. 可输入 6 个字符<br>2. 第 7 位字符无法输入<br>3. 输入框值仍为 6 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:center">22</td>
+<td style="text-align:left">Created by user-最大长度(16)</td>
+<td style="text-align:left">1. Created by user 输入框输入 16 个字符<br>2. 继续输入第 17 位</td>
+<td style="text-align:left">16 位字符串</td>
+<td style="text-align:left">1. 可输入 16 个字符<br>2. 第 17 位字符无法输入<br>3. 输入框值仍为 16 位</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
 </tbody>
 </table>
 <h3 id="空值校验">空值校验 </h3>
@@ -112,7 +299,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">4</td>
+<td style="text-align:center">23</td>
 <td style="text-align:left">Add-Product class为空</td>
 <td style="text-align:left">1. Product class 不选择<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -121,7 +308,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">5</td>
+<td style="text-align:center">24</td>
 <td style="text-align:left">Add-Number为空</td>
 <td style="text-align:left">1. Number 不输入<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -130,20 +317,11 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">6</td>
+<td style="text-align:center">25</td>
 <td style="text-align:left">Add-Market为空</td>
 <td style="text-align:left">1. Market 不选择<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
 <td style="text-align:left">1. 显示错误消息："Market 是必填项"<br>2. 焦点停留在该字段</td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:center">7</td>
-<td style="text-align:left">Number-数字输入限制</td>
-<td style="text-align:left">1. 在 Number 输入框输入非数字字符<br>2. 确认输入结果</td>
-<td style="text-align:left">无</td>
-<td style="text-align:left">1. 非数字字符被自动过滤<br>2. 输入框中仅保留数字</td>
 <td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
@@ -164,7 +342,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">8</td>
+<td style="text-align:center">26</td>
 <td style="text-align:left">Add-正常新增</td>
 <td style="text-align:left">1. 输入完整必填项<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -173,7 +351,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">9</td>
+<td style="text-align:center">27</td>
 <td style="text-align:left">Add-主键冲突</td>
 <td style="text-align:left">1. 输入已存在的主键组合<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -182,7 +360,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">10</td>
+<td style="text-align:center">28</td>
 <td style="text-align:left">Add-Variable不存在</td>
 <td style="text-align:left">1. 输入不存在的 Variable<br>2. 点击 Add<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -191,7 +369,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">11</td>
+<td style="text-align:center">29</td>
 <td style="text-align:left">Add-加载中按钮禁用</td>
 <td style="text-align:left">1. 输入完整必填项后点击 Add<br>2. 在 API 响应前检查按钮状态</td>
 <td style="text-align:left">无</td>
@@ -216,7 +394,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">12</td>
+<td style="text-align:center">30</td>
 <td style="text-align:left">Update-正常更新</td>
 <td style="text-align:left">1. 选择已有记录并修改<br>2. 点击 Update<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -225,7 +403,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">13</td>
+<td style="text-align:center">31</td>
 <td style="text-align:left">Update-记录不存在</td>
 <td style="text-align:left">1. 输入不存在的记录<br>2. 点击 Update<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -250,7 +428,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">14</td>
+<td style="text-align:center">32</td>
 <td style="text-align:left">Delete-正常删除</td>
 <td style="text-align:left">1. 选择已有记录<br>2. 点击 Delete<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -259,7 +437,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">15</td>
+<td style="text-align:center">33</td>
 <td style="text-align:left">Delete-记录不存在</td>
 <td style="text-align:left">1. 输入不存在的记录<br>2. 点击 Delete<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -284,7 +462,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">16</td>
+<td style="text-align:center">34</td>
 <td style="text-align:left">Search-跳转UD09</td>
 <td style="text-align:left">1. 输入检索条件<br>2. 点击 Search<br>3. 确认跳转</td>
 <td style="text-align:left">无</td>
@@ -293,7 +471,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">17</td>
+<td style="text-align:center">35</td>
 <td style="text-align:left">Clear-清空表单</td>
 <td style="text-align:left">1. 输入各种值后点击 Clear<br>2. 确认表单状态</td>
 <td style="text-align:left">无</td>
@@ -318,7 +496,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">18</td>
+<td style="text-align:center">36</td>
 <td style="text-align:left">UD09选择返回-数据回填</td>
 <td style="text-align:left">1. 从 UD09 选择记录返回<br>2. 确认表单回填</td>
 <td style="text-align:left">无</td>
@@ -343,7 +521,7 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">19</td>
+<td style="text-align:center">37</td>
 <td style="text-align:left">异常处理-404错误</td>
 <td style="text-align:left">1. 模拟 API 返回 404<br>2. 执行操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -352,7 +530,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">20</td>
+<td style="text-align:center">38</td>
 <td style="text-align:left">异常处理-网络断开</td>
 <td style="text-align:left">1. 模拟网络断开<br>2. 执行操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>
@@ -361,7 +539,7 @@
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:center">21</td>
+<td style="text-align:center">39</td>
 <td style="text-align:left">异常处理-数据库异常</td>
 <td style="text-align:left">1. 模拟数据库异常<br>2. 执行操作<br>3. 确认结果</td>
 <td style="text-align:left">无</td>

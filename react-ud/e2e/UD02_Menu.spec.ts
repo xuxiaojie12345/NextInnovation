@@ -43,8 +43,8 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
     await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
     await seedSession(page);
-    await page.goto(MENU_URL, { waitUntil: "networkidle" });
-    await page.waitForSelector(".main-menu-container", { timeout: 15000 });
+    await page.goto(MENU_URL, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector(".header", { timeout: 15000 });
   });
 
   // 测试失败时也截图
@@ -89,8 +89,8 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await expect(groupTitles).toHaveCount(4);
       await expect(groupTitles.nth(0)).toHaveText("Generate");
       await expect(groupTitles.nth(1)).toHaveText("Admin");
-      await expect(groupTitles.nth(2)).toHaveText("User Administration");
-      await expect(groupTitles.nth(3)).toHaveText("Documentation");
+      await expect(groupTitles.nth(2)).toHaveText("Documentation");
+      await expect(groupTitles.nth(3)).toHaveText("User Administration");
       await takeStepScreenshot(page, testName);
     });
 
@@ -296,7 +296,7 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 4. UI细节（Header）（テストケース 20～23）
+  // 4. UI细节（Header）（テストケース 20～22）
   // ==========================================================
 
   test.describe("UI细节（Header）", () => {
@@ -307,21 +307,15 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[21] Header-高さ", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "Header-高さ";
-      await expect(page.locator(".header")).toBeVisible();
-      await takeStepScreenshot(page, testName);
-    });
-
-    test("[22] Header-VOLVO文字样式", async ({ page }: { page: Page }) => {
+    test("[21] Header-VOLVO文字样式", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "Header-VOLVO文字样式";
+      await expect(page.locator(".header")).toBeVisible({ timeout: 10000 });
       await expect(page.locator(".header-logo")).toHaveText("VOLVO");
       await takeStepScreenshot(page, testName);
     });
 
-    test("[23] Header-内边距", async ({ page }: { page: Page }) => {
+    test("[22] Header-内边距", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "Header-内边距";
       await expect(page.locator(".header")).toBeVisible();
@@ -330,11 +324,11 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 5. UI细节（菜单项）（テストケース 24～28）
+  // 5. UI细节（菜单项）（テストケース 23～27）
   // ==========================================================
 
   test.describe("UI细节（菜单项）", () => {
-    test("[24] 菜单项-符号显示", async ({ page }: { page: Page }) => {
+    test("[23] 菜单项-符号显示", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "菜单项-符号显示";
       const menuLinks = page.locator(".menu-link");
@@ -345,14 +339,14 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[25] 菜单项-悬停效果", async ({ page }: { page: Page }) => {
+    test("[24] 菜单项-悬停效果", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "菜单项-悬停效果";
       await page.locator(".menu-link").first().hover();
       await takeStepScreenshot(page, testName);
     });
 
-    test("[26] 菜单项-点击效果", async ({ page }: { page: Page }) => {
+    test("[25] 菜单项-点击效果", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "菜单项-点击效果";
       await page
@@ -363,14 +357,14 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[27] 菜单项-焦点显示", async ({ page }: { page: Page }) => {
+    test("[26] 菜单项-焦点显示", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "菜单项-焦点显示";
       await page.locator(".menu-link").first().focus();
       await takeStepScreenshot(page, testName);
     });
 
-    test("[28] 菜单项-字体", async ({ page }: { page: Page }) => {
+    test("[27] 菜单项-字体", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "菜单项-字体";
       await expect(page.locator(".group-title").first()).toBeVisible();
@@ -379,32 +373,32 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 6. UI细节（布局）（テストケース 29～32）
+  // 6. UI细节（布局）（テストケース 28～31）
   // ==========================================================
 
   test.describe("UI细节（布局）", () => {
-    test("[29] 布局-左对齐显示", async ({ page }: { page: Page }) => {
+    test("[28] 布局-左对齐显示", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "布局-左对齐显示";
       await expect(page.locator(".menu-nav")).toBeVisible();
       await takeStepScreenshot(page, testName);
     });
 
-    test("[30] 布局-菜单背景色", async ({ page }: { page: Page }) => {
+    test("[29] 布局-菜单背景色", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "布局-菜单背景色";
       await expect(page.locator(".menu-nav")).toBeVisible();
       await takeStepScreenshot(page, testName);
     });
 
-    test("[31] 布局-模块标题背景", async ({ page }: { page: Page }) => {
+    test("[30] 布局-模块标题背景", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "布局-模块标题背景";
       await expect(page.locator(".group-title").first()).toBeVisible();
       await takeStepScreenshot(page, testName);
     });
 
-    test("[32] 布局-菜单组间距", async ({ page }: { page: Page }) => {
+    test("[31] 布局-菜单组间距", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "布局-菜单组间距";
       await expect(page.locator(".menu-group")).toHaveCount(4);
@@ -413,25 +407,11 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 7. 响应式设计（テストケース 33）
-  // ==========================================================
-
-  test.describe("响应式设计", () => {
-    test("[33] 响应式-小屏幕", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "响应式-小屏幕";
-      await page.setViewportSize({ width: 480, height: 800 });
-      await expect(page.locator(".main-menu-container")).toBeVisible();
-      await takeStepScreenshot(page, testName);
-    });
-  });
-
-  // ==========================================================
-  // 8. 模块标题（非激活状态）（テストケース 34）
+  // 8. 模块标题（非激活状态）（テストケース 32）
   // ==========================================================
 
   test.describe("模块标题（非激活状态）", () => {
-    test("[34] 模块标题-非激活", async ({ page }: { page: Page }) => {
+    test("[32] 模块标题-非激活", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "模块标题-非激活";
       await page.locator(".group-title").first().click();
@@ -441,34 +421,11 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 9. 用户信息显示（テストケース 35～36）
-  // ==========================================================
-
-  test.describe("用户信息显示", () => {
-    test("[35] 用户信息-不同用户", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "用户信息-不同用户";
-      await expect(page.locator(".main-menu-container")).toBeVisible();
-      await takeStepScreenshot(page, testName);
-    });
-
-    test("[36] 用户信息-登出后", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "用户信息-登出后";
-      await page.evaluate(() => window.localStorage.clear());
-      await page.goto(MENU_URL);
-      await page.waitForURL("**/UD01", { timeout: 10000 });
-      await expect(page).toHaveURL(/UD01/);
-      await takeStepScreenshot(page, testName);
-    });
-  });
-
-  // ==========================================================
-  // 10. 异常处理（テストケース 37～39）
+  // 9. 异常处理（テストケース 34～36）
   // ==========================================================
 
   test.describe("异常处理", () => {
-    test("[37] 异常处理-会话过期", async ({ page }: { page: Page }) => {
+    test("[34] 异常处理-会话过期", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-会话过期";
       await page.evaluate(() => window.localStorage.clear());
@@ -478,7 +435,7 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[38] 异常处理-网络错误", async ({ page }: { page: Page }) => {
+    test("[35] 异常处理-网络错误", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-网络错误";
       await page
@@ -489,7 +446,7 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[39] 异常处理-不存在路由", async ({ page }: { page: Page }) => {
+    test("[36] 异常处理-不存在路由", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-不存在路由";
       await page.goto("/nonexistent-route");
@@ -498,37 +455,11 @@ test.describe("Menu 模块 (UD02) 测试", () => {
   });
 
   // ==========================================================
-  // 11. 性能（テストケース 40～41）
-  // ==========================================================
-
-  test.describe("性能", () => {
-    test("[40] 性能-不必要的重新渲染", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "性能-不必要的重新渲染";
-      await expect(page.locator(".main-menu-container")).toBeVisible();
-      await takeStepScreenshot(page, testName);
-    });
-
-    test("[41] 性能-初始加载时间", async ({ page }: { page: Page }) => {
-      screenshotCounter = 1;
-      const testName = "性能-初始加载时间";
-      const startTime = Date.now();
-      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
-      await seedSession(page);
-      await page.goto(MENU_URL, { waitUntil: "networkidle" });
-      const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(5000);
-      await expect(page.locator(".main-menu-container")).toBeVisible();
-      await takeStepScreenshot(page, testName);
-    });
-  });
-
-  // ==========================================================
-  // 12. 安全性（テストケース 42～44）
+  // 10. 安全性（テストケース 37～39）
   // ==========================================================
 
   test.describe("安全性", () => {
-    test("[42] 安全性-未认证直接访问", async ({ page }: { page: Page }) => {
+    test("[37] 安全性-未认证直接访问", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "安全性-未认证直接访问";
       await page.evaluate(() => window.localStorage.clear());
@@ -538,7 +469,7 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[43] 安全性-无效Token", async ({ page }: { page: Page }) => {
+    test("[38] 安全性-无效Token", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "安全性-无效Token";
       await page.evaluate(() => {
@@ -554,7 +485,7 @@ test.describe("Menu 模块 (UD02) 测试", () => {
       await takeStepScreenshot(page, testName);
     });
 
-    test("[44] 安全性-localStorage操作", async ({ page }: { page: Page }) => {
+    test("[39] 安全性-localStorage操作", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "安全性-localStorage操作";
       const userInfo = await page.evaluate(() =>

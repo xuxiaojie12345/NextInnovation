@@ -32,6 +32,26 @@ async function navigateToUD21(page: Page) {
   await page.waitForSelector(".ud21-container", { timeout: 15000 });
 }
 
+/**
+ * 设置 Markets API Mock（返回示例市场列表）
+ */
+async function setupMarketsMock(page: Page) {
+  await page.route("**/api/UD21MarketsInHdocApi/markets", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        data: [
+          { market: "AUT", description: "Austria", weightsFromHdoc: "Y" },
+          { market: "BEL", description: "Belgium", weightsFromHdoc: "" },
+          { market: "CHN", description: "China", weightsFromHdoc: "Y" },
+        ],
+      }),
+    });
+  });
+}
+
 test.describe("Markets in Hdoc (UD21) 测试", () => {
   test.beforeEach(async () => {
     screenshotCounter = 1;
@@ -55,6 +75,7 @@ test.describe("Markets in Hdoc (UD21) 测试", () => {
   test.describe("画面初始化", () => {
     test("[1] 画面初始化-正常表示", async ({ page }) => {
       const t = "画面初始化-正常表示";
+      await setupMarketsMock(page);
       await navigateToUD21(page);
       await takeStepScreenshot(page, t);
       await expect(page.locator(".ud21-header")).toBeVisible();
@@ -126,6 +147,7 @@ test.describe("Markets in Hdoc (UD21) 测试", () => {
   test.describe("表格表示", () => {
     test("[4] 表格表示-正常数据显示", async ({ page }) => {
       const t = "表格表示-正常数据显示";
+      await setupMarketsMock(page);
       await navigateToUD21(page);
       await takeStepScreenshot(page, t);
       const rows = await page.locator(".ud21-table tbody tr").count();
@@ -184,6 +206,7 @@ test.describe("Markets in Hdoc (UD21) 测试", () => {
 
     test("[7] 市场代码-最大3字符", async ({ page }) => {
       const t = "市场代码-最大3字符";
+      await setupMarketsMock(page);
       await navigateToUD21(page);
       await takeStepScreenshot(page, t);
       const marketCells = page.locator(".ud21-table tbody td").first();
