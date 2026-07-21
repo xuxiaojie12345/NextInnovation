@@ -366,6 +366,7 @@ const UploadDeleteTemplate: React.FC = () => {
           <button
             type='button'
             className='udt-link'
+            style={{ border: "none", background: "transparent" }}
             onClick={handleCheckTemplate}
           >
             Check Template (Only for rtf files)

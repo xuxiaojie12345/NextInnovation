@@ -50,7 +50,17 @@ const EdbUserView: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch user information");
+        // 尝试从响应中获取错误信息
+        let errorMsg = "Failed to fetch user information";
+        try {
+          const errorResult = await response.json();
+          if (errorResult.msg) {
+            errorMsg = errorResult.msg;
+          }
+        } catch (_) {}
+        setErrorMessage(errorMsg);
+        setUserInfo(null);
+        return;
       }
 
       const result = await response.json();
@@ -64,6 +74,11 @@ const EdbUserView: React.FC = () => {
         setErrorMessage(result.msg || "获取用户信息失败");
         setUserInfo(null);
       }
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : "获取用户信息失败，请检查网络连接",
+      );
+      setUserInfo(null);
     } finally {
       setIsLoading(false);
     }
