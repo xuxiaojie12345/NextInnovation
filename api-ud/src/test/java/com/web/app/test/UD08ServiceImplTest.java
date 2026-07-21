@@ -291,6 +291,73 @@ class UD08ServiceImplTest {
         }
 
         @Test
+        @DisplayName("覆盖分支 - variable=null, value=null, vs=non-null")
+        void testUpdateBranchVsNotNull() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVs("VS_VAL");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            assertNull(ud08Service.UD08Update(request));
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any());
+        }
+
+        @Test
+        @DisplayName("覆盖分支 - vs=null, vs2=non-null")
+        void testUpdateBranchVs2NotNull() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setVs2("VS2_VAL");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            assertNull(ud08Service.UD08Update(request));
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any());
+        }
+
+        @Test
+        @DisplayName("覆盖分支 - vs2=null, addDate=non-null")
+        void testUpdateBranchAddDateNotNull() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setAddDate("2024-01-01");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            assertNull(ud08Service.UD08Update(request));
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any());
+        }
+
+        @Test
+        @DisplayName("覆盖分支 - addDate=null, updateUser=non-null")
+        void testUpdateBranchUpdateUserNotNull() {
+            UD08UpdateRequest request = new UD08UpdateRequest();
+            request.setProductClass("PC1");
+            request.setNumber("100");
+            request.setMarket("JPN");
+            request.setUpdateUser("USER1");
+
+            HdocUserDefinedRules existing = new HdocUserDefinedRules();
+            when(ud08Mapper.selectByPrimaryKey("PC1", "100", "JPN")).thenReturn(existing);
+
+            assertNull(ud08Service.UD08Update(request));
+            verify(ud08Mapper, times(1)).updateByPrimaryKey(any());
+        }
+
+        @Test
         @DisplayName("更新时TEMPLATE-变量检查失败")
         void testUpdateTemplateVariableNotFound() {
             UD08UpdateRequest request = new UD08UpdateRequest();

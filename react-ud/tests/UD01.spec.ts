@@ -38,8 +38,9 @@ function resetCounter(name: string) {
 async function safeGoto(page: Page) {
   for (let i = 0; i < 3; i++) {
     try {
-      await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForSelector('.login-container', { timeout: 15000 });
+      // React首次编译慢（~70秒），增大超时
+      await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
+      await page.waitForSelector('.login-container', { timeout: 30000 });
       await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
       return;
     } catch (e) {
@@ -107,6 +108,8 @@ test.beforeAll(async () => {
 // 1. Login区域（UI控件）- No.1-16
 // ============================================================
 test.describe.serial('Login区域（UI控件）', () => {
+  // React首次编译慢（~70秒），增大超时
+  test.setTimeout(120000);
 
   test('No.1 画面初始化-username输入框', async ({ page }) => {
     resetCounter('01_username输入框_初始状态');
@@ -360,6 +363,7 @@ test.describe.serial('Login区域（UI控件）', () => {
 // 2. 页面布局 - No.17-19
 // ============================================================
 test.describe.serial('页面布局', () => {
+  test.setTimeout(120000);
 
   test('No.17 左侧信息区-文字内容', async ({ page }) => {
     resetCounter('17_左侧信息区_文字内容');
@@ -557,21 +561,23 @@ test.describe.serial('API认证处理', () => {
     resetCounter('27_认证失败_401');
     await safeGoto(page);
 
-    // 使用错误密码触发 401
+    // Mock 401 响应（错误路径测试，不依赖真实后端）
+    await page.route(API_URL, async route => {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 401, message: 'We didn\'t recognize the username or password you entered. Please try again.' })
+      });
+    });
+
     await page.locator('#username').click();
     await page.locator('#username').pressSequentially('admin');
     await page.locator('#password').click();
     await page.locator('#password').pressSequentially('WrongPass@123');
     await page.locator('.login-button').click();
+    await page.waitForTimeout(1000);
 
-    // 等待响应
-    await page.waitForTimeout(2000);
-
-    const msg = page.locator('.error-message');
-    if (await msg.isVisible().catch(() => false)) {
-      const text = await msg.textContent();
-      console.log(`Error message: "${text}"`);
-    }
+    await expect(page.locator('.error-message')).toBeVisible();
     await expect(page.locator('.login-button')).toBeEnabled();
     await takeScreenshot(page, '27_认证失败_401');
   });
@@ -579,6 +585,15 @@ test.describe.serial('API认证处理', () => {
   test('No.28 认证失败-不同错误凭证多次尝试', async ({ page }) => {
     resetCounter('28_不同错误凭证多次尝试');
     await safeGoto(page);
+
+    // Mock 401 响应（错误路径测试，不依赖真实后端）
+    await page.route(API_URL, async route => {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 401, message: 'Unauthorized' })
+      });
+    });
 
     // 第一次错误
     await page.locator('#username').click();
@@ -722,7 +737,7 @@ test.describe.serial('登录按钮交互', () => {
     resetCounter('34_跳转到Menu');
     await safeGoto(page);
 
-    // 用 mock 确保跳转可验证
+    // 用 mock 确保跳转可验证（注意 data.userInfo 需包含完整用户信息）
     await page.route(API_URL, async route => {
       await route.fulfill({
         status: 200,
@@ -731,12 +746,23 @@ test.describe.serial('登录按钮交互', () => {
           code: 200,
           data: {
             success: true,
-            token: 'test-token-001',
-            userid: 'admin',
-            username: 'Admin',
-            responsible: 'Engineering',
-            userposition: 'Manager',
-            email: 'admin@example.com'
+            userInfo: {
+              token: 'test-token-001',
+              userid: 'admin',
+              username: 'Admin',
+              responsible: 'Engineering',
+              userposition: 'Manager',
+              email: 'admin@example.com',
+              permissions: [
+                'GenerateDucument', 'GenerateDoc', 'GenerateBatch', 'RegdataArchive', 'RegdataBatch',
+                'UpdateRules', 'UpdateUnicodeRules', 'ExistingVariables', 'UnlockDocument',
+                'HDocNumberSeries', 'UploadDeleteTemplate', 'ListTemplates', 'VPPSVinPlate', 'ADCAChange',
+                'HDocTemplateCheck',
+                'HDocUserAdmin', 'HDocUserDocAdmin', 'SearchUser', 'ChangePassword', 'UserPosition',
+                'ArchiveSearch', 'UploadDocument',
+                'UserGuide', 'ADCAChangeGuide', 'VinPlateGuide', 'ArchiveGuide', 'Privacy',
+              ]
+            }
           }
         })
       });
@@ -770,7 +796,8 @@ test.describe.serial('登录按钮交互', () => {
     await page.waitForTimeout(1000);
 
     await expect(page.locator('#username')).toHaveValue('admin');
-    await expect(page.locator('#password')).toHaveValue('wrong');
+    // 密码框登录失败后主动清空（源码安全措施）
+    await expect(page.locator('#password')).toHaveValue('');
     await takeScreenshot(page, '35_输入框保留输入值');
   });
 

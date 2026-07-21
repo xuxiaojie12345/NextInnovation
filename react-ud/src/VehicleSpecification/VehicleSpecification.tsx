@@ -50,7 +50,9 @@ const VehicleSpecification: React.FC = () => {
 
   const location = useLocation();
   // 从路由参数获取底盘编号（格式：serie + 半角空格 + chassisNo）
-  const chassisNo = (location.state as { chassisNo?: string })?.chassisNo || "";
+  // 优先从 location.state 获取（通过 navigate 传参），其次从 URL 查询参数获取（Playwright 测试用）
+  const queryChassisNo = new URLSearchParams(location.search).get('chassisNo') || "";
+  const chassisNo = (location.state as { chassisNo?: string })?.chassisNo || queryChassisNo;
 
   // 页面数据状态
   const [chassisInfo, setChassisInfo] = useState<ChassisInfo | null>(null);

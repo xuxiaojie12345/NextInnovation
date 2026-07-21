@@ -276,6 +276,44 @@ class UD14ServiceImplTest {
         }
 
         @Test
+        @DisplayName("文件存在但不可读时抛出RuntimeException")
+        void testLoadFileNotReadable() throws Exception {
+            // Windows 上文件所有者总能读取文件，无法模拟此场景
+            // 此分支仅在 Linux/Mac 上可通过 setReadable(false) 覆盖
+            org.junit.jupiter.api.Assumptions.assumeFalse(
+                    System.getProperty("os.name").toLowerCase().contains("win"),
+                    "Windows does not support revoking owner read access");
+
+            Path tempDir = Files.createTempDirectory("ud14-load-test-");
+            Path testFile = null;
+            try {
+                ReflectionTestUtils.setField(ud14Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                testFile = marketDir.resolve("test.odt");
+                Files.write(testFile, "hello".getBytes());
+
+                // 将文件设为不可读
+                assertTrue(testFile.toFile().setReadable(false));
+
+                RuntimeException exception = assertThrows(RuntimeException.class,
+                        () -> ud14Service.loadFileAsResource("JPN", "test.odt"));
+
+                String msg = exception.getMessage();
+                assertTrue(msg.contains("not readable") || msg.contains("Failed to load"),
+                        "Expected 'not readable' or 'Failed to load' in: " + msg);
+            } finally {
+                try {
+                    if (testFile != null) testFile.toFile().setReadable(true);
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException e) {}
+            }
+        }
+
+        @Test
         @DisplayName("文件不存在时抛出RuntimeException")
         void testLoadFileNotFound() {
             RuntimeException exception = assertThrows(RuntimeException.class,

@@ -245,14 +245,23 @@ export async function cleanupUD06TestData() {
 const UD07_CHASSIS_SETS = [
   // serie, chnr, country, productType, vin, model, build, sNoteNo, familyId, variantId, symbol, description
   { serie: 'JPCT', chnr: '013945', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013945', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013954', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZZ30D8GT013954XYZ', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013963', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013963', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F02', variantId: 'V02', symbol: 'FTLI-150-XYZ', desc: 'Long symbol description' },
+  { serie: 'JPCT', chnr: '013949', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013949', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013949', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013951', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013951', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013951', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013952', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013952', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013952', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013953', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013953', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013953', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013954', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZZ30D8GT013954XYZ', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013954', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013955', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013955', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013955', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013957', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013957', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013957', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013959', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013959', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013959', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013961', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013961', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013961', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013963', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013963', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013963', familyId: 'F02', variantId: 'V02', symbol: 'FTLI-150-XYZ', desc: 'Long symbol description' },
+  { serie: 'JPCT', chnr: '013964', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013964', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013964', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
   { serie: 'JPCT', chnr: '013966', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013966', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-EXTRA-INFO', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013967', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013967', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013975', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013975', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013976', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013976', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013977', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013977', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013979', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013979', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013967', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013967', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013967', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013975', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013975', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013975', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013976', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013976', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013976', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013977', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013977', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013977', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
+  { serie: 'JPCT', chnr: '013979', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013979', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013979', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
 ];
 
 const UD07_TRANS_TS = '20241001000000';
@@ -276,9 +285,9 @@ export async function insertUD07TestData() {
        (SERIE, CHNR, MODEL, BUILD, CUSTOMER_ADAP, ORDERNUMBER,
         REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
-       VALUES (?, ?, ?, ?, ?, 'GOLF',
+       VALUES (?, ?, ?, ?, ?, ?,
         NOW(), 'test', 'UD07Test', NOW(), 'test', 'UD07Test')`,
-      [d.serie, d.chnr, d.model, d.build, d.sNoteNo]
+      [d.serie, d.chnr, d.model, d.build, d.sNoteNo, `GOLF-${d.chnr}`]
     );
 
     // 3. HDOC_REC_DATA_VDA_VARIANTS
@@ -367,9 +376,77 @@ export async function cleanupUD08TestData() {
 }
 
 // ============================================================
+// UD09 - HDOC_USER_DEFINED_RULES
+// ============================================================
+
+const UD09_TEST_RECORDS = [
+  { pc: 'PC01', num: '100', market: 'DE', variable: 'TEMPLATE-VAR001', val: 'TestValue', vs: 'Variant1', vs2: 'Variant2', comments: 'Test comment', addDate: '202201', deleteDate: '', updateUser: 'admin', updateDatetime: '2022-12-02 05:11:45' },
+  { pc: 'PC01', num: '200', market: 'DE', variable: 'TEMPLATE-VAR002', val: 'Value2', vs: 'OnlyV1', vs2: '', comments: 'Test comment 2', addDate: '202202', deleteDate: '202301', updateUser: 'admin', updateDatetime: '2022-12-03 05:11:45' },
+  { pc: 'PC01', num: '300', market: 'FR', variable: 'VAR003', val: 'Value3', vs: '', vs2: '', comments: 'No variant', addDate: '202203', deleteDate: '', updateUser: 'operator', updateDatetime: '2022-12-04 05:11:45' },
+  { pc: 'PC02', num: '100', market: 'DE', variable: 'VAR004', val: 'Value4', vs: 'VS1', vs2: 'VS2', comments: 'PC02 record', addDate: '202204', deleteDate: '', updateUser: 'admin', updateDatetime: '2022-12-05 05:11:45' },
+  { pc: 'PC02', num: '150', market: 'CHN', variable: 'VAR005', val: 'Value5', vs: '', vs2: '', comments: '', addDate: '202205', deleteDate: '', updateUser: 'operator', updateDatetime: '2022-12-06 05:11:45' },
+  { pc: 'PC03', num: '100', market: 'JPN', variable: 'VAR006', val: 'Value6', vs: 'Test', vs2: 'Me', comments: 'Japan record', addDate: '202206', deleteDate: '', updateUser: 'testuser', updateDatetime: '2022-12-07 05:11:45' },
+];
+
+export async function insertUD09TestData() {
+  for (const r of UD09_TEST_RECORDS) {
+    await execute(
+      `INSERT IGNORE INTO HDOC_USER_DEFINED_RULES
+       (PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, UPDATE_USER, UPDATE_DATETIME,
+        REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+        UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+        NOW(), 'test', 'UD09Test', NOW(), 'test', 'UD09Test')`,
+      [r.pc, r.num, r.market, r.variable, r.val, r.vs, r.vs2, r.comments, r.addDate, r.deleteDate, r.updateUser, r.updateDatetime]
+    );
+  }
+}
+
+export async function cleanupUD09TestData() {
+  const keySet = new Set(UD09_TEST_RECORDS.map(r => `${r.pc}|${r.num}|${r.market}`));
+  for (const key of keySet) {
+    const [pc, num, market] = key.split('|');
+    await execute(`DELETE FROM HDOC_USER_DEFINED_RULES WHERE PC = ? AND NUM = ? AND MARKET = ?`, [pc, num, market]);
+  }
+}
+
+// ============================================================
+// UD10 - ExistingHDocVariables（HDOC_VARIABLES 变量定义数据）
+// ============================================================
+
+const UD10_TEST_RECORDS = [
+  { variable: 'VAR001', type: 'VDA', description: 'Test Variable 001', userid: 'admin', registerDatetime: '2026-01-15 10:30:00' },
+  { variable: 'VAR002', type: 'VDA', description: 'Test Variable 002', userid: 'admin', registerDatetime: '2026-01-16 10:30:00' },
+  { variable: 'VAR003', type: 'User Defined', description: 'User defined test variable', userid: 'operator', registerDatetime: '2026-02-01 09:00:00' },
+];
+
+export async function insertUD10TestData() {
+  for (const r of UD10_TEST_RECORDS) {
+    await execute(
+      `INSERT IGNORE INTO HDOC_VARIABLES
+       (VARIABLE, TYPE, DESCRIPTION, USERID, REGISTER_DATETIME,
+        REGISTER_USER, REGISTER_PROCESS,
+        UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+       VALUES (?, ?, ?, ?, ?,
+        'test', 'UD10Test',
+        NOW(), 'test', 'UD10Test')`,
+      [r.variable, r.type, r.description, r.userid, r.registerDatetime]
+    );
+  }
+}
+
+export async function cleanupUD10TestData() {
+  const variables = UD10_TEST_RECORDS.map(r => r.variable);
+  const placeholders = variables.map(() => '?').join(',');
+  await execute(`DELETE FROM HDOC_VARIABLES WHERE VARIABLE IN (${placeholders})`, variables);
+}
+
+// ============================================================
 // 全局清理 - 清理所有测试数据
 // ============================================================
 export async function cleanupAllTestData() {
+  await cleanupUD10TestData();
+  await cleanupUD09TestData();
   await cleanupUD08TestData();
   await cleanupUD07TestData();
   await cleanupUD06TestData();

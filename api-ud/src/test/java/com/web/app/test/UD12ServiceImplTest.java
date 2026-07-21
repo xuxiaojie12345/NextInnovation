@@ -15,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -338,6 +339,38 @@ class UD12ServiceImplTest {
                             .sorted(Comparator.reverseOrder())
                             .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
                 } catch (IOException e) {}
+            }
+        }
+
+        @Test
+        @DisplayName("文件被锁定时file.delete()返回false，抛出RuntimeException")
+        void testDeleteFailedWhenFileLocked() throws IOException {
+            Path tempDir = Files.createTempDirectory("ud12-delete-locked-test-");
+            FileInputStream lockedStream = null;
+            try {
+                ReflectionTestUtils.setField(ud12Service, "templateRoot", tempDir.toString());
+
+                Path marketDir = tempDir.resolve("JPN");
+                Files.createDirectories(marketDir);
+                Path testFile = marketDir.resolve("locked.odt");
+                Files.createFile(testFile);
+
+                // 打开 FileInputStream 保持文件锁定（Windows 上 file.delete() 会返回 false）
+                lockedStream = new FileInputStream(testFile.toFile());
+
+                RuntimeException exception = assertThrows(RuntimeException.class,
+                        () -> ud12Service.deleteFile("JPN", "locked.odt"));
+
+                assertEquals("System error. Please contact administrator.", exception.getMessage());
+            } finally {
+                if (lockedStream != null) {
+                    try { lockedStream.close(); } catch (IOException ignored) {}
+                }
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException e) {} });
+                } catch (IOException ignored) {}
             }
         }
 
