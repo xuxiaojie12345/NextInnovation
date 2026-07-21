@@ -16,7 +16,6 @@ const QUICK_GUIDES = [
 ];
 
 const VOLVO_3P_GUIDES = [
-  "Volvo 3P Quick Guides",
   "KBS Quick Guide",
   "CVM Quick Guide",
   "AVP Quick Guide",
@@ -62,27 +61,32 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
                 </span>
               </div>
               {QUICK_GUIDES.map((name) => (
-                <div
-                  className="dpg-link-item"
-                  key={name}
-                  onClick={() => Modal.info({ title: "Info", content: "暂时不支持文件下载", transitionName: "" })}
-                >
+                <div className="dpg-link-item" key={name}>
                   <span className="dpg-link-arrow">•</span>
-                  <span className="dpg-link">{name}</span>
+                  <span
+                    className="dpg-link"
+                    onClick={() => Modal.info({ title: "Info", content: name + " 文件暂时不支持下载", transitionName: "" })}
+                  >
+                    {name}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Volvo 3P Quick Guides 链接列表（下部） */}
             <div className="dpg-link-section dpg-volvo-section">
+              <div className="dpg-link-item">
+                <span className="dpg-link">Volvo 3P Quick Guides</span>
+              </div>
               {VOLVO_3P_GUIDES.map((name) => (
-                <div
-                  className="dpg-link-item"
-                  key={name}
-                  onClick={() => Modal.info({ title: "Info", content: "暂不支持文件下载", transitionName: "" })}
-                >
+                <div className="dpg-link-item" key={name}>
                   <span className="dpg-link-arrow">•</span>
-                  <span className="dpg-link">{name}</span>
+                  <span
+                    className="dpg-link"
+                    onClick={() => Modal.info({ title: "Info", content: name + " 文件暂时不支持下载", transitionName: "" })}
+                  >
+                    {name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -90,24 +94,24 @@ const DownloadAndPrintQuickGuides: React.FC = () => {
             {/* 复选框区域 */}
             <div className="dpg-checkbox-section">
               <div className="dpg-checkbox-item">
-                <label className="dpg-checkbox-label">
+                <div className="dpg-checkbox-label">
                   <input
                     type="checkbox"
                     checked={isPrintChecked}
                     onChange={(e) => setIsPrintChecked(e.target.checked)}
                   />
                   <span>To print do the following</span>
-                </label>
+                </div>
               </div>
               <div className="dpg-checkbox-item">
-                <label className="dpg-checkbox-label">
+                <div className="dpg-checkbox-label">
                   <input
                     type="checkbox"
                     checked={isFoldChecked}
                     onChange={(e) => setIsFoldChecked(e.target.checked)}
                   />
                   <span>To fold do the following</span>
-                </label>
+                </div>
               </div>
             </div>
           </div>
