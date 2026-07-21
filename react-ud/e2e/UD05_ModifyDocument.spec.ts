@@ -40,6 +40,11 @@ async function seedSession(page: Page) {
  * UD03 → Submit → UD04 → [AD Change] → UD05 の実画面遷移
  */
 async function navigateFromUD03toUD05(page: Page) {
+  // 0. 设置 API Mock（UD03 doc types + UD04 data + UD05 query）
+  await setupDocTypesMock(page);
+  await setupUD04MockForUD05(page);
+  await setupUD05ApiMock(page);
+
   // 1. セッション設定
   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
   await seedSession(page);
@@ -76,6 +81,111 @@ async function navigateToUD05_direct(page: Page) {
   await seedSession(page);
   await page.goto(UD05_URL, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
+}
+
+// ============================================================
+// API Mock 辅助函数
+// ============================================================
+
+const API_DOC_TYPES = "**/api/UD03SelectHdocdocumentlistApi/types";
+const API_UD04 = "**/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument";
+const API_UD05_QUERY =
+  "**/api/UD05ModifyDocumentApi/UD05SelectVariableModification";
+
+/** 设置 UD03 Document Types API Mock（下拉列表选项） */
+async function setupDocTypesMock(page: Page) {
+  await page.route(API_DOC_TYPES, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          documentTypes: [
+            { doctype: "CERTIFICATE" },
+            { doctype: "VIN-PLATE" },
+            { doctype: "REPORT" },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD04 API Mock（adChangeEnabled=true 使 AD Change 链接可见） */
+async function setupUD04MockForUD05(page: Page) {
+  await page.route(API_UD04, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "100001",
+          ordernumber: "ORD-2024-001",
+          buildWeek: "2024-W12",
+          specWeek: "2024-W11",
+          market: "EU",
+          masterMarket: "DE",
+          snotes: [],
+          snotemessage: "",
+          frontLoadIndex: "95",
+          frontSpeedIndex: "H",
+          driveLoadIndex: "100",
+          driveSpeedIndex: "T",
+          adChangeEnabled: true,
+          adChangeMessage:
+            "After def change detected. Document need to be modified.",
+          templateName: "CERTIFICATE_TEMPLATE",
+          replacedParams: ["param1", "param2"],
+          generatedFileUrl: "/files/generated/certificate_100001.rtf",
+          date: "2024-03-15",
+          hdocVersion: "v2.1.0",
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD05 变量修改信息 API Mock */
+async function setupUD05ApiMock(page: Page) {
+  await page.route(API_UD05_QUERY, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "100001",
+          market: "EU",
+          templateFile: "certificate_template.rtf",
+          modifications: [
+            {
+              variable: "VAR001",
+              description: "Engine Type",
+              currentValue: "Diesel",
+              modifiedValue: "",
+            },
+            {
+              variable: "VAR002",
+              description: "Tire Size",
+              currentValue: "225/65R17",
+              modifiedValue: "",
+            },
+            {
+              variable: "VAR003",
+              description: "Color Code",
+              currentValue: "",
+              modifiedValue: "",
+            },
+          ],
+        },
+      }),
+    });
+  });
 }
 
 // ============================================================

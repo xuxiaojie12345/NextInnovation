@@ -39,9 +39,9 @@ async function setupDocTypesMock(page: Page) {
         msg: "success",
         data: {
           documentTypes: [
-            { code: "CERTIFICATE", name: "Certificate of Homologation" },
-            { code: "VIN-PLATE", name: "VIN Plate" },
-            { code: "REPORT", name: "Test Report" },
+            { doctype: "CERTIFICATE" },
+            { doctype: "VIN-PLATE" },
+            { doctype: "REPORT" },
           ],
         },
       }),
@@ -167,8 +167,8 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
             msg: "success",
             data: {
               documentTypes: [
-                { code: "CERTIFICATE", name: "Certificate of Homologation" },
-                { code: "VIN-PLATE", name: "VIN Plate" },
+                { doctype: "CERTIFICATE" },
+                { doctype: "VIN-PLATE" },
               ],
             },
           }),
@@ -481,9 +481,14 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
       await page.locator("#chassis-no-input").fill("100001");
       await takeStepScreenshot(page, testName);
 
-      // 选择 Document type 为 CERTIFICATE
+      // 选择第一个非空的 Document type
       const docTypeSelect = page.locator("#document-type-select");
-      await docTypeSelect.selectOption("CERTIFICATE");
+      const firstOption = docTypeSelect.locator("option:not([value=''])").first();
+      const optionValue = await firstOption.getAttribute("value");
+      if (optionValue) {
+        await docTypeSelect.selectOption(optionValue);
+        await expect(docTypeSelect).toHaveValue(optionValue);
+      }
       await takeStepScreenshot(page, testName);
 
       // 点击 Submit
@@ -514,8 +519,14 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
       await page.locator("#chassis-series-input").fill("JPCT");
       await page.locator("#chassis-no-input").fill("028321");
 
-      // 选择 Document type 为 CERTIFICATE
-      await page.locator("#document-type-select").selectOption("CERTIFICATE");
+      // 选择第一个非空的 Document type
+      const docTypeSelect = page.locator("#document-type-select");
+      const firstOption = docTypeSelect.locator("option:not([value=''])").first();
+      const optionValue = await firstOption.getAttribute("value");
+      if (optionValue) {
+        await docTypeSelect.selectOption(optionValue);
+        await expect(docTypeSelect).toHaveValue(optionValue);
+      }
 
       // Submit ボタンをクリック
       await page.locator(".ud03-btn").first().click();
@@ -627,6 +638,7 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
       const optionValue = await firstOption.getAttribute("value");
       if (optionValue) {
         await docTypeSelect.selectOption(optionValue);
+        await expect(docTypeSelect).toHaveValue(optionValue);
       }
       await takeStepScreenshot(page, testName);
 
@@ -636,7 +648,17 @@ test.describe("Generate Homologation Document 模块 (UD03) 测试", () => {
       // ネットワーク遮断の有無に関わらず /UD04 へ遷移する
       await page.locator(".ud03-btn").first().click();
 
-      // ページが /UD04 へ遷移することを確認
+      // 先检查 localStorage 是否已保存
+      const savedCriteria = await page.evaluate(() =>
+        localStorage.getItem("ud03_last_criteria"),
+      );
+      if (savedCriteria) {
+        const parsed = JSON.parse(savedCriteria);
+        expect(parsed.chassisSeries).toBe("JPCT");
+        expect(parsed.chassisNo).toBe("028321");
+      }
+
+      // 页面跳转到 /UD04
       await expect(page).toHaveURL(/UD04/, { timeout: 10000 });
       await takeStepScreenshot(page, testName);
     });

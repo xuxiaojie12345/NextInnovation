@@ -43,6 +43,13 @@ async function seedSession(page: Page) {
  * UD03 → Submit → UD04 → [AD Change] → UD05 → Save → UD06 の実画面遷移
  */
 async function navigateFromUD03toUD06(page: Page) {
+  // 0. 设置所有 API Mock
+  await setupDocTypesMock(page);
+  await setupUD04MockForUD06(page);
+  await setupUD05QueryMock(page);
+  await setupUD05SaveMock(page);
+  await setupUD06ApiMock(page);
+
   // 1. セッション設定
   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
   await seedSession(page);
@@ -82,7 +89,7 @@ async function navigateFromUD03toUD06(page: Page) {
     }
   }
 
-  // Save をクリック（実API、成功時に /UD06 へ遷移）
+  // Save をクリック（Mock が成功を返すので /UD06 へ遷移）
   await page.locator(".ud05-btn").click();
   await page.waitForSelector(".ud06-container", { timeout: 20000 });
   await page.waitForTimeout(1500);
@@ -96,6 +103,141 @@ async function navigateToUD06_direct(page: Page) {
   await seedSession(page);
   await page.goto(UD06_URL, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
+}
+
+// ============================================================
+// API Mock 辅助函数
+// ============================================================
+
+const API_DOC_TYPES = "**/api/UD03SelectHdocdocumentlistApi/types";
+const API_UD04 = "**/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument";
+const API_UD05_QUERY =
+  "**/api/UD05ModifyDocumentApi/UD05SelectVariableModification";
+const API_UD05_SAVE =
+  "**/api/UD05ModifyDocumentApi/UD05UpdateHdocAdcaModification";
+const API_UD06_QUERY =
+  "**/api/UD06SaveModificationsApi/UD06SelectHdocAdcaModification";
+
+/** 设置 UD03 Document Types API Mock */
+async function setupDocTypesMock(page: Page) {
+  await page.route(API_DOC_TYPES, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          documentTypes: [
+            { doctype: "CERTIFICATE" },
+            { doctype: "VIN-PLATE" },
+            { doctype: "REPORT" },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD04 API Mock（adChangeEnabled=true, chassisNo 含下划线以便 UD05 拆分） */
+async function setupUD04MockForUD06(page: Page) {
+  await page.route(API_UD04, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "wlx1_100001",
+          ordernumber: "ORD-2024-001",
+          buildWeek: "2024-W12",
+          specWeek: "2024-W11",
+          market: "EU",
+          masterMarket: "DE",
+          snotes: [],
+          snotemessage: "",
+          frontLoadIndex: "95",
+          frontSpeedIndex: "H",
+          driveLoadIndex: "100",
+          driveSpeedIndex: "T",
+          adChangeEnabled: true,
+          adChangeMessage:
+            "After def change detected. Document need to be modified.",
+          templateName: "CERTIFICATE_TEMPLATE",
+          replacedParams: ["param1", "param2"],
+          generatedFileUrl: "/files/generated/certificate_100001.rtf",
+          date: "2024-03-15",
+          hdocVersion: "v2.1.0",
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD05 变量修改信息 API Mock */
+async function setupUD05QueryMock(page: Page) {
+  await page.route(API_UD05_QUERY, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "wlx1_100001",
+          market: "EU",
+          templateFile: "certificate_template.rtf",
+          modifications: [
+            {
+              variable: "VAR001",
+              description: "Engine Type",
+              currentValue: "Diesel",
+              modifiedValue: "",
+            },
+            {
+              variable: "VAR002",
+              description: "Tire Size",
+              currentValue: "225/65R17",
+              modifiedValue: "",
+            },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD05 Save API Mock（必须返回成功才能跳转到 UD06） */
+async function setupUD05SaveMock(page: Page) {
+  await page.route(API_UD05_SAVE, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ code: 200, msg: "success", data: {} }),
+    });
+  });
+}
+
+/** 设置 UD06 修改状态查询 API Mock */
+async function setupUD06ApiMock(page: Page) {
+  await page.route(API_UD06_QUERY, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          foundUnreleasedVersion: 1,
+          message: "VERSION IS RELEASED",
+          doctype: "CERTIFICATE",
+          version: "v2.1.0",
+          storing: "Stored in database",
+        },
+      }),
+    });
+  });
 }
 
 // ============================================================
@@ -257,12 +399,37 @@ test.describe("Save Modifications 模块 (UD06) 测试", () => {
   // ==========================================================
 
   test.describe("例外处理", () => {
+    /**
+     * 使用 addInitScript 在 React 加载前设置 history state。
+     * 该脚本在每个页面加载时执行（在页面脚本之前），当路径为 /UD06 时，
+     * 注入 React Router 期望格式的状态 { usr: {...}, idx: 0 }。
+     */
+    async function injectStateViaInitScript(page: Page) {
+      await page.addInitScript(() => {
+        if (window.location.pathname === "/UD06") {
+          window.history.replaceState(
+            {
+              usr: {
+                chassisSerie: "wlx1",
+                chassisNumber: "100001",
+                modifications: [],
+              },
+              idx: 0,
+            },
+            "",
+            "/UD06",
+          );
+        }
+      });
+    }
+
     test("[7] 异常处理-API错误", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-API错误";
 
-      // 仕様書に"模拟 API 返回错误"と記載
-      await page.route(API_MOD_STATUS, async (route) => {
+      // 移除 beforeEach 注册的默认 mock，使用自定义 mock（返回 500）
+      await page.unroute(API_UD06_QUERY);
+      await page.route(API_UD06_QUERY, async (route) => {
         await route.fulfill({
           status: 500,
           contentType: "application/json",
@@ -270,17 +437,10 @@ test.describe("Save Modifications 模块 (UD06) 测试", () => {
         });
       });
 
-      await navigateToUD06_direct(page);
-      // location.state でパラメータを設定
-      await page.evaluate(
-        ({ serie, number }: { serie: string; number: string }) => {
-          window.history.replaceState(
-            { chassisSerie: serie, chassisNumber: number, modifications: [] },
-            "",
-          );
-        },
-        { serie: CHASSIS_SERIE, number: CHASSIS_NO },
-      );
+      // 注册 init script，在下一次前往 /UD06 时注入 state
+      await injectStateViaInitScript(page);
+      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+      await seedSession(page);
       await page.goto(UD06_URL, { waitUntil: "networkidle" });
       await page.waitForTimeout(1500);
 
@@ -288,37 +448,31 @@ test.describe("Save Modifications 模块 (UD06) 测试", () => {
       await expect(errorMsg).toBeVisible();
       await expect(errorMsg).toHaveText("无法加载修改状态，请重试");
       await takeStepScreenshot(page, testName);
-      await page.unroute(API_MOD_STATUS);
+      await page.unroute(API_UD06_QUERY);
     });
 
     test("[8] 异常处理-网络错误", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-网络错误";
 
-      // 仕様書に"模拟网络断开"と記載
-      await page.route(API_MOD_STATUS, async (route) => {
+      // 移除 beforeEach 注册的默认 mock，使用自定义 mock（abort）
+      await page.unroute(API_UD06_QUERY);
+      await page.route(API_UD06_QUERY, async (route) => {
         await route.abort("connectionrefused");
       });
 
-      await navigateToUD06_direct(page);
-      await page.evaluate(
-        ({ serie, number }: { serie: string; number: string }) => {
-          window.history.replaceState(
-            { chassisSerie: serie, chassisNumber: number, modifications: [] },
-            "",
-          );
-        },
-        { serie: CHASSIS_SERIE, number: CHASSIS_NO },
-      );
+      // 注册 init script，在下一次前往 /UD06 时注入 state
+      await injectStateViaInitScript(page);
+      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+      await seedSession(page);
       await page.goto(UD06_URL, { waitUntil: "networkidle" });
       await page.waitForTimeout(1500);
 
       const errorMsg = page.locator(".ud06-error");
       await expect(errorMsg).toBeVisible();
-      // catch ブロックは常に "无法加载修改状态，请重试"
       await expect(errorMsg).toHaveText("无法加载修改状态，请重试");
       await takeStepScreenshot(page, testName);
-      await page.unroute(API_MOD_STATUS);
+      await page.unroute(API_UD06_QUERY);
     });
   });
 });

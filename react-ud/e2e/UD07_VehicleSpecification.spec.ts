@@ -40,6 +40,11 @@ async function seedSession(page: Page) {
  * UD03 → Submit → UD04 → [Chassis no link] → UD07 の実画面遷移
  */
 async function navigateFromUD03toUD07(page: Page) {
+  // 0. 设置所有 API Mock
+  await setupDocTypesMock(page);
+  await setupUD04MockForUD07(page);
+  await setupUD07ApiMock(page);
+
   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
   await seedSession(page);
 
@@ -72,6 +77,97 @@ async function navigateToUD07_direct(page: Page, hasParam: boolean = true) {
   const url = hasParam ? `${UD07_URL}?chassisNo=${CHASSIS_NO}` : UD07_URL;
   await page.goto(url, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
+}
+
+// ============================================================
+// API Mock 辅助函数
+// ============================================================
+
+const API_DOC_TYPES = "**/api/UD03SelectHdocdocumentlistApi/types";
+const API_UD04 = "**/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument";
+
+/** 设置 UD03 Document Types API Mock */
+async function setupDocTypesMock(page: Page) {
+  await page.route(API_DOC_TYPES, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          documentTypes: [
+            { doctype: "CERTIFICATE" },
+            { doctype: "VIN-PLATE" },
+            { doctype: "REPORT" },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD04 API Mock（Chassis no 链接可见即可） */
+async function setupUD04MockForUD07(page: Page) {
+  await page.route(API_UD04, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "100001",
+          ordernumber: "ORD-2024-001",
+          buildWeek: "2024-W12",
+          specWeek: "2024-W11",
+          market: "EU",
+          masterMarket: "DE",
+          snotes: [],
+          snotemessage: "",
+          frontLoadIndex: "95",
+          frontSpeedIndex: "H",
+          driveLoadIndex: "100",
+          driveSpeedIndex: "T",
+          adChangeEnabled: false,
+          adChangeMessage: "",
+          templateName: "CERTIFICATE_TEMPLATE",
+          replacedParams: ["param1", "param2"],
+          generatedFileUrl: "/files/generated/certificate_100001.rtf",
+          date: "2024-03-15",
+          hdocVersion: "v2.1.0",
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD07 车辆规格 API Mock */
+async function setupUD07ApiMock(page: Page) {
+  await page.route(API_SPEC, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "100001",
+          model: "Model X",
+          builtWeek: "2024-W12",
+          productType: "Standard",
+          vin: "WDB00000000000001",
+          engineNo: "ENG123456",
+          countryOfOperation: "Germany",
+          symbols: [
+            { symbol: "ABS", description: "Anti-lock Braking System" },
+            { symbol: "ESP", description: "Electronic Stability Program" },
+          ],
+          sNotes: ["Note 1: Test note", "Note 2: Another test note"],
+        },
+      }),
+    });
+  });
 }
 
 // ============================================================
@@ -139,9 +235,31 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
       const testName = "画面初始化-加载中状态";
 
       // 仕様書に"模拟 API 延迟响应"と記載
+      // 移除 beforeEach 注册的默认 mock
+      await page.unroute(API_SPEC);
       await page.route(API_SPEC, async (route) => {
         await new Promise((r) => setTimeout(r, 3000));
-        await route.continue();
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: 200,
+            msg: "success",
+            data: {
+              chassisNo: "100001",
+              model: "Model X",
+              builtWeek: "2024-W12",
+              productType: "Standard",
+              vin: "WDB00000000000001",
+              engineNo: "ENG123456",
+              countryOfOperation: "Germany",
+              symbols: [
+                { symbol: "ABS", description: "Anti-lock Braking System" },
+              ],
+              sNotes: [],
+            },
+          }),
+        });
       });
 
       await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
@@ -257,6 +375,8 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
       screenshotCounter = 1;
       const testName = "异常处理-底盘不存在";
 
+      // 移除 beforeEach 注册的默认 mock
+      await page.unroute(API_SPEC);
       await page.route(API_SPEC, async (route) => {
         await route.fulfill({
           status: 404,
@@ -283,6 +403,7 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
       screenshotCounter = 1;
       const testName = "异常处理-服务器500错误";
 
+      await page.unroute(API_SPEC);
       await page.route(API_SPEC, async (route) => {
         await route.fulfill({
           status: 500,
@@ -310,6 +431,7 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
       const testName = "异常处理-网络超时";
       test.setTimeout(90000);
 
+      await page.unroute(API_SPEC);
       await page.route(API_SPEC, async (route) => {
         await new Promise((r) => setTimeout(r, 35000));
         await route.abort("timedout");
@@ -333,6 +455,7 @@ test.describe("Vehicle Specification 模块 (UD07) 测试", () => {
       screenshotCounter = 1;
       const testName = "异常处理-数据库异常";
 
+      await page.unroute(API_SPEC);
       await page.route(API_SPEC, async (route) => {
         await route.fulfill({
           status: 503,

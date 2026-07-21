@@ -38,6 +38,10 @@ async function seedSession(page: Page) {
  * UD03 → Submit → UD04 の実画面遷移で UD04 に到達する（実API呼び出し）
  */
 async function navigateFromUD03toUD04(page: Page) {
+  // 0. 设置 API Mock（UD03 doc types + UD04 data）
+  await setupDocTypesMock(page);
+  await setupUD04ApiMock(page);
+
   // 1. セッション設定
   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
   await seedSession(page);
@@ -56,6 +60,7 @@ async function navigateFromUD03toUD04(page: Page) {
 
   // 5. UD04 画面が表示されるまで待機
   await page.waitForSelector(".ud04-container", { timeout: 15000 });
+  // UD04 の API データがロードされるのを待つ
   await page.waitForTimeout(1500);
 }
 
@@ -67,6 +72,69 @@ async function navigateToUD04(page: Page) {
   await seedSession(page);
   await page.goto(UD04_URL, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
+}
+
+// ============================================================
+// API Mock 辅助函数
+// ============================================================
+
+const API_DOC_TYPES = "**/api/UD03SelectHdocdocumentlistApi/types";
+const API_UD04 = "**/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument";
+
+/** 设置 UD03 Document Types API Mock（下拉列表选项） */
+async function setupDocTypesMock(page: Page) {
+  await page.route(API_DOC_TYPES, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          documentTypes: [
+            { doctype: "CERTIFICATE" },
+            { doctype: "VIN-PLATE" },
+            { doctype: "REPORT" },
+          ],
+        },
+      }),
+    });
+  });
+}
+
+/** 设置 UD04 SelectGeneratedocument API Mock（返回正常数据） */
+async function setupUD04ApiMock(page: Page) {
+  await page.route(API_UD04, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: 200,
+        msg: "success",
+        data: {
+          chassisNo: "100001",
+          ordernumber: "ORD-2024-001",
+          buildWeek: "2024-W12",
+          specWeek: "2024-W11",
+          market: "EU",
+          masterMarket: "DE",
+          snotes: [],
+          snotemessage: "",
+          frontLoadIndex: "95",
+          frontSpeedIndex: "H",
+          driveLoadIndex: "100",
+          driveSpeedIndex: "T",
+          adChangeEnabled: false,
+          adChangeMessage: "",
+          templateName: "CERTIFICATE_TEMPLATE",
+          replacedParams: ["param1", "param2"],
+          generatedFileUrl: "/files/generated/certificate_100001.rtf",
+          date: "2024-03-15",
+          hdocVersion: "v2.1.0",
+        },
+      }),
+    });
+  });
 }
 
 // ============================================================
@@ -340,24 +408,35 @@ test.describe("Generate Document 模块 (UD04) 测试", () => {
   // ==========================================================
 
   test.describe("例外处理", () => {
-    const API_UD04 =
-      "**/api/UD04SelectGeneratedocumentApi/SelectGeneratedocument";
-
-    async function injectStateViaHtml(page: Page) {
-      await page.route("**/UD04", async (route) => {
-        const response = await route.fetch();
-        const body = await response.text();
-        const script = `<script>window.history.replaceState({chassisSeries:"wlx1",chassisNo:"100001",documentType:"CERTIFICATE"},"","/UD04")</script>`;
-        await route.fulfill({
-          body: body.replace("</head>", script + "</head>"),
-          contentType: "text/html",
-        });
+    /**
+     * 使用 addInitScript 在 React 加载前设置 history state。
+     * 该脚本在每个页面加载时执行（在页面脚本之前），当路径为 /UD04 时，
+     * 注入 React Router 期望格式的状态 { usr: {...}, idx: 0 }。
+     */
+    async function injectStateViaInitScript(page: Page) {
+      await page.addInitScript(() => {
+        if (window.location.pathname === "/UD04") {
+          window.history.replaceState(
+            {
+              usr: {
+                chassisSeries: "wlx1",
+                chassisNo: "100001",
+                documentType: "CERTIFICATE",
+              },
+              idx: 0,
+            },
+            "",
+            "/UD04",
+          );
+        }
       });
     }
 
     test("[12] 例外处理-模板不存在", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "例外处理-模板不存在";
+      // 移除 beforeEach 注册的默认 mock，使用自定义 mock
+      await page.unroute(API_UD04);
       await page.route(API_UD04, async (route) => {
         await route.fulfill({
           status: 200,
@@ -368,62 +447,75 @@ test.describe("Generate Document 模块 (UD04) 测试", () => {
           }),
         });
       });
-      await injectStateViaHtml(page);
+      // 注册 init script，在下一次前往 /UD04 时生效
+      await injectStateViaInitScript(page);
       await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
       await seedSession(page);
       await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
       await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
+      // code=500 时组件显示 res.msg
+      await expect(page.locator(".ud04-error-area")).toHaveText(
+        "Can not find template for doctype VIN-PLATE",
+      );
       await takeStepScreenshot(page, testName);
       await page.unroute(API_UD04);
-      await page.unroute("**/UD04");
     });
 
-    // test("[13] 例外处理-规则未定义", async ({ page }: { page: Page }) => {
-    //   screenshotCounter = 1;
-    //   const testName = "例外处理-规则未定义";
-    //   await page.route(API_UD04, async (route) => {
-    //     await route.fulfill({
-    //       status: 200,
-    //       contentType: "application/json",
-    //       body: JSON.stringify({
-    //         code: 200,
-    //         msg: "success",
-    //         data: { chassisNo: "100001", replacedParams: [] },
-    //       }),
-    //     });
-    //   });
-    //   await injectStateViaHtml(page);
-    //   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
-    //   await seedSession(page);
-    //   await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
-    //   await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
-    //   await expect(page.locator(".ud04-error-area")).toHaveText(
-    //     "No template rule defined for this truck.",
-    //   );
-    //   await takeStepScreenshot(page, testName);
-    //   await page.unroute(API_UD04);
-    //   await page.unroute("**/UD04");
-    // });
+    test("[13] 例外处理-规则未定义", async ({ page }: { page: Page }) => {
+      screenshotCounter = 1;
+      const testName = "例外处理-规则未定义";
+      // 移除 beforeEach 注册的默认 mock
+      await page.unroute(API_UD04);
+      await page.route(API_UD04, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: 200,
+            msg: "success",
+            data: { chassisNo: "100001", replacedParams: [] },
+          }),
+        });
+      });
+      await injectStateViaInitScript(page);
+      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+      await seedSession(page);
+      await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
+      await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
+      await expect(page.locator(".ud04-error-area")).toHaveText(
+        "No template rule defined for this truck.",
+      );
+      await takeStepScreenshot(page, testName);
+      await page.unroute(API_UD04);
+    });
 
-    // test("[14] 异常处理-网络错误", async ({ page }: { page: Page }) => {
-    //   screenshotCounter = 1;
-    //   const testName = "异常处理-网络错误";
-    //   await page.route(API_UD04, async (route) => {
-    //     await route.abort("connectionrefused");
-    //   });
-    //   await injectStateViaHtml(page);
-    //   await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
-    //   await seedSession(page);
-    //   await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
-    //   await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
-    //   await takeStepScreenshot(page, testName);
-    //   await page.unroute(API_UD04);
-    //   await page.unroute("**/UD04");
-    // });
+    test("[14] 异常处理-网络错误", async ({ page }: { page: Page }) => {
+      screenshotCounter = 1;
+      const testName = "异常处理-网络错误";
+      // 移除 beforeEach 注册的默认 mock
+      await page.unroute(API_UD04);
+      await page.route(API_UD04, async (route) => {
+        await route.abort("connectionrefused");
+      });
+      await injectStateViaInitScript(page);
+      await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+      await seedSession(page);
+      await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
+      await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
+      // route.abort 在 Chromium 中抛出 TypeError("Failed to fetch")，
+      // 组件 else 分支显示 "系统繁忙，请稍后再试"
+      await expect(page.locator(".ud04-error-area")).toHaveText(
+        "系统繁忙，请稍后再试",
+      );
+      await takeStepScreenshot(page, testName);
+      await page.unroute(API_UD04);
+    });
 
     test("[15] 异常处理-服务器错误", async ({ page }: { page: Page }) => {
       screenshotCounter = 1;
       const testName = "异常处理-服务器错误";
+      // 移除 beforeEach 注册的默认 mock
+      await page.unroute(API_UD04);
       await page.route(API_UD04, async (route) => {
         await route.fulfill({
           status: 500,
@@ -431,14 +523,16 @@ test.describe("Generate Document 模块 (UD04) 测试", () => {
           body: JSON.stringify({ code: 500, msg: "系统繁忙，请稍后再试" }),
         });
       });
-      await injectStateViaHtml(page);
+      await injectStateViaInitScript(page);
       await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
       await seedSession(page);
       await page.goto(UD04_URL, { waitUntil: "domcontentloaded" });
       await page.waitForSelector(".ud04-error-area", { timeout: 15000 });
+      await expect(page.locator(".ud04-error-area")).toHaveText(
+        "系统繁忙，请稍后再试",
+      );
       await takeStepScreenshot(page, testName);
       await page.unroute(API_UD04);
-      await page.unroute("**/UD04");
     });
   });
 
