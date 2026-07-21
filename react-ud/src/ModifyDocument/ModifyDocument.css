@@ -1,0 +1,244 @@
+/* ===== Modify Document 页面 ===== */
+.md-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.md-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.md-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.md-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.md-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.md-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.md-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.md-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.md-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.md-content {
+  width: 100%;
+  max-width: 960px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 32px;
+}
+
+/* ===== 标题 ===== */
+.md-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 错误消息 ===== */
+.md-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 加载中 ===== */
+.md-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 参数信息 ===== */
+.md-info {
+  margin-bottom: 20px;
+}
+
+.md-info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 14px;
+}
+
+.md-info-label {
+  font-weight: 600;
+  color: #333;
+  min-width: 90px;
+}
+
+.md-info-sep {
+  color: #333;
+}
+
+.md-info-value {
+  color: #333;
+}
+
+.md-info-value-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.md-info-value-link:hover {
+  color: #004499;
+}
+
+/* ===== 数据表格 ===== */
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #c0c0c0;
+}
+
+.md-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+}
+
+.md-table th:last-child {
+  border-right: none;
+}
+
+.md-table td {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.md-table td:last-child {
+  border-right: none;
+}
+
+.md-th-var {
+  width: 20%;
+}
+
+.md-th-desc {
+  width: 30%;
+}
+
+.md-th-cur {
+  width: 25%;
+}
+
+.md-th-mod {
+  width: 25%;
+}
+
+.md-td-var {
+  font-weight: 500;
+}
+
+.md-td-desc {
+  color: #333;
+}
+
+.md-td-cur {
+  color: #333;
+}
+
+.md-td-mod {
+  padding: 4px 10px !important;
+}
+
+.md-no-data {
+  text-align: center;
+  color: #888;
+  padding: 24px 10px !important;
+  font-size: 13px;
+}
+
+/* ===== Modified value 输入框 ===== */
+.md-modified-input {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.md-modified-input:focus {
+  border-color: #003057;
+}
+
+/* ===== Save 按钮 ===== */
+.md-save-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+.md-btn-save {
+  padding: 6px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.md-btn-save:hover {
+  background-color: #e8e8e8;
+}

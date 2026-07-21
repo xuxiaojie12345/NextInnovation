@@ -1,0 +1,152 @@
+/* ===== Save Modifications 页面 ===== */
+.sm-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.sm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.sm-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.sm-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.sm-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sm-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sm-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sm-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.sm-body {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.sm-content {
+  width: 100%;
+  max-width: 640px;
+  padding: 0;
+}
+
+/* ===== 标题 ===== */
+.sm-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 错误消息 ===== */
+.sm-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 加载中 ===== */
+.sm-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 信息面板 ===== */
+.sm-info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* 每行字段 */
+.sm-field {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.sm-label {
+  font-weight: 600;
+  color: #333;
+  min-width: 240px;
+  flex-shrink: 0;
+}
+
+.sm-sep {
+  color: #333;
+  margin-right: 8px;
+}
+
+.sm-value {
+  color: #333;
+  word-break: break-all;
+}
+
+.sm-value-message {
+  font-weight: 600;
+  color: #c62828;
+}
+
+/* ===== Close 按钮 ===== */
+.sm-close-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.sm-btn-close {
+  padding: 5px 28px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.sm-btn-close:hover {
+  background-color: #f0f0f0;
+}
