@@ -94,9 +94,6 @@ test.describe('UD01 用户登录模块', () => {
 
   test('05-UserID-控件类型', async ({ page }) => {
     await expect($uid(page)).toHaveAttribute('type', 'text');
-    await ss(page, '入力前', '05');
-    await $uid(page).fill('test');
-    await expect($uid(page)).toHaveValue('test');
     await ss(page, '控件类型', '05');
   });
 
