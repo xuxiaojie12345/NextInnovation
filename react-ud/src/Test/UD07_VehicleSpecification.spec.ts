@@ -16,7 +16,6 @@ const REAL_USER = 'admin';
 const REAL_PASS = 'admin123';
 
 // 禁止并行执行
-test.describe.configure({ mode: 'serial' });
 
 /**
  * 截图（JPEG，从001开始编号）
@@ -103,6 +102,7 @@ test.describe('画面初期表示', () => {
     await goToUD07(page, 'lwws', '12345');
     // 等待 API 响应
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 画面标题
     await expect(page.locator('.ud07-header h1')).toHaveText('VDA - Vehicle Specification:');
@@ -137,6 +137,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '02';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 控件类型为 Label（Output）
     const chassisItem = page.locator('.ud07-item').nth(0);
@@ -153,6 +154,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '03';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 控件类型为 Label（Output）
     const modelItem = page.locator('.ud07-item').nth(1);
@@ -169,6 +171,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '04';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     const builtWeekItem = page.locator('.ud07-item').nth(2);
     const builtWeekValue = builtWeekItem.locator('.ud07-value');
@@ -183,6 +186,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '05';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     const productTypeItem = page.locator('.ud07-item').nth(3);
     const productTypeValue = productTypeItem.locator('.ud07-value');
@@ -195,6 +199,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '06';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     const vinItem = page.locator('.ud07-item').nth(4);
     const vinValue = vinItem.locator('.ud07-value');
@@ -207,6 +212,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '07';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     const engineNoItem = page.locator('.ud07-item').nth(5);
     const engineNoValue = engineNoItem.locator('.ud07-value');
@@ -220,6 +226,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '08';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     const countryItem = page.locator('.ud07-item').nth(6);
     const countryValue = countryItem.locator('.ud07-value');
@@ -232,6 +239,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '09';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 控件类型为 Label（Output）
     const symbolArea = page.locator('.ud07-symbol');
@@ -248,6 +256,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '10';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 控件类型为 Tooltip（Output）
     const symbolLine = page.locator('.ud07-symbol-line').first();
@@ -263,6 +272,7 @@ test.describe('画面初期表示', () => {
     currentTestNo = '11';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. 控件类型为 Label（Output）
     const snote = page.locator('.ud07-snote');
@@ -313,6 +323,7 @@ test.describe('数据加载', () => {
 
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. API 被调用
     expect(apiCalled).toBe(true);
@@ -327,6 +338,7 @@ test.describe('数据加载', () => {
     // 使用真实数据库数据
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. Model 显示
     const modelValue = page.locator('.ud07-item').nth(1).locator('.ud07-value');
@@ -354,6 +366,7 @@ test.describe('数据加载', () => {
     currentTestNo = '14';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // SYMBOL_STR 显示格式化后的值（前8位）
     const symbolLines = page.locator('.ud07-symbol-line');
@@ -392,6 +405,7 @@ test.describe('数据加载', () => {
 
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     // SYMBOL "asd" 不足8位，应补空格至8位
     const symbolLine = page.locator('.ud07-symbol-line').first();
@@ -408,6 +422,7 @@ test.describe('数据加载', () => {
     currentTestNo = '16';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 鼠标悬停到 SYMBOL 区域，Tooltip 显示描述
     const symbolLine = page.locator('.ud07-symbol-line').first();
@@ -438,6 +453,7 @@ test.describe('异常处理', () => {
     });
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     // 1. Error message area 显示
     await expect(page.locator('.ud07-error')).toBeVisible();
@@ -463,6 +479,7 @@ test.describe('异常处理', () => {
     });
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     // Error message area 显示
     await expect(page.locator('.ud07-error')).toBeVisible();
@@ -494,6 +511,7 @@ test.describe('异常处理', () => {
     });
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // Error message area 显示
     await expect(page.locator('.ud07-error')).toBeVisible();
@@ -513,13 +531,14 @@ test.describe('异常处理', () => {
     // 使用不存在的 chassis 数据
     await goToUD07(page, 'XXXXX', '9999999999');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // API 返回数据为空或错误
     // 各 Label 字段显示空值（可能 Engine no 硬编码 428628 仍有值）
     for (let i = 1; i <= 6; i++) {
       if (i === 5) continue;
-      const value = page.locator('.ud07-item').nth(i).locator('.ud07-value');
-      // 可能为空或显示错误
+      const val = page.locator('.ud07-item').nth(i).locator('.ud07-value');
+      await expect(val).toHaveText('-');
     }
 
     await takeScreenshot(page, '数据不存在');
@@ -543,6 +562,7 @@ test.describe('UI交互', () => {
     });
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     // 加载中各 Label 字段未填充数据
     for (let i = 1; i <= 6; i++) {
@@ -558,6 +578,7 @@ test.describe('UI交互', () => {
     currentTestNo = '23';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 加载中提示消失
     await expect(page.locator('.ud07-error')).not.toBeVisible();
@@ -575,6 +596,7 @@ test.describe('UI交互', () => {
     currentTestNo = '24';
     await goToUD07(page, 'jpct', '8888');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 确认各 Label 已填充数据
     const chassisValue = page.locator('.ud07-item').nth(0).locator('.ud07-value');
@@ -605,6 +627,7 @@ test.describe('UI交互', () => {
     currentTestNo = '25';
     await goToUD07(page, 'lwws', '12345');
     await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
 
     // 鼠标悬停到 SYMBOL 区域
     const symbolLine = page.locator('.ud07-symbol-line').first();

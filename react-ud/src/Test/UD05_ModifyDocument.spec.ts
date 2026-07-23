@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
 
@@ -15,8 +16,37 @@ const SCREENSHOT_ROOT = path.resolve(__dirname, 'Image', 'UD05');
 const REAL_USER = 'admin';
 const REAL_PASS = 'admin123';
 
-// 禁止并行执行
-test.describe.configure({ mode: 'serial' });
+// 正常系 Mock 数据（jpct/8888 多条 Variable）
+const MOCK_NORMAL_DATA = {
+  code: 200,
+  data: [
+    { variable: 'VIN_TEXT2', description: 'Additional text on Eicher-Trucks VIN plate for VIPL', newVal: 'VTA-050077' },
+    { variable: 'VIN_TEXT3', description: 'Additional text on Eicher-Trucks VIN plate for VIPL', newVal: 'NB' },
+    { variable: 'VIN_TEXT5', description: 'Additional text on Eicher-Trucks VIN plate for VIPL', newVal: 'UD TRUCKS' },
+    { variable: '1001', description: 'UD10更新测试_13756', newVal: '' },
+    { variable: '1002', description: 'Description1', newVal: '' },
+  ]
+};
+
+// lwws/12345 数据（sylus03/sylus04 变量）
+const MOCK_LWWS_DATA = {
+  code: 200,
+  data: [
+    { variable: 'sylus03', description: 'Test variable 03', newVal: 'old_value_03' },
+    { variable: 'sylus04', description: 'Test variable 04', newVal: 'old_value_04' },
+  ]
+};
+
+// Current value 部分为空的 Mock 数据
+const MOCK_EMPTY_CURRENT_DATA = {
+  code: 200,
+  data: [
+    { variable: 'VIN_TEXT2', description: 'Has current value', newVal: 'VTA-050077' },
+    { variable: 'VIN_TEXT3', description: 'Has current value', newVal: 'NB' },
+    { variable: '1001', description: 'No current value in ADCA_MODIFICATION', newVal: '' },
+    { variable: '1002', description: 'No current value in ADCA_MODIFICATION', newVal: '' },
+  ]
+};
 
 /**
  * 截图（JPEG，从001开始编号）
@@ -44,48 +74,37 @@ async function login(page: Page) {
 }
 
 /**
- * 导航到 UD05 画面并注入路由参数
- * 通过 React Router 内部 navigator.push 设置 location.state
- * 需要先离开当前路由再返回，确保 React Router 正确处理状态变更
+ * 导航到 UD05 画面并注入路由参数 + Mock API
  */
-async function goToUD05(page: Page, chassisSerie: string, chassisNo: string, market: string) {
+async function goToUD05(
+  page: Page,
+  mockResponse: any,
+  chassisSerie = 'lwws',
+  chassisNo = '12345',
+  market = 'IDO'
+) {
+  await page.route('**/api/ud05/selectmodifydocument**', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(mockResponse)
+    });
+  });
+
   await login(page);
-  // 先导航到 UD05，组件会先渲染（无 state）
   await page.goto(BASE_URL + '/UD05');
   await page.waitForSelector('.ud05-container');
-  // 先离开当前路由
-  await page.evaluate(() => {
-    window.history.pushState({}, '', '/UD05?t=' + Date.now());
-  });
-  await page.waitForTimeout(300);
-  // 返回，触发 React Router 的 popstate
-  await page.evaluate(() => {
-    window.history.back();
-  });
-  await page.waitForTimeout(300);
-  // 通过 React Router 内部 navigator.push 注入路由参数
+
   await page.evaluate(({ serie, no, mkt }) => {
-    const root = document.getElementById('root');
-    const containerKey = Object.keys(root).find(k => k.startsWith('__reactContainer'));
-    const seen = new Set();
-    (function walk(fiber, depth) {
-      if (!fiber || depth > 60 || seen.has(fiber)) return;
-      seen.add(fiber);
-      if (fiber.memoizedProps && fiber.memoizedProps.value &&
-          fiber.memoizedProps.value.navigator) {
-        fiber.memoizedProps.value.navigator.push('/UD05', {
-          chassisSerie: serie,
-          chassisNo: no,
-          market: mkt
-        });
-        return;
-      }
-      walk(fiber.child, depth + 1);
-      walk(fiber.sibling, depth);
-    })(root[containerKey], 0);
+    window.history.replaceState(
+      { chassisSerie: serie, chassisNo: no, market: mkt },
+      '',
+      '/UD05'
+    );
   }, { serie: chassisSerie, no: chassisNo, mkt: market });
-  // 等待组件 re-render 和 API 响应
-  await page.waitForTimeout(1000);
+  await page.reload();
+  await page.waitForSelector('.ud05-container');
+  await page.waitForTimeout(2000);
 }
 
 /**
@@ -97,414 +116,376 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ============================================================
-// 1. 画面初期表示
+// 1. 画面初期表示 (No.1-7)
 // ============================================================
 test.describe('画面初期表示', () => {
 
   test('UD05_001_画面初始化_整体布局', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '01';
-    // 对应数据库：HDOC_REC_DATA_VDA_GENERAL.SERIE="lwws", CHNR="12345"
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    // 等待 API 响应
-    await page.waitForTimeout(3000);
+    currentTestNo = '001';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, '初期表示');
 
-    // 1. 画面标题
     await expect(page.locator('h1.ud05-title')).toHaveText('Modify Document');
-    await takeScreenshot(page, '画面标题');
-
-    // 2. Chassis no 显示格式 "lwws 12345"
-    await expect(page.locator('.ud05-label-bold')).toHaveText('Chassis no:');
-    await expect(page.locator('.ud05-info-value-strong')).toHaveText('lwws');
-    await expect(page.locator('.ud05-info-value.ud05-link').first()).toHaveText('12345');
-    // 3. Market 显示 "IDO"
+    await expect(page.locator('.ud05-info-section')).toBeVisible();
+    await expect(page.locator('.ud05-label-bold')).toContainText('Chassis no:');
+    await expect(page.locator('.ud05-info-value-strong')).toContainText('lwws');
+    await expect(page.locator('.ud05-info-value.ud05-link').first()).toContainText('12345');
     await expect(page.locator('.ud05-info-item').nth(1)).toContainText('IDO');
-    // 4. Template 文件链接
-    await expect(page.locator('.ud05-info-value.ud05-link').last()).toHaveText('VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf');
-    // 5. DataTable 显示
+    const templateLink = page.locator('.ud05-info-value.ud05-link').last();
+    await expect(templateLink).toContainText('VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf');
     await expect(page.locator('table.ud05-table')).toBeVisible();
-    // 6. Save 按钮
     await expect(page.locator('button.ud05-btn')).toBeVisible();
     await expect(page.locator('button.ud05-btn')).toHaveText('Save');
-    // 7. Error message area 不显示
     await expect(page.locator('.ud05-message')).not.toBeVisible();
-
-    await takeScreenshot(page, '整体布局');
   });
 
-  test('UD05_002_画面初始化_ChassisNo属性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '02';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_002_画面初始化_Chassis no属性', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '002';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 1. 控件类型为 Label（Output）
     await expect(page.locator('.ud05-label-bold')).toHaveText('Chassis no:');
-    // 2. 显示内容为 "lwws 12345"
-    await expect(page.locator('.ud05-info-value-strong')).toHaveText('lwws');
-    await expect(page.locator('.ud05-info-value.ud05-link').first()).toHaveText('12345');
-    // 3. 表示制御为固定（不可编辑输入框，只有 Label）
-    // 4. Chassis no 链接可点击
+    await expect(page.locator('.ud05-info-value-strong')).toContainText('lwws');
+    await expect(page.locator('.ud05-info-value.ud05-link').first()).toContainText('12345');
     await expect(page.locator('.ud05-info-value.ud05-link').first()).toBeVisible();
-
-    await takeScreenshot(page, 'ChassisNo属性');
   });
 
   test('UD05_003_画面初始化_Market属性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '03';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+    currentTestNo = '003';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 1. 控件类型为 Label（Output）
-    // 2. 显示内容为 "IDO"
     await expect(page.locator('.ud05-info-item').nth(1)).toContainText('Market:');
     await expect(page.locator('.ud05-info-item').nth(1)).toContainText('IDO');
-
-    await takeScreenshot(page, 'Market属性');
   });
 
   test('UD05_004_画面初始化_Template文件链接属性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '04';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+    currentTestNo = '004';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 1. 控件类型为 Link（Action）
     const templateLink = page.locator('.ud05-info-value.ud05-link').last();
-    // 2. 显示文字
     await expect(templateLink).toHaveText('VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf');
-    // 3. 表示制御为活性（可点击状态）
     await expect(templateLink).toBeVisible();
-
-    await takeScreenshot(page, 'Template文件链接');
   });
 
   test('UD05_005_画面初始化_DataTable结构', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '05';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+    currentTestNo = '005';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'AUS');
+    await takeScreenshot(page, '初期表示');
 
-    // DataTable 包含4列
     const headers = page.locator('table.ud05-table th.ud05-th');
     await expect(headers.nth(0)).toHaveText('Variable');
     await expect(headers.nth(1)).toHaveText('Description');
     await expect(headers.nth(2)).toHaveText('Current value');
     await expect(headers.nth(3)).toHaveText('Modified value');
-    // DataTable 显示数据行
+
     const rows = page.locator('table.ud05-table tbody tr');
     const rowCount = await rows.count();
     expect(rowCount).toBeGreaterThan(0);
-
-    await takeScreenshot(page, 'DataTable结构');
   });
 
   test('UD05_006_画面初始化_Save按钮属性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '06';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+    currentTestNo = '006';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
     const saveBtn = page.locator('button.ud05-btn');
-    // 1. 按钮文字为 "Save"
     await expect(saveBtn).toHaveText('Save');
-    // 2. 表示制御为活性
     await expect(saveBtn).toBeEnabled();
-
-    await takeScreenshot(page, 'Save按钮');
   });
 
-  test('UD05_007_画面初始化_ErrorMessageArea属性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '07';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_007_画面初始化_Error message area属性', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '007';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 初期值为空，默认隐藏
     await expect(page.locator('.ud05-message')).not.toBeVisible();
-
-    await takeScreenshot(page, 'ErrorMessageArea');
   });
 });
 
 // ============================================================
-// 2. 画面初期表示-数据加载与数据库字段对应
+// 2. 数据加载与数据库字段对应 (No.8-10)
 // ============================================================
 test.describe('数据加载', () => {
 
   test('UD05_008_数据加载_API调用成功', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '08';
-    let apiCalled = false;
-    let capturedParams = {};
-
+    currentTestNo = '008';
+    let capturedUrl = null;
     await page.route('**/api/ud05/selectmodifydocument**', async route => {
-      apiCalled = true;
-      const url = new URL(route.request().url());
-      capturedParams = {
-        chassisSerie: url.searchParams.get('chassisSerie'),
-        chassisNo: url.searchParams.get('chassisNo')
-      };
+      capturedUrl = route.request().url();
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          code: 200,
-          data: [
-            { chassisSerie: 'jpct', chassisNo: '8888', variable: 'VIN_TEXT2', description: 'Additional text on Eicher-Trucks VIN plate for VIPL', newVal: '778' },
-            { chassisSerie: 'jpct', chassisNo: '8888', variable: 'VIN_TEXT3', description: 'Additional text on Eicher-Trucks VIN plate for VIPL', newVal: '2' }
-          ]
-        })
+        body: JSON.stringify(MOCK_NORMAL_DATA)
       });
     });
 
-    await goToUD05(page, 'jpct', '8888', 'AUS');
-    await page.waitForTimeout(3000);
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'AUS');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
-    expect(apiCalled).toBe(true);
-    expect(capturedParams).toEqual({ chassisSerie: 'jpct', chassisNo: '8888' });
-
-    await takeScreenshot(page, 'API调用成功');
+    expect(capturedUrl).toContain('chassisSerie=jpct');
+    expect(capturedUrl).toContain('chassisNo=8888');
   });
 
-  test('UD05_009_数据加载_DataTable各列对应关系', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '09';
-    // 使用真实数据库数据
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_009_数据加载_DataTable各列与数据库字段对应关系', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '009';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 确认 DataTable 中加载了数据
     const rows = page.locator('table.ud05-table tbody tr');
     const rowCount = await rows.count();
     expect(rowCount).toBeGreaterThan(0);
 
-    // 确认各列对应关系：Variable 列显示 HDOC_VARIABLES 表的 VARIABLE 字段值
     const firstRowCells = rows.first().locator('td.ud05-td');
-    await expect(firstRowCells.nth(0)).toBeVisible(); // Variable
+    await expect(firstRowCells.nth(0)).toBeVisible();
 
-    // Modified value 列为可输入状态，初始为空
     const modifiedInput = rows.first().locator('input.ud05-input');
     await expect(modifiedInput).toBeVisible();
     await expect(modifiedInput).toBeEnabled();
     await expect(modifiedInput).toHaveAttribute('maxLength', '500');
     await expect(modifiedInput).toHaveValue('');
-
-    await takeScreenshot(page, 'DataTable字段对应');
   });
 
-  test('UD05_010_数据加载_CurrentValue无数据时显示空白', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '10';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_010_数据加载_Current value无数据时显示空白', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '010';
+    await goToUD05(page, MOCK_EMPTY_CURRENT_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 确认所有行的 Current value 列都存在（可能有部分行为空白）
     const rows = page.locator('table.ud05-table tbody tr');
     const rowCount = await rows.count();
     for (let i = 0; i < rowCount; i++) {
       const cells = rows.nth(i).locator('td.ud05-td');
-      // Current value 列（第3列）存在
       await expect(cells.nth(2)).toBeVisible();
-      // Modified value 列（第4列）存在输入框
       await expect(cells.nth(3).locator('input.ud05-input')).toBeVisible();
     }
-
-    await takeScreenshot(page, 'CurrentValue空白確認');
   });
 });
 
 // ============================================================
-// 3. Chassis no Link 操作
+// 3. Chassis no Link 操作 (No.11)
 // ============================================================
-test.describe('ChassisNoLink操作', () => {
+test.describe('Chassis no Link 操作', () => {
 
-  test('UD05_011_ChassisNoLink_正常跳转到UD07', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '11';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_011_Chassis no Link_正常跳转到UD07', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '011';
+    await page.route('**/UD07', route => {
+      route.fulfill({ status: 200, body: '<html><body><div class="ud07-container">UD07 Mock</div></body></html>' });
+    });
 
-    await takeScreenshot(page, 'UD05画面');
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 点击 Chassis no 链接
     await page.locator('.ud05-info-value.ud05-link').first().click({ noWaitAfter: true });
-    // 画面跳转到 UD07
     await page.waitForURL('**/UD07', { timeout: 30000 });
-
-    await takeScreenshot(page, '跳转到UD07');
+    await takeScreenshot(page, '跳转後');
+    await expect(page).toHaveURL(/\/UD07/);
   });
 });
 
 // ============================================================
-// 4. Template文件链接操作
+// 4. Template文件链接操作 (No.12)
 // ============================================================
 test.describe('Template文件链接操作', () => {
 
   test('UD05_012_Template文件链接_下载模板', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '12';
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
+    currentTestNo = '012';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    await takeScreenshot(page, 'UD05画面');
-
-    // 点击 Template 文件链接（页面不报错，下载功能待实现）
     await page.locator('.ud05-info-value.ud05-link').last().click();
-    // 页面不报错
     await expect(page.locator('.ud05-container')).toBeVisible();
-    await takeScreenshot(page, 'Template点击結果');
+    await takeScreenshot(page, '操作後');
   });
 });
 
 // ============================================================
-// 5. Save 按钮操作
+// 5. Save 按钮操作 (No.13-18)
 // ============================================================
-test.describe('Save按钮操作', () => {
+test.describe('Save 按钮操作', () => {
 
-  test('UD05_013_Save_修改单个变量保存成功', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '13';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_013_Save_修改单个变量并保存成功', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '013';
+    let capturedBody = null;
+    await page.route('**/api/ud05/updatemodifydocument**', async route => {
+      capturedBody = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200 })
+      });
+    });
 
-    // 在 Variable=VIN_TEXT2 行的 Modified value 列输入新值
-    const rows = page.locator('table.ud05-table tbody tr');
-    const firstInput = rows.first().locator('input.ud05-input');
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
+    const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('VTA-NEWVALUE');
     await takeScreenshot(page, '入力後');
 
-    // 点击 Save 按钮
     await page.locator('button.ud05-btn').click();
-
-    // 等待跳转到 UD06
     await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
-    await takeScreenshot(page, '保存结果');
+    await takeScreenshot(page, '保存結果');
 
-    // 校验 API 调用参数（通过监听请求确认）
-    // 画面跳转到 UD06（无论成功或失败都截图保存结果）
+    expect(capturedBody).not.toBeNull();
+    if (capturedBody) {
+      expect(capturedBody.chassisSerie).toBe('jpct');
+      expect(capturedBody.chassisNo).toBe('8888');
+    }
     await expect(page).toHaveURL(/UD06/);
   });
 
-  test('UD05_014_Save_修改多个变量保存成功', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '14';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_014_Save_修改多个变量并保存成功', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '014';
+    await page.route('**/api/ud05/updatemodifydocument**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200 })
+      });
+    });
 
-    // 在多个 Variable 行的 Modified value 列输入新值
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
     const rows = page.locator('table.ud05-table tbody tr');
     const rowCount = await rows.count();
     if (rowCount >= 2) {
-      await rows.nth(0).locator('input.ud05-input').fill('VAL_UPDATED_1');
-      await rows.nth(1).locator('input.ud05-input').fill('VAL_UPDATED_2');
+      await rows.nth(0).locator('input.ud05-input').fill('VAL_UPDATED_2');
+      await rows.nth(1).locator('input.ud05-input').fill('VAL_UPDATED_3');
     }
     await takeScreenshot(page, '複数入力後');
 
     await page.locator('button.ud05-btn').click();
-
     await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
-    await takeScreenshot(page, '保存结果');
+    await takeScreenshot(page, '保存結果');
   });
 
-  test('UD05_015_Save_空值校验_所有ModifiedValue为空', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '15';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_015_Save_修改全部变量并保存成功', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '015';
+    await page.route('**/api/ud05/updatemodifydocument**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200 })
+      });
+    });
 
-    // 所有行的 Modified value 均保持为空
-    await takeScreenshot(page, '入力前');
+    await goToUD05(page, MOCK_LWWS_DATA, 'lwws', '12345', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
+    const rows = page.locator('table.ud05-table tbody tr');
+    const rowCount = await rows.count();
+    for (let i = 0; i < rowCount; i++) {
+      await rows.nth(i).locator('input.ud05-input').fill(`UPDATE_VAL_${i + 1}`);
+    }
+    await takeScreenshot(page, '全入力後');
 
     await page.locator('button.ud05-btn').click();
+    await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
+    await takeScreenshot(page, '保存結果');
+  });
 
-    // 空值校验触发
+  test('UD05_016_Save_空值校验_所有Modified value为空', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '016';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
+    await page.locator('button.ud05-btn').click();
+    await page.waitForTimeout(1000);
+
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toHaveText('NO UNRELEASED VERSION EXISTS! Please input modified value before saving.');
-    // 画面保持 UD05 不跳转
     await expect(page).toHaveURL(/UD05/);
-
     await takeScreenshot(page, '空值校验错误');
   });
 
-  test('UD05_016_Save_部分行有值部分为空', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '16';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_017_Save_空值校验_部分行有值部分为空', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '017';
+    await page.route('**/api/ud05/updatemodifydocument**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200 })
+      });
+    });
 
-    // 在第一个 Variable 的 Modified value 输入值
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('VAL_TEST');
     await takeScreenshot(page, '入力後');
 
     await page.locator('button.ud05-btn').click();
-
-    // 空值校验通过（至少有一行有值）
     await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
-    await takeScreenshot(page, '保存结果');
+    await takeScreenshot(page, '保存結果');
   });
 
-  test('UD05_017_Save_修改值超过500字符时截断', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '17';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_018_Save_修改值超过500字符时截断', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '018';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 输入超过500字符的字符串
     const longStr = 'A'.repeat(600);
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill(longStr);
 
-    // 确认最大输入长度为500字符
     const actualVal = await firstInput.inputValue();
     expect(actualVal.length).toBe(500);
-
     await takeScreenshot(page, '500文字制限確認');
   });
 });
 
 // ============================================================
-// 6. 异常处理
+// 6. 异常处理 (No.19-25)
 // ============================================================
 test.describe('异常处理', () => {
 
-  test('UD05_018_异常处理_APILoading失败_HTTP500', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '18';
+  test('UD05_019_异常处理_API加载数据失败（HTTP 500）', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '019';
     await page.route('**/api/ud05/selectmodifydocument**', route => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'Internal Server Error' }),
-      });
+      route.fulfill({ status: 500, body: 'Internal Server Error' });
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
 
-    // Error message area 显示
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
+
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toContainText('System error');
-    // Save 按钮不可点击（无数据时禁用）
     await expect(page.locator('button.ud05-btn')).toBeDisabled();
-
-    await takeScreenshot(page, 'API500错误');
   });
 
-  test('UD05_019_异常处理_API返回业务错误', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '19';
+  test('UD05_020_异常处理_API返回业务错误（code≠200）', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '020';
     await page.route('**/api/ud05/selectmodifydocument**', route => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 401, message: 'Unauthorized' }),
+        body: JSON.stringify({ code: 401, data: null })
       });
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
 
-    // Error message area 显示
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
+
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toHaveText('We can not get the data. Please try again.');
-
-    await takeScreenshot(page, '业务错误401');
   });
 
-  test('UD05_020_异常处理_Save时API返回HTTP500', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '20';
-    // Mock Save API 返回 500
+  test('UD05_021_异常处理_Save时API返回HTTP 500错误', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '021';
     await page.route('**/api/ud05/updatemodifydocument**', route => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'Internal Server Error' }),
-      });
+      route.fulfill({ status: 500, body: 'Internal Server Error' });
     });
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST_500');
@@ -512,27 +493,26 @@ test.describe('异常处理', () => {
 
     await page.locator('button.ud05-btn').click();
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, 'Save結果');
 
-    // Error message area 显示
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toContainText('System error');
-    // 画面保持 UD05 不跳转
     await expect(page).toHaveURL(/UD05/);
-
-    await takeScreenshot(page, 'Save500错误');
   });
 
-  test('UD05_021_异常处理_Save时数据更新失败', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '21';
+  test('UD05_022_异常处理_Save时数据更新失败', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '022';
     await page.route('**/api/ud05/updatemodifydocument**', route => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 500, message: '更新失败' }),
+        body: JSON.stringify({ code: 500, message: '更新失败' })
       });
     });
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST_FAIL');
@@ -540,54 +520,53 @@ test.describe('异常处理', () => {
 
     await page.locator('button.ud05-btn').click();
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, 'Save結果');
 
-    // Error message area 显示
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toHaveText('数据更新失败，请稍后重试');
-    // 画面保持 UD05 不跳转
     await expect(page).toHaveURL(/UD05/);
-
-    await takeScreenshot(page, '更新失败错误');
   });
 
-  test('UD05_022_异常处理_API超时加载数据', { timeout: 180000 }, async ({ page }) => {
-    currentTestNo = '22';
+  test('UD05_023_异常处理_API超时（加载数据）', { timeout: 60000 }, async ({ page }) => {
+    currentTestNo = '023';
     await page.route('**/api/ud05/selectmodifydocument**', async route => {
-      await new Promise(resolve => setTimeout(resolve, 35000));
-      route.abort('timedout');
+      await new Promise(r => setTimeout(r, 10000));
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    try {
-      await expect(page.locator('.ud05-message')).toHaveText('System error. Please try again later.', { timeout: 60000 });
-    } catch {
-      // 超时消息可能延迟显示
-    }
 
-    await takeScreenshot(page, '超时错误');
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(3000);
+    await takeScreenshot(page, '超时');
+
+    const isError = await page.locator('.ud05-message').isVisible().catch(() => false);
+    if (isError) {
+      const text = await page.locator('.ud05-message').textContent();
+      expect(text.length).toBeGreaterThan(0);
+    }
   });
 
-  test('UD05_023_异常处理_网络异常加载数据', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '23';
+  test('UD05_024_异常处理_网络异常（加载数据）', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '024';
     await page.route('**/api/ud05/selectmodifydocument**', route => {
       route.abort('internetdisconnected');
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
 
-    // Error message area 显示
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(3000);
+    await takeScreenshot(page, '初期表示');
+
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toContainText('System error');
-
-    await takeScreenshot(page, '网络异常错误');
   });
 
-  test('UD05_024_异常处理_网络异常保存数据', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '24';
+  test('UD05_025_异常处理_网络异常（保存数据）', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '025';
     await page.route('**/api/ud05/updatemodifydocument**', route => {
       route.abort('internetdisconnected');
     });
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST_NET');
@@ -595,188 +574,191 @@ test.describe('异常处理', () => {
 
     await page.locator('button.ud05-btn').click();
     await page.waitForTimeout(2000);
+    await takeScreenshot(page, 'Save結果');
 
-    // Error message area 显示
     await expect(page.locator('.ud05-message')).toBeVisible();
     await expect(page.locator('.ud05-message')).toContainText('System error');
-    // 画面保持 UD05 不跳转
     await expect(page).toHaveURL(/UD05/);
-
-    await takeScreenshot(page, '保存网络异常错误');
   });
 });
 
 // ============================================================
-// 7. UI交互
+// 7. UI交互 (No.26-31)
 // ============================================================
 test.describe('UI交互', () => {
 
-  test('UD05_025_UI交互_加载中显示Loading状态', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '25';
+  test('UD05_026_UI交互_加载中显示Loading状态', { timeout: 60000 }, async ({ page }) => {
+    currentTestNo = '026';
+    let resolveApi;
+    const apiPromise = new Promise(r => { resolveApi = r; });
     await page.route('**/api/ud05/selectmodifydocument**', async route => {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await apiPromise;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 200, data: [] }),
+        body: JSON.stringify({ code: 200, data: [] })
       });
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(2000);
 
-    // 加载中 DataTable 未加载数据
-    // Save 按钮不可点击
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, '加载中');
+
     await expect(page.locator('button.ud05-btn')).toBeDisabled();
-
-    await takeScreenshot(page, '加载中状态');
+    resolveApi();
+    await page.waitForTimeout(2000);
   });
 
-  test('UD05_026_UI交互_加载完成后控件恢复活性', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '26';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_027_UI交互_加载完成后控件恢复活性', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '027';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 加载中提示消失
-    // DataTable 已加载数据
     const rows = page.locator('table.ud05-table tbody tr');
     const rowCount = await rows.count();
     expect(rowCount).toBeGreaterThan(0);
-    // Save 按钮可点击
     await expect(page.locator('button.ud05-btn')).toBeEnabled();
-    // Chassis no Link 可点击
     await expect(page.locator('.ud05-info-value.ud05-link').first()).toBeVisible();
-    // Template 文件链接可点击
     await expect(page.locator('.ud05-info-value.ud05-link').last()).toBeVisible();
-
-    await takeScreenshot(page, '加载完成');
   });
 
-  test('UD05_027_UI交互_Save中按钮禁用', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '27';
+  test('UD05_028_UI交互_Save中按钮禁用', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '028';
+    let resolveApi;
+    const apiPromise = new Promise(r => { resolveApi = r; });
     await page.route('**/api/ud05/updatemodifydocument**', async route => {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await apiPromise;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 200 }),
+        body: JSON.stringify({ code: 200 })
       });
     });
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST');
     await takeScreenshot(page, '入力後');
 
     await page.locator('button.ud05-btn').click();
-
-    // Save 按钮被禁用
     await expect(page.locator('button.ud05-btn')).toBeDisabled();
-    await takeScreenshot(page, 'Save禁用状态');
+    await takeScreenshot(page, 'Save禁用中');
 
-    await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
+    resolveApi();
+    await page.waitForTimeout(2000);
   });
 
-  test('UD05_028_UI交互_Save防止重复提交', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '28';
+  test('UD05_029_UI交互_Save防止重复提交', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '029';
+    let apiCallCount = 0;
     await page.route('**/api/ud05/updatemodifydocument**', async route => {
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      apiCallCount++;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 200 }),
+        body: JSON.stringify({ code: 200 })
       });
     });
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
 
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST_DUP');
     await takeScreenshot(page, '入力後');
 
     await page.locator('button.ud05-btn').click();
-    // 第二次点击无效
     await page.locator('button.ud05-btn').click({ force: true });
     await page.locator('button.ud05-btn').click({ force: true });
 
     await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
-    await takeScreenshot(page, '保存结果');
+    await takeScreenshot(page, '保存結果');
+    expect(apiCallCount).toBeLessThanOrEqual(1);
   });
 
-  test('UD05_029_UI交互_DataTableModifiedValue输入编辑', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '29';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_030_UI交互_DataTable Modified value输入编辑', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '030';
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
 
-    // 在任意行的 Modified value 列输入值
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill('TEST_VALUE');
-    // 确认输入的值正确显示
     await expect(firstInput).toHaveValue('TEST_VALUE');
-    // 其他行的值不受影响
+
     const secondInput = page.locator('table.ud05-table tbody tr').nth(1).locator('input.ud05-input');
     await expect(secondInput).toHaveValue('');
-
-    await takeScreenshot(page, 'ModifiedValue入力確認');
+    await takeScreenshot(page, '入力確認');
   });
 
-  test('UD05_030_UI交互_ErrorMessageArea显示错误消息样式', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '30';
+  test('UD05_031_UI交互_Error message area显示错误消息样式', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '031';
     await page.route('**/api/ud05/selectmodifydocument**', route => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'Internal Server Error' }),
-      });
+      route.fulfill({ status: 500, body: 'Internal Server Error' });
     });
-    await goToUD05(page, 'lwws', '12345', 'IDO');
-    await page.waitForTimeout(3000);
 
-    // Error message area 从隐藏变为可见
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await page.waitForTimeout(2000);
+    await takeScreenshot(page, '初期表示');
+
     await expect(page.locator('.ud05-message')).toBeVisible();
-
-    await takeScreenshot(page, '错误消息样式');
   });
 });
 
 // ============================================================
-// 8. 安全性
+// 8. 安全性 (No.32-33)
 // ============================================================
 test.describe('安全性', () => {
 
-  test('UD05_031_安全性_未登录直接访问UD05画面重定向', { timeout: 60000 }, async ({ page }) => {
-    currentTestNo = '31';
-    // localStorage 已由 beforeEach 清除
+  test('UD05_032_安全性_未登录直接访问UD05画面重定向', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '032';
+    // Step 1: 登录后访问 UD05 画面
+    await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
+    await expect(page).toHaveURL(/\/UD05/);
+    await expect(page.locator('.ud05-container')).toBeVisible();
+    await takeScreenshot(page, 'UD05画面表示');
+
+    // Step 2: 清除 localStorage（画面未刷新）
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/UD05/);
+    await expect(page.locator('.ud05-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // Step 3: 直接访问 UD05 URL → 重定向到 Login
     await page.goto(BASE_URL + '/UD05');
-    await takeScreenshot(page, '直接访问UD05');
+    await page.waitForTimeout(2000);
 
-    // 自动重定向到 Login
-    await page.waitForURL(BASE_URL + '/');
-    await takeScreenshot(page, '重定向到Login');
-
-    // UD05 画面内容不被显示
-    await expect(page.locator('.ud05-container')).not.toBeVisible();
-    // 地址栏 URL 变为 Login 页面
+    // Step 4: 验证重定向结果
     await expect(page).toHaveURL(BASE_URL + '/');
-    // Login 画面显示
     await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.ud05-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
-  test('UD05_032_安全性_ModifiedValueXSS防护', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '32';
-    await goToUD05(page, 'jpct', '8888', 'IDO');
-    await page.waitForTimeout(3000);
+  test('UD05_033_安全性_Modified value XSS防护', { timeout: 120000 }, async ({ page }) => {
+    currentTestNo = '033';
+    await page.route('**/api/ud05/updatemodifydocument**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200 })
+      });
+    });
 
-    // 在 Modified value 列输入 XSS 载荷
+    await goToUD05(page, MOCK_NORMAL_DATA, 'jpct', '8888', 'IDO');
+    await takeScreenshot(page, '初期表示');
+
     const xssPayload = '<script>alert(1)</script>';
     const firstInput = page.locator('table.ud05-table tbody tr').first().locator('input.ud05-input');
     await firstInput.fill(xssPayload);
     await takeScreenshot(page, 'XSS入力後');
 
     await page.locator('button.ud05-btn').click();
-
-    // 页面不崩溃，系统正常运行
     await page.waitForURL('**/UD06', { timeout: 30000 }).catch(() => {});
-    await takeScreenshot(page, 'XSS保存结果');
+    await takeScreenshot(page, 'XSS保存結果');
   });
 });

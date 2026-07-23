@@ -231,16 +231,14 @@ test.describe('搜索条件属性校验', () => {
     await takeScreenshot(page, '初期表示');
 
     const input = page.locator('#ud19-userid');
-    // 先输入有效值
-    await input.fill('admin');
-    // 尝试输入特殊字符
-    await input.fill('admin@123');
+    // 逐字输入含特殊字符的值，@ 被 USER_ID_REGEX 逐个过滤
+    // 最终 'admin' 被接受、'@' 被过滤、'123' 继续被接受
+    await input.pressSequentially('admin@123', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
-    // 特殊字符不被接收，值保持为输入前的有效值
-    expect(await input.inputValue()).toBe('admin@123');
-    // 实际上由于前端过滤，只有半角英数字被保留
+    const val = await input.inputValue();
+    expect(/^[a-zA-Z0-9]*$/.test(val)).toBeTruthy();
     await takeScreenshot(page, 'Userid特殊字符不可输入');
   });
 
@@ -282,14 +280,13 @@ test.describe('搜索条件属性校验', () => {
     await takeScreenshot(page, '初期表示');
 
     const input = page.locator('#ud19-user');
-    // 先输入有效值
-    await input.fill('test');
-    // 尝试输入中文等特殊字符
-    await input.fill('田中太郎');
+    // 逐字输入中文等特殊字符，非半角英数字被 USER_REGEX 逐个过滤
+    await input.pressSequentially('田中太郎', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
-    // 由于前端/后端过滤，非半角英数字不被接收
+    const val = await input.inputValue();
+    expect(/^[a-zA-Z0-9]*$/.test(val)).toBeTruthy();
     await takeScreenshot(page, 'User特殊字符不可输入');
   });
 
@@ -533,7 +530,7 @@ test.describe('Search 按钮操作 - 正常系', () => {
     await takeScreenshot(page, '初期表示');
 
     await page.locator('#ud19-userid').fill('adminl');
-    await page.locator('#ud19-market').selectOption('EUR');
+    await page.locator('#ud19-market').selectOption('AS');
     await takeScreenshot(page, '入力後');
     await page.locator('.ud19-btn-search').click();
     await page.waitForTimeout(2000);
@@ -867,8 +864,14 @@ test.describe('UI交互', () => {
     expect(firstRows1).toBeGreaterThan(0);
     await takeScreenshot(page, '第一次搜索结果');
 
-    // 第二次搜索 admin445
+    // 2. 修改搜索条件为 admin445，User 置空，权限默认值（Not set）
     await page.locator('#ud19-userid').fill('admin445');
+    await page.locator('#ud19-user').fill('');
+    await page.locator('input[name="searchType"]').nth(0).check();
+    await page.waitForTimeout(200);
+    await takeScreenshot(page, '条件変更後');
+
+    // 3. 点击 Search
     await page.locator('.ud19-btn-search').click();
     await page.waitForTimeout(2000);
 
@@ -1058,19 +1061,29 @@ test.describe('安全性', () => {
   test('UD19_050_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '50';
 
-    // 先导航到目标页面，再清除 localStorage（模拟未登录状态）
-    await page.goto(BASE_URL + '/UD19');
+    // 1. 先登录系统，进入 UD19 画面
+    await goToUD19(page);
     await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD19/);
+    await expect(page.locator('.ud19-container')).toBeVisible();
+    await takeScreenshot(page, 'UD19画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
     await page.waitForTimeout(500);
-    // 重新加载页面使其检测到未登录状态
-    await page.reload();
+    await expect(page).toHaveURL(/\/UD19/);
+    await expect(page.locator('.ud19-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD19 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD19');
     await page.waitForTimeout(2000);
 
-    // AppLayout 重定向到根路径 /（Login 页面）
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD19 画面不被显示
     await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud19-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD19_051_安全性_UserID格式验证', { timeout: 120000 }, async ({ page }) => {

@@ -982,17 +982,29 @@ test.describe('安全性', () => {
   test('UD16_045_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '45';
 
-    await page.goto(BASE_URL + '/UD16');
+    // 1. 先登录系统，进入 UD16 画面
+    await goToUD16(page);
     await page.waitForTimeout(1000);
-    await takeScreenshot(page, '初期表示(未Login)');
+    await expect(page).toHaveURL(/\/UD16/);
+    await expect(page.locator('.ud16-container')).toBeVisible();
+    await takeScreenshot(page, 'UD16画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
     await page.waitForTimeout(500);
-    await page.reload();
+    await expect(page).toHaveURL(/\/UD16/);
+    await expect(page.locator('.ud16-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD16 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD16');
     await page.waitForTimeout(2000);
 
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD16 画面不被显示
     await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud16-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD16_046_安全性_SerieChnr格式验证', { timeout: 120000 }, async ({ page }) => {

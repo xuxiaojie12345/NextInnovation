@@ -19,13 +19,9 @@ const REAL_PASS = 'admin123';
 // 测试用底盘号（真实数据库已有数据）
 const CHASSIS_EXIST_JPCT013945 = 'JPCT013945';
 const CHASSIS_EXIST_JPCT8888 = 'jpct8888';
-const CHASSIS_EXIST_WLX1100001 = 'WLX1100001';
+const CHASSIS_EXIST_WLXT100001 = 'WLXT100001';
+const CHASSIS_EXIST_JPCTL013945 = 'JPCTL013945';
 const CHASSIS_NONEXIST = 'NONEXIST12345';
-
-// 数据库 HDOC_SEND_DATA_VIN_PLATE 记录
-// JPCT/013945: STATUS=0, TYPE=2, MSG=null, DOC_READY=2026-06-17, DOC_SENT=2026-06-17, REGISTER_DATETIME=2026-06-17T14:04:37
-// jpct/8888: STATUS=0, TYPE=2, MSG='Data updated successfully', DOC_READY=2026-06-25, DOC_SENT=2026-06-25, REGISTER_DATETIME=2026-06-26T15:38:32
-// WLX1/100001: STATUS=0, TYPE=1, MSG=null, DOC_READY=2026-06-17, DOC_SENT=2026-06-17, REGISTER_DATETIME=2026-06-17T14:04:37
 
 /**
  * 截图（JPEG，从001开始编号）
@@ -75,6 +71,14 @@ async function viewInfo(page: Page, chassisNumber: string): Promise<boolean> {
   const isWarning = await warningMsg.isVisible().catch(() => false);
   return !isError && !isWarning;
 }
+
+/**
+ * 每个测试前初始化
+ */
+test.beforeEach(async ({ page }) => {
+  screenshotCounter = 0;
+  await page.evaluate(() => localStorage.clear()).catch(() => {});
+});
 
 // ============================================================
 // 1. 画面初期表示 (No.1-5)
@@ -451,8 +455,8 @@ test.describe('View Info按钮操作', () => {
     // Plate type - DB: TYPE=2
     await expect(infoValues.nth(1)).toContainText('2');
 
-    // Status - DB: STATUS=0
-    await expect(infoValues.nth(2)).toContainText('0');
+    // Status - DB: STATUS=1（jpct8888 的 STATUS=1）
+    await expect(infoValues.nth(2)).toContainText('1');
 
     // Error Message - DB: MSG='Data updated successfully'
     await expect(infoValues.nth(3)).toContainText('Data updated successfully');
@@ -863,8 +867,8 @@ test.describe('Change to Basic Info按钮操作', () => {
     await goToUD15(page);
     await takeScreenshot(page, '初期表示');
 
-    // 先 View Info 查询 WLX1100001（TYPE=1）
-    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLX1100001);
+    // 先 View Info 查询 WLXT100001（TYPE=1）
+    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLXT100001);
     await takeScreenshot(page, '入力後');
     await page.locator('button:has-text("View Info")').click();
     await page.waitForTimeout(2000);
@@ -874,9 +878,10 @@ test.describe('Change to Basic Info按钮操作', () => {
     const hasWarning = await page.locator('.ud15-message--warning').isVisible().catch(() => false);
     if (hasError || hasWarning) {
       const msg = await page.locator('.ud15-message').textContent();
-      console.log(`View Info error for ${CHASSIS_EXIST_WLX1100001}: ${msg}`);
+      console.log(`View Info error for ${CHASSIS_EXIST_WLXT100001}: ${msg}`);
     }
     await expect(page.locator('.ud15-info-panel')).toBeVisible({ timeout: 10000 });
+    await takeScreenshot(page, 'ViewInfo結果');
 
     // 点击 Change to Basic Info
     await page.locator('button:has-text("Change to Basic Info")').click();
@@ -885,7 +890,7 @@ test.describe('Change to Basic Info按钮操作', () => {
     await expect(page.locator('.ud15-message--success')).toBeVisible();
     await expect(page.locator('.ud15-message')).toContainText('已切换到基本信息');
 
-    await takeScreenshot(page, 'ChangeBasic成功');
+    await takeScreenshot(page, '操作後');
   });
 
   test('UD15_035_Change to Basic Info_底盘号不存在', { timeout: 120000 }, async ({ page }) => {
@@ -894,7 +899,7 @@ test.describe('Change to Basic Info按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 先查询使 plateInfo 不为 null
-    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLX1100001);
+    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_JPCT013945);
     await takeScreenshot(page, '入力後');
     await page.locator('button:has-text("View Info")').click();
     await page.waitForTimeout(1500);
@@ -947,12 +952,13 @@ test.describe('Change to Advanced Info按钮操作', () => {
     await goToUD15(page);
     await takeScreenshot(page, '初期表示');
 
-    // 先 View Info 查询 WLX1100001
-    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLX1100001);
+    // 先 View Info 查询 JPCT013945
+    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_JPCT013945);
     await takeScreenshot(page, '入力後');
     await page.locator('button:has-text("View Info")').click();
     await page.waitForTimeout(1500);
     await expect(page.locator('.ud15-info-panel')).toBeVisible();
+    await takeScreenshot(page, 'ViewInfo結果');
 
     // 点击 Change to Advanced Info
     await page.locator('button:has-text("Change to Advanced Info")').click();
@@ -961,7 +967,7 @@ test.describe('Change to Advanced Info按钮操作', () => {
     await expect(page.locator('.ud15-message--success')).toBeVisible();
     await expect(page.locator('.ud15-message')).toContainText('已切换到高级信息');
 
-    await takeScreenshot(page, 'ChangeAdvanced成功');
+    await takeScreenshot(page, '操作後');
   });
 
   test('UD15_038_Change to Advanced Info_底盘号不存在', { timeout: 120000 }, async ({ page }) => {
@@ -970,7 +976,7 @@ test.describe('Change to Advanced Info按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 先查询使 plateInfo 不为 null
-    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLX1100001);
+    await page.locator('#chassisNumber').fill(CHASSIS_EXIST_WLXT100001);
     await takeScreenshot(page, '入力後');
     await page.locator('button:has-text("View Info")').click();
     await page.waitForTimeout(1500);
@@ -1026,7 +1032,7 @@ test.describe('输出区域数据展示', () => {
     await expect(infoValues.nth(1)).toContainText('2');
     // Status - DB: STATUS=0
     await expect(infoLabels.nth(2)).toContainText('Status');
-    await expect(infoValues.nth(2)).toContainText('0');
+    await expect(infoValues.nth(2)).toContainText('1');
     // Error Message
     await expect(infoLabels.nth(3)).toContainText('Error Message');
     await expect(infoValues.nth(3)).toContainText('Data updated successfully');
@@ -1190,9 +1196,12 @@ test.describe('UI交互', () => {
     });
 
     await page.locator('#chassisNumber').fill(CHASSIS_EXIST_JPCT013945);
-    // 快速连续点击 2 次
+    // 第一次点击
     await page.locator('button:has-text("View Info")').click();
-    await page.locator('button:has-text("View Info")').click();
+    // 等待按钮变为禁用状态（确认 loading 已生效）
+    await expect(page.locator('button:has-text("View Info")')).toBeDisabled({ timeout: 3000 });
+    // 在 disabled 状态下再次点击（应被忽略）
+    await page.locator('button:has-text("View Info")').click({ force: true });
     await page.waitForTimeout(1000);
 
     // 第二次点击无效，只发起 1 次 API 调用
@@ -1448,20 +1457,29 @@ test.describe('安全性', () => {
   test('UD15_053_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '53';
 
-    // 先导航到目标页面，再清除 localStorage
-    await page.goto(BASE_URL + '/UD15');
+    // 1. 先登录系统，进入 UD15 画面
+    await goToUD15(page);
     await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD15/);
+    await expect(page.locator('.ud15-container')).toBeVisible();
+    await takeScreenshot(page, 'UD15画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
     await page.waitForTimeout(500);
-    // 重新加载页面
-    await page.reload();
+    await expect(page).toHaveURL(/\/UD15/);
+    await expect(page.locator('.ud15-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD15 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD15');
     await page.waitForTimeout(2000);
 
-    // 自动重定向到登录画面（根路径 /）
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD15 画面不被显示
     await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud15-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD15_054_安全性_Chassis number格式校验', { timeout: 120000 }, async ({ page }) => {

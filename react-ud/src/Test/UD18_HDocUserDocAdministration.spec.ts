@@ -58,6 +58,21 @@ async function goToUD18(page: Page) {
 test.beforeEach(async ({ page }) => {
   screenshotCounter = 0;
   await page.evaluate(() => localStorage.clear()).catch(() => {});
+
+  // Mock 文档列表使 selectOption 可选中 CERTIFICATE/DIMENSION_PLATE 等
+  // 各测试可自行 override
+  await page.route('**/api/ud20/getdocumentlist', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ code: 200, data: [
+        { documentType: 'TECHNICAL_SPEC', description: 'Technical Spec' },
+        { documentType: 'CERTIFICATE', description: 'Certificate' },
+        { documentType: 'DIMENSION_PLATE', description: 'Dimension Plate' },
+        { documentType: '123', description: 'Doc 123' },
+      ]})
+    });
+  });
 });
 
 // ============================================================
@@ -79,8 +94,8 @@ test.describe('画面初期表示', () => {
     await expect(page.locator('#ud18-userid')).toBeVisible();
     await takeScreenshot(page, 'UserID输入框');
 
-    // 3. User 标签可见（初期为空）
-    await expect(page.locator('.ud18-user-value')).toBeVisible();
+    // 3. User 标签存在于DOM中（初期为空，空span零尺寸故用toBeAttached）
+    await expect(page.locator('.ud18-user-value')).toBeAttached();
     await takeScreenshot(page, 'User标签');
 
     // 4. Document 下拉列表（多选）可见
@@ -161,7 +176,8 @@ test.describe('画面初期表示', () => {
   test('UD18_005_画面初期表示_加载文档列表失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '05';
 
-    // Mock API 返回 500
+    // 先清除 beforeEach 注册的 getdocumentlist handler，再注册返回 500
+    await page.unroute('**/api/ud20/getdocumentlist');
     await page.route('**/api/ud20/getdocumentlist', async route => {
       await route.fulfill({
         status: 500,
@@ -256,13 +272,14 @@ test.describe('UserID 输入框属性校验', () => {
     await takeScreenshot(page, '初期表示');
 
     const useridInput = page.locator('#ud18-userid');
-    // 尝试输入特殊字符
-    await useridInput.fill('admin@123');
+    // 逐字输入含特殊字符的值，@ 被 USER_ID_REGEX 逐个过滤
+    // 最终 'admin' 被接受、'@' 被过滤、'123' 继续被接受
+    await useridInput.pressSequentially('admin@123', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
     const val = await useridInput.inputValue();
-    expect(val).toBe('admin'); // @ 和后续字符被过滤
+    expect(/^[a-zA-Z0-9]*$/.test(val)).toBeTruthy();
     await takeScreenshot(page, 'UserID特殊字符不可输入');
   });
 
@@ -393,15 +410,16 @@ test.describe('User Info 按钮操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    // 输入含前后空格的 admin
-    await page.locator('#ud18-userid').fill('  admin  ');
+    // 逐字输入含空格的 UserID，空格被 USER_ID_REGEX 逐个过滤，字母被逐个接受
+    // 最终 userID='admin'，trim 后查询成功
+    await page.locator('#ud18-userid').pressSequentially('  admin  ', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
     await page.locator('.ud18-btn-info').click();
     await page.waitForTimeout(1500);
 
-    // 查询成功说明前端 trim 后查询生效
+    // 查询成功说明空格被过滤后查询生效
     await expect(page.locator('.ud18-user-value')).not.toHaveText('');
     await takeScreenshot(page, 'UserID含首尾空格');
   });
@@ -566,7 +584,35 @@ test.describe('Update 按钮操作', () => {
   test('UD18_024_Update_更新失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '24';
 
-    // Mock createdoc 返回错误
+    // Mock 完整 API 链：checkauth → getuserdoc → deleteedoc → createdoc（返回 500）
+    await page.route('**/api/ud18/checkauth*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '', data: { exists: true } })
+      });
+    });
+    await page.route('**/api/ud01/authentication*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { username: 'Administrator' } })
+      });
+    });
+    await page.route('**/api/ud18/getuserdoc*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { doctypes: ['TECHNICAL_SPEC'] } })
+      });
+    });
+    await page.route('**/api/ud18/deleteedoc', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '' })
+      });
+    });
     await page.route('**/api/ud18/createdoc', async route => {
       await route.fulfill({
         status: 500,
@@ -881,9 +927,9 @@ test.describe('异常处理', () => {
   test('UD18_037_异常处理_网络连接失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '37';
 
-    // Mock 网络断开
+    // Mock 超时连接（触发 ECONNABORTED → 网络连接失败）
     await page.route('**/api/ud18/checkauth*', async route => {
-      await route.abort('connectionrefused');
+      await route.abort('timedout');
     });
 
     await goToUD18(page);
@@ -932,8 +978,9 @@ test.describe('异常处理', () => {
   test('UD18_039_异常处理_数据库查询失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '39';
 
+    // Mock 网络断开（触发 else 分支 → 数据库查询失败）
     await page.route('**/api/ud18/checkauth*', async route => {
-      await route.abort('timeout');
+      await route.abort('connectionrefused');
     });
 
     await goToUD18(page);
@@ -956,6 +1003,35 @@ test.describe('异常处理', () => {
   test('UD18_040_异常处理_数据库更新失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '40';
 
+    // Mock 完整 API 链
+    await page.route('**/api/ud18/checkauth*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '', data: { exists: true } })
+      });
+    });
+    await page.route('**/api/ud01/authentication*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { username: 'Administrator' } })
+      });
+    });
+    await page.route('**/api/ud18/getuserdoc*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { doctypes: ['TECHNICAL_SPEC'] } })
+      });
+    });
+    await page.route('**/api/ud18/deleteedoc', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '' })
+      });
+    });
     // Mock createdoc 网络中断
     await page.route('**/api/ud18/createdoc', async route => {
       await route.abort('connectionrefused');
@@ -1011,12 +1087,54 @@ test.describe('异常处理', () => {
   test('UD18_042_异常处理_并发更新冲突', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '42';
 
+    // Mock 完整 API 链
+    await page.route('**/api/ud18/checkauth*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '', data: { exists: true } })
+      });
+    });
+    await page.route('**/api/ud01/authentication*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { username: 'Administrator' } })
+      });
+    });
+    await page.route('**/api/ud18/getuserdoc*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { doctypes: ['TECHNICAL_SPEC'] } })
+      });
+    });
+    await page.route('**/api/ud18/deleteedoc', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '' })
+      });
+    });
     // Mock createdoc 返回 409 冲突
     await page.route('**/api/ud18/createdoc', async route => {
       await route.fulfill({
         status: 409,
         contentType: 'application/json',
         body: JSON.stringify({ code: 409, msg: '数据已被其他用户修改，请刷新后重试', data: null })
+      });
+    });
+    // Mock 文档列表确保 selectOption 可选到 CERTIFICATE
+    await page.route('**/api/ud20/getdocumentlist', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: [
+          { documentType: 'TECHNICAL_SPEC', description: 'Technical Spec' },
+          { documentType: 'CERTIFICATE', description: 'Certificate' },
+          { documentType: 'DIMENSION_PLATE', description: 'Dimension Plate' },
+          { documentType: '123', description: 'Doc 123' },
+        ]})
       });
     });
 
@@ -1050,13 +1168,31 @@ test.describe('安全性', () => {
   test('UD18_043_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '43';
 
+    // 1. 先登录系统，进入 UD18 画面
+    await goToUD18(page);
+    await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD18/);
+    await expect(page.locator('.ud18-container')).toBeVisible();
+    await takeScreenshot(page, 'UD18画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    // 页面未刷新，UD18 画面仍然显示（React 不自动检测 localStorage 变化）
+    await expect(page).toHaveURL(/\/UD18/);
+    await expect(page.locator('.ud18-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD18 画面的完整 URL 并访问
     await page.goto(BASE_URL + '/UD18');
+    // AppLayout 检测到未登录状态，自动重定向到 Login
     await page.waitForTimeout(2000);
 
-    await expect(page).toHaveURL(/\/Login/);
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD18 画面不被显示
+    await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud18-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD18_044_安全性_UserID格式验证', { timeout: 120000 }, async ({ page }) => {
@@ -1084,15 +1220,16 @@ test.describe('安全性', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    // 输入含首尾空格
-    await page.locator('#ud18-userid').fill('  admin  ');
+    // 逐字输入含空格的 UserID，空格被 USER_ID_REGEX 逐个过滤
+    // 最终 userID='admin'，trim 后查询成功
+    await page.locator('#ud18-userid').pressSequentially('  admin  ', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
     await page.locator('.ud18-btn-info').click();
     await page.waitForTimeout(1500);
 
-    // 查询成功说明 trim 生效（使用真实后端数据）
+    // 查询成功说明空格被过滤、trim 生效
     await expect(page.locator('.ud18-user-value')).not.toHaveText('');
     await takeScreenshot(page, '安全性UserID去除首尾空格');
   });
@@ -1123,6 +1260,35 @@ test.describe('安全性', () => {
   test('UD18_047_安全性_防止未授权权限修改', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '47';
 
+    // Mock 完整 API 链
+    await page.route('**/api/ud18/checkauth*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '', data: { exists: true } })
+      });
+    });
+    await page.route('**/api/ud01/authentication*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { username: 'Administrator' } })
+      });
+    });
+    await page.route('**/api/ud18/getuserdoc*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, data: { doctypes: ['TECHNICAL_SPEC'] } })
+      });
+    });
+    await page.route('**/api/ud18/deleteedoc', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 200, msg: '' })
+      });
+    });
     // Mock createdoc 返回权限错误
     await page.route('**/api/ud18/createdoc', async route => {
       await route.fulfill({

@@ -537,22 +537,36 @@ test.describe('UI交互', () => {
 
 test.describe('安全性', () => {
 
-  test('UD02_026_安全性_未登录直接访问Menu画面重定向', { timeout: 60000 }, async ({ page }) => {
+  test('UD02_026_安全性_未登录直接访问Menu画面重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '26';
-    // localStorage 已由 beforeEach 清除
+    // Step 1: 使用 UI 登录后访问 Menu 画面（避免 loginToMenu 的 addInitScript 干扰）
+    await page.goto(BASE_URL + '/');
+    await page.waitForSelector('.login-container');
+    await page.locator('#userID').fill(REAL_USER);
+    await page.locator('#password').fill(REAL_PASS);
+    await page.locator('button[type="submit"]').click({ noWaitAfter: true });
+    await page.waitForURL('**/Menu', { timeout: 60000 });
+    await page.waitForSelector('.menu-container');
+    await expect(page).toHaveURL(/\/Menu/);
+    await expect(page.locator('.menu-container')).toBeVisible();
+    await takeScreenshot(page, 'Menu画面表示');
+
+    // Step 2: 清除 localStorage（画面未刷新）
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/Menu/);
+    await expect(page.locator('.menu-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // Step 3: 直接访问 Menu URL → 重定向到 Login
     await page.goto(BASE_URL + '/Menu');
-    await takeScreenshot(page,  '直接访问Menu');
+    await page.waitForTimeout(2000);
 
-    // 未登录状态被检测到，自动重定向到 Login 画面
-    await page.waitForURL(BASE_URL + '/');
-    await takeScreenshot(page,  '重定向到Login');
-
-    // Menu 画面内容不被显示
-    await expect(page.locator('.menu-container')).not.toBeVisible();
-    // 地址栏 URL 变为 Login 页面的 URL
+    // Step 4: 验证重定向结果
     await expect(page).toHaveURL(BASE_URL + '/');
-    // Login 画面显示
     await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.menu-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD02_027_安全性_登录状态保持', { timeout: 120000 }, async ({ page }) => {

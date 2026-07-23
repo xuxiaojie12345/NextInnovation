@@ -867,19 +867,29 @@ test.describe('安全性', () => {
   test('UD14_039_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '39';
 
-    // 先导航到目标页面，再清除 localStorage（模拟未登录状态）
-    await page.goto(BASE_URL + '/UD14');
+    // 1. 先登录系统，进入 UD14 画面
+    await goToUD14(page);
     await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD14/);
+    await expect(page.locator('.ud14-container')).toBeVisible();
+    await takeScreenshot(page, 'UD14画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
     await page.waitForTimeout(500);
-    // 重新加载页面使其检测到未登录状态
-    await page.reload();
+    await expect(page).toHaveURL(/\/UD14/);
+    await expect(page.locator('.ud14-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD14 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD14');
     await page.waitForTimeout(2000);
 
-    // AppLayout 重定向到根路径 /（Login 页面）
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD14 画面不被显示
     await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud14-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD14_040_安全性_路径遍历防护Market', { timeout: 120000 }, async ({ page }) => {

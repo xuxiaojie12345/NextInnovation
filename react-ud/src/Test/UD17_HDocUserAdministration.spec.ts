@@ -128,13 +128,13 @@ test.describe('画面初期表示', () => {
     await page.waitForTimeout(1000);
 
     // 8个角色行
-    const chkStandard = page.locator('#chk-Standard User');
-    const chkRule = page.locator('#chk-Rule Admin');
-    const chkTemplate = page.locator('#chk-Template Admin');
-    const chkDocument = page.locator('#chk-Document Auth Admin');
-    const chkUser = page.locator('#chk-User Admin');
-    const chkAdapt = page.locator('#chk-Adaptation user');
-    const chkManage = page.locator('#chk-Manage Variable List');
+    const chkStandard = page.locator('[id="chk-Standard User"]');
+    const chkRule = page.locator('[id="chk-Rule Admin"]');
+    const chkTemplate = page.locator('[id="chk-Template Admin"]');
+    const chkDocument = page.locator('[id="chk-Document Auth Admin"]');
+    const chkUser = page.locator('[id="chk-User Admin"]');
+    const chkAdapt = page.locator('[id="chk-Adaptation user"]');
+    const chkManage = page.locator('[id="chk-Manage Variable List"]');
 
     await expect(chkStandard).toBeVisible();
     await expect(chkRule).toBeVisible();
@@ -164,7 +164,7 @@ test.describe('画面初期表示', () => {
     await page.waitForTimeout(1500);
 
     // Rule Admin 的 Market 下拉列表（非固定）
-    const ruleMarketSelect = page.locator('#chk-Rule Admin').locator('..').locator('..').locator('.ud17-market-select');
+    const ruleMarketSelect = page.locator('[id="chk-Rule Admin"]').locator('..').locator('..').locator('.ud17-market-select');
     // 用更可靠的方式获取
     const marketSelects = page.locator('.ud17-market-select');
     const selectCount = await marketSelects.count();
@@ -245,8 +245,9 @@ test.describe('UserID 输入框属性校验', () => {
     await takeScreenshot(page, '初期表示');
 
     const input = page.locator('#ud17-userid');
-    // 输入含特殊字符的值，正则过滤后只保留半角英数字
-    await input.fill('admin@123');
+    // 逐字输入含特殊字符的值，@ 被 USER_ID_REGEX 逐个过滤
+    // 最终 'admin' 被接受、'@' 被过滤、'123' 继续被接受
+    await input.pressSequentially('admin@123', { delay: 50 });
     await page.waitForTimeout(200);
     await takeScreenshot(page, '入力後');
 
@@ -305,13 +306,13 @@ test.describe('User Info 按钮操作', () => {
     await expect(page.locator('#ud17-user')).toHaveValue('Administrator');
 
     // admin 有4个权限：Rule Admin(R), Template Admin(T), Document Auth Admin(D), Manage Variable List(MCSU)
-    await expect(page.locator('#chk-Standard User')).not.toBeChecked();
-    await expect(page.locator('#chk-Rule Admin')).toBeChecked();
-    await expect(page.locator('#chk-Template Admin')).toBeChecked();
-    await expect(page.locator('#chk-Document Auth Admin')).toBeChecked();
-    await expect(page.locator('#chk-User Admin')).not.toBeChecked();
-    await expect(page.locator('#chk-Adaptation user')).not.toBeChecked();
-    await expect(page.locator('#chk-Manage Variable List')).toBeChecked();
+    await expect(page.locator('[id="chk-Standard User"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Rule Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Template Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Document Auth Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-User Admin"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Adaptation user"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Manage Variable List"]')).toBeChecked();
 
     // 消息区域隐藏
     await expect(page.locator('.ud17-message')).not.toBeVisible();
@@ -375,13 +376,14 @@ test.describe('User Info 按钮操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    // 输入含空格的 UserID
-    await page.locator('#ud17-userid').fill('  admin  ');
+    // 逐字输入含空格的 UserID，空格被 USER_ID_REGEX 逐个过滤，字母被逐个接受
+    // 最终 userID ='admin'，trim 后查询成功
+    await page.locator('#ud17-userid').pressSequentially('  admin  ', { delay: 50 });
     await takeScreenshot(page, '入力後');
     await page.locator('.ud17-btn-info').click();
     await page.waitForTimeout(2000);
 
-    // User 标签显示 Administrator（trim后查询admin成功）
+    // User 标签显示 Administrator（查询admin成功）
     await expect(page.locator('#ud17-user')).toHaveValue('Administrator');
     await takeScreenshot(page, 'UserInfo空格处理');
   });
@@ -558,8 +560,8 @@ test.describe('Delete Role 按钮操作', () => {
     await expect(page.locator('#ud17-user')).toHaveValue('');
 
     // 所有 Checkbox 恢复未选中
-    await expect(page.locator('#chk-Rule Admin')).not.toBeChecked();
-    await expect(page.locator('#chk-Template Admin')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Rule Admin"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Template Admin"]')).not.toBeChecked();
     await takeScreenshot(page, 'DeleteRole成功');
   });
 
@@ -660,7 +662,7 @@ test.describe('权限配置操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    const chk = page.locator('#chk-Standard User');
+    const chk = page.locator('[id="chk-Standard User"]');
 
     // 勾选
     await chk.check();
@@ -682,11 +684,11 @@ test.describe('权限配置操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 先勾选 Rule Admin
-    await page.locator('#chk-Rule Admin').check();
+    await page.locator('[id="chk-Rule Admin"]').check();
     await page.waitForTimeout(200);
 
     // 选择 Rule Admin 对应的 Market 下拉列表
-    const ruleItem = page.locator('#chk-Rule Admin').locator('..').locator('..');
+    const ruleItem = page.locator('[id="chk-Rule Admin"]').locator('..').locator('..');
     const marketSelect = ruleItem.locator('.ud17-market-select');
     if (await marketSelect.isVisible().catch(() => false)) {
       await marketSelect.selectOption('JPN');
@@ -703,14 +705,14 @@ test.describe('权限配置操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // Standard User 的 Market 固定显示 -EU
-    const standardItem = page.locator('#chk-Standard User').locator('..').locator('..');
+    const standardItem = page.locator('[id="chk-Standard User"]').locator('..').locator('..');
     const marketSelect = standardItem.locator('.ud17-market-select');
     await expect(marketSelect).toBeVisible();
     await expect(marketSelect).toBeDisabled();
     // 应该只有一个选项 -EU
     const options = await marketSelect.locator('option').count();
     expect(options).toBe(1);
-    await expect(marketSelect.locator('option').first()).toHaveValue('-EU');
+    await expect(marketSelect.locator('option').first()).toHaveAttribute('value', '-EU');
     await takeScreenshot(page, 'StandardUserMarket固定');
   });
 
@@ -720,13 +722,13 @@ test.describe('权限配置操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    const adaptItem = page.locator('#chk-Adaptation user').locator('..').locator('..');
+    const adaptItem = page.locator('[id="chk-Adaptation user"]').locator('..').locator('..');
     const marketSelect = adaptItem.locator('.ud17-market-select');
     await expect(marketSelect).toBeVisible();
     await expect(marketSelect).toBeDisabled();
     const options = await marketSelect.locator('option').count();
     expect(options).toBe(1);
-    await expect(marketSelect.locator('option').first()).toHaveValue('-EU');
+    await expect(marketSelect).toHaveValue('-EU');
     await takeScreenshot(page, 'AdaptationUserMarket固定');
   });
 
@@ -736,7 +738,7 @@ test.describe('权限配置操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    const userAdminItem = page.locator('#chk-User Admin').locator('..').locator('..');
+    const userAdminItem = page.locator('[id="chk-User Admin"]').locator('..').locator('..');
     const marketSelect = userAdminItem.locator('.ud17-market-select');
     await expect(marketSelect).not.toBeVisible();
     await takeScreenshot(page, 'UserAdmin无Market');
@@ -748,7 +750,7 @@ test.describe('权限配置操作', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    const manageItem = page.locator('#chk-Manage Variable List').locator('..').locator('..');
+    const manageItem = page.locator('[id="chk-Manage Variable List"]').locator('..').locator('..');
     const marketSelect = manageItem.locator('.ud17-market-select');
     await expect(marketSelect).not.toBeVisible();
     await takeScreenshot(page, 'ManageVariableList无Market');
@@ -872,13 +874,13 @@ test.describe('UI交互', () => {
     await page.waitForTimeout(2000);
 
     // admin 的权限
-    await expect(page.locator('#chk-Rule Admin')).toBeChecked();
-    await expect(page.locator('#chk-Template Admin')).toBeChecked();
-    await expect(page.locator('#chk-Document Auth Admin')).toBeChecked();
-    await expect(page.locator('#chk-Manage Variable List')).toBeChecked();
-    await expect(page.locator('#chk-Standard User')).not.toBeChecked();
-    await expect(page.locator('#chk-User Admin')).not.toBeChecked();
-    await expect(page.locator('#chk-Adaptation user')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Rule Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Template Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Document Auth Admin"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Manage Variable List"]')).toBeChecked();
+    await expect(page.locator('[id="chk-Standard User"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-User Admin"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Adaptation user"]')).not.toBeChecked();
     await takeScreenshot(page, '查询后权限显示');
   });
 
@@ -905,8 +907,8 @@ test.describe('UI交互', () => {
     // User 标签被清空
     await expect(page.locator('#ud17-user')).toHaveValue('');
     // Checkbox 恢复未选中
-    await expect(page.locator('#chk-Rule Admin')).not.toBeChecked();
-    await expect(page.locator('#chk-Template Admin')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Rule Admin"]')).not.toBeChecked();
+    await expect(page.locator('[id="chk-Template Admin"]')).not.toBeChecked();
     await takeScreenshot(page, '删除后清空');
   });
 
@@ -1092,16 +1094,29 @@ test.describe('安全性', () => {
   test('UD17_049_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '49';
 
-    await page.goto(BASE_URL + '/UD17');
+    // 1. 先登录系统，进入 UD17 画面
+    await goToUD17(page);
     await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD17/);
+    await expect(page.locator('.ud17-container')).toBeVisible();
+    await takeScreenshot(page, 'UD17画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
     await page.waitForTimeout(500);
-    await page.reload();
+    await expect(page).toHaveURL(/\/UD17/);
+    await expect(page.locator('.ud17-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD17 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD17');
     await page.waitForTimeout(2000);
 
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD17 画面不被显示
     await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
-    await takeScreenshot(page, '未登录重定向');
+    await expect(page.locator('.ud17-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD17_050_安全性_UserID格式验证', { timeout: 120000 }, async ({ page }) => {
@@ -1127,12 +1142,14 @@ test.describe('安全性', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '初期表示');
 
-    await page.locator('#ud17-userid').fill('  admin  ');
-    await takeScreenshot(page, '入力後');
+    // 逐字输入含空格的 UserID，空格被 USER_ID_REGEX 逐个过滤，字母被逐个接受
+    // 最终 userID 状态为 'admin'，trim 后查询 admin 成功
+    await page.locator('#ud17-userid').pressSequentially('  admin  ', { delay: 50 });
+    await takeScreenshot(page, '入力後（空格被过滤）');
     await page.locator('.ud17-btn-info').click();
     await page.waitForTimeout(2000);
 
-    // trim 后查询成功，显示用户名
+    // 查询成功，显示用户名
     await expect(page.locator('#ud17-user')).toHaveValue('Administrator');
     await takeScreenshot(page, 'UserID去除空格');
   });
