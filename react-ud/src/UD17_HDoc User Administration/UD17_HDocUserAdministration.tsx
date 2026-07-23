@@ -57,6 +57,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
   // 对应设计书 6. 实现注意事项 No.1
   const [userID, setUserID] = useState<string>('');                    // UserID输入值
   const [userName, setUserName] = useState<string>('');                // 用户名（查询后显示）
+  const [queriedUserID, setQueriedUserID] = useState<string>('');      // 上一次查询的UserID
   const [message, setMessage] = useState<string>('');                  // 消息内容
   const [messageType, setMessageType] = useState<'success' | 'error'>('success'); // 消息类型
   const [isLoading, setIsLoading] = useState<boolean>(false);          // 加载状态
@@ -147,7 +148,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
   const handleUserInfo = async () => {
     // 1. 前置处理：去除首尾空格
     const trimmedUserID = userID.trim();
-
+    console.log("修改前的userID"+userID);
     // 2. 空值校验（前端校验）
     if (!trimmedUserID) {
       setMessageType('error');
@@ -205,6 +206,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
         // 步骤6: 结果反馈 - 显示用户名称和权限配置
         setIsQueried(true);
+        setQueriedUserID(trimmedUserID);
         setMessageType('success');
         setMessage('');
       } else {
@@ -247,12 +249,13 @@ const UD17_HDocUserAdministration: React.FC = () => {
    */
   const handleUpdateRole = async () => {
     // 对应设计书 3.2 校验详细规格表 No.3
-    if (!userID.trim() || !isQueried) {
+    const trimmedUserID = userID.trim();
+    if (!trimmedUserID || !isQueried || trimmedUserID !== queriedUserID) {
       setMessageType('error');
       setMessage('请先查询用户信息');
       return;
     }
-
+    console.log("是修改前的还是修改后的userID"+userID);
     setIsLoading(true);
     setMessage('');
 
@@ -279,7 +282,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
       });
 
       const response = await apiClient.put('/api/ud17/updaterole', {
-        userId: userID.trim(),
+        userId: trimmedUserID,
         functionAuths,
       });
 
@@ -318,7 +321,8 @@ const UD17_HDocUserAdministration: React.FC = () => {
    * 删除用户所有权限
    */
   const handleDeleteRole = async () => {
-    if (!userID.trim() || !isQueried) {
+    const trimmedUserID = userID.trim();
+    if (!trimmedUserID || !isQueried || trimmedUserID !== queriedUserID) {
       setMessageType('error');
       setMessage('请先查询用户信息');
       return;
@@ -335,7 +339,7 @@ const UD17_HDocUserAdministration: React.FC = () => {
 
     try {
       const response = await apiClient.post('/api/ud17/deleteuser', {
-        userId: userID.trim(),
+        userId: trimmedUserID,
       });
 
       // 结果处理

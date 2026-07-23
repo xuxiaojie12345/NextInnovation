@@ -81,6 +81,12 @@ const UD16_ADChange: React.FC = () => {
     // 3. 拆分Serie-Chnr
     const { serie, chnr } = splitSerieChnr(trimmedSerieChnr);
 
+    // 3.1 格式校验（必须包含连字符，且连字符前后均有内容）
+    if (!serie || !chnr) {
+      showMessage('Serie-Chnr格式不正确，请使用连字符分隔（例：ABC-123）');
+      return;
+    }
+
     // 4. API调用
     setIsLoading(true);
     showMessage('');
@@ -152,6 +158,12 @@ const UD16_ADChange: React.FC = () => {
     // 3. 拆分Serie-Chnr
     const { serie, chnr } = splitSerieChnr(trimmedSerieChnr);
 
+    // 3.1 格式校验（必须包含连字符，且连字符前后均有内容）
+    if (!serie || !chnr) {
+      showMessage('Serie-Chnr格式不正确，请使用连字符分隔（例：ABC-123）');
+      return;
+    }
+
     // 4. API调用
     setIsLoading(true);
     showMessage('');
@@ -212,6 +224,12 @@ const UD16_ADChange: React.FC = () => {
 
     // 3. 拆分Serie-Chnr
     const { serie, chnr } = splitSerieChnr(trimmedSerieChnr);
+
+    // 3.1 格式校验（必须包含连字符，且连字符前后均有内容）
+    if (!serie || !chnr) {
+      showMessage('Serie-Chnr格式不正确，请使用连字符分隔（例：ABC-123）');
+      return;
+    }
 
     // 4. API调用
     setIsLoading(true);

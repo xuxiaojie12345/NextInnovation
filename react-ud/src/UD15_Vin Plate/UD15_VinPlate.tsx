@@ -271,12 +271,16 @@ const UD15_VinPlate: React.FC = () => {
 
   /**
    * 处理 Chassis number 输入变化
+   * 只允许半角英字（A-Z a-z）和半角数字（0-9），其他字符自动过滤
    * 用户体验优化：用户重新输入时清空错误提示
    *
    * @param {React.ChangeEvent<HTMLInputElement>} e - 输入事件对象
    */
   const handleChassisNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChassisNumber(e.target.value);
+    const rawValue = e.target.value;
+    // 只允许半角英字和半角数字
+    const filteredValue = rawValue.replace(/[^A-Za-z0-9]/g, '');
+    setChassisNumber(filteredValue);
     if (message) {
       setMessage('');
     }

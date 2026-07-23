@@ -27,10 +27,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
   const [compareBU, setCompareBU] = useState<string>('=');
   const [compareUser, setCompareUser] = useState<string>('=');
   const [compareDate, setCompareDate] = useState<string>('=');
-  const [market, setMarket] = useState<string>('');                   // Market
-  const [compareMarket, setCompareMarket] = useState<string>('=');    // Market运算符
-  const [setting, setSetting] = useState<string>('');                 // Setting
-  const [compareSetting, setCompareSetting] = useState<string>('=');  // Setting运算符
+
 
   // ==================== 接收UD20返回的数据 ====================
   useEffect(() => {
@@ -45,10 +42,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       setCompareBU(back.compareBU || '=');
       setCompareUser(back.compareUser || '=');
       setCompareDate(back.compareDate || '=');
-      setMarket(back.market || '');
-      setCompareMarket(back.compareMarket || '=');
-      setSetting(back.setting || '');
-      setCompareSetting(back.compareSetting || '=');
+
       window.history.replaceState({}, document.title);
     } else if (state?.selectedRecord) {
       // 从UD20 Select按钮返回，回填选中记录
@@ -80,24 +74,17 @@ const UD20_MarketDocumentSettings: React.FC = () => {
       params.registerDatetime = date.trim();
       params.registerDatetimeOp = compareDate;
     }
-    if (market.trim()) {
-      params.market = market.trim();
-      params.marketOp = compareMarket;
-    }
-    if (setting.trim()) {
-      params.setting = setting.trim();
-      params.settingOp = compareSetting;
-    }
+
 
     // 保存当前输入，用于从UD20返回时恢复
     navigate('/UD20', {
       state: {
         searchParams: params,
-        formData: { documentType, user, date, market, setting, compareDocType, compareBU, compareUser, compareDate, compareMarket, compareSetting },
+        formData: { documentType, user, date, compareDocType, compareBU, compareUser, compareDate },
       },
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, documentType, user, date, market, setting, compareDocType, compareUser, compareDate, compareMarket, compareSetting]);
+  }, [navigate, documentType, user, date, compareDocType, compareUser, compareDate]);
 
   /**
    * 处理 Clear 按钮点击
@@ -110,10 +97,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
     setCompareBU('=');
     setCompareUser('=');
     setCompareDate('=');
-    setMarket('');
-    setCompareMarket('=');
-    setSetting('');
-    setCompareSetting('=');
+
     setMessage('');
   }, []);
 
@@ -197,7 +181,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
         {/* Document type */}
         <div className="ud201-field-row">
           <span className="ud201-label">Document type</span>
-          <select className="ud201-compare-select" value={compareDocType} onChange={(e) => setCompareDocType(e.target.value)}>
+          <select className="ud201-compare-select" value={compareDocType} onChange={(e) => setCompareDocType(e.target.value)} disabled={isLoading}>
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
@@ -210,52 +194,27 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             }}
             placeholder=""
             maxLength={20}
+            disabled={isLoading}
           />
-        </div>
-
-        {/* Market */}
-        <div className="ud201-field-row">
-          <span className="ud201-label">Market</span>
-          <select className="ud201-compare-select" value={compareMarket} onChange={(e) => setCompareMarket(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-          </select>
-          <input className="ud201-input" type="text" value={market}
-            onChange={(e) => setMarket(e.target.value)}
-            placeholder=""
-          />
-        </div>
-
-        {/* Setting */}
-        <div className="ud201-field-row">
-          <span className="ud201-label">Setting</span>
-          <select className="ud201-compare-select" value={compareSetting} onChange={(e) => setCompareSetting(e.target.value)}>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-          </select>
-          <select className="ud201-input" value={setting}
-            onChange={(e) => setSetting(e.target.value)}
-          >
-            <option value=""></option>
-          </select>
         </div>
 
         {/* Bussines unit */}
         <div className="ud201-field-row">
           <span className="ud201-label">Bussines unit</span>
-          <select className="ud201-compare-select" value={compareBU} onChange={(e) => setCompareBU(e.target.value)}>
+          <select className="ud201-compare-select" value={compareBU} onChange={(e) => setCompareBU(e.target.value)} disabled={isLoading}>
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
           <input className="ud201-input" type="text" value={businessUnit}
             onChange={(e) => setBusinessUnit(e.target.value)}
+            disabled={isLoading}
           />
         </div>
 
         {/* User */}
         <div className="ud201-field-row">
           <span className="ud201-label">User</span>
-          <select className="ud201-compare-select" value={compareUser} onChange={(e) => setCompareUser(e.target.value)}>
+          <select className="ud201-compare-select" value={compareUser} onChange={(e) => setCompareUser(e.target.value)} disabled={isLoading}>
             <option value="=">=</option>
             <option value="!=">!=</option>
           </select>
@@ -267,13 +226,14 @@ const UD20_MarketDocumentSettings: React.FC = () => {
             }}
             placeholder=""
             maxLength={16}
+            disabled={isLoading}
           />
         </div>
 
         {/* Date */}
         <div className="ud201-field-row">
           <span className="ud201-label">Date</span>
-          <select className="ud201-compare-select" value={compareDate} onChange={(e) => setCompareDate(e.target.value)}>
+          <select className="ud201-compare-select" value={compareDate} onChange={(e) => setCompareDate(e.target.value)} disabled={isLoading}>
             <option value="=">=</option>
             <option value="lt">&lt;</option>
             <option value="gt">&gt;</option>
@@ -281,6 +241,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
           <input className="ud201-input" type="text" value={date}
             onChange={(e) => setDate(e.target.value)}
             placeholder=""
+            disabled={isLoading}
           />
         </div>
       </div>

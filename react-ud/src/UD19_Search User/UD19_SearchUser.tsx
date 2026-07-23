@@ -102,7 +102,7 @@ const UD19_SearchUser: React.FC = () => {
   // ==================== API 调用 ====================
 
   /**
-   * 搜索用户
+   * Search 按钮按下 搜索用户
    */
   const handleSearch = async () => {
     const trimmedUserId = userId.trim();
@@ -154,9 +154,11 @@ const UD19_SearchUser: React.FC = () => {
         if (count > 0) {
           // 找到匹配用户，将结果的Userid和User填充到搜索条件中
           const firstResult = tableData[0];
-          if (firstResult) {
-            setUserId(firstResult.userId);
+          if (trimmedUserId) {
             setUsername(firstResult.username);
+          }
+          if (trimmedUsername) {
+            setUserId(firstResult.userId);
           }
           setMessageType('success');
         }

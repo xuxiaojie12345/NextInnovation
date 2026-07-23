@@ -64,6 +64,11 @@
   background-color: #c0c0e8;
 }
 
+.ud201-btn:focus {
+  background-color: #b0b0e0;
+  border-color: #000080;
+}
+
 .ud201-btn:disabled {
   background-color: #cccccc;
   border-color: #cccccc;
