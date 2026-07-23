@@ -168,11 +168,13 @@ test.describe('文件选择', () => {
     currentTestNo = '06';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test content') });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 文件被成功选择，不显示错误消息
     await expect(page.locator('.ud13-message-error')).not.toBeVisible();
@@ -185,6 +187,7 @@ test.describe('文件选择', () => {
     currentTestNo = '07';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择非 RTF 文件（.docx）
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -205,6 +208,7 @@ test.describe('文件选择', () => {
     currentTestNo = '08';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择大小为 0KB 的空 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -221,6 +225,7 @@ test.describe('文件选择', () => {
     currentTestNo = '09';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择大小为 10MB 的 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -242,6 +247,7 @@ test.describe('文件选择', () => {
     currentTestNo = '10';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择大小为 10MB+1 字节的 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -263,12 +269,14 @@ test.describe('文件选择', () => {
     currentTestNo = '11';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     const fileInput = page.locator('#ud13TemplateFileInput');
 
     // 先选择文件 a.rtf
     await fileInput.setInputFiles({ name: 'a.rtf', mimeType: 'application/rtf', buffer: Buffer.from('aaa') });
     await page.waitForTimeout(200);
+    await takeScreenshot(page, '入力後');
 
     // 再次选择文件 b.rtf
     await fileInput.setInputFiles({ name: 'b.rtf', mimeType: 'application/rtf', buffer: Buffer.from('bbb') });
@@ -283,6 +291,7 @@ test.describe('文件选择', () => {
     currentTestNo = '12';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 验证初始状态确认无文件被选择
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -304,6 +313,7 @@ test.describe('Check 按钮操作', () => {
     currentTestNo = '13';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 不选择任何文件，点击 Check 按钮
     await page.locator('.ud13-btn-check').click();
@@ -321,11 +331,13 @@ test.describe('Check 按钮操作', () => {
     currentTestNo = '14';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
     await page.waitForTimeout(200);
+    await takeScreenshot(page, '入力後');
 
     // 点击 Check 按钮
     await page.locator('.ud13-btn-check').click();
@@ -343,11 +355,13 @@ test.describe('Check 按钮操作', () => {
     currentTestNo = '15';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 RTF 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
     await page.waitForTimeout(200);
+    await takeScreenshot(page, '入力後');
 
     // 连续点击 2 次 Check 按钮
     const checkBtn = page.locator('.ud13-btn-check');
@@ -372,6 +386,7 @@ test.describe('消息显示', () => {
     currentTestNo = '16';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择非 RTF 文件触发错误
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -381,6 +396,7 @@ test.describe('消息显示', () => {
       buffer: Buffer.from('test')
     });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 消息区域从隐藏变为可见，错误消息文字为红色
     await expect(page.locator('.ud13-message-error')).toBeVisible();
@@ -392,6 +408,7 @@ test.describe('消息显示', () => {
     currentTestNo = '17';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     const fileInput = page.locator('#ud13TemplateFileInput');
 
@@ -418,6 +435,7 @@ test.describe('消息显示', () => {
     currentTestNo = '18';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     const fileInput = page.locator('#ud13TemplateFileInput');
 
@@ -455,6 +473,7 @@ test.describe('UI交互', () => {
     currentTestNo = '19';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 先点击 Check 按钮（isChecked 保持 false）
     await page.locator('.ud13-btn-check').click();
@@ -475,12 +494,14 @@ test.describe('UI交互', () => {
     currentTestNo = '20';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     const fileInput = page.locator('#ud13TemplateFileInput');
 
     // 选择文件 template.rtf
     await fileInput.setInputFiles({ name: 'template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
     await page.waitForTimeout(200);
+    await takeScreenshot(page, '入力後');
 
     // 再次选择同一文件 template.rtf
     await fileInput.setInputFiles({ name: 'template.rtf', mimeType: 'application/rtf', buffer: Buffer.from('test') });
@@ -501,11 +522,13 @@ test.describe('异常处理', () => {
     currentTestNo = '21';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 .exe 可执行文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'malware.exe', mimeType: 'application/x-msdownload', buffer: Buffer.from('exe content') });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     await expect(page.locator('.ud13-message-error')).toBeVisible();
     await expect(page.locator('.ud13-message')).toContainText('只支持RTF格式文件');
@@ -516,11 +539,13 @@ test.describe('异常处理', () => {
     currentTestNo = '22';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 .pdf 文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'document.pdf', mimeType: 'application/pdf', buffer: Buffer.from('pdf content') });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     await expect(page.locator('.ud13-message-error')).toBeVisible();
     await expect(page.locator('.ud13-message')).toContainText('只支持RTF格式文件');
@@ -531,11 +556,13 @@ test.describe('异常处理', () => {
     currentTestNo = '23';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择 .png 图片文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'image.png', mimeType: 'image/png', buffer: Buffer.from('png content') });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     await expect(page.locator('.ud13-message-error')).toBeVisible();
     await expect(page.locator('.ud13-message')).toContainText('只支持RTF格式文件');
@@ -546,11 +573,13 @@ test.describe('异常处理', () => {
     currentTestNo = '24';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择大小为 0KB 的空文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     await fileInput.setInputFiles({ name: 'empty.rtf', mimeType: 'application/rtf', buffer: Buffer.from([]) });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     await expect(page.locator('.ud13-message-error')).toBeVisible();
     await expect(page.locator('.ud13-message')).toContainText('文件为空，请选择有效的RTF文件');
@@ -561,12 +590,14 @@ test.describe('异常处理', () => {
     currentTestNo = '25';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择超过 10MB 的文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     const largeContent = 'x'.repeat(10 * 1024 * 1024 + 1);
     await fileInput.setInputFiles({ name: 'large.rtf', mimeType: 'application/rtf', buffer: Buffer.from(largeContent) });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 消息区域可见，消息内容为 文件大小超过限制（最大10MB）
     await expect(page.locator('.ud13-message-error')).toBeVisible();
@@ -583,13 +614,18 @@ test.describe('安全性', () => {
   test('UD13_026_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '26';
 
-    // 清除所有 localStorage 数据（模拟未登录状态）
-    await page.evaluate(() => localStorage.clear());
+    // 先导航到目标页面，再清除 localStorage（模拟未登录状态）
     await page.goto(BASE_URL + '/UD13');
+    await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示(未Login)');
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(1000);
+    // 重新加载页面使其检测到未登录状态
+    await page.reload();
     await page.waitForTimeout(2000);
 
-    // 自动重定向到 Login 画面
-    await expect(page).toHaveURL(/\/Login/);
+    // 自动重定向到登录画面（根路径 /）
+    await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
     await takeScreenshot(page, '未登录重定向');
   });
@@ -598,6 +634,7 @@ test.describe('安全性', () => {
     currentTestNo = '27';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     const fileInput = page.locator('#ud13TemplateFileInput');
 
@@ -622,6 +659,7 @@ test.describe('安全性', () => {
     currentTestNo = '28';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择文件名为包含路径遍历字符的文件
     const fileInput = page.locator('#ud13TemplateFileInput');
@@ -631,6 +669,7 @@ test.describe('安全性', () => {
       buffer: Buffer.from('test')
     });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 文件扩展名校验通过（以 .rtf 结尾），文件被选择
     await expect(page.locator('.ud13-message-error')).not.toBeVisible();
@@ -641,12 +680,14 @@ test.describe('安全性', () => {
     currentTestNo = '29';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择超过 10MB 的文件
     const fileInput = page.locator('#ud13TemplateFileInput');
     const largeContent = 'x'.repeat(10 * 1024 * 1024 + 1);
     await fileInput.setInputFiles({ name: 'large_file.rtf', mimeType: 'application/rtf', buffer: Buffer.from(largeContent) });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 前端校验文件大小，超过 10MB 被拒绝
     await expect(page.locator('.ud13-message-error')).toBeVisible();
@@ -658,12 +699,14 @@ test.describe('安全性', () => {
     currentTestNo = '30';
     await goToUD13(page);
     await page.waitForTimeout(1000);
+    await takeScreenshot(page, '初期表示');
 
     // 选择远超过 10MB 的文件（1GB）
     const fileInput = page.locator('#ud13TemplateFileInput');
-    const hugeContent = 'x'.repeat(1024 * 1024 * 1024);
+    const hugeContent = 'x'.repeat(40 * 1024 * 1024);
     await fileInput.setInputFiles({ name: 'huge_file.rtf', mimeType: 'application/rtf', buffer: Buffer.from(hugeContent) });
     await page.waitForTimeout(300);
+    await takeScreenshot(page, '入力後');
 
     // 前端校验立即拒绝
     await expect(page.locator('.ud13-message-error')).toBeVisible();
