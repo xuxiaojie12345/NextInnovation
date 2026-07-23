@@ -8,6 +8,10 @@ import HDocHelp from "./GenerateHomologationDocument​/HDocHelp";
 import ModifyDocument from "./ModifyDocument/ModifyDocument";
 import SaveModifications from "./SaveModifications/SaveModifications";
 import VehicleSpecification from "./VehicleSpecification/VehicleSpecification";
+import HomologationVariables from "./HomologationVariables/HomologationVariables";
+import HomologationVariablesResultList from "./HomologationVariablesResultList/HomologationVariablesResultList";
+import ExistingHDocVariables from "./ExistingHDocVariables/ExistingHDocVariables";
+import ExistingHDocVariablesResultList from "./ExistingHDocVariablesResultList/ExistingHDocVariablesResultList";
 
 function App() {
   return (
@@ -23,6 +27,10 @@ function App() {
             <Route path='/modify-document' element={<ModifyDocument />} />
             <Route path='/save-modifications' element={<SaveModifications />} />
             <Route path='/vehicle-specification' element={<VehicleSpecification />} />
+            <Route path='/homologation-variables' element={<HomologationVariables />} />
+            <Route path='/homologation-variables-result' element={<HomologationVariablesResultList />} />
+            <Route path='/existing-hdoc-variables' element={<ExistingHDocVariables />} />
+            <Route path='/existing-hdoc-variables-result' element={<ExistingHDocVariablesResultList />} />
             <Route path='/TestMain' element={<TestMain />} />
           </Routes>
         </div>

@@ -1,0 +1,227 @@
+/* ===== Homologation Variables Result List 页面 ===== */
+.hrl-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.hrl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.hrl-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.hrl-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.hrl-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hrl-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hrl-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hrl-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.hrl-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.hrl-content {
+  width: 100%;
+  max-width: 1200px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 24px 28px;
+}
+
+/* ===== 标题 ===== */
+.hrl-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 12px 0;
+}
+
+/* ===== 消息 ===== */
+.hrl-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.hrl-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== Count ===== */
+.hrl-count {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* ===== 表格包裹 ===== */
+.hrl-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #c0c0c0;
+}
+
+/* ===== 表格 ===== */
+.hrl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.hrl-table th {
+  text-align: left;
+  padding: 7px 6px;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+  white-space: nowrap;
+}
+
+.hrl-table th:last-child {
+  border-right: none;
+}
+
+.hrl-table td {
+  padding: 5px 6px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.hrl-table td:last-child {
+  border-right: none;
+}
+
+/* 列宽 */
+.hrl-th-sel { width: 32px; text-align: center; }
+.hrl-th-pc { width: 7%; }
+.hrl-th-num { width: 7%; }
+.hrl-th-mkt { width: 6%; }
+.hrl-th-var { width: 9%; }
+.hrl-th-val { width: 9%; }
+.hrl-th-vs { width: 9%; }
+.hrl-th-com { width: 9%; }
+.hrl-th-add { width: 7%; }
+.hrl-th-del { width: 7%; }
+.hrl-th-user { width: 8%; }
+.hrl-th-dt { width: 12%; }
+
+.hrl-td-sel {
+  text-align: center;
+}
+
+.hrl-radio {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 行样式 */
+.hrl-row {
+  cursor: pointer;
+}
+
+.hrl-row:hover {
+  background-color: #f5f8fc;
+}
+
+.hrl-row-selected {
+  background-color: #e0ecf7 !important;
+}
+
+.hrl-td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* User 链接 */
+.hrl-user-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hrl-user-link:hover {
+  color: #004499;
+}
+
+/* 无数据 */
+.hrl-no-data {
+  text-align: center;
+  padding: 24px 6px !important;
+  color: #888;
+}
+
+/* ===== 按钮行 ===== */
+.hrl-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.hrl-btn {
+  padding: 6px 22px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.hrl-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.hrl-btn-delete {
+  color: #c62828;
+}

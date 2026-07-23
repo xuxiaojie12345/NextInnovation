@@ -1,0 +1,197 @@
+/* ===== Existing HDoc Variables 页面 ===== */
+.ehv-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.ehv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.ehv-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.ehv-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.ehv-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ehv-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ehv-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ehv-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.ehv-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.ehv-content {
+  width: 100%;
+  max-width: 680px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.ehv-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 消息 ===== */
+.ehv-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.ehv-success {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 表单 ===== */
+.ehv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ehv-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.ehv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ehv-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.ehv-input {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ehv-input:focus {
+  border-color: #003057;
+}
+
+.ehv-input:disabled {
+  background-color: #f0f0f0;
+}
+
+.ehv-select {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  appearance: auto;
+}
+
+.ehv-select:focus {
+  border-color: #003057;
+}
+
+.ehv-select:disabled {
+  background-color: #f0f0f0;
+}
+
+/* 字段宽度 */
+.ehv-field-var { flex: 1.5; }
+.ehv-field-type { flex: 1; }
+.ehv-field-desc { flex: 1; }
+.ehv-field-user { flex: 1; }
+.ehv-field-date { flex: 1; }
+
+/* ===== 按钮行 ===== */
+.ehv-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d0d0d0;
+  flex-wrap: wrap;
+}
+
+.ehv-btn {
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.ehv-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.ehv-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
