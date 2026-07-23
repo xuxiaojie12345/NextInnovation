@@ -32,11 +32,11 @@ public class UD16ServiceImpl implements UD16Service {
     public Map<String, Object> processAdChange(UD16Request request) {
         String serieChnr = request.getSerieChnr() != null ? request.getSerieChnr().trim() : "";
         
-        // 校验Serie-Chnr格式：必须包含空格分隔的SERIE和CHNR
-        // 注: .trim() 已去除首尾空格，只需检查 split 后是否有 2 个部分
-        String[] parts = serieChnr.split(" ", 2);
+        // 校验Serie-Chnr格式：支持连字符"-"或空格分隔的SERIE和CHNR
+        // 例如 "JPCT-G28321" 或 "JPCT G28321" 均可
+        String[] parts = serieChnr.split("[- ]", 2);
         if (parts.length < 2) {
-            throw new IllegalArgumentException("Serie-Chnr格式无效，请输入'Serie Chnr'格式（如'SERIE CHNR'）");
+            throw new IllegalArgumentException("Serie-Chnr格式无效，请输入'Serie-Chnr'或'Serie Chnr'格式");
         }
         String serie = parts[0];
         String chnr = parts[1];

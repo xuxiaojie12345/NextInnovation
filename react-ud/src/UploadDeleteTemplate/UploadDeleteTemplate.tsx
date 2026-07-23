@@ -74,6 +74,14 @@ const UploadDeleteTemplate: React.FC = () => {
         // response
 
         const response = await api.get(`/api/ud12/selectmarket`);
+        // 检查业务状态码
+        if (response.data.code !== 200) {
+          setError("System error. Please contact administrator.");
+          setUploadMarketList([]);
+          setDeleteMarketList([]);
+          setTemplatesList([]);
+          return;
+        }
         // data
 
         const data: Market[] = response.data.data || [];
@@ -263,10 +271,10 @@ const UploadDeleteTemplate: React.FC = () => {
         setSuccessMessage(
           `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${selectedDeleteMarket}`
         );
-        // 刷新模板列表
-        const marketRes = await api.get(`/api/ud12/selectmarket/${selectedDeleteMarket}`);
-        setTemplatesList(marketRes.data.data || []);
+        // 清空市场和模板选择
+        setSelectedDeleteMarket("");
         setSelectedTemplate("");
+        setTemplatesList([]);
       } else if (response.data.code === 404) {
         setError(response.data.message || "File not found");
       } else {
@@ -310,6 +318,7 @@ const UploadDeleteTemplate: React.FC = () => {
             type="file"
             id="templateFileInput"
             ref={fileInputRef}
+            disabled={loading}
           />
         </div>
 
@@ -320,6 +329,7 @@ const UploadDeleteTemplate: React.FC = () => {
             className="ud12-select"
             value={selectedUploadMarket}
             onChange={handleUploadMarketChange}
+            disabled={uploadMarketList.length === 0 || loading}
           >
             <option value="">-- Select Market --</option>
             {uploadMarketList.map((market) => (
@@ -353,6 +363,7 @@ const UploadDeleteTemplate: React.FC = () => {
             className="ud12-select"
             value={selectedDeleteMarket}
             onChange={handleDeleteMarketChange}
+            disabled={loading}
           >
             <option value="">-- Select Market --</option>
             {deleteMarketList.map((market) => (
@@ -370,7 +381,7 @@ const UploadDeleteTemplate: React.FC = () => {
             className="ud12-select"
             value={selectedTemplate}
             onChange={handleTemplateChange}
-            disabled={false}
+            disabled={loading}
           >
             <option value="">-- Select Template --</option>
             {templatesList.length > 0 ? (
@@ -385,7 +396,7 @@ const UploadDeleteTemplate: React.FC = () => {
 
         <div className="ud12-btn-group">
           <button type="button" className="ud12-btn ud12-btn-danger"
-            onClick={handleDeleteClick}>
+            onClick={handleDeleteClick} disabled={loading}>
             Delete
           </button>
         </div>

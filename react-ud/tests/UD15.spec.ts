@@ -53,7 +53,7 @@ async function gotoUD15(page: Page) {
   await loginViaLocalStorage(page);
   await page.goto(UD15_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(1000);
-  await page.waitForSelector('.ud15-title', { timeout: 10000 });
+  await page.waitForSelector('.ud15-title', { timeout: 30000 });
 }
 
 /** Mock UD15 API */
@@ -97,7 +97,7 @@ async function mockApiNotFound(page: Page, operation: string, chassisNumber: str
 
 /** Mock UD15 API timeout */
 async function mockApiTimeout(page: Page) {
-  await page.route('**/api/ud15/UD15SelecthdocsenddatavinplateApi', () => new Promise(() => {}));
+  await page.route('**/api/ud15/UD15SelecthdocsenddatavinplateApi', (route) => route.abort('timedout'));
 }
 
 const MOCK_VIN_INFO = {
@@ -572,7 +572,7 @@ test.describe.serial('异常处理（No.29-31）', () => {
     await input.click();
     await input.pressSequentially('JPCT013945', { delay: 20 });
     await page.locator('.ud15-btn').filter({ hasText: 'View Info' }).click();
-    await page.waitForTimeout(15000);
+    await page.waitForTimeout(1000);
     await expect(page.locator('.ud15-message.error')).toContainText('System error');
     await takeScreenshot(page, '29_API超时');
     await page.unroute('**/api/ud15/UD15SelecthdocsenddatavinplateApi');
@@ -599,7 +599,8 @@ test.describe.serial('异常处理（No.29-31）', () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto(UD15_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(2000);
-    expect(page.url()).toContain('/Login');
+    // 未登录时应跳转到登录页（根路径 / 渲染 Login 组件）
+    expect(page.url()).toBe(BASE_URL + '/');
     await takeScreenshot(page, '31_未登录');
   });
 });

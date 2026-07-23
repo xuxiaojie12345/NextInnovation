@@ -94,6 +94,8 @@ const ExistingHDocVariablesResultList: React.FC = () => {
           setDataList(res.data.data);
         } else {
           setDataList([]);
+          setMessage(res.data.message || 'System error. Please contact administrator.');
+          setMessageType('error');
         }
       } catch {
         setMessage('System error. Please contact administrator.');

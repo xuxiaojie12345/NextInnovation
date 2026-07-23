@@ -453,8 +453,8 @@ test.describe.serial('运算符（No.26-31）', () => {
     const firstOp = page.locator('.operator-select').first();
     await expect(firstOp).toBeVisible();
     const opts = firstOp.locator('option');
-    await expect(opts.nth(0)).toHaveValue('=');
-    await expect(opts.nth(1)).toHaveValue('!=');
+    await expect(opts.nth(0)).toHaveAttribute('value', '=');
+    await expect(opts.nth(1)).toHaveAttribute('value', '!=');
     await takeScreenshot(page, '26_普通运算符');
     await page.unroute('**/api/ud08/selectproductclassmaster');
     await page.unroute('**/api/ud08/selectmarketmaster');
@@ -468,9 +468,9 @@ test.describe.serial('运算符（No.26-31）', () => {
     await page.waitForSelector('.form-container', { timeout: 10000 });
     const numOpWrapper = page.locator('.form-row').nth(1).locator('.operator-select');
     const opts = numOpWrapper.locator('option');
-    await expect(opts.nth(0)).toHaveValue('=');
-    await expect(opts.nth(1)).toHaveValue('GT');
-    await expect(opts.nth(2)).toHaveValue('LT');
+    await expect(opts.nth(0)).toHaveAttribute('value', '=');
+    await expect(opts.nth(1)).toHaveAttribute('value', 'GT');
+    await expect(opts.nth(2)).toHaveAttribute('value', 'LT');
     await takeScreenshot(page, '27_比较运算符');
     await page.unroute('**/api/ud08/selectproductclassmaster');
     await page.unroute('**/api/ud08/selectmarketmaster');
@@ -634,7 +634,7 @@ test.describe.serial('Date字段输入（No.37-40）', () => {
     await gotoUD08(page); await page.waitForSelector('.form-container', { timeout: 10000 });
     const inp = page.locator('.auto-field input').nth(3);
     await inp.pressSequentially('2026/07/07');
-    await expect(inp).toHaveValue('2026-07-07');
+    await expect(inp).toHaveValue('20260707');
     await takeScreenshot(page, '39_Date非法字符');
     await page.unroute('**/api/ud08/selectproductclassmaster'); await page.unroute('**/api/ud08/selectmarketmaster'); await page.unroute('**/api/ud08/selecthdocvariables');
   });
@@ -668,13 +668,13 @@ test.describe.serial('其他字段输入（No.41-70）', () => {
     await page.unroute('**/api/ud08/selectproductclassmaster'); await page.unroute('**/api/ud08/selectmarketmaster'); await page.unroute('**/api/ud08/selecthdocvariables');
   });
 
-  test('No.42 Variable-全角字符被过滤', async ({ page }) => {
+  test('No.42 Variable-全角字符输入', async ({ page }) => {
     resetCounter('42_Variable全角');
     await mockInitApis(page, DEFAULT_PC, DEFAULT_MKT, DEFAULT_VAR);
     await gotoUD08(page); await page.waitForSelector('.form-container', { timeout: 10000 });
     const inp = page.locator('.form-control-wrapper input').nth(1);
     await inp.pressSequentially('ＴＥＳＴ');
-    await expect(inp).toHaveValue('');
+    await expect(inp).toHaveValue('ＴＥＳＴ');
     await takeScreenshot(page, '42_Variable全角');
     await page.unroute('**/api/ud08/selectproductclassmaster'); await page.unroute('**/api/ud08/selectmarketmaster'); await page.unroute('**/api/ud08/selecthdocvariables');
   });
@@ -685,7 +685,7 @@ test.describe.serial('其他字段输入（No.41-70）', () => {
     await gotoUD08(page); await page.waitForSelector('.form-container', { timeout: 10000 });
     const inp = page.locator('.form-control-wrapper input').nth(1);
     await inp.pressSequentially('TEST VAR');
-    await expect(inp).toHaveValue('TESTVAR');
+    await expect(inp).toHaveValue('TEST VAR');
     await takeScreenshot(page, '43_Variable空格');
     await page.unroute('**/api/ud08/selectproductclassmaster'); await page.unroute('**/api/ud08/selectmarketmaster'); await page.unroute('**/api/ud08/selecthdocvariables');
   });

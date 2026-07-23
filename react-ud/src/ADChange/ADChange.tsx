@@ -317,7 +317,7 @@ const ADChange: React.FC = () => {
             type="text"
             className="ud16-input"
             value={serieChnr}
-            onChange={(e) => { setSerieChnr(e.target.value); if (message) clearMessage(); }}
+            onChange={(e) => { setSerieChnr(e.target.value.replace(/[^a-zA-Z0-9-]/g, '')); if (message) clearMessage(); }}
             disabled={loading}            maxLength={15}
             placeholder="Enter Serie-Chnr"
           />

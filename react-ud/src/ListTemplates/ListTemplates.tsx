@@ -112,7 +112,11 @@ const ListTemplates: React.FC = () => {
         // data
 
         const data: FileListResponse = response.data.data;
-        setFileList(data.files || []);
+        // 按文件名升序排序（对应详细设计 2.1 默认排序规则）
+        const sorted = (data.files || []).sort((a, b) =>
+          a.filename.localeCompare(b.filename)
+        );
+        setFileList(sorted);
       } else {
         setError("System error. Please contact administrator.");
         setFileList([]);

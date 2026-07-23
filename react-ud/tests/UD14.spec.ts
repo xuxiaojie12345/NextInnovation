@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+﻿import { test, expect, Page } from '@playwright/test';
 
 // ============================================================
 // ListTemplates 模块 (UD14) Playwright 自动化测试
@@ -82,16 +82,7 @@ async function mockMarketApiNetError(page: Page) {
 
 /** Mock File List API */
 async function mockFileListApi(page: Page, files: any[], market: string = 'JPN', delay: number = 0) {
-  await page.route(`**/api/ud14/UD14SelectHdocuserdefinedrules?market=${market}`, async (route) => {
-    if (delay > 0) await new Promise(r => setTimeout(r, delay));
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ code: 200, data: { files, totalCount: files.length } })
-    });
-  });
-  // Also catch requests without query params (just in case)
-  await page.route(`**/api/ud14/UD14SelectHdocuserdefinedrules`, async (route) => {
+  await page.route(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/, async (route) => {
     const url = new URL(route.request().url());
     const mkt = url.searchParams.get('market');
     if (mkt === market) {
@@ -109,7 +100,7 @@ async function mockFileListApi(page: Page, files: any[], market: string = 'JPN',
 
 /** Mock File List API failure */
 async function mockFileListApiFail(page: Page, market: string = 'JPN') {
-  await page.route(`**/api/ud14/UD14SelectHdocuserdefinedrules`, async (route) => {
+  await page.route(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/, async (route) => {
     const url = new URL(route.request().url());
     if (url.searchParams.get('market') === market) {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ code: 500, message: 'Error', data: null }) });
@@ -121,7 +112,7 @@ async function mockFileListApiFail(page: Page, market: string = 'JPN') {
 
 /** Mock Download API */
 async function mockDownloadApi(page: Page, filename: string, status: number = 200) {
-  await page.route(`**/api/ud14/download**`, async (route) => {
+  await page.route(/\/api\/ud14\/download/, async (route) => {
     const url = new URL(route.request().url());
     if (url.searchParams.get('filename') === filename) {
       if (status === 200) {
@@ -230,7 +221,7 @@ test.describe.serial('Market选择与文件加载（No.5-9）', () => {
     await expect(headers.nth(4)).toContainText('Size');
     await takeScreenshot(page, '05_加载文件列表');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.6 Market选择-切换Market重新加载', async ({ page }) => {
@@ -253,7 +244,7 @@ test.describe.serial('Market选择与文件加载（No.5-9）', () => {
     await expect(rows.first().locator('td').nth(1)).toContainText('china_doc.docx');
     await takeScreenshot(page, '06_Market切换');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.7 Market选择-切换为空选项清空', async ({ page }) => {
@@ -272,7 +263,7 @@ test.describe.serial('Market选择与文件加载（No.5-9）', () => {
     await expect(page.locator('.ud14-table')).toHaveCount(0);
     await takeScreenshot(page, '07_Market切空');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.8 Market选择-加载空列表', async ({ page }) => {
@@ -289,7 +280,7 @@ test.describe.serial('Market选择与文件加载（No.5-9）', () => {
     await expect(page.locator('.ud14-empty')).toContainText('No templates available');
     await takeScreenshot(page, '08_空文件列表');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.9 Market选择-加载文件列表API失败', async ({ page }) => {
@@ -303,7 +294,7 @@ test.describe.serial('Market选择与文件加载（No.5-9）', () => {
     await expect(page.locator('.ud14-error')).toContainText('System error');
     await takeScreenshot(page, '09_文件列表加载失败');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 });
 
@@ -329,7 +320,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(headers.nth(4)).toContainText('Size');
     await takeScreenshot(page, '10_表格列头');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.11 Filename列显示', async ({ page }) => {
@@ -345,7 +336,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(firstFileLink).toBeVisible();
     await takeScreenshot(page, '11_Filename列');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.12 Used列显示-已引用', async ({ page }) => {
@@ -360,7 +351,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(firstRowCells.nth(2)).toContainText('TEMPLATE-VIN-PLATE');
     await takeScreenshot(page, '12_Used已引用');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.13 Used列显示-未引用', async ({ page }) => {
@@ -375,7 +366,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(secondRowCells.nth(2)).toContainText('');
     await takeScreenshot(page, '13_Used未引用');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.14 Last Mod,列显示', async ({ page }) => {
@@ -390,7 +381,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(firstRowCells.nth(3)).toContainText('2022-01-10 18:29');
     await takeScreenshot(page, '14_LastMod列');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.15 Size列显示', async ({ page }) => {
@@ -405,7 +396,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(firstRowCells.nth(4)).toContainText('317 Kb');
     await takeScreenshot(page, '15_Size列');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 
   test('No.16 文件列表默认排序', async ({ page }) => {
@@ -428,7 +419,7 @@ test.describe.serial('表格显示（No.10-16）', () => {
     await expect(rows.nth(2).locator('td').nth(1)).toContainText('vcc_template.docx');
     await takeScreenshot(page, '16_默认排序');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 });
 
@@ -454,8 +445,8 @@ test.describe.serial('文件下载（No.17-18）', () => {
     expect(downloadTriggered).toBe(true);
     await takeScreenshot(page, '17_文件下载');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
-    await page.unroute('**/api/ud14/download**');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
+    await page.unroute(/\/api\/ud14\/download/);
   });
 
   test('No.18 文件下载-文件不存在', async ({ page }) => {
@@ -475,8 +466,8 @@ test.describe.serial('文件下载（No.17-18）', () => {
     await expect(page.locator('.ud14-error')).toContainText('File not found');
     await takeScreenshot(page, '18_文件不存在');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
-    await page.unroute('**/api/ud14/download**');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
+    await page.unroute(/\/api\/ud14\/download/);
   });
 });
 
@@ -507,6 +498,6 @@ test.describe.serial('Loading状态（No.19-20）', () => {
     await expect(page.locator('.ud14-loading')).toContainText('Loading...');
     await takeScreenshot(page, '20_Loading文件列表');
     await page.unroute('**/api/ud14/UD14SelectMarketmaster');
-    await page.unroute('**/api/ud14/UD14SelectHdocuserdefinedrules');
+    await page.unroute(/\/api\/ud14\/UD14SelectHdocuserdefinedrules/);
   });
 });

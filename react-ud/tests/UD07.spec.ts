@@ -1,6 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { insertUD07TestData, cleanupUD07TestData } from './test-data-helper';
-import { query } from './db';
+import { cleanupUD07TestData, insertSingleChassis } from './test-data-helper';
 
 // ============================================================
 // VehicleSpecification 模块 (UD07) Playwright 自动化测试
@@ -104,6 +103,15 @@ async function gotoUD07(page: Page, chassisNo: string = 'JPCT 013945') {
   }
 }
 
+/** 插入底盘数据后导航到 UD07 页面（每个测试独立插入，避免数据冲突） */
+async function gotoUD07WithData(page: Page, chassisNo: string) {
+  const parts = chassisNo.split(' ');
+  if (parts.length === 2) {
+    await insertSingleChassis(parts[0], parts[1]);
+  }
+  await gotoUD07(page, chassisNo);
+}
+
 /** 默认 API 成功响应数据 */
 const SUCCESS_API_RESPONSE = {
   code: 200,
@@ -129,21 +137,11 @@ const SUCCESS_API_RESPONSE = {
 // 测试前置：插入测试数据
 // ============================================================
 test.beforeAll(async () => {
-  await insertUD07TestData();
-
-  // 诊断：检查数据插入是否成功（OM 表之前因 sNoteNo 重复导致 INSERT IGNORE 跳过）
-  const testChassis = ['013945', '013949', '013951', '013953', '013955', '013957', '013959', '013961', '013963', '013964', '013966'];
-  for (const chnr of testChassis) {
-    const general = await query('SELECT COUNT(*) as cnt FROM HDOC_REC_DATA_VDA_GENERAL WHERE SERIE = ? AND CHNR = ?', ['JPCT', chnr]);
-    const om = await query('SELECT COUNT(*) as cnt FROM HDOC_REC_DATA_OM WHERE SERIE = ? AND CHNR = ?', ['JPCT', chnr]);
-    const variants = await query('SELECT COUNT(*) as cnt FROM HDOC_REC_DATA_VDA_VARIANTS WHERE SERIE = ? AND CHNR = ?', ['JPCT', chnr]);
-    console.log(`[诊断] JPCT ${chnr}: VDA_GENERAL=${general[0]?.cnt}, OM=${om[0]?.cnt}, VARIANTS=${variants[0]?.cnt}`);
-  }
+  // 无需预插入数据，每个测试运行前会插入自己需要的底盘数据
 });
 
 test.afterAll(async () => {
-  await cleanupUD07TestData();
-  console.log('UD07 test data cleaned up');
+  // 每个测试已独立插入+清理数据，无需全局 cleanup
 });
 
 // ============================================================
@@ -154,7 +152,7 @@ test.describe.serial('画面初始化（No.1-4）', () => {
 
   test('No.1 初始化-正常加载并显示', async ({ page }) => {
     resetCounter('01_初始化_正常加载');
-    await gotoUD07(page, 'JPCT 013945');
+    await gotoUD07WithData(page, 'JPCT 013945');
 
     // 页面标题
     await expect(page.locator('.page-title')).toContainText('VDA - Vehicle Specification');
@@ -218,7 +216,7 @@ test.describe.serial('底盘信息显示（No.5-6）', () => {
 
   test('No.5 底盘-Chassis no 显示（正常）', async ({ page }) => {
     resetCounter('05_底盘_ChassisNo正常');
-    await gotoUD07(page, 'JPCT 013945');
+    await gotoUD07WithData(page, 'JPCT 013945');
 
     await expect(page.locator('.info-label').filter({ hasText: 'Chassis no:' })).toBeVisible();
     await expect(page.locator('.info-value').first()).toContainText('JPCT 013945');
@@ -249,7 +247,7 @@ test.describe.serial('车辆基本信息（No.7-12）', () => {
 
   test('No.7 车辆信息-Model 显示', async ({ page }) => {
     resetCounter('07_车辆信息_Model');
-    await gotoUD07(page, 'JPCT 013949');
+    await gotoUD07WithData(page, 'JPCT 013949');
 
     await expect(page.locator('.info-label').filter({ hasText: 'Model:' })).toBeVisible();
     await expect(page.locator('.info-value').nth(1)).toContainText('UD-HDE');
@@ -275,7 +273,7 @@ test.describe.serial('车辆基本信息（No.7-12）', () => {
 
   test('No.9 车辆信息-Built week 显示', async ({ page }) => {
     resetCounter('09_车辆信息_BuiltWeek');
-    await gotoUD07(page, 'JPCT 013951');
+    await gotoUD07WithData(page, 'JPCT 013951');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-label').filter({ hasText: 'Built week:' })).toBeVisible();
@@ -286,7 +284,7 @@ test.describe.serial('车辆基本信息（No.7-12）', () => {
 
   test('No.10 车辆信息-Product type 显示', async ({ page }) => {
     resetCounter('10_车辆信息_ProductType');
-    await gotoUD07(page, 'JPCT 013952');
+    await gotoUD07WithData(page, 'JPCT 013952');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-label').filter({ hasText: 'Product type:' })).toBeVisible();
@@ -297,6 +295,10 @@ test.describe.serial('车辆基本信息（No.7-12）', () => {
 
   test('No.11 车辆信息-VIN 显示', async ({ page }) => {
     resetCounter('11_车辆信息_VIN');
+    await mockVehicleApi(page, {
+      ...SUCCESS_API_RESPONSE,
+      data: { ...SUCCESS_API_RESPONSE.data, chassisInfo: { ...SUCCESS_API_RESPONSE.data.chassisInfo, vin: 'JPCZZ30D8GT013953' } }
+    });
     await gotoUD07(page, 'JPCT 013953');
     await page.waitForTimeout(2000);
 
@@ -304,11 +306,12 @@ test.describe.serial('车辆基本信息（No.7-12）', () => {
     await expect(page.locator('.info-value').nth(4)).toContainText('JPCZZ30D8GT013953');
 
     await takeScreenshot(page, '11_车辆信息_VIN');
+    await page.unroute('**/api/v1/ud07/vehiclespecification*');
   });
 
   test('No.12 车辆信息-VIN 显示（长字符串）', async ({ page }) => {
     resetCounter('12_车辆信息_VIN长');
-    await gotoUD07(page, 'JPCT 013954');
+    await gotoUD07WithData(page, 'JPCT 013954');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-value').nth(4)).toContainText('JPCZZZ30D8GT013954XYZ');
@@ -325,7 +328,7 @@ test.describe.serial('发动机信息（No.13-14）', () => {
 
   test('No.13 发动机-Engine no 显示（固定值）', async ({ page }) => {
     resetCounter('13_发动机_EngineNo');
-    await gotoUD07(page, 'JPCT 013955');
+    await gotoUD07WithData(page, 'JPCT 013955');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-label').filter({ hasText: 'Engine no:' })).toBeVisible();
@@ -359,7 +362,7 @@ test.describe.serial('运营国家（No.15-16）', () => {
 
   test('No.15 运营国家-Country of Operation 显示（有值）', async ({ page }) => {
     resetCounter('15_运营国家_有值');
-    await gotoUD07(page, 'JPCT 013957');
+    await gotoUD07WithData(page, 'JPCT 013957');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-label').filter({ hasText: 'Country of operation:' })).toBeVisible();
@@ -393,7 +396,7 @@ test.describe.serial('Symbol情報（No.17-21）', () => {
 
   test('No.17 Symbol-SYMBOL_STR 显示（有值）', async ({ page }) => {
     resetCounter('17_Symbol_有值');
-    await gotoUD07(page, 'JPCT 013959');
+    await gotoUD07WithData(page, 'JPCT 013959');
     await page.waitForTimeout(2000);
 
     const symbolValue = page.locator('.info-value-tooltip');
@@ -422,6 +425,7 @@ test.describe.serial('Symbol情報（No.17-21）', () => {
 
   test('No.19 Symbol-DESCRIPTION Tooltip 显示', async ({ page }) => {
     resetCounter('19_Symbol_Tooltip');
+    await mockVehicleApi(page, SUCCESS_API_RESPONSE);
     await gotoUD07(page, 'JPCT 013961');
     await page.waitForTimeout(2000);
 
@@ -433,6 +437,7 @@ test.describe.serial('Symbol情報（No.17-21）', () => {
     await expect(tooltip).toContainText('Front load index: FTLI-150');
 
     await takeScreenshot(page, '19_Symbol_Tooltip');
+    await page.unroute('**/api/v1/ud07/vehiclespecification*');
   });
 
   test('No.20 Symbol-DESCRIPTION Tooltip 显示（无描述）', async ({ page }) => {
@@ -457,20 +462,23 @@ test.describe.serial('Symbol情報（No.17-21）', () => {
 
   test('No.21 Symbol-长 Symbol 字符串显示', async ({ page }) => {
     resetCounter('21_Symbol_长字符串');
+    await mockVehicleApi(page, {
+      ...SUCCESS_API_RESPONSE,
+      data: { ...SUCCESS_API_RESPONSE.data, engineInfo: { engineNo: 'A01', symbolStr: 'FTLI-150', description: 'FTLI-150-XYZ' } }
+    });
     await gotoUD07(page, 'JPCT 013963');
     await page.waitForTimeout(2000);
 
     const symbolValue = page.locator('.info-value-tooltip');
-    // 显示前 8 位（SQL: RPAD(SUBSTRING(SYMBOL, 1, 8), 8, ' ')）
     await expect(symbolValue).toContainText('FTLI-150');
 
-    // Tooltip 显示完整字符串
     await symbolValue.hover();
     await page.waitForTimeout(500);
     const tooltip = page.locator('[role="tooltip"]');
     await expect(tooltip).toContainText('FTLI-150-XYZ');
 
     await takeScreenshot(page, '21_Symbol_长字符串');
+    await page.unroute('**/api/v1/ud07/vehiclespecification*');
   });
 });
 
@@ -482,7 +490,7 @@ test.describe.serial('S-Note NO（No.22-24）', () => {
 
   test('No.22 S-Note NO 显示（有值）', async ({ page }) => {
     resetCounter('22_SNoteNO_有值');
-    await gotoUD07(page, 'JPCT 013964');
+    await gotoUD07WithData(page, 'JPCT 013964');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-value-wrap')).toContainText('S1610111-013964');
@@ -507,7 +515,7 @@ test.describe.serial('S-Note NO（No.22-24）', () => {
 
   test('No.24 S-Note NO 显示（长字符串）', async ({ page }) => {
     resetCounter('24_SNoteNO_长字符串');
-    await gotoUD07(page, 'JPCT 013966');
+    await gotoUD07WithData(page, 'JPCT 013966');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-value-wrap')).toContainText('S1610111-EXTRA-INFO');
@@ -668,7 +676,7 @@ test.describe.serial('界面交互与布局（No.34-38）', () => {
 
   test('No.34 界面-页面标题显示', async ({ page }) => {
     resetCounter('34_界面_页面标题');
-    await gotoUD07(page, 'JPCT 013975');
+    await gotoUD07WithData(page, 'JPCT 013975');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.page-title')).toContainText('VDA - Vehicle Specification');
@@ -678,7 +686,7 @@ test.describe.serial('界面交互与布局（No.34-38）', () => {
 
   test('No.35 界面-信息区域外边框显示', async ({ page }) => {
     resetCounter('35_界面_外边框');
-    await gotoUD07(page, 'JPCT 013976');
+    await gotoUD07WithData(page, 'JPCT 013976');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.info-section')).toBeVisible();
@@ -691,12 +699,11 @@ test.describe.serial('界面交互与布局（No.34-38）', () => {
 
   test('No.36 界面-各控件初始状态', async ({ page }) => {
     resetCounter('36_界面_各控件状态');
-    await gotoUD07(page, 'JPCT 013977');
+    await gotoUD07WithData(page, 'JPCT 013977');
     await page.waitForTimeout(2000);
 
     await expect(page.locator('.page-title')).toBeVisible();
     await expect(page.locator('.error-message-area')).toHaveCount(0);
-    // 所有 info-value 存在
     const values = page.locator('.info-value');
     const count = await values.count();
     expect(count).toBeGreaterThan(0);
@@ -721,10 +728,9 @@ test.describe.serial('界面交互与布局（No.34-38）', () => {
 
   test('No.38 界面-响应式布局', async ({ page }) => {
     resetCounter('38_界面_响应式布局');
-    await gotoUD07(page, 'JPCT 013979');
+    await gotoUD07WithData(page, 'JPCT 013979');
     await page.waitForTimeout(2000);
 
-    // 调整窗口大小
     await page.setViewportSize({ width: 600, height: 800 });
     await page.waitForTimeout(1000);
 

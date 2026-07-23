@@ -102,9 +102,15 @@ const EDBUserView: React.FC = () => {
           // API返回非200状态，显示后端返回的具体错误消息
           setError(response.data.message || "Failed to load user information. Please try again.");
         }
-      } catch (err) {
+      } catch (err: any) {
         // 异常处理：网络错误、超时或服务器错误
-        setError("System error. Please contact administrator.");
+        if (err.response && err.response.data && err.response.data.message) {
+          // HTTP 异常状态码（如 404）但服务端返回了错误消息
+          setError(err.response.data.message);
+        } else {
+          // 网络错误/超时/无响应
+          setError("System error. Please contact administrator.");
+        }
       } finally {
         setLoading(false);
       }

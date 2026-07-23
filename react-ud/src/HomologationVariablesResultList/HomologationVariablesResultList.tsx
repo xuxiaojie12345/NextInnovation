@@ -96,9 +96,17 @@ const HomologationVariablesResultList: React.FC = () => {
 
         const res = await api.post(`/api/ud09/search`, searchState);
         if (res.data.code === 200 && Array.isArray(res.data.data)) {
-          setDataList(res.data.data);
+          // DataTable默认按Product Class、Market、Number三个字段升序排序
+          const sorted = [...res.data.data].sort((a: SearchResultItem, b: SearchResultItem) => {
+            if (a.pc !== b.pc) return a.pc.localeCompare(b.pc);
+            if (a.market !== b.market) return a.market.localeCompare(b.market);
+            return a.num.localeCompare(b.num, undefined, { numeric: true });
+          });
+          setDataList(sorted);
         } else {
           setDataList([]);
+          setMessage(res.data.message || 'Search failed. Please try again.');
+          setMessageType('error');
         }
       } catch {
         setMessage('System error. Please contact administrator.');
@@ -420,7 +428,7 @@ const HomologationVariablesResultList: React.FC = () => {
                         <td>{(item.vs || '') + (item.vs && item.vs2 ? ', ' : '') + (item.vs2 || '') || '-'}</td>
                         <td>{item.comments}</td>
                         <td>{(item.addDate || '').split(' ')[0].split('T')[0]}</td>
-                        <td>{(item.deleteDate || '').split(' ')[0].split('T')[0]}</td>
+                        <td>{(item.deleteDate || '-').split(' ')[0].split('T')[0]}</td>
                         <td>
                           <span
                             className="ud09-user-link"

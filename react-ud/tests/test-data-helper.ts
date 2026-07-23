@@ -4,6 +4,7 @@
  * 正常场景用真实数据，异常场景用 Mock
  */
 import { execute, query } from './db';
+export { execute };
 
 // ============================================================
 // UD03 - HDOC_DOCUMENT_LIST
@@ -254,7 +255,7 @@ const UD07_CHASSIS_SETS = [
   { serie: 'JPCT', chnr: '013957', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013957', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013957', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
   { serie: 'JPCT', chnr: '013959', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013959', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013959', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
   { serie: 'JPCT', chnr: '013961', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013961', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013961', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
-  { serie: 'JPCT', chnr: '013963', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013963', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013963', familyId: 'F02', variantId: 'V02', symbol: 'FTLI-150-XYZ', desc: 'Long symbol description' },
+  { serie: 'JPCT', chnr: '013963', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013963', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013963', familyId: 'F02', variantId: 'V02', symbol: 'FTLI-150-XYZ', desc: 'FTLI-150-XYZ' },
   { serie: 'JPCT', chnr: '013964', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013964', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013964', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
   { serie: 'JPCT', chnr: '013966', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013966', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-EXTRA-INFO', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
   { serie: 'JPCT', chnr: '013967', country: 'IDN', productType: 'EM 64 R', vin: 'JPCZZ30D8GT013967', model: 'UD-HDE', build: '1617', sNoteNo: 'S1610111-013967', familyId: 'F01', variantId: 'V01', symbol: 'FTLI-150', desc: 'Front load index: FTLI-150' },
@@ -320,7 +321,6 @@ export async function cleanupUD07TestData() {
     await execute(`DELETE FROM HDOC_REC_DATA_OM WHERE SERIE = ? AND CHNR = ?`, [d.serie, d.chnr]);
     await execute(`DELETE FROM HDOC_REC_DATA_VDA_VARIANTS WHERE SERIE = ? AND CHNR = ?`, [d.serie, d.chnr]);
   }
-  // 清理 KOLA_VARIANT
   const seen = new Set<string>();
   for (const d of UD07_CHASSIS_SETS) {
     const key = `${d.familyId}|${d.variantId}`;
@@ -329,6 +329,63 @@ export async function cleanupUD07TestData() {
       await execute(`DELETE FROM HDOC_REC_DATA_KOLA_VARIANT WHERE FAMILY_ID = ? AND VARIANT_ID = ?`, [d.familyId, d.variantId]);
     }
   }
+}
+
+/** 为指定底盘号插入测试数据（每个测试运行前调用，确保数据独立可用） */
+export async function insertSingleChassis(serie: string, chnr: string) {
+  const d = UD07_CHASSIS_SETS.find(x => x.serie === serie && x.chnr === chnr);
+  if (!d) throw new Error(`Chassis ${serie} ${chnr} not found in test data`);
+
+  // 1. 先清理该底盘的旧数据（避免 ORDERNUMBER 主键冲突）
+  await execute(`DELETE FROM HDOC_REC_DATA_VDA_GENERAL WHERE SERIE = ? AND CHNR = ?`, [d.serie, d.chnr]);
+  await execute(`DELETE FROM HDOC_REC_DATA_OM WHERE SERIE = ? AND CHNR = ?`, [d.serie, d.chnr]);
+  await execute(`DELETE FROM HDOC_REC_DATA_VDA_VARIANTS WHERE SERIE = ? AND CHNR = ?`, [d.serie, d.chnr]);
+  // 清理 KOLA_VARIANT 旧数据（INSERT IGNORE 不会覆盖已有记录）
+  await execute(`DELETE FROM HDOC_REC_DATA_KOLA_VARIANT WHERE FAMILY_ID = ? AND VARIANT_ID = ?`, [d.familyId, d.variantId]);
+
+  // 2. 插入 VDA_GENERAL
+  await execute(
+    `INSERT IGNORE INTO HDOC_REC_DATA_VDA_GENERAL
+     (SERIE, CHNR, COUNTRY_OF_OPERATION, PRODUCT_TYPE, VIN, TRANS_TS,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, ?, ?, ?, ?,
+      NOW(), 'test', 'UD07Test', NOW(), 'test', 'UD07Test')`,
+    [d.serie, d.chnr, d.country, d.productType, d.vin, UD07_TRANS_TS]
+  );
+
+  // 3. 插入 OM（ORDERNUMBER 用 GOLF-{chnr} 保证唯一）
+  await execute(
+    `INSERT IGNORE INTO HDOC_REC_DATA_OM
+     (SERIE, CHNR, MODEL, BUILD, CUSTOMER_ADAP, ORDERNUMBER,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, ?, ?, ?, ?,
+      NOW(), 'test', 'UD07Test', NOW(), 'test', 'UD07Test')`,
+    [d.serie, d.chnr, d.model, d.build, d.sNoteNo, `GOLF-${d.chnr}`]
+  );
+
+  // 4. 插入 VDA_VARIANTS
+  await execute(
+    `INSERT IGNORE INTO HDOC_REC_DATA_VDA_VARIANTS
+     (SERIE, CHNR, FAMILY_ID, VARIANT_ID,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, ?, ?,
+      NOW(), 'test', 'UD07Test', NOW(), 'test', 'UD07Test')`,
+    [d.serie, d.chnr, d.familyId, d.variantId]
+  );
+
+  // 5. 插入 KOLA_VARIANT（FAMILY_ID+VARIANT_ID 唯一，用 INSERT IGNORE 避免重复）
+  await execute(
+    `INSERT IGNORE INTO HDOC_REC_DATA_KOLA_VARIANT
+     (FAMILY_ID, VARIANT_ID, SYMBOL, DESCRIPTION,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, ?, ?,
+      NOW(), 'test', 'UD07Test', NOW(), 'test', 'UD07Test')`,
+    [d.familyId, d.variantId, d.symbol, d.desc]
+  );
 }
 
 // ============================================================
@@ -392,7 +449,7 @@ export async function insertUD09TestData() {
   for (const r of UD09_TEST_RECORDS) {
     await execute(
       `INSERT IGNORE INTO HDOC_USER_DEFINED_RULES
-       (PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, UPDATE_USER, UPDATE_DATETIME,
+       (PC, NUM, MARKET, VARIABLE, VAL, VS, VS2, COMMENTS, ADD_DATE, DELETE_DATE, USERID, UP_DATE,
         REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
@@ -428,9 +485,9 @@ export async function insertUD10TestData() {
         REGISTER_USER, REGISTER_PROCESS,
         UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
        VALUES (?, ?, ?, ?, ?,
-        'test', 'UD10Test',
-        NOW(), 'test', 'UD10Test')`,
-      [r.variable, r.type, r.description, r.userid, r.registerDatetime]
+        ?, 'UD10Test',
+        NOW(), ?, 'UD10Test')`,
+      [r.variable, r.type, r.description, r.userid, r.registerDatetime, r.userid, r.userid]
     );
   }
 }
@@ -439,6 +496,18 @@ export async function cleanupUD10TestData() {
   const variables = UD10_TEST_RECORDS.map(r => r.variable);
   const placeholders = variables.map(() => '?').join(',');
   await execute(`DELETE FROM HDOC_VARIABLES WHERE VARIABLE IN (${placeholders})`, variables);
+}
+
+/** 为 UD11 插入单条变量记录（每个测试独立插入，避免数据冲突） */
+export async function insertUD11Record(variable: string, type: string, description: string, userid: string, registerDatetime: string) {
+  await execute(`DELETE FROM HDOC_VARIABLES WHERE VARIABLE = ?`, [variable]);
+  await execute(
+    `INSERT IGNORE INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, USERID, REGISTER_DATETIME,
+      REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, ?, ?, ?,
+      ?, 'UD11Test', NOW(), ?, 'UD11Test')`,
+    [variable, type, description, userid, registerDatetime, userid, userid]
+  );
 }
 
 // ============================================================
@@ -453,4 +522,246 @@ export async function cleanupAllTestData() {
   await cleanupUD05TestData();
   await cleanupUD04TestData();
   await cleanupUD03TestData();
+}
+
+// ============================================================
+// UD16 - HDOC_ADCA_CHANGE
+// ============================================================
+const UD16_ACTIVE_SERIE = 'JPCT';
+const UD16_ACTIVE_CHNR = 'G28321';
+const UD16_INACTIVE_SERIE = 'JPCT';
+const UD16_INACTIVE_CHNR = 'G28322';
+
+export async function insertUD16TestData() {
+  // 激活的记录（ACT='Y'）
+  await execute(
+    `INSERT IGNORE INTO HDOC_ADCA_CHANGE
+     (SERIE, CHNR, ACT, BU, REASON,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, 'Y', 'BU0001', 'Test activated record',
+      NOW(), 'test', 'UD16Test', NOW(), 'test', 'UD16Test')`,
+    [UD16_ACTIVE_SERIE, UD16_ACTIVE_CHNR]
+  );
+  // 未激活的记录（ACT='N'）
+  await execute(
+    `INSERT IGNORE INTO HDOC_ADCA_CHANGE
+     (SERIE, CHNR, ACT, BU, REASON,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, ?, 'N', 'BU0001', 'Test inactive record',
+      NOW(), 'test', 'UD16Test', NOW(), 'test', 'UD16Test')`,
+    [UD16_INACTIVE_SERIE, UD16_INACTIVE_CHNR]
+  );
+}
+
+export async function cleanupUD16TestData() {
+  await execute(`DELETE FROM HDOC_ADCA_CHANGE WHERE SERIE = ? AND CHNR = ?`, [UD16_ACTIVE_SERIE, UD16_ACTIVE_CHNR]);
+  await execute(`DELETE FROM HDOC_ADCA_CHANGE WHERE SERIE = ? AND CHNR = ?`, [UD16_INACTIVE_SERIE, UD16_INACTIVE_CHNR]);
+}
+
+// ============================================================
+// UD17 - HDOC_USER_INFOR + HDOC_FUNCTION_AUTH + HDOC_MARKET_AUTH
+// ============================================================
+const UD17_TEST_USER = 'V0C6900';
+const UD17_TEST_USERNAME = 'Test User UD17';
+
+export async function insertUD17TestData() {
+  // 1. 测试用户
+  await execute(
+    `INSERT IGNORE INTO HDOC_USER_INFOR
+     (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'dummy123', ?, 'Test Resp', 'Test Pos', 'test@test.com',
+      NOW(), 'test', 'UD17Test', NOW(), 'test', 'UD17Test')`,
+    [UD17_TEST_USER, UD17_TEST_USERNAME]
+  );
+  // 2. 功能权限 - Standard User (USER)
+  await execute(
+    `INSERT IGNORE INTO HDOC_FUNCTION_AUTH
+     (USERID, \`FUNCTION\`,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'USER',
+      NOW(), 'test', 'UD17Test', NOW(), 'test', 'UD17Test')`,
+    [UD17_TEST_USER]
+  );
+  // 3. 功能权限 - Rule Admin (RULES)
+  await execute(
+    `INSERT IGNORE INTO HDOC_FUNCTION_AUTH
+     (USERID, \`FUNCTION\`,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'RULES',
+      NOW(), 'test', 'UD17Test', NOW(), 'test', 'UD17Test')`,
+    [UD17_TEST_USER]
+  );
+  // 4. 市场权限 - Rule Admin / JPN
+  await execute(
+    `INSERT IGNORE INTO HDOC_MARKET_AUTH
+     (USERID, MARKET, TYPE, BU,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'JPN', 'R', 'BU01',
+      NOW(), 'test', 'UD17Test', NOW(), 'test', 'UD17Test')`,
+    [UD17_TEST_USER]
+  );
+  // 5. 市场权限 - Rule Admin / CHN
+  await execute(
+    `INSERT IGNORE INTO HDOC_MARKET_AUTH
+     (USERID, MARKET, TYPE, BU,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'CHN', 'R', 'BU01',
+      NOW(), 'test', 'UD17Test', NOW(), 'test', 'UD17Test')`,
+    [UD17_TEST_USER]
+  );
+}
+
+export async function cleanupUD17TestData() {
+  await execute(`DELETE FROM HDOC_MARKET_AUTH WHERE USERID = ?`, [UD17_TEST_USER]);
+  await execute(`DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = ?`, [UD17_TEST_USER]);
+  await execute(`DELETE FROM HDOC_USER_INFOR WHERE USERID = ?`, [UD17_TEST_USER]);
+}
+
+// ============================================================
+// UD18 - HDOC_USER_INFOR + HDOC_FUNCTION_AUTH + HDOC_USER_DOC
+// ============================================================
+const UD18_TEST_USER = 'A420064';
+const UD18_TEST_USERNAME = 'Jenna Wang';
+
+export async function insertUD18TestData() {
+  // 1. 测试用户
+  await execute(
+    `INSERT IGNORE INTO HDOC_USER_INFOR
+     (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'dummy123', ?, 'Test Resp', 'Test Pos', 'test@test.com',
+      NOW(), 'test', 'UD18Test', NOW(), 'test', 'UD18Test')`,
+    [UD18_TEST_USER, UD18_TEST_USERNAME]
+  );
+  // 2. 功能权限记录（用于 checkAuth 存在性校验）
+  await execute(
+    `INSERT IGNORE INTO HDOC_FUNCTION_AUTH
+     (USERID, \`FUNCTION\`,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'USER',
+      NOW(), 'test', 'UD18Test', NOW(), 'test', 'UD18Test')`,
+    [UD18_TEST_USER]
+  );
+  // 3. 文档权限（HDOC_USER_DOC）- 授权 COC 和 VCC
+  await execute(
+    `INSERT IGNORE INTO HDOC_USER_DOC
+     (USERID, DOCTYPE,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'COC',
+      NOW(), 'test', 'UD18Test', NOW(), 'test', 'UD18Test')`,
+    [UD18_TEST_USER]
+  );
+  await execute(
+    `INSERT IGNORE INTO HDOC_USER_DOC
+     (USERID, DOCTYPE,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'VCC',
+      NOW(), 'test', 'UD18Test', NOW(), 'test', 'UD18Test')`,
+    [UD18_TEST_USER]
+  );
+}
+
+export async function cleanupUD18TestData() {
+  await execute(`DELETE FROM HDOC_USER_DOC WHERE USERID = ?`, [UD18_TEST_USER]);
+  await execute(`DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = ?`, [UD18_TEST_USER]);
+  await execute(`DELETE FROM HDOC_USER_INFOR WHERE USERID = ?`, [UD18_TEST_USER]);
+}
+
+// ============================================================
+// UD19 - HDOC_USER_INFOR + HDOC_MARKET_AUTH + HDOC_FUNCTION_AUTH
+// ============================================================
+const UD19_TEST_USERID = 'SWE';
+const UD19_TEST_USERNAME = 'SWETestUser';
+
+export async function insertUD19TestData() {
+  // 1. 测试用户
+  await execute(
+    `INSERT IGNORE INTO HDOC_USER_INFOR
+     (USERID, PASSWORD, USERNAME, RESPONSIBLE, USERPOSITION, EMAIL,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'dummy123', ?, 'TestResp', 'TestPos', 'test@test.com',
+      NOW(), 'test', 'UD19Test', NOW(), 'test', 'UD19Test')`,
+    [UD19_TEST_USERID, UD19_TEST_USERNAME]
+  );
+  // 2. Rule Admin 功能权限
+  await execute(
+    `INSERT IGNORE INTO HDOC_FUNCTION_AUTH
+     (USERID, \`FUNCTION\`,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'RULES',
+      NOW(), 'test', 'UD19Test', NOW(), 'test', 'UD19Test')`,
+    [UD19_TEST_USERID]
+  );
+  // 3. Template Admin 功能权限
+  await execute(
+    `INSERT IGNORE INTO HDOC_FUNCTION_AUTH
+     (USERID, \`FUNCTION\`,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'TEMPLATE',
+      NOW(), 'test', 'UD19Test', NOW(), 'test', 'UD19Test')`,
+    [UD19_TEST_USERID]
+  );
+  // 4. 市场权限 - Rule Admin / JPN
+  await execute(
+    `INSERT IGNORE INTO HDOC_MARKET_AUTH
+     (USERID, MARKET, TYPE, BU,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'JPN', 'R', 'BU01',
+      NOW(), 'test', 'UD19Test', NOW(), 'test', 'UD19Test')`,
+    [UD19_TEST_USERID]
+  );
+  // 5. 市场权限 - Template / DEU
+  await execute(
+    `INSERT IGNORE INTO HDOC_MARKET_AUTH
+     (USERID, MARKET, TYPE, BU,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'DEU', 'T', 'BU01',
+      NOW(), 'test', 'UD19Test', NOW(), 'test', 'UD19Test')`,
+    [UD19_TEST_USERID]
+  );
+}
+
+export async function cleanupUD19TestData() {
+  await execute(`DELETE FROM HDOC_MARKET_AUTH WHERE USERID = ?`, [UD19_TEST_USERID]);
+  await execute(`DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = ?`, [UD19_TEST_USERID]);
+  await execute(`DELETE FROM HDOC_USER_INFOR WHERE USERID = ?`, [UD19_TEST_USERID]);
+}
+
+// ============================================================
+// UD20-1 - HDOC_DOCUMENT_LIST
+// ============================================================
+const UD201_TEST_DOCTYPE = 'COC';
+
+export async function insertUD201TestData() {
+  await execute(
+    `INSERT IGNORE INTO HDOC_DOCUMENT_LIST
+     (DOCTYPE, DESCRIPTION,
+      REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+      UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+     VALUES (?, 'Certificate of Conformity - Test',
+      '2026-01-15 10:30:00', 'admin', 'UD201Test',
+      '2026-01-15 10:30:00', 'admin', 'UD201Test')`,
+    [UD201_TEST_DOCTYPE]
+  );
+}
+
+export async function cleanupUD201TestData() {
+  await execute(`DELETE FROM HDOC_DOCUMENT_LIST WHERE DOCTYPE = ?`, [UD201_TEST_DOCTYPE]);
 }

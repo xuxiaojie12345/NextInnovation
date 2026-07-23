@@ -193,7 +193,8 @@ const VinPlate: React.FC = () => {
             className="ud15-input"
             value={chassisNumber}
             onChange={(e) => {
-              setChassisNumber(e.target.value);
+              const value = e.target.value.replace(/[^a-zA-Z0-9-]/g, '');
+              setChassisNumber(value);
               if (message) setMessage("");
             }}
             disabled={loading}

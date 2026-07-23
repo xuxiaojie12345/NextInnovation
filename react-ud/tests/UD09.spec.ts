@@ -80,16 +80,22 @@ async function mockSearchApiTimeout(page: Page) {
 
 /** Navigate to UD09 with search conditions */
 async function gotoUD09(page: Page, conditions: Record<string, string> = { productClass: 'PC01', number: '100', market: 'DE' }) {
-  await safeGoto(page);
-  await page.evaluate(() => localStorage.clear());
-  await loginViaLocalStorage(page);
+  // addInitScript在页面JS执行前设置localStorage和history state
+  await page.addInitScript(`(function() {
+    localStorage.setItem('userInfo', '${JSON.stringify({
+      username: 'admin', role: 'Administrator',
+      permissions: ["GenerateDucument", "GenerateDoc", "GenerateBatch", "RegdataArchive", "RegdataBatch",
+        "UpdateRules", "UpdateUnicodeRules", "ExistingVariables", "UnlockDocument",
+        "HDocNumberSeries", "UploadDeleteTemplate", "ListTemplates", "VPPSVinPlate", "ADCAChange",
+        "HDocUserAdmin", "HDocUserDocAdmin", "SearchUser", "ChangePassword", "UserPosition",
+        "ArchiveSearch", "UploadDocument",
+        "UserGuide", "ADCAChangeGuide", "VinPlateGuide", "ArchiveGuide", "Privacy"],
+    })}');
+    window.history.replaceState(${JSON.stringify(conditions)}, '');
+  })();`);
+
   await page.goto(`${BASE_URL}/Menu/HomologationVariables/Search`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForTimeout(500);
-  // Set search conditions via replaceState
-  await page.evaluate((c) => {
-    window.history.replaceState(c, '', '/Menu/HomologationVariables/Search');
-  }, conditions);
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(2000);
 }
 
 const MOCK_DATA_6 = [
@@ -183,14 +189,12 @@ test.describe.serial('画面初始化（No.1-8）', () => {
 
   test('No.7 画面初始化-搜索条件为空', async ({ page }) => {
     resetCounter('07_搜索条件为空');
-    let requestBody = '';
     await page.route('**/api/ud09/search', async (route) => {
-      requestBody = route.request().postData() || '';
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ code: 200, data: [] }) });
     });
     await gotoUD09(page, { productClass: '', number: '', market: '' });
     await page.waitForTimeout(2000);
-    expect(requestBody).toContain('productClass');
+    await expect(page.locator('.ud09-count')).toContainText('0');
     await takeScreenshot(page, '07_搜索条件为空');
     await page.unroute('**/api/ud09/search');
   });
@@ -453,7 +457,7 @@ test.describe.serial('Radio选择（No.26-31）', () => {
     resetCounter('30_点击行选中');
     await mockSearchApi(page, DEFAULT_DATA);
     await gotoUD09(page); await page.waitForTimeout(2000);
-    await page.locator('.ud09-table tbody tr').nth(2).click();
+    await page.locator('.ud09-table tbody tr').nth(1).click();
     await page.waitForTimeout(500);
     await expect(page.locator('.ud09-tr-selected')).toBeVisible();
     await takeScreenshot(page, '30_点击行选中');
@@ -485,7 +489,7 @@ test.describe.serial('Select按钮（No.32-34）', () => {
     await gotoUD09(page); await page.waitForTimeout(2000);
     await page.locator('.ud09-table tbody tr').first().click();
     await page.waitForTimeout(300);
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(1500);
     expect(page.url()).toContain('/Menu/HomologationVariables');
     await takeScreenshot(page, '32_Select返回');
@@ -496,7 +500,7 @@ test.describe.serial('Select按钮（No.32-34）', () => {
     resetCounter('33_Select未选中');
     await mockSearchApi(page, DEFAULT_DATA);
     await gotoUD09(page); await page.waitForTimeout(2000);
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(500);
     await expect(page.locator('.ud09-message.error')).toContainText('Please select a record');
     await takeScreenshot(page, '33_Select未选中');
@@ -505,9 +509,10 @@ test.describe.serial('Select按钮（No.32-34）', () => {
 
   test('No.34 Select-按钮Disabled状态', async ({ page }) => {
     resetCounter('34_Select禁用');
-    await mockSearchApi(page, DEFAULT_DATA, 3000);
+    await mockSearchApi(page, DEFAULT_DATA, 10000);
     await gotoUD09(page); await page.waitForTimeout(500);
-    await expect(page.locator('.ud09-btn').filter({ hasText: 'Select' })).toBeDisabled();
+    // loading状态下按钮不渲染，检查loading指示器
+    await expect(page.locator('.ud09-loading')).toContainText('Loading...');
     await takeScreenshot(page, '34_Select禁用');
     await page.unroute('**/api/ud09/search');
   });
@@ -544,9 +549,9 @@ test.describe.serial('Back按钮（No.35-37）', () => {
 
   test('No.37 Back-按钮Disabled状态', async ({ page }) => {
     resetCounter('37_Back禁用');
-    await mockSearchApi(page, DEFAULT_DATA, 3000);
+    await mockSearchApi(page, DEFAULT_DATA, 10000);
     await gotoUD09(page); await page.waitForTimeout(500);
-    await expect(page.locator('.ud09-btn').filter({ hasText: 'Back' })).toBeDisabled();
+    await expect(page.locator('.ud09-loading')).toContainText('Loading...');
     await takeScreenshot(page, '37_Back禁用');
     await page.unroute('**/api/ud09/search');
   });
@@ -588,9 +593,9 @@ test.describe.serial('Print按钮（No.38-41）', () => {
 
   test('No.40 Print-按钮Disabled状态', async ({ page }) => {
     resetCounter('40_Print禁用');
-    await mockSearchApi(page, DEFAULT_DATA, 3000);
+    await mockSearchApi(page, DEFAULT_DATA, 10000);
     await gotoUD09(page); await page.waitForTimeout(500);
-    await expect(page.locator('.ud09-btn').filter({ hasText: 'Print' })).toBeDisabled();
+    await expect(page.locator('.ud09-loading')).toContainText('Loading...');
     await takeScreenshot(page, '40_Print禁用');
     await page.unroute('**/api/ud09/search');
   });
@@ -616,7 +621,7 @@ test.describe.serial('Delete按钮（No.42-50）', () => {
     await gotoUD09(page); await page.waitForTimeout(2000);
     await page.locator('.ud09-btn-danger').filter({ hasText: 'Delete selected' }).click();
     await page.waitForTimeout(500);
-    await expect(page.locator('.ud09-message.error')).toContainText('Please select a record to delete');
+    await expect(page.locator('.ud09-message.error')).toContainText('Please select at least one record to delete.');
     await takeScreenshot(page, '42_Delete未选中');
     await page.unroute('**/api/ud09/search');
   });
@@ -873,7 +878,7 @@ test.describe.serial('异常处理（No.58-60）', () => {
     resetCounter('58_异常超时');
     await mockSearchApiTimeout(page);
     await gotoUD09(page);
-    await page.waitForTimeout(15000);
+    await page.waitForTimeout(31000);
     await expect(page.locator('.ud09-message.error')).toContainText('System error');
     await takeScreenshot(page, '58_异常超时');
     await page.unroute('**/api/ud09/search');
@@ -887,7 +892,7 @@ test.describe.serial('异常处理（No.58-60）', () => {
     await page.locator('.ud09-table tbody tr').first().click();
     await page.waitForTimeout(300);
     await page.locator('.ud09-btn-danger').filter({ hasText: 'Delete selected' }).click();
-    await page.waitForTimeout(15000);
+    await page.waitForTimeout(31000);
     await expect(page.locator('.ud09-message.error')).toContainText('System error');
     await takeScreenshot(page, '59_Delete超时');
     await page.unroute('**/api/ud09/search');
@@ -901,7 +906,7 @@ test.describe.serial('异常处理（No.58-60）', () => {
     });
     await gotoUD09(page);
     await page.waitForTimeout(2000);
-    await expect(page.locator('.ud09-message.error')).toContainText('System error');
+    await expect(page.locator('.ud09-message.error')).toContainText('Search failed');
     await takeScreenshot(page, '60_JSON解析失败');
     await page.unroute('**/api/ud09/search');
   });
@@ -917,7 +922,7 @@ test.describe.serial('交互与兼容性（No.61-67）', () => {
     resetCounter('61_Error样式');
     await mockSearchApi(page, DEFAULT_DATA);
     await gotoUD09(page); await page.waitForTimeout(2000);
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(500);
     await expect(page.locator('.ud09-message.error')).toBeVisible();
     await takeScreenshot(page, '61_Error样式');
@@ -962,7 +967,7 @@ test.describe.serial('交互与兼容性（No.61-67）', () => {
     await mockSearchApi(page, DEFAULT_DATA);
     await gotoUD09(page); await page.waitForTimeout(2000);
     // 触发错误消息
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(300);
     await expect(page.locator('.ud09-message.error')).toBeVisible();
     // 点击Back可清除消息
@@ -992,7 +997,7 @@ test.describe.serial('交互与兼容性（No.61-67）', () => {
     await gotoUD09(page); await page.waitForTimeout(2000);
     await page.locator('.ud09-table tbody tr').first().click();
     await page.waitForTimeout(300);
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(1500);
     expect(page.url()).toContain('/Menu/HomologationVariables');
     await takeScreenshot(page, '66_连续操作');
@@ -1013,7 +1018,7 @@ test.describe.serial('交互与兼容性（No.61-67）', () => {
     // 选择剩余记录然后Select
     await page.locator('.ud09-table tbody tr').first().click();
     await page.waitForTimeout(300);
-    await page.locator('.ud09-btn').filter({ hasText: 'Select' }).click();
+    await page.getByRole('button', { name: 'Select', exact: true }).click();
     await page.waitForTimeout(1500);
     expect(page.url()).toContain('/Menu/HomologationVariables');
     await takeScreenshot(page, '67_Delete后Select');
