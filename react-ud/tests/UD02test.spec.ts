@@ -135,7 +135,7 @@ const CLICKABLE_MENU_ITEMS: { label: string; path: string }[] = [
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD02 Menu Page - 单体测试", () => {
+test.describe.serial("UD02 Menu Page - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

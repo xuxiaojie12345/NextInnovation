@@ -205,7 +205,7 @@ const TEST_USERID = "UT17_USER";
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD17 HDocUserAdministration - 单体测试", () => {
+test.describe.serial("UD17 HDocUserAdministration - 单体测试", () => {
   test.beforeAll(async () => {
     await initDB();
     await setupTestData();

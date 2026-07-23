@@ -170,7 +170,7 @@ async function selectFirstMarket(
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD12 UploadDeleteTemplate - 单体测试", () => {
+test.describe.serial("UD12 UploadDeleteTemplate - 单体测试", () => {
   test.beforeAll(async () => {
     ensureTempDir();
     await setupTestData();

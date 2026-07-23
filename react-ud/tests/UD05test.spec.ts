@@ -169,7 +169,7 @@ async function openPage(page: Page, url: string = APP_URL_WITH_PARAMS) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD05 Modify Document - 单体测试", () => {
+test.describe.serial("UD05 Modify Document - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

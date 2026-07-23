@@ -187,7 +187,8 @@ function btn(page: Page, name: string) {
     .filter({ hasText: new RegExp(`^${name}$`) });
 }
 
-test.describe("UD09 Homologation Variables Result List - 单体测试", () => {
+test.describe
+  .serial("UD09 Homologation Variables Result List - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

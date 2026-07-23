@@ -93,6 +93,7 @@ async function openLoginPage(page: Page) {
 // テストスイート
 // ============================================================
 test.describe("UD01 Login Page - 单体测试", () => {
+  test.describe.configure({ mode: "serial" });
   test.beforeAll(async () => {
     await setupTestData();
   });
@@ -732,8 +733,12 @@ test.describe("UD01 Login Page - 单体测试", () => {
     await page.locator("button.login-button").click();
     await page.waitForTimeout(2000);
 
-    // 3. fetch 抛出 Network Error，前端无 catch 所以不显示错误消息
+    // 3. fetch 抛出 Network Error，前端 catch 捕获后显示错误消息
     //    finally 执行 setIsLoading(false)，按钮恢复可用
+    await expect(page.locator("div.error-message")).toBeVisible();
+    await expect(page.locator("div.error-message")).toContainText(
+      "Unable to connect to the server",
+    );
     await expect(page.locator("button.login-button")).toBeEnabled();
     await expect(page.locator("button.login-button")).toHaveText("Login");
     // 画面不跳转
@@ -752,7 +757,7 @@ test.describe("UD01 Login Page - 单体测试", () => {
   // No.21 异常处理-API 超时
   // ============================================================
   test("21_异常处理_API超时", async ({ page }) => {
-    // route 拦截模拟 API 超时（fetch 抛出异常，前端 try/finally 无 catch）
+    // route 拦截模拟 API 超时（fetch 抛出异常，前端 catch 捕获）
     await page.route("**/api/login", async (route) => {
       await route.abort("timedout");
     });
@@ -773,8 +778,12 @@ test.describe("UD01 Login Page - 单体测试", () => {
     await page.locator("button.login-button").click();
     await page.waitForTimeout(2000);
 
-    // 3. fetch 超时异常，前端无 catch 所以不显示错误消息
+    // 3. fetch 超时异常，前端 catch 捕获后显示错误消息
     //    finally 执行 setIsLoading(false)，按钮恢复可用
+    await expect(page.locator("div.error-message")).toBeVisible();
+    await expect(page.locator("div.error-message")).toContainText(
+      "Unable to connect to the server",
+    );
     await expect(page.locator("button.login-button")).toBeEnabled();
     await expect(page.locator("button.login-button")).toHaveText("Login");
     // 画面不跳转

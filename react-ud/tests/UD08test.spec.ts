@@ -220,7 +220,7 @@ async function fillRequiredFields(page: Page) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD08 Homologation Variables - 单体测试", () => {
+test.describe.serial("UD08 Homologation Variables - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

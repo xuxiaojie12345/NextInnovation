@@ -162,9 +162,6 @@ public class UD09DeleteHdocuserdefinedrulesServiceImpl implements UD09DeleteHdoc
             // 从第一个请求中尝试获取用户信息，这里使用默认值SYSTEM
             String currentUser = "SYSTEM"; // 实际应从安全上下文中获取
 
-            // 获取当前日期时间
-            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
             for (int i = 0; i < deleteRequests.size(); i++) {
                 UD09DeleteUserDefinedRulesRequest request = deleteRequests.get(i);
 

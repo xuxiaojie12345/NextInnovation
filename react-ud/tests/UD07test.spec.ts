@@ -55,14 +55,15 @@ async function setupTestData() {
         const now = new Date();
         // HDOC_REC_DATA_OM
         await conn.execute(
-          `INSERT INTO HDOC_REC_DATA_OM (SERIE, CHNR, MODEL, CUSTOMER_ADAP, VIN, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
-           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
+          `INSERT INTO HDOC_REC_DATA_OM (SERIE, CHNR, MODEL, CUSTOMER_ADAP, VIN, ORDERNUMBER, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+           VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), ?, ?)`,
           [
             "yann",
             "1234",
             "FH16",
             "S1810111",
             "YV2JN12A4PA123456",
+            "TEST-ORD-001",
             "TEST",
             "PLAYWRIGHT",
             "TEST",
@@ -197,7 +198,7 @@ async function openPage(page: Page, url: string = PAGE_URL) {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD07 Vehicle Specification - 单体测试", () => {
+test.describe.serial("UD07 Vehicle Specification - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

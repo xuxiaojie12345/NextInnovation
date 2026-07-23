@@ -117,7 +117,7 @@ async function getSelectedFileName(page: Page): Promise<string> {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD13 HdocTemplateCheck - 单体测试", () => {
+test.describe.serial("UD13 HdocTemplateCheck - 单体测试", () => {
   test.beforeAll(async () => {
     ensureTempDir();
   });

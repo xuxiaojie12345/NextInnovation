@@ -73,6 +73,13 @@ const Login: React.FC = () => {
             "We didn't recognize the username or password you entered. Please try again.",
         }));
       }
+    } catch {
+      // 网络异常（断开/超时等），显示通用错误消息
+      setErrors((prev) => ({
+        ...prev,
+        authentication:
+          "Unable to connect to the server. Please check your network and try again.",
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +103,10 @@ const Login: React.FC = () => {
         }),
       },
     );
+
+    if (!response.ok) {
+      return { success: false, message: "Server error" };
+    }
 
     const data: BackendLoginResponse = await response.json();
     return data;

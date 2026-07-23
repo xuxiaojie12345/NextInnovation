@@ -129,7 +129,7 @@ function longString(length: number): string {
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD16 ADChange - 单体测试", () => {
+test.describe.serial("UD16 ADChange - 单体测试", () => {
   test.beforeAll(async () => {
     await setupTestData();
   });

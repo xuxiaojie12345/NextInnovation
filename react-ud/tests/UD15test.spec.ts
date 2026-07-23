@@ -92,7 +92,7 @@ let VALID_CHASSIS = "JPCT-013945";
 // ============================================================
 // テストスイート
 // ============================================================
-test.describe("UD15 VinPlate - 单体测试", () => {
+test.describe.serial("UD15 VinPlate - 单体测试", () => {
   test.beforeAll(async () => {
     VALID_CHASSIS = await getTestChassis();
     console.log("Using chassis:", VALID_CHASSIS);
