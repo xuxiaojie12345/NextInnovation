@@ -35,6 +35,8 @@ public final class MessageConstants {
   public static final String MARKET_REQUIRED = "Market is required.";
   public static final String FILE_IS_EMPTY = "File is empty.";
   public static final String MARKET_FOLDER_NOT_FOUND = "Market folder not found.";
+  public static final String PATH_TRAVERSAL_DETECTED =
+      "Invalid file name: path traversal characters are not allowed.";
   public static final String PC_NUM_MARKET_REQUIRED = "pc, num and market are required.";
 
   // ═══════════════════════════════════════════

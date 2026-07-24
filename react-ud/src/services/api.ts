@@ -1,25 +1,62 @@
 // API 服务层：封装 POST/GET/DELETE/文件上传
 export const API_BASE_URL = "/api/v1/hdoc";
 
+/** 请求超时时间（毫秒） */
+const REQUEST_TIMEOUT = 30000;
+
 interface ApiResponse<T> {
   code: number;
   message: string;
   data: T | null;
 }
 
+/**
+ * 带超时的 fetch 封装
+ * 超时或网络异常时返回统一格式的错误响应
+ */
+async function fetchWithTimeout<T>(
+  url: string,
+  options: RequestInit,
+  timeout: number = REQUEST_TIMEOUT,
+): Promise<ApiResponse<T>> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    clearTimeout(timer);
+    if (err instanceof DOMException && err.name === "AbortError") {
+      return { code: 408, message: "Request timeout.", data: null };
+    }
+    return {
+      code: 0,
+      message: "System error. Please contact administrator.",
+      data: null,
+    };
+  }
+}
+
+const authHeader = (): Record<string, string> => ({
+  Authorization: localStorage.getItem("token") || "",
+});
+
 export const api = {
   post: async <T>(endpoint: string, data: any): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    return fetchWithTimeout<T>(`${API_BASE_URL}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token") || "",
+        ...authHeader(),
       },
       body: JSON.stringify(data),
     });
-
-    const result = await response.json();
-    return result;
   },
 
   get: async <T>(
@@ -32,30 +69,23 @@ export const api = {
         url.searchParams.append(key, params[key]),
       );
     }
-
-    const response = await fetch(url.toString(), {
+    return fetchWithTimeout<T>(url.toString(), {
       method: "GET",
       headers: {
-        Authorization: localStorage.getItem("token") || "",
+        ...authHeader(),
       },
     });
-
-    const result = await response.json();
-    return result;
   },
 
   del: async <T>(endpoint: string, data?: any): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    return fetchWithTimeout<T>(`${API_BASE_URL}${endpoint}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token") || "",
+        ...authHeader(),
       },
       body: data ? JSON.stringify(data) : undefined,
     });
-
-    const result = await response.json();
-    return result;
   },
 
   /** 文件上传（multipart/form-data） */
@@ -63,15 +93,12 @@ export const api = {
     endpoint: string,
     formData: FormData,
   ): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    return fetchWithTimeout<T>(`${API_BASE_URL}${endpoint}`, {
       method: "POST",
       headers: {
-        Authorization: localStorage.getItem("token") || "",
+        ...authHeader(),
       },
       body: formData,
     });
-
-    const result = await response.json();
-    return result;
   },
 };

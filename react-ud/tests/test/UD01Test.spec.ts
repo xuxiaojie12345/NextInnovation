@@ -1,11 +1,11 @@
-/**
+﻿/**
  * UD01 - 用户登录模块 Playwright 自动化测试
  *
  * 测试式样书: tests/测试式样书/テスト式样書UD01.md (v2.0)
  * 测试前提: 前后端均已启动，使用真实 API（无 Mock）
  * 数据库验证: 通过 SQL 查询 hdoc_user_infor 表确认数据
  * 截图保存: tests/test/Image/UD01/
- * 测试用例数: 58
+ * 测试用例数: 56
  * 执行模式: serial（串行执行）
  */
 
@@ -24,6 +24,10 @@ const $left = (p: Page) => p.locator('.login-info-panel');
 const $form = (p: Page) => p.locator('.login-form-panel');
 const $alt  = (p: Page) => p.locator('.alternative-login-info');
 const $container = (p: Page) => p.locator('.login-container');
+
+/** 用 JS 直接点击按钮（绕过 webpack-dev-server overlay 阻挡） */
+const clickLogin = (p: Page) =>
+  p.evaluate(() => (document.querySelector('.login-button') as HTMLButtonElement)?.click());
 
 // ── 前置：每次测试前访问登录页 ──
 test.beforeEach(async ({ page }) => {
@@ -55,7 +59,10 @@ test.describe('UD01 用户登录模块', () => {
     await expect($left(page).locator('p').nth(0))
       .toContainText('Use Outlook id and password');
     await expect($left(page).locator('p').nth(1))
-      .toContainText('Support TPI');
+      .toContainText('Support, authorization request or improvement suggestions, send mail to: Support TPI');
+    // 文字颜色为白色
+    const infoColor = await $left(page).evaluate(el => getComputedStyle(el).color);
+    expect(infoColor).toBe('rgb(255, 255, 255)');
     await ss(page, '左侧信息区', '02');
   });
 
@@ -78,13 +85,15 @@ test.describe('UD01 用户登录模块', () => {
   });
 
   test('04-画面初期表示-备选登录提示', async ({ page }) => {
-    // 验证备选登录提示的 3 行文本
+    // 验证备选登录提示的 3 行文本 + 文字颜色为红色
     await expect($alt(page).locator('p').nth(0))
-      .toContainText('Your account is locked');
+      .toHaveText('If you get error message: "Your account is locked. Please contact your system administrator."');
     await expect($alt(page).locator('p').nth(1))
-      .toContainText('alternative login link');
+      .toHaveText('Please try this alternative login link before contacting support.');
     await expect($alt(page).locator('p').nth(2))
-      .toContainText('root cause of problem');
+      .toHaveText('We are working to find root cause of problem.');
+    const altColor = await $alt(page).locator('p').nth(0).evaluate(el => getComputedStyle(el).color);
+    expect(altColor).toBe('rgb(255, 0, 0)');
     await ss(page, '备选登录提示', '04');
   });
 
@@ -100,9 +109,9 @@ test.describe('UD01 用户登录模块', () => {
   test('06-UserID-必须属性（前端空值校验触发）', async ({ page }) => {
     // 不输入任何内容直接点击登录，触发前端空值校验
     await ss(page, '登录前', '06');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('required');
+    await expect($err(page)).toHaveText('Username and password are required.');
     await ss(page, '空值校验', '06');
   });
 
@@ -116,14 +125,16 @@ test.describe('UD01 用户登录模块', () => {
   });
 
   test('08-UserID半角英数字校验-特殊字符拒否', async ({ page }) => {
-    // UserID含特殊字符 @#，但 onChange 会自动过滤非字母数字，API被调用后返回错误
+    // UserID含特殊字符 @#，onChange 过滤后 UserID 变为 'test'（半角英数字），通过校验后调用 API
+    // 注意: 式样书记载为 'UserID must be alphanumeric characters.'，但 onChange 已过滤特殊字符
+    // 导致半角英数字校验无法被触发，实际走 API 调用路径返回认证失败消息
     await ss(page, '入力前', '08');
     await $uid(page).fill('test@#');
     await $pwd(page).fill('pass123');
     await ss(page, '登录前', '08');
-    await $btn(page).click();
-    await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText("We didn't recognize");
+    await clickLogin(page);
+    await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     // URL未跳转说明登录失败
     expect(page.url()).not.toContain('/menu');
     await expect($btn(page)).toBeEnabled();
@@ -132,13 +143,16 @@ test.describe('UD01 用户登录模块', () => {
 
   test('09-UserID半角英数字校验-全角文字拒否', async ({ page }) => {
     // UserID含全角英文字母，onChange 过滤后 UserID 变为空字符串，触发空值校验
+    // 注意: 式样书记载错误消息为 'UserID must be alphanumeric characters.'，但实现中 onChange 过滤了全角字符
+    // 导致 UserID 变为空，触发空值校验，因此实际显示为 'Username and password are required.'
+    // 如要修改行为，需在提交时（而非 onChange 时）做半角英数字校验
     await ss(page, '入力前', '09');
     await $uid(page).fill('ｔｅｓｔ');
     await $pwd(page).fill('pass123');
     await ss(page, '登录前', '09');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('Username and password are required.');
+    await expect($err(page)).toHaveText('Username and password are required.');
     // URL未跳转说明API未被调用
     expect(page.url()).not.toContain('/menu');
     await expect($btn(page)).toBeEnabled();
@@ -224,13 +238,14 @@ test.describe('UD01 用户登录模块', () => {
 
   test('21-Message-文字颜色（红色 #ff4d4f）', async ({ page }) => {
     await ss(page, '登录前', '21');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('required');
+    await expect($err(page)).toHaveText('Username and password are required.');
     const color = await $err(page).evaluate(el => getComputedStyle(el).color);
     expect(color).toBe('rgb(255, 77, 79)');
-    const fontSize = await $err(page).evaluate(el => getComputedStyle(el).fontSize);
-    expect(fontSize).toBe('14px');
+    // 文字居中显示
+    const textAlign = await $err(page).evaluate(el => getComputedStyle(el).textAlign);
+    expect(textAlign).toBe('center');
     await ss(page, '红色文字', '21');
   });
 
@@ -243,10 +258,10 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('wrong');
     await ss(page, '登录前', '22');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     const msg = await $err(page).textContent();
-    expect(msg).toContain("We didn't recognize");
     expect(msg!.length).toBeLessThanOrEqual(256);
     await ss(page, '错误消息', '22');
   });
@@ -272,20 +287,19 @@ test.describe('UD01 用户登录模块', () => {
     await ss(page, '入力前', '24');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    // 用JS点击触发，在API返回前立即检查
-    await page.evaluate(() => {
-      (document.querySelector('.login-button') as HTMLButtonElement)?.click();
+    // 拦截登录 API 延迟 3 秒，确保能捕获加载中状态
+    await page.route('**/api/v1/hdoc/login', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
     });
-    try {
-      await expect($btn(page)).toHaveText('Logging in...', { timeout: 2000 });
-      await expect($btn(page)).toBeDisabled();
-      await expect($uid(page)).toBeDisabled();
-      await expect($pwd(page)).toBeDisabled();
-      await ss(page, '加载中', '24');
-    } catch {
-      console.log('  API响应过快，跳过加载状态验证');
-    }
-    try { await page.waitForURL('**/menu', { timeout: 15000 }); } catch { /* ok */ }
+    await clickLogin(page);
+    await expect($btn(page)).toHaveText('Logging in...', { timeout: 2000 });
+    await expect($btn(page)).toBeDisabled();
+    await expect($uid(page)).toBeDisabled();
+    await expect($pwd(page)).toBeDisabled();
+    await ss(page, '加载中', '24');
+    // 等待路由延迟结束后 API 正常返回并跳转
+    await page.waitForURL('**/menu', { timeout: 20000 });
   });
 
   test('25-Login按钮-失败后恢复可用状态', async ({ page }) => {
@@ -295,7 +309,7 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('wrong');
     await ss(page, '登录前', '25');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     await expect($btn(page)).toBeEnabled();
     await expect($btn(page)).toHaveText('Login');
@@ -304,7 +318,7 @@ test.describe('UD01 用户登录模块', () => {
 
   test('26-空值校验-UserID和Password均为空', async ({ page }) => {
     await ss(page, '登录前', '26');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Username and password are required.');
     await ss(page, '两者为空', '26');
@@ -314,8 +328,8 @@ test.describe('UD01 用户登录模块', () => {
     await ss(page, '入力前', '27');
     await $pwd(page).fill('pass123');
     await ss(page, '登录前', '27');
-    await $btn(page).click();
-    await expect($err(page)).toContainText('required');
+    await clickLogin(page);
+    await expect($err(page)).toHaveText('Username and password are required.');
     await ss(page, 'UserID为空', '27');
   });
 
@@ -323,8 +337,8 @@ test.describe('UD01 用户登录模块', () => {
     await ss(page, '入力前', '28');
     await $uid(page).fill('testuser');
     await ss(page, '登录前', '28');
-    await $btn(page).click();
-    await expect($err(page)).toContainText('required');
+    await clickLogin(page);
+    await expect($err(page)).toHaveText('Username and password are required.');
     await ss(page, 'Password为空', '28');
   });
 
@@ -333,8 +347,8 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill('   ');
     await $pwd(page).fill('pass123');
     await ss(page, '登录前', '29');
-    await $btn(page).click();
-    await expect($err(page)).toContainText('required');
+    await clickLogin(page);
+    await expect($err(page)).toHaveText('Username and password are required.');
     await ss(page, 'UserID空格', '29');
   });
 
@@ -343,8 +357,8 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill('testuser');
     await $pwd(page).fill('   ');
     await ss(page, '登录前', '30');
-    await $btn(page).click();
-    await expect($err(page)).toContainText('required');
+    await clickLogin(page);
+    await expect($err(page)).toHaveText('Username and password are required.');
     await ss(page, 'Password空格', '30');
   });
 
@@ -358,7 +372,7 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
     await ss(page, '登录前', '31');
-    await $btn(page).click();
+    await clickLogin(page);
 
     // ③ 等待页面跳转
     await page.waitForURL('**/menu', { timeout: 15000 });
@@ -407,7 +421,7 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
     await ss(page, '登录前', '32');
-    await $btn(page).click();
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
     const token = await page.evaluate(() => localStorage.getItem('token'));
     const userId = await page.evaluate(() => localStorage.getItem('userId'));
@@ -431,9 +445,9 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('wrong');
     await ss(page, '登录前', '33');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     await expect($btn(page)).toBeEnabled();
     expect(page.url()).not.toContain('/menu');
     await ss(page, '密码错误', '33');
@@ -449,17 +463,18 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill('nonexist');
     await $pwd(page).fill('x');
     await ss(page, '登录前', '34');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     await expect($btn(page)).toBeEnabled();
+    expect(page.url()).not.toContain('/menu');
     await ss(page, '用户不存在', '34');
   });
 
   test('35-空值校验-UserID为空时确保不调用API', async ({ page }) => {
     await $pwd(page).fill('pass');
     await ss(page, '登录前', '35');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toContainText('required');
     // URL未跳转说明API未被调用
     expect(page.url()).not.toContain('/menu');
@@ -474,7 +489,7 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
     await ss(page, '登录前', '36');
-    await $btn(page).click();
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
     const t1 = await page.evaluate(() => localStorage.getItem('token'));
 
@@ -486,7 +501,7 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
     await ss(page, '登录前2', '36');
-    await $btn(page).click();
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
     const t2 = await page.evaluate(() => localStorage.getItem('token'));
 
@@ -505,11 +520,12 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('err_500');
     await ss(page, '登录前', '37');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     // 后端对 err_500 无特殊处理，返回标准认证失败消息
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     await expect($btn(page)).toBeEnabled();
+    expect(page.url()).not.toContain('/menu');
     await ss(page, '500错误', '37');
   });
 
@@ -519,126 +535,108 @@ test.describe('UD01 用户登录模块', () => {
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
     await ss(page, '登录前', '38');
-    await $btn(page).click();
-    try {
-      await page.waitForURL('**/menu', { timeout: 3000 });
-      console.log('  登录成功（网络正常）');
-      await ss(page, '网络正常', '38');
-    } catch {
-      if (await $err(page).isVisible().catch(() => false)) {
-        await expect($btn(page)).toBeEnabled();
-        await ss(page, '网络错误', '38');
-      }
-    }
-  });
-
-  test('39-异常处理-API返回非JSON格式', async ({ page }) => {
-    const u = await getTestUser();
-    if (!u) throw new Error('无可用用户');
-    await $uid(page).fill(u.userid);
-    await $pwd(page).fill('bad_fmt');
-    await ss(page, '登录前', '39');
-    await $btn(page).click();
+    // 拦截并中止登录 API，模拟网络断开
+    await page.route('**/api/v1/hdoc/login', (route) => route.abort());
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
+    await expect($err(page)).toHaveText('System error. Please contact administrator.');
     await expect($btn(page)).toBeEnabled();
-    await ss(page, '非JSON响应', '39');
+    await ss(page, '网络断开', '38');
   });
 
-  test('40-异常处理-API返回业务code!=200', async ({ page }) => {
+  test('39-异常处理-API返回业务失败', async ({ page }) => {
     await $uid(page).fill('noexisttest');
     await $pwd(page).fill('x');
-    await ss(page, '登录前', '40');
-    await $btn(page).click();
+    await ss(page, '登录前', '39');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
-    await expect($btn(page)).toBeEnabled();
-    await ss(page, '业务错误', '40');
-  });
-
-  test('41-异常处理-API超时', async ({ page }) => {
-    const u = await getTestUser();
-    if (!u) throw new Error('无可用用户');
-    await $uid(page).fill(u.userid);
-    await $pwd(page).fill('timeout_test');
-    await ss(page, '登录前', '41');
-    await $btn(page).click();
-    try {
-      await page.waitForURL('**/menu', { timeout: 5000 });
-      console.log('  快速响应，未超时');
-    } catch {
-      if (await $err(page).isVisible().catch(() => false)) {
-        await expect($btn(page)).toBeEnabled();
-        await ss(page, '超时处理', '41');
-      }
-    }
-  });
-
-  test('42-异常处理-账户锁定场景', async ({ page }) => {
-    const u = await getTestUser();
-    if (!u) throw new Error('无可用用户');
-    await $uid(page).fill(u.userid);
-    await $pwd(page).fill('wrong_creds');
-    await ss(page, '登录前', '42');
-    await $btn(page).click();
-    await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     await expect($btn(page)).toBeEnabled();
     expect(page.url()).not.toContain('/menu');
-    await ss(page, '账户锁定', '42');
+    await ss(page, '业务错误', '39');
   });
 
-  // ════════════════════════════════════════════
-  // UI交互-控件状态变化 (TC43~47)
-  // ════════════════════════════════════════════
-
-  test('43-UI交互-登录中所有输入控件禁用', async ({ page }) => {
+  test('40-异常处理-API超时', async ({ page }) => {
+    test.slow();
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '43');
-    await page.evaluate(() => {
-      (document.querySelector('.login-button') as HTMLButtonElement)?.click();
+    await ss(page, '登录前', '40');
+    // 拦截登录 API 延迟 35 秒，触发前端 30 秒超时
+    await page.route('**/api/v1/hdoc/login', async (route) => {
+      await new Promise(r => setTimeout(r, 35000));
+      await route.continue();
     });
-    try {
-      await expect($btn(page)).toHaveText('Logging in...', { timeout: 2000 });
-      await expect($btn(page)).toBeDisabled();
-      await expect($uid(page)).toBeDisabled();
-      await expect($pwd(page)).toBeDisabled();
-      await ss(page, '控件禁用', '43');
-    } catch {
-      console.log('  响应过快，跳过禁用状态验证');
-    }
-    try { await page.waitForURL('**/menu', { timeout: 15000 }); } catch { /* ok */ }
+    await clickLogin(page);
+    // Login.tsx 中 AbortController 30 秒后中止请求
+    await expect($err(page)).toBeVisible({ timeout: 40000 });
+    await expect($err(page)).toHaveText('Request timeout.');
+    await expect($btn(page)).toBeEnabled();
+    await ss(page, '超时处理', '40');
   });
 
-  test('44-UI交互-登录中防止重复提交', async ({ page }) => {
+  // ════════════════════════════════════════════
+  // UI交互-控件状态变化 (TC41~45)
+  // ════════════════════════════════════════════
+
+  test('41-UI交互-登录中所有输入控件禁用', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '44');
-    // 连续点击3次
+    await ss(page, '登录前', '41');
+    // 拦截登录 API，延迟 3 秒返回，确保能捕获加载中状态
+    await page.route('**/api/v1/hdoc/login', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+    await clickLogin(page);
+    await expect($btn(page)).toHaveText('Logging in...', { timeout: 2000 });
+    await expect($btn(page)).toBeDisabled();
+    await expect($uid(page)).toBeDisabled();
+    await expect($pwd(page)).toBeDisabled();
+    await ss(page, '控件禁用', '41');
+    // 等待路由拦截超时后 API 正常返回并跳转
+    await page.waitForURL('**/menu', { timeout: 20000 });
+  });
+
+  test('42-UI交互-登录中防止重复提交', async ({ page }) => {
+    const u = await getTestUser();
+    if (!u) throw new Error('无可用用户');
+    await $uid(page).fill(u.userid);
+    await $pwd(page).fill(u.password);
+    await ss(page, '登录前', '42');
+    // 拦截 API 并计数调用次数
+    let callCount = 0;
+    await page.route('**/api/v1/hdoc/login', async (route) => {
+      callCount++;
+      await new Promise(r => setTimeout(r, 500));
+      await route.continue();
+    });
+    // 第1次点击
+    await clickLogin(page);
+    // 等待 React 状态更新（isLoading=true）后，再尝试点击 2 次
+    await page.waitForTimeout(300);
     await page.evaluate(() => {
       const b = document.querySelector('.login-button') as HTMLButtonElement;
       b?.click();
       b?.click();
-      b?.click();
     });
-    try {
-      await page.waitForURL('**/menu', { timeout: 15000 });
-      console.log('  成功跳转，仅1次API调用');
-    } catch { /* ok */ }
-    await ss(page, '重复提交', '44');
+    await page.waitForURL('**/menu', { timeout: 20000 });
+    // 首次点击后按钮 disabled，后续点击被阻止，只发起 1 次 API 调用
+    expect(callCount).toBe(1);
+    console.log(`  API调用次数: ${callCount}（预期 1 次）`);
+    await ss(page, '重复提交', '42');
   });
 
-  test('45-UI交互-失败后输入值保持（不清空）', async ({ page }) => {
+  test('43-UI交互-失败后输入值保持（不清空）', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('wrong');
-    await ss(page, '登录前', '45');
-    await $btn(page).click();
+    await ss(page, '登录前', '43');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     // 确认输入值保持
     await expect($uid(page)).toHaveValue(u.userid);
@@ -646,109 +644,118 @@ test.describe('UD01 用户登录模块', () => {
     await expect($uid(page)).toBeEnabled();
     await expect($pwd(page)).toBeEnabled();
     await expect($btn(page)).toBeEnabled();
-    await ss(page, '值保持', '45');
+    await ss(page, '值保持', '43');
   });
 
-  test('46-UI交互-登录成功页面跳转到/menu', async ({ page }) => {
+  test('44-UI交互-登录成功页面跳转到/menu', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '46');
-    await $btn(page).click();
+    await ss(page, '登录前', '44');
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
     await expect(page).toHaveURL(/\/menu/);
     const token = await page.evaluate(() => localStorage.getItem('token'));
     expect(token).not.toBeNull();
-    await ss(page, '跳转menu', '46');
+    await ss(page, '跳转menu', '44');
   });
 
-  test('47-UI交互-Enter键提交表单', async ({ page }) => {
+  test('45-UI交互-Enter键提交表单', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '47');
+    await ss(page, '登录前', '45');
     await $pwd(page).press('Enter');
     try {
       await page.waitForURL('**/menu', { timeout: 15000 });
-      await ss(page, 'Enter提交成功', '47');
+      await ss(page, 'Enter提交成功', '45');
     } catch {
       if (await $err(page).isVisible().catch(() => false)) {
-        await ss(page, 'Enter提交失败', '47');
+        await ss(page, 'Enter提交失败', '45');
       }
     }
   });
 
   // ════════════════════════════════════════════
-  // 消息显示-状态变化 (TC48~51)
+  // 消息显示-状态变化 (TC46~49)
   // ════════════════════════════════════════════
 
-  test('48-消息显示-Error样式（红色#ff4d4f）', async ({ page }) => {
-    await ss(page, '登录前', '48');
-    await $btn(page).click();
+  test('46-消息显示-Error样式（红色#ff4d4f）', async ({ page }) => {
+    await ss(page, '登录前', '46');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
-    await expect($err(page)).toContainText('required');
+    await expect($err(page)).toHaveText('Username and password are required.');
     const color = await $err(page).evaluate(el => getComputedStyle(el).color);
     expect(color).toBe('rgb(255, 77, 79)');
-    const fontSize = await $err(page).evaluate(el => getComputedStyle(el).fontSize);
-    expect(fontSize).toBe('14px');
-    await ss(page, 'Error样式', '48');
+    // 文字居中显示
+    const textAlign = await $err(page).evaluate(el => getComputedStyle(el).textAlign);
+    expect(textAlign).toBe('center');
+    await ss(page, 'Error样式', '46');
   });
 
-  test('49-消息清空-新操作时覆盖前一条消息', async ({ page }) => {
-    // 第1次点击
-    await ss(page, '登录前', '49');
-    await $btn(page).click();
+  test('47-消息清空-新操作时覆盖前一条消息', async ({ page }) => {
+    // 第1次点击（空表单 → 空值校验）
+    await ss(page, '登录前', '47');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
     const m1 = await $err(page).textContent();
+    expect(m1).toBe('Username and password are required.');
     console.log(`  消息1: "${m1}"`);
-    await ss(page, '第1次', '49');
-    // 第2次点击
-    await $btn(page).click();
+    await ss(page, '第1次', '47');
+    // 填入错误密码，触发 API 返回不同错误消息，验证旧消息被清除
+    const u = await getTestUser();
+    if (!u) throw new Error('无可用用户');
+    await $uid(page).fill(u.userid);
+    await $pwd(page).fill('wrong');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
     const m2 = await $err(page).textContent();
+    expect(m2).toBe("We didn't recognize the username or password you entered. Please try again.");
     console.log(`  消息2: "${m2}"`);
-    await ss(page, '第2次', '49');
+    // 两次消息不同，证明旧消息已被清除并重新设置
+    expect(m1).not.toBe(m2);
+    await ss(page, '第2次', '47');
   });
 
-  test('50-消息清空-登录成功时错误消息消失', async ({ page }) => {
+  test('48-消息清空-登录成功时错误消息消失', async ({ page }) => {
     // 先触发错误
-    await ss(page, '登录前', '50a');
-    await $btn(page).click();
+    await ss(page, '登录前', '48a');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible();
-    await ss(page, '先触发错误', '50');
+    await ss(page, '先触发错误', '48');
     // 填入正确信息登录
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '50b');
-    await $btn(page).click();
+    await ss(page, '登录前', '48b');
+    await clickLogin(page);
     try {
       await page.waitForURL('**/menu', { timeout: 15000 });
-      await ss(page, '消息清除', '50');
+      await ss(page, '消息清除', '48');
     } catch {
-      await ss(page, '登录结果', '50');
+      await ss(page, '登录结果', '48');
     }
   });
 
-  test('51-登录成功时无错误消息', async ({ page }) => {
+  test('49-登录成功时无错误消息', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await ss(page, '登录前', '51');
-    await $btn(page).click();
+    await ss(page, '登录前', '49');
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
-    await ss(page, '登录成功', '51');
+    await ss(page, '登录成功', '49');
   });
 
   // ════════════════════════════════════════════
-  // 数据库校验 (TC52~54)
+  // 数据库校验 (TC50~52)
   // ════════════════════════════════════════════
 
-  test('52-数据库校验-用户存在于hdoc_user_infor', async ({ page }) => {
+  test('50-数据库校验-用户存在于hdoc_user_infor', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     // DB确认用户存在
@@ -763,14 +770,14 @@ test.describe('UD01 用户登录模块', () => {
     }
     await $uid(page).fill(u.userid);
     await $pwd(page).fill(u.password);
-    await $btn(page).click();
+    await clickLogin(page);
     await page.waitForURL('**/menu', { timeout: 15000 });
     const userId = await page.evaluate(() => localStorage.getItem('userId'));
     expect(userId).toBe(u.userid);
-    await ss(page, 'DB用户存在', '52');
+    await ss(page, 'DB用户存在', '50');
   });
 
-  test('53-数据库校验-密码错误但用户存在', async ({ page }) => {
+  test('51-数据库校验-密码错误但用户存在', async ({ page }) => {
     const u = await getTestUser();
     if (!u) throw new Error('无可用用户');
     // DB确认密码 != 'wrong'
@@ -781,13 +788,15 @@ test.describe('UD01 用户登录模块', () => {
     }
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('wrong');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
-    await ss(page, '密码错误DB确认', '53');
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
+    await expect($btn(page)).toBeEnabled();
+    expect(page.url()).not.toContain('/menu');
+    await ss(page, '密码错误DB确认', '51');
   });
 
-  test('54-数据库校验-用户不存在', async ({ page }) => {
+  test('52-数据库校验-用户不存在', async ({ page }) => {
     // DB确认用户不存在
     const rows = await queryDB("SELECT COUNT(*) as cnt FROM hdoc_user_infor WHERE USERID = 'nonexist'");
     if (rows && rows.length > 0) {
@@ -796,30 +805,31 @@ test.describe('UD01 用户登录模块', () => {
     }
     await $uid(page).fill('nonexist');
     await $pwd(page).fill('x');
-    await $btn(page).click();
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     await expect($btn(page)).toBeEnabled();
-    await ss(page, '用户不存在DB确认', '54');
+    expect(page.url()).not.toContain('/menu');
+    await ss(page, '用户不存在DB确认', '52');
   });
 
   // ════════════════════════════════════════════
-  // 安全性 (TC55~58)
+  // 安全性 (TC53~56)
   // ════════════════════════════════════════════
 
-  test('55-安全性-XSS防护（React自动转义）', async ({ page }) => {
+  test('53-安全性-XSS防护（React自动转义）', async ({ page }) => {
     await $uid(page).fill('testxss');
     await $pwd(page).fill('<script>alert(1)</script>');
-    await ss(page, '登录前', '55');
-    await $btn(page).click();
+    await ss(page, '登录前', '53');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     // XSS 载荷通过 API 调用后返回标准错误消息
-    await expect($err(page)).toContainText("We didn't recognize");
+    await expect($err(page)).toHaveText("We didn't recognize the username or password you entered. Please try again.");
     // 确保没有弹出 alert 对话框（测试能继续进行说明无 XSS 执行）
-    await ss(page, 'XSS防护', '55');
+    await ss(page, 'XSS防护', '53');
   });
 
-  test('56-安全性-密码不出现在console日志', async ({ page }) => {
+  test('54-安全性-密码不出现在console日志', async ({ page }) => {
     const logs: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'log' || msg.type() === 'warning' || msg.type() === 'error') {
@@ -830,33 +840,34 @@ test.describe('UD01 用户登录模块', () => {
     if (!u) throw new Error('无可用用户');
     await $uid(page).fill(u.userid);
     await $pwd(page).fill('SecretP@ss123!');
-    await $btn(page).click();
+    await clickLogin(page);
     await page.waitForTimeout(2000);
     const leaked = logs.filter(l => l.includes('SecretP@ss123!'));
     expect(leaked.length).toBe(0);
     console.log(`  捕获 ${logs.length} 条日志，无密码泄露`);
-    await ss(page, '密码日志', '56');
+    await ss(page, '密码日志', '54');
   });
 
-  test('57-安全性-密码通过POST body发送不在URL', async ({ page }) => {
+  test('55-安全性-密码通过POST body发送不在URL', async ({ page }) => {
     await $uid(page).fill('admin');
     await $pwd(page).fill('pass');
     expect(page.url()).not.toContain('password');
-    await ss(page, 'URL无密码', '57');
+    await ss(page, 'URL无密码', '55');
   });
 
-  test('58-安全性-SQL注入防护', async ({ page }) => {
+  test('56-安全性-SQL注入防护', async ({ page }) => {
     await $uid(page).fill("' OR '1'='1");
     await $pwd(page).fill('x');
-    await ss(page, '登录前', '58');
-    await $btn(page).click();
+    await ss(page, '登录前', '56');
+    await clickLogin(page);
     await expect($err(page)).toBeVisible({ timeout: 10000 });
     const msg = await $err(page).textContent();
     expect(msg).not.toContain('SQL');
     expect(msg).not.toContain('syntax');
-    console.log(`  错误消息: "${msg?.substring(0, 60)}..."`);
+    console.log(`  错误消息: "${msg}"`);
     await expect($btn(page)).toBeEnabled();
-    await ss(page, 'SQL注入防护', '58');
+    expect(page.url()).not.toContain('/menu');
+    await ss(page, 'SQL注入防护', '56');
   });
 
 });

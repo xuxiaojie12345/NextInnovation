@@ -546,7 +546,7 @@ const HomologationVariables: React.FC = () => {
           <option value="">-- Select --</option>
           {productClasses.map((pc) => (
             <option key={pc.pc} value={pc.pc}>
-              {pc.pc} - {pc.description}
+              {pc.description}
             </option>
           ))}
         </select>

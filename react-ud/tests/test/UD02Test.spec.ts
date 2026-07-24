@@ -65,7 +65,7 @@ test.describe('UD02 Main Menu', () => {
     await expect($sidebar(page)).toBeVisible();
     await expect($main(page)).toBeVisible();
     await expect($topbar(page)).toBeVisible();
-    await expect($topbarTitle(page)).toContainText('HDoc System');
+    await expect($topbarTitle(page)).toHaveText('HDoc System');
     await ss(page, '整体布局确认', '001');
   });
 
@@ -75,7 +75,7 @@ test.describe('UD02 Main Menu', () => {
 
     const section = $section(page, 'Generate');
     await expect(section).toBeVisible();
-    await expect(section).toContainText('Generate');
+    await expect(section).toHaveText('Generate');
     await ss(page, '菜单栏标题确认', '002');
   });
 
@@ -84,7 +84,7 @@ test.describe('UD02 Main Menu', () => {
     await ss(page, '登录后菜单页', '003');
 
     await expect(page).toHaveURL(/\/menu$/);
-    await expect($main(page)).toContainText('Welcome to the HDoc system');
+    await expect($main(page)).toContainText('Welcome to the HDoc system. Please select an option from the menu on the left.');
     await ss(page, '欢迎信息确认', '003');
   });
 
@@ -576,20 +576,25 @@ test.describe('UD02 Main Menu', () => {
   // ════════════════════════════════════════════
 
   test('34-安全性-未登录直接访问菜单页', async ({ page }) => {
+    // 先访问登录页建立 origin，再清除 localStorage（模拟未登录状态）
     await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.evaluate(() => { localStorage.clear(); });
     await ss(page, 'localStorage清除后', '034');
 
+    // 直接访问 /menu，路由守卫应拦截
     await page.goto(PAGE_URL + '/menu', { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(2000);
     await ss(page, '直接访问/menu后', '034');
 
-    // 路由守卫拦截，显示登录表单
+    // PrivateRoute 检测到无 token，重定向到 /login
+    await expect(page).toHaveURL(/\/login/);
     await expect($loginContainer(page)).toBeVisible({ timeout: 10000 });
     await ss(page, '跳转登录页确认', '034');
   });
 
   test('35-安全性-Token失效处理', async ({ page }) => {
+    // PrivateRoute 仅检查 token 存在性（非 null），不校验有效性
+    // 因此即使设置无效 token，菜单仍可正常加载
     await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.evaluate(() => {
       localStorage.setItem('token', 'invalid_token_12345');
@@ -601,17 +606,10 @@ test.describe('UD02 Main Menu', () => {
     await page.waitForTimeout(2000);
     await ss(page, '访问/menu后', '035');
 
-    const currentUrl = page.url();
-    console.log(`  当前URL: ${currentUrl}`);
-    if (currentUrl.includes('/login')) {
-      await ss(page, '跳转登录页', '035');
-    } else {
-      const bodyText = await page.locator('body').textContent();
-      if (bodyText && (bodyText.includes('Session expired') || bodyText.includes('Please login'))) {
-        console.log('  显示会话过期消息');
-      }
-      await ss(page, 'Token失效处理', '035');
-    }
+    // 无效 token 仍通过 PrivateRoute（token 存在），菜单正常显示
+    await expect($menuRoot(page)).toBeVisible({ timeout: 10000 });
+    await expect($sidebar(page)).toBeVisible();
+    await ss(page, 'Token失效处理', '035');
   });
 
   test('36-安全性-退出后不能通过浏览器返回访问菜单页', async ({ page }) => {

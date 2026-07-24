@@ -5,7 +5,6 @@ import com.web.app.dto.ApiResponse;
 import com.web.app.service.TemplateService;
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -75,7 +74,10 @@ public class TemplateController extends BaseController {
       Map<String, Object> response = new HashMap<>();
       response.put("message", message);
       return ok(response);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
+      if (e.getMessage() != null && e.getMessage().contains("path traversal")) {
+        return badRequest(e.getMessage());
+      }
       return systemError();
     }
   }
@@ -89,40 +91,22 @@ public class TemplateController extends BaseController {
         return badRequest("Market is required.");
       }
 
-      String dirPath = uploadDir + "/" + market;
-      File dir = new File(dirPath);
-      List<Map<String, Object>> templates = new ArrayList<>();
-      if (dir.exists() && dir.isDirectory()) {
-        templates =
-            Arrays.stream(Objects.requireNonNull(dir.listFiles()))
-                .filter(File::isFile)
-                .map(
-                    file -> {
-                      Map<String, Object> fileInfo = new HashMap<>();
-                      fileInfo.put("filename", file.getName());
-                      long lastModified = file.lastModified();
-                      if (lastModified > 0) {
-                        java.text.SimpleDateFormat sdf =
-                            new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
-                        fileInfo.put("lastMod", sdf.format(new java.util.Date(lastModified)));
-                      } else {
-                        fileInfo.put("lastMod", "-");
-                      }
-                      long fileSize = file.length();
-                      String sizeStr =
-                          fileSize > 0 ? String.format("%.1f", fileSize / 1024.0) + " KB" : "-";
-                      fileInfo.put("size", sizeStr);
-                      return fileInfo;
-                    })
-                .collect(Collectors.toList());
-      } else {
-        return badRequest(MessageConstants.MARKET_FOLDER_NOT_FOUND);
+      List<Map<String, Object>> templates = templateService.listTemplates(market);
+      if (templates.isEmpty()) {
+        String dirPath = uploadDir + "/" + market;
+        File dir = new File(dirPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+          return badRequest(MessageConstants.MARKET_FOLDER_NOT_FOUND);
+        }
       }
 
       Map<String, Object> data = new HashMap<>();
       data.put("templateList", templates);
       return ok(data);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
+      if (e.getMessage() != null && e.getMessage().contains("path traversal")) {
+        return badRequest(e.getMessage());
+      }
       return systemError();
     }
   }
@@ -146,7 +130,10 @@ public class TemplateController extends BaseController {
           .contentType(MediaType.APPLICATION_OCTET_STREAM)
           .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
           .body(resource);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
+      if (e.getMessage() != null && e.getMessage().contains("path traversal")) {
+        return badRequest(e.getMessage());
+      }
       return systemError(MessageConstants.FILE_NOT_FOUND);
     }
   }

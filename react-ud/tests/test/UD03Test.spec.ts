@@ -54,7 +54,7 @@ test.describe('UD03 Generate Homologation Document', () => {
     await expect($page(page)).toBeVisible();
     await expect($header(page)).toContainText('HDoc - Generate Homologation Document');
     await expect($container(page)).toBeVisible();
-    await expect($support(page)).toContainText('HDoc support:');
+    await expect($support(page)).toHaveText('HDoc support: support.tpi@123.com');
     await expect($support(page).locator('a')).toHaveAttribute('href', 'mailto:support.tpi@123.com');
     await ss(page, '整体布局确认', '01');
   });
@@ -212,7 +212,7 @@ test.describe('UD03 Generate Homologation Document', () => {
   test('10-Chassis series-允许文字（仅英文字母）', async ({ page }) => {
     await gotoPage(page);
 
-    // onChange 过滤非字母，ABC12 -> ABC
+    // onChange 过滤非字母，ABC12 -> ABC，前端校验通过，API 被调用
     await $series(page).fill('ABC12');
     await $chnr(page).fill('1234567890');
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
@@ -222,10 +222,9 @@ test.describe('UD03 Generate Homologation Document', () => {
     await $submit(page).click();
     await ss(page, '提交-后', '10');
 
-    // 前端校验通过，API 被调用
+    // onChange 过滤后前端校验通过，API 被调用，返回后端错误消息
     await expect($err(page)).toBeVisible();
-    const err10 = await $err(page).textContent();
-    console.log('  API返回: ' + err10);
+    await expect(page.url()).not.toContain('/generate-document/result');
     await ss(page, '校验结果确认', '10');
   });
 
@@ -266,18 +265,23 @@ test.describe('UD03 Generate Homologation Document', () => {
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
     if (firstValue) await $docType(page).selectOption(firstValue);
 
+    // 拦截 API 延迟 3 秒，确保能捕获提交中禁用状态
+    await page.route('**/api/v1/hdoc/generatedocument', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+
     await ss(page, '提交-前', '14');
     await page.evaluate(() => {
       (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click();
     });
 
-    try {
-      await expect($series(page)).toBeDisabled({ timeout: 2000 });
-      await ss(page, '禁用状态确认', '14');
-    } catch {
-      console.log('  API响应过快，跳过禁用状态验证');
-    }
-    try { await page.waitForURL('**/generate-document/result', { timeout: 15000 }); } catch { /* ok */ }
+    await expect($series(page)).toBeDisabled({ timeout: 2000 });
+    await ss(page, '禁用状态确认', '14');
+
+    // 等待路由延迟结束后 API 正常返回
+    try { await page.waitForURL('**/generate-document/result', { timeout: 20000 }); } catch { /* ok */ }
+    try { await page.unroute('**/api/v1/hdoc/generatedocument'); } catch { /* ok */ }
   });
 
   // ════════════════════════════════════════════
@@ -307,7 +311,7 @@ test.describe('UD03 Generate Homologation Document', () => {
   test('17-Chassis no-允许文字（仅数字）', async ({ page }) => {
     await gotoPage(page);
 
-    // onChange 过滤非数字，ABCDE -> 空
+    // onChange 过滤非数字，ABCDE -> 空，触发空值校验
     await $series(page).fill('ABCDE');
     await $chnr(page).fill('ABCDE');
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
@@ -319,7 +323,7 @@ test.describe('UD03 Generate Homologation Document', () => {
 
     await expect($err(page)).toBeVisible();
     await expect($err(page)).toContainText('Chassis no is required.');
-    await ss(page, '格式校验确认', '17');
+    await ss(page, '空值校验确认', '17');
   });
 
   test('18-Chassis no-文字配置（左对齐）', async ({ page }) => {
@@ -359,18 +363,23 @@ test.describe('UD03 Generate Homologation Document', () => {
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
     if (firstValue) await $docType(page).selectOption(firstValue);
 
+    // 拦截 API 延迟 3 秒，确保能捕获提交中禁用状态
+    await page.route('**/api/v1/hdoc/generatedocument', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+
     await ss(page, '提交-前', '21');
     await page.evaluate(() => {
       (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click();
     });
 
-    try {
-      await expect($chnr(page)).toBeDisabled({ timeout: 2000 });
-      await ss(page, '禁用状态确认', '21');
-    } catch {
-      console.log('  API响应过快，跳过禁用状态验证');
-    }
-    try { await page.waitForURL('**/generate-document/result', { timeout: 15000 }); } catch { /* ok */ }
+    await expect($chnr(page)).toBeDisabled({ timeout: 2000 });
+    await ss(page, '禁用状态确认', '21');
+
+    // 等待路由延迟结束后 API 正常返回
+    try { await page.waitForURL('**/generate-document/result', { timeout: 20000 }); } catch { /* ok */ }
+    try { await page.unroute('**/api/v1/hdoc/generatedocument'); } catch { /* ok */ }
   });
 
   // ════════════════════════════════════════════
@@ -410,18 +419,23 @@ test.describe('UD03 Generate Homologation Document', () => {
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
     if (firstValue) await $docType(page).selectOption(firstValue);
 
+    // 拦截 API 延迟 3 秒，确保能捕获提交中禁用状态
+    await page.route('**/api/v1/hdoc/generatedocument', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+
     await ss(page, '提交-前', '24');
     await page.evaluate(() => {
       (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click();
     });
 
-    try {
-      await expect($docType(page)).toBeDisabled({ timeout: 2000 });
-      await ss(page, '提交中-禁用', '24');
-    } catch {
-      console.log('  API响应过快，跳过禁用验证');
-    }
-    try { await page.waitForURL('**/generate-document/result', { timeout: 15000 }); } catch { /* ok */ }
+    await expect($docType(page)).toBeDisabled({ timeout: 2000 });
+    await ss(page, '提交中-禁用', '24');
+
+    // 等待路由延迟结束后 API 正常返回
+    try { await page.waitForURL('**/generate-document/result', { timeout: 20000 }); } catch { /* ok */ }
+    try { await page.unroute('**/api/v1/hdoc/generatedocument'); } catch { /* ok */ }
   });
 
   // ════════════════════════════════════════════
@@ -451,19 +465,24 @@ test.describe('UD03 Generate Homologation Document', () => {
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
     if (firstValue) await $docType(page).selectOption(firstValue);
 
+    // 拦截 API 延迟 3 秒，确保能捕获提交中状态
+    await page.route('**/api/v1/hdoc/generatedocument', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+
     await ss(page, '提交-前', '26');
     await page.evaluate(() => {
       (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click();
     });
 
-    try {
-      await expect($submit(page)).toHaveText('Submitting...', { timeout: 2000 });
-      await expect($submit(page)).toBeDisabled();
-      await ss(page, '提交中状态', '26');
-    } catch {
-      console.log('  API响应过快，跳过提交中状态验证');
-    }
-    try { await page.waitForURL('**/generate-document/result', { timeout: 15000 }); } catch { /* ok */ }
+    await expect($submit(page)).toHaveText('Submitting...', { timeout: 2000 });
+    await expect($submit(page)).toBeDisabled();
+    await ss(page, '提交中状态', '26');
+
+    // 等待路由延迟结束后 API 正常返回
+    try { await page.waitForURL('**/generate-document/result', { timeout: 20000 }); } catch { /* ok */ }
+    try { await page.unroute('**/api/v1/hdoc/generatedocument'); } catch { /* ok */ }
   });
 
   // ════════════════════════════════════════════
@@ -607,7 +626,7 @@ test.describe('UD03 Generate Homologation Document', () => {
   test('36-格式校验-Chassis series包含数字', async ({ page }) => {
     await gotoPage(page);
 
-    // onChange 过滤非字母，ABC12 -> ABC，前端校验通过
+    // onChange 过滤非字母，ABC12 -> ABC，前端校验通过，API 被调用
     await $series(page).fill('ABC12');
     await $chnr(page).fill('12345');
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
@@ -617,20 +636,16 @@ test.describe('UD03 Generate Homologation Document', () => {
     await $submit(page).click();
     await ss(page, '提交-后', '36');
 
-    const url36 = page.url();
-    if (url36.includes('/generate-document/result')) {
-      console.log('  提交成功，跳转到结果页');
-    } else if (await $err(page).isVisible()) {
-      const err36 = await $err(page).textContent();
-      console.log('  错误消息: ' + err36);
-    }
-    await ss(page, '格式校验确认', '36');
+    // onChange 过滤后前端校验通过，API 被调用，返回后端错误消息
+    await expect($err(page)).toBeVisible();
+    await expect(page.url()).not.toContain('/generate-document/result');
+    await ss(page, '后端返回确认', '36');
   });
 
   test('37-格式校验-Chassis no包含字母', async ({ page }) => {
     await gotoPage(page);
 
-    // onChange 过滤非数字，123AB -> 123，前端校验通过
+    // onChange 过滤非数字，123AB -> 123，前端校验通过，API 被调用
     await $series(page).fill('ABCDE');
     await $chnr(page).fill('123AB');
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
@@ -640,14 +655,10 @@ test.describe('UD03 Generate Homologation Document', () => {
     await $submit(page).click();
     await ss(page, '提交-后', '37');
 
-    const url37 = page.url();
-    if (url37.includes('/generate-document/result')) {
-      console.log('  提交成功，跳转到结果页');
-    } else if (await $err(page).isVisible()) {
-      const err37 = await $err(page).textContent();
-      console.log('  错误消息: ' + err37);
-    }
-    await ss(page, '格式校验确认', '37');
+    // onChange 过滤后前端校验通过，API 被调用，返回后端错误消息
+    await expect($err(page)).toBeVisible();
+    await expect(page.url()).not.toContain('/generate-document/result');
+    await ss(page, '后端返回确认', '37');
   });
 
   test('38-提交成功-车辆存在（导航跳转）', async ({ page }) => {
@@ -759,22 +770,25 @@ test.describe('UD03 Generate Homologation Document', () => {
     const firstValue = await $docType(page).locator('option:not([value=""])').first().getAttribute('value');
     if (firstValue) await $docType(page).selectOption(firstValue);
 
+    // 拦截 API 延迟 3 秒，确保能捕获提交中禁用状态
+    await page.route('**/api/v1/hdoc/generatedocument', async (route) => {
+      await new Promise(r => setTimeout(r, 3000));
+      await route.continue();
+    });
+
     await ss(page, '提交-前', '41');
     await page.evaluate(() => {
       (document.querySelector('button.btn-primary') as HTMLButtonElement)?.click();
     });
 
-    try {
-      await expect($submit(page)).toBeDisabled({ timeout: 2000 });
-      await ss(page, '提交中被禁用', '41');
-    } catch {
-      console.log('  API响应过快，跳过禁用验证');
-    }
+    await expect($submit(page)).toBeDisabled({ timeout: 2000 });
+    await ss(page, '提交中被禁用', '41');
 
     await $submit(page).click({ force: true });
     await page.waitForTimeout(3000);
     await expect($submit(page)).toBeEnabled();
     await ss(page, '重复提交确认', '41');
+    try { await page.unroute('**/api/v1/hdoc/generatedocument'); } catch { /* ok */ }
   });
 
   test('42-提交成功-localStorage保存上次输入', async ({ page }) => {

@@ -137,6 +137,8 @@ const ListAvailableTemplates: React.FC = () => {
       const token = localStorage.getItem("token") || "";
       const url = `${API_BASE_URL}/template/download`;
 
+      const ac = new AbortController();
+      setTimeout(() => ac.abort(), 30000);
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -147,6 +149,7 @@ const ListAvailableTemplates: React.FC = () => {
           market: selectMarket,
           fileName: filename,
         }),
+        signal: ac.signal,
       });
 
       if (!response.ok) {

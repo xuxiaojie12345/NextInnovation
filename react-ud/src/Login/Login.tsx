@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Login.css";
 import { LoginRequest, LoginResponse } from "./Login.types";
+import { api } from "../services/api";
 
 const Login: React.FC = () => {
   const [userid, setUserid] = useState("");
@@ -43,60 +44,19 @@ const Login: React.FC = () => {
         password: passwordVal,
       };
 
-      // POST请求进行身份认证
-      const response = await fetch("/api/v1/hdoc/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginRequest),
-      });
+      // 通过 api.post 调用登录（自动带 30 秒超时、JSON 解析、错误处理）
+      const result = await api.post<{ token: string; userid: string; username: string }>("/login", loginRequest);
 
-      const contentType = response.headers.get("content-type") || "";
-      let result: LoginResponse | null = null;
-
-      if (contentType.includes("application/json")) {
-        try {
-          result = await response.json();
-        } catch (e) {
-          console.error("Failed parsing JSON login response:", e);
-        }
-      } else {
-        const text = await response.text();
-        console.error(
-          "Non-JSON login response:",
-          response.status,
-          response.statusText,
-          text,
-        );
-        setMessage(`Login failed: ${response.status} ${response.statusText}`);
-        return;
-      }
-
-      const hasValidData = result !== null;
-      // 登录成功：保存token并跳转菜单页
-      if (response.ok && hasValidData && result?.code === 200 && result?.data) {
+      if (result.code === 200 && result.data) {
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("userId", result.data.userid);
         localStorage.setItem("username", result.data.username);
         window.location.href = "/menu";
       } else {
-        // 登录失败
-        const serverMsg =
-          result && result.message
-            ? result.message
-            : `Login failed: ${response.status} ${response.statusText}`;
-        console.warn(
-          "Login failed response:",
-          response.status,
-          serverMsg,
-          result,
+        setMessage(
+          result.message || "We didn't recognize the username or password you entered. Please try again.",
         );
-        setMessage(serverMsg || "Login failed. Please try again.");
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setMessage("System error. Please contact administrator.");
     } finally {
       setIsLoading(false);
     }

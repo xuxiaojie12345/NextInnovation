@@ -109,7 +109,7 @@ const EDBUserView: React.FC = () => {
               type="text"
               className="edb-filter-input"
               value={row.value}
-              onChange={(e) => updateFilter(i, "value", e.target.value)}
+              readOnly
             />
           </div>
         ))}

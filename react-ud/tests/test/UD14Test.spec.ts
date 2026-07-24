@@ -41,8 +41,23 @@ const $fileIcon          = (p: Page) => p.locator('.lat-file-icon');
 
 async function navigateToPage(page: Page) {
   await login(page);
-  await page.goto(PAGE_URL + '/menu/list-templates', { waitUntil: 'load' });
-  await page.waitForSelector('.lat-container');
+  await page.goto(PAGE_URL + '/menu/list-templates', { waitUntil: 'load', timeout: 15000 }).catch(() => {
+    console.log('  ⚠️ Page navigation timed out');
+  });
+  try {
+    await page.waitForSelector('.lat-container', { timeout: 10000 });
+  } catch {
+    // 超时后检查是否被重定向到登录页
+    const currentUrl = page.url();
+    console.log('  Current URL after navigation: ' + currentUrl);
+    if (currentUrl.includes('/login')) {
+      console.log('  ⚠️ Redirected to login - token may not be set or invalid');
+    }
+    throw new Error(
+      `Failed to find .lat-container. Current URL: ${currentUrl}. ` +
+      'Possible causes: backend not running, login failed, or page render error.'
+    );
+  }
   await page.waitForTimeout(1500);
 }
 
@@ -641,11 +656,44 @@ test.describe('UD14 List Available Templates', () => {
       // 获取第一个文件名
       const firstFileName = await $downloadLink(page).first().textContent();
       console.log('  Original filename: ' + firstFileName);
-      // 不实际点击下载（避免路径遍历），仅确认文件名正常展示
       await ss(page, 'path traversal', '26');
     } else {
       await ss(page, 'no files', '26');
     }
+
+    // 直接调用后端 API 验证路径遍历防护
+    const token = await page.evaluate(() => localStorage.getItem('token') || '');
+    const apiBase = PAGE_URL.replace(':3000', ':8081') + '/api/v1/hdoc/template';
+
+    // 测试1: 使用路径遍历文件名下载
+    const travResp1 = await page.request.post(apiBase + '/download', {
+      data: { fileName: '../../../etc/passwd', market: firstMarket || 'JP' },
+      headers: { Authorization: token, 'Content-Type': 'application/json' },
+    });
+    const travBody1 = await travResp1.json();
+    console.log('  Path traversal download response:', travBody1);
+    expect(travResp1.status()).not.toBe(200);
+    expect(travBody1.message || '').toContain('path traversal');
+
+    // 测试2: 使用路径遍历文件名删除
+    const travResp2 = await page.request.post(apiBase + '/delete', {
+      data: { fileName: '..\\..\\windows\\system32\\config', market: firstMarket || 'JP' },
+      headers: { Authorization: token, 'Content-Type': 'application/json' },
+    });
+    const travBody2 = await travResp2.json();
+    console.log('  Path traversal delete response:', travBody2);
+    expect(travResp2.status()).not.toBe(200);
+    expect(travBody2.message || '').toContain('path traversal');
+
+    // 测试3: 使用路径遍历 market 参数列出模板
+    const travResp3 = await page.request.post(apiBase + '/listTemplates', {
+      data: { market: '../../etc' },
+      headers: { Authorization: token, 'Content-Type': 'application/json' },
+    });
+    const travBody3 = await travResp3.json();
+    console.log('  Path traversal listTemplates response:', travBody3);
+    expect(travResp3.status()).not.toBe(200);
+    expect(travBody3.message || '').toContain('path traversal');
   });
 
 });
