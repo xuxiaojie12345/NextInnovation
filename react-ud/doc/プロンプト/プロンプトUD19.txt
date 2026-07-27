@@ -1,0 +1,120 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+
+1.基本信息
+   文档编号:DES-Search User-019
+   模块名称:Search User
+   版本号：v1.0
+   作成日:2026-07-22
+
+
+2. 背景 (Background)
+  本模块的核心功能和目标
+  实现Search HDoc User画面的用户检索功能，支持通过Userid、User名称、Market权限、功能权限等多种条件查询HDoc系统内的用户信息，覆盖精准用户查找、全量用户遍历、特定权限用户筛选等多种使用场景，最终在Search Hdoc User检索结果画面展示对应的用户信息与检索结果总记录数，完成HDoc系统的用户查询需求。
+  安全性或特殊要求（如有）
+  所有用户身份核心数据必须对接官方认证数据源Saviynt获取权威结果，用户功能权限、Market权限等敏感数据从专属的业务权限表读取，全程保障用户敏感信息来源合规、数据准确，避免非法篡改或错误数据流出。
+  用户体验方面的考虑
+  所有检索相关的输入、操作控件默认处于激活可操作状态，无需用户额外解锁即可直接输入检索条件，同时提供多种检索模式自由切换，适配不同用户的查询习惯，简化查询操作流程。
+
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Userid | TextField | - | 10 | Input | 半角英数字 | 左 | - | 活性 | 搜索条件 |
+| 2   | User | TextField | - | 32 | Input | 半角英数字 | 左 | - | 活性 | 搜索条件 |
+| 3   | Market | Pull-downList | - | - | Input | - | 左 | - | 活性 | 搜索条件，数据来源为MARKET_MASTER表的MARKET字段 |
+| 4   | Not set | RadioBox | - | - | Input | - | 左 | - | 活性 | 搜索条件 |
+| 5   | Rule | RadioBox | - | - | Input | - | 左 | - | 活性 | 搜索条件 |
+| 6   | Template | RadioBox | - | - | Input | - | 左 | - | 活性 | 搜索条件 |
+| 7   | Search | Button | - | - | Action | - | 中 | - | 活性 | 检索触发按钮 |
+| 8   | Userid | DataTable | - | - | Output | - | 左 | - | - | 搜索结果展示项，数据来源为Saviynt的Userid字段 |
+| 9   | User | DataTable | - | - | Output | - | 左 | - | - | 搜索结果展示项，数据来源为Saviynt的User字段 |
+| 10  | Market | DataTable | - | - | Output | - | 左 | - | - | 搜索结果展示项，数据来源为MARKET_MASTER的MARKET字段 |
+| 11  | COUNT | DataTable | - | - | Output | - | 左 | - | - | 显示搜索结果的记录数 |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+          画面正常表示
+      4.1.2 开始：点击「Search」按钮触发检索
+      空值校验等 (Frontend Check)：
+       若Userid或User输入非半角英数字的非法字符：
+        设置Message =  对应字段名 must be a half width English numeral.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用接口完成身份信息查询，调用HDOC_FUNCTION_AUTH获取用户功能权限，调用HDOC_MARKET_AUTH获取用户Market权限，调用MARKET_MASTER获取Market主数据
+      4.1.4 结果处理：
+       输入Userid触发检索：从Saviynt获取对应用户名，通过Userid从用户market权限表获取对应的Market信息，返回结果列表
+       输入User触发检索：从Saviynt获取对应用户Userid，再通过Userid从用户market权限表获取对应的Market信息，返回结果列表
+       勾选Not set触发检索：遍历查询系统内全部用户的相关信息并返回全量结果
+       勾选Rule触发检索：筛选所有持有Rule Admin权限的用户并返回结果
+       勾选Template触发检索：筛选所有持有Template Admin权限的用户并返回结果
+       成功：展示Search Hdoc User检索结果画面，输出匹配的用户列表与总记录数
+       失败：返回对应错误提示信息，终止检索流程
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 点击Search按钮时 | Userid输入框 | 输入内容包含非半角英数字字符 | Userid仅允许输入半角英数字字符 | 终止检索流程，光标自动定位到Userid输入框 |
+   | 2 | 点击Search按钮时 | User输入框 | 输入内容包含非半角英数字字符 | User仅允许输入半角英数字字符 | 终止检索流程，光标自动定位到User输入框 |
+
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+   UD19SearchResultListApi.UD19SearchHdoc
+     功能：Userid获取User情报
+     Method：GET
+     Endpoint：/api/ud19/UD19SearchResultListApi/UD19SearchHdoc
+
+     Request [请求格式]
+     {
+         "userid": "U123456789",
+         "username": "DemoUser"
+     }
+
+     Response Success (200)
+     {
+       "code": 200,
+       "data": {
+         "userid": "U123456789",
+         "user": "JOIN QIAO",
+         "market": "EU",
+         "count": "10"
+       }
+     }
+
+   UD19SearchResultListApi.UD19SelectMarketMaster
+     功能：Market一覧取得
+     Method：GET
+     Endpoint：/api/ud19/UD19SearchResultListApi/UD19SelectMarketMaster
+
+     Request [请求格式]
+     {
+     }
+
+     Response Success (200)
+     {
+       "code": 200,
+       "data": ["CN", "JP", "US", "EU"]
+     }
+
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 访问无权限接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：SearchUser_詳細設計(UD019).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

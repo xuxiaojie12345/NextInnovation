@@ -1,0 +1,106 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-Save Modifications-006
+   模块名称:Save Modifications
+   版本号：v1.0
+   作成日:2026-07-13
+
+2. 背景 (Background)
+本模块的核心功能和目标
+本模块Save Modifications功能模块，核心目标是向用户呈现对应的业务修改详情，支持用户查看相关变更信息后关闭页面，完成本次修改确认查看的操作流程。
+安全性或特殊要求
+当前无额外特殊安全约束，所有展示数据需从指定数据源准确获取，保证展示的修改信息与业务系统存储的Modify信息完全一致，避免出现信息偏差。
+用户体验方面的考虑
+所有展示文本按指定规则对齐布局，保证页面内容排版整齐易读；页面加载完成后「Close」按钮保持活性状态，用户可以随时点击触发页面关闭，操作路径简洁无多余步骤。
+
+
+3. 画面项目定义 (Screen Parameters)
+| No. | 项目名 (Item) | 种类 (Type) | 必须 (Req) | MaxLength | I/O | 容许文字 (Allowed Chars) | 文字配置 (Align) | 初期值 (Default) | 显示控制 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis serie | Label | - | - | Output | - | 左 | - | - | 获取「-」之前的内容 |
+| 2   | Chassis number | Label | - | - | Output | - | 左 | - | - | 获取「-」之后的内容 |
+| 3   | Doctype | Label | - | - | Output | - | 左 | - | - | 数据源为HDOC_ADCA_MODIFICATION表的DOCTYPE字段 |
+| 4   | Version | Label | - | - | Output | - | 左 | - | - | 数据源为HDOC_ADCA_MODIFICATION表的VERS字段 |
+| 5   | Storing | Label | - | - | Output | - | 左 | - | - | 数据源为HDOC_ADCA_MODIFICATION表的VARIABLE NEWVAL字段 |
+| 6   | FOUND UNRELEASED VERSION | Label | - | - | Output | - | 左 | - | - | 数据源为HDOC_ADCA_MODIFICATION表的VERS字段 |
+| 7   | Message | Label | - | - | Output | - | 左 | 'VERSION IS RELEASED' | - | 对应预设提示内容 |
+| 8   | Close | Button | - | - | Action | - | 中 | - | 活性 | 触发页面关闭操作 |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+4.1 处理流程
+4.1.1 初期表示：
+页面启动后从指定数据源拉取对应的修改内容数据，完整加载所有画面控件，保证Save Modifications画面正常展示，完成所有修正内容的渲染显示。
+4.1.2 开始：[用户触发页面加载完成后查看操作，点击「Close」按钮触发关闭流程]
+前端校验：
+本页面无额外空值类前端校验，所有展示字段均从指定数据源前置获取完成后渲染输出。
+4.1.3 API调用 (Backend Check)：
+调用查询接口，从HDOC_ADCA_MODIFICATION表中获取Modify相关信息，为画面展示提供数据源支撑。
+4.1.4 结果处理：
+成功：所有修正内容正常渲染展示在页面中，用户可正常查看全部修改详情。
+失败：页面按规则保留基础控件展示，提示对应数据加载异常信息。
+
+4.2 校验详细规格表
+无
+
+5. 接口定义 (API Specification)
+getSaveModificationsInfo
+  功能：从HDOC_ADCA_MODIFICATION表中查询获取Modify相关的全部修改信息，为Save Modifications页面提供展示数据源
+  Method：GET
+  Endpoint：/api/hdoc/UD06SaveModificationsApi/UD06SelectHdocAdcaModification
+
+  Request [请求格式]
+ {
+  "chassisSeries": "string",
+  "chassisNo": "string",
+ }
+
+  请求示例：
+  {
+    "chassisSeries": "JPCT",
+    "chassisNo": "028321"
+  }
+
+  Response Success (200)
+  成功响应示例：
+  {
+    "code": "200",
+    "msg": null,
+    "data": {
+      "chassisSerie": "JPCT",
+      "chassisNumber": "028321",
+      "doctype": "DIM-PLATE",
+      "vers": "1",
+      "storing": ｛
+            "variable"："SEAT_1",
+            "newval"："SEAT_2",
+      ,
+      "versiono": "1"
+    }
+  }
+
+  Response Error (500)
+  错误响应示例：
+  {
+    "code": "500",
+    "msg": "System error. Please contact administrator.",
+    "data": null
+  }
+
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 登录接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：SaveModifications_詳細設計(UD006).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

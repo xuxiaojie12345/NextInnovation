@@ -1,0 +1,153 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-Generate Doc-004
+   模块名称:Generate Doc
+   版本号：v1.0
+   作成日:2026-07-10
+
+2. 背景 (Background)
+本模块的核心功能和目标：
+本页面为Generate Document页面，基于前画面传入的设定条件调用VPPS VIN PLATE作成批处理生成VIN Plate文档，完成指定Chassis的车辆相关信息展示、VIN Plate文档生成与下载、关联页面跳转的核心功能，支撑HDOC业务下的车辆铭牌文档快速生成需求。
+安全性或特殊要求：
+无额外特殊安全约束，所有展示数据均从指定业务数据表读取，禁止未授权的数据修改操作。
+用户体验方面的考虑：
+页面加载后自动完成初始数据拉取与批处理调用，无需用户额外手动触发基础生成动作；关键关联操作提供直观的链接入口，AD-Chang状态激活时Modify链接自动标红高亮提示用户；生成的VIN Plate文档可直接点击链接一键下载，优化操作路径。
+
+
+3. 画面项目定义 (Screen Parameters)
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis no | Label | - | 15 | Output | - | 左 | - | - | 从前画面获取Chassis series、Chassis no字段信息展示 |
+| 2   | Ordernumber | Label | - | 16 | Output | - | 左 | - | - | 从HDOC_REC_DATA_OM表读取ORDERNUMBER字段信息展示 |
+| 3   | Build week | Label | - | 10 | Output | - | 左 | - | - | 从HDOC_REC_DATA_OM表读取BUILD字段信息展示 |
+| 4   | Spec week | Label | - | 10 | Output | - | 左 | - | - | 从HDOC_REC_DATA_OM表读取SPEC字段信息展示 |
+| 5   | Market | Label | - | 10 | Output | - | 左 | - | - | 从HDOC_REC_DATA_VDA_GENERAL表读取COUNTRY_OF_OPERATION字段信息展示，对应VDA中的CountryOfOperation |
+| 6   | Master Market | Label | - | - | Output | - | 左 | - | - | 固定设置值为'-EU' |
+| 7   | S-Note NO | Label | - | 4000 | Output | - | 左 | - | - | 从HDOC_REC_DATA_OM表读取CUSTOMER_ADAP字段信息展示 |
+| 8   | S-Note Message | Label | - | 256 | Output | - | 左 | - | - | 存在S-Note信息时固定显示文本'The S-Notes above can affect homologation documents.' |
+| 9  | Load Index | Label | - | 10 | Output | - | 左 | - | - | 从HDOC_REC_DATA_KOLA_TIRE_MASTER表读取LOAD_INDEX字段，即Tire Master信息展示 |
+| 10  | Analyze Rules | Link | - | 10 | Action | - | 左 | - | - | 点击后跳转至「HDOC DEBUG」画面 |
+| 11  | Modify Doc Link | Link | - | 1 | Output/Action | - | 左 | - | 动态 | 当AD-Change状态为激活时，以红色显示文本'After def change detected. Document need to be modified.'，点击后跳转至「Modify Document」画面 |
+| 12  | Using template | Label | - | 20 | Output | - | 左 | - | - | 从VPPS VIN PLATE作成批处理返回的Template字段信息展示 |
+| 13  | Replacing parameters | Label | - | 40 | Output | - | 左 | - | - | 从HDOC_ADCA_MODIFICATION表读取VARIABLE、NEWVAL字段信息展示 |
+| 14  | Generated document | Link | - | - | Action | - | 左 | - | - | 点击后下载由VPPS VIN PLATE作成批处理生成的已填充值的「Vin Plate」.trf文件 |
+| 15  | Date | Label | - | 20 | Output | - | 左 | - | - | 取服务器当前时间展示，格式示例'2022-12-02 05:11:45' |
+| 16  | HDoc version | Label | - | 20 | Output | - | 左 | - | - | 取当前程序的版本号信息展示 |
+| 17  | Error message area | Label | - | - | Output | - | 左 | - | - | 用于展示页面运行过程中抛出的错误信息 |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+4.1 处理流程
+    4.1.1 初期表示：
+        页面加载后基于前画面传入的设定条件，调用VPPS VIN PLATE作成批处理生成VIN Plate，依次完成以下信息展示：
+        1. 展示当前Chassis的接收信息
+        2. 展示当前Chassis的S-Note信息
+        3. 展示当前Chassis的Tire Master信息
+        4. 展示VIN Plate的名称与关联参数
+        5. 展示服务器当前时间
+        6. 展示当前程序版本号
+        7. 若当前Chassis的AD-Chang状态为激活，将Modify链接标红展示
+        最终完成画面的正常渲染。
+    4.1.2 开始：[页面加载自动触发/对应链接点击触发]
+        前端校验 (Frontend Check)：
+         本页面初期展示无额外空值校验逻辑，直接执行后端批处理调用动作。
+    4.1.3 API调用 (Backend Check)：
+        调用VPPS VIN PLATE生成批处理接口，同时从各关联业务数据表拉取对应展示字段信息。
+    4.1.4 结果处理：
+        成功：所有控件信息正常渲染，可正常跳转关联子页面、生成的VIN Plate文件链接。
+        失败：将对应的错误信息展示在Error message area区域。
+
+4.2 校验详细规格表
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | VPPS VIN PLATE批处理执行完成后 | 批处理执行结果 | 批处理异常终止，VIN Plate创建失败 | Batch processing failed: Failed to make the Inplate Error reson:XXX | 将错误信息展示在Error message area区域，中断后续文档生成流程 |
+| 2 | Template文件读取时 | Template取得 | Vin Plate的Template文件不存在 | Can not find template for doctype VIN-PLATE | 将错误信息展示在Error message area区域，中断文档加载流程 |
+| 3 | Template规则匹配时 | Template取得 | Template文件名未在HDOC_USER_DEFINED_RULES表中匹配到对应记录 | Can not find TEMPLATE-VIN-PLATE. No match in user defined rules. | 将错误信息展示在Error message area区域，中断文档生成流程 |
+| 4 | Template参数校验时 | Template取得 | Template中配置的参数未在HDOC_USER_DEFINED_RULES表中匹配到对应记录 | No template rule defined for this truck. XXX XXX | 将错误信息展示在Error message area区域，中断文档生成流程 |
+
+
+5. 接口定义 (API Specification)
+UD04SelectGeneratedocumentApi
+  功能：完成Generate Document页面初始化数据拉取，返回页面所有展示控件所需的字段数据
+  Method：POST
+  Endpoint：/api/ud04/UD04SelectGeneratedocumentApi
+
+ Request [请求格式]
+ {
+  "chassisSeries": "string",
+  "chassisNo": number
+ }
+
+  请求示例：
+  {
+    "chassisSeries": "JPCT",
+    "chassisNo": "028321"
+  }
+
+  Response Success (200)
+  成功响应示例：
+  {
+    "code": 200,
+    "msg": null,
+    "data": {
+    "chassisInfo": "JPCT013759",
+    "ordernumber": "ORD123456", 
+    "buildWeek": 202245,
+    "specWeek": 202244,
+    "market": "DE",
+    "masterMarket": "-EU",
+    "sNoteNo": "CUSTOMER_ADAP_DATA_JPCT_8889",
+    "sNoteMessage": "The S-Notes above can affect homologation documents.",
+    "loadIndex": "148K",
+    "adChangeActive": true,
+    "modifyLinkText": "Modify",
+    "usingTemplate": "VIN_PLATE_template_v2.trf",
+    "replacingParameters": [
+      { "variable": "TIRE_SIZE", "newVal": "245/45R18" }
+    ],
+    "generatedFileUrl": "/api/download/vinplate/VIN_PLATE_template_v2.trf",
+    "serverDate": "2022-12-02 05:11:45",
+    "hDocVersion": "2.1.0"
+  }
+  }
+注：
+字段说明：
+| 字段名称 | 备注说明 |
+| --- | --- |
+| chassisInfo | 参数chassisSeries+ChassisNo |
+| ordernumber | HDOC_REC_DATA_OM 表的 ORDERNUMBER 字段 |
+| buildWeek | HDOC_REC_DATA_OM 表的 BUILD 字段 |
+| specWeek | HDOC_REC_DATA_OM 表的 SPEC 字段 |
+| market | HDOC_REC_DATA_VDA_GENERAL 表的 COUNTRY_OF_OPERATION 字段 |
+| masterMarket | 固定值 -EU |
+| sNoteNo | HDOC_REC_DATA_OM 表的 CUSTOMER_ADAP 字段 |
+| sNoteMessage | 存在S-Note信息时固定显示文本'The S-Notes above can affect homologation documents.'不存在S-Note信息时空白表示 |
+| loadIndex | HDOC_REC_DATA_KOLA_TIRE_MASTER 表的 LOAD_INDEX 字段 |
+| adChangeActive | HDOC_ADCA_CHANGE 表的 ACT 字段，ACT='Y'时为true，否则为false |
+| modifyLinkText | 固定值 Modify |
+| usingTemplate | VVPPS VIN PLATE批处理生成的文件名 |
+| replacingParameters |HDOC_ADCA_MODIFICATION表读取VARIABLE、NEWVAL字段 |
+| generatedFileUrl | VVPPS VIN PLATE批处理生成的文件下载链接 |
+| serverDate | 服务器系统时间 格式（YYYY-MM-DD hh:mm:ss）|
+| hDocVersion | 系统程序版本号 |
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| VPPS VIN PLATE批处理异常终止，VIN Plate创建失败 | 终止后续文档生成动作，将错误信息返回至页面 | Batch processing failed: Failed to make the Inplate Error reson:XXX |
+| Vin Plate的Template文件物理不存在 | 终止Template读取流程，返回错误提示 | Can not find template for doctype VIN-PLATE |
+| Template文件名未在HDOC_USER_DEFINED_RULES中找到匹配记录 | 中断规则匹配流程，返回错误提示 | Can not find TEMPLATE-VIN-PLATE. No match in user defined rules. |
+| Template中的配置参数未在HDOC_USER_DEFINED_RULES中定义规则 | 中断参数填充流程，返回错误提示 | No template rule defined for this truck. XXX XXX |
+| 返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：GenerateDoc_詳細設計(UD004).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

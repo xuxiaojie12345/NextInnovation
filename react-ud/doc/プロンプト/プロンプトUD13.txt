@@ -1,0 +1,73 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1. 基本信息
+   文档编号:DES-HDoc Template Check-013
+   模块名称:HDoc Template Check
+   版本号：v1.0
+   作成日:2026-07-17
+
+
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  该模块属于HDoc Template Check页面，核心目标是支持用户指定Template文件后点击Check按钮完成文件内容校验，读取Template文件内容，提取两个$符号之间包含的变量内容，统计文件内的变量总个数，校验完成后支持用户直接下载已完成检查的Template结果文件。
+  安全性或特殊要求（如有）
+  无额外特殊安全性要求，需保证文件读取操作的权限可控，避免非法文件访问导致系统异常，所有文件解析过程需在本地沙箱内完成，禁止将用户上传的Template文件流出至外部非授权路径。
+  用户体验方面的考虑
+  页面所有控件默认处于激活可用状态，校验触发后如存在异常场景，将立即展示对应明确的错误信息引导用户修正操作，整体操作链路精简，用户仅需完成「选择文件→点击校验→下载结果」三步即可完成全部操作，无多余冗余步骤。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Template File | File Input | - | - | Input | - | 左 | 空 | 活性 | 无 |
+| 2   | Check | Button | - | - | Action | - | 左 | - | 活性 | 无 |
+| 3   | Download checked template | Link | - | - | Output | - | 左 | - | 活性 | 无 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+     	画面可正常完成加载展示，所有控件均处于激活可用状态，Template File输入框默认内容为空，无额外默认值预填充。
+      4.1.2 开始：用户点击Check按钮触发校验流程
+      空值校验等 (Frontend Check)：
+       若用户未选中任何Template文件直接按下Check按钮：
+        设置Message = ERROR: Unable to access file!
+        终止当前校验流程，停留在当前页面等待用户重新操作
+      系统尝试读取已选择的Template文件内容，提取两个$符号之间的所有内容，统计得到Template文件内的变量总个数。
+       若Template文件内不存在任何符合规则的变量（统计得到的变量总个数为0）：
+        设置Message = ERROR: The file content is incorrect!
+        终止当前校验流程，停留在当前页面等待用户重新上传符合要求的文件
+      4.1.3 API调用 (Backend Check)：
+        无
+      4.1.4 结果处理：
+       成功：系统完成Template文件全量校验，Download checked template链接保持激活状态，用户点击该链接即可直接下载已完成检查的Template结果文件
+       失败：返回对应系统异常错误提示，中断后续操作流程，页面保留用户本次选中的文件路径信息供用户重试
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 用户点击Check按钮时 | Check控件 | 用户未选中任何Template文件，直接触发Check按钮点击事件 | ERROR: Unable to access file! | 页面显示对应错误提示，立即中断后续文件读取和校验流程，保留当前页面所有控件状态，等待用户重新选择文件后再次发起校验 |
+   | 2 | 用户点击Check按钮，系统成功读取Template文件内容完成解析后 | Check控件 | Template文件内不存在任何由两个$符号包裹的有效变量，统计得到的变量总个数为0 | ERROR: The file content is incorrect! | 页面显示对应错误提示，立即终止后续校验流程，提示用户检查上传的Template文件内容是否符合规则，等待用户重新上传合规文件后重试校验 |
+
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+   无
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：HDocTemplateCheck_詳細設計(UD013).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

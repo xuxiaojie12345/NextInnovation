@@ -1,0 +1,184 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+
+1.基本信息
+文档编号:DES-Modify Document-005
+模块名称:Modify Document
+版本号：v1.0
+作成日:2026-07-13
+
+2. 背景 (Background)
+本模块的核心功能和目标
+本模块是Modify Document功能模块，核心功能是展示可修改的项目，支持用户录入修正后的值完成修改提交、下载指定的VIN Plate空模板文件、查看指定底盘号的详情信息，最终实现文档修改内容的确认与提交流程。
+安全性或特殊要求
+所有数据读取操作均仅针对指定的业务数据表执行查询操作，不允许未经授权的数据修改，涉及底盘号信息展示时需严格校验数据来源合法性，仅展示授权范围内的车辆详细数据。
+用户体验方面的考虑
+所有可交互元素布局清晰，输入项默认处于激活可编辑状态，操作后页面跳转逻辑直观，错误提示明确展示具体问题，避免用户出现无效操作。
+
+3. 画面项目定义 (Screen Parameters)
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | chassis no | Label | - | - | Output | - | 左 | - | - | 数据来源为前画面的chassis no字段 |
+| 2   | Market | Label | - | - | Output | - | 左 | - | - | 数据来源为前画面的Market字段 |
+| 3   | Template文件 | Link | - | - | Output | - | 左 | - | - | 数据来源为Template文件的Template名字段，点击后下载名为aus/UD_TEST.odt的「Vin Plate」无值.trf文件 |
+| 4   | Variable | DataTable | - | - | Output | - | 左 | - | - | 数据来源为Template文件的Template项目字段 |
+| 5   | Description | DataTable | - | - | Output | - | 左 | - | - | 数据来源为HDOC_VARIABLES表的DESCRIPTION字段 |
+| 6   | Current value | DataTable | - | - | Output | - | 左 | - | - | 数据优先从HDOC_ADCA_MODIFICATION表的NEWVAL字段获取，Modify中不存在对应数据的情况下，从HDOC_REC_DATA_KOLA_VARIANT表的SYMBOL字段获取数据 |
+| 7   | Modified value | TextField | - | 500 | Input | - | 左 | 空白 | 活性 | Modify中不存在对应数据的情况下默认值为空白 |
+| 8   | Save | Button | - | - | Action | - | 中 | - | 活性 | 点击后跳转至「Save Modifications」页面展示所有已录入的修正内容 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+4.1 处理流程
+4.1.1 初期表示：
+Modify Document画面正常展示所有可修正的项目，包含 chassis no、Market 标签信息，Template文件链接，以及Variable、Description、Current value、Modified value的数据表格区域，Save按钮默认处于激活状态。
+4.1.2 开始：用户点击Save按钮触发
+空值校验 (Frontend Check)：
+若所有Modified value输入项均未录入任何内容，直接点击Save按钮：
+ 设置Message = NO UNRELEASED VERSION EXISTS!
+ 终止流程
+用户点击链接'Template: aus/UD_TEST.odt'（文件名预留）触发：
+直接下载「Vin Plate」的未填入值的.trf模板文件，页面无跳转。
+用户点击链接'Chassis no'触发：
+跳转至VDA - Vehicle Specification画面，展示该对应Chassis的全部详细信息。
+4.1.3 API调用 (Backend Check)：
+调用UD05ModifyDocumentApi的UD05SelectVariableModification方法，读取Template文件、HDOC_VARIABLES、HDOC_ADCA_MODIFICATION、HDOC_REC_DATA_KOLA_VARIANT四张数据源表的对应数据完成页面渲染。
+调用UD05ModifyDocumentApi的UD05UpdateHdocAdcaModification方法，校验通过后将用户录入的Modified value数据提交至业务系统，跳转至Save Modifications画面展示修正内容。
+4.1.4 结果处理：
+成功：页面跳转至Save Modifications画面，完整展示所有提交的修正内容，提示用户修改提交成功。
+失败：页面保持在Modify Document画面，展示对应错误信息，保留用户已录入的所有输入内容不丢失。
+
+4.2 校验详细规格表
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 用户点击Save按钮时 | 所有Modified value输入项 | 所有输入项均未录入任何内容 | NO UNRELEASED VERSION EXISTS! | 终止提交流程，页面展示该错误提示，不跳转至Save Modifications画面 |
+
+5. 接口定义 (API Specification)
+UD05ModifyDocumentApi.UD05SelectVariableModification
+ 功能：获取Modify Document画面所需的全部初始数据，完成页面初始化渲染
+ Method：GET
+ Endpoint： /api/ud005/UD05ModifyDocumentApi/UD05SelectVariableModification
+
+ Request [请求格式]
+ {
+  "chassisSeries": "string",
+  "chassisNo": "string",
+ }
+
+  请求示例：
+  {
+    "chassisSeries": "JPCT",
+    "chassisNo": "028321"
+  }
+
+ Response Success (200)
+ 返回包含Variable、Description、Current value等所有初始展示字段的数据集
+ [成功响应示例]
+{
+    "code": 200,
+    "data": {
+        "variableInfo": [
+            {
+                "variable": "VIN1",
+                "description": "Description1",
+                "currentValue": "PK1"
+            },
+            {
+                "variable": "VIN2",
+                "description": "Description2",
+                "currentValue": "PK2"
+            },
+            {
+                "variable": "VIN3",
+                "description": "Description3",
+                "currentValue": "PK3"
+            }
+        ]
+    },
+    "msg": null
+}
+
+UD05ModifyDocumentApi.UD05UpdateHdocAdcaModification
+ 功能：校验用户录入的Modified value数据，保存修改内容至业务系统
+ Method：POST
+ Endpoint：/api/ud005/UD05ModifyDocumentApi/UD05UpdateHdocAdcaModification
+
+ Request [请求格式]
+ {
+  "chassisSeries": "string",
+  "chassisNo": "string",
+  "variableInfo": [
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      },
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      },
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      }
+  ]
+ }
+
+  请求示例：
+  {
+  "chassisSeries": "JPCT",
+  "chassisNo": "028321",
+  "variableInfo": [
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      },
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      },
+      {
+          "variable": "string",
+          "description": "string",
+          "currentValue": "string"
+      }
+  ]
+  }
+
+ Response Success (200)
+ 返回所有已提交的修正内容详情，供Save Modifications画面渲染展示
+ [成功响应示例]
+ {
+   "code": 200,
+   "data": null,
+   "msg": null
+ }
+
+ Response Error (400 / 500)
+ 返回对应错误提示，告知用户提交失败的具体原因
+ [错误响应示例]
+ {
+   "code": 400,
+   "data": null,
+   "msg": "System error. Please contact administrator."
+ }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：ModifyDocument_詳細設計(UD005).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

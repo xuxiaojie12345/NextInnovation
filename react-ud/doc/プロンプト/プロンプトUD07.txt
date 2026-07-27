@@ -1,0 +1,130 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-Vehicle Specification-007
+   模块名称:Vehicle Specification
+   版本号：v1.0
+   作成日:2026-07-14
+
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  该模块Vehicle Specification画面，核心功能是展示VDA-Vehicle Specification画面，完整呈现Chassis的详细相关车辆信息，满足业务人员查询车辆全量规格参数的需求。
+  安全性或特殊要求（如有）
+  所有数据均从指定的业务接收数据表中仅做读取操作，禁止修改原始业务数据；数据检索过程中需要严格限定查询条件，避免出现越权查询非目标车辆数据的情况。
+  用户体验方面的考虑
+  当Variant的对应项目获得光标焦点时，自动弹出工具提示展示对应的DESCRIPTION内容，无需用户额外操作即可查看补充说明；所有输出内容按照左对齐规则排版，保证参数列表阅读流畅统一，对长度不足的内容使用指定的半角空格补全，避免出现排版错乱问题。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis no | Label | - | - | Output | - | 左 | - | - | 数据源为前画面传入的Chassis no |
+| 2   | Model | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_OM的MODEL字段 |
+| 3   | Built week | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_OM的BUILD字段 |
+| 4   | Product type | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_VDA_GENERAL的PRODUCT_TYPE字段 |
+| 5   | VIN | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_VDA_GENERAL的VIN字段 |
+| 6   | Engine no | Label | - | - | Output | - | 左 | - | - | 式样不明暂为固定值：428320 |
+| 7   | Country of Operation | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_VDA_GENERAL的COUNTRY_OF_OPERATION字段 |
+| 8   | SYMBOL_STR | Label | - | - | Output | - | 左 | - | - | 组合SYMBOL和FUNCTION_GROUP字段内容展示，内容截取和补全规则见后续业务逻辑说明 |
+| 9   | DESCRIPTION | Tooltip | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_KOLA_VARIANT的DESCRIPTION字段，仅在光标悬停在Variant对应项目时弹出展示 |
+| 10  | S-Note NO | Label | - | - | Output | - | 左 | - | - | 数据来源表HDOC_REC_DATA_OM的CUSTOMER_ADAP字段 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+          画面正常表示，完成VDA-Vehicle Specification页面渲染，完整呈现Chassis的所有详细信息。
+      4.1.2 开始：[页面初始化加载，从前画面传入目标Chassis no参数触发]
+      4.1.3 API调用 (Backend Check)：
+        调用[UD07VehicleSpecificationApi]
+      4.1.4 结果处理：
+       成功：[按照定义的排版规则展示所有车辆规格参数信息]
+       失败：[提示错误信息，终止画面加载]
+      4.1.5 SYMBOL_STR字段专属数据处理逻辑：
+        ① 检索HDOC_REC_DATA_VDA_VARIANTS表
+        检索条件：传入的Chassis no
+        获取内容：FAMILY_ID、VARIANT_ID
+        ② 检索HDOC_REC_DATA_KOLA_VARIANT表
+        检索条件：使用上一步骤获取的FAMILY_ID、VARIANT_ID
+        获取内容：Symbol字段
+        结果展示规则：从Symbol内容的开头截取8位进行展示，如果Symbol总长度不足8位，使用左对齐的半角空格补全至8位
+        排序规则：将FUNCTION_GROUP内容按照左对齐的方式用半角空格补全到4位，拼接FAMILY_ID(3位)字段完成整体排序
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   UD07VehicleSpecificationApi
+     功能：根据传入的Chassis no参数，从指定的业务数据表中获取对应车辆的全量规格参数信息，完成字段处理后返回给前端页面渲染
+     Method：GET
+     Endpoint：/api/ud07/UD07VehicleSpecificationApi
+
+ Request [请求格式]
+ {
+  "chassisNo": "string",
+ }
+
+  请求示例：
+  {
+    "chassisNo": "JPCT 028321"
+  }
+
+     Response Success (200)
+ {
+    "code": 200,
+    "msg": null,
+    "data": {
+        "model": "UD-HDE",
+        "builtWeek": "1617",
+        "productType": "EM 64 R",
+        "vin": "USCZZ1235689",
+        "engineNo": "428328",
+        "countryOfOperation": "CN",
+        "symbolList": [
+            {
+                "display": "SYMBOL11",
+                "description": "Description of SYMBOL11"
+            },
+            {
+                "display": "SYMBOL12",
+                "description": "Description of SYMBOL12"
+            },
+            {
+                "display": "SYMBOL13",
+                "description": "Description of SYMBOL13"
+            }
+        ],
+        "sNoteNo": "S-NOTE001"
+    }
+}
+
+ Response Error (400 / 500)
+ 返回对应错误提示，提示用户联系管理员
+ [错误响应示例]
+ {
+   "code": 400,
+   "data": null,
+   "msg": "System error. Please contact administrator."
+ }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：VehicleSpecification_詳細設計(UD007).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

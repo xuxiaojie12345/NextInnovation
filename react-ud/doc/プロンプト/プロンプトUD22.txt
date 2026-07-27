@@ -1,0 +1,89 @@
+
+1.基本信息
+文档编号:DES-HDOC-DocumentTypes-022
+模块名称:HDOC Document Types
+版本号：v1.0
+作成日:2026-07-23
+
+2. 背景 (Background)
+本模块的核心功能和目标
+  本模块是Document Types画面，核心目标是展示完整的文档类型列表，为用户提供所有文档类型的基础信息浏览能力。
+安全性或特殊要求（如有）
+  当前设计未定义特殊安全约束，仅支持文档类型数据的查询读取操作，无数据修改类权限需求。
+用户体验方面的考虑
+  页面加载后直接展示全部可查询的文档类型数据，以清晰的表格布局呈现字段信息，对齐规则保证内容规整易读，无多余操作步骤提升信息浏览效率。
+
+3. 画面项目定义 (Screen Parameters)
+| No. | 项目名 (Item) | 类型 (Type) | 必需 (Req) | 最大长度 (MaxLength) | 输入输出 (I/O) | 允许字符 (Allowed Chars) | 文字对齐 (Align) | 默认值 (Default) | 显示控制 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Key | TextField | - | - | Output | - | 左对齐 | - | - | 数据源为HDOC_DOCUMENT_LIST表的DOCTYPE字段 |
+| 2   | Description | TextField | - | - | Output | - | 左对齐 | - | - | 数据源为HDOC_DOCUMENT_LIST表的Description字段 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+4.1 处理流程
+  4.1.1 初始显示：
+   画面正常渲染，页面加载后自动拉取所有文档类型数据完成列表渲染
+  4.1.2 开始：页面加载完成触发
+  空值校验等 (Frontend Check)：
+   页面加载后自动拉取所有文档类型数据完成列表渲染
+  4.1.3 API调用 (Backend Check)：
+    调用queryDocumentTypesList API
+  4.1.4 结果处理：
+   成功：加载HDOC_DOCUMENT_LIST表中所有文档类型数据，完整填充画面的Key、Description字段展示列表，提示消息为空无额外弹窗
+
+4.2 校验详细规格表
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+|      |       |   |       |       |               |
+
+
+5. 接口定义 (API Specification)
+UD20GetDocumentListApi.UD20SelectHdocDocumentList
+  功能：查询所有可用的文档类型全量列表数据
+  Method：GET
+  Endpoint：/api/ud22/UD22GetDocumentListApi/UD22SelectHdocDocumentList
+
+  Request [请求格式]
+  无额外请求参数
+  {
+  
+  }
+
+  Response Success (200)
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "doctype": "DOC001",
+        "description": "项目审批文档"
+      },
+      {
+        "doctype": "DOC002",
+        "description": "业务合同文档"
+      }
+    ]
+  }
+
+  Response Error (500)
+  {
+    "code": 500,
+    "message": "System error. Please contact administrator.",
+    "data": null
+  }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 访问无权限接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：HDOCDocumentTypes_詳細設計(UD022).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

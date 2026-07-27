@@ -1,0 +1,197 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1. 基本情報
+   文档编号: DES-Homologation Variable Result List-009
+   模块名称: HDOC
+   版本号: v1.0
+   作成日: 2026-07-15
+
+
+2. 背景 (Background)
+ 本模块的核心功能和目标
+ 本页面为Homologation Variables Result List页面，核心目标是基于前Homologation Variables页面传入的检索条件，从HDOC_USER_DEFINED_RULES规则表中拉取匹配数据展示检索结果，支持用户执行勾选记录返回上页回填、返回上页还原检索条件、打印检索结果、删除选中记录、跳转EDB User View用户详情页面五类操作，完成homologation变量相关检索结果的全流程交互。
+
+ 安全性或特殊要求（如有）
+ 仅允许对HDOC_USER_DEFINED_RULES数据表执行查询和删除操作，删除操作仅可针对用户已勾选的选中记录执行，禁止无选中状态下触发删除逻辑，避免出现规则数据误删的风险。
+
+ 用户体验方面的考虑
+ 页面初始化时自动加载前页面传入的检索条件对应的结果集，无需用户重复操作；用户点击Back按钮时自动还原前Homologation Variables页面的全部检索条件，操作流程连贯无多余步骤；页面所有功能按钮默认设为活性状态，保证常规操作始终处于可点击状态。
+
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1 | Product class | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的PC字段，排序优先级：Product Class, Market, Number |
+| 2 | Number | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的NUM字段 |
+| 3 | Market | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的MARKET字段 |
+| 4 | Variable | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的MARKET字段 |
+| 5 | Value | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的VAL字段 |
+| 6 | Variant string. | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的VS字段 |
+| 7 | Comments | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的VS2字段 |
+| 8 | Add | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的ADD_DATE字段 |
+| 9 | Delete | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的DELETE_DATE字段 |
+| 10 | Created by user | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的REGISTER_USER字段，点击列中链接可跳转至EDB User View页面 |
+| 11 | Date | DataTable | - | - | Output | - | 左 | - | - | 数据源为HDOC_USER_DEFINED_RULES表的REGISTER_DATETIME字段 |
+| 12 | Count | Label | - | - | Output | - | 左 | Number of lines found: XXX | - | 用于展示当前页面检索结果的总条数 |
+| 13 | Select | Button | - | - | Action | - | 中 | - | 活性 | 勾选列表记录后点击，跳转返回前Homologation Variables页面，自动回填选中的记录内容 |
+| 14 | Back | Button | - | - | Action | - | 中 | - | 活性 | 点击跳转返回前Homologation Variables页面，自动还原该页面此前设置的所有检索条件 |
+| 15 | Print | Button | - | - | Action | - | 中 | - | 活性 | 点击可打印当前页面展示的全部Homologation Variables检索结果 |
+| 16 | Delete selected | Button | - | - | Action | - | 中 | - | 活性 | 点击可删除用户已勾选的全部选中记录 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+
+      4.1.1 初期表示：
+       画面正常表示，基于前Homologation Variables页面传入的检索条件，调用后台接口从HDOC_USER_DEFINED_RULES表中拉取匹配的规则数据，渲染生成检索结果列表
+
+      4.1.2 开始：[Select按钮点击触发]
+      选中记录校验 (Frontend Check)：
+       若未勾选任意列表行记录：
+        设置Message = Please first check the records that need to be selected.
+        终止流程
+      4.1.3 结果处理：
+       成功：直接跳转至前Homologation Variables页面，将选中的记录内容自动回填至对应字段
+       无额外后端处理逻辑，无失败分支
+
+      4.1.2 开始：[Back按钮点击触发]
+      空值校验等 (Frontend Check)：
+       无任何校验逻辑，直接执行后续跳转操作
+      4.1.3 结果处理：
+       成功：直接跳转至前Homologation Variables页面，自动还原该页面此前设置的所有检索条件
+       无额外后端处理逻辑，无失败分支
+
+      4.1.2 开始：[Print按钮点击触发]
+      空值校验等 (Frontend Check)：
+       无任何校验逻辑，直接执行后续打印操作
+      4.1.3 结果处理：
+       成功：调用浏览器原生打印能力，将当前页面展示的Homologation Variables检索结果内容输出至打印设备
+       无额外后端处理逻辑，无失败分支
+
+      4.1.2 开始：[Delete selected按钮点击触发]
+      选中记录校验 (Frontend Check)：
+       若未勾选任意列表行记录：
+        设置Message = Please first check the records that need to be selected.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用D09DeleteHdocuserdefinedrulesApi.UD09DeleteSelected接口，传入已选中记录的唯一标识列表
+      4.1.4 结果处理：
+       成功：选中规则记录删除完成，页面自动刷新最新的检索结果列表
+       失败：选中的记录删除失败，请检查权限后重试
+
+      4.1.2 开始：[Created by user列链接点击触发]
+      空值校验等 (Frontend Check)：
+       无任何校验逻辑
+      4.1.3 结果处理：
+       成功：从后台拉取对应用户的详情信息并在EDB User View页面展示
+       失败：获取用户信息失败，请稍后重试
+
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 点击Select按钮时 | 检索结果列表的勾选状态 | 未勾选任意一条列表记录 | Please first check the records that need to be selected. | 停留在当前页面，不执行跳转操作 |
+   | 2 | 点击Delete selected按钮时 | 检索结果列表的勾选状态 | 未勾选任意一条列表记录 | Please first check the records that need to be selected. | 停留在当前页面，不发起后端删除请求 |
+
+
+5. 接口定义 (API Specification)
+请为每个API提供：
+
+   UD09DeleteHdocuserdefinedrulesApi.UD09Seach
+     功能：根据传入的Homologation Variables检索条件从HDOC_USER_DEFINED_RULES表中获取匹配的规则信息
+     Method：GET
+     Endpoint：/api/ud09/UD09DeleteHdocuserdefinedrulesApi/UD09Seach
+
+     Request [请求格式]
+     请求示例：
+     {
+      "productClass": "01",
+      "number": "1234567890",
+      "market": "CN",
+      "variable": "TEST_VAR",
+      "value": "TEST_VALUE",
+      "variantString1": "VS1",
+      "variantString2": "VS2",
+      "comments": "TEST_comments"
+     }
+
+     Response Success (200)
+     成功响应示例：
+     {
+      "code": 200,
+      "msg": null,
+      "data": {
+       "totalCount": 10,
+       "recordList": [
+        {
+         "pc": "01",
+         "num": "1234567890",
+         "market": "CN",
+         "val": "V001",
+         "vs": "S001",
+         "vs2": "S002",
+         "addDate": "2022-11-20",
+         "deleteDate": "",
+         "registerUser": "U001",
+         "registerDatetime": "2022-11-20"
+        }
+       ]
+      }
+     }
+
+     Response Error 500
+     {
+       "code": 500,
+       "message": "System error, please contact administrator",
+       "data": null
+     }
+
+   UD09DeleteHdocuserdefinedrulesApi.UD09DeleteSelected
+     功能：删除HDOC_USER_DEFINED_RULES表中用户选中的规则记录
+     Method：POST
+     Endpoint：/api/ud09/UD09DeleteHdocuserdefinedrulesApi.UD09DeleteSelected
+
+     Request [请求格式]
+     请求示例：
+     {
+      "productClass": "01",
+      "number": "1234567890",
+      "market": "CN"
+     }
+
+     Response Success (200)
+     成功响应示例：
+     {
+      "code": 200,
+      "msg": null,
+      "data": null
+     }
+
+     Response Error 500
+     {
+       "code": 500,
+       "message": "System error, please contact administrator",
+       "data": null
+     }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：HomologationVariableResultList_詳細設計(UD009).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書
+
+

@@ -1,0 +1,390 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+
+1.基本信息
+   文档编号:DES-Homologation Variables-008
+   模块名称:Homologation Variables
+   版本号：v1.0
+   作成日:2026-07-15
+
+
+2. 背景 (Background)
+   请描述：
+    本模块的核心功能和目标
+    本模块是Homologation Variables功能模块，用于实现用户自定义变量（rules）的全生命周期管理，支持通过指定条件检索Homologation Variables相关数据，同时提供新增、修改、删除自定义规则的操作能力，保障整车认证相关变量数据的可配置性与维护便捷性。
+    安全性或特殊要求
+    执行Add、Update、Delete操作时，针对Product class、Number、Market三个核心字段进行必填校验与重复主键校验，核心数据操作前需关联校验HDOC_VARIABLES基础表的变量合法性，避免非法数据流入业务系统。
+    用户体验方面的考虑
+    页面操作入口清晰，所有操作按钮默认保持激活状态，点击Clear按钮可一键清空所有输入内容，降低用户重复操作成本；操作触发后即时返回明确的处理结果提示，帮助用户快速定位异常原因。
+
+
+3. 画面项目定义 (Screen Parameters)
+   请按照以下格式定义所有控件：
+
+   | No. | 項目名 (Item)        | 種別 (Type)   | 必須 (Req) | MaxLength | I/O         | 許容文字 (Allowed Chars)  | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注                                                         |
+   |-----|---------------------|--------------|-----------|-----------|-------------|--------------------------|-----------------|-----------------|-------------------|--------------------------------------------------------------|
+   | 1   | Product class       | pull-downList| Y         | 2         | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | Add/Update/Delete操作时为必填项                              |
+   | 2   | Number              | textfield    | Y         | 10        | Input/Output| 半角数字                 | 左              | 空              | 活性              | Add/Update/Delete操作时为必填项                              |
+   | 3   | Market              | pull-downList| Y         | 3         | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | Add/Update/Delete操作时为必填项                              |
+   | 4   | Variable            | textfield    | -         | 20        | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 若输入内容以'TEMPLATE-'开头，需移除前缀后校验剩余内容是否在HDOC_VARIABLES表中存在 |
+   | 5   | Value               | textfield    | -         | 200       | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 无特殊约束                                                   |
+   | 6   | Variant string.1    | textfield    | -         | 100       | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 无特殊约束                                                   |
+   | 7   | Variant string.2    | textfield    | -         | 100       | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 无特殊约束                                                   |
+   | 8   | Comments            | textfield    | -         | 100       | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 无特殊约束                                                   |
+   | 9   | Add                 | textfield    | -         | 6         | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 存储新增操作的日期信息                                       |
+   | 10  | Delete              | textfield    | -         | 6         | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 存储删除操作的日期信息                                       |
+   | 11  | Created by user     | textfield    | -         | 16        | Input/Output| 半角英数字+記号           | 左              | 空              | 活性              | 存储最后更新操作的用户信息                                   |
+   | 12  | Date                | textfield    | -         | -         | Input/Output| 日期                     | 左              | 空              | 活性              | 存储最后更新操作的时间信息                                   |
+   | 13  | Search              | button       | -         | -         | Action      | -                        | 中              | -               | 活性              | 点击后执行数据检索并跳转至Homologation Variables检索结果页面 |
+   | 14  | Clear               | button       | -         | -         | Action      | -                        | 中              | -               | 活性              | 点击后清空当前页面所有输入内容                               |
+   | 15  | Add                 | button       | -         | -         | Action      | -                        | 中              | -               | 活性              | 点击后提交当前输入的新数据完成新增注册                       |
+   | 16  | Update              | button       | -         | -         | Action      | -                        | 中              | -               | 活性              | 点击后提交当前修改的内容完成数据更新                         |
+   | 17  | Delete              | button       | -         | -         | Action      | -                        | 中              | -               | 活性              | 点击后提交指定条件完成对应数据的删除操作                     |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+   请提供：
+
+   4.1 处理流程
+     按步骤描述每个主要功能的处理流程，格式如下：
+
+     4.1.1 初期表示：
+      页面正常加载后，展示Homologation Variables页面的所有检索条件控件；Product class下拉选项从PRODUCT_CLASS_MASTER表获取全量产品类别数据，Market下拉选项从MARKET_MASTER表获取全量市场数据，其余输入项默认清空，所有操作按钮保持激活状态。
+
+     4.1.2 开始：Search按钮点击触发
+      空值校验等 (Frontend Check)：
+       无强制必填约束，可支持空条件全量检索
+      字符类型校验：
+       若Number输入内容非半角数字：
+        设置Message = Number must be numeric digits.
+        终止流程
+       若Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user输入内容不符合半角英数字+符号规则：
+        设置Message = 对应字段名 must be a half width English numeral/symbol.
+        终止流程
+       若Date输入内容不符合日期格式：
+        设置Message = The date format of Date is incorrect.
+        终止流程
+
+     4.1.3 API调用 (Backend Check)：
+       调用HomologationVariablesSearchAPI
+
+     4.1.4 结果处理：
+       成功：根据输入的检索条件，从HDOC_USER_DEFINED_RULES表中筛选匹配的结果，跳转展示Homologation Variables检索结果页面
+       失败：弹出系统异常提示，终止跳转操作
+
+     4.1.5 开始：Clear按钮点击触发
+      无前置校验步骤
+
+     4.1.6 结果处理：
+       成功：页面所有输入控件内容全部清空，重置为初始状态
+
+     4.1.7 开始：Add按钮点击触发
+      空值校验等 (Frontend Check)：
+       若Product class、Number、Market任意一项为空：
+        设置Message = Product class, Number, Market are required
+        终止流程
+      字符类型校验：
+       若Number输入内容非半角数字：
+        设置Message = Number must be numeric digits.
+        终止流程
+       若Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user输入内容不符合半角英数字+符号规则：
+        设置Message = 对应字段名 must be a half width English numeral/symbol.
+        终止流程
+       若Date输入内容不符合日期格式：
+        设置Message = The date format of Date is incorrect.
+        终止流程
+
+     4.1.8 API调用 (Backend Check)：
+       调用HomologationVariablesAddAPI
+      后端重复主键校验：
+       若已存在相同Product class、Number、Market的记录：
+        设置Message = Primary key conflict, Please enter the correct content
+        终止流程
+      后端变量合法性校验：
+       若Variable输入内容移除'TEMPLATE-'前缀后，无法在HDOC_VARIABLES表中匹配到对应记录：
+        设置Message = Variant does not exist, Please enter the correct content
+        终止流程
+
+     4.1.9 结果处理：
+       成功：将输入的新数据写入HDOC_USER_DEFINED_RULES表，返回新增成功提示
+       失败：弹出新增失败异常提示
+
+     4.1.10 开始：Update按钮点击触发
+      空值校验等 (Frontend Check)：
+       若Product class、Number、Market任意一项为空：
+        设置Message = Product class, Number, Market are required
+        终止流程
+      字符类型校验：
+       若Number输入内容非半角数字：
+        设置Message = Number must be numeric digits.
+        终止流程
+       若Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user输入内容不符合半角英数字+符号规则：
+        设置Message = 对应字段名 must be a half width English numeral/symbol.
+        终止流程
+       若Date输入内容不符合日期格式：
+        设置Message = The date format of Date is incorrect.
+        终止流程
+
+     4.1.11 API调用 (Backend Check)：
+       调用HomologationVariablesUpdateAPI
+      后端存在性校验：
+       若Product class、Number、Market匹配的目标记录不存在：
+        设置Message = Data does not exist, Please enter the correct content
+        终止流程
+      后端重复主键校验：
+       若更新操作导致Product class、Number、Market出现重复记录：
+        设置Message = Primary key conflict, Please enter the correct content
+        终止流程
+      后端变量合法性校验：
+       若Variable输入内容移除'TEMPLATE-'前缀后，无法在HDOC_VARIABLES表中匹配到对应记录：
+        设置Message = Variant does not exist, Please enter the correct content
+        终止流程
+
+     4.1.12 结果处理：
+       成功：根据输入条件更新HDOC_USER_DEFINED_RULES表中对应记录，返回更新成功提示
+       失败：弹出更新失败异常提示
+
+     4.1.13 开始：Delete按钮点击触发
+      空值校验等 (Frontend Check)：
+       若Product class、Number、Market任意一项为空：
+        设置Message = Product class, Number, Market are required
+        终止流程
+      字符类型校验：
+       若Number输入内容非半角数字：
+        设置Message = Number must be numeric digits.
+        终止流程
+       若Product class、Market输入内容不符合半角英数字+符号规则：
+        设置Message = 对应字段名 must be a half width English numeral/symbol.
+        终止流程
+
+     4.1.14 API调用 (Backend Check)：
+       调用HomologationVariablesDeleteAPI
+      后端存在性校验：
+       若Product class、Number、Market匹配的目标记录不存在：
+        设置Message = Data does not exist, Please enter the correct content
+        终止流程
+
+     4.1.15 结果处理：
+       成功：从HDOC_USER_DEFINED_RULES表中删除匹配的记录，返回删除成功提示
+       失败：弹出删除失败异常提示
+
+   4.2 校验详细规格表
+   | No. | 检查时机       | 检查对象                                      | 检查条件                                               | 错误消息 (Message Content)                                          | 动作                     |
+   |-----|--------------|---------------------------------------------|------------------------------------------------------|---------------------------------------------------------------------|------------------------|
+   | 1   | Search按钮点击 | Number                                      | Number输入内容包含非半角数字字符                           | Number must be numeric digits.                                      | 终止检索流程，聚焦到Number输入框 |
+   | 2   | Search按钮点击 | Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user | 输入内容不符合半角英数字+符号规则                       | 对应字段名 must be a half width English numeral/symbol.               | 终止检索流程，聚焦到异常输入框 |
+   | 3   | Search按钮点击 | Date                                        | 输入内容不符合日期格式                                   | The date format of Date is incorrect.                               | 终止检索流程，聚焦到Date输入框  |
+   | 4   | Add按钮点击    | Product class、Number、Market               | 三个字段任意一项为空                                    | Product class, Number, Market are required                          | 终止新增流程，聚焦到空输入字段  |
+   | 5   | Add按钮点击    | Number                                      | Number输入内容包含非半角数字字符                           | Number must be numeric digits.                                      | 终止新增流程，聚焦到Number输入框 |
+   | 6   | Add按钮点击    | Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user | 输入内容不符合半角英数字+符号规则                       | 对应字段名 must be a half width English numeral/symbol.               | 终止新增流程，聚焦到异常输入框 |
+   | 7   | Add按钮点击    | Date                                        | 输入内容不符合日期格式                                   | The date format of Date is incorrect.                               | 终止新增流程，聚焦到Date输入框  |
+   | 8   | Add接口后端校验 | 新增全量数据                                  | 已存在相同Product class、Number、Market的记录               | Primary key conflict, Please enter the correct content              | 终止新增流程，返回错误提示    |
+   | 9   | Add接口后端校验 | Variable                                    | Variable输入移除'TEMPLATE-'前缀后，HDOC_VARIABLES表中无匹配记录 | Variant does not exist, Please enter the correct content            | 终止新增流程，返回错误提示    |
+   | 10  | Update按钮点击 | Product class、Number、Market               | 三个字段任意一项为空                                    | Product class, Number, Market are required                          | 终止更新流程，聚焦到空输入字段  |
+   | 11  | Update按钮点击 | Number                                      | Number输入内容包含非半角数字字符                           | Number must be numeric digits.                                      | 终止更新流程，聚焦到Number输入框 |
+   | 12  | Update按钮点击 | Product class、Market、Variable、Value、Variant string.1、Variant string.2、Comments、Add、Delete、Created by user | 输入内容不符合半角英数字+符号规则                       | 对应字段名 must be a half width English numeral/symbol.               | 终止更新流程，聚焦到异常输入框 |
+   | 13  | Update按钮点击 | Date                                        | 输入内容不符合日期格式                                   | The date format of Date is incorrect.                               | 终止更新流程，聚焦到Date输入框  |
+   | 14  | Update接口后端校验 | 更新全量数据                                | Product class、Number、Market匹配的待更新记录不存在          | Data does not exist, Please enter the correct content                | 终止更新流程，返回错误提示    |
+   | 15  | Update接口后端校验 | 更新全量数据                                | 更新操作导致Product class、Number、Market出现重复主键         | Primary key conflict, Please enter the correct content              | 终止更新流程，返回错误提示    |
+   | 16  | Update接口后端校验 | Variable                                    | Variable输入移除'TEMPLATE-'前缀后，HDOC_VARIABLES表中无匹配记录 | Variant does not exist, Please enter the correct content            | 终止更新流程，返回错误提示    |
+   | 17  | Delete按钮点击 | Product class、Number、Market               | 三个字段任意一项为空                                    | Product class, Number, Market are required                          | 终止删除流程，聚焦到空输入字段  |
+   | 18  | Delete按钮点击 | Number                                      | Number输入内容包含非半角数字字符                           | Number must be numeric digits.                                      | 终止删除流程，聚焦到Number输入框 |
+   | 19  | Delete按钮点击 | Product class、Market                        | 输入内容不符合半角英数字+符号规则                       | 对应字段名 must be a half width English numeral/symbol.               | 终止删除流程，聚焦到异常输入框 |
+   | 20  | Delete接口后端校验 | 删除全量数据                                | Product class、Number、Market匹配的待删除记录不存在          | Data does not exist, Please enter the correct content                | 终止删除流程，返回错误提示    |
+
+
+5. 接口定义 (API Specification)
+   请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   UD08HomologationVariablesApi.UD08SelectProductclassmaster
+     功能：Product class下拉选项从PRODUCT_CLASS_MASTER表获取全量产品类别数据，返回检索结果集合
+     Method：GET
+     Endpoint：/api/hdoc/UD08HomologationVariablesApi/UD08SelectProductclassmaster
+
+     Request 请求格式
+     {
+
+     }
+
+     Response Success 200
+{
+    "code": 200,
+    "message": null,
+    "data": [
+        "01",
+        "02",
+        "03"
+    ]
+}
+
+     Response Error 500
+     {
+       "code": 500,
+       "message": "System error, please contact administrator",
+       "data": null
+     }
+     
+   UD08HomologationVariablesApi.UD08SelectMarketmaster
+     功能：Market下拉选项从MARKET_MASTER表获取全量市场数据，返回检索结果集合
+     Method：GET
+     Endpoint：/api/ud08/UD08HomologationVariablesApi/UD08SelectMarketmaster
+
+     Request 请求格式
+     {
+
+     }
+
+     Response Success 200
+{
+    "code": 200,
+    "message": null,
+    "data": [
+        "CN",
+        "JP",
+        "US"
+    ]
+}
+
+     Response Error 500
+     {
+       "code": 500,
+       "message": "System error, please contact administrator",
+       "data": null
+     }
+
+
+   UD08HomologationVariablesApi.UD08SelectHdocvariablesUD08SelectHdocvariables
+功能: 获取 Variable 列表（来源于 HDOC_VARIABLES 表），用于校验 Variable 输入值是否存在。
+Method: GET
+Endpoint: /api/UD08SelectHdocvariables
+
+     Request 请求格式
+{
+"variable": "TEST_VAR"
+}
+
+Response Success (200):
+{
+    "code": 200,
+    "message": null,
+    "data": 1
+}
+
+     Response Error 500
+     {
+       "code": 500,
+       "message": "System error, please contact administrator",
+       "data": null
+     }
+
+   UD08HomologationVariablesApi.UD08Add
+     功能：校验新增数据合法性后，将新的用户自定义规则写入HDOC_USER_DEFINED_RULES表
+     Method：POST
+     Endpoint：/api/ud08/UD08HomologationVariablesApi/UD08Add
+
+     Request 请求格式
+     {
+       "productClass": "01",
+       "number": "1234567890",
+       "market": "CN",
+       "variable": "TEST_VAR",
+       "value": "TEST_VALUE",
+       "variantString1": "VS1",
+       "variantString2": "VS2",
+       "comments": "TEST_comments",
+       "addDate": "20221124",
+       "deleteDate": "",
+       "updateUser": "UD01"
+     }
+
+     Response Success 200
+     {
+       "code": 200,
+       "message": null,
+       "data": null
+     }
+
+     Response Error 400
+     {
+       "code": 400,
+       "message": "Primary key conflict, Please enter the correct content",
+       "data": null
+     }
+
+   UD08HomologationVariablesApi.UD08Update
+     功能：校验待更新数据存在性与合法性后，修改HDOC_USER_DEFINED_RULES表中匹配的记录内容
+     Method：PUT
+     Endpoint：/api/ud08/UD08HomologationVariablesApi/UD08Update
+
+     Request 请求格式
+     {
+       "productClass": "01",
+       "number": "1234567890",
+       "market": "CN",
+       "variable": "NEW_VAR",
+       "value": "NEW_VALUE",
+       "variantString1": "NEW_VS1",
+       "variantString2": "NEW_VS2",
+       "comments": "TEST_comments",
+       "addDate": "20221124",
+       "deleteDate": "",
+       "updateUser": "UD001"
+     }
+
+     Response Success 200
+     {
+       "code": 200,
+       "message": null,
+       "data": null
+     }
+
+     Response Error 400
+     {
+       "code": 400,
+       "message": "Data does not exist, Please enter the correct content",
+       "data": null
+     }
+
+   UD08HomologationVariablesApi.UD08Delete
+     功能：校验待删除数据存在性后，移除HDOC_USER_DEFINED_RULES表中匹配的目标记录
+     Method：DELETE
+     Endpoint：/api/hdoc/UD08HomologationVariablesApi/UD08Delete
+
+     Request 请求格式
+     {
+       "productClass": "01",
+       "number": "1234567890",
+       "market": "CN"
+     }
+
+     Response Success 200
+     {
+       "code": 200,
+       "message": null,
+       "data": null
+     }
+
+     Response Error 400
+     {
+       "code": 400,
+       "message": "Data does not exist, Please enter the correct content",
+       "data": null
+     }
+
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：HomologationVariables_詳細設計(UD008).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

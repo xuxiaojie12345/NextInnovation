@@ -1,0 +1,162 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1. 基本信息
+文档编号:DES-HDoc User Doc Administration-018
+模块名称:HDoc User Doc Administration
+版本号：v1.0
+作成日:2026-07-22
+
+2. 背景 (Background)
+本模块是HDoc User Doc Administration页面，业务归属HDOC体系，核心功能是完成HDoc系统内用户的文档权限设置，支持通过输入Userid查询对应用户的基础信息与可分配权限，完成指定用户的文档权限配置，实现对用户文档访问权限的精准管控。
+安全性或特殊要求：
+所有用户权限相关操作必须先校验Userid在用户功能权限表中是否合法，仅存在于用户功能权限表内的用户才可执行权限查询与设置操作，避免非法用户权限的篡改。
+用户体验方面的考虑：
+输入Userid点击User Info按钮后自动从Saviynt拉取对应用户名，减少用户手动填写的操作成本；所有不合法的操作场景都给出明确的英文错误提示，便于操作人员快速定位问题。
+
+3. 画面项目定义 (Screen Parameters)
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | UserID | TextField | Y | 10 | Input | 半角英数字 | 左 | - | 活性 | |
+| 2   | User | Label | - | - | 显示 | - | 左 | - | 活性 | 从Saviynt获取User名 |
+| 3   | Document | pull-downList | - | 50 | Input | 半角英数字 | 左 | - | 活性 | 手动输入文档名称 |
+| 4   | User Info | Button | - | - | Action | - | 中 | - | 活性 | |
+| 5   | Update | Button | - | - | Action | - | 中 | - | 活性 | |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+4.1 处理流程
+4.1.1 初期表示
+画面正常加载，所有控件按初始状态展示。
+4.1.2 用户信息查询（点击User Info触发）
+前端空值校验：UserID为空时提示「UserID are required.」，终止流程。
+后端校验：调用用户功能权限表查询接口校验该Userid是否存在，同时调用Saviynt的AuthenticationApi接口获取对应用户名。
+结果处理：校验Userid存在，从Saviynt获取到User名后，自动填充User标签内容；校验失败弹出错误提示We didn't recognize the userid you entered. Please try again.
+4.1.3 权限更新（点击Update触发）
+前端空值校验：UserID为空时提示「UserID are required.」，终止流程。
+后端校验：调用用户功能权限表查询接口校验该Userid是否存在。
+结果处理：校验通过则获取Document输入框内的内容，更新HDOC_USER_DOC表数据，完成该用户的文档权限设置；校验失败弹出错误提示We didn't recognize the userid you entered. Please try again.
+
+4.2 校验详细规格表
+| No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+|-----|---------|---------|---------|--------------------------|------|
+| 1 | 点击User Info按钮时 | User Info操作触发的Userid校验 | 输入的Userid不存在于用户功能权限表中 | We didn't recognize the userid you entered. Please try again. | 弹出错误提示，终止用户信息查询流程 |
+| 2 | 点击Update按钮时 | Update操作触发的Userid校验 | 输入的Userid不存在于用户功能权限表中 | We didn't recognize the userid you entered. Please try again. | 弹出错误提示，终止权限更新流程 |
+
+5. 接口定义 (API Specification)
+
+   UD18HDocUserDocAdministrationApi.UD20SelectHdocDocumentList
+     功能：根据输入的Userid获取对应的用户的文档权限情报
+     Method：GET
+     Endpoint：/api/ud018/UD18HDocUserDocAdministrationApi/UD20SelectHdocDocumentList
+     Request [请求格式]
+     {
+     }
+     Response Success (200)
+{
+    "code": 200,
+    "data": {
+        "doctypeInfo": [
+            {
+                "doctype": "UD_TEST",
+                "description": "UD_templat(pdf)"
+            },
+            {
+                "doctype": "UD_TEST1",
+                "description": "UD_templat1(pdf)"
+            },
+            {
+                "doctype": "UD_TEST2",
+                "description": "UD_templat2(pdf)"
+            }
+        ]
+    }
+}
+
+   UD18HDocUserDocAdministrationApi.AuthenticationApi
+     功能：根据输入的Userid获取对应的用户名称
+     Method：GET
+     Endpoint：/api/ud018/UD18HDocUserDocAdministrationApi/AuthenticationApi
+     Request [请求格式]
+     {
+       "userid": "TEST001"
+     }
+     Response Success (200)
+     {
+       "code": 200,
+       "data": {
+         "username": "张三",
+         "doctype": ["UD_TEST","UD_TEST2","UD_TEST3"]
+       }
+     }
+
+   UD18HDocUserDocAdministrationApi.UD18SelectHdocFunctionAuth
+     功能：校验Userid是否存在于用户功能权限表
+     Method：GET
+     Endpoint：/api/ud018/UD18HDocUserDocAdministrationApi/UD18SelectHdocFunctionAuth
+     Request [请求格式]
+     {
+       "userid": "TEST001"
+     }
+     Response Success (200)
+     {
+       "code": 200,
+       "data": {
+         "isExists": true
+       },
+       "message" null
+     }
+     Response Error (404)
+     {
+       "code": 404,
+       "data": null,
+       "message": "We didn't recognize the userid you entered. Please try again."
+     }
+
+   UD18HDocUserDocAdministrationApi.UD18CreateHdocUserDoc
+     功能：新规指定用户的文档权限配置
+     Method：PUT
+     Endpoint：/api/ud018/UD18HDocUserDocAdministrationApi/UD18CreateHdocUserDoc
+     Request [请求格式]
+     {
+       "userid": "TEST001",
+       "authDocName": "项目设计书"
+     }
+
+     Response Error (500)
+     {
+       "code": 500,
+       "data": null,
+       "message": "System error. Please contact administrator."
+     }
+
+   UD18HDocUserDocAdministrationApi.UD18DeleteHdocUserDoc
+     功能：删除指定用户的文档权限配置
+     Method：PUT
+     Endpoint：/api/ud018/UD18HDocUserDocAdministrationApi/UD18DeleteHdocUserDoc
+     Request [请求格式]
+     {
+       "userid": "TEST001",
+       "authDocName": "项目设计书"
+     }
+
+     Response Error (500)
+     {
+       "code": 500,
+       "data": null,
+       "message": "System error. Please contact administrator."
+     }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 访问无权限接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：HDocUserDocAdministration_詳細設計(UD018).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

@@ -1,0 +1,2719 @@
+请严格按照以下要求，生成所有【API】的逻辑代码
+
+1.Entity
+根据这个文档生成一下文件 F:\develop\NextInnovation\react-ud\doc\プロンプト\SQL\react_ud_sql.txt
+    1.1.生成相关的entity实体类，以文件中每个表名进行创建，命名规则使用驼峰名规则，如表【user】，实体类名为User
+根据这个文档只生成Entity
+
+2.整体架构
+    2.1 技术栈
+    核心框架: Spring Boot 2.7.6
+    持久层: MyBatis 2.2.2 + Druid 1.2.5 连接池
+    数据库: MySQL
+    API 文档: Swagger 3.0.0 (Springfox)
+    日志框架: Log4j2 (替代默认日志系统)
+    构建工具: Maven
+    编程语言: Java 1.8
+    辅助库: Lombok, PageHelper, commons-lang
+
+    2.2 项目结构
+    ├── src
+    │   └── main
+    │       ├── java
+    │       │   └── com
+    │       │       └── web
+    │       │           └── app
+    │       │               ├── config           配置类
+    │       │               ├── controller       控制器层
+    │       │               ├── domain           领域模型目录
+    │       │               ├── dto              数据传输对象
+    │       │               ├── entity           实体类
+    │       │               ├── mapper           数据访问层
+    │       │               ├── service          业务逻辑层
+    │       │               │   └── impl         业务逻辑实现
+    │       │               └── Application.java  主启动类
+    │       └── resources
+    │           ├── mapper                     MyBatis 映射文件
+    │           ├── sql                        SQL 脚本
+    │           ├── application-dev.yml        开发环境配置
+    │           ├── application-prod.yml       生产环境配置
+    │           ├── application-test.yml       测试环境配置
+    │           ├── application.yml            主配置文件
+    │           ├── log4j2-dev.xml             开发环境日志配置
+    │           ├── log4j2-prod.xml            生产环境日志配置
+    │           └── log4j2-test.xml            测试环境日志配置
+    ├── README.md
+    ├── mvnw.cmd
+    └── pom.xml
+
+2.3 模块组成
+    控制器: [XXXXXController] (src/main/java/com/web/app/controller/XXXXXController.java) - 处理认证请求
+    服务接口: [XXXXXService](src/main/java/com/web/app/service/XXXXXService.java) - 定义认证服务方法
+    服务实现: [XXXXXServiceImpl](src/main/java/com/web/app/service/impl/XXXXXServiceImpl.java) - 实现认证逻辑
+    数据访问: [XXXXXMapper](src/main/java/com/web/app/mapper/XXXXXMapper.java)+ [XXXXXMapper.xml](src/main/resources/mapper/XXXXXMapper.xml) - 数据访问
+    数据传输对象: [XXXXXRequest]()/[XXXXXResponse]() - 认证请求/响应对象
+    实体类: [XXXXX](src/main/java/com/web/app/entity/XXXXX.java) - 实体类
+
+3. API功能概述
+    3.1.[AuthenticationApi]:用户信息的验证与管理
+    3.1.[AuthenticationApi]:用户信息的验证与
+    3.2.[UD03SelectHdocdocumentlistApi]:获取指定用户的所有文件列表
+    3.3.[UD04SelectGeneratedocumentApi]:获取指定文件的文件信息
+    3.4.[UD05ModifyDocumentApi]:修改指定文件的文件信息
+    3.5.[UD06SaveModificationsApi]:显示修改后的文件信息
+    3.6.[UD07VehicleSpecificationApi]:获取底盘信息
+    3.7.[UD08HomologationVariablesApi]:用户自定义规则的查询和保存
+    3.8.[UD09DeleteHdocuserdefinedrulesApi]:用户自定义规则的查询和删除
+    3.9.[UD10HdocvariablesApi]:获取用户自定义变量信息
+    3.10.[UD11HdocvariablesApi]:获取用户自定义变量信息
+    3.11.[UD12UploadDeleteTemplateApi]:文件的上传，删除，模板管理
+    3.13.[UD14SearchresultistApi]:获取格纳文件一览
+    3.14.[UD15SelecthdocsenddatavinplateApi]:获取用户发送数据信息
+    3.15.[UD16ADChangeApi]:产品编号的变更
+    3.16.[UD17HDocUserAdministration​​Api]:对指定用户的用户权限和市场权限的更新和删除
+    3.17.[UD18HDocUserDocAdministrationApi]:设定用户的文件权限
+    3.18.[UD19SearchResultListApi]:获取用户权限等信息
+    3.19.[UD20GetDocumentListApi]:获取文档信息
+    ............
+        
+4. 处理流程
+   【AuthenticationApi】
+   # Login画面
+    4.1 客户端通过POST请求访问接口 /api/ud01/AuthenticationApi，将用户名、密码等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【Ud01Controller】接收前端请求，通过【Ud01Request】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【Ud01Service】接口中的 login() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【Ud01ServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 对密码格式、账号状态进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserMapper】数据访问层，根据用户名查询数据库中的用户信息，获取用户实体对象。
+
+    4.6 登录核心验证逻辑：
+        • 判断用户或者密码是否存在，若有任何一个不存在则返回“We didn't recognize the username or password you entered. Please try again.”
+
+    4.7 验证全部通过后：
+        • 可记录登录日志（登录时间、IP、设备信息）
+        • 构建登录成功响应体，包含用户基础信息
+
+    4.8 封装【LoginResponse】响应对象，统一返回标准格式：
+       Response Success (200)
+       {
+        "code": 200,
+        "message": null,
+        "data": {
+         "userId":"AD001"
+        }
+       }
+
+    【GetUserPermissionsApi】
+    4.1 客户端通过GET请求访问接口/api/ud02/GetUserPermissionsApi/{userId}，将用户ID作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【Ud02Controller】接收前端请求，通过【Ud02Request】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【Ud02Service】接口中的getUserPermissions() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【Ud02ServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+
+    4.5 业务层通过【UserMapper】数据访问层，根据用户ID查询数据库中的用户权限信息。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回用户权限信息
+        • 若数据不存在，返回空
+
+    4.8 封装【XXXXXResponse】响应对象，统一返回标准格式：
+     {
+       "code": 200,
+       "message": "success",
+       "data": {
+       "permissions": [
+         "Generate",
+         "Admin",
+         "User Administration",
+         "Documentation"
+       ]}
+     }      
+
+   【UD03SelectHdocdocumentlistApi】
+    4.1 客户端通过GET请求访问接口 /api/ud03/selecthdocdocumentlist，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的 selectDocumentList() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：无
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，查询数据库中的文件信息。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回文件数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": [
+              {
+                "doctype": "TYPE001",
+                "description": "Document Type 1"
+                },
+              {
+               "doctype": "TYPE002",
+               "description": "Document Type 2"
+              }
+            ]
+        }     
+
+   【UD04SelectGeneratedocumentApi】
+    4.1 客户端通过GET请求访问接口 /api/ud04/selectgenerateddocument，将Chassis series和Chassis no作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的selectGenerateDocument() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：Chassis series,Chassis no
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，查询数据库中的文件信息。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回文件数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+            "ordernumber": "ORD20221202001",
+            "buildWeek": "2022-W48",
+            "specWeek": "2022-W47",
+            "market": "CN",
+            "masterMarket": "-EU",
+            "sNoteNo": "SN001234",
+            "loadIndex": "152/149M",
+            "modifyDocAct": "Y",
+            "usingTemplate": "_eu/VIN_PLATE_UD_TRUCKS_TSA_INDO_PHIL.rtf",
+            "replacingParameters": [
+             {
+              "variable": "PARAM1"
+             },
+             {
+              "variable": "PARAM2"
+              }
+             ],
+            "date": "2022-12-02 05:11:45"
+            }
+        }     
+
+   【UD05ModifyDocumentApi】
+   #初期表示
+    4.1 客户端通过GET请求访问接口 /api/ud05/selectvariablemodification，将Chassis series和Chassis no作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD05SelectVariableModification() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：Chassis series,Chassis no
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+                  "variables": [
+                  {
+                   "variable": "PARAM1",
+                   "description": "Parameter 1 description",
+                   "newval": "VALUE1"
+                  },
+                  {
+                   "variable": "PARAM2",
+                   "description": "Parameter 2 description",
+                   "newval": "VALUE2"
+                  }
+                ]
+                 }
+        }      
+
+   #Save Button押下
+    4.1 客户端通过PUT请求访问接口 /api/ud05/updatehdocadcamodification，将Modified value作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD05UpdateHdocAdcaModification() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：Chassis series,Chassis no
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        • 若数据存在，更新数据
+        • 若数据不存在，返回error
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Modifications saved successfully"
+        }     
+
+   【UD06SaveModificationsApi】
+    4.1 客户端通过GET请求访问接口 /api/ud06/savemodifications，将Chassis series和Chassis no作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD06SelectHdocAdcaModification() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：Chassis series,Chassis no
+
+    4.5 业务层通过【AdcaModificationMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+               "doctype": "VIN_PLATE",
+               "vers": "1.0",
+               "storing": [
+               {
+                "variable": "PARAM1",
+                "newVal": "VALUE1"
+               },
+               {
+                "variable": "PARAM2",
+                "newVal": "VALUE2"
+               }
+                ]
+              }
+        }    
+
+   【UD07VehicleSpecificationApi】
+    4.1 客户端通过GET请求访问接口 /api/ud07/vehiclespecification，将Chassis series和Chassis no作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD07Select() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：Chassis series,Chassis no
+
+    4.5 业务层通过【AdcaModificationMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+              "chassisNo": "1234567890",
+              "model": "FH16",
+              "builtWeek": "2022-W48",
+              "productType": "TRUCK",
+              "vin": "YV2R2XDE1NA123456",
+              "countryOfOperation": "CN",
+              "symbolStrList": [
+               {
+                "symbol": "SYM00001",
+                "functionGroup": "FG01",
+                "familyId": "F01",
+                "variantId": "V01",
+                "description": "Engine variant description"
+                },
+               {
+                "symbol": "SYM00002",
+                "functionGroup": "FG02",
+                "familyId": "F02",
+                "variantId": "V02",
+                "description": "Transmission variant description"
+               }
+             ]
+             }
+        }             
+
+    【UD08HomologationVariablesApi】 
+    # 初期表示
+    ## PRODUCT_CLASS_MASTER取得
+    4.1 客户端通过GET请求访问接口 /api/ud08/productclassmaster，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectProductclassmaster()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对PRODUCT_CLASS_MASTER表进行全表查询
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         返回数据，进行MARKET_MASTER的取得
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "获取产品类别列表成功",
+            "data": [
+    {
+      "pc": "PC01",
+      "description": "乘用车"
+    },
+    {
+      "pc": "PC02",
+      "description": "商用车"
+    }
+  ]
+        } 
+
+    ## MARKET_MASTER取得
+    4.1 客户端通过GET请求访问接口 api/ud08/marketmaster，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectMarketmaster() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对MARKET_MASTER表进行全表查询
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         返回数据
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "获取市场列表成功",
+            "data": [
+    {
+      "market": "CN",
+      "description": "中国市场"
+    },
+    {
+      "market": "EU",
+      "description": "欧洲市场"
+    },
+    {
+      "market": "US",
+      "description": "美国市场"
+    }
+  ]
+        }         
+
+       
+
+    # Add按钮点击
+    ## HDOC_VARIABLES的检索
+    4.1 客户端通过GET请求访问接口 /api/ud08/variables/{variableName}，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectHdocvariables() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 若variable的值是'TEMPLATE-XXX'，将'TEMPLATE-'部分去掉，剩下的部分进行HDOC_VARIABLES的检索
+        • 若Variable的入力内容不是'TEMPLATE-XXX'，进行HDOC_USER_DEFINED_RULES的检索处理
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          返回数据存在结果flag(variablesExistFlag) = 1
+          设置Message = [Variant does not exist, Please enter the correct content]
+         若数据不存在 
+          返回数据存在结果flag(variablesExistFlag) = 0
+          进行HDOC_USER_DEFINED_RULES的检索处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "变量不存在",
+            "variablesExistFlag": 0
+        }    
+
+    ## HDOC_USER_DEFINED_RULES的检索
+    4.1 客户端通过GET请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectHdocuserdefinedrules() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据productClass，number，market进行HDOC_USER_DEFINED_RULES的检索处理
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+        若检索结果为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 0
+         进行数据登录的处理
+        若检索结果不为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 1
+         设置Message = [Primary key conflict, Please enter the correct content]
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "变量不存在",
+            "userDefinedRulesFlag": 0
+        }           
+
+    ## 数据登录
+    4.1 客户端通过POST请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08Add() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_USER_DEFINED_RULES表的登录
+
+    4.5 业务层通过【VariablesMapper】数据访问层，登录数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功登录
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据添加成功"
+        }           
+
+    # Update按钮点击
+    ## HDOC_VARIABLES的检索
+    4.1 客户端通过GET请求访问接口 /api/ud08/variables/{variableName}，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectHdocvariables() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 若variable的值是'TEMPLATE-XXX'，将'TEMPLATE-'部分去掉，剩下的部分进行HDOC_VARIABLES的检索
+        • 若Variable的入力内容不是'TEMPLATE-XXX'，进行HDOC_USER_DEFINED_RULES的检索处理
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          返回数据存在结果flag(variablesExistFlag) = 1
+          设置Message = [Variant does not exist, Please enter the correct content]
+         若数据不存在 
+          返回数据存在结果flag(variablesExistFlag) = 0
+          进行HDOC_USER_DEFINED_RULES的检索处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "变量不存在",
+            "variablesExistFlag": 0
+        }    
+
+    ## HDOC_USER_DEFINED_RULES的检索
+    4.1 客户端通过GET请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectHdocuserdefinedrules() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据productClass，number，market进行HDOC_USER_DEFINED_RULES的检索处理
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        若检索结果为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 0
+         设置Message = [Data does not exist, Please enter the correct content]
+        若检索结果不为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 1
+         进行数据更新的处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "变量存在",
+            "userDefinedRulesFlag": 1
+        }           
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08Update() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据productClass、number、market进行HDOC_USER_DEFINED_RULES的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，更新数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功更新
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据更新成功"
+        }   
+
+    # Delete按钮点击
+    ## 数据取得
+    4.1 客户端通过GET请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08SelectHdocuserdefinedrules() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据productClass，number，market进行HDOC_USER_DEFINED_RULES的检索处理
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+        若检索结果为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 0
+         设置Message = [Data does not exist, Please enter the correct content]
+        若检索结果不为0
+         返回数据存在结果flag(userDefinedRulesFlag) = 1
+         进行数据删除的处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "变量存在",
+            "userDefinedRulesFlag": 1
+        }           
+
+    ## 数据删除
+    4.1 客户端通过DELETE请求访问接口 /api/ud08/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：
+         productClass
+         number
+         market
+         variable
+         value 
+         variantString1
+         variantString2
+         comments 
+         add 
+         delete 
+         createdByUser 
+         date
+         userId 
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD08Delete() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数productClass,number,market进行HDOC_VARIABLES表的删除
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，删除数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功删除
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据删除成功"
+        }   
+
+    【UD09DeleteHdocuserdefinedrulesApi】
+    # 初期表示
+    4.1 客户端通过POST请求访问接口 /api/ud09/searchuserdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：productClass,number,market,variable,value,vs,vs2,comments
+          ※ 上记参数均可为空
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD09Seach() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_USER_DEFINED_RULES表的查询
+
+    4.5 业务层通过【UserDefinedRulesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       • 成功:
+         返回数据
+       • 失败:
+         返回error
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+              "totalCount": 2,
+              "records": [
+                {
+                  "productClass": "PC01",
+                  "number": "1234567890",
+                  "market": "CN",
+                  "variable": "VAR001",
+                  "value": "测试值",
+                  "vs": "VS1",
+                  "vs2": "VS2",
+                  "comments": "注释信息",
+                  "addDate": "202605",
+                  "deleteDate": "",
+                  "createdByUser": "admin",
+                  "date": "2026-05-29 10:30:00"
+                },
+                {
+                  "productClass": "PC01",
+                  "number": "1234567890",
+                  "market": "EU",
+                  "vs": "VS1",
+                  "vs2": "VS2",
+                  "value": "欧洲测试值",
+                  "variantString": "VS3,VS4",
+                  "comments": "欧洲注释",
+                  "addDate": "202605",
+                  "deleteDate": "",
+                  "createdByUser": "user01",
+                  "date": "2026-05-29 11:00:00"
+                }
+              ]
+           }
+        }    
+
+    # Delete selected按钮点击
+    4.1 客户端通过DELETE请求访问接口 /api/ud09/userdefinedrules，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：productClass,number,market
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD09DeleteSelected() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_USER_DEFINED_RULES表的删除
+
+    4.5 业务层通过【UserDefinedRulesMapper】数据访问层，删除数据库。
+
+    4.6 根据删除结果：
+       • 成功:
+         返回message = [数据删除成功]
+       • 失败:
+         返回error
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",
+            "code": 200,
+            "msg": "数据删除成功"
+        } 
+
+    【UD10HdocvariablesApi】    
+    # Add按钮点击
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud10/search，将variable作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Search() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_VARIABLES表的查询
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          返回数据存在结果flag(variablesExistFlag) = 1
+          返回Message = [Variant already exists. Please enter the correct content]
+         若数据不存在 
+          返回数据存在结果flag(variablesExistFlag) = 0
+          进行数据登录的处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+              "variablesExistFlag": 0,
+              "records": []
+            }
+        }    
+
+    ## 数据登录
+    4.1 客户端通过POST请求访问接口 /api/ud10/add，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：variable,type,description,createdByUser,date
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Add() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_VARIABLES表的登录
+
+    4.5 业务层通过【VariablesMapper】数据访问层，登录数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功登录
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "Variable added successfully"
+        }           
+
+    # Update按钮点击
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud10/search，将variable作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Search() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_VARIABLES表的查询
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+        若检索结果为0
+         返回数据存在结果flag(variablesExistFlag) = 0
+         设置Message = [Variant does not  exists. Please enter the correct content]
+        若检索结果不为0
+         返回数据存在结果flag(variablesExistFlag) = 1
+         进行数据更新的处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+              "variablesExistFlag": 1,
+              "records": [
+                {
+                 "variable": "string",
+                 "type": "string",
+                 "description": "string",
+                 "createdByUser": "string",
+                 "date": "string"
+                }
+              ]
+            }
+        } 
+
+    ## 数据更新   
+    4.1 客户端通过PUT请求访问接口 /api/ud10/update，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：variable,type,description,createdByUser,date
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Update() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_VARIABLES表的更新
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据更新结果：
+       - **成功**:
+        数据成功更新
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "Variable updated successfully"
+        } 
+
+    # Delete按钮点击
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud10/search，将variable作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Search() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_VARIABLES表的查询
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+        若检索结果为0
+         返回数据存在结果flag(variablesExistFlag) = 0
+         设置Message = [Variant does not  exists. Please enter the correct content]
+        若检索结果不为0
+         返回数据存在结果flag(variablesExistFlag) = 1
+         进行数据删除的处理
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+              "variablesExistFlag": 1,
+              "records": [
+                {
+                 "variable": "string",
+                 "type": "string",
+                 "description": "string",
+                 "createdByUser": "string",
+                 "date": "string"
+                }
+              ]
+            }
+        }             
+
+    ## 数据删除
+    4.1 客户端通过DELETE请求访问接口 /api/ud10/delete，将variable作为请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD10Delete() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数variable进行HDOC_VARIABLES表的删除
+
+    4.5 业务层通过【VariablesMapper】数据访问层，登录数据库。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功删除
+       - **失败**:
+         返回error  
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "status": "success",            
+            "code": 200,
+            "msg": "Variable deleted successfully"
+        }                     
+
+    【UD11HdocvariablesApi】
+    4.1 客户端通过POST请求访问接口 /api/ud11/search，将以下项目作为请求参数，以JSON格式发送至后端服务。
+        • 参数：variable,type,description
+          ※ 上记参数均可为空
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD11Search() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据传递的参数进行HDOC_VARIABLES表的查询
+
+    4.5 业务层通过【VariablesMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       • 成功:
+         返回数据
+       • 失败:
+         返回error
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+         "code": 200,
+         "data": {
+           "totalCount": 1,
+           "records": [
+             {
+              "variable": "string",
+              "type": "string",
+              "description": "string",
+              "createdByUser": "string",
+              "date": "string"
+             }
+            ]
+         }
+        }  
+
+    【UD12UploadDeleteTemplateApi】
+    # 初期表示
+    4.1 客户端通过GET请求访问接口 /api/ud12/selectmarket，将Template File、Market等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD12SelectMarket()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对MARKET_MASTER表进行全检索
+
+    4.5 业务层通过【MarketMasterMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       • 成功:
+         返回数据
+       • 失败:
+         返回error
+
+    4.8 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": [
+              {
+               "market": "string",
+               "description": "string"
+             }
+           ]
+        }
+
+    # 点击Upload file按钮
+    4.1 客户端通过POST请求访问接口 /api/ud12/uploadfile，将Template File、Market等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对Template File文件进行大小检证
+        • 对Market进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过后将文件上传到服务器端，并返回文件上传结果，服务器地址为https://172.17.0.63/F:/hdoc/template/upload
+
+    4.8 封装【UploadDeleteTemplateResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "File uploaded successfully",
+            "data": {
+                "file": "string",
+                "market": "string",
+                "uploadPath": "string",
+                "uploadTime": "string"
+            }
+        }
+
+    # 点击Delete按钮
+    4.1 客户端通过DELETE请求访问接口 /api/ud12/deletefile，将Template File、Market等请求参数，以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对Template File文件进行大小检证
+        • 对Market进行前置校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过后访问文件服务器端，并删除指定文件，服务器地址为https://172.17.0.63/F:/hdoc/template/upload
+
+    4.8 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "File deleted successfully",
+            "data": {
+                "file": "string",
+                "market": "string",
+                "deleteTime": "string"
+            }
+        }        
+
+    【UD14SearchresultistApi】
+    # 初期获取市场列表
+    4.1 客户端通过GET请求访问接口 /api/ud14/marketmaster，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD14SelectMarketmaster()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：无
+    4.5 业务层通过【MarketMasterMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回市场数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取市场列表成功",
+            "data": [
+    　　　　　　{
+      　　　　　　"market": "CN",
+      　　　　　　"description": "中国市场"
+    　　　　　　},
+    　　　　　　{
+      　　　　　　"market": "EU",
+     　　　　　　 "description": "欧洲市场"
+    　　　　　　},
+    　　　　　　{
+      　　　　　　"market": "US",
+      　　　　　　"description": "美国市场"
+    　　　　　　　}
+  　　　　　　　]
+        }        
+
+    # 选择SelectMartet下拉列表
+    4.1 客户端通过POST请求访问接口 /api/ud14/userdefinedrules/variables，将Market，filename作为请求参数以JSON格式发送至后端服务。        
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD14SelectUserDefinedRules()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserInfoMapper】数据访问层，查询数据库中的用户信息，获取用户名。
+        •查询条件：Market，filename
+
+    4.6 根据查询结果：
+        • 若数据存在
+          返回VARIABLE
+        • 若数据不存在
+          返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data":  {
+              "results": [
+                {
+                 "filename": "template001.xlsx",
+                 "val": "CN-template001.xlsx",
+                 "variables": ["VAR001", "VAR002"]
+                },
+               {
+                "filename": "template002.xlsx",
+                "val": "CN-template002.xlsx",
+                "variables": ["VAR003"]
+               },
+               {
+                "filename": "template003.xlsx",
+                "val": "CN-template003.xlsx",
+                "variables": []
+               }
+              ]
+  
+             }
+        }  
+
+   【UD15SelecthdocsenddatavinplateApi】
+    # 点击View Info按钮 
+    4.1 客户端通过POST请求访问接口 /api/ud15/viewinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ViewInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的检索
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据。
+
+    4.6 根据查询结果：
+      - **成功**:
+         若数据存在 
+          返回数据
+         若数据不存在 
+          设置Warning Message = [Chassis number XXX not found.]
+          返回空
+          ※Message中的XXX为serie+chnr
+      - **失败**:
+         返回error    
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+       "chassisNumber": "string",
+       "type": "string",
+       "status": "string",
+       "msg": "string",
+       "registerDatetime": "string",
+       "docReady": "string",
+       "docSent": "string",
+       "xmlDoc": "string"
+     }
+        } 
+
+    # 点击Set Regenerate按钮      
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud15/viewinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ViewInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的检索
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据。
+
+    4.6 根据查询结果：
+      - **成功**:
+         若数据存在 
+          进行数据更新处理
+         若数据不存在 
+          设置Warning Message = [Chassis number XXX not found.]
+          返回空
+          ※Message中的XXX为serie+chnr
+      - **失败**:
+         返回error              
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+       "chassisNumber": "string",
+       "type": "string",
+       "status": "string",
+       "msg": "string",
+       "registerDatetime": "string",
+       "docReady": "string",
+       "docSent": "string",
+       "xmlDoc": "string"
+     }
+        }   
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud15/setregenerate，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15SetRegenerate()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，更新数据。
+
+    4.6 根据更新结果：
+      - **成功**:
+         数据更新成功
+      - **失败**:
+         返回error             
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Status updated successfully"
+        } 
+
+    # 点击Set OK按钮      
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud15/viewinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ViewInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的检索
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据。
+
+    4.6 根据查询结果：
+      - **成功**:
+         若数据存在 
+          进行数据更新处理
+         若数据不存在 
+          设置Warning Message = [Chassis number XXX not found.]
+          返回空
+          ※Message中的XXX为serie+chnr
+      - **失败**:
+         返回error              
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+       "chassisNumber": "string",
+       "type": "string",
+       "status": "string",
+       "msg": "string",
+       "registerDatetime": "string",
+       "docReady": "string",
+       "docSent": "string",
+       "xmlDoc": "string"
+     }
+        }   
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud15/setok，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15SetOK()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，更新数据。
+
+    4.6 根据更新结果：
+      - **成功**:
+         数据更新成功
+      - **失败**:
+         返回error             
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Status updated successfully"
+        } 
+
+    # 点击Change to Basic Info按钮     
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud15/viewinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ViewInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的检索
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据。
+
+    4.6 根据查询结果：
+      - **成功**:
+         若数据存在 
+          进行数据更新处理
+         若数据不存在 
+          设置Warning Message = [Chassis number XXX not found.]
+          返回空
+          ※Message中的XXX为serie+chnr
+      - **失败**:
+         返回error              
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+       "chassisNumber": "string",
+       "type": "string",
+       "status": "string",
+       "msg": "string",
+       "registerDatetime": "string",
+       "docReady": "string",
+       "docSent": "string",
+       "xmlDoc": "string"
+     }
+        }   
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud15/changetobasicinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ChangetoBasicInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，更新数据。
+
+    4.6 根据更新结果：
+      - **成功**:
+         数据更新成功
+      - **失败**:
+         返回error             
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Status updated successfully"
+        }   
+
+    # 点击Change to Advanced Info按钮     
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud15/viewinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ViewInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的检索
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据。
+
+    4.6 根据查询结果：
+      - **成功**:
+         若数据存在 
+          进行数据更新处理
+         若数据不存在 
+          设置Warning Message = [Chassis number XXX not found.]
+          返回空
+          ※Message中的XXX为serie+chnr
+      - **失败**:
+         返回error              
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": {
+       "chassisNumber": "string",
+       "type": "string",
+       "status": "string",
+       "msg": "string",
+       "registerDatetime": "string",
+       "docReady": "string",
+       "docSent": "string",
+       "xmlDoc": "string"
+     }
+        }   
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud15/changetoadvancedinfo，将serie,chnr作为请求以JSON格式发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD15ChangetoAdvancedInfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_SEND_DATA_VIN_PLATE的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，更新数据。
+
+    4.6 根据更新结果：
+      - **成功**:
+         数据更新成功
+      - **失败**:
+         返回error             
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Status updated successfully"
+        }                                       
+ 
+   【UD16ADChangeApi】 
+    # 点击ADD按钮
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud16/selecthdocadcachange，将serie,chnr作为请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD16SelectHdocAdcaChange()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_ADCA_CHANGE的取得
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          返回error
+          返回Warning Message：AFTER DEF CHANGE IS NOT ACTIVATED
+         若数据不存在 
+          进行数据登录处理
+       - **失败**:
+         返回error          
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": 
+                {
+                 "serie": "string",
+                 "chnr": "string",
+                 "reason": "string"
+            　　}
+        }   
+
+    ## 数据登录
+    4.1 客户端通过POST请求访问接口 /api/ud16/inserthdocadcachange，将serie,chnr、rason作为请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD16InsertHdocAdcaChange()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_ADCA_CHANGE的登录
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功登录
+       - **失败**:
+         返回error          
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Data inserted successfully"
+        }  
+
+    # 点击DELETE按钮
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud16/selecthdocadcachange，将serie,chnr作为请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD16SelectHdocAdcaChange()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_ADCA_CHANGE的取得
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          进行数据更新处理
+         若数据不存在 
+          终止流程
+       - **失败**:
+         返回error          
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": 
+                {
+                 "serie": "string",
+                 "chnr": "string",
+                 "reason": "string"
+            　　}
+        }   
+
+    ## 数据更新
+    4.1 客户端通过POST请求访问接口 /api/ud16/updatehdocadcachange，将serie,chnr、rason作为请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD16UpdateHdocAdcaChange()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_ADCA_CHANGE的更新
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+       - **成功**:
+         数据成功更新
+       - **失败**:
+         返回error          
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Data updated successfully"
+        }          
+
+    # 点击CHECK按钮
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口 /api/ud16/selecthdocadcachange，将serie,chnr作为请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD16SelectHdocAdcaChange()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 根据参数进行HDOC_ADCA_CHANGE的取得
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+       - **成功**:
+         若数据存在 
+          返回error
+          返回Warning Message：AFTER DEF CHANGE IS NOT ACTIVATED
+         若数据不存在 
+          返回空
+          返回Warning Message：[No data found for this chassis number]
+       - **失败**:
+         返回error          
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": 
+                {
+                 "serie": "string",
+                 "chnr": "string",
+                 "reason": "string"
+            　　}
+        } 
+
+   【UD17HDocUserAdministrationApi】
+    # 初期获取市场列表
+    4.1 客户端通过GET请求访问接口 /api/ud17/selectmarketmaster，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD17SelectMarketMaster()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【MarketMasterMapper】数据访问层，查询数据库中的市场信息，获取市场数据。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回市场数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": [
+                {
+                "market"："string",
+                "description": "string"
+            },
+            {
+                "market"："string",
+                "description": "string"
+            }
+            ...
+            ]
+        }        
+
+    # User Info按钮点击
+    ## 用户名取得
+    4.1 客户端通过POST请求访问接口 /api/ud17/userinfo，将UserID请求参数以JSON格式发送至后端服务。        
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD17Userinfo()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserInfoMapper】数据访问层，查询数据库中的用户信息，获取用户名。
+        •查询条件：无
+
+    4.6 根据查询结果：
+        • 若数据存在
+          返回用户名，数据存在结果flag(userInfoFlag) 设为1，进行用户权限取得的处理
+        • 若数据不存在
+          返回空，数据存在结果flag(userInfoFlag) 设为0
+          返回Error Message = [We didn't recognize the userid you entered. Please try again.]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data":  {
+              "userInfoFlag": 1,
+              "userName": "string"
+             }
+        }   
+
+    ## 用户权限取得
+    4.1 客户端通过POST请求访问接口 /api/ud17/functionauth，将UserID请求参数以JSON格式发送至后端服务。              
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD17Functionauth()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【FunctinAuthMapper】数据访问层，查询数据库，获取用户权限。
+        • 查询条件：UserID
+    
+    4.6 根据查询结果：
+        • 若数据存在
+          返回当前用户权限，数据存在结果flag(functionAuthFlag) 设为1，进行用户市场权限取得的处理
+        • 若数据不存在
+          返回空，数据存在结果flag(functionAuthFlag) 设为0
+          返回Error Message = [We didn't recognize the userid you entered. Please try again.]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data":  {
+              "functionAuthFlag": 1,
+              "userId": "string",
+              "function": ["Standard User", "rule admin"]
+             }
+        }     
+
+    ## 用户市场权限取得
+    4.1 客户端通过POST请求访问接口 /api/ud17/marketauth，将UserID和用户权限取得处理中返回的function作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD17Marketauth()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【MarketAuthMapper】数据访问层，查询数据库，获取用户市场权限。
+        • 查询条件：UserID和用户权限取得处理中返回的function
+
+    4.6 根据查询结果：
+        • 若数据存在
+          返回当前用户市场权限，数据存在结果flag(marketAuthFlag) 设为1
+        • 若数据不存在
+          返回空，数据存在结果flag(marketAuthFlag) 设为0
+          返回Error Message = [We didn't recognize the userid you entered. Please try again.]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "数据查询成功",
+            "data": [
+              "marketAuthFlag": 1,
+              {
+                "type": "string",
+                "market": "string"
+              },
+              {
+                "type": "string",
+                "market": "string"
+              }
+             ]
+        }  
+
+    # Delete Role按钮点击
+    4.1 客户端通过DELETE请求访问接口 /api/ud17/deleterole，将UserID请求参数以JSON格式发送至后端服务。            
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD17DeleteRole()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询并删除数据库。
+        • 查询条件：UserID    
+        • 删除条件：UserID
+
+    4.6 根据查询结果：
+        • 若数据存在
+          删除对应数据
+        • 若数据不存在
+          返回Error Message = [User not found]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "Role deleted successfully"
+        }  
+
+
+    【UD18HDocUserDocAdministrationApi】
+    # 初期表示
+    4.1 客户端通过GET请求访问接口/api/ud18/documentlist，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD20SelectHdocDocumentList()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：无
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，查询数据库获取文档列表数据。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回文档列表数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取文档列表成功",
+            "data": [
+              {
+               "description": "车辆规格说明书"
+              },
+              {
+               "description": "用户操作指南"
+              }
+            ]
+        }        
+
+    # User Info按钮点击
+    ##验证用户功能权限
+    4.1 客户端通过GET请求访问接口/api/ud18/functionauth/{userId}，将UserID请求参数以JSON格式发送至后端服务。        
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18SelectHdocFunctionAuth ()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑： 
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【FunctionAuthMapper】数据访问层，查询数据库中的用户信息，获取用户名。
+        •查询条件：UserID
+
+    4.6 根据查询结果：
+        •若数据存在 
+          返回数据存在结果flag(functionAuthExistFlag) = 1
+          进行用户名取得处理
+        •若数据不存在 
+          返回数据存在结果flag(functionAuthExistFlag) = 0
+          设置Message = [We didn't recognize the userid you entered. Please try again.]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "用户权限验证成功",
+            "data":  {
+              "functionAuthExistFlag": 1,
+              "userId": "string"
+             }
+        }   
+
+    ## 用户名取得
+    4.1 客户端通过POST请求访问接口/api/ud18/authentication/{userId}，将UserID请求参数以JSON格式发送至后端服务。              
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的AuthenticationApi方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserMapper】数据访问层，查询数据库，获取用户权限。
+        • 查询条件：UserID
+    
+    4.6 根据查询结果：
+        • 若数据存在
+          返回取得的user名，进行用户权限取得处理
+        • 若数据不存在
+          返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取用户认证成功",
+            "data":  {
+               "userId": "USER001",
+               "userName": "张三"
+            } 
+        }     
+
+    ## 用户文档权限取得
+    4.1 客户端通过GET请求访问接口/api/ud18/authentication/{userId}，将UserID作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18SelectHdocUserDoc()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserDocMapper】数据访问层，查询数据库，获取用户市场权限。
+        • 查询条件：UserID
+
+    4.6 根据查询结果：
+        • 若数据存在
+          返回当前用户权限
+        • 若数据不存在
+          返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取用户权限成功",
+            "data": [
+            "userDocExistFlag": 1,
+             {
+              "userId": "USER001",
+              "docType": "hdoc"
+             },
+             {
+              "userId": "USER001",
+              "docType": "hdoc2"
+             }
+            ]
+        }  
+
+    # Update按钮点击
+    ##验证用户功能权限
+    4.1 客户端通过GET请求访问接口/api/ud18/functionauth/{userId}，将UserID请求参数以JSON格式发送至后端服务。        
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18SelectHdocFunctionAuth ()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑： 
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【FunctionAuthMapper】数据访问层，查询数据库中的用户信息，获取用户名。
+        •查询条件：UserID
+
+    4.6 根据查询结果：
+        •若数据存在 
+          返回数据存在结果flag(functionAuthExistFlag) = 1
+          进行删除数据取得处理
+        •若数据不存在 
+          返回数据存在结果flag(functionAuthExistFlag) = 0
+          设置Message = [We didn't recognize the userid you entered. Please try again.]
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "用户权限验证成功",
+            "data":  {
+              "functionAuthExistFlag": 1,
+              "userId": "string"
+             }
+        }   
+
+    ## 用户文档权限取得
+    4.1 客户端通过GET请求访问接口/api/ud18/userdoc/{userId}，将UserID作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18SelectHdocUserDoc()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserDocMapper】数据访问层，查询数据库，获取用户市场权限。
+        • 查询条件：UserID
+
+    4.6 根据查询结果：
+        • 若数据存在 
+          返回数据存在结果flag(userDocExistFlag) = 1
+          进行数据删除处理
+        • 若数据不存在 
+          返回数据存在结果flag(functionAuthExistFlag) = 0
+          进行数据登录处理
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取用户权限成功",
+            "data": [
+            "userDocExistFlag": 1,
+             {
+              "userId": "USER001",
+              "docType": "hdoc"
+             },
+             {
+              "userId": "USER001",
+              "docType": "hdoc2"
+             }
+            ]
+        }  
+
+    ## 数据删除
+    4.1 客户端通过DELETE请求访问接口/api/ud18/userdoc/{userId}，将UserID作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18DeleteHdocUserDoc()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserDocMapper】数据访问层，删除数据。
+        • 删除条件：UserID
+
+    4.6 根据删除结果：
+        • 若数据删除成功 
+          返回数据删除结果flag(deleteUserDocFlag) = 1
+          进行数据登录处理
+        • 若数据删除失败 
+          返回error，返回msg["数据删除失败"]
+          
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "用户文档权限删除成功",
+            "data": {
+              "deleteUserDocFlag": 1,
+              "userId": "USER001"
+              }
+        } 
+
+    ## 数据登录
+    4.1 客户端通过POST请求访问接口/api/ud18/userdoc，将UserID,Document等作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD18CreateHdocUserDoc()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【UserDocMapper】数据访问层，登录数据。
+
+    4.6 根据登录结果：
+        • 若数据登录成功 
+          返回response
+        • 若数据登录失败 
+          返回error，返回msg["数据登录失败"]
+          
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+         "code": 200,
+         "msg": "用户文档权限创建成功"
+        }                        
+
+    【UD19SearchResultListApi】
+    # 初期表示
+    4.1 客户端通过GET请求访问接口/api/ud19/marketmaster，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD19SelectMarketMaster()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 查询条件：无
+
+    4.5 业务层通过【MarketMasterMapper】数据访问层，查询数据库中的市场信息。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回市场信息
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取市场信息成功",
+            "data": [
+              {
+               "market": "CN",
+               "description": "中国市场"
+              },
+              {
+               "market": "JP",
+               "description": "日本市场"
+              }
+            ]
+        }        
+
+    # Search按钮点击
+    4.1 客户端通过GET请求访问接口/api/ud19/searchusers，将notSet,userId,userName,type,market作为请求参数以JSON格式发送至后端服务。        
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD19SearchHdoc ()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑： 
+        • 对请求参数进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+
+    4.5 业务层通过【XXXXXMapper】数据访问层，查询数据库中的用户信息。
+
+    4.6 根据查询结果：
+        • 若数据存在 
+          返回查询结果
+        • 若数据不存在 
+          返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "用户权限验证成功",
+            "data":  {
+              "list": [
+                {
+                 "userid": "admin001",
+                 "user": "张三",
+                 "market": "CN"
+                },
+                {
+                 "userid": "user002",
+                 "user": "李四",
+                 "market": "JP"
+                }
+               ],
+              "count": 2
+             }
+        }   
+
+   【UD20GetDocumentListApi】
+   # 初期表示
+    4.1 客户端通过POST请求访问接口 /api/documenttypes?documentType={documentType}，将请求发送至后端服务。
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD20SelectHdocDocumentList() 方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，查询数据库中的文件信息。
+
+    4.6 根据查询结果：
+        • 若数据存在，返回文件数据
+        • 若数据不存在，返回空
+
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+            "code": 200,
+            "msg": "获取文档类型列表成功",
+            "documentTypeFlag": 1,
+            "data": [
+              {
+                "doctype": "TYPE001",
+                "description": "Document Type 1"
+                "registerUser":"user001",
+                "registerDatetime": "2021-01-01 00:00:00"
+                },
+              {
+               "doctype": "TYPE002",
+               "description": "Document Type 2"
+               "registerUser":"user001",
+               "registerDatetime": "2021-01-01 00:00:00"
+              }
+            ]
+        }  
+
+    # Update Mode按钮点击
+    ## 数据取得
+    4.1 客户端通过POST请求访问接口/api/documenttypes?documentType={documentType}，将documentType等作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD20SelectHdocDocumentList()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数documentType进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+        • 根据documentType进行HDOC_DOCUMENT_LIST的检索
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，查询数据库。
+
+    4.6 根据查询结果：
+       • 成功:
+        若查询结果为0
+         返回数据存在结果flag(documentTypeFlag) = 0
+         返回Error Message = [Document type does not  exists. Please enter the correct content]
+        若查询结果不为0
+         返回数据存在结果flag(documentTypeFlag) = 1
+         进行数据更新的处理
+       • 失败:
+        返回error
+          
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+         "code": 200,
+         "msg": "数据查询成功"
+         "documentTypeFlag": 1,
+         "data":[
+           {
+           "documentType": "string",
+           "description": "Document Type 1"，
+           "registerUser": "string",
+           "registerDatetime": "string"
+           }
+         ]
+        }    
+
+    ## 数据更新
+    4.1 客户端通过PUT请求访问接口/api/ud20-1/update，将documentType,user,date等作为请求参数以JSON格式发送至后端服务。           
+
+    4.2 后端【XXXXXController】接收前端请求，通过【XXXXXRequest】实体对象封装并校验请求参数，完成请求入口层的参数接收与初步格式验证。
+
+    4.3 控制器层调用【XXXXXService】接口中的UD20-1UpdateHdocDocumentList()方法，将校验后的请求对象传递至业务逻辑层处理。
+
+    4.4 【XXXXXServiceImpl】业务实现层执行核心登录逻辑：
+        • 对请求参数documentType进行非空、长度、格式等合法性校验
+        • 校验不通过则直接返回参数异常响应
+        • 根据documentType进行HDOC_DOCUMENT_LIST的更新
+
+    4.5 业务层通过【DocumentListMapper】数据访问层，更新数据库。
+
+    4.6 根据查询结果：
+       • 成功:
+         数据成功更新
+       • 失败:
+         返回error
+          
+    4.7 封装【XXXXXResponse】响应对象，统一返回标准格式：
+        {
+         "code": 200,
+         "msg": "Document settings updated successfully"
+        }                   
+
+5. 数据库设计（TODO：请根据API一览和概要设计描述各个API的SQL）
+    【AuthenticationApi】
+    5.1 - 查询语句: 
+    SELECT USERID, PASSWORD, USERNAME FROM hdoc_user_infor WHERE USERID = {userId} AND PASSWORD = {password}
+
+    【UD03SelectHdocdocumentlistApi】
+    5.1 - 查询语句: 
+    SELECT DOCTYPE, DESCRIPTION FROM HDOC_DOCUMENT_LIST    
+
+    【UD04SelectGeneratedocumentApi】
+    5.1 - 查询语句: 
+    SELECT om.ORDERNUMBER, om.BUILD, om.SPEC, om.CUSTOMER_ADAP, vda.COUNTRY_OF_OPERATION, tire.LOAD_INDEX, cha.ACT, admod.VARIABLE,CURRENT_TIMESTAMP
+    FROM HDOC_REC_DATA_VDA_GENERAL vda
+     inner join HDOC_REC_DATA_OM om
+     on vda.SERIE = om.SERIE and vda.CHNR = om.CHNR
+     inner join HDOC_REC_DATA_KOLA_TIRE_MASTER tire
+     on vda.TRANS_TS = tire.TRANS_TS
+     inner join HDOC_ADCA_CHANGE cha
+     on vda.SERIE = cha.SERIE and vda.CHNR = cha.CHNR
+     inner join HDOC_ADCA_MODIFICATION admod
+     on vda.SERIE = admod.SERIE and vda.CHNR = admod.CHNO
+    WHERE
+        vda.SERIE = {chassisSeries} AND
+        vda.CHNR = {chassisNo} AND
+        admod.STA = '0'
+
+   【UD05ModifyDocumentApi】
+    #初期表示
+    5.1 - 查询语句:      
+    SELECT am.VARIABLE, am.NEWVAL, va.DESCRIPTION
+    FROM HDOC_ADCA_MODIFICATION am
+     inner join HDOC_VARIABLES va
+     on am.VARIABLE = va.VARIABLE
+    WHERE
+        am.SERIE = {chassisSeries} AND
+        am.CHNR = {chassisNo} AND
+
+    #Save Button押下
+    5.1 - 更新语句:      
+    UPDATE HDOC_ADCA_MODIFICATION
+    SET NEWVAL = {modifiedValue}
+    WHERE
+    SERIE = {chassisSeries} AND
+    CHNR = {chassisNo}
+
+   【UD06SaveModificationsApi】
+    #初期表示
+    5.1 - 查询语句:      
+    SELECT DOCTYPE, VERS, VARIABLE，NEWVAL
+    FROM HDOC_ADCA_MODIFICATION
+    WHERE
+        SERIE = {chassisSeries} AND
+        CHNR = {chassisNo} 
+
+   【UD07VehicleSpecificationApi】      
+    5.1 - 查询语句:
+    SQL1
+     SELECT rdo.MODEL,rdo.BUILD,rdvg.PRODUCT_TYPE,rdvg.VIN,rdvg.COUNTRY_OF_OPERATION,rdvv.FAMILY_ID,rdvv.VARIANT_ID
+     FROM HDOC_REC_DATA_OM rdo
+      inner join HDOC_REC_DATA_VDA_GENERAL rdvg
+      on rdo.SERIE = rdvg.SERIE and rdo.CHNR = rdvg.CHNR
+      inner join HDOC_REC_DATA_VDA_VARIANTS rdvv
+      on rdvg.SERIE = rdvv.SERIE and rdvg.CHNR = rdvv.CHNR
+     WHERE
+        rdo.SERIE = {chassisSeries} AND
+        rdo.CHNR = {chassisNo} 
+
+    SQL2   
+     SELECT SYMBOL,DESCRIPTION
+     FROM HDOC_REC_DATA_KOLA_VARIANT
+     WHERE
+        FAMILY_ID = {SQL1取得的FAMILY_ID} AND
+        VARIANT_ID = {SQL1取得的VARIANT_ID}
+    ORDER BY FUNCTION_GROUP
+
+    【UD08HomologationVariablesApi】
+    # 初期表示
+    5.1 - 查询语句:
+    SELECT MARKET, DESCRIPTION FROM MARKET_MASTER;
+    SELECT PC, DESCRIPTION FROM PRODUCT_CLASS_MASTER
+
+    # Add按钮点击/Update按钮点击
+    5.1 - 查询语句:
+    SELECT COUNT(*)
+    FROM HDOC_VARIABLES
+    WHERE
+       VARIABLE = {'TEMPLATE-'部分去掉后的variable}
+
+    SELECT COUNT(*)
+    FROM HDOC_USER_DEFINED_RULES
+    WHERE
+        PC = {productClass} AND
+        NUM = {number} AND
+        MARKET = {market} 
+
+    # Add按钮点击 
+    5.1 - 插入语句:
+    INSERT INTO HDOC_USER_DEFINED_RULES (
+        PC
+        ,NUM
+        ,MARKET
+        ,VS
+        ,VS2
+        ,VARIABLE
+        ,VAL
+        ,USERID
+        ,UP_DATE
+        ,COMMENTS
+        ,ADD_DATE
+        ,DELETE_DATE
+        ,REGISTER_DATETIME
+        ,REGISTER_USER
+        ,REGISTER_PROCESS
+        ,UPDATE_DATETIME
+        ,UPDATE_USER
+        ,UPDATE_PROCESS)
+    VALUES 
+    (:productClass, :number, :market, :variantString1, :variantString2, :variable, :value, :userId, 'null', :comments, :add, :delete, :date, :createdByUser, 'Homologation Variables',:date, :createdByUser, 'Homologation Variables') 
+
+   # Update按钮点击
+   5.1 - 更新语句:    
+    UPDATE HDOC_USER_DEFINED_RULES
+    SET VS = {variantString1},
+        VS2 = {variantString2},
+        VARIABLE = {variable},
+        VAL = {value},
+        COMMENTS = {comments},
+        ADD_DATE = {add},
+        DELETE_DATE = {delete},
+        REGISTER_DATETIME = {date},
+        REGISTER_USER = {createdByUser}
+    WHERE
+        PC = {productClass} AND
+        NUM = {number} AND
+        MARKET = {market}
+
+    # Delete按钮点击
+    5.1 - 插入语句:
+    SELECT COUNT(*)
+    FROM HDOC_USER_DEFINED_RULES
+    WHERE
+        PC = {productClass} AND
+        NUM = {number} AND
+        MARKET = {market} 
+
+    5.2 - 删除语句:  
+    DELETE FROM HDOC_USER_DEFINED_RULES
+    WHERE
+        PC = {productClass} AND
+        NUM = {number} AND
+        MARKET = {market} 
+
+    【UD09DeleteHdocuserdefinedrulesApi】
+    5.1 - 查询语句:
+     SELECT PC,NUM,MARKET,VARIABLE,VAL,VS,VS2,COMMENTS,ADD_DATE,DELETE_DATE,REGISTER_USER,REGISTER_DATETIME,COUNT(*) OVER() AS total_count
+     FROM HDOC_USER_DEFINED_RULES
+     WHERE
+        PC = {productClass} AND ※1
+        NUM = {number} AND ※1
+        MARKET = {market} AND ※1
+        VARIABLE LIKE %{variable}% AND ※1
+        VAL LIKE %{value}% AND ※1
+        VS LIKE %{vs}% AND ※1
+        VS2 LIKE %{vs2}% AND ※1
+        COMMENTS LIKE %{comments}% ※1 
+      ※1:参数为空的时候，不作为WHERE条件
+
+     5.2 - 删除语句: 
+     DELETE FROM HDOC_USER_DEFINED_RULES
+     WHERE
+        PC = {productClass} AND
+        NUM = {number} AND
+        MARKET = {market} 
+
+   【UD10HdocvariablesApi】
+   # Add按钮点击/Update按钮点击/Delete按钮点击 
+   5.1 - 查询语句:   
+    SELECT COUNT(*)
+    FROM HDOC_VARIABLES
+    WHERE
+       VARIABLE = {variable}
+
+   # Add按钮点击  
+   5.1 - 插入语句:
+    INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, USERID，REGISTER_DATETIME, REGISTER_USER,REGISTER_PROCESS,UPDATE_DATETIME,UPDATE_USER,UPDATE_PROCESS)
+    VALUES 
+    (:variable, :type, :description, :userId, :date, :createdByUser,'Existing HDoc Variables',:date, :createdByUser,'Existing HDoc Variables')  
+
+   # Update按钮点击
+   5.1 - 更新语句:    
+    UPDATE HDOC_VARIABLES
+    SET TYPE = {type},
+        DESCRIPTION = {description},
+        REGISTER_DATETIME = {date},
+        REGISTER_USER = {createdByUser}
+    WHERE
+        VARIABLE = {variable}
+
+    # Delete按钮点击
+    5.1 - 删除语句:  
+    DELETE FROM HDOC_VARIABLES
+    WHERE
+        VARIABLE = {variable}  
+
+   【UD11HdocvariablesApi】
+    5.1 - 查询语句:
+    SELECT VARIABLE,TYPE,DESCRIPTION,REGISTER_DATETIME,REGISTER_USER,COUNT(*) OVER() AS total_count
+    FROM HDOC_VARIABLES
+    WHERE
+       VARIABLE LIKE %{variable}% AND
+       TYPE = {type} AND
+       DESCRIPTION LIKE %{description}%
+
+    【UD12UploadDeleteTemplateApi】  
+     5.1 - 查询语句:
+     SELECT MARKET, DESCRIPTION FROM MARKET_MASTER
+
+    【UD14SearchresultistApi】
+    # 初期获取市场列表
+    5.1 - 查询语句:
+    SELECT MARKET, DESCRIPTION FROM MARKET_MASTER
+
+    # 选择SelectMartet下拉列表
+    5.1 - 查询语句:
+    SELECT VARIABLE
+    FROM HDOC_USER_DEFINED_RULES
+    WHERE
+     MARKET = {market} AND
+     VAL = {val}
+
+   【UD15SelecthdocsenddatavinplateApi】 
+    # 点击View Info按钮
+    5.1 - 查询语句:
+    SELECT SERIE, CHNR, TYPE, STATUS, MSG, REGISTER_DATETIME, DOC_READY, DOC_SENT, XML_DOC 
+    FROM HDOC_SEND_DATA_VIN_PLATE
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr}
+
+    # 点击Set Regenerate按钮
+    5.1 - 更新语句: 
+    UPDATE HDOC_SEND_DATA_VIN_PLATE
+    SET STATUS = '0'
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr}
+
+    # 点击Set OK按钮
+    5.1 - 更新语句: 
+    UPDATE HDOC_SEND_DATA_VIN_PLATE
+    SET STATUS = '1'
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr}   
+
+    # 点击Change to Basic Info按钮
+    5.1 - 更新语句: 
+    UPDATE HDOC_SEND_DATA_VIN_PLATE
+    SET STATUS = '0',
+        TYPE = '1'
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr} 
+
+    # 点击Change to Advanced Info按钮
+    5.1 - 更新语句: 
+    UPDATE HDOC_SEND_DATA_VIN_PLATE
+    SET STATUS = '0',
+        TYPE = '2'
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr}
+
+   【UD16ADChangeApi】 
+   5.1 - 查询语句: 
+   SELECT SERIE, CHNR, REASON
+   FROM HDOC_ADCA_CHANGE
+   WHERE
+    SERIE = {serie} AND
+    CHNR = {chnr} 
+
+    5.2 - 插入语句:    
+    INSERT INTO HDOC_ADCA_CHANGE (SERIE, CHNR, ACT, BU, REASON, REGISTER_DATETIME, REGISTER_USER,REGISTER_PROCESS,UPDATE_DATETIME,UPDATE_USER,UPDATE_PROCESS)
+    VALUES 
+    (:serie, :chnr, 'Y', 'UD',:reason,NOW(), :user,'AD Change',NOW(), :user,'AD Change') 
+
+    5.3 - 更新语句: 
+    UPDATE HDOC_ADCA_CHANGE
+    SET ACT = 'N',
+        REASON = {reason}
+    WHERE
+     SERIE = {serie} AND
+     CHNR = {chnr}  
+
+   【UD17HDocUserAdministrationApi】
+    # 初期获取市场列表
+    5.1 - 查询语句:
+    SELECT MARKET, DESCRIPTION FROM MARKET_MASTER
+
+    # User Info按钮点击
+    ## 用户名取得
+    5.1 - 查询语句: 
+    SELECT USERNAME FROM hdoc_user_infor WHERE USERID = {userId} 
+    
+    ## 用户权限取得
+    5.1 - 查询语句: 
+    SELECT USERID，FUNCTION FROM HDOC_FUNCTION_AUTH WHERE USERID = {userId} 
+
+    ## 用户市场权限取得
+    5.1 - 查询语句: 
+    SELECT TYPE，MARKET FROM HDOC_MARKET_AUTH WHERE USERID = {userId} AND TYPE = {用户权限取得的返回结果}   
+
+    # Delete Role按钮点击
+    5.1 - 查询语句: 
+    SELECT * FROM HDOC_FUNCTION_AUTH WHERE USERID = {userId};   
+    SELECT * FROM HDOC_MARKET_AUTH WHERE USERID = {userId};  
+
+    5.2 - 删除语句: 
+    DELETE FROM HDOC_FUNCTION_AUTH WHERE USERID = {userId};   
+    DELETE FROM HDOC_MARKET_AUTH WHERE USERID = {userId};
+
+   【UD18HDocUserDocAdministrationApi】  
+     5.1 - 查询语句:
+    # 初期表示
+    SELECT DESCRIPTION 
+    FROM HDOC_DOCUMENT_LIST 
+
+     # 验证用户功能权限
+    SELECT USERID 
+    FROM HDOC_FUNCTION_AUTH
+    WHERE
+      USERID = {userId} 
+
+    # 用户名取得
+    SELECT USERNAME 
+    FROM HDOC_USER_INFOR
+    WHERE
+      USERID = {userId}  
+
+    # 用户文档权限取得
+    SELECT USERID, DOCTYPE
+    FROM HDOC_USER_DOC
+    WHERE
+      USERID = {userId}   
+
+    5.2 - 删除语句:
+    # 数据删除
+    DELETE FROM HDOC_USER_DOC
+    WHERE
+      USERID = {userId}  
+
+    5.3 - 插入语句:
+    # 数据登录
+    INSERT INTO HDOC_USER_DOC (USERID, DOCTYPE, REGISTER_DATETIME, REGISTER_USER,REGISTER_PROCESS,UPDATE_DATETIME,UPDATE_USER,UPDATE_PROCESS)
+    VALUES 
+    (:userId, :docType, NOW(), :user,'HDoc User Doc Administration',NOW(), :user,'HDoc User Doc Administration')    
+
+    【UD19SearchResultListApi】  
+    # 初期表示  
+     5.1 - 查询语句:
+     SELECT MARKET,DESCRIPTION FROM MARKET_MASTER
+
+    # Search按钮点击 
+    5.1 - 查询语句:
+    SELECT ui.USERID, ui.USERNAME, ma.MARKET
+     FROM HDOC_USER_INFOR ui
+      inner join HDOC_MARKET_AUTH ma
+      on ui.USERID = ma.USERID
+     WHERE
+      ui.USERID = {userId} AND　※1
+      ui.USERNAME = {userName} AND ※1
+      ma.MARKET = {market} AND ※1
+      ma.TYPE = {type} ※1
+      ※1:notSet = true的时候，不作为WHERE条件
+          notSet = false的时候，作为WHERE条件
+
+    【UD20GetDocumentListApi】  
+    # 初期表示/ Update Mode按钮点击 
+     5.1 - 查询语句:
+     SELECT DOCTYPE,DESCRIPTION,REGISTER_DATETIME,REGISTER_USER FROM HDOC_DOCUMENT_LIST
+     WHERE
+      DOCTYPE = {docType} ※1
+      ※1:docType为空的时候，不作为WHERE条件
+
+    # Update Mode按钮点击
+    5.1 - 更新语句:
+    UPDATE HDOC_DOCUMENT_LIST
+    SET REGISTER_USER = {user}
+       ,REGISTER_DATETIME = {date}
+    WHERE
+      DOCTYPE = {docType}
+
+6. 开发指导原则
+
+6.1 代码编写规范
+    - 遵循MVC三层架构模式
+    - 使用Lombok减少样板代码
+    - 保持Controller、Service、Mapper层职责分离
+
+6.2 错误处理
+    - 对输入参数进行验证
+    - 合理捕获和处理异常
+    - 返回有意义的错误信息

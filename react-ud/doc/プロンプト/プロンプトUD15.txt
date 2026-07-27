@@ -1,0 +1,231 @@
+请根据以下要求生成[模块名称]的详细设计文档：
+
+1.基本信息
+   文档编号:DES-Vin Plate-015
+   模块名称:Vin Plate
+   版本号：v1.0
+   作成日:2022-07-20
+
+
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  本模块是Vin Plate页面，核心功能是支持用户输入Chassis number，查询并展示对应底盘的VIN Plate相关详细信息，同时支持对指定底盘的状态、TYPE属性进行更新操作，实现Vin Plate全流程的信息管理。
+  安全性或特殊要求（如有）
+  所有针对HDOC_SEND_DATA_VIN_PLATE表的更新操作均需基于合法的Chassis number校验通过后才可执行，避免误改非目标底盘的数据。
+  用户体验方面的考虑
+  所有功能按钮默认保持激活状态，用户输入Chassis number后即可直接点击对应按钮触发操作，操作结果实时在页面对应标签区域展示，无多余跳转步骤。
+
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Chassis number | TextField | Y | 15 | Input | - | 左 | - | 活性 | 用于输入待操作的底盘编号 |
+| 2   | View Info | Button | - | - | Action | - | 中 | - | 活性 | 点击后查询并展示VIN Plate详细信息 |
+| 3   | Set Regenerate | Button | - | - | Action | - | 中 | - | 活性 | 点击后将对应底盘的状态更新为'0'(新規追加) |
+| 4   | Set OK | Button | - | - | Action | - | 中 | - | 活性 | 点击后将对应底盘的状态更新为'1'(xml doc 作成済み) |
+| 5   | Change to Basic Info | Button | - | - | Action | - | 中 | - | 活性 | 点击后将对应底盘的状态更新为'0'(新規追加)、TYPE更新为'1'(basic) |
+| 6   | Change to Advanced Info | Button | - | - | Action | - | 中 | - | 活性 | 点击后将对应底盘的状态更新为'0'(新規追加)、TYPE更新为'2'(ADVANCED (with weights)) |
+| 7   | Chassis number | Label | - | - | Output | - | 左 | - | - | 从画面设定内容的Chassis number字段获取并展示 |
+| 8   | Plate type | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的TYPE字段获取并展示 |
+| 9   | Status | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的STATUS字段获取并展示 |
+| 10  | Error Message | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的MSG字段获取并展示 |
+| 11  | Def. | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的REGISTER_DATETIME字段获取并展示 |
+| 12  | Data ready | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的DOC_READY字段获取并展示 |
+| 13  | Sent to CAB factory | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表的DOC_SENT字段获取并展示 |
+| 14  | Print items | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表XML_DOC字段中提取PrintItemName对应的项目值展示 |
+| 15  | VP Data | Label | - | - | Output | - | 左 | - | - | 从HDOC_SEND_DATA_VIN_PLATE表XML_DOC字段中提取各Variant名和对应Value展示 |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+      	画面正常显示Vin Plate页面的所有控件，所有按钮保持激活状态，输出类标签初始无加载数据。
+      4.1.2 开始：点击「View Info」按钮
+      空值校验等 (Frontend Check)：
+       若Chassis number输入为空：
+        设置Message = Chassis number are required.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用查询VIN Plate详情API，传入输入的Chassis number
+      4.1.4 结果处理：
+       成功：加载返回的VIN Plate详细信息，展示VIN Plate送信数据状态、类型等基本信息，同时展示Template的XML文件内的Print Items信息、Variant信息
+       失败：返回Chassis number XXX not found.警告信息
+      ---
+      4.1.2 开始：点击「Set Regenerate」按钮
+      空值校验等 (Frontend Check)：
+       若Chassis number输入为空：
+        设置Message = Chassis number are required.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用更新底盘再生状态API，传入输入的Chassis number
+      4.1.4 结果处理：
+       成功：将HDOC_SEND_DATA_VIN_PLATE表中对应Chassis的STATUS更新为'0'(新規追加)，页面Status标签同步更新展示最新状态
+       失败：返回Chassis number XXX not found.警告信息
+      ---
+      4.1.2 开始：点击「Set OK」按钮
+      空值校验等 (Frontend Check)：
+       若Chassis number输入为空：
+        设置Message = Chassis number are required.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用更新底盘文档完成状态API，传入输入的Chassis number
+      4.1.4 结果处理：
+       成功：将HDOC_SEND_DATA_VIN_PLATE表中对应Chassis的STATUS更新为'1'(xml doc 作成済み)，页面Status标签同步更新展示最新状态
+       失败：返回Chassis number XXX not found.警告信息
+      ---
+      4.1.2 开始：点击「Change to Basic Info」按钮
+      空值校验等 (Frontend Check)：
+       若Chassis number输入为空：
+        设置Message = Chassis number are required.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用更新底盘Basic信息类型API，传入输入的Chassis number
+      4.1.4 结果处理：
+       成功：将HDOC_SEND_DATA_VIN_PLATE表中对应Chassis的STATUS更新为'0'(新規追加)，TYPE更新为'1'(basic)，页面Status、Plate type标签同步更新展示最新属性
+       失败：返回Chassis number XXX not found.警告信息
+      ---
+      4.1.2 开始：点击「Change to Advanced Info」按钮
+      空值校验等 (Frontend Check)：
+       若Chassis number输入为空：
+        设置Message = Chassis number are required.
+        终止流程
+      4.1.3 API调用 (Backend Check)：
+        调用更新底盘Advanced信息类型API，传入输入的Chassis number
+      4.1.4 结果处理：
+       成功：将HDOC_SEND_DATA_VIN_PLATE表中对应Chassis的STATUS更新为'0'(新規追加)，TYPE更新为'2'(ADVANCED (with weights))，页面Status、Plate type标签同步更新展示最新属性
+       失败：返回Chassis number XXX not found.警告信息
+
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | 1 | 任意功能按钮点击时 | Chassis number | 搜索条件匹配的内容不存在时 | Chassis number XXX not found. | 抛出Warning级别的提示，终止后续数据库读写操作，不执行数据更新 |
+
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+
+   查询VIN Plate详情API UD15SelecthdocsenddatavinplateApi.UD15ViewInfo
+     功能：根据传入的Chassis number从HDOC_SEND_DATA_VIN_PLATE表中读取对应底盘的全量VIN Plate相关信息并返回
+     Method：GET
+     Endpoint：/api/ud015/UD15SelecthdocsenddatavinplateApi/UD15ViewInfo
+
+     Request [请求格式]
+     /api/ud015/UD15SelecthdocsenddatavinplateApi/UD15ViewInfo?chassisNo=xxx
+
+Response Success (200):
+{
+  "code": 200,
+  "data": {
+    "chassisNumber": "123456",
+    "plateType": "1",
+    "status": "0",
+    "errorMessage": null,
+    "registerDatetime": "2022-11-21 10:00:00",
+    "docReady": "2022-11-21 12:00:00",
+    "docSent": null,
+    "printItems": ["Item1", "Item2", "Item3"],
+    "vpData": [
+      {"variant": "Variant1", "value": "Value1"},
+      {"variant": "Variant2", "value": "Value2"}
+    ]
+  },
+  "message": null
+  
+}
+
+     Response Error (500)
+     {
+       "code": "500",
+       "data": null,
+       "msg": "Chassis number XXX not found."
+     }
+
+   更新底盘再生状态API UD15SelecthdocsenddatavinplateApi.UD15SetRegenerate
+     功能：根据传入的Chassis number将HDOC_SEND_DATA_VIN_PLATE表中对应底盘的STATUS字段更新为'0'
+     Method：PUT
+     Endpoint：/api/ud015/UD15SelecthdocsenddatavinplateApi/UD15SetRegenerate
+
+     Request [请求格式]
+     {
+       "chassisNumber": "xxx"
+     }
+
+     Response Error (500)
+     {
+       "code": "500",
+       "data": null,
+       "msg": "Chassis number XXX not found."
+     }
+
+   更新底盘文档完成状态API UD15SelecthdocsenddatavinplateApi.UD15SetOK
+     功能：根据传入的Chassis number将HDOC_SEND_DATA_VIN_PLATE表中对应底盘的STATUS字段更新为'1'
+     Method：PUT
+     Endpoint：/api/ud015/UD15SelecthdocsenddatavinplateApi/UD15SetOK
+
+     Request [请求格式]
+     {
+       "chassisNumber": "xxx"
+     }
+
+     Response Error (500)
+     {
+       "code": "500",
+       "data": null,
+       "msg": "Chassis number XXX not found."
+     }
+
+   更新底盘Basic信息类型API UD15SelecthdocsenddatavinplateApi.UD15ChangetoBasicInfo
+     功能：根据传入的Chassis number将HDOC_SEND_DATA_VIN_PLATE表中对应底盘的STATUS更新为'0'，TYPE更新为'1'
+     Method：PUT
+     Endpoint：/api/ud015/UD15SelecthdocsenddatavinplateApi/UD15ChangetoBasicInfo
+
+     Request [请求格式]
+     {
+       "chassisNumber": "xxx"
+     }
+
+     Response Error (500)
+     {
+       "code": "500",
+       "data": null,
+       "msg": "Chassis number XXX not found."
+     }
+
+
+   更新底盘Advanced信息类型API UD15SelecthdocsenddatavinplateApi.UD15ChangetoAdvancedInfo
+     功能：根据传入的Chassis number将HDOC_SEND_DATA_VIN_PLATE表中对应底盘的STATUS更新为'0'，TYPE更新为'2'
+     Method：PUT
+     Endpoint：/api/ud015/UD15SelecthdocsenddatavinplateApi/UD15ChangetoAdvancedInfo
+
+     Request [请求格式]
+     {
+       "chassisNumber": "xxx"
+     }
+
+     Response Error (500)
+     {
+       "code": "500",
+       "data": null,
+       "msg": "Chassis number XXX not found."
+     }
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：VinPlate_詳細設計(UD015).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

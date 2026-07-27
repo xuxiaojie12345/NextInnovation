@@ -1,0 +1,66 @@
+1.基本信息
+   文档编号:DES-Download and Print Quick Guides-023
+   模块名称:Download and Print Quick Guides
+   版本号：v1.0
+   作成日:2026-07-27
+
+
+2. 背景 (Background)
+ 本模块的核心功能和目标
+ 本页面为Download and Print Quick Guides画面，核心功能是支持用户完成Quick Guides文件的在线下载，同时向用户清晰展示Quick Guides的标准打印操作指引与规范折叠操作指引，保障用户可以顺利获取文档并完成后续标准化处理，满足业务场景下的文档使用需求。
+ 安全性或特殊要求（如有）
+ 页面下载链路需做权限校验，仅授权用户可访问下载资源，避免非授权人员获取内部Quick Guides文档。
+ 用户体验方面的考虑
+ 页面所有功能控件统一采用左对齐排版，下载入口高亮突出展示，操作说明区域采用分块式布局，帮助用户快速识别核心操作入口，降低用户的操作理解成本，提升页面使用流畅度。
+
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Download and Print Quick Guides | Page Title | - | - | Output | - | 左 | - | 页面加载时默认展示 | 页面主标题 |
+| 2   | Volvo 3P Quick Guides | Download Link | 是 | - | Input | - | 左 | - | 页面加载时默认启用 | 核心文档下载入口 |
+| 3   | To print do the following | Expand Checkbox | 否 | - | Input | - | 左 | 未勾选 | 勾选后展开打印操作指引详情 | 打印说明触发控件 |
+| 4   | To fold do the following | Expand Checkbox | 否 | - | Input | - | 左 | 未勾选 | 勾选后展开折叠操作指引详情 | 折叠说明触发控件 |
+
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+     	页面完成初始化加载，主标题、下载链接默认展示，两个操作说明checkbox默认处于未勾选状态，对应的详情区域默认隐藏，所有控件按左对齐规则完成排版渲染。
+      4.1.2 开始：[用户点击Volvo 3P Quick Guides下载链接、勾选/取消勾选操作说明checkbox控件]
+      空值校验等 (Frontend Check)：
+       无定义前端校验规则。
+      4.1.3 API调用 (Backend Check)：
+       无定义后端校验规则。
+      4.1.4 结果处理：
+       成功：触发Quick Guides文件下载；勾选checkbox后对应操作指引详情区域展开展示，取消勾选后详情区域自动隐藏。
+       失败：弹出对应提示，终止下载流程。
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 动作 |
+   |-----|---------|---------|---------|--------------------------|------|
+   | |  |  |  |   |  |
+
+
+5. 接口定义 (API Specification)
+       无定义后端接口
+
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 访问无权限接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：DownloadandPrintQuickGuides_詳細設計(UD023).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書

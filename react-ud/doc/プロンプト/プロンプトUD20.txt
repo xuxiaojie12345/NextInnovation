@@ -1,0 +1,128 @@
+1.基本信息
+   文档编号:DES-Market Document Settings List-020
+   模块名称:Market Document Settings List
+   版本号：v1.0
+   作成日:2026-07-22
+
+2. 背景 (Background)
+ 请描述：
+  本模块的核心功能和目标
+  本模块为Market Document Settings List画面，核心功能是展示HDoc - Market Document Setting的搜索结果，支持用户选择记录后点击Select按钮跳转回前页面并自动回填选中内容、点击Back按钮直接跳转返回前画面、点击Print按钮打印当前展示的搜索结果、点击User链接跳转查看对应用户信息；同时支持从该搜索结果页面选中的信息自动回显到Market Document Settings的搜索画面，以及提供EDB User View画面完成用户完整信息展示，目标是为市场文档配置的查询、关联查看操作提供完整的流程支撑。
+  安全性或特殊要求（如有）
+  所有数据从指定业务表HDOC_DOCUMENT_LIST获取，仅支持查询（R）操作，不提供任何数据修改权限，保障业务文档原始数据的安全性。
+  用户体验方面的考虑
+  页面操作逻辑简洁直观，返回、选择、打印等高频常规功能通过独立按钮提供直接入口，用户信息通过可点击文本链接直接跳转查看，无需用户额外输入操作；选中目标记录后自动将内容带回前页面，减少用户二次录入的冗余操作，提升操作流畅度。
+
+3. 画面项目定义 (Screen Parameters)
+请按照以下格式定义所有控件：
+
+| No. | 項目名 (Item) | 種別 (Type) | 必須 (Req) | MaxLength | I/O | 許容文字 (Allowed Chars) | 文字配置 (Align) | 初期値 (Default) | 表示制御 (Control) | 备注 |
+|-----|--------------|-------------|-----------|-----------|-----|-------------------------|-----------------|-----------------|-------------------|------|
+| 1   | Document type | TextField | - | 20 | Output | - | 左 | - | - | 数据来源表HDOC_DOCUMENT_LIST的DOCTYPE字段 |
+| 2   | Bussines unit | TextField | - | - | Output | - | 左 | - | - | 固定显示：BU |
+| 3   | User | TextField | - | 16 | Output | - | 左 | - | - | 数据来源表HDOC_DOCUMENT_LIST的REGISTER_USER字段，支持点击跳转查看用户信息 |
+| 4   | Date | TextField | - | - | Output | - | 左 | - | - | 数据来源表HDOC_DOCUMENT_LIST的REGISTER_DATETIME字段 |
+| 5   | Select | Button | - | - | Action | - | - | - | 活性 | 用于提交选中的记录，返回前页面并自动回显选中内容 |
+| 6   | Back | Button | - | - | Action | - | - | - | 活性 | 用于跳转返回至前一个页面 |
+| 7   | Print | Button | - | - | Action | - | - | - | 活性 | 用于打印当前展示的搜索结果 |
+
+4. 业务逻辑与校验规则 (Business Logic & Checks)
+请提供：
+   4.1 处理流程
+    按步骤描述每个主要功能的处理流程，格式如下：
+      4.1.1 初期表示：
+          画面正常渲染展示，调用HDOC_DOCUMENT_LIST表获取文档一览信息，渲染展示HDoc - Market Document Setting的搜索结果列表。
+      
+      4.1.2 开始：[Select按钮点击触发]
+       空值校验等 (Frontend Check)：
+        若未选中任意记录直接点击Select按钮：
+         设置Message = No data found，错误级别为Error
+         终止后续流程
+        成功：自动将HDoc - Market Document Setting搜索结果画面中选中的信息设置到搜索页面对应的输入项中
+      4.1.3 API调用 (Backend Check)：
+        调用HDOC文档列表查询API获取对应选中记录的详情数据
+      4.1.4 结果处理：
+       成功：跳转至前页面，自动将选中的内容回显到前页面对应的位置
+       失败：提示系统异常，请稍后重试
+      
+      4.1.2 开始：[Back按钮点击触发]
+       无额外校验步骤
+      4.1.3 API调用 (Backend Check)：
+        无后端接口调用
+      4.1.4 结果处理：
+       成功：直接跳转返回前页面
+      
+      4.1.2 开始：[Print按钮点击触发]
+       无额外校验步骤
+      4.1.3 API调用 (Backend Check)：
+        调用当前搜索结果打印服务接口拉取全量打印数据
+      4.1.4 结果处理：
+       成功：唤起系统打印组件，将当前页面的搜索结果输出为打印内容
+       失败：提示打印服务异常，请稍后重试
+      
+      4.1.2 开始：[User链接点击触发]
+       无额外校验步骤
+      4.1.3 API调用 (Backend Check)：
+        调用EDB用户信息查询接口，传入当前行对应的REGISTER_USER用户标识
+      4.1.4 结果处理：
+       成功：跳转至EDB User View画面，展示该条记录对应的完整用户信息
+       失败：提示用户信息获取失败，请稍后重试
+
+   4.2 校验详细规格表
+   | No. | 检查时机 | 检查对象 | 检查条件 | 错误消息 (Message Content) | 错误级别 | 动作 |
+   |-----|---------|---------|---------|--------------------------|----------|------|
+   | 1 | 点击Select按钮时 | Select按钮 | 未选中任意记录，直接点击Select按钮 | No data found | Error | 中断跳转流程，在页面展示错误提示信息 |
+
+5. 接口定义 (API Specification)
+请为每个API提供(TODO：API的具体内容参照API提示词)：
+UD20GetDocumentListApi.UD20SelectHdocDocumentList
+   HDOC文档列表查询API
+     功能：查询HDOC_DOCUMENT_LIST表中的文档一览信息，用于Market Document Settings List页面的搜索结果渲染
+     Method：GET
+     Endpoint：/api/ud20/document/UD20GetDocumentListApi.UD20SelectHdocDocumentList
+
+     Request [请求格式]
+     {
+
+     }
+
+    Response Success (200):
+    {
+      "status": "success",
+      "code": 200,
+      "data": {
+        "totalCount": 3,
+        "records": [
+          {
+            "doctype": "UD_TEST",
+            "businessUnit": "BU",
+            "user": "user123",
+            "date": "2022-11-30 10:30:00"
+          },
+          {
+            "doctype": "UD_SPEC",
+            "businessUnit": "BU",
+            "user": "user456",
+            "date": "2022-11-29 14:20:00"
+          }
+        ]
+      },
+      "message": "Success"
+    }
+
+
+6. 异常处理 (Exception Handling)
+| 异常场景 | 处理方式 | Message显示内容 |
+|---------|---------|----------------|
+| 访问无权限接口调用超时或返回系统内部错误 | 记录系统日志，提示用户联系管理员 | System error. Please contact administrator. |
+
+7. 语言要求
+  文档使用中文编写
+  所有错误消息和成功消息使用中文
+  技术术语可保留英文
+  保持与参考文档（F:\develop\NextInnovation\react-ud\doc\内部設計模板.md）相同的格式结构
+
+8. 输出要求
+  生成完整的Markdown格式文档
+  文件名格式：MarketDocumentSettingsList_詳細設計(UD020).md
+  保存到：F:\develop\NextInnovation\react-ud\doc\詳細設計書
