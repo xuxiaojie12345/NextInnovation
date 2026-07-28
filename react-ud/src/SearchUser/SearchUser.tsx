@@ -212,9 +212,10 @@ const SearchUser: React.FC = () => {
       {/* 搜索结果 */}
       {results.length > 0 && (
         <div className="su-table-section">
+          <div style={{ maxHeight: "255px", overflowY: "auto", marginBottom: "5px" }}>
           <table className="su-table">
             <thead>
-              <tr>
+              <tr style={{ position: "sticky", top: 0, backgroundColor: "white" }}>
                 <th>Userid</th>
                 <th>User</th>
                 <th>Market</th>
@@ -230,7 +231,8 @@ const SearchUser: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <div className="result-count">COUNT: {results.length}</div>
+          </div>
+          <div className="result-count">Number of lines found:  {results.length}</div>
         </div>
       )}
     </div>

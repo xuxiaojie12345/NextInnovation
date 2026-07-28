@@ -12,7 +12,6 @@ const QUICK_GUIDES = [
   "EDB Quick Guide",
   "COS Quick Guide",
   "VBI Quick Guide (Intranet version)",
-  "VBI Quick Guide (Internet version)",
 ];
 
 const VOLVO_3P_GUIDES = [

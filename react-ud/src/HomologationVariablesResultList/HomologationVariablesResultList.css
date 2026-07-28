@@ -10,6 +10,8 @@
 .hv-result-table-wrapper {
   overflow-x: auto;
   margin: 10px;
+  max-height: 617px;
+  overflow-y: auto;
 }
 
 .hv-result-table {
@@ -19,6 +21,7 @@
 }
 
 .hv-result-table th {
+  background-color: white;
   padding: 6px 8px;
   text-align: left;
   font-weight: 700;

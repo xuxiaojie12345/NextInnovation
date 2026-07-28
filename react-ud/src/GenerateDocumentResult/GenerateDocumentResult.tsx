@@ -102,7 +102,7 @@ const GenerateDocumentResult: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="gen-doc-result-loading">Loading...</div>;
+    return <div className="gen-doc-result-container gen-doc-result-loading">Loading...</div>;
   }
 
   if (errorMessage) {
