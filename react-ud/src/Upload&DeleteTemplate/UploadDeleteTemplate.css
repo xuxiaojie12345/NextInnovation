@@ -1,0 +1,276 @@
+/* ===== Upload & Delete Template 页面 ===== */
+.udt-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.udt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.udt-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.udt-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.udt-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.udt-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.udt-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.udt-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.udt-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.udt-content {
+  width: 100%;
+  max-width: 680px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 区域 ===== */
+.udt-section {
+  margin-bottom: 24px;
+}
+
+.udt-section:last-child {
+  margin-bottom: 0;
+}
+
+.udt-section-check {
+  border-top: 1px solid #d0d0d0;
+  padding-top: 20px;
+  margin-top: 16px;
+}
+
+/* ===== 标题 ===== */
+.udt-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #003057;
+}
+
+/* ===== 表单 ===== */
+.udt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.udt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.udt-row-buttons {
+  gap: 0;
+}
+
+.udt-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  min-width: 100px;
+}
+
+/* ===== 文件选择 ===== */
+.udt-file-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.udt-file-button {
+  padding: 4px 12px;
+  font-size: 13px;
+  background-color: #f0f0f0;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  color: #333;
+}
+
+.udt-file-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.udt-file-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.udt-file-name {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ===== 下拉框 ===== */
+.udt-select {
+  padding: 4px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 250px;
+  appearance: auto;
+}
+
+.udt-select-small {
+  width: 100px;
+}
+
+.udt-select:focus {
+  border-color: #003057;
+}
+
+.udt-select:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== 按钮 ===== */
+.udt-btn {
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+  margin-right: 10px;
+}
+
+.udt-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.udt-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.udt-btn-primary {
+  background-color: #003057;
+  color: #ffffff;
+  border-color: #003057;
+}
+
+.udt-btn-primary:hover:not(:disabled) {
+  background-color: #00407a;
+}
+
+.udt-button-group {
+  display: flex;
+  gap: 0;
+}
+
+/* ===== 提示文字 ===== */
+.udt-notice {
+  margin-top: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  background-color: #f9f9f9;
+  border-left: 3px solid #003057;
+}
+
+/* ===== Check Template 区域 ===== */
+.udt-check-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #003057;
+  margin-bottom: 10px;
+}
+
+.udt-check-desc {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.udt-check-link {
+  font-size: 13px;
+  color: #003057;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.udt-check-link:hover {
+  color: #00407a;
+}
+
+/* ===== 消息 ===== */
+.udt-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.udt-success {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.udt-warning {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #f57f17;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+}

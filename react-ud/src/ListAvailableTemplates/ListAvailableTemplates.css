@@ -1,0 +1,190 @@
+/* ===== List Available Templates 页面 ===== */
+.lat-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.lat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.lat-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.lat-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.lat-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lat-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lat-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.lat-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.lat-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.lat-content {
+  width: 100%;
+  max-width: 800px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 区域 ===== */
+.lat-section {
+  margin-bottom: 0;
+}
+
+/* ===== 标题 ===== */
+.lat-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #003057;
+}
+
+/* ===== 筛选区域 ===== */
+.lat-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.lat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.lat-select {
+  padding: 4px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 120px;
+  appearance: auto;
+}
+
+.lat-select:focus {
+  border-color: #003057;
+}
+
+.lat-select:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== 消息 ===== */
+.lat-message {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.lat-loading {
+  padding: 16px;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}
+
+/* ===== 表格 ===== */
+.lat-table-container {
+  margin-top: 8px;
+  border: 1px solid #d0d0d0;
+}
+
+.lat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.lat-th {
+  padding: 10px 12px;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  background-color: #f0f4f8;
+  border-bottom: 2px solid #003057;
+}
+
+.lat-th-right {
+  text-align: right;
+}
+
+.lat-td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+}
+
+.lat-td-right {
+  text-align: right;
+}
+
+.lat-row-even {
+  background-color: #ffffff;
+}
+
+.lat-row-odd {
+  background-color: #f9f9f9;
+}
+
+.lat-link {
+  color: #003057;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lat-link:hover {
+  color: #00407a;
+}

@@ -1,0 +1,196 @@
+/* ===== HDoc Template Check 页面 ===== */
+.htc-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.htc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.htc-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.htc-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.htc-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.htc-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.htc-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.htc-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.htc-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.htc-content {
+  width: 100%;
+  max-width: 680px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 区域 ===== */
+.htc-section {
+  margin-bottom: 0;
+}
+
+/* ===== 标题 ===== */
+.htc-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #003057;
+}
+
+/* ===== 表单 ===== */
+.htc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.htc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.htc-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  min-width: 120px;
+}
+
+/* ===== 文件选择 ===== */
+.htc-file-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.htc-file-button {
+  padding: 4px 12px;
+  font-size: 13px;
+  background-color: #f0f0f0;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  color: #333;
+}
+
+.htc-file-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.htc-file-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.htc-file-name {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ===== 按钮 ===== */
+.htc-btn {
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.htc-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.htc-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.htc-btn-check {
+  background-color: #003057;
+  color: #ffffff;
+  border-color: #003057;
+}
+
+.htc-btn-check:hover:not(:disabled) {
+  background-color: #00407a;
+}
+
+/* ===== 下载链接 ===== */
+.htc-download-link {
+  font-size: 13px;
+  color: #003057;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.htc-download-link:hover {
+  color: #00407a;
+}
+
+/* ===== 消息 ===== */
+.htc-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.htc-success {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.5;
+  margin-top: 12px;
+}
