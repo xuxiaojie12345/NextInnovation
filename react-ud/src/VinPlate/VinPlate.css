@@ -1,0 +1,205 @@
+/* ===== Vin Plate 页面 ===== */
+.vp-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.vp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.vp-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.vp-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.vp-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vp-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.vp-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.vp-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.vp-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.vp-content {
+  width: 100%;
+  max-width: 800px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 区域 ===== */
+.vp-section {
+  margin-bottom: 0;
+}
+
+/* ===== 标题 ===== */
+.vp-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #003057;
+}
+
+/* ===== 输入区域 ===== */
+.vp-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.vp-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  min-width: 120px;
+}
+
+.vp-input {
+  padding: 6px 10px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 250px;
+}
+
+.vp-input:focus {
+  border-color: #003057;
+}
+
+.vp-input:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== 按钮区域 ===== */
+.vp-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.vp-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.vp-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.vp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== 错误消息 ===== */
+.vp-error-message {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 详细信息区域 ===== */
+.vp-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #d0d0d0;
+}
+
+.vp-detail-row {
+  display: flex;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.vp-detail-label {
+  font-weight: 500;
+  color: #333;
+  min-width: 180px;
+}
+
+.vp-detail-value {
+  color: #555;
+  flex: 1;
+}
+
+.vp-detail-section {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.vp-detail-section .vp-detail-label {
+  min-width: auto;
+  margin-bottom: 4px;
+}
+
+.vp-pre {
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  background-color: #f8f8f8;
+  border: 1px solid #d0d0d0;
+  padding: 8px 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}

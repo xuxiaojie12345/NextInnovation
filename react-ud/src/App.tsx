@@ -12,6 +12,10 @@ import HomologationVariables from "./HomologationVariables/HomologationVariables
 import HomologationVariablesResultList from "./HomologationVariablesResultList/HomologationVariablesResultList";
 import ExistingHDocVariables from "./ExistingHDocVariables/ExistingHDocVariables";
 import ExistingHDocVariablesResultList from "./ExistingHDocVariablesResultList/ExistingHDocVariablesResultList";
+import UploadDeleteTemplate from "./Upload&DeleteTemplate/UploadDeleteTemplate";
+import HDocTemplateCheck from "./HDocTemplateCheck/HDocTemplateCheck";
+import ListAvailableTemplates from "./ListAvailableTemplates/ListAvailableTemplates";
+import VinPlate from "./VinPlate/VinPlate";
 
 function App() {
   return (
@@ -31,6 +35,10 @@ function App() {
             <Route path='/homologation-variables-result' element={<HomologationVariablesResultList />} />
             <Route path='/existing-hdoc-variables' element={<ExistingHDocVariables />} />
             <Route path='/existing-hdoc-variables-result' element={<ExistingHDocVariablesResultList />} />
+            <Route path='/upload-delete-template' element={<UploadDeleteTemplate />} />
+            <Route path='/hdoc-template-check' element={<HDocTemplateCheck />} />
+            <Route path='/list-available-templates' element={<ListAvailableTemplates />} />
+            <Route path='/vin-plate' element={<VinPlate />} />
             <Route path='/TestMain' element={<TestMain />} />
           </Routes>
         </div>
