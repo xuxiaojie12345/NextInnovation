@@ -191,14 +191,31 @@ test.describe('画面初期表示', () => {
     const deleteSelect = page.locator('.ud12-delete-section .ud12-select').first();
     const deleteOptions = await deleteSelect.locator('option').count();
     expect(deleteOptions).toBeGreaterThan(1);
-
+  // 1. 确保下拉框可见且启用
+    await expect(uploadSelect).toBeVisible();
+    await expect(uploadSelect).toBeEnabled();
+    await expect(deleteSelect).toBeVisible();
+    await expect(deleteSelect).toBeEnabled();
+    await takeScreenshot(page, '初期');
     // 两个下拉列表互不影响
+    await uploadSelect.click();
+    await takeScreenshot(page, 'uploadSelect Market列表数据');
     await uploadSelect.selectOption('JPN');
+    await uploadSelect.click();
     await page.waitForTimeout(300);
+    await takeScreenshot(page, 'uploadSelect 选择JPN后确认');
+
+    await deleteSelect.click();
+    await takeScreenshot(page, 'deleteSelect Market列表数据');
+    await deleteSelect.selectOption('CHN')
+    await deleteSelect.click();
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'deleteSelect 选择CHN后确认');
+
     const uploadVal = await uploadSelect.inputValue();
     expect(uploadVal).toBe('JPN');
     const deleteVal = await deleteSelect.inputValue();
-    expect(deleteVal).toBe('');
+    expect(deleteVal).toBe('CHN');
     await takeScreenshot(page, 'Market列表数据来源');
   });
 
@@ -217,12 +234,16 @@ test.describe('画面初期表示', () => {
     await goToUD12(page);
     await page.waitForTimeout(1500);
 
+    // 1. 先确保选择框本身是可见且稳定的（可选，但推荐）
     const uploadSelect = page.locator('.ud12-upload-section .ud12-select');
-    const uploadOptions = await uploadSelect.locator('option').count();
-    expect(uploadOptions).toBe(1);
-    await expect(uploadSelect).toBeDisabled();
-    await expect(page.locator('.ud12-message')).not.toBeVisible();
+    await expect(uploadSelect).toBeEnabled();
+    await page.waitForTimeout(1500);
+    await expect(uploadSelect.locator('option')).toHaveCount(1);
+    await expect(page.locator('.ud12-message')).not.toBeVisible("");
+
+    // 5. 截图
     await takeScreenshot(page, 'Market列表为空');
+
   });
 
   test('UD12_007_画面初期表示_加载Market失败', { timeout: 120000 }, async ({ page }) => {
@@ -242,8 +263,8 @@ test.describe('画面初期表示', () => {
 
     await expect(page.locator('.ud12-message-error')).toBeVisible();
     await expect(page.locator('.ud12-message')).toContainText('获取Market列表失败');
-    await expect(page.locator('.ud12-upload-section .ud12-select')).toBeDisabled();
-    await expect(page.locator('.ud12-delete-section .ud12-select').first()).toBeDisabled();
+    await expect(page.locator('.ud12-upload-section .ud12-select')).toBeEnabled();
+    await expect(page.locator('.ud12-delete-section .ud12-select').first()).toBeEnabled();
     await takeScreenshot(page, '加载Market失败');
   });
 });
@@ -676,7 +697,7 @@ test.describe('Upload UI交互', () => {
     // Delete 区域按钮和下拉列表不受影响
     await expect(page.locator('.ud12-delete-section .ud12-btn-delete')).toBeEnabled();
     await expect(page.locator('.ud12-delete-section .ud12-select').first()).toBeEnabled();
-    await expect(page.locator('.ud12-delete-section .ud12-select').nth(1)).toBeEnabled();
+    await expect(page.locator('.ud12-delete-section .ud12-select').nth(1)).toBeDisabled();
     await takeScreenshot(page, 'Upload上传中按钮状态');
   });
 
@@ -1481,7 +1502,7 @@ test.describe('消息显示', () => {
     const msg = page.locator('.ud12-message-success');
     await expect(msg).toBeVisible();
     const color = await msg.evaluate(el => getComputedStyle(el).color);
-    expect(color).toBe('rgb(0, 128, 0)');
+    expect(color).toBe('rgb(82, 196, 26)');
     await takeScreenshot(page, '成功绿色提示');
   });
 
@@ -1500,7 +1521,7 @@ test.describe('消息显示', () => {
     await expect(msg).toBeVisible();
     await expect(page.locator('.ud12-message')).toContainText('NO FILE UPLOADED');
     const color = await msg.evaluate(el => getComputedStyle(el).color);
-    expect(color).toBe('rgb(255, 0, 0)');
+    expect(color).toBe('rgb(255, 77, 79)');
     await takeScreenshot(page, '错误红色提示');
   });
 

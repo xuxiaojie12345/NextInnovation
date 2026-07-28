@@ -106,12 +106,12 @@ const UD08_HomologationVariables: React.FC = () => {
   /**
    * 格式化日期为 yyyy-MM-DD 格式
    */
-  const formatDate = (date: Date): string => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
+  // const formatDate = (date: Date): string => {
+  //   const y = date.getFullYear();
+  //   const m = String(date.getMonth() + 1).padStart(2, '0');
+  //   const d = String(date.getDate()).padStart(2, '0');
+  //   return `${y}-${m}-${d}`;
+  // };
 
   // ==================== 接收UD09传来的数据 ====================
   /**
@@ -438,8 +438,8 @@ const UD08_HomologationVariables: React.FC = () => {
       if (response.data.code === 200) {
         setMessage('数据添加成功');
         setMessageType('success');
-        setDisplayCreatedByUser(currentUser);
-        setDisplayDate(formatDate(now));
+        // setDisplayCreatedByUser(currentUser);
+        // setDisplayDate(formatDate(now));
         // 清空输入表单（保留主键字段以便查看）
         setVariable({ value: '', operator: '=' });
         setValue({ value: '', operator: '=' });
@@ -516,8 +516,8 @@ const UD08_HomologationVariables: React.FC = () => {
         setMessage('数据更新成功');
         setMessageType('success');
 
-        setDisplayCreatedByUser(currentUser);
-        setDisplayDate(formatDate(now));
+        // setDisplayCreatedByUser(currentUser);
+        // setDisplayDate(formatDate(now));
 
       } else {
         setMessage(response.data.message || '操作失败');

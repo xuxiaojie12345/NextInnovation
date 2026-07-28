@@ -122,16 +122,93 @@
   min-width: 160px;
 }
 
+/* ==================== 打印预览覆盖层（测试模式） ==================== */
+.ud20-print-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.ud20-print-preview-header {
+  background: #003366;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  width: 800px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+}
+
+.ud20-print-preview-close {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ud20-print-preview-close:hover {
+  background: #c9302c;
+}
+
+.ud20-print-preview-frame {
+  background: white;
+  padding: 30px;
+  width: 800px;
+  min-height: 500px;
+  overflow: auto;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.ud20-print-preview-frame .ud20-container {
+  border: none;
+  width: 100%;
+}
+
+.ud20-print-preview-frame .ud20-content {
+  border: 1px solid #9999cc;
+}
+
 /* User链接样式 */
 .ud20-user-link {
-  color: #003366;
+  color: #0066cc;
   text-decoration: underline;
   cursor: pointer;
   font-weight: 500;
 }
 
 .ud20-user-link:hover {
-  color: #0066cc;
+  /* color: #0066cc;
+  outline: 3px solid #000080;
+  outline-offset: 5px; */
+  background-color: #cce5ff;
+  color: #000000;
+  
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+  border-radius: 2px;
+}
+
+.ud20-user-link:focus {
+  outline: 3px solid #000080;
+  outline-offset: 2px;
+  background-color: #cce5ff;
+  color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+  border-radius: 2px;
 }
 
 /* 加载中和空数据提示 */
@@ -188,7 +265,8 @@
   background-color: #004488;
 }
 
-.ud20-btn:focus {
+.ud20-btn:focus,
+.ud20-btn:focus-visible {
   background-color: #b0b0e0;
   border-color: #000080;
 }

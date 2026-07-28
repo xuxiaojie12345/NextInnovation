@@ -223,9 +223,9 @@ test.describe('画面初期表示', () => {
     currentTestNo = '011';
     // 预先设置 localStorage
     await page.evaluate(() => {
-      localStorage.setItem('chassisSeries', 'jpct');
-      localStorage.setItem('chassisNo', '8888');
-      localStorage.setItem('documentType', 'CERTIFICATE');
+      localStorage.setItem('lastchassisSeries', 'jpct');
+      localStorage.setItem('lastchassisNo', '8888');
+      localStorage.setItem('lastdocumentType', 'CERTIFICATE');
     });
     await goToUD03(page);
     await takeScreenshot(page, '初期表示');

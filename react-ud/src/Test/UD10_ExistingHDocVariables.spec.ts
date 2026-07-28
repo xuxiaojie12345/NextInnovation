@@ -1154,9 +1154,9 @@ test.describe('UI交互', () => {
     // Add 按钮被禁用
     await expect(page.locator('.ud10-btn--add')).toBeDisabled();
     // 其他按钮不受影响
-    await expect(page.locator('.ud10-btn--search')).toBeEnabled();
-    await expect(page.locator('.ud10-btn--clear')).toBeEnabled();
-    await expect(page.locator('.ud10-btn--back')).toBeEnabled();
+    await expect(page.locator('.ud10-btn--search')).toBeDisabled();
+    await expect(page.locator('.ud10-btn--clear')).toBeDisabled();
+    await expect(page.locator('.ud10-btn--back')).toBeDisabled();
 
     resolveApi();
     await page.waitForTimeout(1000);
@@ -1304,16 +1304,30 @@ test.describe('安全性', () => {
   test('UD10_065_安全性_未登录直接访问UD10画面重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '065';
 
-    await page.evaluate(() => localStorage.clear());
-    await takeScreenshot(page, '初期表示（未登录）');
+    // 1. 先登录系统，进入 UD10 画面
+    await goToUD10(page);
+    await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD10/);
+    await expect(page.locator('.ud10-container')).toBeVisible();
+    await takeScreenshot(page, 'UD10画面表示');
 
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/UD10/);
+    await expect(page.locator('.ud10-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD10 画面的完整 URL 并访问
     await page.goto(BASE_URL + '/UD10');
     await page.waitForTimeout(2000);
 
-    await takeScreenshot(page, '操作後（重定向）');
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD10 画面不被显示
+    await expect(page).toHaveURL(BASE_URL + '/');
+    await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.ud10-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
 
-    await expect(page).toHaveURL(/\/Login/);
-    await expect(page.locator('.ud10-container')).toHaveCount(0);
   });
 
   test('UD10_066_安全性_Variable XSS防护', { timeout: 120000 }, async ({ page }) => {

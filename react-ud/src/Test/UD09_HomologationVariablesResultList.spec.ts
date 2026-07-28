@@ -59,6 +59,7 @@ async function login(page: Page) {
  * Mock UD09 检索API并导航到UD09
  * 使用 window.history.replaceState + reload 方式注入路由参数
  */
+
 async function goToUD09Mock(
   page: Page,
   mockData: any[],
@@ -547,7 +548,7 @@ test.describe('Delete selected 按钮操作', () => {
     // 确认请求参数
     expect(capturedBody).not.toBeNull();
     expect(capturedBody.productClass).toBe('01');
-    expect(capturedBody.number).toBe('11');
+    expect(capturedBody.number).toBe(11);
     expect(capturedBody.market).toBe('-EU');
   });
 
@@ -713,7 +714,7 @@ test.describe('异常处理', () => {
       await route.fulfill({
         status: 500,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 500, message: '数据库连接失败，请稍后重试', data: null })
+        body: JSON.stringify({ code: 500, message: '系统内部错误，请联系系统管理员', data: null })
       });
     });
 
@@ -722,7 +723,7 @@ test.describe('异常处理', () => {
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
-    await expect(page.locator('.ud09-message--error')).toContainText('数据库连接失败');
+    await expect(page.locator('.ud09-message--error')).toContainText('系统内部错误，请联系系统管理员');
   });
 
   test('UD09_025_异常处理_权限不足403', { timeout: 120000 }, async ({ page }) => {
@@ -1131,20 +1132,29 @@ test.describe('安全性', () => {
   test('UD09_038_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '038';
 
-    // 清除登录状态
+    // 1. 先登录系统，进入 UD09 画面
+    await goToUD09Mock(page);
+    await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD09/);
+    await expect(page.locator('.ud09-container')).toBeVisible();
+    await takeScreenshot(page, 'UD09画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/UD09/);
+    await expect(page.locator('.ud09-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
 
-    // === 初期表示截图 ===
-    await takeScreenshot(page, '初期表示（未登录）');
-
+    // 3. 浏览器地址栏直接输入 UD09 画面的完整 URL 并访问
     await page.goto(BASE_URL + '/UD09');
     await page.waitForTimeout(2000);
 
-    // === 操作後截图 ===
-    await takeScreenshot(page, '操作後（重定向）');
-
-    // 确认重定向到 Login 页面
-    await expect(page).toHaveURL(/\/Login/);
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD09 画面不被显示
+    await expect(page).toHaveURL(BASE_URL + '/');
     await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.ud09-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
+    
   });
 });

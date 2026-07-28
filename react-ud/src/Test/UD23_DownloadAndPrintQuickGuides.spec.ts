@@ -497,9 +497,8 @@ test.describe('安全性', () => {
 
     for (let i = 0; i < linkCount; i++) {
       const href = await links.nth(i).getAttribute('href');
-      // 确认链接不以盘符或绝对路径开头
+      // 确认链接不以盘符开头
       expect(href).not.toMatch(/^[A-Za-z]:\\/);
-      expect(href).not.toMatch(/^\/[A-Za-z]/);
       // 链接为相对路径
       expect(href).toMatch(/^\/guides\//);
     }

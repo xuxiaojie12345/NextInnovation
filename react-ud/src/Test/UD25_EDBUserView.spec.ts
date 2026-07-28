@@ -52,14 +52,13 @@ async function login(page: Page) {
  */
 async function goToUD25(page: Page, userId: string) {
   await login(page);
-  // 通过 JavaScript 设置 location.state 后跳转
-  await page.goto(BASE_URL + '/UD25');
-  await page.evaluate((uid) => {
-    window.history.replaceState({ userId: uid }, '', '/UD25');
+  // React Router v6 将用户数据存在 history.state.usr 中
+  await page.addInitScript((uid) => {
+    window.history.replaceState({ usr: { userId: uid } }, '');
   }, userId);
-  await page.reload();
+  await page.goto(BASE_URL + '/UD25');
   await page.waitForSelector('.ud25-container');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1500);
 }
 
 /**
@@ -78,7 +77,7 @@ test.describe('画面初期表示', () => {
   test('UD25_001_画面初始化_整体布局', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '001';
     await goToUD25(page, 'admin');
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(3000);
     await takeScreenshot(page, '初期表示');
 
     // 1. 页面容器可见
@@ -221,7 +220,7 @@ test.describe('画面初期表示', () => {
   test('UD25_007_画面初始化_Loading状态', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '007';
 
-    // 模拟 API 延迟响应
+    // 模拟 API 延迟响应（在 login 之前设置）
     await page.route('**/api/ud01/authentication*', async (route) => {
       await new Promise(resolve => setTimeout(resolve, 3000));
       await route.fulfill({
@@ -235,11 +234,11 @@ test.describe('画面初期表示', () => {
     });
 
     await login(page);
+    // 使用 addInitScript 注入 userId（与 goToUD25 相同的格式）
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
     await page.goto(BASE_URL + '/UD25');
-    await page.evaluate(() => {
-      window.history.replaceState({ userId: 'admin' }, '', '/UD25');
-    });
-    await page.reload();
     await page.waitForSelector('.ud25-container');
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
@@ -310,11 +309,13 @@ test.describe('画面初期表示', () => {
     expect(msgText).toContain('未找到用户信息');
     await expect(page.locator('.ud25-message--error')).toBeVisible();
 
-    await takeScreenshot(page, '操作後');
   });
 
   test('UD25_010_画面初始化_API失败_模拟500', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '010';
+
+    // 先登录（mock 必须在登录之后设置，避免影响登录 API）
+    await login(page);
 
     // 模拟 API 返回 500
     await page.route('**/api/ud01/authentication*', async (route) => {
@@ -325,7 +326,12 @@ test.describe('画面初期表示', () => {
       });
     });
 
-    await goToUD25(page, 'admin');
+    // 再导航到 UD25
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
+    await page.goto(BASE_URL + '/UD25');
+    await page.waitForSelector('.ud25-container');
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '初期表示');
 
@@ -333,8 +339,6 @@ test.describe('画面初期表示', () => {
     await expect(page.locator('.ud25-message')).toBeVisible();
     await expect(page.locator('.ud25-message')).toHaveText('获取用户信息失败');
     await expect(page.locator('.ud25-message--error')).toBeVisible();
-
-    await takeScreenshot(page, '操作後');
 
     await page.unroute('**/api/ud01/authentication*');
   });
@@ -359,6 +363,10 @@ test.describe('Clear按钮操作', () => {
     }, { timeout: 10000 });
 
     // 点击 Clear 按钮
+    // 将焦点移到 Clear 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud25-btn--default')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Clearボタン押下');
     await page.locator('.ud25-btn--default').click();
     await page.waitForTimeout(500);
     await takeScreenshot(page, '操作後');
@@ -383,6 +391,10 @@ test.describe('Clear按钮操作', () => {
     await page.locator('.ud25-btn--default').click();
     await page.waitForTimeout(300);
 
+    // 将焦点移到 Clear 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud25-btn--default')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Clearボタン押下');
     // 空状态下再次点击 Clear
     await page.locator('.ud25-btn--default').click();
     await page.waitForTimeout(500);
@@ -407,34 +419,82 @@ test.describe('Back按钮操作', () => {
 
   test('UD25_013_Back_返回前画面', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '013';
-    await goToUD25(page, 'admin');
-    await page.waitForTimeout(1500);
+    await login(page);
+    // 先访问 UD24 构建历史记录，模拟从 UD09 跳转到 UD25
+    await page.goto(BASE_URL + '/UD09');
+    await page.waitForSelector('.ud09-container');
+    // 再访问 UD25
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
+    await page.goto(BASE_URL + '/UD25');
+    await page.waitForSelector('.ud25-container');
+    // 等待数据加载完成
+    await page.waitForFunction(() => {
+      const inputs = document.querySelectorAll('.ud25-form-group input');
+      return inputs.length === 4 && (inputs[0] as HTMLInputElement).value !== '';
+    }, { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back 按钮
+    // 将焦点移到 Back 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud25-btn--primary')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Backボタン押下');
     await page.locator('.ud25-btn--primary').click();
     await page.waitForTimeout(1000);
+    // 移除焦点，避免前画面按钮显示 hover 样式
+    await page.evaluate(() => {
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+    await page.waitForTimeout(300);
     await takeScreenshot(page, '操作後');
 
-    // 画面返回前画面（navigate(-1)）
-    const currentUrl = page.url();
-    expect(currentUrl).not.toContain('/UD25');
+    // 画面返回 UD09
+    await expect(page).toHaveURL(/\/UD09/);
   });
 
   test('UD25_014_Back_从UDxx返回上一页', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '014';
-    await goToUD25(page, 'admin');
-    await page.waitForTimeout(1500);
+    await login(page);
+    // 先访问 UD24 构建历史记录
+    await page.goto(BASE_URL + '/UD11');
+    await page.waitForSelector('.ud11-container');
+    // 再访问 UD25
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
+    await page.goto(BASE_URL + '/UD25');
+    await page.waitForSelector('.ud25-container');
+    // 等待数据加载完成
+    await page.waitForFunction(() => {
+      const inputs = document.querySelectorAll('.ud25-form-group input');
+      return inputs.length === 4 && (inputs[0] as HTMLInputElement).value !== '';
+    }, { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back 按钮
+    // 将焦点移到 Back 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud25-btn--primary')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Backボタン押下');
     await page.locator('.ud25-btn--primary').click();
     await page.waitForTimeout(1000);
+    // 移除焦点，避免前画面按钮显示 hover 样式
+    await page.evaluate(() => {
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+    await page.waitForTimeout(300);
     await takeScreenshot(page, '操作後');
 
-    // navigate(-1) 返回上一个历史记录
-    const currentUrl = page.url();
-    expect(currentUrl).not.toContain('/UD25');
+    // navigate(-1) 返回 UD11
+    await expect(page).toHaveURL(/\/UD11/);
   });
 
 });
@@ -446,8 +506,7 @@ test.describe('UI交互', () => {
 
   test('UD25_015_UI交互_Loading中按钮禁用', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '015';
-
-    // 模拟 API 延迟响应
+    // 模拟 API 延迟响应（在 login 之前设置）
     await page.route('**/api/ud01/authentication*', async (route) => {
       await new Promise(resolve => setTimeout(resolve, 3000));
       await route.fulfill({
@@ -461,11 +520,11 @@ test.describe('UI交互', () => {
     });
 
     await login(page);
+    // 使用 addInitScript 注入 userId（与 goToUD25 相同的格式）
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
     await page.goto(BASE_URL + '/UD25');
-    await page.evaluate(() => {
-      window.history.replaceState({ userId: 'admin' }, '', '/UD25');
-    });
-    await page.reload();
     await page.waitForSelector('.ud25-container');
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
@@ -515,31 +574,45 @@ test.describe('异常处理', () => {
 
   test('UD25_017_异常处理_API调用超时', { timeout: 180000 }, async ({ page }) => {
     currentTestNo = '017';
+    test.setTimeout(120000);
 
-    // 模拟 API 响应超时（>30秒）
+    await login(page);
+    // 使用 addInitScript 注入 userId（与 goToUD25 相同的格式）
+    await page.addInitScript((uid) => {
+      window.history.replaceState({ usr: { userId: uid } }, '');
+    }, 'admin');
+
     await page.route('**/api/ud01/authentication*', async (route) => {
-      await new Promise(resolve => setTimeout(resolve, 35000));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 200, data: {} }),
-      });
+      // 第一层校验：通过请求来源URL判断，仅当前页面路径包含/UD25时才执行Mock
+      const currentPageUrl = page.url();
+      if (currentPageUrl.includes('/UD25')) {
+        // 仅UD25页面的请求才延迟31秒后触发超时
+        await new Promise(resolve => setTimeout(resolve, 31000));
+        await route.abort('timedout');
+      } else {
+        // Login/Menu等其他页面的同路径请求直接放行，完全走原有真实接口逻辑
+        await route.continue();
+      }
     });
+    // 注册完拦截器再跳转页面
+    await page.goto(BASE_URL + '/UD25', { waitUntil: 'domcontentloaded' });
 
-    await goToUD25(page, 'admin');
+    await page.waitForSelector('.ud25-container');
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
 
-    // 等待超时错误（axios 30秒超时）
-    try {
-      await page.waitForFunction(() => {
-        const msg = document.querySelector('.ud25-message--error');
-        return msg !== null;
-      }, { timeout: 40000 });
-    } catch { }
-    await page.waitForTimeout(1000);
-    await takeScreenshot(page, '操作後');
+    await page.waitForResponse(res => 
+      res.url().includes('/api/ud01/authentication') 
+      && res.request().timing().responseEnd > 30000
+    );
+    // API超时逻辑触发后，仅留10秒余量等待React异步渲染错误提示
+    await page.locator('.ud25-message--error').waitFor({
+      state: 'visible',
+      timeout: 10000
+    });
 
+    await takeScreenshot(page, '操作後');
+    await expect(page.locator('.ud25-message--error')).toHaveText('请求超时，请稍后重试.');
     await expect(page.locator('.ud25-message')).toBeVisible();
     await expect(page.locator('.ud25-message--error')).toBeVisible();
 

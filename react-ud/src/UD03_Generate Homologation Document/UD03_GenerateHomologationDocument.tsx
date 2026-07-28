@@ -234,9 +234,11 @@ const UD03_GenerateHomologationDocument: React.FC = () => {
         <h1 className='page-title'>HDoc - Generate Homologation Document</h1>
 
         {/* 消息显示区域 */}
-        <div className='error-message-area'>
-          {message}
-        </div>
+        {message && (
+          <div className='error-message-area'>
+            {message}
+          </div>
+        )}
 
         {/* 表单区域 */}
         <div className='form-section'>

@@ -54,12 +54,21 @@ const UD25_EDBUserView: React.FC = () => {
           setMessage('');
         } else {
           // 响应数据为空
-          setMessage(response.data?.msg || '未找到用户信息');
+          setMessage('未找到用户信息');
           setMessageType('error');
         }
-      } catch (error) {
-        setMessage('获取用户信息失败');
-        setMessageType('error');
+      } catch (error: any) {
+        // 异常处理 - 网络超时
+        if (error.code === "ECONNABORTED") {
+          // 请求超时
+          setMessage("请求超时，请稍后重试.");
+        }else{
+          setMessage('获取用户信息失败');
+          setMessageType('error');
+        }
+      // catch (error) {
+      //   setMessage('获取用户信息失败');
+      //   setMessageType('error');
       } finally {
         setIsLoading(false);
       }

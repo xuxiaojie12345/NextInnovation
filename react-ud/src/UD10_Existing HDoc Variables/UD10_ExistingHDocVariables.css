@@ -96,6 +96,7 @@
   outline: none;
   box-sizing: border-box;
   max-width: 320px;
+  text-align: left;
 }
 
 .ud10-row .ud10-input:focus {
@@ -172,6 +173,7 @@
 
 .ud10-btn:hover {
   opacity: 0.85;
+  background-color: #004488;
 }
 
 .ud10-btn:disabled {

@@ -17,30 +17,30 @@ const REAL_USER = 'admin';
 const REAL_PASS = 'admin123';
 
 // 单条 Storing Mock 数据
-const MOCK_SINGLE_STORING = {
-  code: 200,
-  data: [
-    { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT2', newVal: 'VTA-050077' }
-  ]
-};
+// const MOCK_SINGLE_STORING = {
+//   code: 200,
+//   data: [
+//     { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT2', newVal: 'VTA-050077' }
+//   ]
+// };
 
 // 多条 Storing Mock 数据（jpct/8888）
-const MOCK_MULTI_STORING = {
-  code: 200,
-  data: [
-    { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT5', newVal: '30' },
-    { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT6', newVal: 'PK20' },
-    { doctype: 'VIN_PLATE', vers: '1', variable: 'VPGVW_2', newVal: '17501' },
-  ]
-};
+// const MOCK_MULTI_STORING = {
+//   code: 200,
+//   data: [
+//     { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT5', newVal: '30' },
+//     { doctype: 'VIN_PLATE', vers: '1', variable: 'VIN_TEXT6', newVal: 'PK20' },
+//     { doctype: 'VIN_PLATE', vers: '1', variable: 'VPGVW_2', newVal: '17501' },
+//   ]
+// };
 
 // lwws/12345 单条数据
-const MOCK_LWWS_STORING = {
-  code: 200,
-  data: [
-    { doctype: 'VIN_PLATE', vers: '1', variable: 'LWW_01', newVal: 'sylus03_UPDATE' }
-  ]
-};
+// const MOCK_LWWS_STORING = {
+//   code: 200,
+//   data: [
+//     { doctype: 'VIN_PLATE', vers: '1', variable: 'LWW_01', newVal: 'sylus03_UPDATE' }
+//   ]
+// };
 
 /**
  * 截图（JPEG，从001开始编号）
@@ -115,9 +115,9 @@ test.beforeEach(async ({ page }) => {
 test.describe('画面初期表示', () => {
 
   test('UD06_001_画面初始化_整体布局', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '001';
-    await goToUD06(page, MOCK_SINGLE_STORING, 'lwws', '12345', [
-      { variable: 'VIN_TEXT2', currentValue: '', modifiedValue: 'VTA-050077' }
+    currentTestNo = '01';
+    await goToUD06(page, 'lwws', '12345', [
+      { variable: 'LWW_01', currentValue: '', modifiedValue: 'VTA-050077' }
     ]);
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
@@ -138,8 +138,8 @@ test.describe('画面初期表示', () => {
 
   test('UD06_002_画面初始化_Chassis serie属性', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '002';
-    await goToUD06(page, MOCK_SINGLE_STORING, 'jpct', '8888', [
-      { variable: 'VIN_TEXT2', currentValue: '', modifiedValue: '778' }
+    await goToUD06(page, 'jpct', '8888', [
+      { variable: 'LWW_01', currentValue: '', modifiedValue: '778' }
     ]);
     await takeScreenshot(page, '初期表示');
 

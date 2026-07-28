@@ -91,6 +91,7 @@ const UD20_MarketDocumentSettings: React.FC = () => {
    */
   const handleClear = useCallback(() => {
     setDocumentType('');
+    setBusinessUnit('BU');
     setUser('');
     setDate('');
     setCompareDocType('=');
@@ -168,10 +169,10 @@ const UD20_MarketDocumentSettings: React.FC = () => {
 
       {/* 按钮区域 */}
         <div className="ud201-button-row">
-        <button className="ud201-btn" onClick={handleSearch} disabled={isLoading}>Search</button>
-        <button className="ud201-btn" onClick={handleClear} disabled={isLoading}>Clear</button>
-        <button className="ud201-btn" onClick={handleBack} disabled={isLoading}>Back</button>
-        <button className="ud201-btn" onClick={handleUpdateMode} disabled={isLoading}>
+        <button className="ud201-btn" onClick={handleSearch} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>Search</button>
+        <button className="ud201-btn" onClick={handleClear} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>Clear</button>
+        <button className="ud201-btn" onClick={handleBack} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>Back</button>
+        <button className="ud201-btn" onClick={handleUpdateMode} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>
           Update Mode
         </button>
       </div>

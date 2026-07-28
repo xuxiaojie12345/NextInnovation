@@ -275,10 +275,10 @@ const UD12_UploadDeleteTemplate: React.FC = () => {
         const msg = response.data.msg || `TEMPLATE ${selectedTemplate} WAS SUCESSFULLY DELETE FROM MARKET ${deleteMarket}`;
         setMessage(msg);
         setMessageType("success");
-        // 刷新Templates下拉框和Market下拉框
+        // 清空下拉框状态
         setDeleteMarket("");
         setSelectedTemplate("");
-        fetchTemplateList(deleteMarket);
+        setTemplateOptions([]);
       } else {
         setMessage(response.data.msg || "文件删除失败");
         setMessageType("error");

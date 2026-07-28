@@ -94,7 +94,7 @@ const UD22_DocumentTypes: React.FC = () => {
               ) : docTypes.length === 0 && !isLoading ? (
                 <tr>
                   <td colSpan={2} className="ud22-empty">
-                    {message || '当前没有可用的文档类型'}
+                    {'当前没有可用的文档类型'}
                   </td>
                 </tr>
               ) : (

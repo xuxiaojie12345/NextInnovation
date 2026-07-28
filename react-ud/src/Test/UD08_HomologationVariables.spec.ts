@@ -408,15 +408,15 @@ test.describe('画面初期表示', () => {
     await goToUD08(page);
     await takeScreenshot(page, '初期表示');
 
-    // Add/Delete/Date 的运算符选项为 =, <, >（行9, 10, 12）
-    for (const rowIdx of [9, 10, 12]) {
+    // Add/Delete/Date 的运算符选项为 =, <, >（行2, 9, 10, 12）
+    for (const rowIdx of [2, 9, 10, 12]) {
       const opOptions = await page.locator(fieldOperator(rowIdx)).locator('option').allTextContents();
       const trimmedOps = opOptions.map(o => o.trim());
       expect(trimmedOps).toEqual(['=', '<', '>']);
     }
 
     // 其他项目（Product class, Number, Market, Variable, Value, Variant string.1, Variant string.2, Comments）的运算符选项包含 =, !=
-    for (const rowIdx of [1, 2, 3, 4, 5, 6, 7, 8, 11]) {
+    for (const rowIdx of [1, 3, 4, 5, 6, 7, 8, 11]) {
       const opOptions = await page.locator(fieldOperator(rowIdx)).locator('option').allTextContents();
       const trimmedOps = opOptions.map(o => o.trim());
       expect(trimmedOps).toContain('=');
@@ -2212,18 +2212,29 @@ test.describe('安全性', () => {
 
   test('UD08_113_安全性_未登录直接访问UD08画面重定向', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '113';
-    // 清除所有 localStorage（模拟未登录）
-    await page.evaluate(() => localStorage.clear());
-    await takeScreenshot(page, '初期表示（未登录）');
 
-    // 直接访问 UD08
-    await page.goto(BASE_URL + '/UD08');
+    // 1. 先登录系统，进入 UD08 画面
+    await goToUD08(page);
     await page.waitForTimeout(1000);
-    await takeScreenshot(page, '操作後（重定向）');
+    await expect(page).toHaveURL(/\/UD08/);
+    await expect(page.locator('.ud08-container')).toBeVisible();
+    await takeScreenshot(page, 'UD08画面表示');
 
-    // 自动重定向到 Login 画面
-    expect(page.url()).not.toContain('/UD08');
-    // UD08 内容不被显示
-    await expect(page.locator('.ud08-container')).toHaveCount(0);
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/UD08/);
+    await expect(page.locator('.ud08-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
+
+    // 3. 浏览器地址栏直接输入 UD08 画面的完整 URL 并访问
+    await page.goto(BASE_URL + '/UD08');
+    await page.waitForTimeout(2000);
+
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD08 画面不被显示
+    await expect(page).toHaveURL(BASE_URL + '/');
+    await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.ud08-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 });

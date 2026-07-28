@@ -17,6 +17,7 @@
   font-size: 14px;
   min-height: 20px;
   border: 1px solid transparent;
+  text-align: left;
 }
 
 .ud25-message--success {
@@ -78,6 +79,13 @@
 
 .ud25-btn:hover {
   opacity: 0.85;
+  background-color: #004488;
+}
+
+.ud25-btn:focus,
+.ud25-btn:focus-visible {
+  background-color: #004488;
+  border-color: #000080;
 }
 
 .ud25-btn:disabled {

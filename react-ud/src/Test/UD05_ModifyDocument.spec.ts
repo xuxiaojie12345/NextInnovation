@@ -121,7 +121,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('画面初期表示', () => {
 
   test('UD05_001_画面初始化_整体布局', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '001';
+    currentTestNo = '01';
     await goToUD05(page, MOCK_NORMAL_DATA, 'lwws', '12345', 'IDO');
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');

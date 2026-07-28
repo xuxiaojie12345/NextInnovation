@@ -83,17 +83,31 @@ const UD06_SaveModifications: React.FC = () => {
       });
 
       if (response.data?.code === 200 && response.data?.data) {
-        const data = response.data.data;
-        const storingText = `${data.variable || ''} ${data.newVal || data.newval || ''}`.trim();
-        setState(prev => ({
-          ...prev,
-          doctype: data.doctype || '',
-          version: data.vers || '',
-          storing: storingText,
-          foundUnreleasedVersion: data.vers || '',
-          message: '',
-          isLoading: false,
-        }));
+        const dataList = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
+        // 将多条 Variable+NewVal 组合用逗号连接
+        const storingLines = dataList.map((item: any) =>
+          `${item.variable || ''} ${item.newVal || item.newval || ''}`.trim()
+        ).filter((line: string) => line.length > 0);
+        const storingText = storingLines.join(', ');
+        // 取第一条记录的 Doctype/Vers 作为统一显示（所有记录属于同一文档）
+        const firstItem = dataList[0];
+        if (firstItem) {
+          setState(prev => ({
+            ...prev,
+            doctype: firstItem.doctype || '',
+            version: firstItem.vers || '',
+            storing: storingText,
+            foundUnreleasedVersion: firstItem.vers || '',
+            message: '',
+            isLoading: false,
+          }));
+        } else {
+          setState(prev => ({
+            ...prev,
+            message: 'We can not get the data. Please try again.',
+            isLoading: false,
+          }));
+        }
       } else {
         setState(prev => ({
           ...prev,

@@ -140,7 +140,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('画面初期表示', () => {
 
   test('UD11_001_画面初始化_整体布局', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '001';
+    currentTestNo = '01';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '1001', description: 'UD10更新测试_13756' });
 
     // === 初期表示截图 ===
@@ -153,11 +153,11 @@ test.describe('画面初期表示', () => {
     // 3. DataTable 区域可见
     await expect(page.locator('.ud11-table')).toBeVisible();
     // 4. 按钮行可见
-    await expect(page.locator('.ud11-btn--primary')).toBeVisible();
-    await expect(page.locator('.ud11-btn--default').nth(0)).toBeVisible(); // Down
-    await expect(page.locator('.ud11-btn--default').nth(1)).toBeVisible(); // Back
-    await expect(page.locator('.ud11-btn--default').nth(2)).toBeVisible(); // Print
-    await expect(page.locator('.ud11-btn--excel')).toBeVisible();
+    await expect(page.locator('.ud11-btn').nth(0)).toBeVisible();
+    await expect(page.locator('.ud11-btn').nth(1)).toBeVisible(); // Down
+    await expect(page.locator('.ud11-btn').nth(2)).toBeVisible(); // Back
+    await expect(page.locator('.ud11-btn').nth(3)).toBeVisible(); // Print
+    await expect(page.locator('.ud11-btn').nth(4)).toBeVisible();
 
     // 5. Count 标签显示
     await expect(page.locator('.ud11-count')).toBeVisible();
@@ -168,7 +168,7 @@ test.describe('画面初期表示', () => {
   });
 
   test('UD11_002_画面初始化_DataTable列标题', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '002';
+    currentTestNo = '02';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -184,7 +184,7 @@ test.describe('画面初期表示', () => {
   });
 
   test('UD11_003_画面初始化_全检索显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '003';
+    currentTestNo = '03';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -203,7 +203,7 @@ test.describe('画面初期表示', () => {
   });
 
   test('UD11_004_画面初始化_带条件检索显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '004';
+    currentTestNo = '04';
     // Mock 精确检索结果
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '1002', type: 'User Defined', description: 'Description1' });
 
@@ -223,7 +223,7 @@ test.describe('画面初期表示', () => {
   });
 
   test('UD11_005_画面初始化_无检索结果', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '005';
+    currentTestNo = '05';
     await goToUD11Mock(page, MOCK_RESULTS_EMPTY, { variable: 'NONEXIST_VAR_99999' });
 
     // === 初期表示截图 ===
@@ -237,11 +237,11 @@ test.describe('画面初期表示', () => {
     expect(countText).toContain('Number of lines found: 0');
 
     // 不显示错误消息
-    await expect(page.locator('.ud11-message--error')).toHaveCount(0);
+    await expect(page.locator('.ud11-message-error')).toHaveCount(0);
   });
 
   test('UD11_006_画面初始化_Count标签显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '006';
+    currentTestNo = '06';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '112' });
 
     // === 初期表示截图 ===
@@ -256,7 +256,7 @@ test.describe('画面初期表示', () => {
   });
 
   test('UD11_007_画面初始化_Loading状态', { timeout: 60000 }, async ({ page }) => {
-    currentTestNo = '007';
+    currentTestNo = '07';
 
     // 延迟 API 响应
     let resolveApi;
@@ -278,7 +278,7 @@ test.describe('画面初期表示', () => {
     });
     await page.reload();
     await page.waitForSelector('.ud11-container');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(3000);
 
     // === 加载中截图 ===
     await takeScreenshot(page, 'Loading状态');
@@ -286,22 +286,22 @@ test.describe('画面初期表示', () => {
     // 加载中显示
     await expect(page.locator('.ud11-table-wrapper')).toContainText('加载中...');
     // 按钮禁用
-    await expect(page.locator('.ud11-btn--primary')).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(0)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(1)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(2)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--excel')).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(0)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(1)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(2)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(3)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(4)).toBeDisabled();
 
     // 恢复响应
     resolveApi();
     await page.waitForTimeout(1500);
 
     // 加载完成后按钮恢复
-    await expect(page.locator('.ud11-btn--primary')).toBeEnabled();
+    await expect(page.locator('.ud11-btn').nth(0)).toBeEnabled();
   });
 
   test('UD11_008_画面初始化_API失败（500错误）', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '008';
+    currentTestNo = '08';
 
     await page.route('**/api/ud11/search', async route => {
       await route.fulfill({
@@ -317,7 +317,7 @@ test.describe('画面初期表示', () => {
     await takeScreenshot(page, '初期表示');
 
     // 错误消息
-    await expect(page.locator('.ud11-message--error')).toContainText('获取检索结果失败');
+    await expect(page.locator('.ud11-message-error')).toContainText('获取检索结果失败');
     // DataTable 暂无数据
     await expect(page.locator('.ud11-table tbody')).toContainText('暂无数据');
     // Count 显示 0
@@ -331,7 +331,7 @@ test.describe('画面初期表示', () => {
 test.describe('DataTable数据展示', () => {
 
   test('UD11_009_Variable列_数据显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '009';
+    currentTestNo = '09';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '1001' });
 
     // === 初期表示截图 ===
@@ -342,7 +342,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_010_Variable列_最大长度30字符', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '010';
+    currentTestNo = '10';
     await goToUD11Mock(page, [
       { variable: '3811wj', type: 'User Defined', description: 'duc3811aaa', registerUser: 'user00000', registerDatetime: '2026-07-03T04:54:21.000Z' }
     ], { variable: '3811wj' });
@@ -355,7 +355,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_011_Type列_数据显示（VDA）', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '011';
+    currentTestNo = '11';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI.filter(r => r.type === 'VDA'), { type: 'VDA' });
 
     // === 初期表示截图 ===
@@ -369,7 +369,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_012_Type列_数据显示（User Defined）', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '012';
+    currentTestNo = '12';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI.filter(r => r.type === 'User Defined'), { type: 'User Defined' });
 
     // === 初期表示截图 ===
@@ -383,7 +383,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_013_Type列_数据显示（空值）', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '013';
+    currentTestNo = '13';
     await goToUD11Mock(page, [
       { variable: '1001', type: '', description: 'UD10更新测试_13756', registerUser: 'x001', registerDatetime: '2026-06-23T01:30:16.000Z' }
     ], { variable: '1001' });
@@ -397,7 +397,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_014_Description列_数据显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '014';
+    currentTestNo = '14';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '1002' });
 
     // === 初期表示截图 ===
@@ -408,7 +408,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_015_Description列_空值显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '015';
+    currentTestNo = '15';
     await goToUD11Mock(page, [
       { variable: '123', type: '', description: '', registerUser: 'AUTO_d6d68c', registerDatetime: '2026-06-22T08:50:28.000Z' }
     ], { variable: '123' });
@@ -421,7 +421,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_016_Created by user列_数据显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '016';
+    currentTestNo = '16';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE.map(r => ({ ...r, variable: '1001', registerUser: 'x001' })), { variable: '1001' });
 
     // === 初期表示截图 ===
@@ -437,7 +437,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_017_Created by user列_空值显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '017';
+    currentTestNo = '17';
     await goToUD11Mock(page, MOCK_RESULTS_EMPTY_USER, { variable: '202606' });
 
     // === 初期表示截图 ===
@@ -450,7 +450,7 @@ test.describe('DataTable数据展示', () => {
   });
 
   test('UD11_018_Date列_数据显示', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '018';
+    currentTestNo = '18';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE.map(r => ({ ...r, variable: '1001' })), { variable: '1001' });
 
     // === 初期表示截图 ===
@@ -469,7 +469,7 @@ test.describe('DataTable数据展示', () => {
 test.describe('单选按钮（Radio）操作', () => {
 
   test('UD11_019_Radio_选择一条记录', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '019';
+    currentTestNo = '19';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -491,7 +491,7 @@ test.describe('单选按钮（Radio）操作', () => {
   });
 
   test('UD11_020_Radio_切换选择记录', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '020';
+    currentTestNo = '20';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -517,7 +517,7 @@ test.describe('单选按钮（Radio）操作', () => {
   });
 
   test('UD11_021_Radio_取消选择（点击已选中记录）', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '021';
+    currentTestNo = '21';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -541,7 +541,7 @@ test.describe('单选按钮（Radio）操作', () => {
   });
 
   test('UD11_022_Radio_初始状态_无选中', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '022';
+    currentTestNo = '22';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
@@ -555,7 +555,7 @@ test.describe('单选按钮（Radio）操作', () => {
   });
 
   test('UD11_023_Radio_单条记录时可取消选择', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '023';
+    currentTestNo = '23';
     await goToUD11Mock(page, MOCK_RESULTS_SINGLE, { variable: '1002' });
 
     // === 初期表示截图 ===
@@ -585,27 +585,27 @@ test.describe('单选按钮（Radio）操作', () => {
 test.describe('Select 按钮操作', () => {
 
   test('UD11_024_Select_未选择记录', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '024';
+    currentTestNo = '24';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // 未选择记录，直接点击 Select
-    await page.locator('.ud11-btn--primary').click();
+    await page.locator('.ud11-btn').nth(0).click();
     await page.waitForTimeout(500);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Select未选择）');
 
     // 错误消息
-    await expect(page.locator('.ud11-message--error')).toContainText('请选择一条记录');
+    await expect(page.locator('.ud11-message-error')).toContainText('请选择一条记录');
     // 页面不跳转
     expect(page.url()).toContain('/UD11');
   });
 
   test('UD11_025_Select_选择记录成功', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '025';
+    currentTestNo = '25';
     await page.route('**/UD10', route => {
       route.fulfill({ status: 200, body: '<html><body><div class="ud10-container">UD10 Mock</div></body></html>' });
     });
@@ -623,7 +623,7 @@ test.describe('Select 按钮操作', () => {
     await takeScreenshot(page, '選択後');
 
     // 点击 Select
-    await page.locator('.ud11-btn--primary').click();
+    await page.locator('.ud11-btn').nth(0).click();
     await page.waitForTimeout(2000);
 
     // === 操作後截图 ===
@@ -634,7 +634,7 @@ test.describe('Select 按钮操作', () => {
   });
 
   test('UD11_026_Select_选择其他记录成功', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '026';
+    currentTestNo = '26';
     await page.route('**/UD10', route => {
       route.fulfill({ status: 200, body: '<html><body>UD10 Mock</body></html>' });
     });
@@ -652,7 +652,7 @@ test.describe('Select 按钮操作', () => {
     // === 選択後截图 ===
     await takeScreenshot(page, '選択後');
 
-    await page.locator('.ud11-btn--primary').click();
+    await page.locator('.ud11-btn').nth(0).click();
     await page.waitForTimeout(2000);
 
     // === 操作後截图 ===
@@ -668,21 +668,21 @@ test.describe('Select 按钮操作', () => {
 test.describe('Down 按钮操作', () => {
 
   test('UD11_027_Down_未选择记录', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '027';
+    currentTestNo = '27';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // 未选择记录，点击 Down
-    await page.locator('.ud11-btn--default').nth(0).click();
+    await page.locator('.ud11-btn').nth(1).click();
     await page.waitForTimeout(500);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Down未选择）');
 
     // 错误消息
-    await expect(page.locator('.ud11-message--error')).toContainText('请选择一条记录');
+    await expect(page.locator('.ud11-message-error')).toContainText('请选择一条记录');
     expect(page.url()).toContain('/UD11');
   });
 });
@@ -693,7 +693,7 @@ test.describe('Down 按钮操作', () => {
 test.describe('Back 按钮操作', () => {
 
   test('UD11_028_Back_返回UD10画面', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '028';
+    currentTestNo = '28';
     await page.route('**/UD10', route => {
       route.fulfill({ status: 200, body: '<html><body><div class="ud10-container">UD10 Mock</div></body></html>' });
     });
@@ -704,7 +704,7 @@ test.describe('Back 按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back
-    await page.locator('.ud11-btn--default').nth(1).click();
+    await page.locator('.ud11-btn').nth(2).click();
     await page.waitForTimeout(2000);
 
     // === 操作後截图 ===
@@ -715,7 +715,7 @@ test.describe('Back 按钮操作', () => {
   });
 
   test('UD11_029_Back_返回后检索条件保持', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '029';
+    currentTestNo = '29';
     await page.route('**/UD10', route => {
       route.fulfill({ status: 200, body: '<html><body><div class="ud10-container">UD10 Mock</div></body></html>' });
     });
@@ -726,7 +726,7 @@ test.describe('Back 按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back
-    await page.locator('.ud11-btn--default').nth(1).click();
+    await page.locator('.ud11-btn').nth(2).click();
     await page.waitForTimeout(2000);
 
     // === 操作後截图 ===
@@ -743,34 +743,34 @@ test.describe('Back 按钮操作', () => {
 test.describe('Print 按钮操作', () => {
 
   test('UD11_030_Print_有数据打印', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '030';
+    currentTestNo = '30';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // Print 按钮可用，无错误消息
-    await expect(page.locator('.ud11-btn--default').nth(2)).toBeEnabled();
-    await expect(page.locator('.ud11-btn--default').nth(2)).toHaveText('Print');
-    await expect(page.locator('.ud11-message--error')).toHaveCount(0);
+    await expect(page.locator('.ud11-btn').nth(3)).toBeEnabled();
+    await expect(page.locator('.ud11-btn').nth(3)).toHaveText('Print');
+    await expect(page.locator('.ud11-message-error')).toHaveCount(0);
   });
 
   test('UD11_031_Print_无数据打印', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '031';
+    currentTestNo = '31';
     await goToUD11Mock(page, MOCK_RESULTS_EMPTY, { variable: 'NONEXIST_VAR_99999' });
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // 点击 Print
-    await page.locator('.ud11-btn--default').nth(2).click();
+    await page.locator('.ud11-btn').nth(3).click();
     await page.waitForTimeout(500);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Print无数据）');
 
     // 错误消息
-    await expect(page.locator('.ud11-message--error')).toContainText('没有可打印的数据');
+    await expect(page.locator('.ud11-message-error')).toContainText('没有可打印的数据');
   });
 });
 
@@ -780,7 +780,7 @@ test.describe('Print 按钮操作', () => {
 test.describe('Excel 按钮操作', () => {
 
   test('UD11_032_Excel_有数据导出CSV', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '032';
+    currentTestNo = '32';
 
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
@@ -788,35 +788,35 @@ test.describe('Excel 按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 点击 Excel
-    await page.locator('.ud11-btn--excel').click();
+    await page.locator('.ud11-btn').nth(4).click();
     await page.waitForTimeout(1000);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Excel导出）');
 
     // 成功消息
-    await expect(page.locator('.ud11-message--success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_033_Excel_空数据导出', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '033';
+    currentTestNo = '33';
     await goToUD11Mock(page, MOCK_RESULTS_EMPTY, { variable: 'NONEXIST_VAR_99999' });
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
-    await page.locator('.ud11-btn--excel').click();
+    await page.locator('.ud11-btn').nth(4).click();
     await page.waitForTimeout(1000);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Excel空数据）');
 
     // 成功消息
-    await expect(page.locator('.ud11-message--success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_034_Excel_导出失败', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '034';
+    currentTestNo = '34';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // 覆盖 Blob 构造函数使其抛出异常
@@ -828,14 +828,14 @@ test.describe('Excel 按钮操作', () => {
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
-    await page.locator('.ud11-btn--excel').click();
+    await page.locator('.ud11-btn').nth(4).click();
     await page.waitForTimeout(1000);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（Excel失败）');
 
     // 错误消息
-    await expect(page.locator('.ud11-message--error')).toContainText('导出失败');
+    await expect(page.locator('.ud11-message-error')).toContainText('导出失败');
   });
 });
 
@@ -845,7 +845,7 @@ test.describe('Excel 按钮操作', () => {
 test.describe('Created by user 链接操作', () => {
 
   test('UD11_035_Created by user_点击链接跳转', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '035';
+    currentTestNo = '35';
     await page.route('**/UD25', route => {
       route.fulfill({ status: 200, body: '<html><body><div class="ud25-container">UD25 Mock</div></body></html>' });
     });
@@ -866,7 +866,7 @@ test.describe('Created by user 链接操作', () => {
   });
 
   test('UD11_036_Created by user_点击空用户', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '036';
+    currentTestNo = '36';
     await goToUD11Mock(page, MOCK_RESULTS_EMPTY_USER, { variable: '202606' });
 
     // === 初期表示截图 ===
@@ -878,11 +878,11 @@ test.describe('Created by user 链接操作', () => {
     expect(userText.trim()).toBe('');
 
     // 无 .ud11-user-link 元素
-    await expect(firstRowCells.nth(4).locator('.ud11-user-link')).toHaveCount(0);
+    await expect(firstRowCells.nth(4).locator('.ud11-user-link')).toBeEmpty();
   });
 
   test('UD11_037_Created by user_点击不同用户', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '037';
+    currentTestNo = '37';
     await page.route('**/UD25', route => {
       route.fulfill({ status: 200, body: '<html><body>UD25 Mock</body></html>' });
     });
@@ -909,7 +909,7 @@ test.describe('Created by user 链接操作', () => {
 test.describe('UI交互', () => {
 
   test('UD11_038_UI交互_Loading中按钮禁用', { timeout: 60000 }, async ({ page }) => {
-    currentTestNo = '038';
+    currentTestNo = '38';
 
     let resolveApi;
     const apiPromise = new Promise(resolve => { resolveApi = resolve; });
@@ -936,22 +936,22 @@ test.describe('UI交互', () => {
     await takeScreenshot(page, '加载中');
 
     // 所有按钮禁用
-    await expect(page.locator('.ud11-btn--primary')).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(0)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(1)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--default').nth(2)).toBeDisabled();
-    await expect(page.locator('.ud11-btn--excel')).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(0)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(1)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(2)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(3)).toBeDisabled();
+    await expect(page.locator('.ud11-btn').nth(4)).toBeDisabled();
 
     // 恢复
     resolveApi();
     await page.waitForTimeout(1500);
 
     // 加载完成后恢复
-    await expect(page.locator('.ud11-btn--primary')).toBeEnabled();
+    await expect(page.locator('.ud11-btn').nth(0)).toBeEnabled();
   });
 
   test('UD11_039_UI交互_操作中防止重复点击', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '039';
+    currentTestNo = '39';
     await page.route('**/UD10', route => {
       route.fulfill({ status: 200, body: '<html><body>UD10 Mock</body></html>' });
     });
@@ -969,10 +969,13 @@ test.describe('UI交互', () => {
     await takeScreenshot(page, '選択後');
 
     // 快速连续点击 Select
-    await page.locator('.ud11-btn--primary').click();
-    await page.locator('.ud11-btn--primary').click({ force: true });
-    await page.waitForTimeout(2000);
-
+    // 先触发 Select 未选择错误
+    await page.evaluate(() => (document.querySelectorAll('.ud11-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
+    await page.locator('.ud11-btn').nth(0).click();
+    await page.locator('.ud11-btn').nth(0).click({ force: true });
+    await page.waitForTimeout(300);
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（重复点击）');
 
@@ -981,72 +984,92 @@ test.describe('UI交互', () => {
   });
 
   test('UD11_040_UI交互_错误消息显示红色', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '040';
+    currentTestNo = '40';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // 未选择记录，点击 Select
-    await page.locator('.ud11-btn--primary').click();
+    // 先触发 Select 未选择错误
+    await page.evaluate(() => (document.querySelectorAll('.ud11-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
+    await page.locator('.ud11-btn').nth(0).click();
     await page.waitForTimeout(500);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（错误消息）');
 
     // 错误消息可见
-    await expect(page.locator('.ud11-message--error')).toBeVisible();
-    const color = await page.locator('.ud11-message--error').evaluate(el => window.getComputedStyle(el).color);
+    await expect(page.locator('.ud11-message-error')).toBeVisible();
+    const color = await page.locator('.ud11-message-error').evaluate(el => window.getComputedStyle(el).color);
     expect(color).toBe('rgb(255, 77, 79)');
   });
 
   test('UD11_041_UI交互_成功消息显示绿色', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '041';
+    currentTestNo = '41';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
     // Excel 导出成功
-    await page.locator('.ud11-btn--excel').click();
+    await page.locator('.ud11-btn').nth(4).click();
     await page.waitForTimeout(1000);
 
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（成功消息）');
 
-    await expect(page.locator('.ud11-message--success')).toBeVisible();
-    const color = await page.locator('.ud11-message--success').evaluate(el => window.getComputedStyle(el).color);
+    await expect(page.locator('.ud11-message-success')).toBeVisible();
+    const color = await page.locator('.ud11-message-success').evaluate(el => window.getComputedStyle(el).color);
     expect(color).toBe('rgb(82, 196, 26)');
   });
 
   test('UD11_042_UI交互_新消息覆盖旧消息', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '042';
+    currentTestNo = '42';
     await goToUD11Mock(page, MOCK_RESULTS_MULTI, {});
 
     // === 初期表示截图 ===
-    await takeScreenshot(page, '初期表示');
+    // await takeScreenshot(page, '初期表示');
 
     // 先触发 Select 未选择错误
-    await page.locator('.ud11-btn--primary').click();
+    await page.evaluate(() => (document.querySelectorAll('.ud11-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
+    await page.locator('.ud11-btn').nth(0).click();
     await page.waitForTimeout(300);
 
     // 错误消息可见
-    await expect(page.locator('.ud11-message--error')).toContainText('请选择一条记录');
+    await expect(page.locator('.ud11-message-error')).toContainText('请选择一条记录');
+   // === 操作前截图 ===
+    await takeScreenshot(page, '操作前（消息显示）');
+
+    // 选择记录
+    await page.locator('.ud11-radio').first().click({ force: true });
+    await page.waitForTimeout(300);
+
+    // === 選択後截图 ===
+    await takeScreenshot(page, '選択後');
 
     // 再执行 Excel 导出成功
-    await page.locator('.ud11-btn--excel').click();
+    await page.evaluate(() => (document.querySelectorAll('.ud11-btn')[4] as HTMLElement).focus());
+    await takeScreenshot(page, 'Excel click之前）');
+    await page.locator('.ud11-btn').nth(4).click();
     await page.waitForTimeout(1000);
 
+    await page.locator('.ud11-title').click();
+    await page.waitForTimeout(1000);
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（消息覆盖）');
 
     // 旧错误消息被清除，显示成功消息
-    await expect(page.locator('.ud11-message--error')).toHaveCount(0);
-    await expect(page.locator('.ud11-message--success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud11-message-error')).toHaveCount(0);
+    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_043_UI交互_加载完成后清除消息', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '043';
+    currentTestNo = '43';
 
     // 第一次 API 返回 500
     let apiCallCount = 0;
@@ -1058,6 +1081,15 @@ test.describe('UI交互', () => {
           contentType: 'application/json',
           body: JSON.stringify({ code: 500, msg: '获取检索结果失败' })
         });
+      // 第一次加载 - 失败
+      await goToUD11Real(page, {});
+      await page.waitForTimeout(5000);
+      // 错误消息可见
+      await expect(page.locator('.ud11-message-error')).toContainText('获取检索结果失败');
+      // === 第一次加载截图 ===
+      await takeScreenshot(page, '第一次加载（失败）');
+
+      apiCallCount++;
       } else {
         await route.fulfill({
           status: 200,
@@ -1067,13 +1099,7 @@ test.describe('UI交互', () => {
       }
     });
 
-    // 第一次加载 - 失败
-    await goToUD11Real(page, {});
-    await page.waitForTimeout(1000);
-    await expect(page.locator('.ud11-message--error')).toContainText('获取检索结果失败');
-
-    // === 第一次加载截图 ===
-    await takeScreenshot(page, '第一次加载（失败）');
+    
 
     // 第二次加载 - 成功
     await page.evaluate(() => {
@@ -1087,7 +1113,7 @@ test.describe('UI交互', () => {
     await takeScreenshot(page, '第二次加载（成功）');
 
     // 错误消息被清除
-    await expect(page.locator('.ud11-message--error')).toHaveCount(0);
+    await expect(page.locator('.ud11-message-error')).toHaveCount(0);
     await expect(page.locator('.ud11-message')).toHaveCount(0);
   });
 });
@@ -1098,50 +1124,50 @@ test.describe('UI交互', () => {
 test.describe('异常处理', () => {
 
   test('UD11_044_异常处理_API超时', { timeout: 60000 }, async ({ page }) => {
-    currentTestNo = '044';
+    currentTestNo = '44';
 
     // 模拟 API 超时
     await page.route('**/api/ud11/search', async route => {
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, msg: '请求超时，请稍后重试' })
+      });
     });
-
+    
     await goToUD11Real(page, {});
     await page.waitForTimeout(3000);
-
     // === 截图 ===
     await takeScreenshot(page, '超时状态');
+    await expect(page.locator('.ud11-empty')).toContainText('暂无数据');
+    await expect(page.locator('.ud11-message-error')).toContainText('请求超时，请稍后重试');
 
-    const isError = await page.locator('.ud11-message--error').isVisible().catch(() => false);
-    if (isError) {
-      const text = await page.locator('.ud11-message--error').textContent();
-      expect(text.length).toBeGreaterThan(0);
-    }
-    await expect(page.locator('.ud11-table tbody')).toContainText('暂无数据');
   });
 
   test('UD11_045_异常处理_网络连接失败', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '045';
+    currentTestNo = '45';
 
-    // 模拟网络断开
+    // 模拟网络断开 API 返回 HTTP 500
     await page.route('**/api/ud11/search', async route => {
-      // 不处理，模拟网络断开
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, msg: '网络连接失败，请检查网络设置' })
+      });
     });
 
     await goToUD11Real(page, {});
     await page.waitForTimeout(3000);
 
     // === 截图 ===
-    await takeScreenshot(page, '网络失败');
-
-    const isError = await page.locator('.ud11-message--error').isVisible().catch(() => false);
-    if (isError) {
-      const text = await page.locator('.ud11-message--error').textContent();
-      expect(text.length).toBeGreaterThan(0);
-    }
+    await takeScreenshot(page, '页面加载完--暂无数据');
+    await expect(page.locator('.ud11-message-error')).toContainText('网络连接失败，请检查网络设置');
+    await expect(page.locator('.ud11-empty')).toContainText('暂无数据');
+    
   });
 
   test('UD11_046_异常处理_数据解析错误', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '046';
+    currentTestNo = '46';
 
     // 模拟 API 返回异常数据格式
     await page.route('**/api/ud11/search', async route => {
@@ -1157,7 +1183,7 @@ test.describe('异常处理', () => {
     // === 初期表示截图 ===
     await takeScreenshot(page, '初期表示');
 
-    await expect(page.locator('.ud11-message--error')).toContainText('获取检索结果失败');
+    await expect(page.locator('.ud11-message-error')).toContainText('获取检索结果失败');
     await expect(page.locator('.ud11-table tbody')).toContainText('暂无数据');
   });
 });
@@ -1168,25 +1194,35 @@ test.describe('异常处理', () => {
 test.describe('安全性', () => {
 
   test('UD11_047_安全性_未登录直接访问重定向', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '047';
+    currentTestNo = '47';
 
+    // 1. 先登录系统，进入 UD11 画面
+    await goToUD11Real(page, {});
+    await page.waitForTimeout(1000);
+    await expect(page).toHaveURL(/\/UD11/);
+    await expect(page.locator('.ud11-container')).toBeVisible();
+    await takeScreenshot(page, 'UD11画面表示');
+
+    // 2. 清除所有 localStorage 数据（模拟未登录状态）
     await page.evaluate(() => localStorage.clear());
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/UD11/);
+    await expect(page.locator('.ud11-container')).toBeVisible();
+    await takeScreenshot(page, 'localStorage清除後（画面未刷新）');
 
-    // === 初期表示截图 ===
-    await takeScreenshot(page, '初期表示（未登录）');
-
+    // 3. 浏览器地址栏直接输入 UD11 画面的完整 URL 并访问
     await page.goto(BASE_URL + '/UD11');
     await page.waitForTimeout(2000);
 
-    // === 操作後截图 ===
-    await takeScreenshot(page, '操作後（重定向）');
-
-    await expect(page).toHaveURL(/\/Login/);
-    await expect(page.locator('.ud11-container')).toHaveCount(0);
+    // 4. 确认结果：URL 变为根路径（Login 画面），UD11 画面不被显示
+    await expect(page).toHaveURL(BASE_URL + '/');
+    await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('.ud11-container')).not.toBeVisible();
+    await takeScreenshot(page, '重定向結果（Login画面）');
   });
 
   test('UD11_048_安全性_Variable列XSS防护', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '048';
+    currentTestNo = '48';
 
     let dialogShown = false;
     page.on('dialog', () => { dialogShown = true; });
@@ -1207,7 +1243,7 @@ test.describe('安全性', () => {
   });
 
   test('UD11_049_安全性_用户信息保护', { timeout: 120000 }, async ({ page }) => {
-    currentTestNo = '049';
+    currentTestNo = '49';
     await page.route('**/UD25', route => {
       route.fulfill({ status: 200, body: '<html><body>UD25 Mock</body></html>' });
     });

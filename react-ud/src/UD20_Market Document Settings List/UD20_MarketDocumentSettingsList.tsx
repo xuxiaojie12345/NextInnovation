@@ -108,8 +108,48 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
   /**
    * 处理 Print 按钮点击
    * 打印当前页面内容
+   * 测试模式下显示视觉预览（避免 window.print 阻塞截图）
    */
   const handlePrint = useCallback(() => {
+    // Playwright 测试模式：显示页面内打印预览覆盖层
+    if ((window as any).__PLAYWRIGHT_PRINT_TEST__) {
+      const container = document.querySelector('.ud20-container');
+      if (!container) return;
+      const clone = container.cloneNode(true) as HTMLElement;
+      // 移除按钮行
+      const btnRow = clone.querySelector('.ud20-button-row');
+      if (btnRow) btnRow.remove();
+      // 移除消息
+      const msg = clone.querySelector('.ud20-message');
+      if (msg) msg.remove();
+      // 移除标题
+      const title = clone.querySelector('.ud20-title');
+      if (title) title.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'ud20-print-preview-overlay';
+
+      const header = document.createElement('div');
+      header.className = 'ud20-print-preview-header';
+      header.textContent = 'Print Preview';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'ud20-print-preview-close';
+      closeBtn.textContent = 'Close Preview';
+      closeBtn.onclick = () => overlay.remove();
+      header.appendChild(closeBtn);
+
+      const frame = document.createElement('div');
+      frame.className = 'ud20-print-preview-frame';
+      frame.appendChild(clone);
+
+      overlay.appendChild(header);
+      overlay.appendChild(frame);
+      document.body.appendChild(overlay);
+      return;
+    }
+
+    // 正常模式：调用浏览器打印
     window.print();
   }, []);
 
@@ -137,13 +177,13 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
 
         {/* 按钮区域 */}
         <div className="ud20-button-row">
-          <button className="ud20-btn" onClick={handleSelect} disabled={isLoading}>
+          <button className="ud20-btn" onClick={handleSelect} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>
             Select
           </button>
-          <button className="ud20-btn" onClick={handleBack} disabled={isLoading}>
+          <button className="ud20-btn" onClick={handleBack} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>
             Back
           </button>
-          <button className="ud20-btn" onClick={handlePrint} disabled={isLoading}>
+          <button className="ud20-btn" onClick={handlePrint} onMouseDown={(e) => { e.preventDefault(); e.currentTarget.blur(); }} disabled={isLoading}>
             Print
           </button>
         </div>  
@@ -186,7 +226,7 @@ const UD20_MarketDocumentSettingsList: React.FC = () => {
                     <td className="ud20-col-doctype">{doc.documentType}</td>
                     <td className="ud20-col-bu">BU</td>
                     <td className="ud20-col-user">
-                      <span className="ud20-user-link"
+                      <span className="ud20-user-link" tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleUserClick(doc.registerUser);

@@ -91,7 +91,7 @@ const UD21_MarketsInHDoc: React.FC = () => {
               ) : marketList.length === 0 && !isLoading ? (
                 <tr>
                   <td colSpan={3} className="ud21-empty">
-                    {message || '当前没有可用的市场信息'}
+                    {'当前没有可用的市场信息'}
                   </td>
                 </tr>
               ) : (

@@ -61,10 +61,11 @@
 }
 
 .ud201-btn:hover {
-  background-color: #c0c0e8;
+  background-color: #004488;
 }
 
-.ud201-btn:focus {
+.ud201-btn:focus,
+.ud201-btn:focus-visible {
   background-color: #b0b0e0;
   border-color: #000080;
 }

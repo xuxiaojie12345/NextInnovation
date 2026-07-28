@@ -485,9 +485,16 @@ test.describe('Search按钮操作', () => {
 
     // 所有字段为空
     // 点击 Search 按钮
+    // 将焦点移到 Search 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Searchボタン押下');
     const searchBtn = page.locator('.ud201-btn').nth(0);
     await searchBtn.click();
     await page.waitForTimeout(1000);
+    // 移开鼠标避免 UD20 按钮显示 hover 样式
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
 
     // 1. 画面跳转到 UD20（/UD20）
     await takeScreenshot(page, '操作後');
@@ -510,9 +517,16 @@ test.describe('Search按钮操作', () => {
     await page.locator('.ud201-input').nth(2).fill('661234');
 
     // 3. 点击 Search 按钮
+    // 将焦点移到 Search 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Searchボタン押下');
     const searchBtn = page.locator('.ud201-btn').nth(0);
     await searchBtn.click();
     await page.waitForTimeout(1000);
+    // 移开鼠标避免 UD20 按钮显示 hover 样式
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
 
     // 4. 画面跳转到 UD20
     await takeScreenshot(page, '操作後');
@@ -533,9 +547,16 @@ test.describe('Search按钮操作', () => {
     await takeScreenshot(page, '入力後');
 
     // 3. 点击 Search 按钮
+    // 将焦点移到 Search 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Searchボタン押下');
     const searchBtn = page.locator('.ud201-btn').nth(0);
     await searchBtn.click();
     await page.waitForTimeout(1000);
+    // 移开鼠标避免 UD20 按钮显示 hover 样式
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
 
     // 4. 画面跳转到 UD20
     await takeScreenshot(page, '操作後');
@@ -557,20 +578,28 @@ test.describe('Clear按钮操作', () => {
 
     // 1. 输入各种值
     await page.locator('.ud201-input').nth(0).fill('CERTIFICATE');
+    await page.locator('.ud201-input').nth(1).fill('ABCDE');
     await page.locator('.ud201-input').nth(2).fill('661234');
     await page.locator('.ud201-input').nth(3).fill('2026-06-28');
 
     // 2. 修改比较运算符为 ≠
     await page.locator('.ud201-compare-select').nth(0).selectOption('!=');
+    await page.locator('.ud201-compare-select').nth(1).selectOption('!=');
     await page.locator('.ud201-compare-select').nth(2).selectOption('!=');
     await page.locator('.ud201-compare-select').nth(3).selectOption('lt');
 
     await takeScreenshot(page, '入力後');
 
     // 3. 点击 Clear 按钮
+    // 将焦点移到 Clear 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[1] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Clearボタン押下');
     const clearBtn = page.locator('.ud201-btn').nth(1);
     await clearBtn.click();
     await page.waitForTimeout(500);
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
 
     // 4. 确认结果
     // Document type 输入框被清空
@@ -586,9 +615,7 @@ test.describe('Clear按钮操作', () => {
     await expect(page.locator('.ud201-compare-select').nth(3)).toHaveValue('=');
     // Bussines unit 保持 BU
     await expect(page.locator('.ud201-input').nth(1)).toHaveValue('BU');
-    // 消息区域被清空（如有旧消息）
-    await expect(page.locator('.ud201-message')).not.toBeVisible();
-
+    
     await takeScreenshot(page, '操作後');
   });
 
@@ -597,17 +624,52 @@ test.describe('Clear按钮操作', () => {
     await goToUD201(page);
     await takeScreenshot(page, '初期表示');
 
-    // 所有字段保持为空
+    // Document type 为空
+    // 点击 Update Mode 按钮
+    // 将焦点移到 Update Mode 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[3] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'UpdateModeボタン押下');
+    const updateBtn = page.locator('.ud201-btn').nth(3);
+    await updateBtn.click();
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, 'UpdateModeボタン押下後');
+
+    // 1. 输入各种值
+    await page.locator('.ud201-input').nth(1).fill('ABCDE');
+    await page.locator('.ud201-input').nth(2).fill('661234');
+    await page.locator('.ud201-input').nth(3).fill('2026-06-28');
+
+    // 2. 修改比较运算符为 ≠
+    await page.locator('.ud201-compare-select').nth(0).selectOption('!=');
+    await page.locator('.ud201-compare-select').nth(1).selectOption('!=');
+    await page.locator('.ud201-compare-select').nth(2).selectOption('!=');
+    await page.locator('.ud201-compare-select').nth(3).selectOption('lt');
+
+    await takeScreenshot(page, '入力後');
+    // 将焦点移到 Clear 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[1] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Clearボタン押下');
+    
     // 点击 Clear 按钮
     const clearBtn = page.locator('.ud201-btn').nth(1);
     await clearBtn.click();
     await page.waitForTimeout(500);
 
-    // 1. 各字段保持为空状态
-    await expect(page.locator('.ud201-input').nth(0)).toHaveValue('');
+    // 1. Bussines unit 保持 BU
+    await expect(page.locator('.ud201-input').nth(1)).toHaveValue('BU');
+    // 2. 各字段保持为空状态
+    // User 输入框被清空
     await expect(page.locator('.ud201-input').nth(2)).toHaveValue('');
+    // Date 输入框被清空
     await expect(page.locator('.ud201-input').nth(3)).toHaveValue('');
-    // 2. 无报错信息
+    // 所有比较运算符恢复为 =
+    await expect(page.locator('.ud201-compare-select').nth(0)).toHaveValue('=');
+    await expect(page.locator('.ud201-compare-select').nth(1)).toHaveValue('=');
+    await expect(page.locator('.ud201-compare-select').nth(2)).toHaveValue('=');
+    await expect(page.locator('.ud201-compare-select').nth(3)).toHaveValue('=');
+    // 3. 无报错信息
     await expect(page.locator('.ud201-message')).not.toBeVisible();
 
     await takeScreenshot(page, '操作後');
@@ -626,6 +688,10 @@ test.describe('Back按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back 按钮
+    // 将焦点移到 Back 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[2] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Backボタン押下');
     const backBtn = page.locator('.ud201-btn').nth(2);
     await backBtn.click();
     await page.waitForTimeout(1000);
@@ -650,6 +716,10 @@ test.describe('UpdateMode按钮操作', () => {
 
     // Document type 为空
     // 点击 Update Mode 按钮
+    // 将焦点移到 Update Mode 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[3] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'UpdateModeボタン押下');
     const updateBtn = page.locator('.ud201-btn').nth(3);
     await updateBtn.click();
     await page.waitForTimeout(500);
@@ -674,6 +744,10 @@ test.describe('UpdateMode按钮操作', () => {
     await takeScreenshot(page, '入力後');
 
     // 2. 点击 Update Mode 按钮
+    // 将焦点移到 Update Mode 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[3] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'UpdateModeボタン押下');
     const updateBtn = page.locator('.ud201-btn').nth(3);
     await updateBtn.click();
     await page.waitForTimeout(2000);
@@ -700,6 +774,10 @@ test.describe('UpdateMode按钮操作', () => {
     await takeScreenshot(page, '入力後');
 
     // 2. 点击 Update Mode 按钮
+    // 将焦点移到 Update Mode 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[3] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'UpdateModeボタン押下');
     const updateBtn = page.locator('.ud201-btn').nth(3);
     await updateBtn.click();
     await page.waitForTimeout(2000);
@@ -733,6 +811,10 @@ test.describe('UpdateMode按钮操作', () => {
     await takeScreenshot(page, '入力後');
 
     // 2. 点击 Update Mode 按钮
+    // 将焦点移到 Update Mode 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud201-btn')[3] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'UpdateModeボタン押下');
     const updateBtn = page.locator('.ud201-btn').nth(3);
     await updateBtn.click();
     await page.waitForTimeout(1000);

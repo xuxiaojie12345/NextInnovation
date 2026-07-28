@@ -469,6 +469,10 @@ test.describe('Select按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 未选择任何记录，直接点击 Select 按钮
+    // 将焦点移到 Select 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
     const selectBtn = page.locator('.ud20-btn').nth(0);
     await selectBtn.click();
     await page.waitForTimeout(500);
@@ -499,6 +503,10 @@ test.describe('Select按钮操作', () => {
     await takeScreenshot(page, '入力後');
 
     // 点击 Select 按钮
+    // 将焦点移到 Select 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
     const selectBtn = page.locator('.ud20-btn').nth(0);
     await selectBtn.click();
     await page.waitForTimeout(1000);
@@ -527,6 +535,10 @@ test.describe('Select按钮操作', () => {
       await takeScreenshot(page, '入力後');
 
       // 点击 Select 按钮
+      // 将焦点移到 Select 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-btn')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタン押下');
       const selectBtn = page.locator('.ud20-btn').nth(0);
       await selectBtn.click();
       await page.waitForTimeout(1000);
@@ -551,6 +563,10 @@ test.describe('Back按钮操作', () => {
     await takeScreenshot(page, '初期表示');
 
     // 点击 Back 按钮
+    // 将焦点移到 Back 按钮，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-btn')[1] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Backボタン押下');
     const backBtn = page.locator('.ud20-btn').nth(1);
     await backBtn.click();
     await page.waitForTimeout(1000);
@@ -573,14 +589,25 @@ test.describe('Print按钮操作', () => {
     await page.waitForTimeout(1500);
     await takeScreenshot(page, '初期表示');
 
-    // 点击 Print 按钮
-    const printBtn = page.locator('.ud20-btn').nth(2);
-    await printBtn.click().catch(() => {});
-    await page.waitForTimeout(500);
+    // 点击 Print 按钮（将焦点移到 Print 按钮，截图后点击）
+    await page.evaluate(() => (document.querySelectorAll('.ud20-btn')[2] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Printボタン押下');
+    // 设置测试模式标志：handlePrint 会显示页面内打印预览覆盖层（不阻塞）
+    await page.evaluate(() => { (window as any).__PLAYWRIGHT_PRINT_TEST__ = true; });
+    await page.locator('.ud20-btn').nth(2).click({ force: true });
+    await page.waitForTimeout(800);
     await takeScreenshot(page, '操作後');
 
-    // 页面应仍然在 UD20
+    // 关闭预览覆盖层
+    await page.locator('.ud20-print-preview-close').click();
+    await page.waitForTimeout(500);
+
+    // 不显示错误消息
+    await expect(page.locator('.ud20-message')).not.toBeVisible();
+    // 页面 URL 仍为 UD20
     await expect(page).toHaveURL(/\/UD20/);
+
   });
 
 });
@@ -599,9 +626,15 @@ test.describe('User链接操作', () => {
     // 等待行加载
     await page.waitForSelector('.ud20-table tbody .ud20-row', { timeout: 10000 });
 
-    // 点击第1行 User 列的链接
-    const firstUserLink = page.locator('.ud20-table tbody .ud20-row').first().locator('.ud20-user-link');
-    await firstUserLink.click();
+    // 点击第3行（admin） User 列的链接
+    const targetRow = page.locator('.ud20-table tbody .ud20-row').nth(2);
+    const userLink = targetRow.locator('.ud20-user-link');
+    await expect(userLink).toHaveText('admin');
+    // 将焦点移到 User 链接，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-user-link')[2] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Userリンク焦点');
+    await userLink.click();
     await page.waitForTimeout(1500);
     await takeScreenshot(page, '操作後');
 
@@ -618,19 +651,20 @@ test.describe('User链接操作', () => {
     // 等待行加载
     await page.waitForSelector('.ud20-table tbody .ud20-row', { timeout: 10000 });
 
-    // 点击某行的 User 链接
-    const rows = page.locator('.ud20-table tbody .ud20-row');
-    const rowCount = await rows.count();
-    for (let i = 0; i < rowCount; i++) {
-      const userLink = rows.nth(i).locator('.ud20-user-link');
-      if (await userLink.isVisible().catch(() => false)) {
-        await userLink.click();
-        await page.waitForTimeout(1500);
-        await takeScreenshot(page, '操作後');
-        await expect(page).toHaveURL(/\/UD25/);
-        break;
-      }
-    }
+    // 点击 user01 所在行的 User 链接
+    const targetRow = page.locator('.ud20-table tbody .ud20-row').filter({ hasText: 'user01' });
+    const userLink = targetRow.locator('.ud20-user-link');
+    await expect(userLink).toHaveText('user01');
+    // 将焦点移到 User 链接，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-user-link')[4] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Userリンク焦点');
+    await userLink.click();
+    await page.waitForTimeout(1500);
+    await takeScreenshot(page, '操作後');
+
+    // 画面迁移到 UD25
+    await expect(page).toHaveURL(/\/UD25/);
   });
 
   test('UD20_021_User链接_点击不重复选择行', { timeout: 120000 }, async ({ page }) => {
@@ -648,19 +682,21 @@ test.describe('User链接操作', () => {
     await page.waitForTimeout(300);
     await takeScreenshot(page, '入力後');
 
-    // 点击 User 链接（某行的User链接）
-    const rows = page.locator('.ud20-table tbody .ud20-row');
-    const rowCount = await rows.count();
-    for (let i = 0; i < rowCount; i++) {
-      const userLink = rows.nth(i).locator('.ud20-user-link');
-      if (await userLink.isVisible().catch(() => false)) {
-        await userLink.click();
-        await page.waitForTimeout(1500);
-        await takeScreenshot(page, '操作後');
-        await expect(page).toHaveURL(/\/UD25/);
-        break;
-      }
-    }
+    // 点击第3行（admin） User 列的链接
+    const targetRow = page.locator('.ud20-table tbody .ud20-row').nth(2);
+    const userLink = targetRow.locator('.ud20-user-link');
+    await expect(userLink).toHaveText('admin');
+    await expect(targetRow.locator('input[type="radio"]')).not.toBeChecked();
+    // 将焦点移到 User 链接，截图后点击
+    await page.evaluate(() => (document.querySelectorAll('.ud20-user-link')[2] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Userリンク焦点');
+    await userLink.click();
+    await page.waitForTimeout(1500);
+    await takeScreenshot(page, '操作後');
+
+    // 画面迁移到 UD25
+    await expect(page).toHaveURL(/\/UD25/);
   });
 
 });
@@ -866,7 +902,14 @@ test.describe('异常处理', () => {
   test('UD20_029_异常处理_获取用户信息失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '029';
 
-    // 模拟 UD25 API 返回 500
+    await goToUD20(page);
+    await page.waitForTimeout(1500);
+    await takeScreenshot(page, '初期表示');
+
+    // 等待行加载
+    await page.waitForSelector('.ud20-table tbody .ud20-row', { timeout: 10000 });
+
+    // 模拟 UD25 API 返回 500（在登录完成后设置，避免影响登录认证）
     await page.route('**/api/ud01/authentication*', async (route) => {
       await route.fulfill({
         status: 500,
@@ -874,13 +917,6 @@ test.describe('异常处理', () => {
         body: JSON.stringify({ code: 500, message: '获取用户信息失败，请稍后重试' }),
       });
     });
-
-    await goToUD20(page);
-    await page.waitForTimeout(1500);
-    await takeScreenshot(page, '初期表示');
-
-    // 等待行加载
-    await page.waitForSelector('.ud20-table tbody .ud20-row', { timeout: 10000 });
 
     // 点击 User 链接
     const firstUserLink = page.locator('.ud20-table tbody .ud20-row').first().locator('.ud20-user-link');
@@ -902,9 +938,9 @@ test.describe('异常处理', () => {
     await page.waitForTimeout(1500);
     await takeScreenshot(page, '初期表示');
 
-    // 点击 Print 按钮
-    const printBtn = page.locator('.ud20-btn').nth(2);
-    await printBtn.click().catch(() => {});
+    // 点击 Print 按钮（先覆写 window.print 阻止原生打印对话框）
+    await page.evaluate(() => { window.print = () => {}; });
+    await page.locator('.ud20-btn').nth(2).click({ force: true });
     await page.waitForTimeout(500);
     await takeScreenshot(page, '操作後');
 

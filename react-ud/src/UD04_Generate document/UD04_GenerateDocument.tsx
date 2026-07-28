@@ -352,7 +352,6 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* Analyze Rules */}
             <div className='result-item'>
-              <label className='result-label'>Analyze Rules:</label>
               <span  className='result-value link-blue' onClick={handleAnalyzeRulesClick} style={{ cursor: 'pointer' }} >
                 Analyze Rules
               </span>

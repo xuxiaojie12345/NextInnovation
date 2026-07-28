@@ -16,24 +16,6 @@ const SCREENSHOT_ROOT = path.resolve(__dirname, 'Image', 'UD21');
 const REAL_USER = 'admin';
 const REAL_PASS = 'admin123';
 
-// DB: MARKET_MASTER 表实际数据（15条记录）
-// -EU / Europe
-// AF / Africa
-// AS / Asia
-// AUS / Australia
-// CHN / China
-// EUR / Europe
-// JPN / Japan
-// M19 / M19A Description
-// NA / North America
-// SA / South America
-// USA / United States
-// UT1 / UT12_JPN Description
-// X1 / A1
-// X2 / A2
-// X3 / A3
-
-
 /**
  * 截图（JPEG，从001开始编号）
  */
@@ -326,7 +308,7 @@ test.describe('异常处理', () => {
   test('UD21_010_异常处理_API失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '010';
 
-    // 模拟 API 返回非 200 状态码
+    // 模拟 API 返回业务状态码非 200
     await page.route('**/api/ud19/getmarket', async (route) => {
       await route.fulfill({
         status: 200,

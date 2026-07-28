@@ -25,22 +25,16 @@
   border: 1px solid transparent;
 }
 
-.ud11-message--success {
+.ud11-message-success {
   background-color: #f6ffed;
   border-color: #b7eb8f;
   color: #52c41a;
 }
 
-.ud11-message--error {
+.ud11-message-error {
   background-color: #fff2f0;
   border-color: #ffccc7;
   color: #ff4d4f;
-}
-
-.ud11-message--info {
-  background-color: #e6f7ff;
-  border-color: #91d5ff;
-  color: #1890ff;
 }
 
 /* ---------- 主内容区域 ---------- */
@@ -79,8 +73,21 @@
   min-width: 70px;
 }
 
-.ud11-btn:hover { opacity: 0.85; }
-.ud11-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ud11-btn:hover { 
+  opacity: 0.85; 
+  background-color: #004488;
+}
+
+.ud11-btn:focus,
+.ud11-btn:focus-visible {
+  background-color: #b0b0e0;
+  border-color: #000080;
+}
+
+.ud11-btn:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+}
 
 /* ---------- 表格容器 ---------- */
 .ud11-table-wrapper {
@@ -107,7 +114,6 @@
   z-index: 1;
 }
 
-
 .ud11-table td {
   padding: 6px 10px;
   border: 1px solid #e8e8e8;
@@ -123,6 +129,14 @@
   background-color: #bae7ff;
 }
 
+/* 加载中和空数据提示 */
+.ud11-loading,
+.ud11-empty {
+  text-align: center;
+  padding: 20px 0;
+  color: #999;
+  font-size: 14px;
+}
 /* Radio */
 .ud11-radio {
   width: 16px;

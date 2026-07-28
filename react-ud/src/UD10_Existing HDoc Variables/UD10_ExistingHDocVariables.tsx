@@ -49,12 +49,12 @@ const UD10_ExistingHDocVariables: React.FC = () => {
   /**
    * 格式化日期为 yyyy-MM-DD 格式
    */
-  const formatDate = (date: Date): string => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
+  // const formatDate = (date: Date): string => {
+  //   const y = date.getFullYear();
+  //   const m = String(date.getMonth() + 1).padStart(2, '0');
+  //   const d = String(date.getDate()).padStart(2, '0');
+  //   return `${y}-${m}-${d}`;
+  // };
 
   /**
    * 从UD11返回时，根据返回类型处理数据填充
@@ -194,8 +194,8 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       if (response.data && response.data.code === 200) {
         setMessage('添加成功');
         setMessageType('success');
-        setDisplayCreatedByUser(currentUser);
-        setDisplayDate(formatDate(now));
+        // setDisplayCreatedByUser(currentUser);
+        // setDisplayDate(formatDate(now));
         setVariable('');
         setType('');
         setDescription('');
@@ -234,7 +234,7 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       if (response.data && response.data.code === 200) {
         setMessage('更新成功');
         setMessageType('success');
-        setDisplayDate(formatDate(now));
+        // setDisplayDate(formatDate(now));
       } else {
         setMessage(response.data?.message || '更新失败');
         setMessageType('error');
@@ -259,11 +259,11 @@ const UD10_ExistingHDocVariables: React.FC = () => {
       const response = await apiClient.post('/api/ud10/delete', {
         variable: variable.trim(),
       });
-
       if (response.data && response.data.code === 200) {
+        // 先清空输入表单，再显示成功消息（避免 handleClear 清空 message）
+        handleClear();
         setMessage('删除成功');
         setMessageType('success');
-        handleClear();
       } else {
         setMessage(response.data?.message || '删除失败');
         setMessageType('error');

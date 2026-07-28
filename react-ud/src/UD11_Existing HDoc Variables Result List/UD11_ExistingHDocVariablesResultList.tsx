@@ -76,9 +76,18 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
           setMessage(response.data?.msg || '获取检索结果失败');
           setMessageType('error');
         }
-      } catch (error) {
+      } catch (error: any) {
         setResults([]);
-        setMessage('获取检索结果失败');
+        // 按详细设计5.异常处理区分错误类型
+        if (error.code === 'ECONNABORTED') {
+          setMessage('请求超时，请稍后重试');
+        } else if (error.response) {
+          setMessage(error.response.data?.msg || '获取检索结果失败');
+        } else if (error.message && error.message.includes('Network')) {
+          setMessage('网络连接失败，请检查网络设置');
+        } else {
+          setMessage('获取检索结果失败');
+        }
         setMessageType('error');
       } finally {
         setIsLoading(false);
@@ -210,7 +219,7 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
       <div className="ud11-title">Existing HDoc Variables</div>
 
       {message && (
-        <div className={`ud11-message ud11-message--${messageType}`}>
+        <div className={`ud11-message ud13-message-${messageType}`}>
           {message}
         </div>
       )}
@@ -218,17 +227,15 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
       <div className="ud11-content">
         {/* 按钮行 */}
         <div className="ud11-button-row">
-          <button className="ud11-btn ud11-btn--primary" onClick={handleSelect} disabled={isLoading}>Select</button>
-          <button className="ud11-btn ud11-btn--default" onClick={handleDown} disabled={isLoading}>Down</button>
-          <button className="ud11-btn ud11-btn--default" onClick={handleBack} disabled={isLoading}>Back</button>
-          <button className="ud11-btn ud11-btn--default" onClick={handlePrint} disabled={isLoading}>Print</button>
-          <button className="ud11-btn ud11-btn--excel" onClick={handleExcel} disabled={isLoading}>Excel</button>
+          <button className="ud11-btn" onClick={handleSelect} disabled={isLoading}>Select</button>
+          <button className="ud11-btn" onClick={handleDown} disabled={isLoading}>Down</button>
+          <button className="ud11-btn" onClick={handleBack} disabled={isLoading}>Back</button>
+          <button className="ud11-btn" onClick={handlePrint} disabled={isLoading}>Print</button>
+          <button className="ud11-btn" onClick={handleExcel} disabled={isLoading}>Excel</button>
         </div>
 
         {/* 表格 */}
-        {isLoading ? (
-          <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>加载中...</div>
-        ) : (
+        
           <div className="ud11-table-wrapper">
             <table className="ud11-table">
               <thead>
@@ -242,11 +249,16 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {results.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '20px', color: '#999' }}>暂无数据</td>
-                  </tr>
-                ) : (
+                
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="ud11-loading">加载中...</td>
+                </tr>
+              ) : results.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="ud11-empty">暂无数据</td>
+                </tr>
+              ) : (
                   results.map((record, index) => (
                     <tr key={`${record.variable}-${index}`}
                       className={selectedIndex === index ? 'ud11-row--selected' : ''}
@@ -254,7 +266,8 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
                       <td className="ud11-td--center">
                         <input type="radio" name="ud11-selection" className="ud11-radio"
                           checked={selectedIndex === index}
-                          onChange={() => handleRadioChange(index)}
+                          onClick={() => handleRadioChange(index)}
+                          readOnly
                         />
                       </td>
                       <td>{record.variable}</td>
@@ -272,11 +285,12 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
                       <td>{record.registerDatetime}</td>
                     </tr>
                   ))
-                )}
+                )
+                }
               </tbody>
             </table>
           </div>
-        )}
+        
         
         {/* 件数 */}
         <div className="ud11-count">Number of lines found: {count}</div>

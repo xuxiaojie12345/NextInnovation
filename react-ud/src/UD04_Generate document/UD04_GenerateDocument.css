@@ -33,6 +33,7 @@
   color: #1890ff;
   text-decoration: underline;
   transition: color 0.2s;
+  text-align: left;
 }
 .ud04-container .result-value-GeneratedDocument{
   font-weight: bold;
@@ -114,6 +115,7 @@
   color: #333;
   font-size: 14px;
   padding-right: 10px;
+  text-align: left;
 }
 .ud04-container .result-label-ReplacingParameters {
   flex: 0 0 200px;
@@ -128,6 +130,7 @@
   color: #333;
   font-size: 14px;
   padding-right: 10px;
+  text-align: left;
 }
 
 .ud04-container .result-value {
