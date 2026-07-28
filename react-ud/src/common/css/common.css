@@ -35,6 +35,30 @@
 }
 
 @media print {
+
+  .ehvr-table-wrapper {
+    max-height: unset !important;
+    overflow: visible !important;
+  }
+  .ehvr-table thead th {
+    position: static !important;
+  }
+  /* 防止行被分页截断 */
+  .ehvr-table tbody tr {
+    page-break-inside: avoid;
+  }
+
+   /* 打印时移除高度限制，取消滚动 */
+  .hv-result-table-wrapper {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* 打印取消表头sticky，部分打印机不支持sticky */
+  .hv-result-table thead th {
+    position: static !important;
+  }
+
   .no-print {
     display: none !important;
   }

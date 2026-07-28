@@ -10,6 +10,8 @@
 .ehvr-table-wrapper {
   overflow-x: auto;
   margin: 10px;
+  max-height: 605px;
+  overflow-y: auto;
 }
 
 .ehvr-table {
@@ -30,6 +32,7 @@
   position: sticky;
   top: 0;
   min-width: 90px;
+  background-color: white; 
 }
 
 .ehvr-th-noborder {

@@ -124,7 +124,7 @@ const ModifyDocument: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="modify-doc-loading">Loading...</div>;
+    return <div className="modify-doc-loading modify-doc-container">Loading...</div>;
   }
 
   if (errorMessage && variables.length === 0) {

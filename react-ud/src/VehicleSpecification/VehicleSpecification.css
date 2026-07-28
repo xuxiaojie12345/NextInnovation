@@ -8,6 +8,7 @@
 }
 
 .vs-loading {
+  max-width: 760px;
   padding: 40px 0;
   text-align: center;
   color: #888;

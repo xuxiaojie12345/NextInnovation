@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Login.css";
-import { LoginRequest, LoginResponse } from "./Login.types";
+import { LoginRequest } from "./Login.types";
 import { api } from "../services/api";
 
 const Login: React.FC = () => {

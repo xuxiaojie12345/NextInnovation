@@ -168,7 +168,7 @@ const VehicleSpecification: React.FC = () => {
         <div className="vs-symbol-list">
           {data.kolaList.map((kola, idx) => (
             <div key={idx} className="vs-symbol-item">
-              <Tooltip title={kola.description} placement="bottom">
+              <Tooltip title={kola.description} placement="bottomLeft">
                 <span className="td-symbol">{kola.symbol}</span>
               </Tooltip>
             </div>
@@ -179,7 +179,7 @@ const VehicleSpecification: React.FC = () => {
       )}
 
       {/* S-Note 信息 */}
-      <div style={{ height: "30px" }} />
+      <div style={{ height: "40px" }} />
       <div className="vs-footer">
         <strong>S-Note NO: </strong>
         <span className="vs-link-text" onClick={() => {}}>
