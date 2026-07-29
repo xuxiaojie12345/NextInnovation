@@ -288,7 +288,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
 
             {/* Build week */}
@@ -317,7 +317,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
 
             {/* S-Note NO */}
@@ -336,7 +336,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
             
             {/* Load Index */}
@@ -347,7 +347,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
 
             {/* Analyze Rules */}
@@ -359,7 +359,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
 
             {/* Modify Doc Link */}
@@ -389,7 +389,7 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
             
             {/* Generated document */}
@@ -401,12 +401,12 @@ const UD04_GenerateDocument: React.FC = () => {
 
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
             
             {/* 空白行 */}
             <div className='result-item'>
-              <label className='result-label'></label>
+              <label className='result-space'></label>
             </div>
             
             {/* Date */}

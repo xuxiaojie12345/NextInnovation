@@ -432,92 +432,132 @@ test.describe('画面初期表示', () => {
   test('UD08_017_画面初始化_从UD09 Select返回时回填数据', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '017';
     await goToUD08(page);
-    // 先清空
-    // 模拟从 UD09 Select 返回
-    await page.evaluate(() => {
-      window.history.replaceState({
-        selectedRecord: {
-          productClass: '01',
-          number: '11',
-          market: '-EU',
-          variable: '1001',
-          value: '111',
-          variantString1: '222',
-          variantString2: '333',
-          comments: '4445',
-          addDate: '202607',
-          deleteDate: '202606',
-          createdByUser: 'user02',
-          date: '2026-07-02'
-        }
-      }, '', '/UD08');
-    });
-    await page.reload();
-    await page.waitForSelector('.ud08-container');
+    await takeScreenshot(page, '初期表示');
+
+    // 在 Created by user 字段输入 'user01'
+    await page.locator(fieldInput(11)).fill('user01');
+    await takeScreenshot(page, '入力後（user01）');
+
+    // 聚焦 Search 按钮后截图
+    await page.evaluate(() => (document.querySelector('.ud08-btn--search') as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Searchボタンフォーカス');
+
+    // 点击 Search 按钮，迁移到 UD09（使用真实 API）
+    await page.locator('.ud08-btn--search').click();
     await page.waitForTimeout(2000);
 
-    await takeScreenshot(page, '初期表示（Select回填）');
+    // 等待 UD09 画面加载完成
+    await page.waitForSelector('.ud09-container', { timeout: 15000 });
+    // 移开焦点，确保截图无聚焦样式
+    await page.evaluate(() => document.body.focus());
+    await takeScreenshot(page, 'UD09画面表示');
+    
+    // 选择第一条记录的 Radio button
+    await page.locator('.ud09-radio').first().click();
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, 'UD09選択後');
 
-    // 确认回填数据
+    // 聚焦 Select 按钮后截图
+    await page.evaluate(() => (document.querySelector('button.ud09-btn--primary') as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Selectボタンフォーカス');
+
+    // 点击 Select 按钮，返回 UD08
+    await page.locator('button.ud09-btn--primary').click();
+    await page.waitForTimeout(1000);
+
+    // 返回 UD08，等待下拉列表加载完成且回填数据生效
+    await page.waitForSelector('.ud08-container');
+    await page.waitForFunction(() => {
+      const pcSelect = document.querySelector('.ud08-content > .ud08-search-row:nth-child(2) .ud08-select') as HTMLSelectElement;
+      if (!pcSelect) return false;
+      return pcSelect.value === '01';
+    }, { timeout: 15000 });
+
+    // 移开焦点，确保截图无聚焦样式
+    await page.evaluate(() => document.body.focus());
+    // await page.locator('.ud08-title').focus();
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, 'UD08回填結果');
+
+    // 确认回填数据（使用真实 API，验证主键字段回填正确）
     await expect(page.locator(fieldSelect(1))).toHaveValue('01');
-    await expect(page.locator(fieldInput(2))).toHaveValue('11');
-    await expect(page.locator(fieldSelect(3))).toHaveValue('-EU');
-    await expect(page.locator(fieldInput(4))).toHaveValue('1001');
-    await expect(page.locator(fieldInput(5))).toHaveValue('111');
-    await expect(page.locator(fieldInput(6))).toHaveValue('222');
-    await expect(page.locator(fieldInput(7))).toHaveValue('333');
-    await expect(page.locator(fieldInput(8))).toHaveValue('4445');
+    await expect(page.locator(fieldInput(2))).toHaveValue('38111');
+    await expect(page.locator(fieldSelect(3))).toHaveValue('CHN');
+    await expect(page.locator(fieldInput(4))).toHaveValue('TEMPLATE-VAR');
+    await expect(page.locator(fieldInput(5))).toHaveValue('000');
+    await expect(page.locator(fieldInput(6))).toHaveValue('111');
+    await expect(page.locator(fieldInput(7))).toHaveValue('222');
+    await expect(page.locator(fieldInput(8))).toHaveValue('333');
     await expect(page.locator(fieldInput(9))).toHaveValue('202607');
-    await expect(page.locator(fieldInput(10))).toHaveValue('202606');
-    await expect(page.locator(fieldInput(11))).toHaveValue('user02');
-    await expect(page.locator(fieldInput(12))).toHaveValue('2026-07-02');
+    await expect(page.locator(fieldInput(10))).toHaveValue('');
+    await expect(page.locator(fieldInput(11))).toHaveValue('user01');
+    await expect(page.locator(fieldInput(12))).toHaveValue('2026-07-16');
   });
 
   test('UD08_018_画面初始化_从UD09 Back返回时保留跳转前数据', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '018';
-    await goToUD08(page);
 
-    // 模拟从 UD09 Back 返回
-    await page.evaluate(() => {
-      window.history.replaceState({
-        backFormData: {
-          productClass: '02',
-          productClassOp: '=',
-          number: '22',
-          numberOp: '=',
-          market: 'AUS',
-          marketOp: '=',
-          variable: '',
-          variableOp: '=',
-          value: '',
-          valueOp: '=',
-          variantString1: '',
-          variantString1Op: '=',
-          variantString2: '',
-          variantString2Op: '=',
-          comments: '',
-          commentsOp: '=',
-          displayAddDate: '',
-          addDateOp: '=',
-          displayDeleteDate: '',
-          deleteDateOp: '=',
-          displayCreatedByUser: '',
-          createdByUserOp: '=',
-          displayDate: '',
-          registerDatetimeOp: '='
-        }
-      }, '', '/UD08');
-    });
-    await page.reload();
-    await page.waitForSelector('.ud08-container');
+    await goToUD08(page);
+    await takeScreenshot(page, '初期表示');
+
+    // 等待 Product class 下拉列表加载完成
+    await page.waitForFunction(() => {
+      const pcSelect = document.querySelector('.ud08-content > .ud08-search-row:nth-child(2) .ud08-select') as HTMLSelectElement;
+      return pcSelect && pcSelect.options.length > 0;
+    }, { timeout: 15000 });
+
+    // 输入 Product class=04
+    await page.locator(fieldSelect(1)).selectOption('04');
+    // 输入 Number=12
+    await page.locator(fieldInput(2)).fill('12');
+
+    // 等待 Market 下拉列表加载完成
+    await page.waitForFunction(() => {
+      const marketSelect = document.querySelector('.ud08-content > .ud08-search-row:nth-child(4) .ud08-select') as HTMLSelectElement;
+      return marketSelect && marketSelect.options.length > 0;
+    }, { timeout: 15000 });
+
+    // 输入 Market=EUR
+    await page.locator(fieldSelect(3)).selectOption('EUR');
+    await takeScreenshot(page, '入力後');
+
+    // 点击 Search 按钮，迁移到 UD09（使用真实 API）
+    await page.locator('.ud08-btn--search').click();
     await page.waitForTimeout(2000);
 
-    await takeScreenshot(page, '初期表示（Back恢复）');
+    // 等待 UD09 画面加载完成
+    await page.waitForSelector('.ud09-container', { timeout: 15000 });
+    await takeScreenshot(page, 'UD09画面表示');
 
-    // 确认数据保持
-    await expect(page.locator(fieldSelect(1))).toHaveValue('02');
-    await expect(page.locator(fieldInput(2))).toHaveValue('22');
-    await expect(page.locator(fieldSelect(3))).toHaveValue('AUS');
+    // 聚焦 Back 按钮后截图
+    await page.evaluate(() => (document.querySelectorAll('button.ud09-btn--default')[0] as HTMLElement).focus());
+    await page.waitForTimeout(300);
+    await takeScreenshot(page, 'Backボタンフォーカス');
+
+    // 点击 Back 按钮，返回 UD08
+    await page.locator('button.ud09-btn--default').nth(0).click();
+    await page.waitForTimeout(1000);
+
+    // 等待 UD08 加载完成且数据恢复
+    await page.waitForSelector('.ud08-container');
+    await page.waitForFunction(() => {
+      const pcSelect = document.querySelector('.ud08-content > .ud08-search-row:nth-child(2) .ud08-select') as HTMLSelectElement;
+      if (!pcSelect) return false;
+      return pcSelect.value === '04';
+    }, { timeout: 15000 });
+
+    // 移开焦点，确保截图无聚焦样式
+    // await page.locator('.ud08-title').focus();
+    await page.evaluate(() => document.body.focus());
+    await page.waitForTimeout(500);
+    await takeScreenshot(page, 'Back復元結果');
+
+    // 确认跳转前的输入数据全部保留
+    await expect(page.locator(fieldSelect(1))).toHaveValue('04');
+    await expect(page.locator(fieldInput(2))).toHaveValue('12');
+    await expect(page.locator(fieldSelect(3))).toHaveValue('EUR');
   });
 });
 
@@ -1558,6 +1598,23 @@ test.describe('Update 按钮操作', () => {
 
   test('UD08_087_Update_记录不存在（404）', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '087';
+
+    // Mock Product class 主数据 API，确保包含 '99' 选项
+    await page.route('**/api/ud08/selectproductclassmaster*', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 200,
+          data: [
+            { pc: '01' }, { pc: '02' }, { pc: '03' }, { pc: '04' }, { pc: '05' },
+            { pc: '11' }, { pc: '12' }, { pc: '13' }, { pc: '14' }, { pc: '15' },
+            { pc: '21' }, { pc: '22' }, { pc: '23' }, { pc: 'PC' }, { pc: '99' }
+          ]
+        })
+      });
+    });
+
     await goToUD08(page);
 
     await page.route('**/api/ud08/selecthdocvariables*', route => {
@@ -1677,6 +1734,23 @@ test.describe('Delete 按钮操作', () => {
 
   test('UD08_092_Delete_记录不存在（404）', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '092';
+
+    // Mock Product class 主数据 API，确保包含 '99' 选项
+    await page.route('**/api/ud08/selectproductclassmaster*', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 200,
+          data: [
+            { pc: '01' }, { pc: '02' }, { pc: '03' }, { pc: '04' }, { pc: '05' },
+            { pc: '11' }, { pc: '12' }, { pc: '13' }, { pc: '14' }, { pc: '15' },
+            { pc: '21' }, { pc: '22' }, { pc: '23' }, { pc: 'PC' }, { pc: '99' }
+          ]
+        })
+      });
+    });
+
     await goToUD08(page);
 
     await page.route('**/api/ud08/delete', route => {
@@ -2082,11 +2156,12 @@ test.describe('UI交互', () => {
     await page.waitForTimeout(500);
     await takeScreenshot(page, '操作中（按钮禁用）');
 
-    // 在 API 响应前，Add 按钮被禁用
+    // 在 API 响应前，所有按钮均被禁用（isLoading=true）
     await expect(page.locator('.ud08-btn--add')).toBeDisabled();
-    // 其他按钮不受影响
-    await expect(page.locator('.ud08-btn--search')).toBeEnabled();
-    await expect(page.locator('.ud08-btn--clear')).toBeEnabled();
+    await expect(page.locator('.ud08-btn--search')).toBeDisabled();
+    await expect(page.locator('.ud08-btn--clear')).toBeDisabled();
+    await expect(page.locator('.ud08-btn--update')).toBeDisabled();
+    await expect(page.locator('.ud08-btn--delete')).toBeDisabled();
 
     // 恢复 API 响应
     resolveVarCheck();

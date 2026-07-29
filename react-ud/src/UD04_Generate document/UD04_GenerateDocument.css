@@ -132,6 +132,14 @@
   padding-right: 10px;
   text-align: left;
 }
+.ud04-container .result-space {
+  flex: 0 0 200px;
+  color: #333;
+  font-size: 14px;
+  padding-right: 10px;
+  text-align: left;
+}
+
 
 .ud04-container .result-value {
   flex: 1;

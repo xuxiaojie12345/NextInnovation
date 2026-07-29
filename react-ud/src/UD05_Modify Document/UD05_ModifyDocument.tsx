@@ -257,8 +257,8 @@ const UD05_ModifyDocument: React.FC = () => {
             ) : null}
             {chassisSerie && chassisNo ? " " : ""}
             <span
-              className={chassisNo ? "ud05-info-value ud05-link" : "ud05-info-value"}
-              onClick={chassisNo ? handleChassisNoClick : undefined}
+              className={chassisNo ? (isLoading ? "ud05-info-value ud05-link ud05-link-disabled" : "ud05-info-value ud05-link") : "ud05-info-value"}
+              onClick={chassisNo && !isLoading ? handleChassisNoClick : undefined}
             >
               {chassisNo || "-"}
             </span>
@@ -274,7 +274,8 @@ const UD05_ModifyDocument: React.FC = () => {
 
         <div className="ud05-info-item">
           <label className="ud05-info-label">Templateファイル:</label>
-          <span className="ud05-info-value ud05-link" onClick={handleTemplateClick}>
+          <span className={isLoading ? "ud05-info-value ud05-link ud05-link-disabled" : "ud05-info-value ud05-link"}
+            onClick={!isLoading ? handleTemplateClick : undefined}>
             {TEMPLATE_FILENAME}
           </span>
         </div>

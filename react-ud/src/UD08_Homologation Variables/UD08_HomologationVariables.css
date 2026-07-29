@@ -163,6 +163,11 @@
   background-color: #004488;
 }
 
+.ud08-btn:focus,
+.ud08-btn:focus-visible {
+  background-color: #b0b0e0;
+  border-color: #000080;
+}
 .ud08-btn:active {
   opacity: 0.7;
 }

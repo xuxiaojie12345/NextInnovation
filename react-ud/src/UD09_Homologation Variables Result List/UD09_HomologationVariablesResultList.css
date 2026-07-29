@@ -164,6 +164,12 @@
   opacity: 0.85;
   background-color: #004488;
 }
+
+.ud09-btn:focus,
+.ud09-btn:focus-visible {
+  background-color: #b0b0e0;
+  border-color: #000080;
+}
 .ud09-btn:active {
   opacity: 0.7;
 }

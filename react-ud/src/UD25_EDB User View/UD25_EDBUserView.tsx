@@ -58,17 +58,19 @@ const UD25_EDBUserView: React.FC = () => {
           setMessageType('error');
         }
       } catch (error: any) {
-        // 异常处理 - 网络超时
+        // 异常处理
         if (error.code === "ECONNABORTED") {
           // 请求超时
           setMessage("请求超时，请稍后重试.");
-        }else{
+          setMessageType('error');
+        } else if (!error.response) {
+          // 网络连接失败（无响应，如连接被拒绝、DNS解析失败等）
+          setMessage('网络连接失败，请检查网络设置');
+          setMessageType('error');
+        } else {
           setMessage('获取用户信息失败');
           setMessageType('error');
         }
-      // catch (error) {
-      //   setMessage('获取用户信息失败');
-      //   setMessageType('error');
       } finally {
         setIsLoading(false);
       }
@@ -95,7 +97,12 @@ const UD25_EDBUserView: React.FC = () => {
    * 处理 Back 按钮点击
    */
   const handleBack = useCallback(() => {
-    navigate(-1); // 返回前一个画面
+    try {
+      navigate(-1); // 返回前一个画面
+    } catch {
+      setMessage('画面迁移失败');
+      setMessageType('error');
+    }
   }, [navigate]);
 
   // ==================== 渲染 ====================

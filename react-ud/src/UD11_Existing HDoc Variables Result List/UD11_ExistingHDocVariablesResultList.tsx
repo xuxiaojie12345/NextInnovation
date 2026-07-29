@@ -219,7 +219,7 @@ const UD11_ExistingHDocVariablesResultList: React.FC = () => {
       <div className="ud11-title">Existing HDoc Variables</div>
 
       {message && (
-        <div className={`ud11-message ud13-message-${messageType}`}>
+        <div className={`ud11-message ud11-message-${messageType}`}>
           {message}
         </div>
       )}

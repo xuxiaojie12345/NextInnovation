@@ -83,6 +83,18 @@
   color: #0050b3;
 }
 
+/* 加载中链接禁用样式 */
+.ud05-container .ud05-link-disabled {
+  color: #999999;
+  cursor: default;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.ud05-container .ud05-link-disabled:hover {
+  color: #999999;
+}
+
 /* ==================== 错误消息样式 ==================== */
 .ud05-container .ud05-message {
     background-color: #fff2f0;

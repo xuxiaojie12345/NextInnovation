@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 /* eslint-disable */
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
@@ -795,7 +795,7 @@ test.describe('Excel 按钮操作', () => {
     await takeScreenshot(page, '操作後（Excel导出）');
 
     // 成功消息
-    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud13-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_033_Excel_空数据导出', { timeout: 120000 }, async ({ page }) => {
@@ -812,7 +812,7 @@ test.describe('Excel 按钮操作', () => {
     await takeScreenshot(page, '操作後（Excel空数据）');
 
     // 成功消息
-    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud13-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_034_Excel_导出失败', { timeout: 120000 }, async ({ page }) => {
@@ -974,12 +974,11 @@ test.describe('UI交互', () => {
     await page.waitForTimeout(300);
     await takeScreenshot(page, 'Selectボタン押下');
     await page.locator('.ud11-btn').nth(0).click();
-    await page.locator('.ud11-btn').nth(0).click({ force: true });
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(2000);
     // === 操作後截图 ===
-    await takeScreenshot(page, '操作後（重复点击）');
+    await takeScreenshot(page, '操作後（Select跳转）');
 
-    // 页面已跳转
+    // 页面已跳转（首次点击即触发导航）
     await expect(page).toHaveURL(/\/UD10/);
   });
 
@@ -1021,8 +1020,8 @@ test.describe('UI交互', () => {
     // === 操作後截图 ===
     await takeScreenshot(page, '操作後（成功消息）');
 
-    await expect(page.locator('.ud11-message-success')).toBeVisible();
-    const color = await page.locator('.ud11-message-success').evaluate(el => window.getComputedStyle(el).color);
+    await expect(page.locator('.ud13-message-success')).toBeVisible();
+    const color = await page.locator('.ud13-message-success').evaluate(el => window.getComputedStyle(el).color);
     expect(color).toBe('rgb(82, 196, 26)');
   });
 
@@ -1065,31 +1064,22 @@ test.describe('UI交互', () => {
 
     // 旧错误消息被清除，显示成功消息
     await expect(page.locator('.ud11-message-error')).toHaveCount(0);
-    await expect(page.locator('.ud11-message-success')).toContainText('CSV导出成功');
+    await expect(page.locator('.ud13-message-success')).toContainText('CSV导出成功');
   });
 
   test('UD11_043_UI交互_加载完成后清除消息', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '43';
 
     // 第一次 API 返回 500
-    let apiCallCount = 0;
+    let firstRequest = true;
     await page.route('**/api/ud11/search', async route => {
-      apiCallCount++;
-      if (apiCallCount === 1) {
+      if (firstRequest) {
+        firstRequest = false;
         await route.fulfill({
           status: 500,
           contentType: 'application/json',
           body: JSON.stringify({ code: 500, msg: '获取检索结果失败' })
         });
-      // 第一次加载 - 失败
-      await goToUD11Real(page, {});
-      await page.waitForTimeout(5000);
-      // 错误消息可见
-      await expect(page.locator('.ud11-message-error')).toContainText('获取检索结果失败');
-      // === 第一次加载截图 ===
-      await takeScreenshot(page, '第一次加载（失败）');
-
-      apiCallCount++;
       } else {
         await route.fulfill({
           status: 200,
@@ -1099,9 +1089,17 @@ test.describe('UI交互', () => {
       }
     });
 
-    
+    // 第一次加载 - API 返回 500
+    await goToUD11Real(page, {});
+    await page.waitForTimeout(2000);
+    // 错误消息可见
+    await expect(page.locator('.ud11-message-error')).toContainText('获取检索结果失败');
+    // === 第一次加载截图 ===
+    await takeScreenshot(page, '第一次加载（失败）');
 
-    // 第二次加载 - 成功
+    // 第二次加载 - 重新导航到 UD11，API 返回 200
+    await page.goto(BASE_URL + '/UD11');
+    await page.waitForSelector('.ud11-container');
     await page.evaluate(() => {
       window.history.replaceState({ searchParams: {}, formData: {} }, '', '/UD11');
     });

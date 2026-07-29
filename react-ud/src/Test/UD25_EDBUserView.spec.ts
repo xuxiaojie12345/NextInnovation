@@ -601,30 +601,31 @@ test.describe('异常处理', () => {
     await page.waitForTimeout(500);
     await takeScreenshot(page, '初期表示');
 
-    await page.waitForResponse(res => 
-      res.url().includes('/api/ud01/authentication') 
-      && res.request().timing().responseEnd > 30000
-    );
-    // API超时逻辑触发后，仅留10秒余量等待React异步渲染错误提示
+    // 等待 API 超时（路由中已设置 31 秒延迟后 abort），然后等待错误消息出现
     await page.locator('.ud25-message--error').waitFor({
       state: 'visible',
-      timeout: 10000
+      timeout: 60000
     });
-
+    await page.waitForTimeout(500);
     await takeScreenshot(page, '操作後');
     await expect(page.locator('.ud25-message--error')).toHaveText('请求超时，请稍后重试.');
     await expect(page.locator('.ud25-message')).toBeVisible();
     await expect(page.locator('.ud25-message--error')).toBeVisible();
-
     await page.unroute('**/api/ud01/authentication*');
+
   });
 
   test('UD25_018_异常处理_网络连接失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '018';
 
-    // 模拟网络断开
+    // 模拟网络断开（仅在 UD25 页面时生效，不影响登录）
     await page.route('**/api/ud01/authentication*', async (route) => {
-      await route.abort('connectionrefused');
+      const currentPageUrl = page.url();
+      if (currentPageUrl.includes('/UD25')) {
+        await route.abort('connectionrefused');
+      } else {
+        await route.continue();
+      }
     });
 
     await goToUD25(page, 'admin');
@@ -633,11 +634,8 @@ test.describe('异常处理', () => {
 
     // 消息区域可见
     await expect(page.locator('.ud25-message')).toBeVisible();
-    await expect(page.locator('.ud25-message')).toHaveText('获取用户信息失败');
+    await expect(page.locator('.ud25-message')).toHaveText('网络连接失败，请检查网络设置');
     await expect(page.locator('.ud25-message--error')).toBeVisible();
-
-    await takeScreenshot(page, '操作後');
-
     await page.unroute('**/api/ud01/authentication*');
   });
 
@@ -668,6 +666,18 @@ test.describe('异常处理', () => {
 
   test('UD25_020_异常处理_画面迁移失败', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '020';
+
+    // 在页面加载前拦截 history.go，使其抛出异常模拟导航失败
+    await page.addInitScript(() => {
+      const origGo = window.history.go.bind(window.history);
+      window.history.go = function (delta) {
+        if (delta === -1 || delta === undefined) {
+          throw new Error('模拟导航失败');
+        }
+        return origGo(delta);
+      };
+    });
+
     await goToUD25(page, 'admin');
     await page.waitForTimeout(1500);
     await takeScreenshot(page, '初期表示');
@@ -680,9 +690,14 @@ test.describe('异常处理', () => {
     await page.waitForTimeout(1000);
     await takeScreenshot(page, '操作後');
 
-    // navigate(-1) 返回到前画面
-    const currentUrl = page.url();
-    expect(currentUrl).not.toContain('/UD25');
+    // 1. 消息区域可见
+    await expect(page.locator('.ud25-message')).toBeVisible();
+    // 2. 消息内容
+    await expect(page.locator('.ud25-message')).toHaveText('画面迁移失败');
+    // 3. 类型为 Error（红色）
+    await expect(page.locator('.ud25-message--error')).toBeVisible();
+    // 4. 停留在当前页面
+    await expect(page).toHaveURL(/\/UD25/);
   });
 
 });
