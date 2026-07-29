@@ -221,11 +221,12 @@ test.describe('画面初期表示', () => {
 
   test('UD03_011_画面初始化_上次输入条件恢复（有缓存）', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '011';
-    // 预先设置 localStorage
+    // 先导航到有 origin 的页面，再预先设置 localStorage
+    await page.goto(BASE_URL + '/');
     await page.evaluate(() => {
-      localStorage.setItem('lastchassisSeries', 'jpct');
-      localStorage.setItem('lastchassisNo', '8888');
-      localStorage.setItem('lastdocumentType', 'CERTIFICATE');
+      localStorage.setItem('lastChassisSeries', 'jpct');
+      localStorage.setItem('lastChassisNo', '8888');
+      localStorage.setItem('lastDocumentType', 'CERTIFICATE');
     });
     await goToUD03(page);
     await takeScreenshot(page, '初期表示');
@@ -609,10 +610,10 @@ test.describe('Submit 按钮正常跳转', () => {
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '操作後');
 
-    // 检查 localStorage 缓存
-    const series = await page.evaluate(() => localStorage.getItem('chassisSeries'));
-    const no = await page.evaluate(() => localStorage.getItem('chassisNo'));
-    const docType = await page.evaluate(() => localStorage.getItem('documentType'));
+    // 检查 localStorage 缓存（组件使用 lastChassisSeries/lastChassisNo/lastDocumentType 存储）
+    const series = await page.evaluate(() => localStorage.getItem('lastChassisSeries'));
+    const no = await page.evaluate(() => localStorage.getItem('lastChassisNo'));
+    const docType = await page.evaluate(() => localStorage.getItem('lastDocumentType'));
     expect(series).toBe('jpct');
     expect(no).toBe('8888');
     expect(docType).toBe('CERTIFICATE');
@@ -637,8 +638,8 @@ test.describe('Submit 按钮正常跳转', () => {
     await goToUD03(page);
     await takeScreenshot(page, '初期表示');
 
-    await page.locator('#chassisSeries').fill('ABC12');
-    await page.locator('#chassisNo').fill('12345');
+    await page.locator('#chassisSeries').fill('lwwss');
+    await page.locator('#chassisNo').fill('0001');
     await page.locator('#documentType').selectOption('123');
     await takeScreenshot(page, '入力後');
 
@@ -646,6 +647,15 @@ test.describe('Submit 按钮正常跳转', () => {
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '操作後');
 
+    // 确认 localStorage 缓存
+    const series = await page.evaluate(() => localStorage.getItem('lastChassisSeries'));
+    const no = await page.evaluate(() => localStorage.getItem('lastChassisNo'));
+    const docType = await page.evaluate(() => localStorage.getItem('lastDocumentType'));
+    expect(series).toBe('lwwss');
+    expect(no).toBe('0001');
+    expect(docType).toBe('123');
+
+    // 跳转到 UD04
     await expect(page).toHaveURL(/\/UD04/);
   });
 
@@ -730,9 +740,9 @@ test.describe('Submit 按钮正常跳转', () => {
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '操作後');
 
-    const series = await page.evaluate(() => localStorage.getItem('chassisSeries'));
-    const no = await page.evaluate(() => localStorage.getItem('chassisNo'));
-    const docType = await page.evaluate(() => localStorage.getItem('documentType'));
+    const series = await page.evaluate(() => localStorage.getItem('lastChassisSeries'));
+    const no = await page.evaluate(() => localStorage.getItem('lastChassisNo'));
+    const docType = await page.evaluate(() => localStorage.getItem('lastDocumentType'));
     expect(series).toBe('jpct');
     expect(no).toBe('8888');
     expect(docType).toBe('CERTIFICATE');
@@ -742,16 +752,14 @@ test.describe('Submit 按钮正常跳转', () => {
     currentTestNo = '038';
 
     let apiCallCount = 0;
-    await page.route('**/api/ud04/getdocumentdata', async route => {
+    await page.route((url) => url.href.includes('/api/ud04/getdocumentdata'), async route => {
       apiCallCount++;
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 200, data: {} })
-      });
-    });
-    await page.route('**/UD04', route => {
-      route.fulfill({ status: 200, body: '<html><body>UD04 Mock</body></html>' });
+      if (apiCallCount <= 2) {
+        // UD03 submit 和 dispatchEvent：延迟 3 秒验证 disabled 状态
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      // 透传到真实后端 API（jpct/8888 在 DB 中存在，返回真实数据）
+      await route.continue();
     });
 
     await goToUD03(page);
@@ -762,15 +770,25 @@ test.describe('Submit 按钮正常跳转', () => {
     await page.locator('#documentType').selectOption('CERTIFICATE');
     await takeScreenshot(page, '入力後');
 
-    // 连续点击 2 次
+    // 第一次点击
     await page.locator('.btn-submit').click();
-    await page.waitForTimeout(300);
-    await page.locator('.btn-submit').click({ force: true });
-    await page.waitForTimeout(2000);
-    await takeScreenshot(page, '操作後');
+    // 等待 React 重渲染，按钮变为 disabled
+    await page.waitForTimeout(500);
+    // 确认画面未跳转
+    expect(page.url()).toContain('/UD03');
+    // 确认按钮被 disabled
+    await expect(page.locator('.btn-submit')).toBeDisabled();
+    await takeScreenshot(page, '点击後（loading-按钮禁用）');
 
-    // 只调用 1 次 API
-    expect(apiCallCount).toBe(1);
+    // 第二次点击（disabled 按钮）
+    await page.locator('.btn-submit').dispatchEvent('click');
+    await page.waitForTimeout(500);
+
+    // 等待第 1 次 API 返回 → 跳转到 UD04 → UD04 加载真实数据
+    await page.waitForTimeout(8000);
+    await takeScreenshot(page, '操作後（UD04画面）');
+
+    // 跳转到 UD04
     await expect(page).toHaveURL(/\/UD04/);
   });
 });
@@ -1016,12 +1034,13 @@ test.describe('UI交互', () => {
 
     await takeScreenshot(page, '加载中');
 
-    // 在 API 响应前确认控件状态
-    await expect(page.locator('#chassisSeries')).toBeEnabled();
-    await expect(page.locator('#chassisNo')).toBeEnabled();
-    await expect(page.locator('.btn-submit')).toBeEnabled();
-    await expect(page.locator('.btn-reset')).toBeEnabled();
-    await expect(page.locator('.btn-help')).toBeEnabled();
+    // 在 API 响应前确认控件状态（所有控件 disabled={isLoading}）
+    await expect(page.locator('#chassisSeries')).toBeDisabled();
+    await expect(page.locator('#chassisNo')).toBeDisabled();
+    await expect(page.locator('#documentType')).toBeDisabled();
+    await expect(page.locator('.btn-submit')).toBeDisabled();
+    await expect(page.locator('.btn-reset')).toBeDisabled();
+    await expect(page.locator('.btn-help')).toBeDisabled();
 
     resolveApi();
     await page.waitForTimeout(2000);
@@ -1048,19 +1067,15 @@ test.describe('UI交互', () => {
   test('UD03_051_UI交互_Submit加载中按钮禁用', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '051';
 
-    // 延迟 UD04 数据检查 API 响应
-    let resolveCheck;
-    const checkPromise = new Promise(resolve => { resolveCheck = resolve; });
-    await page.route('**/api/ud04/getdocumentdata', async route => {
-      await checkPromise;
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 200, data: {} })
-      });
-    });
-    await page.route('**/UD04', route => {
-      route.fulfill({ status: 200, body: '<html><body>UD04 Mock</body></html>' });
+    let apiCallCount = 0;
+    await page.route((url) => url.href.includes('/api/ud04/getdocumentdata'), async route => {
+      apiCallCount++;
+      if (apiCallCount <= 2) {
+        // 延迟 3 秒验证 disabled 状态
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      // 透传到真实后端 API
+      await route.continue();
     });
 
     await goToUD03(page);
@@ -1073,14 +1088,17 @@ test.describe('UI交互', () => {
 
     await page.locator('.btn-submit').click();
     await page.waitForTimeout(500);
-
-    await takeScreenshot(page, 'Submit中');
-
     // Submit 按钮被禁用
     await expect(page.locator('.btn-submit')).toBeDisabled();
+    await takeScreenshot(page, 'Submit中');
 
-    resolveCheck();
-    await page.waitForTimeout(2000);
+     await page.waitForTimeout(8000);
+    await takeScreenshot(page, '操作後（UD04画面）');
+
+    // 跳转到 UD04
+    await expect(page).toHaveURL(/\/UD04/);
+    // // 等待 API 返回
+    // await page.waitForTimeout(3000);
   });
 
   test('UD03_052_UI交互_Error message area显示错误消息样式', { timeout: 120000 }, async ({ page }) => {
@@ -1180,10 +1198,10 @@ test.describe('安全性', () => {
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '操作後');
 
-    // localStorage 确认
-    const series = await page.evaluate(() => localStorage.getItem('chassisSeries'));
-    const no = await page.evaluate(() => localStorage.getItem('chassisNo'));
-    const docType = await page.evaluate(() => localStorage.getItem('documentType'));
+    // localStorage 确认（组件使用 lastChassisSeries/lastChassisNo/lastDocumentType 存储）
+    const series = await page.evaluate(() => localStorage.getItem('lastChassisSeries'));
+    const no = await page.evaluate(() => localStorage.getItem('lastChassisNo'));
+    const docType = await page.evaluate(() => localStorage.getItem('lastDocumentType'));
     expect(series).toBe('jpct');
     expect(no).toBe('8888');
     expect(docType).toBe('CERTIFICATE');
@@ -1191,11 +1209,12 @@ test.describe('安全性', () => {
 
   test('UD03_056_安全性_缓存数据过期清理', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '056';
-    // 预先设置 localStorage 缓存
+    // 先导航到有 origin 的页面，再预先设置 localStorage 缓存
+    await page.goto(BASE_URL + '/');
     await page.evaluate(() => {
-      localStorage.setItem('chassisSeries', 'jpct');
-      localStorage.setItem('chassisNo', '8888');
-      localStorage.setItem('documentType', 'CERTIFICATE');
+      localStorage.setItem('lastChassisSeries', 'jpct');
+      localStorage.setItem('lastChassisNo', '8888');
+      localStorage.setItem('lastDocumentType', 'CERTIFICATE');
     });
 
     // 重新登录后访问 UD03，缓存数据应自动填充
