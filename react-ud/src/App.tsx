@@ -20,6 +20,11 @@ import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministrat
 import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
 import SearchUser from "./SearchUser/SearchUser";
 import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocumentSettingsList";
+import MarketsInHDoc from "./MarketsInHDoc/MarketsInHDoc";
+import DocumentTypes from "./DocumentTypes/DocumentTypes";
+import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
+import UserGuide from "./UserGuide/UserGuide";
+import UserView from "./UserView/UserView";
 
 function App() {
   return (
@@ -48,6 +53,11 @@ function App() {
             <Route path='/hdoc-user-doc-administration' element={<HDocUserDocAdministration />} />
             <Route path='/search-user' element={<SearchUser />} />
             <Route path='/market-document-settings-list' element={<MarketDocumentSettingsList />} />
+            <Route path='/markets-in-hdoc' element={<MarketsInHDoc />} />
+            <Route path='/document-types' element={<DocumentTypes />} />
+            <Route path='/download-print-quick-guides' element={<DownloadAndPrintQuickGuides />} />
+            <Route path='/user-guide' element={<UserGuide />} />
+            <Route path='/edb-user-view' element={<UserView />} />
           </Routes>
         </div>
       </Router>
