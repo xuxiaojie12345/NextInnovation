@@ -74,7 +74,7 @@ const ListAvailableTemplates: React.FC = () => {
           const fileDetails = listRes.data.templateList || [];
 
           if (fileDetails.length === 0) {
-            setMessage("No templates found for the selected market.");
+            // setMessage("No templates found for the selected market.");
             setTemplateList([]);
             return;
           }
