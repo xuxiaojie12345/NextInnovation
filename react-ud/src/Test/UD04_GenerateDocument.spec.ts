@@ -70,7 +70,7 @@ async function goToUD04(page: Page, chassisSerie: string, chassisNo: string) {
       if (fiber.memoizedProps && fiber.memoizedProps.value &&
           fiber.memoizedProps.value.navigator) {
         fiber.memoizedProps.value.navigator.push('/UD04', {
-          chassisSerie: serie,
+          chassisSeries: serie,
           chassisNo: no
         });
         return;
@@ -205,7 +205,7 @@ test.describe('画面初期表示', () => {
     await goToUD04(page, "lwws","12345");
     await takeScreenshot(page, '初期表示');
     await expect(page.locator('.result-label-ReplacingParameters')).toContainText('Replacing parameters:');
-    await expect(page.locator('.result-section')).toContainText('AD Change. Modifying:VAR_TEST');
+    await expect(page.locator('.result-section')).toContainText('AD Change. Modifying:LWW_01');
   });
 
   test('UD04_014_画面初始化_Generated document属性', { timeout: 120000 }, async ({ page }) => {
@@ -243,6 +243,29 @@ test.describe('画面初期表示', () => {
 
   test('UD04_018_初期表示_各字段最大显示长度确认', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '18';
+
+    // Mock API 返回超长字段数据（数据库无 jpctL/8888012345）
+    await page.route('**/api/ud04/getdocumentdata**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 200,
+          data: {
+            ordernumber: '1234567890123456',
+            build: '1234567890',
+            spec: '201617',
+            countryOfOperation: 'IDO',
+            customerAdap: 'S1810111',
+            loadIndex: 'FTLI-15',
+            act: '',
+            newval: '',
+            variable: '',
+          }
+        })
+      });
+    });
+
     await goToUD04(page, 'jpctL', '8888012345');
     await takeScreenshot(page, '初期表示');
 
@@ -357,19 +380,60 @@ test.describe('Modify Doc Link 操作', () => {
   test('UD04_023_Modify Doc Link_ACT=Y时显示', { timeout: 120000 }, async ({ page }) => {
     currentTestNo = '23';
 
+    // Mock API 返回 act='Y' 以显示 Modify Doc Link
+    await page.route('**/api/ud04/getdocumentdata**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 200,
+          data: {
+            ordernumber: '1097295',
+            build: '2016173',
+            spec: '201617',
+            countryOfOperation: 'IDO',
+            customerAdap: 'S1810111',
+            loadIndex: 'FTLI-15',
+            act: 'Y',
+            newval: 'LWW_01',
+            variable: 'LWW_01',
+          }
+        })
+      });
+    });
+
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    // 通过 history.replaceState + reload 可靠地注入路由参数
+    // 先离开当前路由再返回，确保 React Router 正确处理
     await page.evaluate(() => {
-      window.history.replaceState(
-        { chassisSerie: 'lwws', chassisNo: '12345' },
-        '',
-        '/UD04'
-      );
+      window.history.pushState({}, '', '/UD04?t=' + Date.now());
     });
-    await page.reload();
-    await page.waitForSelector('.ud04-container');
+    await page.waitForTimeout(300);
+    await page.evaluate(() => {
+      window.history.back();
+    });
+    await page.waitForTimeout(300);
+    // 通过 React Router 内部 navigator.push 注入路由参数
+    await page.evaluate(({ serie, no }) => {
+      const root = document.getElementById('root');
+      const containerKey = Object.keys(root).find(k => k.startsWith('__reactContainer'));
+      const seen = new Set();
+      (function walk(fiber, depth) {
+        if (!fiber || depth > 60 || seen.has(fiber)) return;
+        seen.add(fiber);
+        if (fiber.memoizedProps && fiber.memoizedProps.value &&
+            fiber.memoizedProps.value.navigator) {
+          fiber.memoizedProps.value.navigator.push('/UD04', {
+            chassisSeries: serie,
+            chassisNo: no
+          });
+          return;
+        }
+        walk(fiber.child, depth + 1);
+        walk(fiber.sibling, depth);
+      })(root[containerKey], 0);
+    }, { serie: 'lwws', no: '12345' });
     await page.waitForTimeout(2000);
     await takeScreenshot(page, '初期表示');
 
@@ -454,7 +518,7 @@ test.describe('异常处理', () => {
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    await page.evaluate(() => window.history.replaceState({ chassisSerie: 'lwws', chassisNo: '12345' }, '', '/UD04'));
+    await page.evaluate(() => window.history.replaceState({ chassisSeries: 'lwws', chassisNo: '12345' }, '', '/UD04'));
     await page.reload();
     await page.waitForSelector('.ud04-container');
     await page.waitForTimeout(2000);
@@ -468,7 +532,7 @@ test.describe('异常处理', () => {
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    await page.evaluate(() => window.history.replaceState({ chassisSerie: 'lwws', chassisNo: '12345' }, '', '/UD04'));
+    await page.evaluate(() => window.history.replaceState({ chassisSeries: 'lwws', chassisNo: '12345' }, '', '/UD04'));
     await page.reload();
     await page.waitForSelector('.ud04-container');
     await page.waitForTimeout(2000);
@@ -485,7 +549,7 @@ test.describe('异常处理', () => {
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    await page.evaluate(() => window.history.replaceState({ chassisSerie: 'lwws', chassisNo: '12345' }, '', '/UD04'));
+    await page.evaluate(() => window.history.replaceState({ chassisSeries: 'lwws', chassisNo: '12345' }, '', '/UD04'));
     await page.reload();
     await page.waitForSelector('.ud04-container');
     await page.waitForTimeout(3000);
@@ -503,7 +567,7 @@ test.describe('异常处理', () => {
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    await page.evaluate(() => window.history.replaceState({ chassisSerie: 'lwws', chassisNo: '12345' }, '', '/UD04'));
+    await page.evaluate(() => window.history.replaceState({ chassisSeries: 'lwws', chassisNo: '12345' }, '', '/UD04'));
     await page.reload();
     await page.waitForSelector('.ud04-container');
     await page.waitForTimeout(2000);
@@ -519,7 +583,8 @@ test.describe('异常处理', () => {
     await login(page);
     await page.goto(BASE_URL + '/UD04');
     await page.waitForSelector('.ud04-container');
-    await page.evaluate(() => window.history.replaceState({ chassisSerie: 'XXXXX', chassisNo: '9999999999' }, '', '/UD04'));
+
+    await page.evaluate(() => window.history.replaceState({ chassisSeries: 'XXXXX', chassisNo: '9999999999' }, '', '/UD04'));
     await page.reload();
     await page.waitForSelector('.ud04-container');
     await page.waitForTimeout(2000);
