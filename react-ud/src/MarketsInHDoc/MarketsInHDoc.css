@@ -1,0 +1,159 @@
+/* ===== Markets in HDoc 页面 ===== */
+.mih-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.mih-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.mih-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.mih-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.mih-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mih-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mih-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mih-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.mih-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.mih-content {
+  width: 100%;
+  max-width: 720px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.mih-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ===== 消息 ===== */
+.mih-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.mih-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 表格包裹 ===== */
+.mih-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #c0c0c0;
+}
+
+/* ===== 表格 ===== */
+.mih-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mih-table th {
+  text-align: left;
+  padding: 7px 12px;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+}
+
+.mih-table th:last-child {
+  border-right: none;
+}
+
+.mih-table td {
+  padding: 5px 12px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.mih-table td:last-child {
+  border-right: none;
+}
+
+.mih-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mih-th-market { width: 22%; }
+.mih-th-desc { width: 46%; }
+.mih-th-weights { width: 32%; }
+
+.mih-row:hover {
+  background-color: #f5f8fc;
+}
+
+.mih-td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 无数据 */
+.mih-no-data {
+  text-align: center;
+  padding: 24px 12px !important;
+  color: #888;
+}

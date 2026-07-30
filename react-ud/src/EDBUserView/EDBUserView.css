@@ -1,0 +1,157 @@
+/* ===== EDB User View 页面 ===== */
+.euv-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.euv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.euv-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.euv-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.euv-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.euv-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.euv-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.euv-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.euv-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.euv-content {
+  width: 100%;
+  max-width: 560px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.euv-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 错误消息 ===== */
+.euv-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.euv-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 表单 ===== */
+.euv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.euv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.euv-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.euv-input {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #666;
+  background-color: #f5f5f5;
+  border: 1px solid #c0c0c0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.euv-input:disabled {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: default;
+}
+
+/* ===== 按钮行 ===== */
+.euv-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.euv-btn {
+  padding: 6px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.euv-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.euv-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

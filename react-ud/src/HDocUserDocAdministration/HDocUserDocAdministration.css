@@ -1,0 +1,234 @@
+/* ===== HDoc User Doc Administration 页面 ===== */
+.hda-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.hda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.hda-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.hda-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.hda-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hda-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hda-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hda-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.hda-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.hda-content {
+  width: 100%;
+  max-width: 640px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.hda-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 消息 ===== */
+.hda-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.hda-success {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== UserID 输入行 ===== */
+.hda-userid-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hda-field-userid {
+  flex: 1;
+  max-width: 300px;
+}
+
+.hda-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hda-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.hda-input {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.hda-input:focus {
+  border-color: #003057;
+}
+
+.hda-input:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== User 名称行 ===== */
+.hda-user-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hda-user-name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* ===== Document 区域 ===== */
+.hda-doc-section {
+  margin-bottom: 20px;
+}
+
+.hda-doc-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.hda-doc-list {
+  border: 1px solid #c0c0c0;
+  padding: 8px 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.hda-doc-empty {
+  font-size: 13px;
+  color: #888;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.hda-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+
+.hda-doc-item:hover {
+  background-color: #f5f5f5;
+}
+
+.hda-doc-checkbox {
+  margin: 0;
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.hda-doc-text {
+  color: #333;
+  line-height: 1.4;
+}
+
+/* ===== 按钮 ===== */
+.hda-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.hda-btn {
+  padding: 6px 22px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.hda-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.hda-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

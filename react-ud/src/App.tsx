@@ -16,6 +16,14 @@ import UploadDeleteTemplate from "./Upload&DeleteTemplate/UploadDeleteTemplate";
 import HDocTemplateCheck from "./HDocTemplateCheck/HDocTemplateCheck";
 import ListAvailableTemplates from "./ListAvailableTemplates/ListAvailableTemplates";
 import VinPlate from "./VinPlate/VinPlate";
+import HDocUserAdministration from "./HDocUserAdministration/HDocUserAdministration";
+import HDocUserDocAdministration from "./HDocUserDocAdministration/HDocUserDocAdministration";
+import EDBUserView from "./EDBUserView/EDBUserView";
+import SearchUser from "./SearchUser/SearchUser";
+import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocumentSettingsList";
+import DocumentTypes from "./DocumentTypes/DocumentTypes";
+import MarketsInHDoc from "./MarketsInHDoc/MarketsInHDoc";
+import ADChange from "./ADChange/ADChange";
 
 function App() {
   return (
@@ -39,6 +47,14 @@ function App() {
             <Route path='/hdoc-template-check' element={<HDocTemplateCheck />} />
             <Route path='/list-available-templates' element={<ListAvailableTemplates />} />
             <Route path='/vin-plate' element={<VinPlate />} />
+            <Route path='/hdoc-user-administration' element={<HDocUserAdministration />} />
+            <Route path='/hdoc-user-doc-administration' element={<HDocUserDocAdministration />} />
+            <Route path='/edb-user-view' element={<EDBUserView />} />
+            <Route path='/search-user' element={<SearchUser />} />
+            <Route path='/market-document-settings-list' element={<MarketDocumentSettingsList />} />
+            <Route path='/document-types' element={<DocumentTypes />} />
+            <Route path='/markets-in-hdoc' element={<MarketsInHDoc />} />
+            <Route path='/ad-change' element={<ADChange />} />
             <Route path='/TestMain' element={<TestMain />} />
           </Routes>
         </div>

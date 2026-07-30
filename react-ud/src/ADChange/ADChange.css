@@ -1,0 +1,228 @@
+/* ===== AD Change 页面 ===== */
+.adc-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.adc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.adc-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.adc-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.adc-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.adc-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.adc-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.adc-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.adc-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.adc-content {
+  width: 100%;
+  max-width: 560px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.adc-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 20px 0;
+}
+
+/* ===== 消息 ===== */
+.adc-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.adc-success {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 表单 ===== */
+.adc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.adc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adc-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.adc-input {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.adc-input:focus {
+  border-color: #003057;
+}
+
+.adc-input:disabled {
+  background-color: #f0f0f0;
+}
+
+.adc-textarea {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.adc-textarea:focus {
+  border-color: #003057;
+}
+
+.adc-textarea:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== 按钮行 ===== */
+.adc-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.adc-btn {
+  padding: 6px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.adc-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.adc-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== CHECK 结果 ===== */
+.adc-check-result {
+  border: 1px solid #c0c0c0;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.adc-check-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.adc-check-field {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.adc-check-label {
+  font-weight: 600;
+  color: #555;
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.adc-check-value {
+  color: #333;
+}
+
+.adc-active-yes {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.adc-active-no {
+  color: #c62828;
+  font-weight: 600;
+}

@@ -1,0 +1,296 @@
+/* ===== Search User 页面 ===== */
+.su-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.su-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.su-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.su-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.su-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.su-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.su-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.su-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.su-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.su-content {
+  width: 100%;
+  max-width: 820px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 28px 28px;
+}
+
+/* ===== 标题 ===== */
+.su-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ===== 错误消息 ===== */
+.su-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ===== 搜索区域 ===== */
+.su-search-section {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.su-search-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.su-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.su-field-user {
+  flex: 1;
+}
+
+.su-field-market {
+  width: 240px;
+}
+
+.su-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.su-input {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.su-input:focus {
+  border-color: #003057;
+}
+
+.su-input:disabled {
+  background-color: #f0f0f0;
+}
+
+.su-select {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #ffffff;
+  border: 1px solid #a0a0a0;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  appearance: auto;
+}
+
+.su-select:focus {
+  border-color: #003057;
+}
+
+.su-select:disabled {
+  background-color: #f0f0f0;
+}
+
+/* ===== Radio 按钮行 ===== */
+.su-radio-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 8px 0;
+}
+
+.su-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+
+.su-radio {
+  margin: 0;
+  cursor: pointer;
+}
+
+.su-radio-label {
+  font-size: 13px;
+  color: #333;
+}
+
+/* ===== Search 按钮 ===== */
+.su-search-btn-row {
+  display: flex;
+}
+
+.su-btn {
+  padding: 6px 28px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.su-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.su-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== 检索结果区域 ===== */
+.su-result-section {
+  margin-top: 0;
+}
+
+.su-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* ===== 表格 ===== */
+.su-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #c0c0c0;
+}
+
+.su-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.su-table th {
+  text-align: left;
+  padding: 7px 10px;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+}
+
+.su-table th:last-child {
+  border-right: none;
+}
+
+.su-table td {
+  padding: 5px 10px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.su-table td:last-child {
+  border-right: none;
+}
+
+.su-th-id { width: 25%; }
+.su-th-name { width: 40%; }
+.su-th-mkt { width: 35%; }
+
+.su-row:hover {
+  background-color: #f5f8fc;
+}
+
+.su-td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Userid 链接 */
+.su-user-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.su-user-link:hover {
+  color: #004499;
+}
+
+/* 无数据 */
+.su-no-data {
+  text-align: center;
+  padding: 24px 10px !important;
+  color: #888;
+}

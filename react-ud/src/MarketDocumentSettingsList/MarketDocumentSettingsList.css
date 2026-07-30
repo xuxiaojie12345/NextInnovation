@@ -1,0 +1,208 @@
+/* ===== Market Document Settings List 页面 ===== */
+.mdsl-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.mdsl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px;
+  background-color: #003057;
+  color: #ffffff;
+  user-select: none;
+}
+
+.mdsl-header .header-left {
+  display: flex;
+  align-items: center;
+}
+
+.mdsl-header .volvo-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.mdsl-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mdsl-header .welcome-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mdsl-header .logout-button {
+  font-size: 12px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mdsl-header .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 主内容区域 ===== */
+.mdsl-body {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.mdsl-content {
+  width: 100%;
+  max-width: 860px;
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  padding: 24px 24px 28px;
+}
+
+/* ===== 标题 ===== */
+.mdsl-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 16px 0;
+}
+
+/* ===== 消息 ===== */
+.mdsl-error {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c62828;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.mdsl-loading {
+  padding: 16px 0;
+  font-size: 14px;
+  color: #888;
+}
+
+/* ===== 表格包裹 ===== */
+.mdsl-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #c0c0c0;
+}
+
+/* ===== 表格 ===== */
+.mdsl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mdsl-table th {
+  text-align: left;
+  padding: 7px 10px;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+}
+
+.mdsl-table th:last-child {
+  border-right: none;
+}
+
+.mdsl-table td {
+  padding: 5px 10px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.mdsl-table td:last-child {
+  border-right: none;
+}
+
+/* 列宽 */
+.mdsl-th-sel { width: 36px; text-align: center; }
+.mdsl-th-doctype { width: 28%; }
+.mdsl-th-bu { width: 16%; }
+.mdsl-th-user { width: 18%; }
+.mdsl-th-date { width: 30%; }
+
+.mdsl-td-sel {
+  text-align: center;
+}
+
+.mdsl-radio {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 行样式 */
+.mdsl-row {
+  cursor: pointer;
+}
+
+.mdsl-row:hover {
+  background-color: #f5f8fc;
+}
+
+.mdsl-row-selected {
+  background-color: #e0ecf7 !important;
+}
+
+.mdsl-td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* User 链接 */
+.mdsl-user-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mdsl-user-link:hover {
+  color: #004499;
+}
+
+/* 无数据 */
+.mdsl-no-data {
+  text-align: center;
+  padding: 24px 10px !important;
+  color: #888;
+}
+
+/* ===== 按钮行 ===== */
+.mdsl-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.mdsl-btn {
+  padding: 6px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.mdsl-btn:hover {
+  background-color: #f0f0f0;
+}
