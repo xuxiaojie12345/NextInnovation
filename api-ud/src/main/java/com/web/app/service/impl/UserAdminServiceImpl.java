@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class UserAdminServiceImpl implements UserAdminService {
 
     @Autowired
-    private UserInfoMapper userInfoMapper;
+    private HdocUserInfoMapper userInfoMapper;
     @Autowired
     private HdocFunctionAuthMapper hdocFunctionAuthMapper;
     @Autowired
@@ -26,7 +26,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public UserInfoResponse getUserInfo(String userId) {
-        UserInfo user = userInfoMapper.selectByUserId(userId);
+        HdocUserInfo user = userInfoMapper.selectByUserId(userId);
         if (user == null) {
             throw new BusinessException(404, "User not found");
         }
@@ -36,7 +36,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         resp.setUserId(user.getUserid());
         resp.setUserName(user.getUsername());
         resp.setRole(role);
-        resp.setEmail(user.getEMail());
+        resp.setEmail(user.getEmail());
         resp.setResponsible(user.getResponsible());
         resp.setUserPosition(user.getUserposition());
         return resp;
@@ -102,7 +102,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public SearchResultResponse<UserSearchRecord> searchHdocUsers(UD19SearchHdocRequest request) {
-        List<UserInfo> users = userInfoMapper.selectByCondition(
+        List<HdocUserInfo> users = userInfoMapper.selectByCondition(
             request.getUserId(), request.getUserName(), request.getMarket());
         List<UserSearchRecord> records = users.stream().map(u -> {
             UserSearchRecord rec = new UserSearchRecord();

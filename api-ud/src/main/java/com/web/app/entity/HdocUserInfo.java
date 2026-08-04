@@ -4,13 +4,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class UserInfo {
+public class HdocUserInfo {
     private String userid;
     private String password;
     private String username;
     private String responsible;
     private String userposition;
-    private String eMail;
+    private String email;
     private String market;
     private LocalDateTime registerDatetime;
     private String registerUser;

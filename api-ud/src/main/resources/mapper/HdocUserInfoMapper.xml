@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.web.app.mapper.UserInfoMapper">
-    <select id="selectByUserId" resultType="com.web.app.entity.UserInfo">
-        SELECT * FROM USER_INFO WHERE USERID = #{userId}
+<mapper namespace="com.web.app.mapper.HdocUserInfoMapper">
+    <select id="selectByUserId" resultType="com.web.app.entity.HdocUserInfo">
+        SELECT * FROM HDOC_USER_INFOR WHERE USERID = #{userId}
     </select>
-    <select id="selectByUserIdAndPassword" resultType="com.web.app.entity.UserInfo">
-        SELECT * FROM USER_INFO WHERE USERID = #{userId} AND PASSWORD = #{password}
+    <select id="selectByUserIdAndPassword" resultType="com.web.app.entity.HdocUserInfo">
+        SELECT * FROM HDOC_USER_INFOR WHERE USERID = #{userId} AND PASSWORD = #{password}
     </select>
-    <select id="selectByCondition" resultType="com.web.app.entity.UserInfo">
+    <select id="selectByCondition" resultType="com.web.app.entity.HdocUserInfo">
         SELECT ui.*, ma.MARKET AS market
-        FROM USER_INFO ui
+        FROM HDOC_USER_INFOR ui
         LEFT JOIN HDOC_MARKET_AUTH ma ON ma.USERID = ui.USERID
         WHERE 1=1
         <if test="userId != null and userId != ''"> AND ui.USERID LIKE CONCAT('%', #{userId}, '%') </if>
