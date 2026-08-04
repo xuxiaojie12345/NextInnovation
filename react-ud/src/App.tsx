@@ -24,6 +24,8 @@ import MarketDocumentSettingsList from "./MarketDocumentSettingsList/MarketDocum
 import DocumentTypes from "./DocumentTypes/DocumentTypes";
 import MarketsInHDoc from "./MarketsInHDoc/MarketsInHDoc";
 import ADChange from "./ADChange/ADChange";
+import DownloadAndPrintQuickGuides from "./DownloadAndPrintQuickGuides/DownloadAndPrintQuickGuides";
+import UserGuide from "./UserGuide/UserGuide";
 
 function App() {
   return (
@@ -55,6 +57,8 @@ function App() {
             <Route path='/document-types' element={<DocumentTypes />} />
             <Route path='/markets-in-hdoc' element={<MarketsInHDoc />} />
             <Route path='/ad-change' element={<ADChange />} />
+            <Route path='/download-and-print-quick-guides' element={<DownloadAndPrintQuickGuides />} />
+            <Route path='/user-guide' element={<UserGuide />} />
             <Route path='/TestMain' element={<TestMain />} />
           </Routes>
         </div>
