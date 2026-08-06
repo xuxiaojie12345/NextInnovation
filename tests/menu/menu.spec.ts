@@ -106,9 +106,11 @@ async function loginAs(page: Page, userId: string) {
 async function gotoMenuLoggedIn(page: Page, userId: string) {
   // 先通过登录流程建立 session
   await loginAs(page, userId);
-  // 等待权限加载完成
+  // 侧栏始终渲染（含 Account），但权限为异步加载；
+  // 等待 Loading 消失表示权限响应已返回，菜单或错误已渲染，避免时序竞态。
+  await expect(page.locator('.menu-loading-container')).toHaveCount(0, { timeout: 15000 });
   await expect(page.locator('.menu-sidebar')).toBeVisible();
-  await shot(page, '断言: 左侧菜单栏可见');
+  await shot(page, '断言: 左侧菜单栏可见(权限加载完成)');
 }
 
 // ============================================================================
