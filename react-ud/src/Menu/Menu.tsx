@@ -21,6 +21,8 @@ const Menu: React.FC = () => {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  // 当前在右侧内容区加载的画面路径（iframe）
+  const [activeUrl, setActiveUrl] = useState<string>('');
 
   const navigate = useNavigate();
 
@@ -40,6 +42,11 @@ const Menu: React.FC = () => {
         { id: 'uploadTemplate', label: 'Upload/Delete template', path: '/upload-delete-template', permission: 'hdoc_admin' },
         { id: 'listTemplates', label: 'List available templates', path: '/list-available-templates', permission: 'hdoc_admin' },
         { id: 'vinPlate', label: 'VPPS Vin plate', path: '/vin-plate', permission: 'hdoc_admin' },
+        { id: 'adChange', label: 'AD Change', path: '/ad-change', permission: 'hdoc_admin' },
+        { id: 'marketDocSettings', label: 'Market Document Settings List', path: '/market-document-settings-list', permission: 'hdoc_admin' },
+        { id: 'marketsInHDoc', label: 'Markets in HDoc', path: '/markets-in-hdoc', permission: 'hdoc_admin' },
+        { id: 'documentTypes', label: 'Document Types', path: '/document-types', permission: 'hdoc_admin' },
+        { id: 'quickGuides', label: 'Download and Print Quick Guides', path: '/download-print-quick-guides', permission: 'hdoc_admin' },
         { id: 'adCaChange', label: 'AD/CA Change', path: '/ad-ca-change', permission: 'hdoc_admin' },
       ],
     },
@@ -69,8 +76,21 @@ const Menu: React.FC = () => {
         navigate('/');
         return;
       }
+      // 后端 GetUserFunctionAuth 通过 @RequestHeader("userId") 读取用户 ID。
+      // 从登录时保存的 userInfo 中解析 userId 并放入 userId 请求头。
+      let userId = '';
+      try {
+        const info = JSON.parse(userInfoStr);
+        userId = info.userId || '';
+      } catch {
+        userId = '';
+      }
+      if (!userId) {
+        navigate('/');
+        return;
+      }
       const response = await axios.get('/api/user/GetUserFunctionAuth', {
-        headers: { Authorization: `Bearer ${userInfoStr}` },
+        headers: { userId },
       });
       if (response.data.status === 'success') {
         setPermissions(response.data.data.permissions || []);
@@ -113,16 +133,16 @@ const Menu: React.FC = () => {
     return permissions.some((p) => p === permission);
   };
 
-  // 处理菜单点击跳转
+  // 处理菜单点击：在右侧内容区（iframe）加载对应画面
   const handleMenuItemClick = (path: string) => {
-    navigate(path);
+    setActiveUrl(path);
   };
 
   // 处理键盘事件
   const handleKeyDown = (e: React.KeyboardEvent, path: string) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      navigate(path);
+      setActiveUrl(path);
     }
   };
 
@@ -131,62 +151,41 @@ const Menu: React.FC = () => {
     fetchPermissions();
   };
 
-  // 无权限时显示提示
-  if (!isLoading && permissions.length === 0 && !errorMessage) {
-    return (
-      <div className="menu-container">
-        <div className="menu-header">
-          <div className="menu-logo">VOLVO</div>
-        </div>
-        <div className="menu-error-container">
-          <p className="menu-error-text">YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE</p>
-          <button className="menu-retry-button" onClick={handleRetry}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // 获取当前登录用户名
+  const getUserName = (): string => {
+    const userInfoStr = sessionStorage.getItem('userInfo');
+    if (!userInfoStr) return '';
+    try {
+      const info = JSON.parse(userInfoStr);
+      return info.userName || info.name || '';
+    } catch {
+      return '';
+    }
+  };
 
-  // 加载中显示
-  if (isLoading) {
-    return (
-      <div className="menu-container">
-        <div className="menu-header">
-          <div className="menu-logo">VOLVO</div>
-        </div>
-        <div className="menu-loading-container">
-          <div className="menu-loading-spinner" />
-          <p className="menu-loading-text">Loading menu...</p>
-        </div>
-      </div>
-    );
-  }
+  // 处理登出：清空 session 并返回登录页
+  const handleLogout = () => {
+    sessionStorage.removeItem('userInfo');
+    setActiveUrl('');
+    navigate('/');
+  };
 
-  // 错误时显示
-  if (errorMessage) {
-    return (
-      <div className="menu-container">
-        <div className="menu-header">
-          <div className="menu-logo">VOLVO</div>
-        </div>
-        <div className="menu-error-container">
-          <p className="menu-error-text">{errorMessage}</p>
-          <button className="menu-retry-button" onClick={handleRetry}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // 顶部导航条：右侧显示用户名和 Logout 按钮
+  const renderNavbar = () => (
+    <div className="menu-navbar">
+      <span className="menu-navbar-user">{getUserName()}</span>
+      <button className="menu-navbar-logout" onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
+  );
 
-  return (
-    <div className="menu-container">
-      {/* 顶部标题区域 */}
+  // 左侧菜单栏
+  const renderSidebar = () => (
+    <div className="menu-sidebar">
       <div className="menu-header">
         <div className="menu-logo">VOLVO</div>
       </div>
-      {/* 菜单内容区域 */}
       <div className="menu-content">
         {menuSections.map((section) => {
           const visibleItems = section.items.filter((item) => hasPermission(item.permission));
@@ -198,7 +197,7 @@ const Menu: React.FC = () => {
                 {visibleItems.map((item) => (
                   <li
                     key={item.id}
-                    className="menu-item"
+                    className={`menu-item${activeUrl === item.path ? ' menu-item-active' : ''}`}
                     tabIndex={0}
                     role="button"
                     onClick={() => handleMenuItemClick(item.path)}
@@ -217,7 +216,7 @@ const Menu: React.FC = () => {
           <h3 className="menu-section-title">Account</h3>
           <ul className="menu-list">
             <li
-              className="menu-item"
+              className={`menu-item${activeUrl === '/change-password' ? ' menu-item-active' : ''}`}
               tabIndex={0}
               role="button"
               onClick={() => handleMenuItemClick('/change-password')}
@@ -228,6 +227,75 @@ const Menu: React.FC = () => {
             </li>
           </ul>
         </div>
+      </div>
+    </div>
+  );
+
+  // 右侧内容区（iframe 加载对应的子画面）
+  const renderContent = () => {
+    if (!isLoading && permissions.length === 0 && !errorMessage) {
+      return (
+        <div className="menu-content-area">
+          <div className="menu-error-container">
+            <p className="menu-error-text">YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE</p>
+            <button className="menu-retry-button" onClick={handleRetry}>
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+    if (isLoading) {
+      return (
+        <div className="menu-content-area">
+          <div className="menu-loading-container">
+            <div className="menu-loading-spinner" />
+            <p className="menu-loading-text">Loading menu...</p>
+          </div>
+        </div>
+      );
+    }
+    if (errorMessage) {
+      return (
+        <div className="menu-content-area">
+          <div className="menu-error-container">
+            <p className="menu-error-text">{errorMessage}</p>
+            <button className="menu-retry-button" onClick={handleRetry}>
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+    // 正常：右侧为 iframe 内容区
+    if (!activeUrl) {
+      return (
+        <div className="menu-content-area">
+          <div className="menu-placeholder">
+            <p>Select a menu item from the left to view its content.</p>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="menu-content-area">
+        <iframe
+          className="menu-iframe"
+          src={activeUrl}
+          title={activeUrl}
+        />
+      </div>
+    );
+  };
+
+  return (
+    <div className="menu-container">
+      {/* 顶部导航条（全宽） */}
+      {renderNavbar()}
+      {/* 左右分栏：左侧菜单 + 右侧内容 */}
+      <div className="menu-body">
+        {renderSidebar()}
+        {renderContent()}
       </div>
     </div>
   );

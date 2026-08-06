@@ -45,7 +45,7 @@ const Login: React.FC = () => {
     }
     setIsLoading(true);
     try {
-      const response = await axios.post('/api/AuthenticationApi', {
+      const response = await axios.post('/api/authentication', {
         userId: userId.trim(),
         password: password,
       });
@@ -131,6 +131,7 @@ const Login: React.FC = () => {
             className="login-button"
             htmlType="submit"
             loading={isLoading}
+            disabled={isLoading}
             block
           >
             Login
@@ -141,7 +142,7 @@ const Login: React.FC = () => {
               administrator&rdquo;
             </p>
             <p>
-              Please try this alterative login link before contacting support.{' '}
+              Please try this alternative login link before contacting support.{' '}
               <a href="/login">Login</a>
             </p>
             <p>We are working to find root cause of problem.</p>

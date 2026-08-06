@@ -17,7 +17,7 @@ public class SimpleCORSFilter implements Filter {
     response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, HEAD");
     response.setHeader("Access-Control-Max-Age", "3600");
     response.setHeader("Access-Control-Allow-Headers", "access-control-allow-origin, " +
-        "authority, content-type, version-info, X-Requested-With");
+        "authority, content-type, version-info, X-Requested-With, authorization, userId");
     chain.doFilter(req, res);
   }
 
