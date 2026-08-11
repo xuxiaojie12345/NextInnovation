@@ -2,6 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.HdocRecDataVdaGeneralMapper">
     <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataVdaGeneral">
-        SELECT * FROM HDOC_REC_DATA_VDA_GENERAL WHERE CHASSIS_NO = #{chassisNo}
+        SELECT * FROM HDOC_REC_DATA_VDA_GENERAL WHERE VIN = #{chassisNo} ORDER BY BUILD_WEEK LIMIT 1
     </select>
 </mapper>

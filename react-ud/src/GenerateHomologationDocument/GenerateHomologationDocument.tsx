@@ -129,13 +129,19 @@ const GenerateHomologationDocument: React.FC = () => {
       return;
     }
     saveConditions();
-    navigate('/generate-document', {
-      state: {
-        chassisSeries: chassisSeries.trim(),
-        chassisNo: chassisNo.trim(),
-        documentType,
-      },
-    });
+    // 通过 postMessage 通知 Menu 右侧 iframe 切换到 Generate document 画面，
+    // 并以 URL query 参数传递搜索条件（GenerateDocument 从 location.search 读取）。
+    const target = `/generate-document?chassisNo=${encodeURIComponent(chassisNo.trim())}&docType=${encodeURIComponent(documentType)}&chassisSeries=${encodeURIComponent(chassisSeries.trim())}`;
+    if (window.parent !== window) {
+      // 在 Menu iframe 中：通知父窗口（Menu）切换右侧内容
+      window.parent.postMessage(
+        { type: 'NAVIGATE', path: target },
+        '*'
+      );
+    } else {
+      // 独立访问时回退为直接跳转（携带 query 参数）
+      navigate(target);
+    }
   };
 
   // 处理Reset按钮点击事件

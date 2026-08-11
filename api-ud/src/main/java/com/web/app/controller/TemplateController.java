@@ -6,6 +6,9 @@ import com.web.app.dto.request.UD12DeleteFileRequest;
 import com.web.app.service.FileService;
 import com.web.app.service.MasterDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -22,6 +25,17 @@ public class TemplateController {
     @GetMapping("/UD12SelectMarket")
     public ApiResponse<List<SelectListResponse>> selectMarket() {
         return ApiResponse.success(masterDataService.getMarketList());
+    }
+
+    /** 模板文件下载：返回一个空白的 .trf 模板文件（供 Modify Document 画面下载） */
+    @GetMapping("/download/template")
+    public ResponseEntity<byte[]> downloadTemplate() {
+        String content = "// TEMPLATE VIN_PLATE (blank)\r\n";
+        byte[] data = content.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=template.trf")
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(data);
     }
 
     @PostMapping("/UD12UploadFile")

@@ -1,0 +1,300 @@
+-- ============================================================================
+-- Generate Document 模块 (UD04) 测试数据 (Unit Test Data)
+-- 对应测试式样书：react-ud/src/GenerateDocument/GenerateDocument_単体テスト仕様書.md
+-- 对应前端：react-ud/src/GenerateDocument/GenerateDocument.tsx
+-- 对应后端：GenerateDocumentServiceImpl.generateDocument(chassisNo, docType)
+--
+-- 【运行前提】
+-- 1) 本数据面向【真实后端】模式：依赖后端 (localhost:8081) 正常运行、
+--    数据库已按 react_ud_sql.txt 的 DDL 建表。
+-- 2) 后端 mapper WHERE 已修正为按 VIN 关联（chassisNo 视为 VIN）：
+--      - HDOC_REC_DATA_OM               WHERE VIN = #{chassisNo}
+--      - HDOC_REC_DATA_VDA_GENERAL      WHERE VIN = #{chassisNo}
+--      - HDOC_REC_DATA_VDA_VARIANTS     WHERE VIN = #{chassisNo}
+--      - HDOC_REC_DATA_KAP_SNOTE        WHERE VARIANT_ID = #{chassisNo}
+--      - HDOC_REC_DATA_KOLA_TIRE_MASTER WHERE TDIM = #{chassisNo}
+--      - ADCA_CHANGE / ADCA_MODIFICATION 按 OM 取出的 SERIE + CHNR 关联
+--      - HDOC_SEND_DATA_VIN_PLATE       按 OM 取出的 ORDERNUMBER 关联
+--
+-- 【测试场景】
+--   场景 A  规格书设定值（query 直访）    VIN = ABC1234567890
+--     完整数据 -> 覆盖 No.12 精确 spec 值（chassisInfo="ABC1234567890" 等）、
+--     No.1-6,8,13,15,18,22,26,40-42,44,45
+--   场景 B  完整 Menu 链路主 happy path   VIN = 028321
+--     完整数据（GenerateHomologationDocument 表单要求 chassis no 为 1-10 位纯数字）
+--     -> 覆盖 No.1-6,8,12,13,15,18,22,26,40-42,44,45（完整链路）
+--   场景 C（空数据组合）：VIN = BA00000000
+--     -> S-Note 空(No.14)、Load Index 空(No.16)、AD-Change 未激活(No.20)、
+--        无生成文件(No.23)、替换参数空(No.43)
+--   场景 D（部分字段无记录）：VIN = CA00000001
+--     -> OM 有记录但 VDA 无记录 -> buildWeek/specWeek/market 显示 '-' (No.17)
+--
+-- 执行：mysql -h172.17.0.63 -uroot -p1234 react_ud < this_file.sql
+-- 脚本使用 INSERT ... ON DUPLICATE KEY UPDATE，可重复执行。
+-- ============================================================================
+
+USE react_ud;
+
+-- ============================================================================
+-- 场景 A：主 happy path (VIN = ABC1234567890)
+-- ============================================================================
+
+-- 1) OM 订单信息
+INSERT INTO `HDOC_REC_DATA_OM`
+  (ORDERNUMBER, TRANS_TS, SALESMARKET, BUYERPARTYID, ENDCUSTOMERPARTYID, DEALAGREEMENTID,
+   SPEC, BUILD, SERIE, CHNR, DELIVERY, MODEL, VIN, CUSTOMER_ADAP, VARSTR, SYMBOL_STR,
+   ORDERSTATUS, ASSEMBLY_ORDER, FAC_LINE, REGDATE, PC, NSV_DESCR, FIRM_PLAN, VSTATUS,
+   LAST_CD, FO, PRODUCTION_END, BUYERPARTYID2, TDI_DEALERID, RELEASEFACTORY, RETAILSALESDATE,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ORD123456', 'TRANS_A', 'DE', 'BUYER01', 'CUST01', 'AGREE01',
+   1, 2, 'A1234', '5678901234', 3, 'MODEL-A', 'ABC1234567890', '', '', '',
+   'ACCEPTED', 'ASSY001', 'F1', '202245', 'PC', '', 1, 1,
+   1, 'FO', '202245', 'BUYER2', 'D1', 'REL', '2022-12-01',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 2) VDA_GENERAL（制造周 / 主规格周 / 市场）
+INSERT INTO `HDOC_REC_DATA_VDA_GENERAL`
+  (SERIE, CHNR, TRANS_TS, VIN, COUNTRY_OF_OPERATION, REGISTRATION_NUMBER, DELIVERY_DATE,
+   BRAND_ID, PC, PRODUCT_TYPE, COMPANY_CODE, MARKETING_TYPE, MAIN_SPEC_WEEK, BODY_SPEC_WEEK,
+   BUILD_WEEK, USING_END_CUSTOMER_ID,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('A1234', '5678901234', 'TRANS_A', 'ABC1234567890', 'DE', 'REG123', '2022-12-02',
+   'BRAND1', 'PC', 'VAN', 'COMP1', 'MARK1', '202244', '202243',
+   '202245', 'CUST01',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN), COUNTRY_OF_OPERATION = VALUES(COUNTRY_OF_OPERATION),
+  MAIN_SPEC_WEEK = VALUES(MAIN_SPEC_WEEK), BUILD_WEEK = VALUES(BUILD_WEEK),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 3) VDA_VARIANTS
+INSERT INTO `HDOC_REC_DATA_VDA_VARIANTS`
+  (SERIE, CHNR, VIN, FAMILY_ID, VARIANT_ID, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('A1234', '5678901234', 'ABC1234567890', 'FA001', 'VA001', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 4) KAP_SNOTE（S-Note 显示 "ADAPTATION CODE XYZ"，按 VARIANT_ID = VIN 关联）
+INSERT INTO `HDOC_REC_DATA_KAP_SNOTE`
+  (SNOTE, VARIANT_ID, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ADAPTATIONXYZ', 'ABC1234567890', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  SNOTE = VALUES(SNOTE),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 5) KOLA_TIRE_MASTER（Load Index="148/145 K"，按 TDIM = VIN 关联）
+INSERT INTO `HDOC_REC_DATA_KOLA_TIRE_MASTER`
+  (PARTNO, TDIM, BRAND, LOAD_INDEX, VPV, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('TIRE000001', 'ABC1234567890', 'BR0', '148/145 K', 'VPV1', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  TDIM = VALUES(TDIM), LOAD_INDEX = VALUES(LOAD_INDEX),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 6) ADCA_CHANGE（ACT=Y -> adChangeActive=true）
+INSERT INTO `HDOC_ADCA_CHANGE`
+  (SERIE, CHNR, ACT, BU, REASON,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('A1234', '5678901234', 'Y', 'BU1', 'ADCA test',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  ACT = VALUES(ACT), BU = VALUES(BU),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 7) ADCA_MODIFICATION（Replacing parameters，3 条）
+INSERT INTO `HDOC_ADCA_MODIFICATION`
+  (SERIE, CHNO, DOCTYPE, LANG, VARIABLE, VERS, NEWVAL, STA, BU, RELEASE_USER, RELEASE_DATE_TIME,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('A1234', '5678901234', 'VIN_PLATE', 'EN', 'TIRE_SIZE', 1, '245/45R18', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test'),
+  ('A1234', '5678901234', 'VIN_PLATE', 'EN', 'AXLE_CONF', 1, '4X2', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test'),
+  ('A1234', '5678901234', 'VIN_PLATE', 'EN', 'WB_MM', 1, '5800', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  NEWVAL = VALUES(NEWVAL),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- 8) HDOC_SEND_DATA_VIN_PLATE（生成文件，按 ORDERNUMBER 关联 -> generatedFileUrl）
+INSERT INTO `HDOC_SEND_DATA_VIN_PLATE`
+  (SERIE, CHNR, PC, ADDED, DOC_READY, DOC_SENT, BU, STATUS, XML_DOC, MSG, `TYPE`,
+   IS_JS_DIVISION, ORDERNUMBER, FILENAME_ON_DISK, ADCA_CHANGE_FLG,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('A1234', '5678901234', 'PC', '2022-12-01', '2022-12-02', NULL, 'BU1', 1, NULL, NULL, 'X',
+   'N', 'ORD123456', 'ABC1234567890.trf', 'Y',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  ORDERNUMBER = VALUES(ORDERNUMBER), FILENAME_ON_DISK = VALUES(FILENAME_ON_DISK),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ============================================================================
+-- 场景 A2：完整 Menu 链路主 happy path (VIN = 028321)
+--   GenerateHomologationDocument 表单要求 Chassis no 为 1-10 位纯数字，
+--   因此主链路使用 028321。以下为完整数据集，覆盖 No.1-6,8,12,13,15,18,22,26,40-42,44,45。
+--   （SERIE/CHNR 使用 99999/028321000，避免与场景 A 的 A1234/5678901234 主键冲突）
+-- ============================================================================
+INSERT INTO `HDOC_REC_DATA_OM`
+  (ORDERNUMBER, TRANS_TS, SALESMARKET, SERIE, CHNR, MODEL, VIN,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ORD100001', 'TRANS_A', 'DE', '99999', '028321000', 'MODEL-A', '028321',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+INSERT INTO `HDOC_REC_DATA_VDA_GENERAL`
+  (SERIE, CHNR, VIN, COUNTRY_OF_OPERATION, MAIN_SPEC_WEEK, BODY_SPEC_WEEK, BUILD_WEEK,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('99999', '028321000', '028321', 'DE', '202244', '202243', '202245',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN), COUNTRY_OF_OPERATION = VALUES(COUNTRY_OF_OPERATION),
+  MAIN_SPEC_WEEK = VALUES(MAIN_SPEC_WEEK), BUILD_WEEK = VALUES(BUILD_WEEK),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+INSERT INTO `HDOC_REC_DATA_VDA_VARIANTS`
+  (SERIE, CHNR, VIN, FAMILY_ID, VARIANT_ID, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('99999', '028321000', '028321', 'FA001', 'VA001', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- KAP_SNOTE：S-Note "ADAPTATIONXYZ"（SNOTE 列 VARCHAR(16)，值须 <=16 字符）
+INSERT INTO `HDOC_REC_DATA_KAP_SNOTE`
+  (SNOTE, VARIANT_ID, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ADAPTATIONXYZ', '028321', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  SNOTE = VALUES(SNOTE),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- KOLA_TIRE_MASTER：Load Index "148/145 K"（PARTNO 与场景 A 区分，避免主键冲突）
+INSERT INTO `HDOC_REC_DATA_KOLA_TIRE_MASTER`
+  (PARTNO, TDIM, BRAND, LOAD_INDEX, VPV, TRANS_TS,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('TIRE000002', '028321', 'BR0', '148/145 K', 'VPV1', 'TRANS_A',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  TDIM = VALUES(TDIM), LOAD_INDEX = VALUES(LOAD_INDEX),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ADCA_CHANGE：ACT=Y -> adChangeActive=true
+INSERT INTO `HDOC_ADCA_CHANGE`
+  (SERIE, CHNR, ACT, BU, REASON,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('99999', '028321000', 'Y', 'BU1', 'ADCA test',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  ACT = VALUES(ACT), BU = VALUES(BU),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ADCA_MODIFICATION：Replacing parameters（3 条）
+INSERT INTO `HDOC_ADCA_MODIFICATION`
+  (SERIE, CHNO, DOCTYPE, LANG, VARIABLE, VERS, NEWVAL, STA, BU, RELEASE_USER, RELEASE_DATE_TIME,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('99999', '028321000', 'VIN_PLATE', 'EN', 'TIRE_SIZE', 1, '245/45R18', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test'),
+  ('99999', '028321000', 'VIN_PLATE', 'EN', 'AXLE_CONF', 1, '4X2', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test'),
+  ('99999', '028321000', 'VIN_PLATE', 'EN', 'WB_MM', 1, '5800', 1, 'BU1', 'release', NOW(),
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  NEWVAL = VALUES(NEWVAL),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- HDOC_SEND_DATA_VIN_PLATE：生成文件 -> generatedFileUrl
+INSERT INTO `HDOC_SEND_DATA_VIN_PLATE`
+  (SERIE, CHNR, PC, ADDED, BU, STATUS, `TYPE`, IS_JS_DIVISION, ORDERNUMBER, FILENAME_ON_DISK, ADCA_CHANGE_FLG,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('99999', '028321000', 'PC', '2022-12-01', 'BU1', 1, 'X', 'N', 'ORD100001', '028321.trf', 'Y',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  ORDERNUMBER = VALUES(ORDERNUMBER), FILENAME_ON_DISK = VALUES(FILENAME_ON_DISK),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+
+-- ============================================================================
+-- 场景 B：空数据组合 (VIN = BA00000000)
+--   OM / VDA_GENERAL 有记录；无 S-Note / 无 Tire / ADCA ACT=N / 无文件 / 无替换参数
+-- ============================================================================
+INSERT INTO `HDOC_REC_DATA_OM`
+  (ORDERNUMBER, SALESMARKET, SERIE, CHNR, VIN, MODEL,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ORD200002', 'FR', 'B1234', '2233445566', 'BA00000000', 'MODEL-B',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+INSERT INTO `HDOC_REC_DATA_VDA_GENERAL`
+  (SERIE, CHNR, VIN, COUNTRY_OF_OPERATION, MAIN_SPEC_WEEK, BUILD_WEEK,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('B1234', '2233445566', 'BA00000000', 'FR', '202229', '202230',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN), COUNTRY_OF_OPERATION = VALUES(COUNTRY_OF_OPERATION),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ADCA_CHANGE ACT=N -> adChangeActive=false
+INSERT INTO `HDOC_ADCA_CHANGE`
+  (SERIE, CHNR, ACT, BU,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('B1234', '2233445566', 'N', 'BU1',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  ACT = VALUES(ACT),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ============================================================================
+-- 场景 C：部分字段无记录 (VIN = CA00000001)
+--   OM 有记录，但 VDA_GENERAL 无记录 -> buildWeek/specWeek/market 显示 '-'
+-- ============================================================================
+INSERT INTO `HDOC_REC_DATA_OM`
+  (ORDERNUMBER, SALESMARKET, SERIE, CHNR, VIN, MODEL,
+   REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+VALUES
+  ('ORD300003', 'IT', 'C1234', '3344556677', 'CA00000001', 'MODEL-C',
+   NOW(), 'system', 'test', NOW(), 'system', 'test')
+ON DUPLICATE KEY UPDATE
+  VIN = VALUES(VIN),
+  UPDATE_DATETIME = NOW(), UPDATE_USER = 'system', UPDATE_PROCESS = 'test';
+
+-- ============================================================================
+-- 补充说明
+-- ----------------------------------------------------------------------------
+-- 运行测试前：
+--   1) 确保后端 (8081) 已用最新代码启动
+--   2) 确保前端 dev server (3000) 运行
+--   3) 执行本 SQL
+-- ============================================================================

@@ -35,6 +35,10 @@ public class ModificationController {
             @RequestBody UD06SelectModificationRequest request) {
         ModificationDetailResponse resp = modificationService.getModificationDetail(
             request.getSerie(), request.getChassisNo());
+        if (resp == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "No modification data found.");
+        }
         return ApiResponse.success(resp);
     }
 }

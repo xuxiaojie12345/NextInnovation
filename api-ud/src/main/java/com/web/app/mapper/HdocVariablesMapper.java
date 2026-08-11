@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface HdocVariablesMapper {
     List<HdocVariables> selectAll();
+    HdocVariables selectByVariable(@Param("variable") String variable);
     List<HdocVariables> selectByCondition(@Param("variable") String variable, @Param("type") String type,
         @Param("description") String description, @Param("createdByUser") String createdByUser,
         @Param("dateFrom") String dateFrom, @Param("dateTo") String dateTo);

@@ -2,6 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.HdocRecDataKapSnoteMapper">
     <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataKapSnote">
-        SELECT * FROM HDOC_REC_DATA_KAP_SNOTE WHERE SNOTE_NO LIKE CONCAT('%', #{chassisNo}, '%')
+        SELECT * FROM HDOC_REC_DATA_KAP_SNOTE WHERE VARIANT_ID = #{chassisNo}
     </select>
 </mapper>

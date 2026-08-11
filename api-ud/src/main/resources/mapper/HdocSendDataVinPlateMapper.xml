@@ -2,7 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.app.mapper.HdocSendDataVinPlateMapper">
     <select id="selectByChassisNo" resultType="com.web.app.entity.HdocSendDataVinPlate">
-        SELECT * FROM HDOC_SEND_DATA_VIN_PLATE WHERE CHASSIS_NO = #{chassisNo}
+        SELECT * FROM HDOC_SEND_DATA_VIN_PLATE WHERE ORDERNUMBER = #{chassisNo} LIMIT 1
+    </select>
+    <select id="selectByOrderNumber" resultType="com.web.app.entity.HdocSendDataVinPlate">
+        SELECT * FROM HDOC_SEND_DATA_VIN_PLATE WHERE ORDERNUMBER = #{orderNumber} LIMIT 1
     </select>
     <update id="updateStatus">
         UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status} WHERE CHASSIS_NO = #{chassisNo}

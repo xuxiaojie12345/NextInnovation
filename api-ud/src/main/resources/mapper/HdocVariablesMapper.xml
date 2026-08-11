@@ -4,6 +4,9 @@
     <select id="selectAll" resultType="com.web.app.entity.HdocVariables">
         SELECT * FROM HDOC_VARIABLES
     </select>
+    <select id="selectByVariable" resultType="com.web.app.entity.HdocVariables">
+        SELECT * FROM HDOC_VARIABLES WHERE VARIABLE = #{variable} LIMIT 1
+    </select>
     <select id="selectByCondition" resultType="com.web.app.entity.HdocVariables">
         SELECT * FROM HDOC_VARIABLES WHERE 1=1
         <if test="variable != null and variable != ''"> AND VARIABLE LIKE CONCAT('%', #{variable}, '%') </if>
