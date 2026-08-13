@@ -4,4 +4,7 @@
     <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataKapSnote">
         SELECT * FROM HDOC_REC_DATA_KAP_SNOTE WHERE VARIANT_ID = #{chassisNo}
     </select>
+    <select id="selectBySnote" resultType="com.web.app.entity.HdocRecDataKapSnote">
+        SELECT * FROM HDOC_REC_DATA_KAP_SNOTE WHERE SNOTE = #{snote} LIMIT 1
+    </select>
 </mapper>

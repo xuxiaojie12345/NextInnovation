@@ -164,7 +164,11 @@ const ModifyDocument: React.FC = () => {
   };
 
   const handleChassisLink = () => {
-    window.open(`/vda-vehicle-specification?chassisNo=${chassisNo}`, '_blank');
+    // 与 SaveModifications 一致：通过 React Router navigate 在右侧内容区跳转，
+    // 并以 state 传递 chassisNo（VehicleSpecification 从 location.state 读取）。
+    navigate('/vda-vehicle-specification', {
+      state: { chassisNo },
+    });
   };
 
   if (isLoading) {

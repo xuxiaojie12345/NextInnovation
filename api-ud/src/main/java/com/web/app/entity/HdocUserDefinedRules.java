@@ -13,7 +13,7 @@ public class HdocUserDefinedRules {
     private String vs2;
     private String variable;
     private String val;
-    private String userid;
+    private String userId;
     private String upDate;
     private String comments;
     private String addDate;

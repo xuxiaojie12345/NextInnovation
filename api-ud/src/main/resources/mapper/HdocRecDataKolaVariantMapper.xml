@@ -4,4 +4,7 @@
     <select id="selectByChassisNo" resultType="com.web.app.entity.HdocRecDataKolaVariant">
         SELECT * FROM HDOC_REC_DATA_KOLA_VARIANT WHERE DESCRIPTION = #{chassisNo}
     </select>
+    <select id="selectByFamilyAndVariant" resultType="com.web.app.entity.HdocRecDataKolaVariant">
+        SELECT * FROM HDOC_REC_DATA_KOLA_VARIANT WHERE FAMILY_ID = #{familyId} AND VARIANT_ID = #{variantId} LIMIT 1
+    </select>
 </mapper>

@@ -39,27 +39,43 @@ public class VariableServiceImpl implements VariableService {
 
     @Override
     public void addVariable(UD10AddVariableRequest request) {
+        if (hdocVariablesMapper.existsByVariable(request.getVariable()) > 0) {
+            throw new BusinessException(409, "Variant already exists. Please enter the correct content.");
+        }
         HdocVariables entity = new HdocVariables();
         entity.setVariable(request.getVariable());
         entity.setType(request.getType());
         entity.setDescription(request.getDescription());
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        entity.setRegisterDatetime(now);
+        entity.setRegisterUser("system");
+        entity.setRegisterProcess("UD10Add");
+        entity.setUpdateDatetime(now);
+        entity.setUpdateUser("system");
+        entity.setUpdateProcess("UD10Add");
         hdocVariablesMapper.insert(entity);
     }
 
     @Override
     public void updateVariable(UD10UpdateVariableRequest request) {
+        if (hdocVariablesMapper.existsByVariable(request.getVariable()) == 0) {
+            throw new BusinessException(404, "Variant does not exist. Please enter the correct content.");
+        }
         HdocVariables entity = new HdocVariables();
         entity.setVariable(request.getVariable());
         entity.setType(request.getType());
         entity.setDescription(request.getDescription());
-        int affected = hdocVariablesMapper.update(entity);
-        if (affected == 0) {
-            throw new BusinessException(404, "Variable not found");
-        }
+        entity.setUpdateDatetime(java.time.LocalDateTime.now());
+        entity.setUpdateUser("system");
+        entity.setUpdateProcess("UD10Update");
+        hdocVariablesMapper.update(entity);
     }
 
     @Override
     public void deleteVariable(String variable) {
+        if (hdocVariablesMapper.existsByVariable(variable) == 0) {
+            throw new BusinessException(404, "Variant does not exist. Please enter the correct content.");
+        }
         hdocVariablesMapper.deleteByVariable(variable);
     }
 }

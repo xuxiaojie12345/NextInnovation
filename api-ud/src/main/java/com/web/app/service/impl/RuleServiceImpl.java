@@ -22,6 +22,7 @@ public class RuleServiceImpl implements RuleService {
     public void addRule(UD08AddRuleRequest request) {
         HdocUserDefinedRules entity = new HdocUserDefinedRules();
         entity.setPc(request.getPc());
+        entity.setNum(request.getNum() != null ? new java.math.BigDecimal(request.getNum()) : null);
         entity.setMarket(request.getMarket());
         entity.setVs(request.getVs());
         entity.setVs2(request.getVs2());
@@ -30,6 +31,14 @@ public class RuleServiceImpl implements RuleService {
         entity.setComments(request.getComments());
         entity.setAddDate(request.getAddDate());
         entity.setDeleteDate(request.getDeleteDate());
+        entity.setUserId(request.getUserId());
+        entity.setRegisterDatetime(java.time.LocalDateTime.now());
+        entity.setRegisterUser(request.getUserId() != null ? request.getUserId() : "system");
+        entity.setRegisterProcess("UD08Add");
+        entity.setUpdateDatetime(java.time.LocalDateTime.now());
+        entity.setUpdateUser(request.getUserId() != null ? request.getUserId() : "system");
+        entity.setUpdateProcess("UD08Add");
+        entity.setUpDate(java.time.LocalDate.now().toString());
         rulesMapper.insert(entity);
     }
 
@@ -73,8 +82,8 @@ public class RuleServiceImpl implements RuleService {
             rec.setComments(r.getComments());
             rec.setAddDate(r.getAddDate());
             rec.setDeleteDate(r.getDeleteDate());
-            rec.setCreatedByUser(r.getRegisterUser());
-            rec.setCreatedDate(r.getRegisterDatetime() != null ? r.getRegisterDatetime().toString() : null);
+            rec.setRegisterUser(r.getRegisterUser());
+            rec.setRegisterDatetime(r.getRegisterDatetime() != null ? r.getRegisterDatetime().toString() : null);
             return rec;
         }).collect(Collectors.toList());
         return new SearchResultResponse<>(records.size(), records);

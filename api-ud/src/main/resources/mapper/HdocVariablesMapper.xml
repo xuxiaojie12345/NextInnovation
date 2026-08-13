@@ -17,12 +17,18 @@
         <if test="dateTo != null and dateTo != ''"> AND REGISTER_DATETIME &lt;= #{dateTo} </if>
     </select>
     <insert id="insert" parameterType="com.web.app.entity.HdocVariables">
-        INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION) VALUES (#{variable}, #{type}, #{description})
+        INSERT INTO HDOC_VARIABLES (VARIABLE, TYPE, DESCRIPTION, REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{variable}, #{type}, #{description}, #{registerDatetime}, #{registerUser}, #{registerProcess}, #{updateDatetime}, #{updateUser}, #{updateProcess})
     </insert>
     <update id="update" parameterType="com.web.app.entity.HdocVariables">
-        UPDATE HDOC_VARIABLES SET TYPE = #{type}, DESCRIPTION = #{description} WHERE VARIABLE = #{variable}
+        UPDATE HDOC_VARIABLES SET TYPE = #{type}, DESCRIPTION = #{description},
+        UPDATE_DATETIME = #{updateDatetime}, UPDATE_USER = #{updateUser}, UPDATE_PROCESS = #{updateProcess}
+        WHERE VARIABLE = #{variable}
     </update>
     <delete id="deleteByVariable">
         DELETE FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
     </delete>
+    <select id="existsByVariable" resultType="int">
+        SELECT COUNT(*) FROM HDOC_VARIABLES WHERE VARIABLE = #{variable}
+    </select>
 </mapper>

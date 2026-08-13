@@ -19,6 +19,6 @@ public class RuleSearchRecord {
     private String comments;
     private String addDate;
     private String deleteDate;
-    private String createdByUser;
-    private String createdDate;
+    private String registerUser;
+    private String registerDatetime;
 }

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface HdocRecDataKapSnoteMapper {
     List<HdocRecDataKapSnote> selectByChassisNo(@Param("chassisNo") String chassisNo);
+    HdocRecDataKapSnote selectBySnote(@Param("snote") String snote);
 }

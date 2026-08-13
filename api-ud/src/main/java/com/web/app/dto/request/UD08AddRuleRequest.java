@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class UD08AddRuleRequest {
     private String pc;
+    private String num;
     private String market;
     private String vs;
     private String vs2;
@@ -13,4 +14,5 @@ public class UD08AddRuleRequest {
     private String comments;
     private String addDate;
     private String deleteDate;
+    private String userId;
 }

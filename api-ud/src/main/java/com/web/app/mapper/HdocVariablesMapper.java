@@ -13,4 +13,5 @@ public interface HdocVariablesMapper {
     int insert(HdocVariables record);
     int update(HdocVariables record);
     int deleteByVariable(@Param("variable") String variable);
+    int existsByVariable(@Param("variable") String variable);
 }

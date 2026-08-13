@@ -41,6 +41,8 @@ public class GenerateDocumentServiceImpl implements GenerateDocumentService {
     @Autowired
     private HdocRecDataKolaTireMasterMapper hdocRecDataKolaTireMasterMapper;
     @Autowired
+    private HdocRecDataKolaVariantMapper hdocRecDataKolaVariantMapper;
+    @Autowired
     private HdocAdcaChangeMapper hdocAdcaChangeMapper;
     @Autowired
     private HdocAdcaModificationMapper hdocAdcaModificationMapper;
@@ -132,10 +134,81 @@ public class GenerateDocumentServiceImpl implements GenerateDocumentService {
 
     @Override
     public VehicleSpecificationResponse getVehicleSpecification(String chassisNo) {
-        // Aggregate data from multiple tables into a single response
         VehicleSpecificationResponse resp = new VehicleSpecificationResponse();
         resp.setChassisNo(chassisNo);
-        // For now, return what we can query
+
+        // 1) VDA_GENERAL：制造周 / 产品类型 / VIN / 运营国家
+        List<HdocRecDataVdaGeneral> vdaList = hdocRecDataVdaGeneralMapper.selectByChassisNo(chassisNo);
+        if (!vdaList.isEmpty()) {
+            HdocRecDataVdaGeneral vda = vdaList.get(0);
+            resp.setBuiltWeek(vda.getBuildWeek());
+            resp.setProductType(vda.getProductType());
+            resp.setVin(vda.getVin());
+            resp.setCountryOfOperation(vda.getCountryOfOperation());
+        }
+
+        // 2) OM：车型 / CUSTOMER_ADAP（S-Note code）
+        String customerAdap = null;
+        List<HdocRecDataOm> omList = hdocRecDataOmMapper.selectByChassisNo(chassisNo);
+        if (!omList.isEmpty()) {
+            HdocRecDataOm om = omList.get(0);
+            resp.setModel(om.getModel());
+            customerAdap = om.getCustomerAdap();
+        }
+
+        // 3) KOLA_VARIANT（DESCRIPTION=chassisNo 关联该底盘的变体）：组装 symbolList
+        //    （按 sortKey 升序，display 8 位）；engineNo 取 FAMILY_ID LIKE 'DPX%' 的 SYMBOL
+        List<VehicleSpecificationResponse.SymbolItem> symbolList = new ArrayList<>();
+        String engineNo = null;
+        List<HdocRecDataKolaVariant> kolaVariants = hdocRecDataKolaVariantMapper.selectByChassisNo(chassisNo);
+        for (HdocRecDataKolaVariant k : kolaVariants) {
+            // display：SYMBOL 取前 8 位，不足 8 位右侧补空格；左对齐
+            String display = formatDisplay(k.getSymbol());
+            String family = k.getFamilyId() != null ? k.getFamilyId() : "";
+            String sortKey = (k.getFunctionGroup() != null ? k.getFunctionGroup() : "") + family;
+            symbolList.add(new VehicleSpecificationResponse.SymbolItem(
+                display, k.getDescription(), sortKey));
+            // engineNo：FAMILY_ID LIKE 'DPX%' 对应的 SYMBOL
+            if (engineNo == null && family.startsWith("DPX")) {
+                engineNo = display != null ? display.trim() : "";
+            }
+        }
+        // 按 sortKey 升序排序（null 排后）
+        symbolList.sort((a, b) -> {
+            String ka = a.getSortKey() == null ? "" : a.getSortKey();
+            String kb = b.getSortKey() == null ? "" : b.getSortKey();
+            return ka.compareTo(kb);
+        });
+        resp.setSymbolList(symbolList);
+        // symbolStr：display 拼接（空格分隔）
+        resp.setSymbolStr(symbolList.stream()
+            .map(VehicleSpecificationResponse.SymbolItem::getDisplay)
+            .collect(Collectors.joining(" ")));
+        resp.setEngineNo(engineNo);
+
+        // 4) S-Note：CUSTOMER_ADAP 匹配 KAP_SNOTE
+        if (customerAdap != null && !customerAdap.trim().isEmpty()) {
+            resp.setSNoteNo(customerAdap);
+            HdocRecDataKapSnote snote = hdocRecDataKapSnoteMapper.selectBySnote(customerAdap);
+            if (snote != null) {
+                // KAP_SNOTE.VARIANT_ID 物理含义为 DESCRIPTION（S-Note 描述）
+                resp.setSNoteDesc(snote.getVariantId());
+            }
+        }
+
         return resp;
+    }
+
+    /** display：取 SYMBOL 前 8 位，不足 8 位右侧补空格至 8 位 */
+    private String formatDisplay(String symbol) {
+        if (symbol == null) {
+            return "";
+        }
+        String s = symbol.length() > 8 ? symbol.substring(0, 8) : symbol;
+        StringBuilder sb = new StringBuilder(s);
+        while (sb.length() < 8) {
+            sb.append(' ');
+        }
+        return sb.toString();
     }
 }

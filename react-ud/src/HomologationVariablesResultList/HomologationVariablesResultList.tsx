@@ -172,9 +172,9 @@ const HomologationVariablesResultList: React.FC = () => {
             { headers: { Authorization: `Bearer ${token}` } }
           );
           if (response.data.status === 'success') {
-            showMessage(response.data.message || 'Records deleted successfully.', 'success');
             setSelectedRowKeys(new Set());
-            fetchSearchResults();
+            await fetchSearchResults();
+            showMessage(response.data.message || 'Records deleted successfully.', 'success');
           } else {
             showMessage(response.data.message || 'Failed to delete selected records.', 'error');
           }

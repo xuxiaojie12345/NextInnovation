@@ -22,13 +22,16 @@
         <if test="deleteDateFrom != null and deleteDateFrom != ''"> AND DELETE_DATE &gt;= #{deleteDateFrom} </if>
         <if test="deleteDateTo != null and deleteDateTo != ''"> AND DELETE_DATE &lt;= #{deleteDateTo} </if>
         <if test="createdByUser != null and createdByUser != ''"> AND REGISTER_USER LIKE CONCAT('%', #{createdByUser}, '%') </if>
+        ORDER BY PC, MARKET, NUM
     </select>
     <select id="selectDistinctVariable" resultType="string">
         SELECT DISTINCT VARIABLE FROM HDOC_USER_DEFINED_RULES WHERE VARIABLE IS NOT NULL
     </select>
     <insert id="insert" parameterType="com.web.app.entity.HdocUserDefinedRules">
-        INSERT INTO HDOC_USER_DEFINED_RULES (PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS, ADD_DATE, DELETE_DATE)
-        VALUES (#{pc}, #{num}, #{market}, #{vs}, #{vs2}, #{variable}, #{val}, #{userId}, #{upDate}, #{comments}, #{addDate}, #{deleteDate})
+        INSERT INTO HDOC_USER_DEFINED_RULES (PC, NUM, MARKET, VS, VS2, VARIABLE, VAL, USERID, UP_DATE, COMMENTS, ADD_DATE, DELETE_DATE,
+            REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS, UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES (#{pc}, #{num}, #{market}, #{vs}, #{vs2}, #{variable}, #{val}, #{userId}, #{upDate}, #{comments}, #{addDate}, #{deleteDate},
+            #{registerDatetime}, #{registerUser}, #{registerProcess}, #{updateDatetime}, #{updateUser}, #{updateProcess})
     </insert>
     <update id="update" parameterType="com.web.app.entity.HdocUserDefinedRules">
         UPDATE HDOC_USER_DEFINED_RULES SET VS = #{vs}, VS2 = #{vs2}, VARIABLE = #{variable}, VAL = #{val},

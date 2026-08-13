@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface HdocRecDataKolaVariantMapper {
     List<HdocRecDataKolaVariant> selectByChassisNo(@Param("chassisNo") String chassisNo);
+    HdocRecDataKolaVariant selectByFamilyAndVariant(@Param("familyId") String familyId, @Param("variantId") String variantId);
 }
