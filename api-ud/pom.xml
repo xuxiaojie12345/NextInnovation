@@ -17,6 +17,9 @@
     <properties>
         <lombok.version>1.18.30</lombok.version>
         <java.version>1.8</java.version>
+        <!--统一编码：避免 Windows 中文环境下 Maven 输出/日志乱码-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--打包的时候跳过测试-->
         <skipTests>true</skipTests>
     </properties>
@@ -147,11 +150,19 @@
                     <target>1.8</target>
                     
                     <encoding>UTF-8</encoding>
+                    <!--JDK 23+ 默认禁用注解处理，显式启用以保证 Lombok 生效-->
+                    <compilerArgs>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!--强制应用 JVM 使用 UTF-8，解决 spring-boot:run 时中文日志/报错乱码-->
+                    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+                </configuration>
             </plugin>
         </plugins>
 

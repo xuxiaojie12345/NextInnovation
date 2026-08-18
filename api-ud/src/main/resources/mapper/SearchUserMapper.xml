@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SearchUserMapper.xml
+    对应后端提示词 5. 数据库设计（SQL 5.2 / 5.3）
+-->
+<mapper namespace="com.web.app.mapper.SearchUserMapper">
+
+    <!-- 用户信息结果映射（hdoc_user_infor） -->
+    <resultMap id="userInforMap" type="com.web.app.entity.HdocUserInfor">
+        <result column="USERID" property="userid"/>
+        <result column="USERNAME" property="username"/>
+    </resultMap>
+
+    <!-- 检索结果映射（userid / user / market） -->
+    <resultMap id="userSearchResultMap" type="com.web.app.dto.SearchUserResponse$UserSearchResult">
+        <result column="userid" property="userid"/>
+        <result column="user" property="user"/>
+        <result column="market" property="market"/>
+    </resultMap>
+
+    <!--
+        根据用户ID查询用户信息（用户名校验，等价 AuthenticationApi 数据源）
+    -->
+    <select id="selectUserByUserid" resultMap="userInforMap">
+        SELECT USERID, USERNAME
+        FROM hdoc_user_infor
+        WHERE USERID = #{userid}
+        LIMIT 1
+    </select>
+
+    <!--
+        根据用户名模糊查询用户列表（User 检索：先取得 Userid）
+    -->
+    <select id="selectUsersByUsername" resultMap="userInforMap">
+        SELECT USERID, USERNAME
+        FROM hdoc_user_infor
+        WHERE USERNAME LIKE CONCAT('%', #{username}, '%')
+    </select>
+
+    <!--
+        SQL 5.2：根据用户ID查询用户 Market 列表
+        SELECT MARKET FROM HDOC_MARKET_AUTH WHERE USERID = {userId}
+    -->
+    <select id="selectMarketsByUserid" resultType="java.lang.String">
+        SELECT MARKET
+        FROM HDOC_MARKET_AUTH
+        WHERE USERID = #{userid}
+    </select>
+
+    <!--
+        SQL 5.3：按条件检索用户
+        动态条件规则（后端提示词 5.3）：
+          - market 为空时取消 market 条件
+          - function 为空或 NOT_SET 时取消 function 条件
+    -->
+    <select id="selectUsersByCondition" resultMap="userSearchResultMap">
+        SELECT DISTINCT INFO.USERID AS userid,
+                        INFO.USERNAME AS `user`,
+                        MAR.MARKET AS market
+        FROM hdoc_user_infor INFO
+        LEFT JOIN HDOC_MARKET_AUTH MAR ON INFO.USERID = MAR.USERID
+        LEFT JOIN HDOC_FUNCTION_AUTH FUN ON INFO.USERID = FUN.USERID
+        <where>
+            <if test="serid != null and serid != ''">
+                AND INFO.USERID LIKE CONCAT('%', #{serid}, '%')
+            </if>
+            <if test="user != null and user != ''">
+                AND INFO.USERNAME LIKE CONCAT('%', #{user}, '%')
+            </if>
+            <if test="market != null and market != ''">
+                AND MAR.MARKET = #{market}
+            </if>
+            <if test="function != null and function != '' and function != 'NOT_SET'">
+                AND FUN.`FUNCTION` = #{function}
+            </if>
+        </where>
+        ORDER BY INFO.USERID
+    </select>
+
+</mapper>

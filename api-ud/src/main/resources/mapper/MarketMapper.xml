@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    MarketMapper.xml
+    对应后端提示词 5. 数据库设计（SQL 5.1）
+-->
+<mapper namespace="com.web.app.mapper.MarketMapper">
+
+    <!--
+        SQL 5.1：Market 列表检索（画面初期表示时调用）
+        SELECT MARKET FROM MARKET_MASTER
+    -->
+    <select id="selectMarketList" resultType="java.lang.String">
+        SELECT MARKET
+        FROM MARKET_MASTER
+        ORDER BY MARKET
+    </select>
+
+</mapper>

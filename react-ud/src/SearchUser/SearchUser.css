@@ -1,0 +1,183 @@
+/* ============================================================
+ * SearchUser.css
+ * Search HDoc User 画面样式
+ * 式样参照 work/searchUser.png：
+ *   - 标题：深蓝加粗，左上角
+ *   - 检索表单：左侧面板布局
+ *   - Market：下拉列表（带滚动）
+ *   - RadioBox：蓝色选中圆点
+ *   - Search 按钮：浅紫蓝背景，深色文字
+ *   - 结果表格：浅蓝/白色交替行背景
+ * ============================================================ */
+
+/* 画面容器：PC端居中显示，白色背景 */
+.search-user-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #333333;
+}
+
+/* 画面标题：深蓝加粗，左上角 */
+.search-user-title {
+  color: #1a3e72;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0 0 16px 0;
+}
+
+/* 错误/提示消息：红色，左对齐（设计书第 5 章 Message 表示） */
+.search-user-message {
+  color: #ff4d4f;
+  text-align: left;
+  font-size: 14px;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+/* ---------- 检索表单区域（左侧面板） ---------- */
+.search-user-form {
+  width: 260px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  margin-bottom: 4px;
+  color: #333333;
+}
+
+/* Userid / User 文本输入框 */
+.form-row input[type="text"] {
+  width: 100%;
+  height: 26px;
+  padding: 2px 6px;
+  border: 1px solid #7f9db9;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+/* Market 下拉列表（select 列表形式，带滚动，参照设计图） */
+.form-row select {
+  width: 120px;
+  border: 1px solid #7f9db9;
+  font-size: 14px;
+  background-color: #ffffff;
+}
+
+.form-row select option {
+  padding: 2px 4px;
+}
+
+/* RadioBox 单选组：Not set / Rule / Template */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0 12px 0;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+/* 选中时为蓝色圆点（浏览器原生 accent-color） */
+.radio-item input[type="radio"] {
+  accent-color: #1a3e72;
+  margin-right: 6px;
+}
+
+/* Search 按钮：浅紫蓝背景，深色文字，居中 */
+.button-row {
+  align-items: flex-start;
+}
+
+.search-button {
+  min-width: 90px;
+  height: 28px;
+  padding: 2px 16px;
+  background-color: #d6dff7;
+  border: 1px solid #9db3e8;
+  color: #1a1a1a;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #c3d0f2;
+}
+
+.search-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------- 检索结果区域（检索区域下方显示） ---------- */
+.search-user-result {
+  margin-top: 8px;
+}
+
+/* 结果表格：带边框网格 */
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #9db3e8;
+}
+
+.result-table th,
+.result-table td {
+  border: 1px solid #b8c8e8;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+/* 表头：浅蓝背景 */
+.result-table th {
+  background-color: #d6dff7;
+  font-weight: bold;
+}
+
+/* 交替行背景：浅蓝/白（参照设计图） */
+.result-table tbody tr:nth-child(odd) {
+  background-color: #eef3fc;
+}
+
+.result-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.empty-cell {
+  color: #999999;
+  text-align: center;
+}
+
+/* COUNT 表示：検索結果のレコード数（画面项目 No.11） */
+.result-count {
+  margin-top: 8px;
+  text-align: left;
+  color: #333333;
+}
+
+/* ---------- 响应式适配 ---------- */
+@media (max-width: 480px) {
+  .search-user-container {
+    padding: 12px;
+  }
+
+  .search-user-form {
+    width: 100%;
+  }
+}

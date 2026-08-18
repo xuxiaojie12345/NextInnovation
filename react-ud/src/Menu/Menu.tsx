@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 
 interface MenuItem {
@@ -12,6 +13,8 @@ interface MenuSection {
 }
 
 const Menu: React.FC = () => {
+  const navigate = useNavigate();
+
   const menuSections: MenuSection[] = [
     {
       title: 'Generate Document',
@@ -41,7 +44,7 @@ const Menu: React.FC = () => {
       items: [
         { label: 'HDoc User Administration' },
         { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
+        { label: 'Search User', path: '/user-admin/search-user' },
         { label: 'Change Password' },
         { label: 'User Position' },
       ],
@@ -66,8 +69,12 @@ const Menu: React.FC = () => {
   ];
 
   const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
+    // 已配置路由的菜单项跳转到对应画面（如 Search User → SearchUser 画面）
+    if (item.path) {
+      navigate(item.path);
+    } else {
+      console.log('Clicked:', item.label);
+    }
   };
 
   return (
