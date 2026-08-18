@@ -4,6 +4,8 @@ import "./HomologationVariables.css";
 
 interface DropdownOption {
   code: string;
+  pc?: string;
+  market?: string;
   description?: string;
 }
 

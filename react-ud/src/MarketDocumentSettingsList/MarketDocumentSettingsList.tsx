@@ -66,7 +66,7 @@ const MarketDocumentSettingsList: React.FC = () => {
     }
 
     const row = documents[selectedIndex];
-    navigate(-1, {
+    navigate(-1 as any, {
       state: {
         selectedDocument: {
           documentType: row.doctype,
