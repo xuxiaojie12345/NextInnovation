@@ -5,7 +5,14 @@
         SELECT * FROM HDOC_ADCA_CHANGE WHERE SERIE = #{serie} AND CHNR = #{chnr}
     </select>
     <insert id="insert" parameterType="com.web.app.entity.HdocAdcaChange">
-        INSERT INTO HDOC_ADCA_CHANGE (SERIE, CHNR, ACT, REASON) VALUES (#{serie}, #{chnr}, #{act}, #{reason})
+        INSERT INTO HDOC_ADCA_CHANGE
+          (SERIE, CHNR, ACT, BU, REASON,
+           REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+           UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
+          (#{serie}, #{chnr}, #{act}, #{bu}, #{reason},
+           NOW(), #{registerUser}, #{registerProcess},
+           NOW(), #{updateUser}, #{updateProcess})
     </insert>
     <update id="updateActToN">
         UPDATE HDOC_ADCA_CHANGE SET ACT = 'N' WHERE SERIE = #{serie} AND CHNR = #{chnr}

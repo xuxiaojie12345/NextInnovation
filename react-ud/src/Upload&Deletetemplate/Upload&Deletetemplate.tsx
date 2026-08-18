@@ -5,7 +5,7 @@ import axios from 'axios';
 import './Upload&Deletetemplate.css';
 
 interface MarketItem {
-  market: string;
+  code: string;
   description: string;
 }
 
@@ -255,8 +255,8 @@ const UploadDeletetemplate: React.FC = () => {
                   value={uploadMarket || undefined}
                   onChange={(v) => { setUploadMarket(v); setMessage(''); }}
                   options={marketList.map((m) => ({
-                    value: m.market,
-                    label: `${m.market} - ${m.description}`,
+                    value: m.code,
+                    label: `${m.code} - ${m.description}`,
                   }))}
                   showSearch
                   filterOption={(input, option) =>
@@ -289,10 +289,11 @@ const UploadDeletetemplate: React.FC = () => {
                   className="udt-select"
                   placeholder=""
                   value={deleteMarket || undefined}
+                  allowClear
                   onChange={(v) => { setDeleteMarket(v); setMessage(''); }}
                   options={marketList.map((m) => ({
-                    value: m.market,
-                    label: `${m.market} - ${m.description}`,
+                    value: m.code,
+                    label: `${m.code} - ${m.description}`,
                   }))}
                   showSearch
                   filterOption={(input, option) =>

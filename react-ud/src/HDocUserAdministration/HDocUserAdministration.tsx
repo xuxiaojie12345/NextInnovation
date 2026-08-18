@@ -17,7 +17,6 @@ interface Permissions {
   userAdmin: PermissionEntry;
   adaptationUser: PermissionEntry;
   manageVariableList: PermissionEntry;
-  showChangeVariantsFields: PermissionEntry;
   marketSuperUser: PermissionEntry;
 }
 
@@ -29,7 +28,6 @@ const emptyPermissions = (): Permissions => ({
   userAdmin: { enabled: false, market: null },
   adaptationUser: { enabled: false, market: null },
   manageVariableList: { enabled: false, market: null },
-  showChangeVariantsFields: { enabled: false, market: null },
   marketSuperUser: { enabled: false, market: null },
 });
 
@@ -39,7 +37,7 @@ const HDocUserAdministration: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [permissions, setPermissions] = useState<Permissions>(emptyPermissions());
-  const [marketList, setMarketList] = useState<{ code: string; name: string }[]>([]);
+  const [marketList, setMarketList] = useState<{ code: string; description: string }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('error');
@@ -77,6 +75,41 @@ const HDocUserAdministration: React.FC = () => {
     setMessage('');
   };
 
+  // 业务规则：角色复选框只能选中一个（互斥）。勾选某角色时取消其它所有角色。
+  const allRoleKeys: (keyof Permissions)[] = [
+    'standardUser', 'ruleAdmin', 'templateAdmin', 'documentAuthAdmin',
+    'userAdmin', 'adaptationUser', 'manageVariableList', 'marketSuperUser',
+  ];
+  const toggleRole = (key: keyof Permissions, checked: boolean) => {
+    setPermissions((prev) => {
+      const next = { ...prev };
+      allRoleKeys.forEach((k) => {
+        next[k] = { ...next[k], enabled: false, market: null };
+        if (k === key) {
+          next[k].enabled = checked;
+        }
+      });
+      return next;
+    });
+    setMessage('');
+  };
+
+  // 选择 Market Super User 下拉：视为选择该角色（互斥），清空则取消该角色
+  const selectMarketSuperUser = (val: string | null) => {
+    setPermissions((prev) => {
+      const next = { ...prev };
+      allRoleKeys.forEach((k) => {
+        next[k] = { ...next[k], enabled: false, market: null };
+        if (k === 'marketSuperUser') {
+          next[k].enabled = !!val;
+          next[k].market = val || null;
+        }
+      });
+      return next;
+    });
+    setMessage('');
+  };
+
   const clearPermissions = () => {
     setPermissions(emptyPermissions());
     setUserName('');
@@ -94,7 +127,6 @@ const HDocUserAdministration: React.FC = () => {
         userAdmin: p.userAdmin || { enabled: false, market: null },
         adaptationUser: p.adaptationUser || { enabled: false, market: null },
         manageVariableList: p.manageVariableList || { enabled: false, market: null },
-        showChangeVariantsFields: p.showChangeVariantsFields || { enabled: false, market: null },
         marketSuperUser: p.marketSuperUser || { enabled: false, market: null },
       });
       showMessage(responseData.message || 'Success', 'success');
@@ -212,7 +244,7 @@ const HDocUserAdministration: React.FC = () => {
 
   const marketOptions = marketList.map((m) => ({
     value: m.code,
-    label: `${m.code} - ${m.name}`,
+    label: `${m.code} - ${m.description}`,
   }));
 
   return (
@@ -261,7 +293,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.standardUser.enabled}
-                  onChange={(e) => updatePermission('standardUser', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('standardUser', e.target.checked)}
                 >
                   Standard User
                 </Checkbox>
@@ -282,7 +314,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.ruleAdmin.enabled}
-                  onChange={(e) => updatePermission('ruleAdmin', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('ruleAdmin', e.target.checked)}
                 >
                   Rule Admin
                 </Checkbox>
@@ -305,7 +337,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.templateAdmin.enabled}
-                  onChange={(e) => updatePermission('templateAdmin', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('templateAdmin', e.target.checked)}
                 >
                   Template Admin
                 </Checkbox>
@@ -328,7 +360,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.documentAuthAdmin.enabled}
-                  onChange={(e) => updatePermission('documentAuthAdmin', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('documentAuthAdmin', e.target.checked)}
                 >
                   Document Auth Admin
                 </Checkbox>
@@ -351,7 +383,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.userAdmin.enabled}
-                  onChange={(e) => updatePermission('userAdmin', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('userAdmin', e.target.checked)}
                 >
                   User Admin
                 </Checkbox>
@@ -363,7 +395,7 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.adaptationUser.enabled}
-                  onChange={(e) => updatePermission('adaptationUser', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('adaptationUser', e.target.checked)}
                 >
                   Adaptation user
                 </Checkbox>
@@ -384,21 +416,9 @@ const HDocUserAdministration: React.FC = () => {
               <div className="hua-perm-check">
                 <Checkbox
                   checked={permissions.manageVariableList.enabled}
-                  onChange={(e) => updatePermission('manageVariableList', 'enabled', e.target.checked)}
+                  onChange={(e) => toggleRole('manageVariableList', e.target.checked)}
                 >
                   Manage Variable List
-                </Checkbox>
-              </div>
-              <div className="hua-perm-market" />
-            </div>
-
-            <div className="hua-permission-row">
-              <div className="hua-perm-check">
-                <Checkbox
-                  checked={permissions.showChangeVariantsFields.enabled}
-                  onChange={(e) => updatePermission('showChangeVariantsFields', 'enabled', e.target.checked)}
-                >
-                  Show change variants fields
                 </Checkbox>
               </div>
               <div className="hua-perm-market" />
@@ -412,15 +432,7 @@ const HDocUserAdministration: React.FC = () => {
                 <Select
                   className="hua-select"
                   value={permissions.marketSuperUser.enabled ? (permissions.marketSuperUser.market || undefined) : undefined}
-                  onChange={(val) => {
-                    if (val) {
-                      updatePermission('marketSuperUser', 'enabled', true);
-                      updatePermission('marketSuperUser', 'market', val);
-                    } else {
-                      updatePermission('marketSuperUser', 'enabled', false);
-                      updatePermission('marketSuperUser', 'market', null);
-                    }
-                  }}
+                  onChange={selectMarketSuperUser}
                   placeholder="Select market super user"
                   options={marketOptions}
                   allowClear

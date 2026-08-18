@@ -6,7 +6,7 @@ import axios from 'axios';
 import './ListAvailableTemplates.css';
 
 interface MarketInfo {
-  market: string;
+  code: string;
   description: string;
 }
 
@@ -153,10 +153,11 @@ const ListAvailableTemplates: React.FC = () => {
                 className="lat-select"
                 placeholder=""
                 value={selectedMarket || undefined}
+                allowClear
                 onChange={(v) => { setSelectedMarket(v); setMessage(''); }}
                 options={marketList.map((m) => ({
-                  value: m.market,
-                  label: `${m.market} - ${m.description}`,
+                  value: m.code,
+                  label: `${m.code} - ${m.description}`,
                 }))}
                 showSearch
                 filterOption={(input, option) =>

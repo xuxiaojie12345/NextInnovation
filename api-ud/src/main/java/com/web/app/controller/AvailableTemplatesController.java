@@ -2,6 +2,7 @@ package com.web.app.controller;
 
 import com.web.app.dto.ApiResponse;
 import com.web.app.dto.response.SelectListResponse;
+import com.web.app.dto.response.TemplateFileInfoResponse;
 import com.web.app.service.MasterDataService;
 import com.web.app.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,15 @@ public class AvailableTemplatesController {
         return ApiResponse.success(masterDataService.getMarketList());
     }
 
+    /**
+     * UD14 模板文件列表：根据 Market 读取 uploads/{market} 下的文件，
+     * 并结合 HDOC_USER_DEFINED_RULES 的 VARIABLE 列表标记 Used，
+     * 返回 { filename, used, lastMod, size } 列表。
+     */
     @GetMapping("/UD14SelectHdocuserdefinedrules")
-    public ApiResponse<List<String>> selectHdocUserDefinedRules() {
-        return ApiResponse.success(masterDataService.getDistinctVariableList());
+    public ApiResponse<List<TemplateFileInfoResponse>> selectHdocUserDefinedRules(@RequestParam("market") String market) {
+        List<String> variables = masterDataService.getDistinctVariableList();
+        return ApiResponse.success(fileService.getTemplateFileInfos(market, variables));
     }
 
     @GetMapping("/UD14downfile")

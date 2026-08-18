@@ -22,13 +22,13 @@ public class AdcaChangeController {
 
     @PostMapping("/UD16InsertHdocAdcaChange")
     public ApiResponse<Void> insertHdocAdcaChange(@RequestBody UD16InsertAdcaChangeRequest request) {
-        adcaChangeService.insertHdocAdcaChange(request.getSerie(), request.getChnr(), request.getReason());
-        return ApiResponse.success(null, "AD Change inserted successfully");
+        String message = adcaChangeService.insertHdocAdcaChange(request.getSerie(), request.getChnr(), request.getReason());
+        return ApiResponse.success(null, message);
     }
 
     @PostMapping("/UD16UpdateHdocAdcaChange")
     public ApiResponse<Void> updateHdocAdcaChange(@RequestBody UD16SerieChnrRequest request) {
-        adcaChangeService.updateHdocAdcaChange(request.getSerie(), request.getChnr());
-        return ApiResponse.success(null, "AD Change updated successfully");
+        String message = adcaChangeService.updateHdocAdcaChange(request.getSerie(), request.getChnr());
+        return ApiResponse.success(null, message);
     }
 }

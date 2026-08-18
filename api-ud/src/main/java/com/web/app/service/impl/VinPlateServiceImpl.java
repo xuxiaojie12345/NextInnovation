@@ -24,21 +24,33 @@ public class VinPlateServiceImpl implements VinPlateService {
 
     @Override
     public void setRegenerate(String chassisNo) {
-        vinPlateMapper.updateStatus(chassisNo, "0");
+        int rows = vinPlateMapper.updateStatus(chassisNo, "0");
+        if (rows == 0) {
+            throw new BusinessException(404, "Vin Plate record not found for chassisNo: " + chassisNo);
+        }
     }
 
     @Override
     public void setOk(String chassisNo) {
-        vinPlateMapper.updateStatus(chassisNo, "1");
+        int rows = vinPlateMapper.updateStatus(chassisNo, "1");
+        if (rows == 0) {
+            throw new BusinessException(404, "Vin Plate record not found for chassisNo: " + chassisNo);
+        }
     }
 
     @Override
     public void changeToBasicInfo(String chassisNo) {
-        vinPlateMapper.updateStatusAndType(chassisNo, "0", "1");
+        int rows = vinPlateMapper.updateStatusAndType(chassisNo, "0", "1");
+        if (rows == 0) {
+            throw new BusinessException(404, "Vin Plate record not found for chassisNo: " + chassisNo);
+        }
     }
 
     @Override
     public void changeToAdvancedInfo(String chassisNo) {
-        vinPlateMapper.updateStatusAndType(chassisNo, "0", "2");
+        int rows = vinPlateMapper.updateStatusAndType(chassisNo, "0", "2");
+        if (rows == 0) {
+            throw new BusinessException(404, "Vin Plate record not found for chassisNo: " + chassisNo);
+        }
     }
 }

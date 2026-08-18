@@ -33,6 +33,78 @@ const STATUS_MAP: Record<string, string> = {
   '9': 'エラー',
 };
 
+// ============================================================================
+// 后端返回的字段是实体 HdocSendDataVinPlate（chnr/type/msg/status/xmlDoc...），
+// 与前端 VinPlateInfo 契约不一致。这里做字段映射，并从 XML_DOC 中解析
+// Print items（PrintItemName）与 VP Data（Variant 名/值）。
+// ============================================================================
+interface RawVinPlate {
+  chassisNo?: string;
+  ordernumber?: string;
+  chnr?: string;
+  type?: string;
+  status?: number | string;
+  msg?: string | null;
+  registerDatetime?: string;
+  docReady?: string | null;
+  docSent?: string | null;
+  xmlDoc?: string | null;
+  [key: string]: unknown;
+}
+
+function parsePrintItems(xmlDoc?: string | null): string[] {
+  if (!xmlDoc) return [];
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlDoc, 'text/xml');
+    if (doc.getElementsByTagName('parsererror').length > 0) return [];
+    const items: string[] = [];
+    const names = doc.getElementsByTagName('PrintItemName');
+    for (let i = 0; i < names.length; i += 1) {
+      const v = names[i].textContent;
+      if (v !== null && v !== undefined) items.push(v);
+    }
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+function parseVpData(xmlDoc?: string | null): VpDataItem[] {
+  if (!xmlDoc) return [];
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlDoc, 'text/xml');
+    if (doc.getElementsByTagName('parsererror').length > 0) return [];
+    const data: VpDataItem[] = [];
+    const variants = doc.getElementsByTagName('Variant');
+    for (let i = 0; i < variants.length; i += 1) {
+      const el = variants[i];
+      data.push({ variant: el.getAttribute('name') || '', value: el.textContent || '' });
+    }
+    return data;
+  } catch {
+    return [];
+  }
+}
+
+function mapVinPlateInfo(raw: RawVinPlate): VinPlateInfo {
+  const chassisNo = raw.chassisNo || raw.ordernumber || raw.chnr || '';
+  const xmlDoc = raw.xmlDoc;
+  return {
+    chassisNo,
+    plateType: String(raw.type ?? ''),
+    status: String(raw.status ?? ''),
+    errorMessage: raw.msg ?? null,
+    registerDatetime: raw.registerDatetime ?? '',
+    docReady: raw.docReady ?? '',
+    docSent: raw.docSent ?? null,
+    printItems: Array.isArray(raw.printItems) ? raw.printItems : parsePrintItems(xmlDoc),
+    vpData: Array.isArray(raw.vpData) ? raw.vpData : parseVpData(xmlDoc),
+  };
+}
+
+
 const VinPlate: React.FC = () => {
   const navigate = useNavigate();
 
@@ -91,7 +163,7 @@ const VinPlate: React.FC = () => {
     }
     const result = await callApi('/api/UD15ViewInfo');
     if (result?.data) {
-      setVinPlateInfo(result.data);
+      setVinPlateInfo(mapVinPlateInfo(result.data as RawVinPlate));
     } else {
       setVinPlateInfo(null);
     }
@@ -231,7 +303,7 @@ const VinPlate: React.FC = () => {
                     <td className="vp-detail-label">Print items</td>
                     <td className="vp-detail-value">
                       <ul className="vp-list">
-                        {vinPlateInfo.printItems.map((item, i) => (
+                        {(vinPlateInfo.printItems || []).map((item, i) => (
                           <li key={i}>{item}</li>
                         ))}
                       </ul>
@@ -248,7 +320,7 @@ const VinPlate: React.FC = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {vinPlateInfo.vpData.map((item, i) => (
+                          {(vinPlateInfo.vpData || []).map((item, i) => (
                             <tr key={i}>
                               <td>{item.variant}</td>
                               <td>{item.value}</td>

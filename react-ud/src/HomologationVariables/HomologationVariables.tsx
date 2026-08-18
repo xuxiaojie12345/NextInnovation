@@ -5,12 +5,17 @@ import axios from 'axios';
 import './HomologationVariables.css';
 
 interface ProductClass {
-  pc: string;
+  code: string;
   description: string;
 }
 
 interface MarketItem {
-  market: string;
+  code: string;
+  description: string;
+}
+
+interface VariableOption {
+  code: string;
   description: string;
 }
 
@@ -48,7 +53,7 @@ const HomologationVariables: React.FC = () => {
 
   const [productClassList, setProductClassList] = useState<ProductClass[]>([]);
   const [marketList, setMarketList] = useState<MarketItem[]>([]);
-  const [variableList, setVariableList] = useState<string[]>([]);
+  const [variableList, setVariableList] = useState<VariableOption[]>([]);
   const [message, setMessage] = useState<string>('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('error');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -83,6 +88,9 @@ const HomologationVariables: React.FC = () => {
       if (c.deleteDate) setDeleteDate(c.deleteDate);
       if (c.createdByUser) setCreatedByUser(c.createdByUser);
       if (c.updateDate) setUpdateDate(c.updateDate);
+    } else if (state?.filterVariable) {
+      // 从 UD11 ResultList 的 Down 按钮跳入：携带 Variable 过滤条件
+      setVariable(state.filterVariable);
     }
     window.history.replaceState({}, '');
   }, [location.state]);
@@ -157,7 +165,8 @@ const HomologationVariables: React.FC = () => {
     if (checkVar.startsWith('TEMPLATE-')) {
       checkVar = checkVar.substring(9);
     }
-    if (!variableList.includes(checkVar)) {
+    // 后端 UD08SelectHdocvariables 返回 [{code, description}]，校验 code 是否存在于 Variable 列表
+    if (!variableList.some((v) => v.code === checkVar)) {
       showMessage('Variant does not exist, Please enter the correct content.', 'error');
       return false;
     }
@@ -346,8 +355,8 @@ const HomologationVariables: React.FC = () => {
                   value={productClass || undefined}
                   onChange={(v) => { setProductClass(v); setMessage(''); }}
                   options={productClassList.map((pc) => ({
-                    value: pc.pc,
-                    label: `${pc.pc} - ${pc.description}`,
+                    value: pc.code,
+                    label: `${pc.code} - ${pc.description}`,
                   }))}
                   showSearch
                   filterOption={(input, option) =>
@@ -373,8 +382,8 @@ const HomologationVariables: React.FC = () => {
                   value={market || undefined}
                   onChange={(v) => { setMarket(v); setMessage(''); }}
                   options={marketList.map((m) => ({
-                    value: m.market,
-                    label: `${m.market} - ${m.description}`,
+                    value: m.code,
+                    label: `${m.code} - ${m.description}`,
                   }))}
                   showSearch
                   filterOption={(input, option) =>

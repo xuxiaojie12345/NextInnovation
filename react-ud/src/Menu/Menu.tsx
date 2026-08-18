@@ -31,7 +31,9 @@ const Menu: React.FC = () => {
     {
       title: 'Generate',
       items: [
-        { id: 'generateDoc', label: 'Generate Doc', path: '/generate-document', permission: 'hdoc' },
+        // 点击 Generate Doc：先进入认证文档信息输入画面（GenerateHomologationDocument），
+        // 提交后再在右侧显示实际的 GenerateDocument 生成画面。
+        { id: 'generateDoc', label: 'Generate Doc', path: '/GenerateHomologationDocument', permission: 'hdoc' },
       ],
     },
     {
@@ -127,6 +129,20 @@ const Menu: React.FC = () => {
     }
     fetchPermissions();
   }, [fetchPermissions, navigate]);
+
+  // 监听右侧 iframe 内子画面上报的跳转请求（跨画面通信）
+  // 子画面（如 GenerateHomologationDocument）Submit 时通过
+  // window.parent.postMessage({ type: 'NAVIGATE', path }) 通知 Menu 切换右侧内容。
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const msg = event.data as { type?: string; path?: string } | null;
+      if (msg && msg.type === 'NAVIGATE' && typeof msg.path === 'string') {
+        setActiveUrl(msg.path);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   // 判断某个权限是否在权限列表中
   const hasPermission = (permission: string): boolean => {

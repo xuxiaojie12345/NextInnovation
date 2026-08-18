@@ -8,9 +8,9 @@
         SELECT * FROM HDOC_SEND_DATA_VIN_PLATE WHERE ORDERNUMBER = #{orderNumber} LIMIT 1
     </select>
     <update id="updateStatus">
-        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status} WHERE CHASSIS_NO = #{chassisNo}
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status} WHERE ORDERNUMBER = #{chassisNo}
     </update>
     <update id="updateStatusAndType">
-        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status}, TYPE = #{type} WHERE CHASSIS_NO = #{chassisNo}
+        UPDATE HDOC_SEND_DATA_VIN_PLATE SET STATUS = #{status}, TYPE = #{type} WHERE ORDERNUMBER = #{chassisNo}
     </update>
 </mapper>

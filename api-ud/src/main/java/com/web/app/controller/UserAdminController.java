@@ -24,14 +24,20 @@ public class UserAdminController {
 
     @PostMapping("/UD17UpdateRole")
     public ApiResponse<Void> updateRole(@RequestBody UD17UpdateRoleRequest request) {
-        userAdminService.updateUserRole(request.getUserId(), request.getRoles());
-        return ApiResponse.success(null, "Role updated successfully");
+        userAdminService.updateUserRole(request.getUserId(), request.getPermissions());
+        return ApiResponse.success(null, "User roles updated successfully.");
     }
 
     @PostMapping("/UD17DeleteRole")
     public ApiResponse<Void> deleteRole(@RequestBody UD17DeleteRoleRequest request) {
         userAdminService.deleteUserRole(request.getUserId());
-        return ApiResponse.success(null, "Role deleted successfully");
+        return ApiResponse.success(null, "User roles deleted successfully.");
+    }
+
+    // 前端 User Administration 画面加载 Market 下拉
+    @GetMapping("/UD17SelectMarketmaster")
+    public ApiResponse<java.util.List<SelectListResponse>> selectMarketmaster() {
+        return ApiResponse.success(masterDataService.getMarketList());
     }
 
     @PostMapping("/UD18SelectHdocFunctionAuth")
@@ -53,7 +59,7 @@ public class UserAdminController {
     @PostMapping("/UD18CreateHdocUserDoc")
     public ApiResponse<Void> createHdocUserDoc(@RequestBody UD18CreateUserDocRequest request) {
         userAdminService.createUserDoc(request.getUserId(), request.getDoctypes());
-        return ApiResponse.success(null, "User doc permissions created successfully");
+        return ApiResponse.success(null, "User document permissions updated successfully.");
     }
 
     @GetMapping("/UD19SelectMarketMaster")

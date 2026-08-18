@@ -37,26 +37,29 @@ const ADChange: React.FC = () => {
       });
       if (response.data.status === 'success') {
         showMessage(response.data.message, 'success');
+        return response.data;
       } else {
         showMessage(response.data.message || 'Operation failed.', 'error');
+        return null;
       }
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 401 || error.response.status === 403) {
           sessionStorage.removeItem('userInfo');
           navigate('/');
-          return;
+          return null;
         }
         showMessage(error.response.data?.message || 'Operation failed.', 'error');
       } else {
         showMessage('Network connection failed. Please try again later.', 'error');
       }
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCheck = () => {
+  const handleCheck = async () => {
     if (!serieChnr.trim()) {
       showMessage('Serie-Chnr is required.', 'error');
       return;
@@ -66,7 +69,14 @@ const ADChange: React.FC = () => {
       showMessage('Invalid Serie-Chnr format. Expected format: Serie-Chnr.', 'error');
       return;
     }
-    callApi('/api/UD16SelectHdocAdcaChange', { serie: parsed.serie, chnr: parsed.chnr });
+    const display = `${parsed.serie}-${parsed.chnr}`;
+    const result = await callApi('/api/UD16SelectHdocAdcaChange', { serie: parsed.serie, chnr: parsed.chnr });
+    if (result?.data?.act) {
+      // 后端返回 act：Y -> ACTIVE，N -> INACTIVE；覆盖默认的 "Success" 文案
+      const act = result.data.act;
+      const state = act === 'Y' ? 'ACTIVE' : 'INACTIVE';
+      showMessage(`Serie-Chnr ${display} is ${state}.`, 'success');
+    }
   };
 
   const handleAdd = () => {

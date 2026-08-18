@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class HdocUserDocResponse {
     private String userId;
+    private String userName;
     private List<String> doctypes;
 }

@@ -8,9 +8,14 @@
         DELETE FROM HDOC_MARKET_AUTH WHERE USERID = #{userId}
     </delete>
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO HDOC_MARKET_AUTH (USERID, MARKET) VALUES
+        INSERT INTO HDOC_MARKET_AUTH
+          (USERID, MARKET, `TYPE`, BU,
+           REGISTER_DATETIME, REGISTER_USER, REGISTER_PROCESS,
+           UPDATE_DATETIME, UPDATE_USER, UPDATE_PROCESS)
+        VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.userId}, #{item.market})
+            (#{item.userid}, #{item.market}, #{item.type}, #{item.bu},
+             NOW(), 'system', 'ud17', NOW(), 'system', 'ud17')
         </foreach>
     </insert>
 </mapper>

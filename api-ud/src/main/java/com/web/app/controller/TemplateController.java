@@ -41,12 +41,18 @@ public class TemplateController {
     @PostMapping("/UD12UploadFile")
     public ApiResponse<Void> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("market") String market) {
         fileService.uploadFile(file, market);
-        return ApiResponse.success(null, "File uploaded successfully");
+        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "";
+        return ApiResponse.success(null, "TEMPLATE " + filename + " WAS SUCCESSFULLY UPLOADED TO MARKET " + market);
     }
 
     @PostMapping("/UD12DeleteFile")
     public ApiResponse<Void> deleteFile(@RequestBody UD12DeleteFileRequest request) {
         fileService.deleteFile(request.getMarket(), request.getFileName());
-        return ApiResponse.success(null, "File deleted successfully");
+        return ApiResponse.success(null, "TEMPLATE " + request.getFileName() + " WAS SUCCESSFULLY DELETE FROM MARKET " + request.getMarket());
+    }
+
+    @GetMapping("/UD12GetTemplatesByMarket")
+    public ApiResponse<List<String>> getTemplatesByMarket(@RequestParam("market") String market) {
+        return ApiResponse.success(fileService.getTemplatesByMarket(market));
     }
 }
