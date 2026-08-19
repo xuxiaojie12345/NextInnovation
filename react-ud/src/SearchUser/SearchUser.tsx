@@ -87,7 +87,8 @@ const SearchUser: React.FC = () => {
   // ---------- 检索条件状态（对应画面项目 No.1～No.6） ----------
   const [userid, setUserid] = useState<string>("");
   const [user, setUser] = useState<string>("");
-  const [market, setMarket] = useState<string>("");
+  // Market下拉列表初始设为"-EU"，加载后自动设置第一个选项
+  const [market, setMarket] = useState<string>("-EU");
   // 单选组初期值为未選択（设计书 2.1：Not set/Rule/Template 初期値 未選択）
   const [functionType, setFunctionType] = useState<FunctionType>("");
 
@@ -127,18 +128,6 @@ const SearchUser: React.FC = () => {
   };
 
   /**
-   * Market 下拉点击处理：再次点击已选中的选项时取消选择
-   * 原生 select 点击已选项不触发 onChange，故通过 onClick 判断实现二次点击取消，
-   * 取消后 market 状态置空，检索时不再传递 market 条件
-   */
-  const handleMarketClick = (e: React.MouseEvent<HTMLSelectElement>) => {
-    const target = e.target as HTMLOptionElement;
-    if (target.tagName === "OPTION" && target.value === market) {
-      setMarket("");
-    }
-  };
-
-  /**
    * 初期表示处理（对应设计书 3.1.1）
    * 画面正常表示，请求 API 加载 Market 列表填充下拉选项。
    * 异常场景 No.4：Market 列表加载失败时下拉显示为空，不阻断画面表示。
@@ -149,13 +138,18 @@ const SearchUser: React.FC = () => {
         `${API_BASE_URL}/api/Market/getMarketList`,
       );
       if (res.data.code === 200 && res.data.data) {
-        setMarketList(res.data.data.markets || []);
+        const markets = res.data.data.markets || [];
+        setMarketList(markets);
+        // 设置第一个Market为默认选中值
+        if (markets.length > 0 && market === "-EU") {
+          setMarket(markets[0]);
+        }
       }
     } catch (error) {
       // 加载失败不阻断画面表示，仅提示（设计书第 5 章 No.4）
       setMessage("Market 列表加载失败，请刷新页面重试。");
     }
-  }, []);
+  }, [market]);
 
   useEffect(() => {
     loadMarketList();
@@ -264,7 +258,6 @@ const SearchUser: React.FC = () => {
             id="su-market"
             value={market}
             onChange={(e) => setMarket(e.target.value)}
-            onClick={handleMarketClick}
             disabled={isLoading}
             size={6}
           >
