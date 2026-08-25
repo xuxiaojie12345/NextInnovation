@@ -17,14 +17,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        if (request.getUserId() == null || request.getPassword() == null) {
-            throw new BusinessException(400, "UserId and password are required");
+        String userId = request.getUserId();
+        boolean needPassword = request.getNeedPassword() == null || request.getNeedPassword();
+
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new BusinessException(400, "UserID parameter is missing.");
         }
-        HdocUserInfo user = userInfoMapper.selectByUserIdAndPassword(request.getUserId(), request.getPassword());
+
+        if (needPassword) {
+            // Login 场景：要求 userId + password
+            if (request.getPassword() == null) {
+                throw new BusinessException(400, "UserId and password are required");
+            }
+            HdocUserInfo user = userInfoMapper.selectByUserIdAndPassword(userId.trim(), request.getPassword());
+            if (user == null) {
+                throw new BusinessException(401, "Invalid username or password.");
+            }
+            return toResponse(user);
+        }
+
+        // UserView / EDB User View 场景：仅按 userId 查询用户信息（不校验 password）
+        HdocUserInfo user = userInfoMapper.selectByUserId(userId.trim());
         if (user == null) {
-            throw new BusinessException(401, "Invalid username or password.");
+            throw new BusinessException(404, "User not found. Please try again.");
         }
-        AuthenticationResponse response = AuthenticationResponse.builder()
+        return toResponse(user);
+    }
+
+    private AuthenticationResponse toResponse(HdocUserInfo user) {
+        return AuthenticationResponse.builder()
             .userId(user.getUserid())
             .name(user.getUsername())
             .role(user.getResponsible())
@@ -33,6 +54,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .userPosition(user.getUserposition())
             .email(user.getEmail())
             .build();
-        return response;
     }
 }

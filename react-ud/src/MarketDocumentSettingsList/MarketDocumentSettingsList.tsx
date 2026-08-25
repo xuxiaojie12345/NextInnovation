@@ -104,7 +104,17 @@ const MarketDocumentSettingsList: React.FC = () => {
       key: 'doctype',
       width: 200,
       render: (text: string, record: DocRecord) => (
-        <span className="mds-doctype-cell">
+        <span
+          className="mds-doctype-cell"
+          onClick={() => {
+            // 点击已选中行时取消选中（符合仕様書 No.19/16；已选中时原生 radio 不再触发 onChange，
+            // 故由 cell onClick 处理取消，radio onChange 负责选中）
+            if (selectedDoctype === record.doctype) {
+              setSelectedDoctype(null);
+              setMessage('');
+            }
+          }}
+        >
           <Radio
             checked={selectedDoctype === record.doctype}
             onChange={() => {
@@ -186,7 +196,6 @@ const MarketDocumentSettingsList: React.FC = () => {
             <Button
               className="mds-btn mds-btn-select"
               onClick={handleSelect}
-              disabled={!selectedDoctype}
             >
               Select
             </Button>

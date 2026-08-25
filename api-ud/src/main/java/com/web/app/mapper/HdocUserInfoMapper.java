@@ -8,5 +8,5 @@ public interface HdocUserInfoMapper {
     HdocUserInfo selectByUserId(@Param("userId") String userId);
     HdocUserInfo selectByUserIdAndPassword(@Param("userId") String userId, @Param("password") String password);
     List<HdocUserInfo> selectByCondition(@Param("userId") String userId, @Param("userName") String userName,
-        @Param("market") String market);
+        @Param("market") String market, @Param("roleType") String roleType);
 }

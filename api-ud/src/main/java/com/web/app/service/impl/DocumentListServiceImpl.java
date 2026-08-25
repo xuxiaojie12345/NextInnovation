@@ -30,7 +30,8 @@ public class DocumentListServiceImpl implements DocumentListService {
         List<HdocDocumentList> list = hdocDocumentListMapper.selectAll();
         return list.stream()
             .map(d -> new DocumentListRecord(d.getDoctype(), "BU", d.getRegisterUser(),
-                d.getRegisterDatetime() != null ? d.getRegisterDatetime().toString() : null))
+                d.getRegisterDatetime() != null ? d.getRegisterDatetime().toString() : null,
+                d.getDescription()))
             .collect(Collectors.toList());
     }
 }

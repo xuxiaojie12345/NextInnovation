@@ -13,4 +13,5 @@ public class DocumentListRecord {
     private String businessUnit;
     private String user;
     private String date;
+    private String description;
 }

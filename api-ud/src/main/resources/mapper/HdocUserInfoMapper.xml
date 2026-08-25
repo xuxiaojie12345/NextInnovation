@@ -8,12 +8,14 @@
         SELECT * FROM HDOC_USER_INFOR WHERE USERID = #{userId} AND PASSWORD = #{password}
     </select>
     <select id="selectByCondition" resultType="com.web.app.entity.HdocUserInfo">
-        SELECT ui.*, ma.MARKET AS market
+        SELECT DISTINCT ui.*,
+               (SELECT MAX(ma.MARKET) FROM HDOC_MARKET_AUTH ma WHERE ma.USERID = ui.USERID) AS market
         FROM HDOC_USER_INFOR ui
-        LEFT JOIN HDOC_MARKET_AUTH ma ON ma.USERID = ui.USERID
         WHERE 1=1
         <if test="userId != null and userId != ''"> AND ui.USERID LIKE CONCAT('%', #{userId}, '%') </if>
         <if test="userName != null and userName != ''"> AND ui.USERNAME LIKE CONCAT('%', #{userName}, '%') </if>
-        <if test="market != null and market != ''"> AND ma.MARKET = #{market} </if>
+        <if test="market != null and market != ''"> AND EXISTS (SELECT 1 FROM HDOC_MARKET_AUTH ma WHERE ma.USERID = ui.USERID AND ma.MARKET = #{market}) </if>
+        <if test="roleType == 'RULE'"> AND EXISTS (SELECT 1 FROM HDOC_FUNCTION_AUTH fa WHERE fa.USERID = ui.USERID AND fa.FUNCTION = 'hdoc_user_rule') </if>
+        <if test="roleType == 'TEMPLATE'"> AND EXISTS (SELECT 1 FROM HDOC_FUNCTION_AUTH fa WHERE fa.USERID = ui.USERID AND fa.FUNCTION = 'hdoc_user_template') </if>
     </select>
 </mapper>

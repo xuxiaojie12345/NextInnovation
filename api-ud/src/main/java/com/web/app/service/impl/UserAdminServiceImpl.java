@@ -195,7 +195,7 @@ public class UserAdminServiceImpl implements UserAdminService {
     @Override
     public SearchResultResponse<UserSearchRecord> searchHdocUsers(UD19SearchHdocRequest request) {
         List<HdocUserInfo> users = userInfoMapper.selectByCondition(
-            request.getUserId(), request.getUserName(), request.getMarket());
+            request.getUserId(), request.getUserName(), request.getMarket(), request.getRoleType());
         List<UserSearchRecord> records = users.stream().map(u -> {
             UserSearchRecord rec = new UserSearchRecord();
             rec.setUserId(u.getUserid());

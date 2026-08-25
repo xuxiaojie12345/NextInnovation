@@ -7,4 +7,5 @@ public class UD19SearchHdocRequest {
     private String userId;
     private String userName;
     private String market;
+    private String roleType;
 }

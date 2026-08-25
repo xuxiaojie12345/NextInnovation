@@ -63,8 +63,16 @@ public class UserAdminController {
     }
 
     @GetMapping("/UD19SelectMarketMaster")
-    public ApiResponse<java.util.List<SelectListResponse>> selectMarketMaster() {
-        return ApiResponse.success(masterDataService.getMarketList());
+    public ApiResponse<java.util.List<java.util.Map<String, Object>>> selectMarketMaster() {
+        // 返回 {market, description} 以便前端下拉直接使用
+        java.util.List<java.util.Map<String, Object>> result = new java.util.ArrayList<>();
+        for (SelectListResponse m : masterDataService.getMarketList()) {
+            java.util.Map<String, Object> option = new java.util.HashMap<>();
+            option.put("market", m.getCode());
+            option.put("description", m.getDescription());
+            result.add(option);
+        }
+        return ApiResponse.success(result);
     }
 
     @PostMapping("/UD19SearchHdoc")
