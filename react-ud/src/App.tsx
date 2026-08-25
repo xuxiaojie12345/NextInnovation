@@ -34,6 +34,7 @@ function App() {
         <div>
           <Routes>
             <Route path='/' element={<Login />} />
+            <Route path='/login' element={<Login />} />
             <Route path='/menu' element={<Menu />} />
             <Route path='/generate-homologation-document' element={<GenerateHomologationDocument />} />
             <Route path='/generate-document' element={<GenerateDocument />} />

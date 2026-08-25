@@ -56,30 +56,30 @@
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ===== 主内容区域 ===== */
+/* ===== 主内容区域：左右布局 ===== */
 .menu-body {
   display: flex;
-  justify-content: center;
-  padding: 32px 24px;
+  align-items: flex-start;
+  min-height: calc(100vh - 48px);
 }
 
-/* ===== 菜单面板 ===== */
-.menu-panel {
-  width: 100%;
-  max-width: 600px;
-  background-color: #ffffff;
-  border: 1px solid #d0d0d0;
-  border-radius: 2px;
-  padding: 0;
+/* ===== 左侧边栏 ===== */
+.menu-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background-color: #003057;
+  color: #ffffff;
+  min-height: calc(100vh - 48px);
+  padding: 0 0 24px 0;
 }
 
 .menu-panel-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  color: #003057;
-  padding: 16px 20px 12px;
+  color: #ffffff;
+  padding: 18px 20px 14px;
   margin: 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* ===== 加载中 ===== */
@@ -87,26 +87,26 @@
   padding: 32px 20px;
   text-align: center;
   font-size: 14px;
-  color: #888;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ===== 错误消息 ===== */
 .menu-error {
   padding: 16px 20px;
   font-size: 13px;
-  color: #c62828;
+  color: #ff8a80;
   background-color: transparent;
   line-height: 1.5;
 }
 
 /* ===== 菜单导航 ===== */
 .menu-nav {
-  padding: 4px 0;
+  padding: 8px 0;
 }
 
 /* 菜单分类 */
 .menu-category {
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .menu-category:last-child {
@@ -118,19 +118,19 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 20px;
+  padding: 11px 20px;
   cursor: pointer;
   user-select: none;
   transition: background-color 0.15s;
 }
 
 .menu-category-header:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .menu-category-arrow {
   font-size: 12px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   width: 14px;
   text-align: center;
   flex-shrink: 0;
@@ -139,14 +139,14 @@
 .menu-category-title {
   font-size: 14px;
   font-weight: 600;
-  color: #003057;
+  color: #ffffff;
 }
 
 /* 菜单项列表 */
 .menu-items {
   list-style: none;
   margin: 0;
-  padding: 0 0 4px 0;
+  padding: 0 0 6px 0;
 }
 
 /* 菜单项 */
@@ -154,19 +154,19 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 20px 6px 40px;
+  padding: 9px 20px 9px 40px;
   cursor: pointer;
   transition: background-color 0.15s;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .menu-item:hover {
-  background-color: #eef3f8;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .menu-item-icon {
   font-size: 13px;
-  color: #003057;
+  color: #7fb3d8;
   width: 14px;
   text-align: center;
   flex-shrink: 0;
@@ -174,6 +174,32 @@
 
 .menu-item-label {
   font-size: 13px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+}
+
+/* ===== 右侧主体区域 ===== */
+.menu-main {
+  flex: 1;
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-main-placeholder {
+  text-align: center;
+}
+
+.menu-main-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #003057;
+  margin: 0 0 10px 0;
+}
+
+.menu-main-desc {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
 }

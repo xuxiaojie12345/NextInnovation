@@ -170,9 +170,10 @@ const Menu: React.FC = () => {
         </div>
       </header>
 
-      {/* 主内容区域 */}
+      {/* 主内容区域：侧边栏 + 主体 */}
       <div className="menu-body">
-        <div className="menu-panel">
+        {/* 左侧边栏 */}
+        <aside className="menu-sidebar">
           <h2 className="menu-panel-title">Generate Document</h2>
 
           {/* 加载中 */}
@@ -217,7 +218,17 @@ const Menu: React.FC = () => {
               ))}
             </nav>
           )}
-        </div>
+        </aside>
+
+        {/* 右侧主体区域 */}
+        <main className="menu-main">
+          <div className="menu-main-placeholder">
+            <h3 className="menu-main-title">HDoc System</h3>
+            <p className="menu-main-desc">
+              请从左侧菜单中选择要使用的功能。
+            </p>
+          </div>
+        </main>
       </div>
     </div>
   );
