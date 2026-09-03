@@ -1,0 +1,112 @@
+/* ============================================
+ * HDoc Help 画面スタイル
+ * Help.png の式样に準拠（白背景・深蓝标题・灰下划线链接）
+ * ============================================ */
+
+/* 全体コンテナ：白背景，填满右侧内容区域（与 GenerateDoc 同一位置显示） */
+.help-container {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+/* タイトル（Help.png：深蓝・粗体・大字） */
+.help-title {
+  margin: 0 0 14px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #0d2a5c;
+}
+
+/* リンクリスト（Help.png：灰色下划线） */
+.help-links {
+  margin: 0 0 28px;
+  padding-left: 28px;
+}
+
+.help-links li {
+  margin-bottom: 5px;
+}
+
+/* 超链接共通样式（button 模拟链接：去掉默认按钮样式） */
+.help-link {
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.help-link:hover {
+  color: #0d2a5c;
+}
+
+/* 普通リンク（Help.png：灰色） */
+.help-link-gray {
+  color: #6a6a6a;
+}
+
+/* 特別リンク（Help.png：Order CoC paper 为蓝色） */
+.help-link-blue {
+  color: #1a5fc8;
+}
+
+/* 小节タイトル（Help.png：黑色粗体） */
+.help-section-title {
+  margin: 22px 0 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* 本文（Help.png：标准深色 sans-serif） */
+.help-text {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* 番号付きリスト */
+.help-list {
+  margin: 0 0 10px;
+  padding-left: 28px;
+  font-size: 14px;
+  color: #333333;
+  line-height: 1.8;
+}
+
+/* 戻るナビゲーション */
+.help-back {
+  margin-top: 32px;
+}
+
+.footer-button {
+  min-width: 88px;
+  height: 28px;
+  font-size: 13px;
+  color: #000000;
+  background-color: #efefef;
+  border: 1px solid #b0b0b0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.footer-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* ============================================
+ * レスポンシブ対応（窄屏适配）
+ * ============================================ */
+@media (max-width: 768px) {
+  .help-container {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- HdocUserInforMapperインターフェースと紐づくSQLマッピングファイル -->
+<mapper namespace="com.web.app.mapper.HdocUserInforMapper">
+
+    <!-- ログイン認証：ユーザーIDとパスワードでユーザー情報を照会 -->
+    <select id="login" resultType="com.web.app.domain.entity.HdocUserInfor">
+        SELECT USERID, PASSWORD, USERNAME
+        FROM hdoc_user_infor
+        WHERE USERID = #{userId}
+          AND PASSWORD = #{password}
+    </select>
+
+</mapper>

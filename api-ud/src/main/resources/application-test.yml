@@ -9,9 +9,9 @@ spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:33069/myproject?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://172.17.0.63:3306/react_ud?&characterEncoding=utf-8&serverTimezone=UTC
         username: root
-        password: 123456a?
+        password: 1234
         druid:
             min-idle: 3
             max-active: 15

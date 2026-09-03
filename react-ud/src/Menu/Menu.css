@@ -1,34 +1,61 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
+/* ============================================
+ * 菜单画面スタイル
+ * 内部設計（Menu_詳細設計.md）に準拠
+ * レイアウト：左侧固定菜单 + 右侧内容刷新区域
+ * ============================================ */
+
+/* 全体レイアウト：左右分栏，铺满视口 */
+.menu-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
   font-family: Arial, sans-serif;
+  background-color: #dddddd;
+  overflow: hidden;
 }
 
+/* ============================================
+ * 左侧：固定菜单区域（内部設計：画面固定左侧不动）
+ * ============================================ */
+.menu-sidebar {
+  flex: 0 0 454px;
+  width: 454px;
+  height: 100%;
+  background-color: #dddddd;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 顶部标识区域 */
 .menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  height: 85px;
+  padding: 0 38px;
+  box-sizing: border-box;
+  background-color: #06156b;
 }
 
 .volvo-logo {
-  max-width: 150px;
+  max-width: 210px;
   height: auto;
 }
 
 .text-logo {
   color: white;
-  font-size: 24px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 48px;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
+/* 菜单内容区域 */
 .menu-content {
-  padding: 0;
+  padding: 20px 25px 40px;
 }
 
 .menu-section {
-  border-bottom: 1px solid #ccc;
+  margin-bottom: 22px;
 }
 
 .menu-section:last-child {
@@ -36,13 +63,13 @@
 }
 
 .section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
+  background-color: #e5e5e5;
+  color: #06156b;
+  font-size: 24px;
   font-weight: bold;
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+  border: 1px solid #d5d5d5;
 }
 
 .menu-list {
@@ -54,10 +81,11 @@
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  min-height: 32px;
+  padding: 2px 2px;
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
+  color: #06156b;
+  font-size: 22px;
   transition: background-color 0.2s;
 }
 
@@ -65,12 +93,73 @@
   background-color: #d5e3f0;
 }
 
+/* 当前选中菜单项高亮 */
+.menu-item.active {
+  background-color: #bcd4ec;
+  font-weight: bold;
+}
+
 .menu-arrow {
   margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
+  color: #06156b;
+  font-size: 20px;
 }
 
 .menu-label {
   flex: 1;
+  word-break: break-word;
 }
+
+/* ============================================
+ * 右侧：内容区域（内部設計：点击超链接后刷新）
+ * ============================================ */
+.menu-main {
+  flex: 1;
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  min-width: 0;
+}
+
+.content-header {
+  background-color: #003366;
+  color: #ffffff;
+  padding: 14px 24px;
+  box-sizing: border-box;
+}
+
+.content-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.content-body {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: auto;
+  background-color: #f5f5f5;
+}
+
+.content-placeholder {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  border: 1px dashed #bbb;
+  background-color: #ffffff;
+  padding: 40px 24px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+/* Generate Doc 画面用：白背景铺满，无内边距（GenerateDoc.png 式样：白底） */
+.content-body.generate-doc-body {
+  padding: 0;
+  background-color: #ffffff;
+}
+
+/* ============================================
+ * レスポンシブ対応（PC 端居中，窄屏适配）
+ * ============================================ */

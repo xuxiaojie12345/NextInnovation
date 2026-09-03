@@ -1,84 +1,240 @@
+/* ============================================
+ * ログイン画面スタイル
+ * 参照画像（霧の中の高速道路を背景）の式样に準拠
+ * ============================================ */
+
+/* 全体コンテナ：背景画像を全面表示 */
 .login-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  width: 100vw;
   height: 100vh;
-  background-color: #f0f2f5;
-  background-image: url("/src/fTRYDXFAD.jpeg");
-  /* 建议改为 cover 以适配不同分辨率屏幕 */
+  background-image: url("../../public/login-bg.png");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-}
-
-.login-box {
-  /* 启用背景和 Padding 以符合常规登录框设计 */
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  /* 移除 absolute 定位，由父容器 Flex 居中 */
+  padding: 0 80px;
   position: relative;
-}
-
-.login-header h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-  margin-top: 0;
-}
-
-.form-group {
-  margin-bottom: 20px;
-  text-align: left; /* 确保 Label 和 Input 左对齐 */
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #666;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
   box-sizing: border-box;
-  text-align: left; /* 输入文字左对齐 */
 }
 
-.form-group input:focus {
-  border-color: #1890ff;
+/* ============================================
+ * 左側：タイトルエリア（白文字）
+ * ============================================ */
+.login-title-area {
+  flex: 1;
+  max-width: 55%;
+}
+
+.login-title {
+  font-size: 42px;
+  font-weight: 300;
+  color: #ffffff;
+  margin: 0 0 12px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title-edb {
+  font-weight: 700;
+  font-size: 54px;
+}
+
+.title-full {
+  font-weight: 300;
+  font-size: 40px;
+}
+
+.login-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 10px;
+}
+
+.login-support {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================
+ * 右側：ログインパネル + パネル下部の赤文字
+ * ============================================ */
+.login-right {
+  flex: 0 0 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.login-form-area {
+  width: 100%;
+}
+
+/* 白い矩形パネル */
+.login-form {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.login-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 入力欄スタイル（白パネル内・枠線で区別） */
+.login-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  border: 1px solid #c8ccd4;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #333;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
+.login-input::placeholder {
+  color: #999;
+}
+
+.login-input:focus {
+  border-color: #205081;
+  box-shadow: 0 0 0 3px rgba(32, 80, 129, 0.15);
+}
+
+.login-input:disabled {
+  background-color: #f0f2f5;
+  cursor: not-allowed;
+}
+
+/* Login ボタンスタイル（白パネルに対して濃色） */
 .login-button {
   width: 100%;
-  padding: 12px;
-  /* 启用按钮背景色 */
-  background-color: #1890ff;
-  color: white;
+  height: 44px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #205081;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  text-align: center; /* 按钮文字居中 */
-  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-top: 2px;
 }
 
-.login-button:hover {
-  background-color: #40a9ff;
+.login-button:hover:not(:disabled) {
+  background-color: #163d63;
 }
 
 .login-button:disabled {
-  background-color: #ccc;
+  background-color: #9fb0c0;
   cursor: not-allowed;
+}
+
+/* エラーメッセージ（内部設計 7. 实现注意事项：红色 #ff4d4f） */
+.error-message {
+  color: #d63333;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  word-break: break-word;
+}
+
+/* パネル下部の赤色ヘルプテキスト（参照画像に準拠） */
+.login-help {
+  color: #d63333;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.login-help p {
+  margin: 0 0 6px;
+}
+
+.help-quote {
+  font-style: italic;
+}
+
+.help-link {
+  color: #d63333;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+}
+
+/* ============================================
+ * レスポンシブ対応
+ * ============================================ */
+@media (max-width: 1024px) {
+  .login-container {
+    padding: 0 40px;
+  }
+
+  .login-title {
+    font-size: 36px;
+  }
+
+  .title-edb {
+    font-size: 44px;
+  }
+
+  .title-full {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 40px;
+  }
+
+  .login-title-area {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .login-title {
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .title-edb {
+    font-size: 34px;
+  }
+
+  .title-full {
+    font-size: 24px;
+  }
+
+  .login-right {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 380px;
+  }
 }

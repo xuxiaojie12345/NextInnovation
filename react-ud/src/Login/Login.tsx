@@ -1,23 +1,45 @@
 import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 // ... existing code ...
 
-// 模拟 AuthenticationApi (实际项目中请替换为真实的 API 调用)
+// ============================================
+// AuthenticationApi（参照内部設計書 5.1 / 6. 异常处理）
+// POST /api/Login/Authentication
+// ============================================
+
+/** 后端统一响应格式（LoginResponse: code / message / data） */
+export interface LoginResponse {
+  code: number;
+  message: string;
+  data: {
+    token: string;
+    userId: string;
+    username: string;
+  } | null;
+}
+
+/** API 基础地址（默认本地后端 8081，可用 .env 的 REACT_APP_API_BASE_URL 覆盖） */
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8081";
+
+/**
+ * 调用后端登录认证 API
+ * @param userID   用户ID
+ * @param password 密码
+ * @returns LoginResponse（code: 200 成功 / 401 认证失败 / 其他 系统错误）
+ */
 const authenticationApi = async (
   userID: string,
   password: string,
-): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 模拟逻辑：假设 admin/123456 为正确账号
-      if (userID === "admin" && password === "123456") {
-        resolve({ success: true });
-      } else {
-        resolve({ success: false });
-      }
-    }, 800);
-  });
+): Promise<LoginResponse> => {
+  const response = await axios.post<LoginResponse>(
+    `${API_BASE_URL}/api/Login/Authentication`,
+    { userid: userID, password },
+    { timeout: 10000 }, // API 超时 10 秒（对应内部設計書 6. 异常处理）
+  );
+  return response.data;
 };
 
 const Login: React.FC = () => {
@@ -44,7 +66,7 @@ const Login: React.FC = () => {
     const val = e.target.value;
     // 正则校验：允许半角英数字及常见 ASCII 符号
     if (
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(val) &&
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]*$/.test(val) &&
       val.length <= 32
     ) {
       setPassword(val);
@@ -71,19 +93,47 @@ const Login: React.FC = () => {
     try {
       const result = await authenticationApi(trimmedUserID, trimmedPassword);
 
-      if (result.success) {
-        // 认证成功：跳转或保存 Token
-        // alert("Login Successful!");
+      if (result.code === 200) {
+        // 认证成功：保存 Token 及用户信息，画面迁移至 /Menu
+        localStorage.setItem("token", result.data?.token ?? "");
+        localStorage.setItem("userId", result.data?.userId ?? "");
+        localStorage.setItem("username", result.data?.username ?? "");
         navigate("/Menu");
+      } else if (result.code === 401) {
+        // 认证失败或账户锁定（对应内部設計書 6. 异常处理）
+        const backendMsg = result.message || "";
+        if (/lock/i.test(backendMsg)) {
+          setMessage(
+            "Your account is locked. Please contact your system administrator.",
+          );
+        } else {
+          setMessage(
+            backendMsg ||
+              "We didn't recognize the username or password you entered. Please try again.",
+          );
+        }
       } else {
-        // 认证失败：显示指定错误信息
-        setMessage(
-          "We didn't recognize the username or password you entered. Please try again.",
-        );
+        // 其他错误码（如 500 系统错误）
+        setMessage(result.message || "System error. Please contact support.");
       }
     } catch (error) {
-      // 异常处理：网络错误或服务器错误
-      setMessage("System error. Please contact administrator.");
+      // 异常处理（对应内部設計書 6. 异常处理）
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          // API 超时
+          setMessage("Request timeout. Please try again.");
+        } else if (!error.response) {
+          // 网络异常（后端未启动 / 无法连接）
+          setMessage(
+            "Network error. Please check your connection and try again.",
+          );
+        } else {
+          // 服务器返回异常
+          setMessage("System error. Please contact support.");
+        }
+      } else {
+        setMessage("System error. Please contact support.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -91,66 +141,83 @@ const Login: React.FC = () => {
 
   return (
     <div className='login-container'>
-      <div className='login-box'>
-        <div className='login-header'>
-          <h2>Login</h2>
+      {/* 左側：タイトル・説明エリア（白文字） */}
+      <div className='login-title-area'>
+        <h1 className='login-title'>
+          <span className='title-edb'>EDB</span>
+          <span className='title-full'>Engineering Database</span>
+        </h1>
+        <p className='login-subtitle'>Use Outlook id and password</p>
+        <p className='login-support'>
+          Support, authorization request or improvement suggestions, send mail
+          to: Support IPI
+        </p>
+      </div>
+
+      {/* 右側：ログインパネル + パネル下部の赤文字 */}
+      <div className='login-right'>
+        <div className='login-form-area'>
+          <div className='login-form'>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLogin();
+              }}
+            >
+              {/* UserID: TextField, Input, Left Align */}
+              <input
+                id='userID'
+                className='login-input'
+                type='text'
+                value={userID}
+                onChange={handleUserIDChange}
+                placeholder='UserID'
+                aria-label='UserID'
+                disabled={isLoading}
+                autoComplete='username'
+              />
+
+              {/* Password: TextField, Input, Left Align, Masked */}
+              <input
+                id='password'
+                className='login-input'
+                type='password'
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder='Password'
+                aria-label='Password'
+                disabled={isLoading}
+                autoComplete='current-password'
+              />
+
+              {/* Message Label: Output, Left Align, Red Color（Login 按钮の上に表示） */}
+              {message && <div className='error-message'>{message}</div>}
+
+              {/* Login Button: Center Align, Active/Disabled Control */}
+              <button type='submit' className='login-button' disabled={isLoading}>
+                {isLoading ? "Processing..." : "Login"}
+              </button>
+            </form>
+          </div>
         </div>
 
-        {/* Message Label: Output, Left Align, Red Color */}
-        {message && (
-          <div
-            className='error-message'
-            style={{
-              color: "#ff4d4f",
-              textAlign: "left",
-              marginBottom: "15px",
-              fontSize: "14px",
-              wordBreak: "break-word",
-            }}
-          >
-            {message}
-          </div>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          {/* UserID: TextField, Input, Left Align */}
-          <div className='form-group'>
-            <label htmlFor='userID'>UserID</label>
-            <input
-              id='userID'
-              type='text'
-              value={userID}
-              onChange={handleUserIDChange}
-              placeholder='Enter User ID'
-              disabled={isLoading}
-              autoComplete='username'
-            />
-          </div>
-
-          {/* Password: TextField, Input, Left Align, Masked */}
-          <div className='form-group'>
-            <label htmlFor='password'>Password</label>
-            <input
-              id='password'
-              type='password'
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder='Enter Password'
-              disabled={isLoading}
-              autoComplete='current-password'
-            />
-          </div>
-
-          {/* Login Button: Center Align, Active/Disabled Control */}
-          <button type='submit' className='login-button' disabled={isLoading}>
-            {isLoading ? "Processing..." : "Login"}
-          </button>
-        </form>
+        {/* パネル下部：赤色のヘルプテキスト（参照画像に準拠） */}
+        <div className='login-help'>
+          <p>
+            If you get error message{" "}
+            <span className='help-quote'>
+              "Your account is locked. Please contact your system
+              administrator"
+            </span>
+          </p>
+          <p>
+            Please try this alternative login link before contacting support.{" "}
+            <button type='button' className='help-link'>
+              Login
+            </button>
+          </p>
+          <p>We are working to find root cause of problem</p>
+        </div>
       </div>
     </div>
   );
