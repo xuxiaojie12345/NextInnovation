@@ -78,12 +78,24 @@ const saveStoredConditions = (conditions: StoredConditions): void => {
  * - Reset：清除画面数据并重新进行初期表示（内部設計 4.3 / 5.3）
  * - Help：在相同位置显示 [Help] 画面（内部設計 4.4 / 5.4）
  */
+/** GenerateDocument 画面检索条件（Submit 传入） */
+export interface GenerateDocumentParams {
+  chassisSeries: string;
+  chassisNo: string;
+  documentType: string;
+}
+
 interface GenerateDocProps {
   /** 点击 Help 按钮时显示 [Help] 画面的回调（与本画面同一位置） */
   onShowHelp?: () => void;
+  /** 点击 Submit 时显示 [GenerateDocument] 画面的回调（在本画面同一位置显示），并传入检索条件 */
+  onShowGenerateDocument?: (params: GenerateDocumentParams) => void;
 }
 
-const GenerateDoc: React.FC<GenerateDocProps> = ({ onShowHelp }) => {
+const GenerateDoc: React.FC<GenerateDocProps> = ({
+  onShowHelp,
+  onShowGenerateDocument,
+}) => {
   const navigate = useNavigate();
 
   // 画面入力値（内部設計 3. 画面項目定义）
@@ -152,11 +164,12 @@ const GenerateDoc: React.FC<GenerateDocProps> = ({ onShowHelp }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 处理 Chassis series 输入（内部設計 3：半角数字, MaxLength 5）
+  // 处理 Chassis series 输入（半角英数字, MaxLength 5）
+  // Chassis series 为英数字组合（参考图样例如 JPCT），须允许英文字母输入
   const handleChassisSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // 正则校验：只允许半角数字
-    if (/^[0-9]*$/.test(val) && val.length <= 5) {
+    // 正则校验：只允许半角英数字（a-z, A-Z, 0-9）
+    if (/^[a-zA-Z0-9]*$/.test(val) && val.length <= 5) {
       setChassisSeries(val);
       // 用户体验优化：用户重新输入时清空错误提示
       if (message) setMessage("");
@@ -234,13 +247,17 @@ const GenerateDoc: React.FC<GenerateDocProps> = ({ onShowHelp }) => {
     });
 
     // 将数据传入画面 [Generate document] 并迁移（内部設計 4.2 / 5.2）
-    navigate("/GenerateDocument", {
-      state: {
-        chassisSeries: chassisSeries.trim(),
-        chassisNo: chassisNo.trim(),
-        documentType,
-      },
-    });
+    const params: GenerateDocumentParams = {
+      chassisSeries: chassisSeries.trim(),
+      chassisNo: chassisNo.trim(),
+      documentType,
+    };
+    if (onShowGenerateDocument) {
+      // 在 Menu 右侧内容区域（与本画面同一位置）显示 [GenerateDocument] 画面
+      onShowGenerateDocument(params);
+    } else {
+      navigate("/GenerateDocument", { state: params });
+    }
   };
 
   return (

@@ -1,0 +1,183 @@
+/* GenerateDocument.css
+ * 描述：GenerateDocument(生成文档表示)画面的样式。
+ * 显示风格参照 GenerateHomologationDocument（GenerateDoc）画面：
+ * 白底铺满右侧内容区、深蓝粗体标题、浅蓝色边框内容区、灰色操作按钮；
+ * 不再作为独立全屏版面（居中灰底卡片）显示，而是与 GenerateDoc 同位置（Menu 右侧内容区）呈现。
+ */
+
+/* 画面外层容器：白底铺满右侧内容区域（参照 GenerateDoc 的 .generate-doc-container） */
+.generate-doc {
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+/* 内容区：浅蓝色边框矩形（参照 GenerateDoc 的 .generate-doc-form 式样） */
+.generate-doc__card {
+  width: 100%;
+  max-width: 720px;
+  padding: 20px 28px 12px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 1px solid #a9c6e8;
+}
+
+/* 画面标题：深蓝粗体（参照 GenerateDoc 的 .generate-doc-title） */
+.generate-doc__title {
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2a5c;
+  border-bottom: 1px solid #a9c6e8;
+}
+
+/* 区块容器：内部上下轻微留白 */
+.generate-doc__section {
+  margin: 10px 0;
+}
+
+/* 小节标题：深蓝色加粗（与画面标题同色系 #0d2a5c） */
+.generate-doc-section__title {
+  margin: 8px 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d2a5c;
+}
+
+/* 单条信息行 */
+.generate-doc-row {
+  display: flex;
+  align-items: baseline;
+  padding: 2px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 信息标签 */
+.generate-doc-row__label {
+  flex-shrink: 0;
+  min-width: 150px;
+  color: #333333;
+}
+
+/* 信息值 */
+.generate-doc-row__value {
+  color: #111111;
+  word-break: break-all;
+}
+
+/* 数据取得状态提示 */
+.generate-doc__status {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 错误消息区：红色文字 */
+.generate-doc__error-message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #c0392b;
+  background-color: #fdf0ef;
+  border: 1px solid #e6b8b4;
+  border-radius: 2px;
+}
+
+/* S-Note 列表 */
+.generate-doc__snote-list {
+  margin: 4px 0;
+}
+
+/* S-Note 条目：内容超过边框宽度时自动折行显示 */
+.generate-doc__snote-item {
+  padding: 2px 0;
+  font-size: 14px;
+  color: #333333;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* 红色警示文字 */
+.generate-doc__warning {
+  margin: 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c0392b;
+}
+
+/* 替换参数条目 */
+.generate-doc__replacing-item {
+  padding: 2px 0 2px 16px;
+  font-size: 14px;
+  color: #333333;
+}
+
+/* 超链接样式（与标题同色系 #0d2a5c） */
+.generate-doc__link {
+  display: inline-block;
+  padding: 0;
+  font-size: 14px;
+  color: #0d2a5c;
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.generate-doc__link:hover {
+  color: #2f6fd0;
+}
+
+/* 操作按钮组 */
+.generate-doc__button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 操作按钮：浅灰色 */
+.generate-doc__button {
+  min-width: 110px;
+  padding: 5px 16px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #e8eaed;
+  border: 1px solid #c5ccd4;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.generate-doc__button:hover {
+  background-color: #d8dbe0;
+}
+
+/* 底部信息：细蓝线上方的小号灰色文字 */
+.generate-doc__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin-top: 14px;
+  padding-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  border-top: 1px solid #1d3e81;
+}
+
+/* 窄屏响应式：内容区与容器留白 */
+@media (max-width: 600px) {
+  .generate-doc {
+    padding: 16px;
+  }
+
+  .generate-doc__card {
+    padding: 16px 16px 10px;
+  }
+}

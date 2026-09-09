@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import './Menu.css';
-import GenerateDoc from '../GenerateDoc/GenerateDoc';
+import GenerateDoc, {
+  GenerateDocumentParams,
+} from '../GenerateHomologationDocument​/GenerateDoc';
+import GenerateDocument from '../GenerateDocument/GenerateDocument';
+import ModifyDocument from '../ModifyDocument/ModifyDocument';
 import Help from '../Help/Help';
 
 /**
@@ -71,6 +75,10 @@ const Menu: React.FC = () => {
   const [selected, setSelected] = useState<MenuItem>(MENU_SECTIONS[0].items[0]);
   // 是否在右侧内容区域显示 [Help] 画面（GenerateDoc 点击 Help 后与本画面同一位置显示）
   const [showHelp, setShowHelp] = useState<boolean>(false);
+  // 是否在右侧内容区域显示 [GenerateDocument] 画面（GenerateDoc 点击 Submit 后与本画面同一位置显示）
+  const [docParams, setDocParams] = useState<GenerateDocumentParams | null>(null);
+  // 是否在右侧内容区域显示 [ModifyDocument] 画面（GenerateDocument 点击 [Modify Doc Link] 后在本画面同一位置显示）
+  const [showModifyDocument, setShowModifyDocument] = useState<boolean>(false);
 
   /**
    * 菜单项点击处理（内部設計 3.2 超链接点击）
@@ -78,8 +86,10 @@ const Menu: React.FC = () => {
    */
   const handleMenuItemClick = (item: MenuItem) => {
     setSelected(item);
-    // 切换菜单时退出 Help 画面
+    // 切换菜单时退出 Help / GenerateDocument / ModifyDocument 画面
     setShowHelp(false);
+    setDocParams(null);
+    setShowModifyDocument(false);
   };
 
   return (
@@ -132,14 +142,39 @@ const Menu: React.FC = () => {
         </div>
         {/* Generate Doc 超链接：加载 [GenerateHomologationDocument] 画面（内部設計 3.2） */}
         {selected.screen === "GenerateHomologationDocument" ? (
-          // Help 画面与 GenerateDoc 画面在同一位置（右侧内容区域）显示
-          showHelp ? (
+          // ModifyDocument / GenerateDocument / Help / GenerateDoc 画面均在右侧内容区域同一位置显示
+          docParams ? (
+            showModifyDocument ? (
+              <div className="content-body generate-doc-body">
+                <ModifyDocument
+                  chassisSeries={docParams.chassisSeries}
+                  chassisNo={docParams.chassisNo}
+                  onBack={() => setShowModifyDocument(false)}
+                />
+              </div>
+            ) : (
+              <div className="content-body generate-doc-body">
+                <GenerateDocument
+                  chassisSeries={docParams.chassisSeries}
+                  chassisNo={docParams.chassisNo}
+                  onShowModifyDocument={() => setShowModifyDocument(true)}
+                  onBack={() => {
+                    setDocParams(null);
+                    setShowModifyDocument(false);
+                  }}
+                />
+              </div>
+            )
+          ) : showHelp ? (
             <div className="content-body generate-doc-body">
               <Help onBack={() => setShowHelp(false)} />
             </div>
           ) : (
             <div className="content-body generate-doc-body">
-              <GenerateDoc onShowHelp={() => setShowHelp(true)} />
+              <GenerateDoc
+                onShowHelp={() => setShowHelp(true)}
+                onShowGenerateDocument={(params) => setDocParams(params)}
+              />
             </div>
           )
         ) : (

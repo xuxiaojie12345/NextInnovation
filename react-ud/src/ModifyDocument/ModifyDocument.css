@@ -1,0 +1,64 @@
+/* ModifyDocument.css
+ * 描述：ModifyDocument(文档修改)示例画面的样式。
+ * 显示风格参照 GenerateHomologationDocument / GenerateDocument 画面：
+ * 白底铺满右侧内容区、深蓝粗体标题、浅蓝色边框内容区；不再作为独立全屏版面显示。
+ */
+/* 画面外层容器：白底铺满右侧内容区域 */
+.modify-doc {
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+/* 内容区：浅蓝色边框矩形 */
+.modify-doc__card {
+  width: 100%;
+  max-width: 640px;
+  padding: 20px 28px 16px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 1px solid #a9c6e8;
+}
+
+.modify-doc__title {
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2a5c;
+  border-bottom: 1px solid #a9c6e8;
+}
+
+.modify-doc__info {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #333333;
+}
+
+.modify-doc__placeholder {
+  margin: 8px 0 16px;
+  padding: 12px;
+  font-size: 13px;
+  color: #6b7280;
+  background-color: #f4f6f8;
+  border: 1px dashed #c5ccd4;
+  border-radius: 2px;
+}
+
+.modify-doc__button {
+  padding: 5px 20px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #e8eaed;
+  border: 1px solid #c5ccd4;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.modify-doc__button:hover {
+  background-color: #d8dbe0;
+}

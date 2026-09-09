@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- HdocRecDataVdaGeneralMapperインターフェースと紐づくSQLマッピングファイル -->
+<mapper namespace="com.web.app.mapper.HdocRecDataVdaGeneralMapper">
+
+    <!-- Chassis関連データを取得 -->
+    <select id="getChassisData" resultType="com.web.app.dto.UD04SelectGeneratedocumentData">
+        SELECT
+            om.ORDERNUMBER               AS ordernumber,
+            om.BUILD                     AS build,
+            om.SPEC                      AS spec,
+            om.CUSTOMER_ADAP             AS custrAdap,
+            vda.COUNTRY_OF_OPERATION     AS countryOfOperation,
+            tire.LOAD_INDEX              AS loadIndex,
+            cha.ACT                      AS act,
+            admod.VARIABLE               AS variable
+        FROM
+            HDOC_REC_DATA_VDA_GENERAL vda
+            inner join HDOC_REC_DATA_OM om
+                on vda.SERIE = om.SERIE
+                and vda.CHNR = om.CHNR
+            inner join HDOC_REC_DATA_KOLA_TIRE_MASTER tire
+                on vda.TRANS_TS = tire.TRANS_TS
+            inner join HDOC_ADCA_CHANGE cha
+                on vda.SERIE = cha.SERIE
+                and vda.CHNR = cha.CHNR
+            inner join HDOC_ADCA_MODIFICATION admod
+                on vda.SERIE = admod.SERIE
+                and vda.CHNR = admod.CHNO
+        WHERE
+            vda.SERIE = #{series}
+            AND vda.CHNR = #{chassisNo}
+            AND admod.STA = '0'
+    </select>
+
+</mapper>
