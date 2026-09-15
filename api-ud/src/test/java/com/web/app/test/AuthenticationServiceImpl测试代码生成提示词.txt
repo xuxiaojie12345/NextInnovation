@@ -1,0 +1,10 @@
+
+测试代码生成路径:D:\HD\workspace\NextInnovation\api-ud\src\test\java\com\web\app
+
+测试代码参照对象：D:\HD\workspace\NextInnovation\api-ud\src\main\java\com\web\app\service\impl\AuthenticationServiceImpl.java
+
+测试代码名称：AuthenticationServiceImpl
+
+根据【测试代码参照对象】，生成Junit测试代码。
+要求生成的测试代码覆盖【测试代码参照对象】里的所有分支，特别是代码里的null分支或者empty分支，使Junit覆盖率达到百分之百。
+生成的测试代码命名为【测试代码名称】Test.java，放到【测试代码生成路径】路径下。

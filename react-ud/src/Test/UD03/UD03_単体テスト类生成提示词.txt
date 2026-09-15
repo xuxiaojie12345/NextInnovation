@@ -1,0 +1,14 @@
+测试式样书：D:\HD\workspace\NextInnovation\react-ud\src\Test\プロンプトUD03_単体テスト仕様書.md
+
+测试参照tsx文件：D:\HD\workspace\NextInnovation\react-ud\src\GenerateHomologationDocument​\GenerateDoc.tsx
+
+输出文件位置：D:\HD\workspace\NextInnovation\react-ud\src\Test
+
+输出文件名：UD03_playwright
+
+任务要求：
+
+ 1.严格按照仕様書记载的测试对象，操作步骤，设定值和预想结果，生成可以使用playwright自动化测试的测试代码，名为【输出文件名】
+ 2.要求所有的测试对象都要生成对应的测试用例，且生成的playwright测试每执行一步都要截图，截图格式为jpeg，以每个测试观点名称为单元循环从001开始命名，
+ 3.存储到【输出文件位置】
+ 4.要求测试代码中获取的元素要和【测试参照tsx文件】中的元素一致，不要出现因为取不到相应元素报错的情况。

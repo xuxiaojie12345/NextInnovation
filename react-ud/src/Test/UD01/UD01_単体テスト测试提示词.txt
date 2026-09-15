@@ -1,0 +1,10 @@
+测试类：UD01_playwright.spec.ts
+
+输出文件位置：D:\HD\workspace\NextInnovation\react-ud\src\Test\UD01
+
+输出文件名：UD01_playwright
+
+任务要求：
+
+ 1.按照【测试类】中的提示，执行测试任务。
+ 2.生成的截图放入【输出文件位置】
