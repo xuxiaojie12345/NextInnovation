@@ -16,8 +16,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.82",
-    "@types/react": "^18.2.57",
-    "@types/react-dom": "^18.2.19",
     "antd": "^5.29.1",
     "axios": "^1.6.8",
     "axios-mock-adapter": "^1.22.0",
@@ -33,22 +31,15 @@
     "react-hook-form": "^7.66.1",
     "react-i18next": "^14.1.0",
     "react-router-dom": "^6.30.2",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
     "zod": "^3.25.76"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "dev": "vite",
+    "start": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "browserslist": {
     "production": [
@@ -63,7 +54,12 @@
     ]
   },
   "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
-    "sass": "^1.72.0"
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.72.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
   }
 }

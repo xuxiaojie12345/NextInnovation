@@ -1,13 +1,28 @@
-body {
+/**
+ * 全局基础样式
+ * ------------------------------------------------------------------
+ * 仅保留最小化的全局重置，页面级样式均由各画面自身的 CSS 定义
+ * （登录画面：src/Login/Login.css）。
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+a {
+  color: inherit;
 }

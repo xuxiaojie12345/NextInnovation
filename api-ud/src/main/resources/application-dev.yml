@@ -57,6 +57,14 @@ swagger:
 logging:
     config: classpath:log4j2-dev.xml
 
+# Token 生成参数（AuthenticationServiceImpl 使用）
+app:
+    token:
+        # 签名密钥（生产环境请通过环境变量覆盖）
+        secret: edb-engineering-database-secret-key
+        # Token 有效期（毫秒），默认 2 小时
+        expire: 7200000
+
 file:
     # 静态资源对外暴露的访问路径
     # file.staticAccessPath=/api/file/**

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  登录认证 Mapper 映射文件
+  对应详细设计 5.1 AuthenticationApi 的数据访问 SQL
+-->
+<mapper namespace="com.web.app.mapper.AuthenticationMapper">
+
+  <!-- 用户信息结果映射：数据库列名（下划线/特殊字符）→ 实体属性名（驼峰） -->
+  <resultMap id="userInforResultMap" type="com.web.app.entity.HdocUserInfor">
+    <id property="userid" column="USERID"/>
+    <id property="password" column="PASSWORD"/>
+    <id property="username" column="USERNAME"/>
+    <result property="responsible" column="RESPONSIBLE"/>
+    <result property="userposition" column="USERPOSITION"/>
+    <!-- 邮箱列名含连字符，使用反引号转义以匹配数据库实际列名 -->
+    <result property="eMail" column="`E-MMAIL`"/>
+    <result property="registerDatetime" column="REGISTER_DATETIME"/>
+    <result property="registerUser" column="REGISTER_USER"/>
+    <result property="registerProcess" column="REGISTER_PROCESS"/>
+    <result property="updateDatetime" column="UPDATE_DATETIME"/>
+    <result property="updateUser" column="UPDATE_USER"/>
+    <result property="updateProcess" column="UPDATE_PROCESS"/>
+  </resultMap>
+
+  <!-- 功能权限结果映射 -->
+  <resultMap id="functionAuthResultMap" type="com.web.app.entity.HdocFunctionAuth">
+    <id property="userid" column="USERID"/>
+    <id property="function" column="FUNCTION"/>
+    <result property="registerDatetime" column="REGISTER_DATETIME"/>
+    <result property="registerUser" column="REGISTER_USER"/>
+    <result property="registerProcess" column="REGISTER_PROCESS"/>
+    <result property="updateDatetime" column="UPDATE_DATETIME"/>
+    <result property="updateUser" column="UPDATE_USER"/>
+    <result property="updateProcess" column="UPDATE_PROCESS"/>
+  </resultMap>
+
+  <!-- 市场权限结果映射 -->
+  <resultMap id="marketAuthResultMap" type="com.web.app.entity.HdocMarketAuth">
+    <id property="userid" column="USERID"/>
+    <id property="market" column="MARKET"/>
+    <id property="type" column="TYPE"/>
+    <id property="bu" column="BU"/>
+    <result property="registerDatetime" column="REGISTER_DATETIME"/>
+    <result property="registerUser" column="REGISTER_USER"/>
+    <result property="registerProcess" column="REGISTER_PROCESS"/>
+    <result property="updateDatetime" column="UPDATE_DATETIME"/>
+    <result property="updateUser" column="UPDATE_USER"/>
+    <result property="updateProcess" column="UPDATE_PROCESS"/>
+  </resultMap>
+
+  <!--
+    根据用户ID查询用户信息
+    使用 #{} 参数占位符（预编译参数化查询），防止 SQL 注入
+  -->
+  <select id="selectUserByUserid" resultMap="userInforResultMap">
+    SELECT USERID,
+           PASSWORD,
+           USERNAME,
+           RESPONSIBLE,
+           USERPOSITION,
+           `E-MMAIL`,
+           REGISTER_DATETIME,
+           REGISTER_USER,
+           REGISTER_PROCESS,
+           UPDATE_DATETIME,
+           UPDATE_USER,
+           UPDATE_PROCESS
+    FROM hdoc_user_infor
+    WHERE USERID = #{userid}
+  </select>
+
+  <!-- 查询指定用户的功能权限列表 -->
+  <select id="selectFunctionAuthByUserid" resultMap="functionAuthResultMap">
+    SELECT USERID,
+           `FUNCTION`,
+           REGISTER_DATETIME,
+           REGISTER_USER,
+           REGISTER_PROCESS,
+           UPDATE_DATETIME,
+           UPDATE_USER,
+           UPDATE_PROCESS
+    FROM HDOC_FUNCTION_AUTH
+    WHERE USERID = #{userid}
+  </select>
+
+  <!-- 查询指定用户的市场权限列表 -->
+  <select id="selectMarketAuthByUserid" resultMap="marketAuthResultMap">
+    SELECT USERID,
+           MARKET,
+           `TYPE`,
+           BU,
+           REGISTER_DATETIME,
+           REGISTER_USER,
+           REGISTER_PROCESS,
+           UPDATE_DATETIME,
+           UPDATE_USER,
+           UPDATE_PROCESS
+    FROM HDOC_MARKET_AUTH
+    WHERE USERID = #{userid}
+  </select>
+
+</mapper>

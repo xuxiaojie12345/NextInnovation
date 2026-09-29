@@ -1,116 +1,87 @@
-import React from 'react';
+/**
+ * Menu 组件 - 主菜单页面（登录成功后的跳转目标）
+ * ------------------------------------------------------------------
+ * 详细设计 3.1：认证成功后跳转到 Menu 页面。
+ * 详细设计 7.4：未认证用户访问 Menu 时应重定向回 Login。
+ *
+ * @component
+ * @returns {React.JSX.Element} 主菜单页面
+ */
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 
-interface MenuItem {
-  label: string;
-  path?: string;
+/** 与 Login 模块约定的 sessionStorage 键名 */
+const TOKEN_STORAGE_KEY = 'edb_auth_token';
+const USER_STORAGE_KEY = 'edb_user_info';
+
+/**
+ * 从 sessionStorage 读取登录用户 ID（惰性初始化，避免在 effect 内 setState）
+ * @returns 用户 ID，读取失败时返回空字符串
+ */
+function readStoredUserID(): string {
+  const storedUser = sessionStorage.getItem(USER_STORAGE_KEY);
+  if (!storedUser) return '';
+  try {
+    return JSON.parse(storedUser) || '';
+  } catch {
+    // 存储内容异常时忽略，不影响页面渲染
+    return '';
+  }
 }
 
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
+/**
+ * Menu 组件本体
+ * @returns {React.JSX.Element} 主菜单页面
+ */
+function Menu(): React.JSX.Element {
+  const navigate = useNavigate();
+  /** 当前登录用户 ID */
+  const [userID] = useState<string>(readStoredUserID);
 
-const Menu: React.FC = () => {
-  const menuSections: MenuSection[] = [
-    {
-      title: 'Generate Document',
-      items: [
-        { label: 'Generate Doc' },
-        { label: 'Generate in Batch' },
-        { label: 'Regdata Archive' },
-        { label: 'Regdata Batch' },
-      ],
-    },
-    {
-      title: 'Admin',
-      items: [
-        { label: 'Update user defined variables (rules)' },
-        { label: 'Update user defined variables (UNICODE rules)' },
-        { label: 'Existing HDoc variables' },
-        { label: 'Unlock Document' },
-        { label: 'HDoc Number Series' },
-        { label: 'Upload/Delete template' },
-        { label: 'List available templates' },
-        { label: 'VPPS Vin plate' },
-        { label: 'AD/CA Change' },
-      ],
-    },
-    {
-      title: 'User Administration',
-      items: [
-        { label: 'HDoc User Administration' },
-        { label: 'HDoc User Doc Administration' },
-        { label: 'Search User' },
-        { label: 'Change Password' },
-        { label: 'User Position' },
-      ],
-    },
-    {
-      title: 'Archive',
-      items: [
-        { label: 'Search' },
-        { label: 'Upload Document' },
-      ],
-    },
-    {
-      title: 'Documentation',
-      items: [
-        { label: 'User Guide' },
-        { label: 'AD/CA Change Guide' },
-        { label: 'Vin plate Guide FM/FH' },
-        { label: 'Archive Guide' },
-        { label: 'Privacy' },
-      ],
-    },
-  ];
+  // 详细设计 7.4：未认证用户访问受保护页面时重定向回 Login
+  const isAuthenticated: boolean = Boolean(
+    sessionStorage.getItem(TOKEN_STORAGE_KEY),
+  );
 
-  const handleMenuItemClick = (item: MenuItem) => {
-    // 这里可以添加导航逻辑
-    console.log('Clicked:', item.label);
-  };
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  /**
+   * 退出登录：清除认证信息并返回登录页
+   */
+  const handleLogout = useCallback((): void => {
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    sessionStorage.removeItem(USER_STORAGE_KEY);
+    navigate('/login', { replace: true });
+  }, [navigate]);
 
   return (
-    <div className="menu-container">
-      <div className="menu-header">
-        <img 
-          src="/volvo-logo.png" 
-          alt="VOLVO" 
-          className="volvo-logo"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-            const parent = (e.target as HTMLImageElement).parentElement;
-            if (parent) {
-              const textLogo = document.createElement('div');
-              textLogo.className = 'text-logo';
-              textLogo.textContent = 'VOLVO';
-              parent.appendChild(textLogo);
-            }
-          }}
-        />
-      </div>
+    <div className="menu-screen">
+      <header className="menu-header">
+        <h1 className="menu-header__title">
+          <strong>EDB</strong> Engineering Database
+        </h1>
+        <div className="menu-header__user">
+          <span className="menu-header__name">{userID || 'User'}</span>
+          <button
+            className="menu-header__logout"
+            type="button"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
 
-      <div className="menu-content">
-        {menuSections.map((section, index) => (
-          <div key={index} className="menu-section">
-            <h3 className="section-title">{section.title}</h3>
-            <ul className="menu-list">
-              {section.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex} 
-                  className="menu-item"
-                  onClick={() => handleMenuItemClick(item)}
-                >
-                  <span className="menu-arrow">»</span>
-                  <span className="menu-label">{item.label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <main className="menu-main">
+        <h2 className="menu-main__heading">Main Menu</h2>
+      </main>
     </div>
   );
-};
+}
 
 export default Menu;

@@ -1,76 +1,105 @@
-.menu-container {
-  width: 300px;
-  background-color: #e8e8e8;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
+/* ==========================================================================
+   Menu 页面样式（登录成功后的跳转目标）
+   ========================================================================== */
+
+.menu-screen {
+  min-height: 100vh;
+  background-color: #f2f5f9;
+  font-family: 'Segoe UI', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
+  color: #1f2933;
 }
 
+/* ------------------------------ 页头 ------------------------------ */
 .menu-header {
-  background-color: #003366;
-  padding: 15px 20px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  background-color: #14509f;
+  color: #ffffff;
 }
 
-.volvo-logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.text-logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-.menu-content {
-  padding: 0;
-}
-
-.menu-section {
-  border-bottom: 1px solid #ccc;
-}
-
-.menu-section:last-child {
-  border-bottom: none;
-}
-
-.section-title {
-  background-color: #f5f5f5;
-  color: #003366;
-  font-size: 14px;
-  font-weight: bold;
+.menu-header__title {
   margin: 0;
-  padding: 8px 15px;
-  border-bottom: 1px solid #ddd;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.menu-header__title strong {
+  font-weight: 700;
+}
+
+.menu-header__user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.menu-header__logout {
+  height: 30px;
+  padding: 0 14px;
+  font-size: 13px;
+  color: #14509f;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.menu-header__logout:hover {
+  background-color: #dbe8f8;
+}
+
+/* ------------------------------ 主体 ------------------------------ */
+.menu-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.menu-main__heading {
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.menu-main__desc {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: #5b6675;
 }
 
 .menu-list {
-  list-style: none;
-  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 6px 15px;
+.menu-list__item {
+  padding: 18px 20px;
+  font-size: 15px;
+  background-color: #ffffff;
+  border: 1px solid #dde4ec;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(20, 80, 159, 0.06);
   cursor: pointer;
-  color: #003366;
-  font-size: 13px;
-  transition: background-color 0.2s;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.menu-item:hover {
-  background-color: #d5e3f0;
+.menu-list__item:hover {
+  border-color: #1e6fd9;
+  box-shadow: 0 4px 12px rgba(30, 111, 217, 0.16);
 }
 
-.menu-arrow {
-  margin-right: 8px;
-  color: #003366;
-  font-size: 12px;
-}
-
-.menu-label {
-  flex: 1;
+@media (max-width: 480px) {
+  .menu-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
