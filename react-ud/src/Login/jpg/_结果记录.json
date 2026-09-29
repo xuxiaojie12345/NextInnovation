@@ -1,0 +1,340 @@
+{
+  "total": 67,
+  "results": [
+    {
+      "tcNo": "TC01",
+      "pic": "UD01画面ピクチャー001.jpeg",
+      "note": "初期表示：背景图/左侧信息/右侧表单/输入框为空/Message 不显示/Login 按钮"
+    },
+    {
+      "tcNo": "TC02",
+      "pic": "UD01画面ピクチャー002.jpeg",
+      "note": "焦点自动定位：activeElement=username"
+    },
+    {
+      "tcNo": "TC03",
+      "pic": "UD01画面ピクチャー003.jpeg",
+      "note": "PC 宽屏 1280px：左右分栏并排显示"
+    },
+    {
+      "tcNo": "TC04",
+      "pic": "UD01画面ピクチャー004.jpeg",
+      "note": "窄屏 375px：分栏转为上下堆叠、无横向滚动条"
+    },
+    {
+      "tcNo": "TC05",
+      "pic": "UD01画面ピクチャー005.jpeg",
+      "note": "表单下方 3 行锁定提示文本（命中数=1）"
+    },
+    {
+      "tcNo": "TC06",
+      "pic": "UD01画面ピクチャー006.jpeg",
+      "note": "Support TPI 链接样式 + href=\"mailto:support@tpi.example.com\""
+    },
+    {
+      "tcNo": "TC07",
+      "pic": "UD01画面ピクチャー007.jpeg",
+      "note": "alternative login link: href=https://support.tpi.example.com/alternative-login target=_blank rel=noopener noreferrer"
+    },
+    {
+      "tcNo": "TC08",
+      "pic": "UD01画面ピクチャー008.jpeg",
+      "note": "UserID 正常输入 admin -> 实测值=\"admin\""
+    },
+    {
+      "tcNo": "TC09",
+      "pic": "UD01画面ピクチャー009.jpeg",
+      "note": "UserID 10 位 -> 实测值=\"abcdefghij\" (len=10)"
+    },
+    {
+      "tcNo": "TC10",
+      "pic": "UD01画面ピクチャー010.jpeg",
+      "note": "UserID 输入 11 位 -> 实测值=\"abcdefghij\" (len=10)"
+    },
+    {
+      "tcNo": "TC11",
+      "pic": "UD01画面ピクチャー011.jpeg",
+      "note": "UserID 输入 ab-c_d@1 -> 实测值=\"abcd1\""
+    },
+    {
+      "tcNo": "TC12",
+      "pic": "UD01画面ピクチャー012.jpeg",
+      "note": "UserID 输入全角 ａｄｍｉｎ -> 实测值=\"admin\""
+    },
+    {
+      "tcNo": "TC13",
+      "pic": "UD01画面ピクチャー013.jpeg",
+      "note": "UserID 输入中文 管理员 -> 实测值=\"\""
+    },
+    {
+      "tcNo": "TC14",
+      "pic": "UD01画面ピクチャー014.jpeg",
+      "note": "UserID 输入 \"  admin  \" -> 输入框实测值=\"admin\""
+    },
+    {
+      "tcNo": "TC14b",
+      "pic": "UD01画面ピクチャー015.jpeg",
+      "note": "提交后实际 UserID 为 \"admin\"（trim 生效）"
+    },
+    {
+      "tcNo": "TC15",
+      "pic": "UD01画面ピクチャー016.jpeg",
+      "note": "UserID 空 -> 消息=\"Username and password are required.\" color=rgb(255, 77, 79) 焦点=username"
+    },
+    {
+      "tcNo": "TC16",
+      "pic": "UD01画面ピクチャー017.jpeg",
+      "note": "UserID 仅空格 -> 消息=\"Username and password are required.\""
+    },
+    {
+      "tcNo": "TC17",
+      "pic": "UD01画面ピクチャー018.jpeg",
+      "note": "UserID DOM 属性: {\"lang\":\"en\",\"inputMode\":\"url\",\"autoCapitalize\":\"off\",\"autoCorrect\":\"off\",\"spellCheck\":\"false\",\"maxLength\":\"10\"}"
+    },
+    {
+      "tcNo": "TC18",
+      "pic": "UD01画面ピクチャー019.jpeg",
+      "note": "Password 正常输入 Admin@123 -> 掩码显示，type=password (TC19 同图证实)"
+    },
+    {
+      "tcNo": "TC20",
+      "pic": "UD01画面ピクチャー020.jpeg",
+      "note": "点击眼睛图标后 type=text（明文显示）"
+    },
+    {
+      "tcNo": "TC20b",
+      "pic": "UD01画面ピクチャー021.jpeg",
+      "note": "再次点击后恢复 type=password（掩码显示）"
+    },
+    {
+      "tcNo": "TC21",
+      "pic": "UD01画面ピクチャー022.jpeg",
+      "note": "掩码状态按钮 aria-label=\"Show password\"，SVG aria-hidden=\"true\""
+    },
+    {
+      "tcNo": "TC22",
+      "pic": "UD01画面ピクチャー023.jpeg",
+      "note": "Password 32 位 -> 实测长度=32"
+    },
+    {
+      "tcNo": "TC23",
+      "pic": "UD01画面ピクチャー024.jpeg",
+      "note": "Password 输入 33 位 -> 实测长度=32"
+    },
+    {
+      "tcNo": "TC24",
+      "pic": "UD01画面ピクチャー025.jpeg",
+      "note": "Password 符号输入 P@ssw0rd!#$% -> 实测长度=12"
+    },
+    {
+      "tcNo": "TC25",
+      "pic": "UD01画面ピクチャー026.jpeg",
+      "note": "Password 输入 \"ab cd\" -> 实测长度=4（空格被过滤）"
+    },
+    {
+      "tcNo": "TC26",
+      "pic": "UD01画面ピクチャー027.jpeg",
+      "note": "Password 全角输入 -> 实测长度=8（归一化为 Admin123）"
+    },
+    {
+      "tcNo": "TC27",
+      "pic": "UD01画面ピクチャー028.jpeg",
+      "note": "Password 空 -> 消息=\"Username and password are required.\" 焦点=current-password"
+    },
+    {
+      "tcNo": "TC28",
+      "pic": "UD01画面ピクチャー029.jpeg",
+      "note": "Password 仅空格 -> 消息=\"Username and password are required.\""
+    },
+    {
+      "tcNo": "TC29",
+      "pic": "UD01画面ピクチャー030.jpeg",
+      "note": "两者都为空 -> 消息=\"Username and password are required.\" API调用次数=0 焦点=username"
+    },
+    {
+      "tcNo": "TC30",
+      "pic": "UD01画面ピクチャー031.jpeg",
+      "note": "触发错误消息后：消息=\"Username and password are required.\""
+    },
+    {
+      "tcNo": "TC30b",
+      "pic": "UD01画面ピクチャー032.jpeg",
+      "note": "输入 \"a\" 后消息被清除：消息=\"\" 高度=0"
+    },
+    {
+      "tcNo": "TC31",
+      "pic": "UD01画面ピクチャー033.jpeg",
+      "note": "合法输入 admin/Admin@123（Zod safeParse 通过）"
+    },
+    {
+      "tcNo": "TC31b",
+      "pic": "UD01画面ピクチャー034.jpeg",
+      "note": "点击 Login 后正常进入 API 流程，URL=http://localhost:3000/menu API调用次数=1"
+    },
+    {
+      "tcNo": "TC32",
+      "pic": "UD01画面ピクチャー035.jpeg",
+      "note": "点击后按钮文案/状态（请求中）：\"(已跳转页面)\""
+    },
+    {
+      "tcNo": "TC32b",
+      "pic": "UD01画面ピクチャー036.jpeg",
+      "note": "登录成功跳转 /menu（URL=http://localhost:3000/menu）Token=YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwNzM1NjQ1fDVmTEI5dlpGODQ2bk96T2I5U0cwcFBkdE9hd1ZVdS0waU9JY2xaclhuNDQ user=\"admin\" localStorage=null"
+    },
+    {
+      "tcNo": "TC33",
+      "pic": "UD01画面ピクチャー037.jpeg",
+      "note": "Password 框回车提交 -> URL=http://localhost:3000/menu"
+    },
+    {
+      "tcNo": "TC34",
+      "pic": "UD01画面ピクチャー038.jpeg",
+      "note": "sessionStorage 键=[\"edb_auth_token\",\"edb_user_info\"] token=YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwNzM3NTk1fDBvWlNkN09JeENVY2UxNlh2eVI4NWRPcHh6aFJ0YkNJLVFxUUNzWmxVU1E user=\"admin\""
+    },
+    {
+      "tcNo": "TC35",
+      "pic": "UD01画面ピクチャー039.jpeg",
+      "note": "Menu 页面头部显示用户名与 Logout 按钮"
+    },
+    {
+      "tcNo": "TC36",
+      "pic": "UD01画面ピクチャー040.jpeg",
+      "note": "第二次登录成功 token: YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwNzQxNTYwfGVIb21RUUZCWnVYNFZZSXkyQTU5X2dvaWk4YzZJWno5NGR0a0liWkVIUEk -> YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwNzQzMDkxfFh0WlhwMmxXYTU5SGh4X1RNbjRsOS1PeW1VYXcwQkpqdWdkbi1yWGxkLWs（覆盖更新，URL=http://localhost:3000/menu）"
+    },
+    {
+      "tcNo": "TC37",
+      "pic": "UD01画面ピクチャー041.jpeg",
+      "note": "401: 消息=\"We didn't recognize the username or password you entered. Please try again.\" color=rgb(255, 77, 79) 密码清空后长度=0 焦点=password 按钮=\"Login\""
+    },
+    {
+      "tcNo": "TC38",
+      "pic": "UD01画面ピクチャー042.jpeg",
+      "note": "403: 消息=\"Your account is locked. Please contact your system administrator.\" color=rgb(255, 77, 79) 密码保留长度=9 按钮=\"Login\""
+    },
+    {
+      "tcNo": "TC39",
+      "pic": "UD01画面ピクチャー043.jpeg",
+      "note": "伪造 500 -> 消息=\"System error. Please contact administrator.\" 按钮=\"Login\""
+    },
+    {
+      "tcNo": "TC40",
+      "pic": "UD01画面ピクチャー044.jpeg",
+      "note": "网络断开（route abort）-> 消息=\"Network error. Please check your connection.\""
+    },
+    {
+      "tcNo": "TC41",
+      "pic": "UD01画面ピクチャー045.jpeg",
+      "note": "模拟超时 >10s -> 消息=\"Network error. Please check your connection.\""
+    },
+    {
+      "tcNo": "TC42",
+      "pic": "UD01画面ピクチャー046.jpeg",
+      "note": "HTTP200+code999 -> 消息=\"Business code is not 200.\" URL=http://localhost:3000/login"
+    },
+    {
+      "tcNo": "TC43",
+      "pic": "UD01画面ピクチャー047.jpeg",
+      "note": "401+自定义 message -> 消息=\"Backend error.\""
+    },
+    {
+      "tcNo": "TC44",
+      "pic": "UD01画面ピクチャー048.jpeg",
+      "note": "登录中按钮：\"Logging in...\" disabled=true"
+    },
+    {
+      "tcNo": "TC45",
+      "pic": "UD01画面ピクチャー049.jpeg",
+      "note": "连续点击两次 -> API 实际调用次数=1 URL=http://localhost:3000/menu"
+    },
+    {
+      "tcNo": "TC46",
+      "pic": "UD01画面ピクチャー050.jpeg",
+      "note": "失败后按钮回归：\"Login\" disabled=false"
+    },
+    {
+      "tcNo": "TC47",
+      "pic": "UD01画面ピクチャー051.jpeg",
+      "note": "错误消息样式 color=rgb(255, 77, 79) textAlign=start height=18.8438px"
+    },
+    {
+      "tcNo": "TC48",
+      "pic": "UD01画面ピクチャー052.jpeg",
+      "note": "Message 元素 role=alert aria-live=polite 空时 height=0px"
+    },
+    {
+      "tcNo": "TC49",
+      "pic": "UD01画面ピクチャー053.jpeg",
+      "note": "401 错误消息显示中：\"We didn't recognize the username or password you entered. Please try again.\""
+    },
+    {
+      "tcNo": "TC49b",
+      "pic": "UD01画面ピクチャー054.jpeg",
+      "note": "重新输入后消息清除：\"\" 高度=0"
+    },
+    {
+      "tcNo": "TC50",
+      "pic": "UD01画面ピクチャー055.jpeg",
+      "note": "请求中离开页面 -> console.error 数量=0 "
+    },
+    {
+      "tcNo": "TC51",
+      "pic": "UD01画面ピクチャー056.jpeg",
+      "note": "Request: POST http://localhost:3000/api/auth/login body={\"userid\":\"admin\",\"password\":\"Admin@123\"}"
+    },
+    {
+      "tcNo": "TC52",
+      "pic": "UD01画面ピクチャー057.jpeg",
+      "note": "Content-Type: application/json"
+    },
+    {
+      "tcNo": "TC53",
+      "pic": "UD01画面ピクチャー058.jpeg",
+      "note": "成功响应 HTTP=200 body={\"code\":200,\"data\":{\"userid\":\"admin\",\"username\":\"Administrator\",\"token\":\"YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwNzk3OTg1fGdRSlhtQ2NDM3oxX0VZc3NMNTY0XzQyYkx3aGlaSmduNUFjeTh1a2otdTA\",\"functions\":[\"UD01\",\"UD12\"],\"markets\":[\"GLO\"]},\"message\":\"success\"}"
+    },
+    {
+      "tcNo": "TC54",
+      "pic": "UD01画面ピクチャー059.jpeg",
+      "note": "401 时页面未抛异常（pageerror=0），组件正常显示消息=\"Backend error.\""
+    },
+    {
+      "tcNo": "TC55",
+      "pic": "UD01画面ピクチャー060.jpeg",
+      "note": "authApi.ts 中 REQUEST_TIMEOUT_MS = 10000 ms"
+    },
+    {
+      "tcNo": "TC56",
+      "pic": "UD01画面ピクチャー061.jpeg",
+      "note": "Console 日志中含明文密码的条数=0"
+    },
+    {
+      "tcNo": "TC57",
+      "pic": "UD01画面ピクチャー062.jpeg",
+      "note": "存储中是否含密码: session=false local=false cookie=false"
+    },
+    {
+      "tcNo": "TC58",
+      "pic": "UD01画面ピクチャー063.jpeg",
+      "note": "XSS 输入 -> UserID 实测=\"scriptal\" Password 长度=27 弹窗触发=false"
+    },
+    {
+      "tcNo": "TC59",
+      "pic": "UD01画面ピクチャー064.jpeg",
+      "note": "清除 Token 后访问 /menu -> 实际 URL=http://localhost:3000/login"
+    },
+    {
+      "tcNo": "TC60",
+      "pic": "UD01画面ピクチャー065.jpeg",
+      "note": "401 失败后 edb_auth_token=null URL=http://localhost:3000/login"
+    },
+    {
+      "tcNo": "TC61",
+      "pic": "UD01画面ピクチャー066.jpeg",
+      "note": "登录成功进入 Menu，token=YWRtaW58QWRtaW5pc3RyYXRvcnwxNzkwNjYwODEyNDkwfEFsMlJRRkZmVTQzbDR6MVNnMS00UWtUZ2U5ZjVQbDllaW5tekprOURwY00"
+    },
+    {
+      "tcNo": "TC61b",
+      "pic": "UD01画面ピクチャー067.jpeg",
+      "note": "Logout 后 token=null user=null URL=http://localhost:3000/login"
+    }
+  ]
+}
