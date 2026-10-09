@@ -1,0 +1,15 @@
+/* ===== 休日設置 画面 ===== */
+
+.holiday-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* 編集中の行をハイライト */
+.holiday-row-editing > td {
+  background: #e6f4ff !important;
+}

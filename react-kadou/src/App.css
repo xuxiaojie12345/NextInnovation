@@ -1,0 +1,60 @@
+/* ===== アプリ全体レイアウト ===== */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f0f2f5;
+}
+
+.app-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 画面切り替え用（非表示の画面は DOM に残して状態を保持する） */
+.app-view-hidden {
+  display: none;
+}
+
+/* ===== 追加系 画面（要員情報 / プロジェクト管理）の共通枠 ===== */
+
+.screen-page {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.screen-card {
+  max-width: 960px;
+}
+
+/* モーダル等のフォーム項目ラベル（共通） */
+.form-label {
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 要員情報画面：右上の「社員情報 / 一括読み込む」 */
+.personnel-header-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.personnel-import-hint {
+  font-size: 12px;
+  color: #888;
+  max-width: 460px;
+}
