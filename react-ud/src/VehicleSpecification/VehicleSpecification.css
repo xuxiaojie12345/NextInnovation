@@ -1,0 +1,128 @@
+/* VehicleSpecification.css
+ * 描述：Vehicle Specification(VDA 车辆仕样)画面的样式。
+ * 画面风格与 Generate document 画面统一（参照 GenerateDocument.css）：
+ * 白底、浅蓝色边框内容区、深蓝粗体标题 #0d2a5c、灰色按钮；
+ * 仕样代码一览以等宽字体 + 淡蓝色底框表示。
+ */
+
+/* 画面外层容器：白底铺满右侧内容区域（与 .generate-doc 统一） */
+.veh-spec {
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+/* 内容区：浅蓝色边框矩形（与 .generate-doc__card 统一） */
+.veh-spec__card {
+  width: 100%;
+  max-width: 1000px;
+  padding: 20px 28px 16px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 1px solid #a9c6e8;
+}
+
+/* 画面标题：深蓝粗体（与 .generate-doc__title 统一） */
+.veh-spec__title {
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2a5c;
+  border-bottom: 1px solid #a9c6e8;
+}
+
+/* 车辆基本信息区：两列 */
+.veh-spec__info {
+  margin: 10px 0 16px;
+}
+
+.veh-spec__info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  padding: 2px 0;
+}
+
+.veh-spec__info-line {
+  display: flex;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+}
+
+/* 标签固定宽度，使值与值对齐（参照画面式样图） */
+.veh-spec__info-label {
+  flex: 0 0 180px;
+  white-space: nowrap;
+  color: #333333;
+}
+
+.veh-spec__info-value {
+  color: #111111;
+  word-break: break-all;
+}
+
+/* 仕样代码一览：等宽字体 + 淡蓝色底框 */
+.veh-spec__grid {
+  padding: 10px 12px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333333;
+  background-color: #f4f8fd;
+  border: 1px solid #d7e3f2;
+  border-radius: 2px;
+}
+
+.veh-spec__grid-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: 12px;
+}
+
+.veh-spec__grid-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 返回按钮：浅灰色（与 .generate-doc__button 统一） */
+.veh-spec__button {
+  margin-top: 16px;
+  min-width: 110px;
+  padding: 5px 16px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #e8eaed;
+  border: 1px solid #c5ccd4;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.veh-spec__button:hover {
+  background-color: #d8dbe0;
+}
+
+/* 窄屏响应式：信息区改为单列 */
+@media (max-width: 768px) {
+  .veh-spec {
+    padding: 16px;
+  }
+
+  .veh-spec__card {
+    padding: 16px;
+  }
+
+  .veh-spec__info-row {
+    grid-template-columns: 1fr;
+  }
+
+  .veh-spec__grid-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

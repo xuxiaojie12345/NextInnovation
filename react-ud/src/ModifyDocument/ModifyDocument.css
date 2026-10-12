@@ -1,9 +1,10 @@
 /* ModifyDocument.css
- * 描述：ModifyDocument(文档修改)示例画面的样式。
- * 显示风格参照 GenerateHomologationDocument / GenerateDocument 画面：
- * 白底铺满右侧内容区、深蓝粗体标题、浅蓝色边框内容区；不再作为独立全屏版面显示。
+ * 描述：Modify Document(文档修正)画面的样式。
+ * 画面风格与 Generate document 画面统一（参照 GenerateDocument.css）：
+ * 白底铺满右侧内容区、浅蓝色边框内容区、深蓝粗体标题 #0d2a5c、深蓝超链接、灰色操作按钮。
  */
-/* 画面外层容器：白底铺满右侧内容区域 */
+
+/* 画面外层容器：白底铺满右侧内容区域（与 .generate-doc 统一） */
 .modify-doc {
   width: 100%;
   height: 100%;
@@ -14,16 +15,17 @@
   overflow: auto;
 }
 
-/* 内容区：浅蓝色边框矩形 */
+/* 内容区：浅蓝色边框矩形（与 .generate-doc__card 统一） */
 .modify-doc__card {
   width: 100%;
-  max-width: 640px;
+  max-width: 900px;
   padding: 20px 28px 16px;
   box-sizing: border-box;
   background-color: #ffffff;
   border: 1px solid #a9c6e8;
 }
 
+/* 画面标题：深蓝粗体（与 .generate-doc__title 统一） */
 .modify-doc__title {
   margin: 0 0 16px;
   padding-bottom: 6px;
@@ -33,24 +35,71 @@
   border-bottom: 1px solid #a9c6e8;
 }
 
+/* Chassis no / Market / Template 信息区 */
 .modify-doc__info {
-  margin: 8px 0;
+  margin: 10px 0;
+}
+
+/* 单条信息行（与 .generate-doc-row 统一） */
+.modify-doc-row {
+  display: flex;
+  align-items: baseline;
+  padding: 2px 0;
   font-size: 14px;
+  line-height: 1.6;
+}
+
+.modify-doc-row__label {
+  flex-shrink: 0;
+  min-width: 150px;
   color: #333333;
 }
 
-.modify-doc__placeholder {
-  margin: 8px 0 16px;
-  padding: 12px;
-  font-size: 13px;
-  color: #6b7280;
-  background-color: #f4f6f8;
-  border: 1px dashed #c5ccd4;
-  border-radius: 2px;
+.modify-doc-row__value {
+  color: #111111;
+  word-break: break-all;
 }
 
+/* chassis no 超链接：深蓝下划线（与 .generate-doc__link 统一） */
+.modify-doc__chassis-link {
+  padding: 0;
+  font-size: 14px;
+  color: #0d2a5c;
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.modify-doc__chassis-link:hover {
+  color: #2f6fd0;
+}
+
+/* Template 文件超链接：深蓝下划线（与 .generate-doc__link 统一） */
+.modify-doc__link {
+  display: inline-block;
+  padding: 0;
+  font-size: 14px;
+  color: #0d2a5c;
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.modify-doc__link:hover {
+  color: #2f6fd0;
+}
+
+/* Save 按钮区 */
+.modify-doc__action {
+  margin: 10px 0;
+}
+
+/* Save 按钮：浅灰色（与 .generate-doc__button 统一） */
 .modify-doc__button {
-  padding: 5px 20px;
+  min-width: 110px;
+  padding: 5px 16px;
   font-size: 14px;
   color: #333333;
   background-color: #e8eaed;
@@ -59,6 +108,118 @@
   cursor: pointer;
 }
 
-.modify-doc__button:hover {
+.modify-doc__button:hover:not(:disabled) {
   background-color: #d8dbe0;
+}
+
+.modify-doc__button:disabled {
+  color: #9aa0a6;
+  cursor: not-allowed;
+}
+
+/* 错误消息区：红色（与 .generate-doc__error-message 统一） */
+.modify-doc__message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #c0392b;
+  background-color: #fdf0ef;
+  border: 1px solid #e6b8b4;
+  border-radius: 2px;
+}
+
+/* 数据取得状态提示（与 .generate-doc__status 统一） */
+.modify-doc__status {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* DataTable：Variable / Description / Current value / Modified value */
+.modify-doc__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 8px;
+  background-color: #ffffff;
+}
+
+/* 表头：深蓝粗体 + 淡蓝色底 */
+.modify-doc__th {
+  padding: 5px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2a5c;
+  text-align: left;
+  background-color: #e8f0fa;
+  border: 1px solid #c5d5e8;
+}
+
+/* 列宽：Variable / Description / Current value / Modified value */
+.modify-doc__table th:nth-child(1) {
+  width: 16%;
+}
+
+.modify-doc__table th:nth-child(2) {
+  width: 40%;
+}
+
+.modify-doc__table th:nth-child(3) {
+  width: 22%;
+}
+
+.modify-doc__table th:nth-child(4) {
+  width: 22%;
+}
+
+.modify-doc__td {
+  padding: 3px 8px;
+  font-size: 14px;
+  color: #333333;
+  vertical-align: middle;
+  border: 1px solid #d7e3f2;
+  word-break: break-word;
+}
+
+/* 交替行：淡蓝色底色 */
+.modify-doc__tr:nth-child(odd) .modify-doc__td {
+  background-color: #f4f8fd;
+}
+
+.modify-doc__tr:nth-child(even) .modify-doc__td {
+  background-color: #ffffff;
+}
+
+/* Modified value 输入框（边框风格与按钮统一） */
+.modify-doc__input {
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  font: inherit;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #c5ccd4;
+  border-radius: 2px;
+}
+
+.modify-doc__input:focus {
+  outline: none;
+  border-color: #0d2a5c;
+  box-shadow: 0 0 0 2px rgba(13, 42, 92, 0.12);
+}
+
+/* 窄屏响应式：内容区与容器留白（与 GenerateDocument 一致） */
+@media (max-width: 600px) {
+  .modify-doc {
+    padding: 16px;
+  }
+
+  .modify-doc__card {
+    padding: 16px 16px 10px;
+  }
+
+  .modify-doc-row__label {
+    min-width: 110px;
+  }
 }

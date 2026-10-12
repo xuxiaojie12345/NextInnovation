@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- HdocAdcaModificationMapperインターフェースと紐づくSQLマッピングファイル -->
+<mapper namespace="com.web.app.mapper.HdocAdcaModificationMapper">
+
+    <!-- ModifyDocument一覧を取得 -->
+    <!-- 備考：設計書の記載は「HAM.SERIEHE」だが、テーブル定義および更新SQLに合わせて SERIE を使用 -->
+    <select id="getModifyDocument" resultType="com.web.app.dto.UD05SelectVariableModificationItem">
+        SELECT
+            HAM.VARIABLE                 AS variable,
+            HV.DESCRIPTION               AS description,
+            HAM.NEWVAL                   AS newval
+        FROM
+            HDOC_ADCA_MODIFICATION HAM
+        LEFT JOIN HDOC_VARIABLES HV
+            ON HAM.VARIABLE = HV.VARIABLE
+        WHERE
+            HAM.SERIE = #{chassisSeries}
+            AND HAM.CHNO = #{chassisNo}
+    </select>
+
+    <!-- ModifyDocumentの修正値を更新 -->
+    <update id="updateModifyDocument">
+        UPDATE HDOC_ADCA_MODIFICATION
+        SET
+            NEWVAL = #{modifiedValue},
+            UPDATE_DATETIME = NOW(),
+            UPDATE_USER = #{userId}
+        WHERE
+            CHNO = #{chassisNo}
+            AND SERIE = #{chassisSeries}
+    </update>
+
+</mapper>

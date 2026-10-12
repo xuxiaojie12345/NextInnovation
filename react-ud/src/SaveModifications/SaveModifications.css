@@ -1,0 +1,89 @@
+/* SaveModifications.css
+ * 描述：Save Modifications(保存结果)画面的样式。
+ * 画面风格与 Generate document 画面统一（参照 GenerateDocument.css）：
+ * 白底、浅蓝色边框内容区、深蓝粗体标题 #0d2a5c、灰色操作按钮。
+ */
+
+/* 画面外层容器：白底铺满右侧内容区域（与 .generate-doc 统一） */
+.save-mod {
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+/* 内容区：浅蓝色边框矩形（与 .generate-doc__card 统一） */
+.save-mod__card {
+  width: 100%;
+  max-width: 560px;
+  padding: 20px 28px 16px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 1px solid #a9c6e8;
+}
+
+/* 画面标题：深蓝粗体（与 .generate-doc__title 统一） */
+.save-mod__title {
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2a5c;
+  border-bottom: 1px solid #a9c6e8;
+}
+
+/* 结果明细：等宽字体 + 淡蓝色底框 */
+.save-mod__body {
+  padding: 10px 12px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  color: #333333;
+  background-color: #f4f8fd;
+  border: 1px solid #d7e3f2;
+  border-radius: 2px;
+}
+
+.save-mod__line {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 版本已发行行：绿色背景突出显示 */
+.save-mod__line--released {
+  background-color: #00ff00;
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Close 按钮：浅灰色（与 .generate-doc__button 统一） */
+.save-mod__button {
+  margin-top: 16px;
+  min-width: 110px;
+  padding: 5px 16px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #e8eaed;
+  border: 1px solid #c5ccd4;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.save-mod__button:hover {
+  background-color: #d8dbe0;
+}
+
+/* 窄屏响应式 */
+@media (max-width: 600px) {
+  .save-mod {
+    padding: 16px;
+  }
+
+  .save-mod__card {
+    padding: 16px;
+  }
+}
