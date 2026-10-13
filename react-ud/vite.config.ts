@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite';
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 /**
@@ -7,6 +8,7 @@ import react from '@vitejs/plugin-react';
  * 本工程由 CRA(react-scripts) 迁移至 Vite：
  *  - 入口为项目根目录的 index.html
  *  - 环境变量使用 import.meta.env（VITE_ 前缀）
+ *  - 单元测试使用 Vitest + jsdom（规约 24：后端用 JUnit 5，前端用 Vitest）
  */
 export default defineConfig({
   plugins: [react()],
@@ -28,5 +30,18 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+  },
+  /**
+   * Vitest 配置
+   * - environment: jsdom，提供 DOM 与 sessionStorage 等浏览器 API
+   * - setupFiles: 引入 jest-dom 断言扩展（与 setupTests.ts 一致）
+   * - globals: 启用 describe / test / expect 全局注入
+   */
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/setupTests.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    css: false,
   },
 });

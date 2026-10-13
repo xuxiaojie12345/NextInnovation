@@ -1,105 +1,202 @@
 /* ==========================================================================
-   Menu 页面样式（登录成功后的跳转目标）
+   Menu 页面样式
+   对应【详细设计UD02.md（Menu 模块）】2.1 画面参数定义 / 6 实现注意事项
+   - 全屏背景图 + PC 端居中显示（与 Login 画面保持一致，要求 3）
+   - 顶栏：菜单标题居中固定显示 "Menu"，Welcome Message 右对齐
+   - 主体：按业务分组的导航 Link
+   - 响应式：窄屏（<= 900px）时分组纵向堆叠
    ========================================================================== */
 
+/* ------------------------------ 变量定义 ------------------------------ */
 .menu-screen {
+  --menu-accent: #1e6fd9;
+  --menu-accent-dark: #14509f;
+  --menu-text: #1f2933;
+  --menu-muted: #5b6675;
+  --menu-border: #c7d0db;
+
+  /* 与 Login 一致：全屏背景图 + 居中显示 */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-height: 100vh;
-  background-color: #f2f5f9;
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: #205faa;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   font-family: 'Segoe UI', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
-  color: #1f2933;
+  color: var(--menu-text);
 }
 
-/* ------------------------------ 页头 ------------------------------ */
+/* 背景压暗遮罩：与 Login 完全一致，保证内容清晰可读 */
+.menu-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 28, 58, 0.55) 0%,
+    rgba(6, 28, 58, 0.3) 45%,
+    rgba(6, 28, 58, 0.15) 100%
+  );
+}
+
+/* ------------------------------ 顶栏 ------------------------------ */
 .menu-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 28px;
-  background-color: #14509f;
-  color: #ffffff;
+  justify-content: center;
+  width: 100%;
+  max-width: 1160px;
+  min-height: 56px;
 }
 
+/* 控件 14：Menu Title（居中固定显示 "Menu"） */
 .menu-header__title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.menu-header__title strong {
+  font-size: 34px;
   font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-.menu-header__user {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 14px;
-}
-
-.menu-header__logout {
-  height: 30px;
-  padding: 0 14px;
-  font-size: 13px;
-  color: #14509f;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.menu-header__logout:hover {
-  background-color: #dbe8f8;
-}
-
-/* ------------------------------ 主体 ------------------------------ */
-.menu-main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
-.menu-main__heading {
-  margin: 0 0 8px;
-  font-size: 26px;
-}
-
-.menu-main__desc {
-  margin: 0 0 24px;
+/* 控件 13：Welcome Message（右对齐、动态显示，内容为空时不占位） */
+.menu-header__welcome {
+  position: absolute;
+  right: 0;
+  margin: 0;
+  max-width: 256px;
   font-size: 15px;
-  color: #5b6675;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #f0f4f8;
+  text-align: right;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.menu-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
+.menu-header__welcome--visible {
+  opacity: 1;
+}
+
+/* ------------------------------ 主体内容区 ------------------------------ */
+.menu-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1160px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.menu-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/* ------------------------------ 分组 ------------------------------ */
+.menu-group {
+  flex: 1 1 260px;
+  min-width: 260px;
+  padding: 20px 22px 16px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  /* 与 Login 表单区一致：半透明白底 + 阴影 */
+  background-color: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+}
+
+.menu-group__title {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--menu-accent);
+  border-bottom: 1px solid #e4e9f0;
+}
+
+.menu-group__list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.menu-list__item {
-  padding: 18px 20px;
-  font-size: 15px;
-  background-color: #ffffff;
-  border: 1px solid #dde4ec;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(20, 80, 159, 0.06);
+.menu-group__item {
+  margin-bottom: 4px;
+}
+
+/* ------------------------------ 导航 Link ------------------------------ */
+/* 控件 1〜12：Link（左对齐、活性），点击触发画面迁移 */
+.menu-link {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--menu-text);
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
-.menu-list__item:hover {
-  border-color: #1e6fd9;
-  box-shadow: 0 4px 12px rgba(30, 111, 217, 0.16);
+.menu-link:hover {
+  color: var(--menu-accent-dark);
+  background-color: rgba(30, 111, 217, 0.1);
 }
 
-@media (max-width: 480px) {
+.menu-link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
+   响应式：窄屏时分组纵向堆叠
+   ========================================================================== */
+@media (max-width: 900px) {
+  .menu-screen {
+    padding: 32px 16px;
+  }
+
   .menu-header {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .menu-header__title {
+    font-size: 28px;
+  }
+
+  .menu-header__welcome {
+    position: static;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .menu-panel {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .menu-group {
+    min-width: 0;
+    width: 100%;
   }
 }
