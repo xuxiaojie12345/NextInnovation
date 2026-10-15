@@ -1,14 +1,15 @@
 import React, { useMemo } from 'react';
-import { Card, Space, Statistic, Table, Tag, Typography } from 'antd';
+import { Card, Empty, Space, Statistic, Table, Tag, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import {
   JINAN_ALL_LABEL,
-  JINAN_DEPARTMENTS,
   JINAN_TARGET_RATE,
+  getJinanDepartments,
   getJinanWeeklyStats,
 } from '../data/mockJinanStats';
 import type { JinanDept, JinanWeeklyStat } from '../data/mockJinanStats';
+import { buildYearWeeks, weekKeyOf } from '../data/yearWeeks';
 import './JinanWorkRateScreen.css';
 
 const { Title, Text } = Typography;
@@ -19,10 +20,6 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 /** 率（%）= 分子 ÷ 分母 × 100 */
 const rate = (num: number, den: number) =>
   den <= 0 ? 0 : round1((num / den) * 100);
-
-/** 指定日が属する週の月曜日（週キー 'YYYY-MM-DD'） */
-const weekKeyOf = (d: dayjs.Dayjs) =>
-  d.subtract((d.day() + 6) % 7, 'day').format('YYYY-MM-DD');
 
 /** 稼動率のセル表示（目標値以上は緑） */
 const rateCell = (v: number) => (
@@ -74,20 +71,36 @@ interface MetricRow {
   isRate?: boolean;
 }
 
+interface JinanWorkRateScreenProps {
+  /** 表示する年度 */
+  year: number;
+}
+
 /**
  * 済南拠点 稼働率統計 画面（メニュー「済南稼働率統計」で切り替わる画面）
  * 週単位（月曜〜日曜）で 総人数 / 離職人数 / 稼動人数 / 稼動率 などを集計して表示する
+ * ※部門（行）は年度の部門マスタに従う（2025 は 2 部門、2026 は 3 部門）
  * ※現状はモックデータ表示（バックエンド未接続）
  */
-const JinanWorkRateScreen: React.FC = () => {
-  /** 今日を含む週の週キー */
-  const currentWeekKey = useMemo(() => weekKeyOf(dayjs()), []);
+const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({ year }) => {
+  /** 対象年度の済南拠点の部門 */
+  const departments = useMemo(() => getJinanDepartments(year), [year]);
 
-  /** 対象年（当年） */
-  const displayYear = dayjs().year();
+  /** 当年か（当年だけ「今週の集計」を出す） */
+  const isCurrentYear = year === dayjs().year();
 
-  /** 済南全社（3 部門の合計）の週次統計 */
-  const allStats = useMemo(() => getJinanWeeklyStats(JINAN_ALL_LABEL), []);
+  /** 当年は今日を含む週、それ以外の年度は年度末の週 */
+  const currentWeekKey = useMemo(() => {
+    if (isCurrentYear) return weekKeyOf(dayjs());
+    const weeks = buildYearWeeks(year);
+    return weeks.length > 0 ? weeks[weeks.length - 1].key : '';
+  }, [year, isCurrentYear]);
+
+  /** 済南全社（全部門の合計）の週次統計 */
+  const allStats = useMemo(
+    () => getJinanWeeklyStats(JINAN_ALL_LABEL, year),
+    [year],
+  );
 
   /** 週列（当年分／月曜始まり） */
   const weeks: WeekCol[] = useMemo(
@@ -114,7 +127,7 @@ const JinanWorkRateScreen: React.FC = () => {
           order: ym.year * 12 + ym.month,
           // 年をまたぐ月（前年12月・翌年1月）は年を付けて表示する
           label:
-            ym.year === displayYear
+            ym.year === year
               ? `${ym.month + 1}月`
               : `${ym.year}年${ym.month + 1}月`,
           weeks: [],
@@ -129,7 +142,7 @@ const JinanWorkRateScreen: React.FC = () => {
         label,
         weeks: groupWeeks,
       }));
-  }, [weeks, displayYear]);
+  }, [weeks, year]);
 
   /**
    * 指標行（10 指標 × 4 部門 = 40 行）
@@ -209,13 +222,13 @@ const JinanWorkRateScreen: React.FC = () => {
       },
     ];
 
-    const deptRows: JinanDept[] = [...JINAN_DEPARTMENTS, JINAN_ALL_LABEL];
+    const deptRows: JinanDept[] = [...departments, JINAN_ALL_LABEL];
     const rows: MetricRow[] = [];
     metrics.forEach((m) => {
       deptRows.forEach((department, dIdx) => {
         /** 週キー → 値 */
         const values: Record<string, number> = {};
-        getJinanWeeklyStats(department).forEach((s) => {
+        getJinanWeeklyStats(department, year).forEach((s) => {
           values[s.weekKey] = m.value(s);
         });
         rows.push({
@@ -231,7 +244,7 @@ const JinanWorkRateScreen: React.FC = () => {
       });
     });
     return rows;
-  }, []);
+  }, [departments, year]);
 
   /**
    * 今週の集計（当週 = 今日を含む週の実績値）
@@ -280,11 +293,17 @@ const JinanWorkRateScreen: React.FC = () => {
   const period = useMemo(
     () => ({
       weeks: weeks.length,
-      first: weeks[0].monday.format('YYYY/M/D'),
-      last: weeks[weeks.length - 1].monday.format('YYYY/M/D'),
+      first: weeks.length > 0 ? weeks[0].monday.format('YYYY/M/D') : '－',
+      last:
+        weeks.length > 0
+          ? weeks[weeks.length - 1].monday.format('YYYY/M/D')
+          : '－',
     }),
     [weeks],
   );
+
+  /** データがあるか（データ未準備の年度は空表示） */
+  const hasData = allStats.length > 0;
 
   /** 今週のサマリ（10 項目） */
   const cards: {
@@ -326,7 +345,7 @@ const JinanWorkRateScreen: React.FC = () => {
         width: 110,
         // 同じ指標の 4 行（第一〜第三開発部・済南全社）はセルを縦に結合して表示する
         onCell: (row) => ({
-          rowSpan: row.isFirstOfMetric ? JINAN_DEPARTMENTS.length + 1 : 0,
+          rowSpan: row.isFirstOfMetric ? departments.length + 1 : 0,
           className: row.isFirstOfMetric ? 'jinan-metric-cell' : '',
         }),
       },
@@ -371,7 +390,31 @@ const JinanWorkRateScreen: React.FC = () => {
     });
 
     return cols;
-  }, [monthGroups, currentWeekKey]);
+  }, [monthGroups, currentWeekKey, departments]);
+
+  // データ未準備の年度は空表示にする
+  if (!hasData) {
+    return (
+      <div className='screen-page'>
+        <div className='screen-header'>
+          <div>
+            <Title level={4} style={{ margin: 0 }}>
+              {year}年度　済南稼働率統計（週単位）
+            </Title>
+            <Text type='secondary'>
+              {year}年度のデータは未準備です。
+            </Text>
+          </div>
+          <Space>
+            <Tag color='blue'>拠点：済南</Tag>
+          </Space>
+        </div>
+        <Card className='screen-card' style={{ marginTop: 12 }}>
+          <Empty description={`${year}年度のデータは未準備です`} />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className='screen-page'>
@@ -379,10 +422,10 @@ const JinanWorkRateScreen: React.FC = () => {
       <div className='screen-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            済南稼働率統計（週単位）
+            {year}年度　済南稼働率統計（週単位）
           </Title>
           <Text type='secondary'>
-            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（第一〜第三開発部・済南全社）に週単位（月曜〜日曜）で集計した統計画面です。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
+            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departments, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
           </Text>
         </div>
         <Space>
@@ -393,7 +436,7 @@ const JinanWorkRateScreen: React.FC = () => {
 
       {/* 今週の集計（10 項目） */}
       <Card
-        title={`今週の集計（${JINAN_ALL_LABEL}／${week.label}）`}
+        title={`${isCurrentYear ? '今週' : '年度末週'}の集計（${JINAN_ALL_LABEL}／${week.label}）`}
         className='screen-card jinan-card-full'
         extra={<Text type='secondary'>目標稼働率 {JINAN_TARGET_RATE}%</Text>}
       >
@@ -418,14 +461,14 @@ const JinanWorkRateScreen: React.FC = () => {
           ))}
         </div>
         <Text type='secondary' className='jinan-note'>
-          ※ 当週（{week.period}）の実績値です。人数は当週の人数、稼動率は「各分子 ÷ 総人数」で算出しています。
-          {!week.hasData && ' ※当週のデータが無いため 0 で表示しています。'}
+          ※ {isCurrentYear ? '当週' : '年度末週'}（{week.period}）の実績値です。人数は当該週の人数、稼動率は「各分子 ÷ 総人数」で算出しています。
+          {!week.hasData && ' ※対象週のデータが無いため 0 で表示しています。'}
         </Text>
       </Card>
 
       {/* 週次統計（指標 × 週の横向き） */}
       <Card
-        title={`週次 稼動統計（10 指標 × 4 部門 × ${period.weeks} 週）`}
+        title={`週次 稼動統計（10 指標 × ${departments.length + 1} 部門 × ${period.weeks} 週）`}
         className='screen-card jinan-card-full'
         style={{ marginTop: 12 }}
         extra={
@@ -444,7 +487,7 @@ const JinanWorkRateScreen: React.FC = () => {
           rowClassName={(r) => (r.isTotal ? 'jinan-total-row' : '')}
         />
         <Text type='secondary' className='jinan-note'>
-          ※ 行 = 指標 × 部門（第一〜第三開発部／済南全社 = 3 部門の合計）、列 = 週（月曜〜日曜）。「今週の列」（{currentWeekKey} の週）はハイライト表示。
+          ※ 行 = 指標 × 部門（{[...departments, `${JINAN_ALL_LABEL} = ${departments.length} 部門の合計`].join('／')}）、列 = 週（月曜〜日曜）。「{isCurrentYear ? '今週' : '年度末週'}の列」（{currentWeekKey} の週）はハイライト表示。
         </Text>
       </Card>
 

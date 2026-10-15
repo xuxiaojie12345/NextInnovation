@@ -23,11 +23,18 @@ import {
   ReloadOutlined,
   SaveOutlined,
   SelectOutlined,
-  SyncOutlined,
 } from '@ant-design/icons';
 import './WorkStatus.css';
-import { PERSON_MAIN_PROJECT } from '../data/mockData';
 import { Department, Personnel, Project, AssignmentMap } from './types';
+import {
+  WEEK_COL_WIDTH,
+  FIXED_LEFT_WIDTH,
+  WeekCol,
+  buildYearWeeks,
+  mondayOf,
+} from '../data/yearWeeks';
+import type { UnpaidMap, WorkStatusData } from '../data/yearStore';
+import type { WorkStatusPayload } from '../data/kadouRepository';
 
 const { Title, Text } = Typography;
 
@@ -43,9 +50,6 @@ const KEY_SEP = '|';
  */
 const LEAVE_PROJECT_NAME = '内・退職';
 
-/** 表示年（当年）。グリッドは「当年1月1日を含む週」〜「12月31日を含む週」のみを表示する */
-const DISPLAY_YEAR = dayjs().year();
-
 /** セルキー（要員ID|週キー）を組み立てる */
 const cellKey = (personId: string, weekKey: string) =>
   `${personId}${KEY_SEP}${weekKey}`;
@@ -55,15 +59,6 @@ const parseCellKey = (key: string): { personId: string; weekKey: string } => {
   const i = key.indexOf(KEY_SEP);
   return { personId: key.slice(0, i), weekKey: key.slice(i + 1) };
 };
-
-/** 1週（月曜〜日曜）の情報 */
-interface WeekCol {
-  /** 週キー = 月曜日 'YYYY-MM-DD' */
-  key: string;
-  monday: Dayjs;
-  sunday: Dayjs;
-  index: number;
-}
 
 /** 月ごとの週グループ（ヘッダー2段組み用） */
 interface MonthGroup {
@@ -90,32 +85,6 @@ interface Row {
   isTotal: boolean;
 }
 
-/** 指定日が属する週の月曜日を返す */
-const mondayOf = (d: Dayjs): Dayjs => d.subtract((d.day() + 6) % 7, 'day');
-
-/**
- * 当年の週列を列挙する（月曜始まり）。
- * 1月1日を含む週 〜 12月31日を含む週（前年12月・翌年1月にまたがる週も含む）
- */
-const buildYearWeeks = (year: number): WeekCol[] => {
-  const firstMonday = mondayOf(dayjs(`${year}-01-01`));
-  const lastMonday = mondayOf(dayjs(`${year}-12-31`));
-  const weeks: WeekCol[] = [];
-  let cur = firstMonday;
-  let guard = 0;
-  while (!cur.isAfter(lastMonday, 'day') && guard < 80) {
-    weeks.push({
-      key: cur.format('YYYY-MM-DD'),
-      monday: cur,
-      sunday: cur.add(6, 'day'),
-      index: weeks.length,
-    });
-    cur = cur.add(7, 'day');
-    guard += 1;
-  }
-  return weeks;
-};
-
 /** 週キー（月曜 'YYYY-MM-DD'）の配列を 開始週〜終了週 で生成する */
 const buildWeekKeys = (fromMonday: Dayjs, toMonday: Dayjs): string[] => {
   const keys: string[] = [];
@@ -129,25 +98,32 @@ const buildWeekKeys = (fromMonday: Dayjs, toMonday: Dayjs): string[] => {
   return keys;
 };
 
-/** WorkStatus の props（要員・プロジェクト・部門は App（メニュー側）で管理する） */
+/** WorkStatus の props（年度データは App 側で管理する） */
 interface WorkStatusProps {
-  /** 要員一覧（メニューの「要員情報」で増える） */
+  /** 表示する年度 */
+  year: number;
+  /** 要員一覧（保存済み。画面での編集は下書きとして保持し、保存で確定する） */
   personnel: Personnel[];
   /** プロジェクト一覧（メニューの「プロジェクト管理」で増える） */
   projects: Project[];
-  /** 部門マスタ（要員検索の「部署」の選択肢） */
+  /** 部門マスタ（所属列のフィルタの選択肢） */
   departments: Department[];
   /**
-   * 「社員番号」列で社員番号を入力したとき（社員マスタから 役割・名前・所属 を自動取得）
-   * 戻り値 false = 処理中止（一覧内で社員番号が重複）。入力値は元の値に戻す
+   * 初期表示で選択しておく部署（空 = 全部署）。
+   * ログインユーザーが部長なら自部門が初期選択される。
+   * 部署の選択肢は常に全部門（他部門へ切り替えて閲覧できる＝データ集約）。
    */
-  onChangePersonnelEmployeeNo: (personId: string, employeeNo: string) => boolean;
-  /** 「退場予定」列で退場予定を変更したとき */
-  onChangePersonnelLeavePlan: (personId: string, leavePlan: string) => void;
-  /** 行追加（全項目が空の行を追加する） */
-  onAddRow: () => void;
-  /** 行削除 */
-  onDeleteRow: (personId: string) => void;
+  defaultDepartments?: string[];
+  /** 社員マスタ（社員番号 → 要員）。社員番号入力時に 役割・名前・所属 を引く */
+  employeeMaster: Map<string, Personnel>;
+  /** 保存済みのグリッド内容（割当・BUFFER） */
+  initialWorkStatus: WorkStatusData;
+  /** 保存（下書きを確定して親へ渡す） */
+  onSave: (payload: WorkStatusPayload) => void;
+  /** 未保存の変更があるかの通知 */
+  onDirtyChange: (dirty: boolean) => void;
+  /** 「保存」処理を親へ登録する（未保存確認ダイアログから呼ばれる） */
+  registerSaveHandler: (fn: (() => void) | null) => void;
 }
 
 /**
@@ -226,7 +202,7 @@ const WeekCell = React.memo(
   }: WeekCellProps) => (
     <div
       className={`ws-week-cell${isUnpaid ? ' ws-week-cell-unpaid' : ''}`}
-      title={isUnpaid ? '無償支援（契約外・非計費）' : undefined}
+      title={isUnpaid ? 'BUFFER（契約外・非計費）' : undefined}
       // 右クリックはコンテキストメニューのみ（項目の選択リストを開かない）
       onMouseDownCapture={(e) => {
         if (e.button !== 0) e.stopPropagation();
@@ -244,8 +220,8 @@ const WeekCell = React.memo(
         showSearch
         optionFilterProp='label'
         popupMatchSelectWidth={false}
-        // 無償支援のセルは矢印アイコンの位置に「無償」バッジを表示する
-        suffixIcon={isUnpaid ? <span className='ws-unpaid-badge'>無償</span> : undefined}
+        // 無償支援のセルは矢印アイコンの位置に「BUFFER」バッジを表示する
+        suffixIcon={isUnpaid ? <span className='ws-unpaid-badge'>BUFFER</span> : undefined}
       />
     </div>
   ),
@@ -255,22 +231,47 @@ const WeekCell = React.memo(
  * 要員 × 週 のプロジェクト割当グリッド（週単位・当年 1月〜12月 の 1年度分）
  */
 const WorkStatus: React.FC<WorkStatusProps> = ({
+  year,
   personnel,
   projects,
   departments,
-  onChangePersonnelEmployeeNo,
-  onChangePersonnelLeavePlan,
-  onAddRow,
-  onDeleteRow,
+  defaultDepartments,
+  employeeMaster,
+  initialWorkStatus,
+  onSave,
+  onDirtyChange,
+  registerSaveHandler,
 }) => {
-  // 割当: 要員ID -> (週キー 'YYYY-MM-DD' -> プロジェクトID or null)
-  const [assignment, setAssignment] = useState<AssignmentMap>({});
+  // ---- 下書き（保存するまで確定しない編集内容）------------------------
+  // 未保存の変更があるか
+  const [dirty, setDirty] = useState(false);
+  // 要員行の変更（要員ID -> 変更項目）
+  const [personnelEdits, setPersonnelEdits] = useState<
+    Record<string, Partial<Personnel>>
+  >({});
+  // 行追加した要員
+  const [personnelAdded, setPersonnelAdded] = useState<Personnel[]>([]);
+  // 行削除した要員ID
+  const [personnelDeleted, setPersonnelDeleted] = useState<string[]>([]);
 
-  // ---- 要員検索・絞り込み（部署 × 要員 の連動リスト） ----
-  // 選択した部署（空 = 全部署）
-  const [deptFilter, setDeptFilter] = useState<string[]>([]);
-  // 選択した要員（空 = 部署内の全員）
-  const [personFilter, setPersonFilter] = useState<string[]>([]);
+  // 割当: 要員ID -> (週キー 'YYYY-MM-DD' -> プロジェクトID or null)
+  const [assignment, setAssignment] = useState<AssignmentMap>(() => ({
+    ...initialWorkStatus.assignment,
+  }));
+
+  // ---- 検索条件（部署で表示要員を絞り込む） ----
+  // 選択した部署（空 = 全部署）。初期値はログインユーザーの既定部門
+  // （部長 = 自部門／事業部長・管理者 = 全部門）
+  // ※所属列の列ヘッダーフィルタと連動する
+  const [deptFilter, setDeptFilter] = useState<string[]>(
+    () => defaultDepartments ?? [],
+  );
+
+  // 週列（キー = 週キー 'YYYY-MM-DD'）ごとの「プロジェクト」列フィルタ（空 = 絞り込みなし）
+  // ※所属列と同様、Excel のオートフィルタと同じ位置付け（列ごとの条件は AND）
+  const [weekProjectFilter, setWeekProjectFilter] = useState<
+    Record<string, string[]>
+  >({});
 
   // ---- 複数セル選択 & プロジェクト名のコピー/貼り付け ----
   // 複数セル選択モード（ON の間はクリックでセルを選択できる）
@@ -287,9 +288,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const [pasteUnpaid, setPasteUnpaid] = useState(false);
 
   // ---- 無償支援（契約外・非計費）: 要員ID -> (週キー -> true) ----
-  const [unpaid, setUnpaid] = useState<Record<string, Record<string, boolean>>>(
-    {},
-  );
+  const [unpaid, setUnpaid] = useState<UnpaidMap>(() => ({
+    ...initialWorkStatus.unpaid,
+  }));
 
   // ---- セルの右クリックメニュー ----
   // 対象セルと表示位置（画面座標）
@@ -303,6 +304,150 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   // ---- 表示期間（From / To とも任意） ----
   const [rangeFrom, setRangeFrom] = useState<Dayjs | null>(null);
   const [rangeTo, setRangeTo] = useState<Dayjs | null>(null);
+
+  // ---- グリッドの初期表示位置（当月の列を左端に表示する） ----
+  // テーブル全体のラッパー（.ant-table-body を探して水平スクロールする）
+  const tableWrapRef = useRef<HTMLDivElement>(null);
+  // 初期スクロールを 1 度だけ実行するためのフラグ
+  const didInitScrollRef = useRef(false);
+
+  // ---- 下書き（要員行・割当・BUFFER）の操作 -------------------------
+
+  /** 下書きを反映した要員一覧（＝画面上の要員） */
+  const draftPersonnel = useMemo(() => {
+    const deleted = new Set(personnelDeleted);
+    const edited = (p: Personnel) =>
+      personnelEdits[p.id] ? { ...p, ...personnelEdits[p.id] } : p;
+    const rows = personnel.filter((p) => !deleted.has(p.id)).map(edited);
+    const added = personnelAdded.filter((p) => !deleted.has(p.id)).map(edited);
+    return [...rows, ...added];
+  }, [personnel, personnelEdits, personnelAdded, personnelDeleted]);
+
+  /** 未保存かどうかを親（年度切替・ログアウトの確認）へ通知する */
+  useEffect(() => {
+    onDirtyChange(dirty);
+  }, [dirty, onDirtyChange]);
+
+  /** 要員行の項目を変更する（下書き） */
+  const updatePersonnelField = useCallback(
+    (personId: string, patch: Partial<Personnel>) => {
+      setPersonnelEdits((prev) => ({
+        ...prev,
+        [personId]: { ...(prev[personId] ?? {}), ...patch },
+      }));
+      setDirty(true);
+    },
+    [],
+  );
+
+  /**
+   * 社員番号の確定（社員マスタから 役割・名前・所属 を取得して下書きに反映）
+   * 戻り値: true = 採用 / false = 処理中止（下書き内で社員番号が重複）
+   */
+  const commitEmployeeNo = useCallback(
+    (personId: string, employeeNo: string): boolean => {
+      const no = employeeNo.trim();
+
+      // 重複チェック：下書き内の他の行で既に使われている社員番号は登録できない
+      if (
+        no !== '' &&
+        draftPersonnel.some((p) => p.id !== personId && p.employeeNo === no)
+      ) {
+        message.error(
+          `社員番号「${no}」は一覧に既に登録されているため、処理を中止しました。`,
+        );
+        return false;
+      }
+
+      const master = employeeMaster.get(no);
+      if (!master) {
+        if (no !== '') {
+          message.warning(`社員番号「${no}」は社員マスタに存在しません。`);
+        }
+        updatePersonnelField(personId, {
+          employeeNo: no,
+          name: '',
+          role: '',
+          department: '',
+          projectKey: undefined,
+        });
+        return true;
+      }
+      updatePersonnelField(personId, {
+        employeeNo: no,
+        name: master.name,
+        role: master.role,
+        department: master.department,
+        projectKey: master.projectKey,
+      });
+      return true;
+    },
+    [draftPersonnel, employeeMaster, updatePersonnelField],
+  );
+
+  /** 退場予定の変更（下書き） */
+  const commitLeavePlan = useCallback(
+    (personId: string, leavePlan: string) =>
+      updatePersonnelField(personId, { leavePlan }),
+    [updatePersonnelField],
+  );
+
+  /** 行追加（全項目が空の行を下書きに追加する） */
+  const handleAddRow = useCallback(() => {
+    setPersonnelAdded((prev) => [
+      ...prev,
+      {
+        id: `p-new-${Date.now()}`,
+        employeeNo: '',
+        name: '',
+        role: '',
+        department: '',
+      },
+    ]);
+    setDirty(true);
+    message.success('空の行を追加しました（未保存・社員番号を入力してください）。');
+  }, []);
+
+  /** 行削除（下書き） */
+  const handleDeleteRow = useCallback((personId: string) => {
+    setPersonnelAdded((prev) => prev.filter((p) => p.id !== personId));
+    setPersonnelDeleted((prev) =>
+      prev.includes(personId) ? prev : [...prev, personId],
+    );
+    setDirty(true);
+    message.success('行を削除しました（未保存）。');
+  }, []);
+
+  /** 保存（下書きを確定して親へ渡す） */
+  const handleSave = useCallback(() => {
+    // 削除した要員の割当・BUFFER は保存対象から外す
+    const alive = new Set(draftPersonnel.map((p) => p.id));
+    const assignmentOut: AssignmentMap = {};
+    Object.keys(assignment).forEach((pid) => {
+      if (alive.has(pid)) assignmentOut[pid] = assignment[pid];
+    });
+    const unpaidOut: UnpaidMap = {};
+    Object.keys(unpaid).forEach((pid) => {
+      if (alive.has(pid)) unpaidOut[pid] = unpaid[pid];
+    });
+
+    onSave({
+      personnel: draftPersonnel,
+      assignment: assignmentOut,
+      unpaid: unpaidOut,
+    });
+    // 下書きをクリア（＝保存済みになった）
+    setPersonnelEdits({});
+    setPersonnelAdded([]);
+    setPersonnelDeleted([]);
+    setDirty(false);
+  }, [draftPersonnel, assignment, unpaid, onSave]);
+
+  /** 未保存確認ダイアログから呼べるように「保存」処理を登録する */
+  useEffect(() => {
+    registerSaveHandler(handleSave);
+    return () => registerSaveHandler(null);
+  }, [registerSaveHandler, handleSave]);
 
   // プロジェクトの選択肢と参照マップ（メニューの「プロジェクト管理」で増える）
   // ※セルには「略称」を表示する
@@ -324,41 +469,20 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [projects],
   );
 
-  // 部門の選択肢（部門管理画面で管理する部門マスタから取得）
-  const deptOptions = useMemo(
-    () => departments.map((d) => ({ value: d.name, label: d.name })),
+  // 所属列の列ヘッダーフィルタ項目（部門マスタ）※未絞り込み時の候補
+  const deptFilterItems = useMemo(
+    () => departments.map((d) => ({ text: d.name, value: d.name })),
     [departments],
   );
 
-  // 部署で絞り込んだ要員（「要員」リストの選択肢 = 部署との連動）
-  const deptMembers = useMemo(
-    () =>
-      deptFilter.length === 0
-        ? personnel
-        : personnel.filter((p) => deptFilter.includes(p.department)),
-    [deptFilter, personnel],
-  );
-  // 実際に表へ表示する要員（部署絞り込み かつ 要員指定）
-  const visiblePersonnel = useMemo(
-    () =>
-      deptMembers.filter(
-        (p) => personFilter.length === 0 || personFilter.includes(p.id),
-      ),
-    [deptMembers, personFilter],
+  // 週列の列ヘッダーフィルタ項目（プロジェクト = 略称）※未絞り込み時の候補
+  const projectFilterItems = useMemo(
+    () => projects.map((p) => ({ text: p.abbr || p.name, value: p.key })),
+    [projects],
   );
 
-  // 「要員」セレクトの選択肢（部署に連動し、部署・役割も表示）
-  const personOptions = useMemo(
-    () =>
-      deptMembers.map((p) => ({
-        value: p.id,
-        label: `${p.name}（${p.department}・${p.role}）`,
-      })),
-    [deptMembers],
-  );
-
-  // 当年（1月1日を含む週 〜 12月31日を含む週）の全週列
-  const allWeeks: WeekCol[] = useMemo(() => buildYearWeeks(DISPLAY_YEAR), []);
+  // 対象年度（1月1日を含む週 〜 12月31日を含む週）の全週列
+  const allWeeks: WeekCol[] = useMemo(() => buildYearWeeks(year), [year]);
 
   // 表示期間（From / To）で絞り込んだ週列（From / To とも未指定なら全週）
   const weeks: WeekCol[] = useMemo(() => {
@@ -388,7 +512,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           order: ym.year * 12 + ym.month,
           // 年をまたぐ月（前年12月・翌年1月）は「YYYY年M月」と表示して日付の誤解を防ぐ
           label:
-            ym.year === DISPLAY_YEAR
+            ym.year === year
               ? `${ym.month + 1}月`
               : `${ym.year}年${ym.month + 1}月`,
           weeks: [],
@@ -399,31 +523,151 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     return Array.from(map.values())
       .sort((a, b) => a.order - b.order)
       .map(({ key, label, weeks: groupWeeks }) => ({ key, label, weeks: groupWeeks }));
-  }, [weeks]);
+  }, [weeks, year]);
 
   /**
-   * 「開始済みの週（月曜 <= 今日）」まで主担当プロジェクトを自動セット（モック用）。
-   * 明示的にクリアした週（null）は上書きしない。
+   * 列ヘッダーフィルタの候補（Excel のオートフィルタと同じ挙動）。
+   *
+   * どこかの列で絞り込むと、他の列の候補は「その絞り込み結果に実際に存在する値」だけになる。
+   * 例: ある週で「桜・基幹刷新…」を選ぶと、他の週の候補はその担当者が実際に
+   *     入っているプロジェクトだけに絞られる。
+   *
+   *  - dept: 所属列の候補（他の条件を満たす要員に実際に存在する部門）
+   *  - week: 週列ごとの候補（その週に実際に割り当てがあるプロジェクト）
+   *
+   * ※候補を求めるときは「その列自身の条件」は除外する（自分の選択肢を広げられるように）。
+   * ※まだ何も絞り込んでいないときはマスタ全件を候補にする
+   *   （データがまだ無い週で候補が空になるのを避けるため）。
+   */
+  const filterOptions = useMemo(() => {
+    const visibleWeekKeys = new Set(weeks.map((w) => w.key));
+    // 適用中の週列条件（表示中の週のみ）
+    const activeWeekFilters = Object.entries(weekProjectFilter).filter(
+      ([key, vals]) => vals.length > 0 && visibleWeekKeys.has(key),
+    );
+
+    // まだ何も絞り込んでいない → マスタ全件を候補にする
+    if (deptFilter.length === 0 && activeWeekFilters.length === 0) {
+      const week: Record<string, { text: string; value: string }[]> = {};
+      weeks.forEach((w) => {
+        week[w.key] = projectFilterItems;
+      });
+      return { dept: deptFilterItems, week };
+    }
+
+    /** exceptWeekKey 以外の条件と（withDept なら）部署条件を満たす要員 */
+    const rowsWithout = (exceptWeekKey: string | null, withDept: boolean) =>
+      draftPersonnel.filter((p) => {
+        if (
+          withDept &&
+          deptFilter.length > 0 &&
+          !deptFilter.includes(p.department)
+        ) {
+          return false;
+        }
+        const cell = assignment[p.id] ?? {};
+        return activeWeekFilters.every(([key, wanted]) => {
+          if (key === exceptWeekKey) return true;
+          const pid = cell[key];
+          return !!pid && wanted.includes(pid);
+        });
+      });
+
+    /** その週に実際に割り当てがあるプロジェクトを候補にする */
+    const weekOptions = (weekKey: string, rows: Personnel[]) => {
+      const used = new Set<string>();
+      rows.forEach((p) => {
+        const pid = assignment[p.id]?.[weekKey];
+        if (pid) used.add(pid);
+      });
+      return projects
+        .filter((p) => used.has(p.key))
+        .map((p) => ({ text: p.abbr || p.name, value: p.key }));
+    };
+
+    // 所属列: 週列の条件を満たす要員に存在する部門
+    // 週列:   その週に実在するプロジェクト（自分の列の条件は除く）
+    const week: Record<string, { text: string; value: string }[]> = {};
+    weeks.forEach((w) => {
+      week[w.key] = weekOptions(w.key, rowsWithout(w.key, true));
+    });
+
+    const deptUsed = new Set(rowsWithout(null, false).map((p) => p.department));
+    const dept = departments
+      .filter((d) => deptUsed.has(d.name))
+      .map((d) => ({ text: d.name, value: d.name }));
+
+    return { dept, week };
+  }, [
+    weeks,
+    draftPersonnel,
+    departments,
+    projects,
+    assignment,
+    deptFilter,
+    weekProjectFilter,
+    deptFilterItems,
+    projectFilterItems,
+  ]);
+
+  /**
+   * 実際に表へ表示する要員。
+   *  - 所属列の列ヘッダーフィルタ（部署）で絞り込み（未選択 = 全部署）
+   *  - 週列の列ヘッダーフィルタ（プロジェクト名）で絞り込み
+   *  ※Excel のオートフィルタと同じく、列ごとの条件は AND で結合する（1 列内は OR）
+   */
+  const visiblePersonnel = useMemo(() => {
+    const rows =
+      deptFilter.length === 0
+        ? draftPersonnel
+        : draftPersonnel.filter((p) => deptFilter.includes(p.department));
+
+    // プロジェクトが選択されている週列（表示中の週のみを対象にする）
+    const activeWeeks = weeks.filter(
+      (w) => (weekProjectFilter[w.key]?.length ?? 0) > 0,
+    );
+    if (activeWeeks.length === 0) return rows;
+
+    return rows.filter((p) => {
+      const cell = assignment[p.id] ?? {};
+      // すべての週列の条件を満たす行だけを表示する（AND）
+      return activeWeeks.every((w) => {
+        const wanted = weekProjectFilter[w.key] ?? [];
+        const pid = cell[w.key];
+        return !!pid && wanted.includes(pid);
+      });
+    });
+  }, [deptFilter, draftPersonnel, weeks, weekProjectFilter, assignment]);
+
+  /**
+   * 初期表示: 左固定列のすぐ右に「当年は当月、それ以外の年度は第 1 週」が並ぶ位置まで
+   * 水平スクロールする。
+   * ※マウント直後の 1 回だけ実行する（以降の操作では位置を保持する）。
    */
   useEffect(() => {
-    setAssignment((prev) => {
-      const today = dayjs();
-      let changed = false;
-      const next: AssignmentMap = {};
-      personnel.forEach((p) => {
-        const cell = { ...(prev[p.id] ?? {}) };
-        weeks.forEach((w) => {
-          if (w.monday.isAfter(today, 'day')) return; // 未来の週は未入力
-          if (cell[w.key] === undefined) {
-            cell[w.key] = PERSON_MAIN_PROJECT[p.id] ?? null;
-            changed = true;
-          }
-        });
-        next[p.id] = cell;
+    if (didInitScrollRef.current) return;
+    if (monthGroups.length === 0) return;
+    // 当年だけ「当月」を左端にする（それ以外の年度は第 1 週のまま）
+    let weeksBefore = 0;
+    if (year === dayjs().year()) {
+      const currentMonthKey = `${year}-${dayjs().month()}`;
+      for (const g of monthGroups) {
+        if (g.key === currentMonthKey) break;
+        weeksBefore += g.weeks.length;
+      }
+    }
+    didInitScrollRef.current = true;
+    // レイアウト確定後にスクロールする（フレームを 2 回待つ）
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const body = tableWrapRef.current?.querySelector('.ant-table-body');
+        if (!(body instanceof HTMLElement)) return;
+        const target = weeksBefore * WEEK_COL_WIDTH;
+        const max = Math.max(0, body.scrollWidth - body.clientWidth);
+        body.scrollLeft = Math.min(target, max);
       });
-      return changed ? next : prev;
     });
-  }, [weeks, personnel]);
+  }, [monthGroups, year]);
 
   /** 1セルの「無償支援（契約外・非計費）」フラグを解除する */
   const clearUnpaidAt = useCallback((personId: string, weekKey: string) => {
@@ -433,6 +677,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       delete cell[weekKey];
       return { ...prev, [personId]: cell };
     });
+    setDirty(true);
   }, []);
 
   /** 1セルの「無償支援（契約外・非計費）」フラグを設定/解除する */
@@ -444,6 +689,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         else delete cell[weekKey];
         return { ...prev, [personId]: cell };
       });
+      setDirty(true);
     },
     [],
   );
@@ -468,6 +714,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         return { ...prev, [personId]: cell };
       });
       clearUnpaidAt(personId, weekKey);
+      setDirty(true);
     },
     [clearUnpaidAt],
   );
@@ -494,6 +741,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         });
         // プロジェクトを変更したため、対象週の「無償支援」は自動解除する
         keys.forEach((k) => clearUnpaidAt(personId, k));
+        setDirty(true);
         return;
       }
       setAssignmentAt(personId, weekKey, projectId ?? null);
@@ -505,14 +753,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const leavePersonIds = useMemo(() => {
     const ids = new Set<string>();
     if (!leaveProjectKey) return ids;
-    personnel.forEach((p) => {
+    draftPersonnel.forEach((p) => {
       const cells = assignment[p.id];
       if (cells && weeks.some((w) => cells[w.key] === leaveProjectKey)) {
         ids.add(p.id);
       }
     });
     return ids;
-  }, [assignment, weeks, personnel, leaveProjectKey]);
+  }, [assignment, weeks, draftPersonnel, leaveProjectKey]);
 
   /** 週ごとの割当人数（表示中要員のみ） */
   const weeklyAssignedCounts: number[] = useMemo(
@@ -680,6 +928,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         const { personId, weekKey } = parseCellKey(key);
         clearUnpaidAt(personId, weekKey);
       });
+      setDirty(true);
     },
     [selectedCells, clearUnpaidAt],
   );
@@ -700,6 +949,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         });
         return next;
       });
+      setDirty(true);
     },
     [selectedCells, assignment],
   );
@@ -726,7 +976,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     const label = value
       ? projectMap.get(value)?.abbr ?? value
       : '未割当（クリア）';
-    message.info(`コピーしました: ${label}${unpaidFlag ? '（無償支援）' : ''}`);
+    message.info(`コピーしました: ${label}${unpaidFlag ? '（BUFFER）' : ''}`);
   }, [selectedCells, assignment, projectMap, isUnpaidAt]);
 
   /** コピーしたプロジェクト（と無償支援）を選択セルすべてへ貼り付け */
@@ -748,7 +998,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         : (projectMap.get(clipboard)?.abbr ?? clipboard);
     message.success(
       `選択中の ${selectedCells.size} セルに「${label}」${
-        withUnpaid ? 'を無償支援として' : 'を'
+        withUnpaid ? 'をBUFFERとして' : 'を'
       }貼り付けました。`,
     );
   }, [
@@ -813,13 +1063,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     return [
       {
         key: 'unpaid-on',
-        label: '無償支援にする',
+        label: 'BUFFERにする',
         icon: <CheckOutlined />,
         disabled: !hasProject || unpaidCell,
       },
       {
         key: 'unpaid-off',
-        label: '無償支援を解除',
+        label: 'BUFFERを解除',
         icon: <CloseOutlined />,
         disabled: !unpaidCell,
       },
@@ -854,7 +1104,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         setClipboard(v);
         setPasteUnpaid(flag);
         const label = v ? projectMap.get(v)?.abbr ?? v : '未割当（クリア）';
-        message.info(`コピーしました: ${label}${flag ? '（無償支援）' : ''}`);
+        message.info(`コピーしました: ${label}${flag ? '（BUFFER）' : ''}`);
       } else if (key === 'clear') {
         setAssignmentAt(personId, weekKey, null);
       }
@@ -862,24 +1112,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     },
     [cellMenu, assignment, isUnpaidAt, projectMap, setUnpaidAt, setAssignmentAt],
   );
-
-  /** 部署変更時、部署外の要員選択を自動で外す（部署→要員の連動） */
-  const handleDeptFilterChange = (vals: string[]) => {
-    setDeptFilter(vals);
-    const set = new Set(vals);
-    setPersonFilter((prev) =>
-      prev.filter((id) => {
-        const p = personnel.find((x) => x.id === id);
-        return !p || set.size === 0 || set.has(p.department);
-      }),
-    );
-  };
-
-  /** 要員フィルタを初期化（全部署・全員を表示） */
-  const resetFilters = () => {
-    setDeptFilter([]);
-    setPersonFilter([]);
-  };
 
   /** テーブル列定義（要員 + 月グループ配下の週列 + 集計列） */
   const columns: TableColumnsType<Row> = useMemo(() => {
@@ -895,7 +1127,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       {
         title: (
           <div className='leave-head'>
-            退場予定
+            備考
             <div className='leave-head-note'>
               （社員所属≠案件所属の場合入力必要）
             </div>
@@ -913,10 +1145,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               size='small'
               defaultValue={row.leavePlan ?? ''}
               maxLength={30}
-              placeholder='例：2026/10/31'
-              onBlur={(e) => onChangePersonnelLeavePlan(row.id, e.target.value)}
+              placeholder={`例：${year}/10/31`}
+              onBlur={(e) => commitLeavePlan(row.id, e.target.value)}
               onPressEnter={(e) =>
-                onChangePersonnelLeavePlan(row.id, e.currentTarget.value)
+                commitLeavePlan(row.id, e.currentTarget.value)
               }
             />
           );
@@ -942,7 +1174,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           return (
             <EmployeeNoInput
               value={row.employeeNo}
-              onCommit={(next) => onChangePersonnelEmployeeNo(row.id, next)}
+              onCommit={(next) => commitEmployeeNo(row.id, next)}
             />
           );
         },
@@ -958,11 +1190,18 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       },
       {
         // 所属＝該当社員の所属（部門マスタの部門名）。社員番号の入力で自動セットされる（表示のみ）
+        // 列ヘッダーのフィルタで部門を自由に選択できる
+        // （候補は他の列の絞り込み結果に追随する = Excel のオートフィルタと同じ）
         title: '所属',
         dataIndex: 'department',
         key: 'department',
         fixed: 'left',
         width: 90,
+        filters: filterOptions.dept,
+        filterMultiple: true,
+        filteredValue: deptFilter.length > 0 ? deptFilter : null,
+        // 行の絞り込みは visiblePersonnel 側で行うため、ここでは全行を表示する
+        onFilter: () => true,
         render: (v: string, row) => (row.isTotal ? '' : v || '－'),
       },
     ];
@@ -982,6 +1221,19 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           key: w.key,
           width: 96,
           align: 'center',
+          // 列ヘッダーのフィルタ（Excel のオートフィルタと同じ絞り込み）。
+          // その週に選択したプロジェクトを担当している要員だけを表示する。
+          // 候補は他の列の絞り込み結果に追随する（自分の列の条件は除外）。
+          // ※所属列のフィルタとは独立（列ごとの条件は AND で結合）
+          filters: filterOptions.week[w.key],
+          filterMultiple: true,
+          filterSearch: true,
+          filteredValue:
+            (weekProjectFilter[w.key]?.length ?? 0) > 0
+              ? weekProjectFilter[w.key]
+              : null,
+          // 行の絞り込みは visiblePersonnel 側で行うため、ここでは全行を表示する
+          onFilter: () => true,
           onCell: () => ({}),
           render: (_, row) => {
             if (row.isTotal) {
@@ -1002,7 +1254,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
                   onContextMenu={(e) => openCellMenu(row.id, w.key, e)}
                   title={
                     unpaidCell
-                      ? '無償支援（契約外・非計費）'
+                      ? 'BUFFER（契約外・非計費）'
                       : prj
                       ? `${prj.abbr || prj.name}（ドラッグ / Shift+クリックで矩形選択）`
                       : '未割当（右クリックでメニュー）'
@@ -1029,7 +1281,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
                   </div>
                   {unpaidCell ? (
                     <span className='ws-unpaid-badge ws-unpaid-badge-corner'>
-                      無償
+                      BUFFER
                     </span>
                   ) : null}
                 </div>
@@ -1068,7 +1320,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             okText='削除'
             cancelText='キャンセル'
             okButtonProps={{ danger: true }}
-            onConfirm={() => onDeleteRow(row.id)}
+            onConfirm={() => handleDeleteRow(row.id)}
           >
             <Button type='text' danger size='small' icon={<DeleteOutlined />}>
               削除
@@ -1080,10 +1332,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     return cols;
   }, [
     monthGroups,
+    year,
     weeklyAssignedCounts,
     assignment,
     projectOptions,
     projectMap,
+    deptFilter,
+    weekProjectFilter,
+    filterOptions,
     handleChangeCellProject,
     isUnpaidAt,
     openCellMenu,
@@ -1091,9 +1347,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     selectedCells,
     handleCellMouseDown,
     handleCellDragEnter,
-    onChangePersonnelEmployeeNo,
-    onChangePersonnelLeavePlan,
-    onDeleteRow,
+    commitEmployeeNo,
+    commitLeavePlan,
+    handleDeleteRow,
   ]);
 
   /** テーブルデータ（表示中要員 + 合計行） */
@@ -1122,13 +1378,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [visiblePersonnel],
   );
 
-  /** 保存（現状はモック：コンソール出力のみ） */
-  const handleSave = () => {
-    // TODO: バックエンド実装後に /api/kadou/** へ送信する
-    console.log('save payload', { personnel, assignment });
-    message.success('保存しました（モック実装：サーバー未接続）。');
-  };
-
   // 固定列（fixed left/right）利用時は scroll.y を指定する必要がある。
   // 行数が少ないとヘッダー/本体の幅計測が振動して「チラつき」を起こすため、
   // 本体の縦スクロール高さを行数に応じた固定値にする（少ない行は余白を最小化）。
@@ -1143,7 +1392,22 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         weeks.length - 1
       ].monday.format('YYYY/M/D')}`
     : '（該当する週なし）';
-  const summaryLabel = `表示範囲：${rangeLabel}（${weeks.length} / ${allWeeks.length} 週） ・ 要員表示 ${visiblePersonnel.length} / ${personnel.length} 名 ・ 割当延べ ${rangeTotalAssignments} 人週`;
+  const summaryLabel = `表示範囲：${rangeLabel}（${weeks.length} / ${allWeeks.length} 週） ・ 要員表示 ${visiblePersonnel.length} / ${draftPersonnel.length} 名 ・ 割当延べ ${rangeTotalAssignments} 人週`;
+
+  /** 「全表示」で解除する対象があるか（表示期間 or 列フィルタ） */
+  const hasActiveFilter =
+    !!rangeFrom ||
+    !!rangeTo ||
+    deptFilter.length > 0 ||
+    Object.keys(weekProjectFilter).length > 0;
+
+  /** 表示期間とすべての列フィルタ（所属列・各週列）をまとめて解除する */
+  const resetAllFilters = () => {
+    setRangeFrom(null);
+    setRangeTo(null);
+    setDeptFilter([]);
+    setWeekProjectFilter({});
+  };
 
   return (
     <div className='ws-page'>
@@ -1151,7 +1415,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       <div className='ws-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            要員 週別 プロジェクト稼働管理
+            {year}年度　要員 週別 プロジェクト稼働管理
           </Title>
           <Text type='secondary'>{summaryLabel}</Text>
         </div>
@@ -1166,7 +1430,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           </Tag>
         </Space>
         <Space wrap>
-          <Button icon={<PlusOutlined />} onClick={onAddRow}>
+          <Button icon={<PlusOutlined />} onClick={handleAddRow}>
             行追加
           </Button>
           <Button
@@ -1174,56 +1438,23 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             icon={<SelectOutlined />}
             onClick={() => toggleSelectMode(!selectMode)}
           >
-            複数セル選択
+            {selectMode ? '複数選択解除' : '複数選択'}
           </Button>
-          <Button icon={<SaveOutlined />} onClick={handleSave}>
-            保存（モック）
-          </Button>
+          {dirty && <Tag color='orange'>未保存の変更あり</Tag>}
           <Button
-            icon={<SyncOutlined />}
-            onClick={() => {
-              // TODO: 年度初期化の詳細仕様（対象範囲・初期値・確認方法）が確定後に実装する
-              message.warning(
-                '年度初期化：詳しい仕様を要確認のため、処理を中止しました。',
-              );
-            }}
+            type={dirty ? 'primary' : 'default'}
+            icon={<SaveOutlined />}
+            onClick={handleSave}
+            disabled={!dirty}
           >
-            年度初期化
+            保存（モック）
           </Button>
         </Space>
       </div>
 
-      {/* 要員検索・表示期間バー（2 つの条件を 1 行にまとめて余白を無くす） */}
+      {/* 表示期間バー */}
       <div className='ws-filter-bar'>
         <Space wrap size={10}>
-          <span className='filter-title'>要員検索</span>
-          <Select
-            mode='multiple'
-            allowClear
-            placeholder='部署（複数可・未選択=全部署）'
-            value={deptFilter}
-            onChange={handleDeptFilterChange}
-            options={deptOptions}
-            style={{ width: 260 }}
-            maxTagCount={2}
-          />
-          <span className='filter-arrow'>→</span>
-          <Select
-            mode='multiple'
-            allowClear
-            showSearch
-            placeholder='要員（部署に連動・複数可）'
-            value={personFilter}
-            onChange={(v: string[]) => setPersonFilter(v)}
-            options={personOptions}
-            optionFilterProp='label'
-            style={{ width: 340 }}
-            maxTagCount={2}
-          />
-          <Button icon={<ReloadOutlined />} onClick={resetFilters}>
-            全表示
-          </Button>
-          <span className='filter-sep' />
           <span className='filter-title'>表示期間</span>
           <DatePicker
             value={rangeFrom}
@@ -1242,17 +1473,16 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           />
           <Button
             icon={<ReloadOutlined />}
-            disabled={!rangeFrom && !rangeTo}
-            onClick={() => {
-              setRangeFrom(null);
-              setRangeTo(null);
-            }}
+            disabled={!hasActiveFilter}
+            onClick={resetAllFilters}
           >
-            全期間
+            全表示
           </Button>
         </Space>
         <Text type='secondary' className='filter-hint'>
-          部署を選ぶと要員リストが連動します。From/To で表示する週を絞り込めます（From/To とも任意）。
+          所属列・週列の列ヘッダーのフィルタ（漏斗）で表示する要員を絞り込めます（Excel と同じく列ごとの条件は AND）。
+          From/To で表示する週を絞り込めます（From/To とも任意）。
+          「全表示」で表示期間とすべての列フィルタを解除できます。
         </Text>
       </div>
 
@@ -1317,22 +1547,22 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               onClick={() => {
                 applyUnpaidToSelected(true);
                 message.success(
-                  `選択中の割当済み ${assignedSelectedCount} セルを無償支援にしました。`,
+                  `選択中の割当済み ${assignedSelectedCount} セルを BUFFER にしました。`,
                 );
               }}
             >
-              無償支援に
+              BUFFERに
             </Button>
             <Button
               disabled={assignedSelectedCount === 0}
               onClick={() => {
                 applyUnpaidToSelected(false);
                 message.success(
-                  `選択中の割当済み ${assignedSelectedCount} セルの無償支援を解除しました。`,
+                  `選択中の割当済み ${assignedSelectedCount} セルの BUFFER を解除しました。`,
                 );
               }}
             >
-              無償支援を解除
+              BUFFERを解除
             </Button>
             <Button
               type='text'
@@ -1347,30 +1577,27 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           </Space>
           <Text type='secondary'>
             ※セルをドラッグで範囲選択（クリック=1セル ON/OFF / Shift+クリック=矩形選択）。
-            セルの右クリックメニューからも「無償支援」を設定できます（貼り付けは無償支援も引き継ぎます）。
+            セルの右クリックメニューからも「BUFFER」を設定できます（貼り付けは BUFFER も引き継ぎます）。
           </Text>
         </div>
       )}
 
-      {/* プロジェクト一覧（略称） */}
+      {/* 凡例 */}
       <div className='ws-legend'>
-        {projects.map((p) => (
-          <span key={p.key} className='legend-item' title={p.name || p.abbr}>
-            {p.abbr || p.name}
-          </span>
-        ))}
+        <span className='legend-item'>{LEAVE_PROJECT_NAME}</span>
         <span className='legend-item'>未割当（－）</span>
         <span
           className='legend-item ws-legend-unpaid'
-          title='無償支援（契約外・非計費）'
+          title='BUFFER（契約外・非計費）'
         >
-          無償支援（斜紋＋無償）
+          BUFFER
         </span>
         <Text type='secondary'>　※セルでプロジェクト（略称）を選択します。</Text>
       </div>
 
       {/* グリッド本体 */}
       <div
+        ref={tableWrapRef}
         className={`ws-table-card${selectMode ? ' ws-table-card-select' : ''}`}
       >
         <Table<Row>
@@ -1386,10 +1613,44 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               ? 'row-leave-planned'
               : ''
           }
+          // 列ヘッダーフィルタ → 所属列（部署）・週列（プロジェクト）へ反映する
+          onChange={(_pagination, filters) => {
+            // 所属列（部署）→ 検索条件
+            const rawDept = filters.department;
+            const nextDept = Array.isArray(rawDept)
+              ? rawDept.map((v) => String(v))
+              : [];
+            setDeptFilter((prev) =>
+              prev.length === nextDept.length &&
+              prev.every((v, i) => v === nextDept[i])
+                ? prev
+                : nextDept,
+            );
+            // 週列（プロジェクト）→ 週ごとの列フィルタ
+            setWeekProjectFilter((prev) => {
+              const next: Record<string, string[]> = {};
+              weeks.forEach((w) => {
+                const raw = filters[w.key];
+                const vals = Array.isArray(raw) ? raw.map((v) => String(v)) : [];
+                if (vals.length > 0) next[w.key] = vals;
+              });
+              const same =
+                Object.keys(prev).length === Object.keys(next).length &&
+                Object.keys(next).every((k) => {
+                  const before = prev[k] ?? [];
+                  const after = next[k];
+                  return (
+                    before.length === after.length &&
+                    after.every((v, i) => v === before[i])
+                  );
+                });
+              return same ? prev : next;
+            });
+          }}
           scroll={{
-            // 左固定（番号60+退場予定190+役割90+社員番号90+名前90+所属90=610）
+            // 左固定（番号60+備考190+役割90+社員番号90+名前90+所属90）
             // + 週列 + 右固定（操作 90）
-            x: 610 + weeks.length * 96 + 90,
+            x: FIXED_LEFT_WIDTH + weeks.length * WEEK_COL_WIDTH + 90,
             y: tableScrollY,
           }}
         />
@@ -1405,7 +1666,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         </Text>
         <br />
         <Text type='secondary'>
-          ※「無償支援（契約外・非計費）」は、セルの右クリックメニューまたは「複数セル選択」の一括ボタンで設定/解除できます（ピンクの斜紋＋「無償」バッジで表示。プロジェクトを変更すると自動解除されます）。
+          ※「BUFFER（契約外・非計費）」は、セルの右クリックメニューまたは「複数選択」の一括ボタンで設定/解除できます（ピンクの斜紋＋「BUFFER」バッジで表示。プロジェクトを変更すると自動解除されます）。
         </Text>
       </div>
 

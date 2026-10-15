@@ -7,16 +7,21 @@ import dayjs, { Dayjs } from 'dayjs';
 /** 稼働率の目標値（%） */
 export const JINAN_TARGET_RATE = 50;
 
-/** 済南拠点の部門（統計上の区分） */
-export const JINAN_DEPARTMENTS = ['第一開発部', '第二開発部', '第三開発部'] as const;
+/** 済南拠点の部門（年度ごとに部門マスタが変わるため年度別に持つ） */
+export const JINAN_DEPARTMENTS_BY_YEAR: Record<number, string[]> = {
+  2025: ['第一開発部', '第三開発部'],
+  2026: ['第一開発部', '第二開発部', '第三開発部'],
+};
 
 /** 済南全社（全部門の合計）を表すラベル */
 export const JINAN_ALL_LABEL = '済南全社' as const;
 
 /** 統計上の部門（済南全社 を含む） */
-export type JinanDept =
-  | (typeof JINAN_DEPARTMENTS)[number]
-  | typeof JINAN_ALL_LABEL;
+export type JinanDept = string;
+
+/** 指定年度の済南拠点の部門一覧を返す（データが無い年度は空配列） */
+export const getJinanDepartments = (year: number): string[] =>
+  JINAN_DEPARTMENTS_BY_YEAR[year] ?? [];
 
 /** 済南拠点の週次稼動統計（1 週 = 月曜〜日曜 / 部門別） */
 export interface JinanWeeklyStat {
@@ -47,29 +52,31 @@ export interface JinanWeeklyStat {
 /** 指定日が属する週の月曜日を返す */
 const mondayOf = (d: Dayjs): Dayjs => d.subtract((d.day() + 6) % 7, 'day');
 
-/** 部門ごとの年始在籍数（合計 52 名 = 済南全社） */
-const BASE_HEADCOUNT: Record<(typeof JINAN_DEPARTMENTS)[number], number> = {
-  第一開発部: 22,
-  第二開発部: 18,
-  第三開発部: 12,
+/** 年度・部門ごとの年始在籍数 */
+const BASE_HEADCOUNT_BY_YEAR: Record<number, Record<string, number>> = {
+  2025: { 第一開発部: 20, 第三開発部: 11 },
+  2026: { 第一開発部: 22, 第二開発部: 18, 第三開発部: 12 },
 };
 
 /**
- * 当年の週次統計（モック）を部門別に生成する。
+ * 指定年度の週次統計（モック）を部門別に生成する。
  * ・部門ごとに四半期ごとの 1 名離職・数週後の 1 名補充で在籍が変動する
  * ・稼動人数は繁忙期（夏〜秋）に増える想定の季節変動を加える
- * ※済南全社 はこの 3 部門の合計として算出する（getJinanWeeklyStats）
+ * ※済南全社 は対象部門の合計として算出する（getJinanWeeklyStats）
  */
-const buildWeeklyStats = (): JinanWeeklyStat[] => {
-  const year = dayjs().year();
+const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
+  const departments = getJinanDepartments(year);
+  const baseHeadcount = BASE_HEADCOUNT_BY_YEAR[year];
+  if (departments.length === 0 || !baseHeadcount) return [];
+
   const firstMonday = mondayOf(dayjs(`${year}-01-01`));
   const lastMonday = mondayOf(dayjs(`${year}-12-31`));
   const stats: JinanWeeklyStat[] = [];
-  const headcounts = JINAN_DEPARTMENTS.map((d) => BASE_HEADCOUNT[d]);
+  const headcounts = departments.map((d) => baseHeadcount[d] ?? 0);
   let cur = firstMonday;
   let i = 0;
   while (!cur.isAfter(lastMonday, 'day') && i < 60) {
-    JINAN_DEPARTMENTS.forEach((department, d) => {
+    departments.forEach((department, d) => {
       const leavers = (i + d) % 13 === 3 ? 1 : 0; // 四半期ごとに 1 名離職
       const recruit = (i + d) % 13 === 8 ? 1 : 0; // 離職の数週後に 1 名補充
       headcounts[d] = headcounts[d] - leavers + recruit;
@@ -107,24 +114,27 @@ const buildWeeklyStats = (): JinanWeeklyStat[] => {
   return stats;
 };
 
-/** 部門別の週次統計（当年分。済南全社 は含まない） */
-export const JINAN_WEEKLY_STATS: JinanWeeklyStat[] = buildWeeklyStats();
+/** 年度ごとの週次統計（済南全社 は含まない。データが無い年度は空配列） */
+const JINAN_STATS_BY_YEAR: Record<number, JinanWeeklyStat[]> = {
+  2025: buildWeeklyStats(2025),
+  2026: buildWeeklyStats(2026),
+};
 
 /**
- * 指定部門の週次統計を返す。
- * 済南全社 の場合は 第一〜第三開発部 の合計値を週ごとに算出して返す。
+ * 指定年度・指定部門の週次統計を返す。
+ * 済南全社 の場合は対象部門の合計値を週ごとに算出して返す。
  */
 export const getJinanWeeklyStats = (
   department: JinanDept,
+  year: number,
 ): JinanWeeklyStat[] => {
+  const all = JINAN_STATS_BY_YEAR[year] ?? [];
   if (department !== JINAN_ALL_LABEL) {
-    return JINAN_WEEKLY_STATS.filter((s) => s.department === department);
+    return all.filter((s) => s.department === department);
   }
-  const weekKeys = Array.from(
-    new Set(JINAN_WEEKLY_STATS.map((s) => s.weekKey)),
-  );
+  const weekKeys = Array.from(new Set(all.map((s) => s.weekKey)));
   return weekKeys.map((weekKey) => {
-    const list = JINAN_WEEKLY_STATS.filter((s) => s.weekKey === weekKey);
+    const list = all.filter((s) => s.weekKey === weekKey);
     const sum = (f: (s: JinanWeeklyStat) => number) =>
       list.reduce((a, s) => a + f(s), 0);
     return {

@@ -31,6 +31,8 @@ import {
 const { Title, Text } = Typography;
 
 interface PersonnelInfoScreenProps {
+  /** 表示する年度 */
+  year: number;
   /** 要員一覧（社員番号で 役割・名前・所属 を引く。マスタを兼ねる） */
   personnel: Personnel[];
   /** 部門マスタ（所属の選択肢。部門管理画面で管理する） */
@@ -58,6 +60,7 @@ interface PersonnelInfoScreenProps {
  * すべての項目は編集でき、存在しない社員番号は確認のうえで新規追加できる。
  */
 const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
+  year,
   personnel,
   departments,
   onSubmit,
@@ -294,7 +297,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       <div className='screen-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            要員情報
+            {year}年度　要員情報
           </Title>
           <Text type='secondary'>
             社員番号を入力すると、該当する要員の 役割・名前・所属

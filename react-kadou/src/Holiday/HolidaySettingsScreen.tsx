@@ -19,21 +19,10 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
+import { Holiday, HolidayKind } from '../data/yearStore';
 import './HolidaySettingsScreen.css';
 
 const { Title, Text } = Typography;
-
-/** 休日の区分 */
-type HolidayKind = '祝日' | '会社休日' | '振替休日';
-
-/** 休日設定の1件 */
-interface Holiday {
-  id: string;
-  /** 'YYYY-MM-DD' */
-  date: string;
-  name: string;
-  kind: HolidayKind;
-}
 
 /** 区分一覧 */
 const KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
@@ -51,22 +40,6 @@ const KIND_OPTIONS = KINDS.map((k) => ({ value: k, label: k }));
 /** CSV 出力の見出し */
 const CSV_HEADER = '日付,名称,区分';
 
-/** 初期データ（モック） */
-const INITIAL_HOLIDAYS: Holiday[] = [
-  { id: 'h01', date: '2026-01-01', name: '元日', kind: '祝日' },
-  { id: 'h02', date: '2026-02-11', name: '建国記念の日', kind: '祝日' },
-  { id: 'h03', date: '2026-03-20', name: '春分の日', kind: '祝日' },
-  { id: 'h04', date: '2026-04-29', name: '昭和の日', kind: '祝日' },
-  { id: 'h05', date: '2026-05-04', name: 'みどりの日', kind: '祝日' },
-  { id: 'h06', date: '2026-05-05', name: 'こどもの日', kind: '祝日' },
-  { id: 'h07', date: '2026-08-13', name: '夏季休暇', kind: '会社休日' },
-  { id: 'h08', date: '2026-08-14', name: '夏季休暇', kind: '会社休日' },
-  { id: 'h09', date: '2026-09-21', name: '敬老の日', kind: '祝日' },
-  { id: 'h10', date: '2026-09-23', name: '秋分の日', kind: '祝日' },
-  { id: 'h11', date: '2026-09-24', name: '振替休日', kind: '振替休日' },
-  { id: 'h12', date: '2026-12-29', name: '年末年始休暇', kind: '会社休日' },
-];
-
 /** 日付の表示形式 */
 const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)');
 
@@ -74,13 +47,24 @@ const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)');
 const csvEscape = (v: string): string =>
   /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
 
+interface HolidaySettingsScreenProps {
+  /** 表示する年度 */
+  year: number;
+  /** その年度の休日（App 側で年度ごとに保持） */
+  holidays: Holiday[];
+  setHolidays: React.Dispatch<React.SetStateAction<Holiday[]>>;
+}
+
 /**
  * 休日設置 画面（メニュー「休日設置」で切り替わる画面）
  * 追加・編集・削除に加え、CSV 出力に対応する。
- * ※現状は画面上のみ保持（バックエンド実装後に永続化し、稼動グリッドの休日表示へ反映する）
+ * ※休日は年度ごとのデータ（年度切替で表示が切り替わる）
  */
-const HolidaySettingsScreen: React.FC = () => {
-  const [holidays, setHolidays] = useState<Holiday[]>(INITIAL_HOLIDAYS);
+const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
+  year,
+  holidays,
+  setHolidays,
+}) => {
   // 編集中の休日ID（null = 新規追加モード）
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -94,9 +78,8 @@ const HolidaySettingsScreen: React.FC = () => {
 
   const isEditing = editingId !== null;
 
-  /** 当年（実行年）の休日のみを対象にした集計 */
+  /** 選択中年度の休日のみを対象にした集計 */
   const summary = useMemo(() => {
-    const year = dayjs().year();
     const list = holidays.filter((h) => dayjs(h.date).year() === year);
     return {
       year,
@@ -106,7 +89,7 @@ const HolidaySettingsScreen: React.FC = () => {
         count: list.filter((h) => h.kind === k).length,
       })),
     };
-  }, [holidays]);
+  }, [holidays, year]);
 
   /** 日付順に並べる */
   const sortedHolidays = useMemo(
@@ -249,10 +232,10 @@ const HolidaySettingsScreen: React.FC = () => {
       <div className='screen-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            休日設置
+            {year}年度　休日設置
           </Title>
           <Text type='secondary'>
-            稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。登録した休日は稼動グリッドの休日表示に反映されます。
+            稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。休日は年度ごとのデータで、年度切替で表示が切り替わります。
           </Text>
         </div>
         <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>

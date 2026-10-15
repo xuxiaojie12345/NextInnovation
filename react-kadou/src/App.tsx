@@ -1,27 +1,214 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { message } from 'antd';
 import AppMenu from './Menu/Menu';
 import type { MenuKey } from './Menu/Menu';
+import Login from './Login/Login';
 import HolidaySettingsScreen from './Holiday/HolidaySettingsScreen';
 import DepartmentManagementScreen from './Department/DepartmentManagementScreen';
 import PersonnelInfoScreen from './Personnel/PersonnelInfoScreen';
 import ProjectManagementScreen from './Project/ProjectManagementScreen';
 import JinanWorkRateScreen from './Statistics/JinanWorkRateScreen';
 import WorkStatus from './WorkStatus/WorkStatus';
-import { MOCK_DEPARTMENTS, MOCK_PERSONNEL, MOCK_PROJECTS } from './data/mockData';
+import YearSelectScreen from './YearSelect/YearSelectScreen';
+import UserManagementScreen from './User/UserManagementScreen';
+import UnsavedChangesModal from './components/UnsavedChangesModal';
 import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
+import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
+import {
+  AVAILABLE_YEARS,
+  Holiday,
+  YearStore,
+  currentYear,
+  getYearSummary,
+} from './data/yearStore';
+import { WorkStatusPayload, kadouRepository } from './data/kadouRepository';
 import './App.css';
 
+/** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
+const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
+  ? AVAILABLE_YEARS
+  : [...AVAILABLE_YEARS, currentYear()];
+
+/** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
+type PendingAction =
+  | { type: 'year'; year: number }
+  | { type: 'logout' }
+  | null;
+
 function App() {
-  // 部門マスタ（画面「部門管理」で 新規登録 / 修正 / 削除 する）
-  const [departments, setDepartments] = useState<Department[]>(MOCK_DEPARTMENTS);
-  // 要員一覧（画面「要員情報」で追加・更新される）
-  const [personnel, setPersonnel] = useState<Personnel[]>(MOCK_PERSONNEL);
-  // プロジェクト一覧（画面「プロジェクト管理」で 新規登録 / 修正 / 削除 する）
-  const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
-  // 表示中の画面（メニューで切り替える）
+  // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
+  const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
+  // ログイン中のユーザーID（null = 未ログイン）
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // 選択中の年度（既定 = 当年）
+  const [selectedYear, setSelectedYear] = useState<number>(() => currentYear());
+  // 年度ごとのデータ（＝保存済みデータ）
+  const [stores, setStores] = useState<Record<number, YearStore>>(() =>
+    kadouRepository.snapshot(INITIAL_YEARS),
+  );
+  // 表示中の画面
   const [activeView, setActiveView] = useState<MenuKey>('work-status');
+  // 要員稼動管理に未保存の変更があるか
+  const [dirty, setDirty] = useState(false);
+  // 未保存確認ダイアログで保留中の操作
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  // 要員稼動管理の「保存」処理（WorkStatus から登録される）
+  const saveHandlerRef = useRef<(() => void) | null>(null);
+  // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
+  const warnedDeptRef = useRef('');
+
+  const currentUser = useMemo(
+    () => users.find((u) => u.userId === currentUserId) ?? null,
+    [users, currentUserId],
+  );
+
+  /** 選択中年度のデータ */
+  const store = stores[selectedYear];
+
+  /** 年度選択画面に表示する年度ごとの概要 */
+  const yearSummaries = useMemo(
+    () => AVAILABLE_YEARS.map((y) => getYearSummary(y)),
+    [],
+  );
+
+  // ---- ログイン / ログアウト ----------------------------------------
+
+  /** ログイン（年度は当年に戻す） */
+  const handleLogin = useCallback((user: AuthUser) => {
+    setCurrentUserId(user.userId);
+    setSelectedYear(currentYear());
+    setActiveView('work-status');
+    setDirty(false);
+  }, []);
+
+  /** 実際のログアウト処理（年度は保持する） */
+  const doLogout = useCallback(() => {
+    setCurrentUserId(null);
+    setActiveView('work-status');
+    setDirty(false);
+    setPendingAction(null);
+  }, []);
+
+  /** ログアウト（未保存があれば確認ダイアログを出す） */
+  const requestLogout = useCallback(() => {
+    if (dirty) {
+      setPendingAction({ type: 'logout' });
+      return;
+    }
+    doLogout();
+  }, [dirty, doLogout]);
+
+  // ---- 年度切替 ------------------------------------------------------
+
+  /** 実際の年度切替（切替後は要員稼動管理へ移動する） */
+  const applyYearChange = useCallback((year: number) => {
+    setSelectedYear(year);
+    setActiveView('work-status');
+    setDirty(false);
+    setPendingAction(null);
+  }, []);
+
+  /** 年度切替（未保存があれば確認ダイアログを出す） */
+  const requestYearChange = useCallback(
+    (year: number) => {
+      if (year === selectedYear) return;
+      if (dirty) {
+        setPendingAction({ type: 'year', year });
+        return;
+      }
+      applyYearChange(year);
+    },
+    [selectedYear, dirty, applyYearChange],
+  );
+
+  /** 未保存確認の「保存して続行」 */
+  const handleSaveAndContinue = useCallback(() => {
+    saveHandlerRef.current?.();
+    const action = pendingAction;
+    if (action?.type === 'year') {
+      applyYearChange(action.year);
+    } else if (action?.type === 'logout') {
+      doLogout();
+    } else {
+      setPendingAction(null);
+    }
+  }, [pendingAction, applyYearChange, doLogout]);
+
+  /** 未保存確認の「破棄して続行」 */
+  const handleDiscardAndContinue = useCallback(() => {
+    const action = pendingAction;
+    setDirty(false);
+    if (action?.type === 'year') {
+      // 年度が変わるので WorkStatus は作り直され、下書きは破棄される
+      applyYearChange(action.year);
+      return;
+    }
+    if (action?.type === 'logout') {
+      doLogout();
+      return;
+    }
+    setPendingAction(null);
+  }, [pendingAction, applyYearChange, doLogout]);
+
+  // ---- 年度データの更新（マスタ系） ---------------------------------
+
+  /** 選択中年度のストアを更新する */
+  const updateStore = useCallback(
+    (patch: Partial<YearStore>) => {
+      setStores((prev) => ({
+        ...prev,
+        [selectedYear]: { ...prev[selectedYear], ...patch },
+      }));
+      void kadouRepository.saveMaster(selectedYear, patch);
+    },
+    [selectedYear],
+  );
+
+  /** 部門マスタ（部門管理画面） */
+  const setYearDepartments = useCallback<
+    React.Dispatch<React.SetStateAction<Department[]>>
+  >(
+    (action) => {
+      const current = stores[selectedYear]?.departments ?? [];
+      const next = typeof action === 'function' ? action(current) : action;
+      updateStore({ departments: next });
+    },
+    [stores, selectedYear, updateStore],
+  );
+
+  /** プロジェクトマスタ（プロジェクト管理画面） */
+  const setYearProjects = useCallback<
+    React.Dispatch<React.SetStateAction<Project[]>>
+  >(
+    (action) => {
+      const current = stores[selectedYear]?.projects ?? [];
+      const next = typeof action === 'function' ? action(current) : action;
+      updateStore({ projects: next });
+    },
+    [stores, selectedYear, updateStore],
+  );
+
+  /** 休日（休日設置画面） */
+  const setYearHolidays = useCallback<
+    React.Dispatch<React.SetStateAction<Holiday[]>>
+  >(
+    (action) => {
+      const current = stores[selectedYear]?.holidays ?? [];
+      const next = typeof action === 'function' ? action(current) : action;
+      updateStore({ holidays: next });
+    },
+    [stores, selectedYear, updateStore],
+  );
+
+  /** 要員一覧（要員情報画面・一括読み込み） */
+  const setYearPersonnel = useCallback(
+    (updater: (prev: Personnel[]) => Personnel[]) => {
+      const current = stores[selectedYear]?.personnel ?? [];
+      updateStore({ personnel: updater(current) });
+    },
+    [stores, selectedYear, updateStore],
+  );
 
   /**
    * 要員情報の登録（モック：画面上のみ保持）
@@ -35,7 +222,7 @@ function App() {
       department: string;
       role: string;
     }) => {
-      setPersonnel((prev) => {
+      setYearPersonnel((prev) => {
         const index = prev.findIndex(
           (p) => p.employeeNo === values.employeeNo,
         );
@@ -49,192 +236,195 @@ function App() {
         return [...prev, { id: `p-${Date.now()}`, ...values }];
       });
     },
-    [],
+    [setYearPersonnel],
   );
 
   /**
    * 社員情報（Excel / CSV）の一括読み込み（モック：画面上のみ保持）
    * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
-   * ※Excel の解析はフロント側（Personnel/personnelImport.ts）で行う。
-   *   バックエンド実装時は API（multipart/form-data）に置き換える。
    */
-  const handleImportPersonnel = useCallback((rows: PersonnelImportRow[]) => {
-    setPersonnel((prev) => {
-      const indexByNo = new Map(prev.map((p, i) => [p.employeeNo, i]));
-      const next = [...prev];
+  const handleImportPersonnel = useCallback(
+    (rows: PersonnelImportRow[]) => {
+      setYearPersonnel((prev) => {
+        const indexByNo = new Map(prev.map((p, i) => [p.employeeNo, i]));
+        const next = [...prev];
 
-      rows.forEach((row, i) => {
-        const index = indexByNo.get(row.employeeNo);
-        if (index !== undefined) {
-          // 既存の社員番号 → 社員情報の項目のみ上書きする
-          // （案件所属 projectKey / 退場予定 leavePlan は保持する）
-          const current = next[index];
-          next[index] = {
-            ...current,
+        rows.forEach((row, i) => {
+          const index = indexByNo.get(row.employeeNo);
+          if (index !== undefined) {
+            // 既存の社員番号 → 社員情報の項目のみ上書きする
+            // （案件所属 projectKey / 退場予定 leavePlan は保持する）
+            const current = next[index];
+            next[index] = {
+              ...current,
+              name: row.name,
+              role: row.role || current.role,
+              department: row.department || current.department,
+            };
+            return;
+          }
+          // 新規の社員番号 → 要員一覧へ追加する
+          indexByNo.set(row.employeeNo, next.length);
+          next.push({
+            id: `p-imp-${row.employeeNo}-${i}`,
+            employeeNo: row.employeeNo,
             name: row.name,
-            role: row.role || current.role,
-            department: row.department || current.department,
-          };
-          return;
-        }
-        // 新規の社員番号 → 要員一覧へ追加する
-        indexByNo.set(row.employeeNo, next.length);
-        next.push({
-          id: `p-imp-${row.employeeNo}-${i}`,
-          employeeNo: row.employeeNo,
-          name: row.name,
-          role: row.role || '要員',
-          department: row.department,
+            role: row.role || '要員',
+            department: row.department,
+          });
         });
+
+        return next;
       });
+    },
+    [setYearPersonnel],
+  );
 
-      return next;
-    });
+  // ---- 要員稼動管理の保存 -------------------------------------------
+
+  /** 要員稼動管理の保存（下書きを確定してストアへ書き戻す） */
+  const handleSaveWorkStatus = useCallback(
+    (payload: WorkStatusPayload) => {
+      setStores((prev) => ({
+        ...prev,
+        [selectedYear]: {
+          ...prev[selectedYear],
+          personnel: payload.personnel,
+          workStatus: {
+            assignment: payload.assignment,
+            unpaid: payload.unpaid,
+          },
+        },
+      }));
+      void kadouRepository.saveWorkStatus(selectedYear, payload);
+      message.success(
+        `${selectedYear}年度の内容を保存しました（モック：サーバー未接続）。`,
+      );
+    },
+    [selectedYear],
+  );
+
+  /** 要員稼動管理の「保存」処理を WorkStatus から受け取る（未保存確認から呼ぶ） */
+  const registerSaveHandler = useCallback((fn: (() => void) | null) => {
+    saveHandlerRef.current = fn;
   }, []);
 
-  /** 社員マスタ（社員番号で 役割・名前・所属(項目) を引く） */
+  /** 社員マスタ（社員番号 → 要員） */
   const employeeMaster = useMemo(
-    () => new Map(MOCK_PERSONNEL.map((p) => [p.employeeNo, p])),
-    [],
+    () => new Map(store.personnel.map((p) => [p.employeeNo, p])),
+    [store.personnel],
   );
 
-  /**
-   * 要員稼動管理画面の「社員番号」入力時
-   * 社員マスタから 役割・名前・所属 を取得して自動セットする
-   *
-   * 戻り値: true = 採用 / false = 処理中止（一覧内で社員番号が重複した場合）
-   */
-  const handleChangePersonnelEmployeeNo = useCallback(
-    (personId: string, employeeNo: string): boolean => {
-      const no = employeeNo.trim();
+  /** ログイン直後に絞り込む部門（部長＝自部門。その年度に存在しない場合は全部門） */
+  const defaultDepartments = useMemo(() => {
+    if (!currentUser) return [];
+    const wanted = defaultDepartmentsOf(currentUser);
+    if (wanted.length === 0) return [];
+    const names = new Set(store.departments.map((d) => d.name));
+    return wanted.filter((n) => names.has(n));
+  }, [currentUser, store.departments]);
 
-      // 重複チェック：一覧内の他の行で既に使われている社員番号は登録できない
-      if (
-        no !== '' &&
-        personnel.some((p) => p.id !== personId && p.employeeNo === no)
-      ) {
-        message.error(
-          `社員番号「${no}」は一覧に既に登録されているため、処理を中止しました。`,
-        );
-        return false;
-      }
-
-      const master = employeeMaster.get(no);
-      if (!master) {
-        if (no !== '') {
-          message.warning(`社員番号「${no}」は社員マスタに存在しません。`);
-        }
-        // マスタにない場合は 役割・名前・所属 をクリアする
-        setPersonnel((prev) =>
-          prev.map((p) =>
-            p.id === personId
-              ? {
-                  ...p,
-                  employeeNo: no,
-                  name: '',
-                  role: '',
-                  department: '',
-                  projectKey: undefined,
-                }
-              : p,
-          ),
-        );
-        return true;
-      }
-      setPersonnel((prev) =>
-        prev.map((p) =>
-          p.id === personId
-            ? {
-                ...p,
-                employeeNo: no,
-                name: master.name,
-                role: master.role,
-                department: master.department,
-                projectKey: master.projectKey,
-              }
-            : p,
-        ),
-      );
-      return true;
-    },
-    [employeeMaster, personnel],
-  );
-
-  /** 要員稼動管理画面の「退場予定」列で退場予定を変更したとき */
-  const handleChangePersonnelLeavePlan = useCallback(
-    (personId: string, leavePlan: string) => {
-      setPersonnel((prev) =>
-        prev.map((p) => (p.id === personId ? { ...p, leavePlan } : p)),
-      );
-    },
-    [],
-  );
-
-  /** 要員稼動管理画面の「行追加」（全項目が空の行を追加する） */
-  const handleAddPersonnelRow = useCallback(() => {
-    setPersonnel((prev) => [
-      ...prev,
-      {
-        id: `p-new-${Date.now()}`,
-        employeeNo: '',
-        name: '',
-        role: '',
-        department: '',
-      },
-    ]);
-    message.success('空の行を追加しました（社員番号を入力してください）。');
-  }, []);
-
-  /** 要員稼動管理画面の「行削除」 */
-  const handleDeletePersonnelRow = useCallback((personId: string) => {
-    setPersonnel((prev) => prev.filter((p) => p.id !== personId));
-    message.success('行を削除しました（モック）。');
-  }, []);
+  /** 部長の自部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
+  useEffect(() => {
+    if (!currentUser) return;
+    const wanted = defaultDepartmentsOf(currentUser);
+    if (wanted.length === 0) return;
+    const names = new Set(store.departments.map((d) => d.name));
+    const missing = wanted.filter((n) => !names.has(n));
+    if (missing.length === 0) return;
+    const key = `${selectedYear}:${currentUser.userId}`;
+    if (warnedDeptRef.current === key) return;
+    warnedDeptRef.current = key;
+    message.warning(
+      `${missing.join('・')} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
+    );
+  }, [currentUser, selectedYear, store.departments]);
 
   /** メニューキー → 画面の対応（メニューの並び順とは独立） */
   const views: Record<MenuKey, React.ReactNode> = {
+    'year-select': (
+      <YearSelectScreen
+        selectedYear={selectedYear}
+        onSelect={requestYearChange}
+        summaries={yearSummaries}
+      />
+    ),
     'work-status': (
       <WorkStatus
-        personnel={personnel}
-        projects={projects}
-        departments={departments}
-        onChangePersonnelEmployeeNo={handleChangePersonnelEmployeeNo}
-        onChangePersonnelLeavePlan={handleChangePersonnelLeavePlan}
-        onAddRow={handleAddPersonnelRow}
-        onDeleteRow={handleDeletePersonnelRow}
+        year={selectedYear}
+        personnel={store.personnel}
+        projects={store.projects}
+        departments={store.departments}
+        defaultDepartments={defaultDepartments}
+        employeeMaster={employeeMaster}
+        initialWorkStatus={store.workStatus}
+        onSave={handleSaveWorkStatus}
+        onDirtyChange={setDirty}
+        registerSaveHandler={registerSaveHandler}
       />
     ),
     'personnel-info': (
       <PersonnelInfoScreen
-        personnel={personnel}
-        departments={departments}
+        year={selectedYear}
+        personnel={store.personnel}
+        departments={store.departments}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}
       />
     ),
     'department-manage': (
       <DepartmentManagementScreen
-        departments={departments}
-        setDepartments={setDepartments}
+        year={selectedYear}
+        departments={store.departments}
+        setDepartments={setYearDepartments}
       />
     ),
     'project-manage': (
       <ProjectManagementScreen
-        projects={projects}
-        setProjects={setProjects}
-        departments={departments}
+        year={selectedYear}
+        projects={store.projects}
+        setProjects={setYearProjects}
+        departments={store.departments}
       />
     ),
-    'jinan-work-rate': <JinanWorkRateScreen />,
-    'holiday-settings': <HolidaySettingsScreen />,
+    'jinan-work-rate': <JinanWorkRateScreen year={selectedYear} />,
+    'holiday-settings': (
+      <HolidaySettingsScreen
+        year={selectedYear}
+        holidays={store.holidays}
+        setHolidays={setYearHolidays}
+      />
+    ),
+    'user-manage': (
+      <UserManagementScreen
+        users={users}
+        setUsers={setUsers}
+        currentUserId={currentUserId}
+        departments={store.departments.map((d) => d.name)}
+        allowManage={currentUser?.role === 'admin'}
+      />
+    ),
   };
+
+  // 未ログイン時はログイン画面を表示する
+  if (!currentUser) {
+    return <Login users={users} onLogin={handleLogin} />;
+  }
 
   return (
     <div className='app-shell'>
       {/* 共通メニュー（選択で画面を切り替える） */}
-      <AppMenu activeKey={activeView} onSelect={setActiveView} />
+      <AppMenu
+        activeKey={activeView}
+        onSelect={setActiveView}
+        user={currentUser}
+        onLogout={requestLogout}
+        year={selectedYear}
+        onYearChange={requestYearChange}
+      />
 
-      <div className='app-main'>
+      {/* 年度が変わったら全画面を作り直す（画面内の状態を確実に切り替えるため） */}
+      <div className='app-main' key={selectedYear}>
         {/* 全画面を常時マウントしておき、表示/非表示のみ切り替える
             （月移動・絞り込み・セル編集・入力中の値などの画面状態を保持するため） */}
         {(Object.keys(views) as MenuKey[]).map((key) => (
@@ -248,6 +438,15 @@ function App() {
           </div>
         ))}
       </div>
+
+      {/* 未保存の変更がある状態で年度切替 / ログアウト をしようとしたとき */}
+      <UnsavedChangesModal
+        open={pendingAction !== null}
+        year={selectedYear}
+        onSave={handleSaveAndContinue}
+        onDiscard={handleDiscardAndContinue}
+        onCancel={() => setPendingAction(null)}
+      />
     </div>
   );
 }

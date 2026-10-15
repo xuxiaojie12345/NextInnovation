@@ -91,7 +91,9 @@ const getIsoWeek = (date: Dayjs): number => {
 };
 
 interface ProjectManagementScreenProps {
-  /** プロジェクト一覧（App 側で保持） */
+  /** 表示する年度 */
+  year: number;
+  /** プロジェクト一覧（App 側で年度ごとに保持） */
   projects: Project[];
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   /** 部門マスタ（「所属部門」「部門」の選択肢） */
@@ -106,6 +108,7 @@ interface ProjectManagementScreenProps {
  * 主キーのシステム項目ID はシステム採番（一覧の最右に表示・編集不可）。
  */
 const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
+  year,
   projects,
   setProjects,
   departments,
@@ -320,7 +323,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       <div className='screen-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            プロジェクト管理
+            {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
             プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。

@@ -32,7 +32,9 @@ const buildNextDepartmentId = (list: Department[]): string => {
 };
 
 interface DepartmentManagementScreenProps {
-  /** 部門マスタ（App 側で保持） */
+  /** 表示する年度 */
+  year: number;
+  /** 部門マスタ（App 側で年度ごとに保持） */
   departments: Department[];
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
 }
@@ -44,6 +46,7 @@ interface DepartmentManagementScreenProps {
  * プロジェクト管理画面の「所属部門」「部門」の選択肢になる。
  */
 const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
+  year,
   departments,
   setDepartments,
 }) => {
@@ -153,7 +156,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       <div className='screen-header'>
         <div>
           <Title level={4} style={{ margin: 0 }}>
-            部門管理
+            {year}年度　部門管理
           </Title>
           <Text type='secondary'>
             要員の部門・プロジェクトの部門として選択できる部門を管理します（主キーの部門ID は内部キーのため画面には表示しません）。
