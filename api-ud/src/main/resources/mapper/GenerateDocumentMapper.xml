@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  生成认证文档 Mapper 映射文件
+  对应【詳細設計UD03.md】2.1 控件 3 的 Document type 下拉列表数据源
+  与【全体APIのプロンプト.txt】5.1 UD03SelectHdocdocumentlistApi 的查询语句
+-->
+<mapper namespace="com.web.app.mapper.GenerateDocumentMapper">
+
+  <!-- 文档类型结果映射：数据库列名 → 实体属性名（驼峰） -->
+  <resultMap id="documentListResultMap" type="com.web.app.entity.HdocDocumentList">
+    <id property="doctype" column="DOCTYPE"/>
+    <result property="description" column="DESCRIPTION"/>
+    <result property="registerDatetime" column="REGISTER_DATETIME"/>
+    <result property="registerUser" column="REGISTER_USER"/>
+    <result property="registerProcess" column="REGISTER_PROCESS"/>
+    <result property="updateDatetime" column="UPDATE_DATETIME"/>
+    <result property="updateUser" column="UPDATE_USER"/>
+    <result property="updateProcess" column="UPDATE_PROCESS"/>
+  </resultMap>
+
+  <!--
+    查询文档类型下拉列表
+    按 DOCTYPE 升序排列，保证下拉列表显示顺序稳定
+  -->
+  <select id="selectHdocDocumentList" resultMap="documentListResultMap">
+    SELECT DOCTYPE,
+           DESCRIPTION,
+           REGISTER_DATETIME,
+           REGISTER_USER,
+           REGISTER_PROCESS,
+           UPDATE_DATETIME,
+           UPDATE_USER,
+           UPDATE_PROCESS
+    FROM HDOC_DOCUMENT_LIST
+    ORDER BY DOCTYPE
+  </select>
+
+</mapper>

@@ -44,6 +44,22 @@ public final class MessageConstants implements Serializable {
   /** Password 超长 */
   public static final String PASSWORD_LENGTH = "Password must be 32 characters or less.";
 
+  /** Chassis series 必填（UD03，详细设计 3.1.1 / 测试用例 13） */
+  public static final String CHASSIS_SERIES_REQUIRED = "Chassis series is required.";
+
+  /** Chassis series 格式非法（UD03，仅允许半角英字） */
+  public static final String CHASSIS_SERIES_FORMAT =
+      "Chassis series must contain only half-width letters.";
+
+  /** Chassis no 必填（UD03，详细设计 3.1.1 / 测试用例 13） */
+  public static final String CHASSIS_NO_REQUIRED = "Chassis no is required.";
+
+  /** Chassis no 格式非法（UD03，仅允许半角数字） */
+  public static final String CHASSIS_NO_FORMAT = "Chassis no must contain only half-width numbers.";
+
+  /** Document type 必填（UD03，详细设计 2.1 控件 3） */
+  public static final String DOCUMENT_TYPE_REQUIRED = "Document type is required.";
+
   /** 私有构造方法，禁止实例化常量类 */
   private MessageConstants() {
   }

@@ -1,0 +1,217 @@
+/* ==========================================================================
+   GenerateDocument 页面样式
+   对应【詳細設計UD03.md】2.1 画面参数定义 / 7 实现注意事项
+   - 全屏背景图 + 压暗遮罩 + PC 端居中显示（与 Login(UD01) / Menu(UD02) 完全一致）
+   - 卡片内：标题 + 3 个输入项目 + error message area + 3 个居中按钮
+   - 响应式：窄屏（<= 640px）时输入项目纵向铺满
+   命名遵循 BEM 方式与开发规约 21〜23
+   ========================================================================== */
+
+/* ------------------------------ 画面容器 ------------------------------ */
+.generate-document-画面 {
+  --generate-accent: #1e6fd9;
+  --generate-accent-dark: #14509f;
+  --generate-text: #1f2933;
+  --generate-muted: #5b6675;
+  --generate-border: #c7d0db;
+  --generate-error: #d93025;
+
+  /* 与 Login（UD01）/ Menu（UD02）一致：全屏背景图 + 居中显示 */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: #205faa;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  font-family: 'Segoe UI', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
+  color: var(--generate-text);
+}
+
+/* 背景压暗遮罩：与 Login / Menu 完全一致，保证内容清晰可读 */
+.generate-document-画面::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 28, 58, 0.55) 0%,
+    rgba(6, 28, 58, 0.3) 45%,
+    rgba(6, 28, 58, 0.15) 100%
+  );
+}
+
+/* ------------------------------ 卡片 ------------------------------ */
+.generate-document-卡片 {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  padding: 32px 36px 28px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(6, 28, 58, 0.3);
+}
+
+/* 画面标题 */
+.generate-document-标题 {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--generate-accent-dark);
+}
+
+/* ------------------------------ 表单 ------------------------------ */
+.generate-document-表单 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 单个输入项目：标签 + 控件 */
+.generate-document-项目 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 项目标签（详细设计 2.1：文字配置 左对齐） */
+.generate-document-ラベル {
+  flex: 0 0 140px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--generate-muted);
+  text-align: left;
+}
+
+/* 文本输入框（Chassis series / Chassis no） */
+.generate-document-入力 {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: var(--generate-text);
+  background-color: #ffffff;
+  border: 1px solid var(--generate-border);
+  border-radius: 4px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.generate-document-入力:focus {
+  border-color: var(--generate-accent);
+  box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.15);
+}
+
+/* 下拉列表（Document type） */
+.generate-document-選択 {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 36px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: var(--generate-text);
+  background-color: #ffffff;
+  border: 1px solid var(--generate-border);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.generate-document-選択:focus {
+  border-color: var(--generate-accent);
+  box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.15);
+}
+
+/* 控件 7：error message area（默认隐藏，内容非空时才渲染） */
+.generate-document-エラーメッセージ {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--generate-error);
+  text-align: left;
+  word-break: break-word;
+}
+
+/* ------------------------------ 按钮区 ------------------------------ */
+/* 控件 4 / 5 / 6：三个按钮居中排列 */
+.generate-document-按钮区 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.generate-document-按钮 {
+  min-width: 96px;
+  height: 38px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--generate-accent-dark);
+  background-color: #ffffff;
+  border: 1px solid var(--generate-accent);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.generate-document-按钮:hover {
+  background-color: rgba(30, 111, 217, 0.08);
+}
+
+.generate-document-按钮:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.25);
+}
+
+/* 主按钮（Submit） */
+.generate-document-按钮-主 {
+  color: #ffffff;
+  background-color: var(--generate-accent);
+  border-color: var(--generate-accent);
+}
+
+.generate-document-按钮-主:hover {
+  background-color: var(--generate-accent-dark);
+}
+
+/* ------------------------------ 响应式 ------------------------------ */
+@media (max-width: 640px) {
+  .generate-document-卡片 {
+    padding: 24px 20px;
+  }
+
+  /* 窄屏时项目改为纵向排列，输入控件铺满整行 */
+  .generate-document-项目 {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .generate-document-ラベル {
+    flex: 0 0 auto;
+  }
+
+  .generate-document-按钮区 {
+    flex-wrap: wrap;
+  }
+}
