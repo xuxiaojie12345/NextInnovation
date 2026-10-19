@@ -148,12 +148,17 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   }, []);
 
   /** 削除 */
-  const handleDelete = useCallback((row: Holiday) => {
-    setHolidays((prev) => prev.filter((h) => h.id !== row.id));
-    // 削除した行を編集中だった場合はフォームを初期化
-    setEditingId((prev) => (prev === row.id ? null : prev));
-    message.success(`${formatDate(row.date)}「${row.name}」を削除しました（モック）。`);
-  }, []);
+  const handleDelete = useCallback(
+    (row: Holiday) => {
+      setHolidays((prev) => prev.filter((h) => h.id !== row.id));
+      // 削除した行を編集中だった場合はフォームを初期化
+      setEditingId((prev) => (prev === row.id ? null : prev));
+      message.success(
+        `${formatDate(row.date)}「${row.name}」を削除しました（モック）。`,
+      );
+    },
+    [setHolidays],
+  );
 
   /** CSV 出力（Excel で開けるよう BOM 付き UTF-8 / CRLF） */
   const handleExport = () => {

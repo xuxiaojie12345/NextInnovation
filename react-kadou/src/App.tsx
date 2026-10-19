@@ -66,10 +66,13 @@ function App() {
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
 
-  /** 年度選択画面に表示する年度ごとの概要 */
+  /**
+   * 年度選択画面に表示する年度ごとの概要。
+   * 保存済みストア（＝編集中の内容）から作るため、マスタを編集すると件数も追随する。
+   */
   const yearSummaries = useMemo(
-    () => AVAILABLE_YEARS.map((y) => getYearSummary(y)),
-    [],
+    () => AVAILABLE_YEARS.map((y) => getYearSummary(y, stores[y])),
+    [stores],
   );
 
   // ---- ログイン / ログアウト ----------------------------------------

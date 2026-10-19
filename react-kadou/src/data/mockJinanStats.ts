@@ -7,7 +7,11 @@ import dayjs, { Dayjs } from 'dayjs';
 /** 稼働率の目標値（%） */
 export const JINAN_TARGET_RATE = 50;
 
-/** 済南拠点の部門（年度ごとに部門マスタが変わるため年度別に持つ） */
+/**
+ * 済南拠点の部門（年度ごとに部門マスタが変わるため年度別に持つ）
+ * ※協力会社（`Department.kind === 'partner'`）は部門と平級だが
+ *   稼働率統計の集計対象外のため、この一覧には含めない。
+ */
 export const JINAN_DEPARTMENTS_BY_YEAR: Record<number, string[]> = {
   2025: ['第一開発部', '第三開発部'],
   2026: ['第一開発部', '第二開発部', '第三開発部'],
@@ -76,7 +80,9 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
   let cur = firstMonday;
   let i = 0;
   while (!cur.isAfter(lastMonday, 'day') && i < 60) {
-    departments.forEach((department, d) => {
+    // for で回す（コールバックをループ内に作らない＝no-loop-func 回避）
+    for (let d = 0; d < departments.length; d += 1) {
+      const department = departments[d];
       const leavers = (i + d) % 13 === 3 ? 1 : 0; // 四半期ごとに 1 名離職
       const recruit = (i + d) % 13 === 8 ? 1 : 0; // 離職の数週後に 1 名補充
       headcounts[d] = headcounts[d] - leavers + recruit;
@@ -107,7 +113,7 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
         tianjin,
         localActive,
       });
-    });
+    }
     cur = cur.add(7, 'day');
     i += 1;
   }

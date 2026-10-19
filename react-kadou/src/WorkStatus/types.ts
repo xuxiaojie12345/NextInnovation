@@ -25,12 +25,21 @@ export interface Personnel {
   leavePlan?: string;
 }
 
-/** 部門（部門マスタ） */
+/** 部門の種別（部門 / 協力会社） */
+export type DepartmentKind = 'dept' | 'partner';
+
+/** 部門（部門マスタ）。協力会社も同じマスタで部門と平級に管理する */
 export interface Department {
   /** 部門ID（主キー。画面には表示しない） */
   id: string;
-  /** 部門名 */
+  /** 部門名（協力会社は会社名） */
   name: string;
+  /**
+   * 種別（未設定 = 部門）
+   * 'partner' = 協力会社。要員の所属・プロジェクトの所属部門としては選択できるが、
+   * 済南稼働率統計（稼働率）の集計対象には含めない。
+   */
+  kind?: DepartmentKind;
 }
 
 /** プロジェクト（固定リスト / マスタ） */

@@ -3,11 +3,15 @@ import { buildProjectAbbr } from '../Project/projectAbbr';
 
 /**
  * 部門マスタのモックデータ（部門管理画面で管理する。部門ID は画面には表示しない）
+ * ※協力会社（kind='partner'）は部門と平級の単位。要員の「所属」・
+ *   プロジェクトの「所属部門」としては選択できるが、稼働率統計の対象外。
  */
 export const MOCK_DEPARTMENTS: Department[] = [
   { id: 'dept-0001', name: '第一開発部' },
   { id: 'dept-0002', name: '第二開発部' },
   { id: 'dept-0003', name: '第三開発部' },
+  // 協力会社（＝部門と平級の単位。稼働率統計には含めない）
+  { id: 'dept-0004', name: '協力会社A', kind: 'partner' },
 ];
 
 /**
@@ -47,6 +51,8 @@ export const MOCK_PERSONNEL: Personnel[] = [
   { id: 'p27', employeeNo: '10027', name: '後藤 秀', department: '第三開発部', role: 'T11E08', projectKey: 'pj-0006' },
   { id: 'p28', employeeNo: '10028', name: '小川 結衣', department: '第三開発部', role: 'T09E06', projectKey: 'pj-0006' },
   { id: 'p29', employeeNo: '10029', name: '三浦 陽介', department: '第三開発部', role: 'T08E06', projectKey: 'pj-0006' },
+  // 協力会社A（部門と平級の単位。稼働率統計には含めない）
+  { id: 'p30', employeeNo: '10030', name: '大塚 拓真', department: '協力会社A', role: 'T09E07', projectKey: 'pj-0007' },
 ];
 
 /**
@@ -108,6 +114,18 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('みなと銀行', '教育研修', '企画', 'A'),
     department: '第二開発部',
     name: '教育・研修',
+  },
+  {
+    // 協力会社の案件（所属部門 = 部門マスタの協力会社）
+    key: 'pj-0007',
+    id: 'PRJ-0007',
+    customer: '桜井商事',
+    caseName: '基幹刷新支援',
+    team: '協力',
+    subTeam: 'A',
+    abbr: buildProjectAbbr('桜井商事', '基幹刷新支援', '協力', 'A'),
+    department: '協力会社A',
+    name: '基幹刷新支援',
   },
   {
     // 内・退職（この項目の要員はグレー表示にする）

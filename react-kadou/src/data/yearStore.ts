@@ -296,15 +296,27 @@ export interface YearSummary {
   weekCount: number;
 }
 
-export const getYearSummary = (year: number): YearSummary => {
-  const source = YEAR_DATA[year];
+/**
+ * 年度データの概要（年度選択画面で表示する）。
+ * 静的モック（YEAR_DATA）ではなく、その時点の年度ストアの内容から作るため、
+ * 部門・要員・項目・休日を編集すると年度選択画面の件数も追随する。
+ */
+export const getYearSummary = (
+  year: number,
+  store?: YearStore,
+): YearSummary => {
+  const departmentCount = store?.departments.length ?? 0;
+  const personnelCount = store?.personnel.length ?? 0;
+  const projectCount = store?.projects.length ?? 0;
+  const holidayCount = store?.holidays.length ?? 0;
   return {
     year,
-    hasData: !!source,
-    departmentCount: source ? source.departments.length : 0,
-    personnelCount: source ? source.personnel.length : 0,
-    projectCount: source ? source.projects.length : 0,
-    holidayCount: source ? source.holidays.length : 0,
+    hasData:
+      departmentCount + personnelCount + projectCount + holidayCount > 0,
+    departmentCount,
+    personnelCount,
+    projectCount,
+    holidayCount,
     weekCount: buildYearWeeks(year).length,
   };
 };
