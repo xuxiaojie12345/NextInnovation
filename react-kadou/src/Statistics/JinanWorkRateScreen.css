@@ -77,6 +77,37 @@
   font-size: 12px;
 }
 
+/* ===== 指標別 折れ線グラフ ===== */
+
+/* グラフを自動折り返しで並べる */
+.jinan-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px;
+}
+
+.jinan-chart-item {
+  min-width: 0;
+  padding: 8px 8px 4px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.jinan-chart-title {
+  margin: 0 0 4px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #595959;
+}
+
+/* 狭い画面では 1 列にする */
+@media (max-width: 900px) {
+  .jinan-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 算出式（定義）のリスト */
 .jinan-formula-list {
   margin: 0;

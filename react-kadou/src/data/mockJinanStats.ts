@@ -47,8 +47,6 @@ export interface JinanWeeklyStat {
   nonContractActive: number;
   /** 教育実施人数 */
   training: number;
-  /** 天津出張人数 */
-  tianjin: number;
   /** 現地稼動人数（日本出張含） */
   localActive: number;
 }
@@ -98,8 +96,8 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
       );
       const nonContractActive = 1 + ((i + d) % 3);
       const training = 1 + ((i + d) % 2);
-      const tianjin = (i + d) % 7 === 0 ? 2 : (i + d) % 3 === 0 ? 1 : 0;
-      const localActive = Math.max(0, activeTotal - tianjin);
+      // 天津出張人数の指標は削除したため、現地稼動人数は総稼動人数と同じ
+      const localActive = activeTotal;
       stats.push({
         weekKey: cur.format('YYYY-MM-DD'),
         start: cur.format('YYYY/M/D'),
@@ -110,7 +108,6 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
         activeTotal,
         nonContractActive,
         training,
-        tianjin,
         localActive,
       });
     }
@@ -159,7 +156,6 @@ export const getJinanWeeklyStats = (
       activeTotal: sum((s) => s.activeTotal),
       nonContractActive: sum((s) => s.nonContractActive),
       training: sum((s) => s.training),
-      tianjin: sum((s) => s.tianjin),
       localActive: sum((s) => s.localActive),
     };
   });

@@ -3,6 +3,17 @@ import { Card, Empty, Space, Statistic, Table, Tag, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
   JINAN_ALL_LABEL,
   JINAN_TARGET_RATE,
   getJinanDepartments,
@@ -36,6 +47,93 @@ const rateCell = (v: number) => (
 
 /** 指標値のセル表示（数値 + 単位） */
 const cellText = (row: MetricRow, v: number) => `${v} ${row.unit}`;
+
+/** 指標の定義（週次テーブル・折れ線グラフで共用） */
+interface MetricDef {
+  key: string;
+  label: string;
+  unit: '名' | '%';
+  isRate?: boolean;
+  value: (s: JinanWeeklyStat) => number;
+}
+
+/** 表示する指標（天津出張人数は削除） */
+const METRICS: MetricDef[] = [
+  {
+    key: 'headcount',
+    label: '総人数',
+    unit: '名',
+    value: (s) => s.headcount,
+  },
+  {
+    key: 'leavers',
+    label: '離職人数',
+    unit: '名',
+    value: (s) => s.leavers,
+  },
+  {
+    key: 'activeTotal',
+    label: '総稼動人数',
+    unit: '名',
+    value: (s) => s.activeTotal,
+  },
+  {
+    key: 'activeRate',
+    label: '総稼動率',
+    unit: '%',
+    isRate: true,
+    value: (s) => rate(s.activeTotal, s.headcount),
+  },
+  {
+    key: 'nonContractActive',
+    label: '非契約稼動人数',
+    unit: '名',
+    value: (s) => s.nonContractActive,
+  },
+  {
+    key: 'training',
+    label: '教育実施人数',
+    unit: '名',
+    value: (s) => s.training,
+  },
+  {
+    key: 'localActive',
+    label: '現地稼動人数（日本出張含）',
+    unit: '名',
+    value: (s) => s.localActive,
+  },
+  {
+    key: 'localRate',
+    label: '現地稼動率',
+    unit: '%',
+    isRate: true,
+    value: (s) => rate(s.localActive, s.headcount),
+  },
+  {
+    key: 'contractRate',
+    label: '契約稼動率',
+    unit: '%',
+    isRate: true,
+    value: (s) =>
+      rate(Math.max(0, s.activeTotal - s.nonContractActive), s.headcount),
+  },
+];
+
+/** 折れ線の色（済南全社は濃いグレー） */
+const CHART_COLORS = [
+  '#1677ff',
+  '#52c41a',
+  '#fa8c16',
+  '#722ed1',
+  '#13c2c2',
+  '#eb2f96',
+];
+
+/** 系列（部門）の色を返す */
+const chartColorOf = (department: string, index: number): string =>
+  department === JINAN_ALL_LABEL
+    ? '#595959'
+    : CHART_COLORS[index % CHART_COLORS.length];
 
 /** 1 週（月曜〜日曜）の列情報 */
 interface WeekCol {
@@ -159,90 +257,17 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   }, [weeks, year]);
 
   /**
-   * 指標行（10 指標 × 4 部門 = 40 行）
+   * 指標行（9 指標 × 部門 + 済南全社）
    * 各指標ごとに 第一開発部 / 第二開発部 / 第三開発部 / 済南全社 の順に展開する
    */
   const metricRows: MetricRow[] = useMemo(() => {
-    const metrics: {
-      key: string;
-      label: string;
-      unit: '名' | '%';
-      isRate?: boolean;
-      value: (s: JinanWeeklyStat) => number;
-    }[] = [
-      {
-        key: 'headcount',
-        label: '総人数',
-        unit: '名',
-        value: (s) => s.headcount,
-      },
-      {
-        key: 'leavers',
-        label: '離職人数',
-        unit: '名',
-        value: (s) => s.leavers,
-      },
-      {
-        key: 'activeTotal',
-        label: '総稼動人数',
-        unit: '名',
-        value: (s) => s.activeTotal,
-      },
-      {
-        key: 'activeRate',
-        label: '総稼動率',
-        unit: '%',
-        isRate: true,
-        value: (s) => rate(s.activeTotal, s.headcount),
-      },
-      {
-        key: 'nonContractActive',
-        label: '非契約稼動人数',
-        unit: '名',
-        value: (s) => s.nonContractActive,
-      },
-      {
-        key: 'training',
-        label: '教育実施人数',
-        unit: '名',
-        value: (s) => s.training,
-      },
-      {
-        key: 'tianjin',
-        label: '天津出張人数',
-        unit: '名',
-        value: (s) => s.tianjin,
-      },
-      {
-        key: 'localActive',
-        label: '現地稼動人数（日本出張含）',
-        unit: '名',
-        value: (s) => s.localActive,
-      },
-      {
-        key: 'localRate',
-        label: '現地稼動率',
-        unit: '%',
-        isRate: true,
-        value: (s) => rate(s.localActive, s.headcount),
-      },
-      {
-        key: 'contractRate',
-        label: '契約稼動率',
-        unit: '%',
-        isRate: true,
-        value: (s) =>
-          rate(Math.max(0, s.activeTotal - s.nonContractActive), s.headcount),
-      },
-    ];
-
     const deptRows: JinanDept[] = [...departments, JINAN_ALL_LABEL];
     const rows: MetricRow[] = [];
-    metrics.forEach((m) => {
+    METRICS.forEach((m) => {
       deptRows.forEach((department, dIdx) => {
         /** 週キー → 値 */
         const values: Record<string, number> = {};
-        getJinanWeeklyStats(department, year).forEach((s) => {
+        getJinanWeeklyStats(department, year, departments).forEach((s) => {
           values[s.weekKey] = m.value(s);
         });
         rows.push({
@@ -296,7 +321,6 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
       activeRate: current ? rate(current.activeTotal, current.headcount) : 0,
       nonContractActive: current?.nonContractActive ?? 0,
       training: current?.training ?? 0,
-      tianjin: current?.tianjin ?? 0,
       localActive: current?.localActive ?? 0,
       localRate: current ? rate(current.localActive, current.headcount) : 0,
       contractRate: current ? rate(contract(current), current.headcount) : 0,
@@ -319,7 +343,42 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   /** データがあるか（データ未準備の年度は空表示） */
   const hasData = allStats.length > 0;
 
-  /** 今週のサマリ（10 項目） */
+  /** 折れ線グラフの系列（部門＋済南全社） */
+  const chartSeries: JinanDept[] = useMemo(
+    () => [...departments, JINAN_ALL_LABEL],
+    [departments],
+  );
+
+  /** 指標ごとのグラフデータ（週キー → 各系列の値） */
+  const chartData = useMemo(
+    () =>
+      METRICS.map((m) => {
+        const valuesByDept = new Map<string, Map<string, number>>();
+        chartSeries.forEach((department) => {
+          const values = new Map<string, number>();
+          getJinanWeeklyStats(department, year, departments).forEach((s) => {
+            values.set(s.weekKey, m.value(s));
+          });
+          valuesByDept.set(department, values);
+        });
+
+        const data = weeks.map((w) => {
+          const point: Record<string, string | number> = {
+            weekKey: w.key,
+            label: w.monday.format('M/D'),
+          };
+          chartSeries.forEach((department) => {
+            point[department] = valuesByDept.get(department)?.get(w.key) ?? 0;
+          });
+          return point;
+        });
+
+        return { metric: m, data };
+      }),
+    [chartSeries, departments, weeks, year],
+  );
+
+  /** 今週のサマリ（9 項目） */
   const cards: {
     label: string;
     value: number;
@@ -332,7 +391,6 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     { label: '総稼動率', value: week.activeRate, suffix: '%', isRate: true },
     { label: '非契約稼動人数', value: week.nonContractActive, suffix: '名' },
     { label: '教育実施人数', value: week.training, suffix: '名' },
-    { label: '天津出張人数', value: week.tianjin, suffix: '名' },
     {
       label: '現地稼動人数（日本出張含）',
       value: week.localActive,
@@ -439,7 +497,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
             {year}年度　済南稼働率統計（週単位）
           </Title>
           <Text type='secondary'>
-            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departments, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
+            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departments, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。指標ごとの折れ線グラフと週次テーブルで表示します。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
           </Text>
         </div>
         <Space>
@@ -448,7 +506,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
         </Space>
       </div>
 
-      {/* 今週の集計（10 項目） */}
+      {/* 今週の集計（9 項目） */}
       <Card
         title={`${isCurrentYear ? '今週' : '年度末週'}の集計（${JINAN_ALL_LABEL}／${week.label}）`}
         className='screen-card jinan-card-full'
@@ -477,12 +535,90 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
         <Text type='secondary' className='jinan-note'>
           ※ {isCurrentYear ? '当週' : '年度末週'}（{week.period}）の実績値です。人数は当該週の人数、稼動率は「各分子 ÷ 総人数」で算出しています。
           {!week.hasData && ' ※対象週のデータが無いため 0 で表示しています。'}
+          <br />
+          ※ 天津出張人数の指標削除に伴い、現地稼動人数・現地稼動率は総稼動人数・総稼動率と同じ値です。
+        </Text>
+      </Card>
+
+      {/* 指標別 折れ線グラフ */}
+      <Card
+        title={`指標別 折れ線グラフ（${METRICS.length} 指標 × ${departments.length + 1} 系列 × ${period.weeks} 週）`}
+        className='screen-card jinan-card-full'
+        style={{ marginTop: 12 }}
+        extra={<Text type='secondary'>各指標の週次推移（部門別）</Text>}
+      >
+        <div className='jinan-chart-grid'>
+          {chartData.map(({ metric, data }) => (
+            <div className='jinan-chart-item' key={metric.key}>
+              <div className='jinan-chart-title'>
+                {metric.label}（{metric.unit}）
+              </div>
+              <ResponsiveContainer width='100%' height={220}>
+                <LineChart
+                  data={data}
+                  margin={{ top: 8, right: 16, bottom: 0, left: 0 }}
+                >
+                  <CartesianGrid strokeDasharray='3 3' stroke='#e8e8e8' />
+                  <XAxis
+                    dataKey='label'
+                    tick={{ fontSize: 11 }}
+                    minTickGap={24}
+                    tickMargin={6}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11 }}
+                    width={44}
+                    domain={metric.isRate ? [0, 100] : [0, 'auto']}
+                    allowDecimals={metric.isRate}
+                    unit={metric.unit === '%' ? '%' : undefined}
+                  />
+                  <Tooltip
+                    labelFormatter={(label) => `${label} の週`}
+                    formatter={(value, name) => [
+                      `${value} ${metric.unit}`,
+                      name,
+                    ]}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  {metric.isRate && (
+                    <ReferenceLine
+                      y={JINAN_TARGET_RATE}
+                      stroke='#ff4d4f'
+                      strokeDasharray='4 4'
+                      label={{
+                        value: `目標 ${JINAN_TARGET_RATE}%`,
+                        position: 'insideTopRight',
+                        fontSize: 11,
+                        fill: '#ff4d4f',
+                      }}
+                    />
+                  )}
+                  {chartSeries.map((department, index) => (
+                    <Line
+                      key={department}
+                      type='monotone'
+                      dataKey={department}
+                      name={department}
+                      stroke={chartColorOf(department, index)}
+                      strokeWidth={department === JINAN_ALL_LABEL ? 2.5 : 2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                      connectNulls
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ))}
+        </div>
+        <Text type='secondary' className='jinan-note'>
+          ※ 各グラフは指標ごとに、{departments.join('・')} と {JINAN_ALL_LABEL}（合計）の週次推移を表示します。稼動率のグラフの赤破線は目標値 {JINAN_TARGET_RATE}% です。
         </Text>
       </Card>
 
       {/* 週次統計（指標 × 週の横向き） */}
       <Card
-        title={`週次 稼動統計（10 指標 × ${departments.length + 1} 部門 × ${period.weeks} 週）`}
+        title={`週次 稼動統計（${METRICS.length} 指標 × ${departments.length + 1} 部門 × ${period.weeks} 週）`}
         className='screen-card jinan-card-full'
         style={{ marginTop: 12 }}
         extra={
@@ -518,7 +654,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
           <li>総稼動率 = 総稼動人数 ÷ 総人数 × 100</li>
           <li>契約稼動率 = 契約稼動人数 ÷ 総人数 × 100</li>
           <li>
-            現地稼動人数（日本出張含） = 総稼動人数 − 天津出張人数（日本出張者は現地稼動に含める）
+            現地稼動人数（日本出張含） = 総稼動人数
           </li>
           <li>現地稼動率 = 現地稼動人数 ÷ 総人数 × 100</li>
           <li>教育実施人数は稼動人数には含めない（教育 = 非稼動として集計）</li>
