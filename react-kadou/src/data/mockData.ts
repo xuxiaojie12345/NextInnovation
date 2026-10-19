@@ -7,11 +7,11 @@ import { buildProjectAbbr } from '../Project/projectAbbr';
  *   プロジェクトの「所属部門」としては選択できるが、稼働率統計の対象外。
  */
 export const MOCK_DEPARTMENTS: Department[] = [
-  { id: 'dept-0001', name: '第一開発部' },
-  { id: 'dept-0002', name: '第二開発部' },
-  { id: 'dept-0003', name: '第三開発部' },
+  { id: 'dept-0001', name: '第一開発部', location: '済南' },
+  { id: 'dept-0002', name: '第二開発部', location: '済南' },
+  { id: 'dept-0003', name: '第三開発部', location: '済南' },
   // 協力会社（＝部門と平級の単位。稼働率統計には含めない）
-  { id: 'dept-0004', name: '協力会社A', kind: 'partner' },
+  { id: 'dept-0004', name: '協力会社A', location: '済南', kind: 'partner' },
 ];
 
 /**

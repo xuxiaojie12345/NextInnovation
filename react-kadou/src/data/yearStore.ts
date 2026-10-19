@@ -75,8 +75,8 @@ export const currentYear = (): number => dayjs().year();
 /* ------------------------------------------------------------------ */
 
 const DEPARTMENTS_2025: Department[] = [
-  { id: 'dept-0001', name: '第一開発部' },
-  { id: 'dept-0003', name: '第三開発部' },
+  { id: 'dept-0001', name: '第一開発部', location: '済南' },
+  { id: 'dept-0003', name: '第三開発部', location: '済南' },
 ];
 
 const PROJECTS_2025: Project[] = [

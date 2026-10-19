@@ -10,6 +10,7 @@ import {
   Table,
   Tag,
   Typography,
+  Upload,
 } from 'antd';
 import type { TableColumnsType } from 'antd';
 import {
@@ -17,10 +18,17 @@ import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { Department, Project } from '../WorkStatus/types';
 import { buildProjectAbbr } from './projectAbbr';
+import {
+  PROJECT_IMPORT_ACCEPT,
+  PROJECT_IMPORT_FORMAT_HINT,
+  ProjectImportRow,
+  parseProjectFile,
+} from './projectImport';
 import './ProjectManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -68,14 +76,30 @@ const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
  * 内部キーの採番（既存の pj-xxxx の最大値 + 1）。
  * 項目ID は任意入力（空欄・重複可）のため、一意キーは内部で自動採番する。
  */
-const buildNextProjectKey = (list: Project[]): string => {
+const nextProjectNumber = (list: Project[]): number => {
   const numbers = list
     .map((p) => /^pj-(\d+)$/.exec(p.key))
     .filter((m): m is RegExpExecArray => m !== null)
     .map((m) => Number(m[1]));
-  const next = (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
-  return `pj-${String(next).padStart(4, '0')}`;
+  return (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
 };
+
+/** 次の内部キー（例：pj-0008） */
+const buildNextProjectKey = (list: Project[]): string =>
+  `pj-${String(nextProjectNumber(list)).padStart(4, '0')}`;
+
+/** 一括読み込みの1行をプロジェクトへ変換する（略称は自動生成） */
+const toProject = (row: ProjectImportRow, key: string): Project => ({
+  key,
+  id: row.id,
+  customer: row.customer,
+  caseName: row.caseName,
+  team: row.team,
+  subTeam: row.subTeam,
+  abbr: buildProjectAbbr(row.customer, row.caseName, row.team, row.subTeam),
+  department: row.department,
+  name: row.name,
+});
 
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
 const projectLabel = (p: Project): string =>
@@ -117,6 +141,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const [form, setForm] = useState<ProjectFormValues>(EMPTY_FORM);
   // 修正中の内部キー（null = 新規登録モード）
   const [editingKey, setEditingKey] = useState<string | null>(null);
+  // 一括読み込み：ファイル解析中フラグ
+  const [importing, setImporting] = useState(false);
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -217,6 +243,79 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       );
     }
     handleResetForm();
+  };
+
+  /**
+   * 一括読み込み：プロジェクト情報ファイル（Excel / CSV）を解析し、
+   * そのまま一覧へ追加する（重複可・確認なし）。
+   */
+  const handleImportFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const result = await parseProjectFile(file);
+      if (result.rows.length === 0) {
+        const detail =
+          result.warnings.length > 0
+            ? `（${result.warnings[0]}${
+                result.warnings.length > 1 ? ' ほか' : ''
+              }）`
+            : '';
+        message.error(
+          `一括読み込み：取り込めるプロジェクトがありませんでした（${file.name}）${detail}`,
+        );
+        return;
+      }
+
+      // 部門マスタに無い所属部門（取り込み自体は行う）
+      const deptNames = new Set(departments.map((d) => d.name));
+      const unknownDepartments = Array.from(
+        new Set(
+          result.rows
+            .map((r) => r.department)
+            .filter((d) => d !== '' && !deptNames.has(d)),
+        ),
+      );
+
+      // 内部キーは既存の最大値 + 1 から連番で採番する
+      setProjects((prev) => {
+        const start = nextProjectNumber(prev);
+        const added = result.rows.map((row, i) =>
+          toProject(row, `pj-${String(start + i).padStart(4, '0')}`),
+        );
+        return [...prev, ...added];
+      });
+
+      message.success(
+        `プロジェクトを一括読み込みしました：${result.rows.length} 件を追加しました（モック）。`,
+      );
+
+      const notes: string[] = [];
+      if (unknownDepartments.length > 0) {
+        notes.push(
+          `部門マスタに無い所属部門：${unknownDepartments.join(
+            '、',
+          )}（部門管理画面で登録してください）`,
+        );
+      }
+      if (result.warnings.length > 0) {
+        notes.push(
+          `取り込まなかった行：${result.warnings.length} 件（${result.warnings[0]}${
+            result.warnings.length > 1 ? ' ほか' : ''
+          }）`,
+        );
+      }
+      if (notes.length > 0) {
+        message.warning(notes.join(' / '));
+      }
+    } catch (e) {
+      message.error(
+        e instanceof Error
+          ? `一括読み込みに失敗しました：${e.message}`
+          : '一括読み込みに失敗しました。',
+      );
+    } finally {
+      setImporting(false);
+    }
   };
 
   const columns: TableColumnsType<Project> = useMemo(
@@ -326,7 +425,37 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
-            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。
+            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。右上の「一括読み込む」から Excel / CSV を取り込めます。
+          </Text>
+        </div>
+
+        {/* 右上：プロジェクト情報（Excel / CSV）の一括読み込み */}
+        <div className='project-header-side'>
+          <Space size={8} wrap align='center'>
+            <Text strong>プロジェクト情報</Text>
+            <Upload
+              accept={PROJECT_IMPORT_ACCEPT}
+              showUploadList={false}
+              multiple={false}
+              disabled={importing}
+              beforeUpload={(file) => {
+                // サーバーへは送信せず、フロントのみで解析する（モック）
+                void handleImportFile(file);
+                return false;
+              }}
+            >
+              <Button
+                type='primary'
+                icon={<UploadOutlined />}
+                loading={importing}
+              >
+                一括読み込む
+              </Button>
+            </Upload>
+            <Tag color='blue'>フロント モック（バックエンド未接続）</Tag>
+          </Space>
+          <Text type='secondary' className='project-import-hint'>
+            {PROJECT_IMPORT_FORMAT_HINT}
           </Text>
         </div>
       </div>

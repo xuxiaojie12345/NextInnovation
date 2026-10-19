@@ -18,7 +18,11 @@ import {
   EditOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Department, DepartmentKind } from '../WorkStatus/types';
+import {
+  Department,
+  DepartmentKind,
+  DepartmentLocation,
+} from '../WorkStatus/types';
 
 const { Title, Text } = Typography;
 
@@ -26,6 +30,12 @@ const { Title, Text } = Typography;
 const KIND_OPTIONS: { value: DepartmentKind; label: string }[] = [
   { value: 'dept', label: '部門' },
   { value: 'partner', label: '協力会社' },
+];
+
+/** 拠点の選択肢（固定 2 択） */
+const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
+  { value: '天津', label: '天津' },
+  { value: '済南', label: '済南' },
 ];
 
 /** 種別の表示名（未設定は部門扱い） */
@@ -53,9 +63,10 @@ interface DepartmentManagementScreenProps {
 /**
  * 部門管理 画面（メニュー「部門管理」で切り替わる画面）
  * 部門と協力会社は同じマスタで平級に管理する（種別 = 部門 / 協力会社）。
- * 画面には名称のみを表示し、主キーの部門ID は内部キーとして隠す。
+ * 名称・拠点・種別を管理し、主キーの部門ID は内部キーとして隠す。
  * ここで登録した名称が、要員稼動管理画面の「所属」列と
  * プロジェクト管理画面の「所属部門」の選択肢になる。
+ * ※拠点は必須（天津 / 済南）で、済南稼働率統計は拠点が済南の部門のみを対象にする。
  * ※協力会社は稼働率統計の集計対象外（済南稼働率統計には出さない）。
  */
 const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
@@ -67,6 +78,10 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const [name, setName] = useState('');
   // 種別（新規登録 / 修正で共用）
   const [kind, setKind] = useState<DepartmentKind>('dept');
+  // 拠点（新規登録 / 修正で共用。必須のため未選択を許可する）
+  const [location, setLocation] = useState<DepartmentLocation | undefined>(
+    undefined,
+  );
   // 修正中の部門ID（null = 新規登録モード）
   const [editingId, setEditingId] = useState<string | null>(null);
   // 修正開始時にフォームへスクロールするための参照
@@ -79,6 +94,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     setEditingId(null);
     setName('');
     setKind('dept');
+    setLocation(undefined);
   }, []);
 
   /** 修正（選択した部門をフォームへ読み込む） */
@@ -86,6 +102,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     setEditingId(row.id);
     setName(row.name);
     setKind(row.kind ?? 'dept');
+    setLocation(row.location);
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
@@ -101,11 +118,15 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     [setDepartments],
   );
 
-  /** 新規登録 / 修正の実行（名称は必須・重複不可） */
+  /** 新規登録 / 修正の実行（名称・拠点は必須、名称は重複不可） */
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) {
       message.warning('名称を入力してください。');
+      return;
+    }
+    if (!location) {
+      message.warning('拠点を選択してください。');
       return;
     }
     if (departments.some((d) => d.name === trimmed && d.id !== editingId)) {
@@ -115,15 +136,21 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
 
     if (editingId) {
       setDepartments((prev) =>
-        prev.map((d) => (d.id === editingId ? { ...d, name: trimmed, kind } : d)),
+        prev.map((d) =>
+          d.id === editingId ? { ...d, name: trimmed, kind, location } : d,
+        ),
       );
-      message.success(`${kindLabelOf(kind)}「${trimmed}」を修正しました（モック）。`);
+      message.success(
+        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました（モック）。`,
+      );
     } else {
       setDepartments((prev) => [
         ...prev,
-        { id: buildNextDepartmentId(prev), name: trimmed, kind },
+        { id: buildNextDepartmentId(prev), name: trimmed, kind, location },
       ]);
-      message.success(`${kindLabelOf(kind)}「${trimmed}」を登録しました（モック）。`);
+      message.success(
+        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました（モック）。`,
+      );
     }
     handleResetForm();
   };
@@ -134,6 +161,15 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+      },
+      {
+        // 拠点（天津 / 済南）
+        title: '拠点',
+        dataIndex: 'location',
+        key: 'location',
+        width: 100,
+        render: (v: DepartmentLocation) =>
+          v === '天津' ? <Tag color='cyan'>天津</Tag> : <Tag color='geekblue'>済南</Tag>,
       },
       {
         // 種別（部門 / 協力会社）。協力会社は稼働率統計の対象外
@@ -191,7 +227,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             {year}年度　部門管理
           </Title>
           <Text type='secondary'>
-            要員の「所属」・プロジェクトの「所属部門」として選択できる部門と協力会社を管理します（主キーの部門ID は内部キーのため画面には表示しません）。協力会社は部門と平級の単位ですが、稼働率統計の対象外です。
+            要員の「所属」・プロジェクトの「所属部門」として選択できる部門と協力会社を管理します（主キーの部門ID は内部キーのため画面には表示しません）。拠点（天津／済南）は必須で、済南稼働率統計は拠点が済南の部門のみを集計対象にします。協力会社は部門と平級の単位ですが、稼働率統計の対象外です。
           </Text>
         </div>
         <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>
@@ -223,6 +259,16 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 onPressEnter={handleSubmit}
                 style={{ width: 260 }}
+              />
+            </div>
+            <div>
+              <div className='form-label'>拠点（必須）</div>
+              <Select
+                placeholder='拠点を選択'
+                value={location}
+                onChange={(v: DepartmentLocation) => setLocation(v)}
+                options={LOCATION_OPTIONS}
+                style={{ width: 140 }}
               />
             </div>
             <Button

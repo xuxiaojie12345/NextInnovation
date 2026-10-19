@@ -28,12 +28,17 @@ export interface Personnel {
 /** 部門の種別（部門 / 協力会社） */
 export type DepartmentKind = 'dept' | 'partner';
 
+/** 拠点（部門の所在地。固定 2 択） */
+export type DepartmentLocation = '天津' | '済南';
+
 /** 部門（部門マスタ）。協力会社も同じマスタで部門と平級に管理する */
 export interface Department {
   /** 部門ID（主キー。画面には表示しない） */
   id: string;
   /** 部門名（協力会社は会社名） */
   name: string;
+  /** 拠点（必須。天津 / 済南） */
+  location: DepartmentLocation;
   /**
    * 種別（未設定 = 部門）
    * 'partner' = 協力会社。要員の所属・プロジェクトの所属部門としては選択できるが、

@@ -9,6 +9,14 @@
   margin-bottom: 8px;
 }
 
+/* 一括読み込みの形式ヒント */
+.holiday-import-hint {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
 /* 編集中の行をハイライト */
 .holiday-row-editing > td {
   background: #e6f4ff !important;

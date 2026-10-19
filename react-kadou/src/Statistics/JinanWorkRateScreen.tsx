@@ -9,6 +9,7 @@ import {
   getJinanWeeklyStats,
 } from '../data/mockJinanStats';
 import type { JinanDept, JinanWeeklyStat } from '../data/mockJinanStats';
+import type { Department } from '../WorkStatus/types';
 import { buildYearWeeks, weekKeyOf } from '../data/yearWeeks';
 import './JinanWorkRateScreen.css';
 
@@ -74,6 +75,8 @@ interface MetricRow {
 interface JinanWorkRateScreenProps {
   /** 表示する年度 */
   year: number;
+  /** 部門マスタ（拠点が済南の部門だけを集計対象にする） */
+  departments: Department[];
 }
 
 /**
@@ -82,9 +85,20 @@ interface JinanWorkRateScreenProps {
  * ※部門（行）は年度の部門マスタに従う（2025 は 2 部門、2026 は 3 部門）
  * ※現状はモックデータ表示（バックエンド未接続）
  */
-const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({ year }) => {
-  /** 対象年度の済南拠点の部門 */
-  const departments = useMemo(() => getJinanDepartments(year), [year]);
+const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
+  year,
+  departments: departmentMaster,
+}) => {
+  /**
+   * 対象年度の済南拠点の部門（部門マスタで拠点＝済南の部門のみ）
+   * 拠点を天津に変更した部門は集計対象から外れる。
+   */
+  const departments = useMemo(() => {
+    const jinanTargets = new Set(getJinanDepartments(year));
+    return departmentMaster
+      .filter((d) => d.location === '済南' && jinanTargets.has(d.name))
+      .map((d) => d.name);
+  }, [departmentMaster, year]);
 
   /** 当年か（当年だけ「今週の集計」を出す） */
   const isCurrentYear = year === dayjs().year();
@@ -96,10 +110,10 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({ year }) => {
     return weeks.length > 0 ? weeks[weeks.length - 1].key : '';
   }, [year, isCurrentYear]);
 
-  /** 済南全社（全部門の合計）の週次統計 */
+  /** 済南全社（対象部門の合計）の週次統計 */
   const allStats = useMemo(
-    () => getJinanWeeklyStats(JINAN_ALL_LABEL, year),
-    [year],
+    () => getJinanWeeklyStats(JINAN_ALL_LABEL, year, departments),
+    [departments, year],
   );
 
   /** 週列（当年分／月曜始まり） */

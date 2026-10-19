@@ -15,6 +15,8 @@
  * NOTE: バックエンド実装時は、この parsePersonnelFile() を API 呼び出し
  *       （例：POST /api/kadou/personnel/import  multipart/form-data）に置き換える。
  *       画面側・App 側のインターフェース（PersonnelImportRow）はそのまま利用できる。
+ * NOTE: 表形式ファイル（Excel / CSV）の読み取り処理（readSpreadsheetFile）は
+ *       プロジェクト情報の一括読み込み（Project/projectImport.ts）と共用する。
  */
 
 /** 一括読み込みで受け取る1件分の社員情報 */
@@ -76,7 +78,7 @@ const toHalfWidth = (value: string): string =>
     .replace(/\u3000/g, ' ');
 
 /** 見出し比較用の正規化（半角化・小文字化・空白／括弧書きの除去） */
-const normalizeKey = (value: string): string =>
+export const normalizeKey = (value: string): string =>
   toHalfWidth(value)
     .toLowerCase()
     .replace(/\s+/g, '')
@@ -496,17 +498,16 @@ const buildRows = (
 // ---------------------------------------------------------------------------
 
 /**
- * 社員情報ファイル（Excel / CSV）を読み取り、取り込み可能な行を返す。
- * 解析に失敗した場合は Error（日本語メッセージ）を投げる。
+ * 表形式ファイル（Excel / CSV）を読み取り、セルの行列と読み取り元を返す。
+ * ※要員情報・プロジェクト情報の一括読み込みで共用する。
  */
-export const parsePersonnelFile = async (
+export const readSpreadsheetFile = async (
   file: File,
-): Promise<PersonnelImportResult> => {
+): Promise<{ matrix: string[][]; source: string }> => {
   const fileName = file.name.toLowerCase();
 
   if (fileName.endsWith('.xlsx') || fileName.endsWith('.xlsm')) {
-    const { matrix, source } = await readXlsx(await file.arrayBuffer());
-    return buildRows(matrix, source);
+    return readXlsx(await file.arrayBuffer());
   }
 
   if (fileName.endsWith('.xls')) {
@@ -516,7 +517,18 @@ export const parsePersonnelFile = async (
   }
 
   // CSV / タブ区切りテキスト
-  return buildRows(parseDelimitedText(await file.text()), 'CSV');
+  return { matrix: parseDelimitedText(await file.text()), source: 'CSV' };
+};
+
+/**
+ * 社員情報ファイル（Excel / CSV）を読み取り、取り込み可能な行を返す。
+ * 解析に失敗した場合は Error（日本語メッセージ）を投げる。
+ */
+export const parsePersonnelFile = async (
+  file: File,
+): Promise<PersonnelImportResult> => {
+  const { matrix, source } = await readSpreadsheetFile(file);
+  return buildRows(matrix, source);
 };
 
 /** 取り込み前後の増減（追加・上書き件数）を数える */

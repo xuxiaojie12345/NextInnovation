@@ -390,7 +390,12 @@ function App() {
         departments={store.departments}
       />
     ),
-    'jinan-work-rate': <JinanWorkRateScreen year={selectedYear} />,
+    'jinan-work-rate': (
+      <JinanWorkRateScreen
+        year={selectedYear}
+        departments={store.departments}
+      />
+    ),
     'holiday-settings': (
       <HolidaySettingsScreen
         year={selectedYear}

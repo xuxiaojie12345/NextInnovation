@@ -10,6 +10,7 @@ import {
   Table,
   Tag,
   Typography,
+  Upload,
 } from 'antd';
 import type { TableColumnsType } from 'antd';
 import {
@@ -17,9 +18,15 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { Holiday, HolidayKind } from '../data/yearStore';
+import {
+  HOLIDAY_IMPORT_ACCEPT,
+  HOLIDAY_IMPORT_FORMAT_HINT,
+  parseHolidayFile,
+} from './holidayImport';
 import './HolidaySettingsScreen.css';
 
 const { Title, Text } = Typography;
@@ -57,7 +64,7 @@ interface HolidaySettingsScreenProps {
 
 /**
  * 休日設置 画面（メニュー「休日設置」で切り替わる画面）
- * 追加・編集・削除に加え、CSV 出力に対応する。
+ * 追加・編集・削除に加え、CSV 出力と Excel / CSV の一括読み込みに対応する。
  * ※休日は年度ごとのデータ（年度切替で表示が切り替わる）
  */
 const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
@@ -75,6 +82,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
 
   // 編集開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
+
+  // 一括読み込み：ファイル解析中フラグ
+  const [importing, setImporting] = useState(false);
 
   const isEditing = editingId !== null;
 
@@ -176,6 +186,73 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     message.success(`${sortedHolidays.length} 件を CSV 出力しました。`);
+  };
+
+  /**
+   * 一括読み込み：休日情報ファイル（Excel / CSV）を解析し、
+   * 同一日付は上書き・新規日付は追加する（確認なし）。
+   */
+  const handleImportFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const result = await parseHolidayFile(file, year);
+      if (result.rows.length === 0) {
+        const detail =
+          result.warnings.length > 0
+            ? `（${result.warnings[0]}${
+                result.warnings.length > 1 ? ' ほか' : ''
+              }）`
+            : '';
+        message.error(
+          `一括読み込み：取り込める休日がありませんでした（${file.name}）${detail}`,
+        );
+        return;
+      }
+
+      // 既存日付は上書き、新規日付は追加する
+      const existingDates = new Set(holidays.map((h) => h.date));
+      const updated = result.rows.filter((r) =>
+        existingDates.has(r.date),
+      ).length;
+      const added = result.rows.length - updated;
+
+      setHolidays((prev) => {
+        const next = [...prev];
+        result.rows.forEach((row) => {
+          const index = next.findIndex((h) => h.date === row.date);
+          if (index >= 0) {
+            next[index] = { ...next[index], name: row.name, kind: row.kind };
+          } else {
+            next.push({
+              id: `h-imp-${row.date}`,
+              date: row.date,
+              name: row.name,
+              kind: row.kind,
+            });
+          }
+        });
+        return next;
+      });
+
+      message.success(
+        `休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`,
+      );
+      if (result.warnings.length > 0) {
+        message.warning(
+          `取り込まなかった行などが ${result.warnings.length} 件あります（${result.warnings[0]}${
+            result.warnings.length > 1 ? ' ほか' : ''
+          }）。`,
+        );
+      }
+    } catch (e) {
+      message.error(
+        e instanceof Error
+          ? `一括読み込みに失敗しました：${e.message}`
+          : '一括読み込みに失敗しました。',
+      );
+    } finally {
+      setImporting(false);
+    }
   };
 
   const columns: TableColumnsType<Holiday> = useMemo(
@@ -317,12 +394,34 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           </Space>
         }
       >
-        {/* CSV 出力 */}
+        {/* 一括読み込み / CSV 出力 */}
         <div className='holiday-toolbar'>
+          <Upload
+            accept={HOLIDAY_IMPORT_ACCEPT}
+            showUploadList={false}
+            multiple={false}
+            disabled={importing}
+            beforeUpload={(file) => {
+              // サーバーへは送信せず、フロントのみで解析する（モック）
+              void handleImportFile(file);
+              return false;
+            }}
+          >
+            <Button
+              type='primary'
+              icon={<UploadOutlined />}
+              loading={importing}
+            >
+              一括読み込む
+            </Button>
+          </Upload>
           <Button icon={<DownloadOutlined />} onClick={handleExport}>
             CSV出力
           </Button>
         </div>
+        <Text type='secondary' className='holiday-import-hint'>
+          {HOLIDAY_IMPORT_FORMAT_HINT}
+        </Text>
 
         <Table<Holiday>
           rowKey='id'

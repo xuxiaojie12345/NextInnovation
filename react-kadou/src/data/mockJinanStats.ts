@@ -129,18 +129,24 @@ const JINAN_STATS_BY_YEAR: Record<number, JinanWeeklyStat[]> = {
 /**
  * 指定年度・指定部門の週次統計を返す。
  * 済南全社 の場合は対象部門の合計値を週ごとに算出して返す。
+ * targetDepartments を指定すると、その部門だけを集計対象にする
+ * （部門マスタの拠点が「済南」の部門だけを渡すために使用する）。
  */
 export const getJinanWeeklyStats = (
   department: JinanDept,
   year: number,
+  targetDepartments?: string[],
 ): JinanWeeklyStat[] => {
   const all = JINAN_STATS_BY_YEAR[year] ?? [];
+  const targets = targetDepartments
+    ? all.filter((s) => targetDepartments.includes(s.department))
+    : all;
   if (department !== JINAN_ALL_LABEL) {
-    return all.filter((s) => s.department === department);
+    return targets.filter((s) => s.department === department);
   }
-  const weekKeys = Array.from(new Set(all.map((s) => s.weekKey)));
+  const weekKeys = Array.from(new Set(targets.map((s) => s.weekKey)));
   return weekKeys.map((weekKey) => {
-    const list = all.filter((s) => s.weekKey === weekKey);
+    const list = targets.filter((s) => s.weekKey === weekKey);
     const sum = (f: (s: JinanWeeklyStat) => number) =>
       list.reduce((a, s) => a + f(s), 0);
     return {
