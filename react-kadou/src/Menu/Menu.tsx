@@ -34,6 +34,8 @@ interface AppMenuProps {
   onSelect: (key: MenuKey) => void;
   /** ログイン中のユーザー */
   user: AuthUser;
+  /** ログイン中のユーザーの担当部門名（未設定 = 全部門） */
+  departmentName?: string;
   /** ログアウト */
   onLogout: () => void;
   /** 選択中の年度 */
@@ -110,6 +112,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
   activeKey,
   onSelect,
   user,
+  departmentName,
   onLogout,
   year,
   onYearChange,
@@ -146,7 +149,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
           <span className='app-menu-user-name'>{user.name}</span>
           <Tag color={ROLE_COLOR[user.role]}>
             {user.roleLabel}
-            {user.department ? `／${user.department}` : ''}
+            {departmentName ? `／${departmentName}` : ''}
           </Tag>
           <Button size='small' icon={<LogoutOutlined />} onClick={onLogout}>
             ログアウト

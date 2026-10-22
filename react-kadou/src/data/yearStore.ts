@@ -9,13 +9,18 @@
  *    （src/data/kadouRepository.ts を参照）
  */
 import dayjs from 'dayjs';
-import { AssignmentMap, Department, Personnel, Project } from '../WorkStatus/types';
+import {
+  AssignmentMap,
+  Department,
+  Personnel,
+  Project,
+  WorkStatusRows,
+} from '../WorkStatus/types';
 import { buildProjectAbbr } from '../Project/projectAbbr';
 import {
   MOCK_DEPARTMENTS,
   MOCK_PERSONNEL,
   MOCK_PROJECTS,
-  PERSON_MAIN_PROJECT,
 } from './mockData';
 import {
   JinanWeeklyStat,
@@ -41,6 +46,8 @@ export type UnpaidMap = Record<string, Record<string, boolean>>;
 
 /** 要員稼動管理グリッドの保存済みデータ */
 export interface WorkStatusData {
+  /** 稼働表に表示する要員（社員番号の並び） */
+  rows: WorkStatusRows;
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
 }
@@ -51,8 +58,6 @@ export interface YearStore {
   departments: Department[];
   personnel: Personnel[];
   projects: Project[];
-  /** 要員ID -> 主担当プロジェクトキー（自動セットの初期値） */
-  personMainProject: Record<string, string>;
   holidays: Holiday[];
   /** 済南拠点の週次統計（済南全社 は含まない） */
   jinan: JinanWeeklyStat[];
@@ -75,83 +80,83 @@ export const currentYear = (): number => dayjs().year();
 /* ------------------------------------------------------------------ */
 
 const DEPARTMENTS_2025: Department[] = [
-  { id: 'dept-0001', name: '第一開発部', location: '済南' },
-  { id: 'dept-0003', name: '第三開発部', location: '済南' },
+  { departmentId: 'dept-0001', name: '第一開発部', location: '済南' },
+  { departmentId: 'dept-0003', name: '第三開発部', location: '済南' },
 ];
 
 const PROJECTS_2025: Project[] = [
   {
-    key: 'pj-0001',
-    id: 'PRJ-0001',
+    projectId: 'pj-0001',
+    projectCode: 'PRJ-0001',
     customer: '桜井商事',
     caseName: '基幹刷新',
     team: '第一',
     subTeam: 'A',
     abbr: buildProjectAbbr('桜井商事', '基幹刷新', '第一', 'A'),
-    department: '第一開発部',
+    departmentId: 'dept-0001',
     name: '基幹刷新',
   },
   {
-    key: 'pj-0003',
-    id: 'PRJ-0003',
+    projectId: 'pj-0003',
+    projectCode: 'PRJ-0003',
     customer: '北斗物流',
     caseName: '業務効率化',
     team: '基盤',
     subTeam: 'A',
     abbr: buildProjectAbbr('北斗物流', '業務効率化', '基盤', 'A'),
-    department: '第三開発部',
+    departmentId: 'dept-0003',
     name: '業務効率化',
   },
   {
-    key: 'pj-0004',
-    id: 'PRJ-0004',
+    projectId: 'pj-0004',
+    projectCode: 'PRJ-0004',
     customer: '北斗物流',
     caseName: '保守運用',
     team: '運用',
     subTeam: 'C',
     abbr: buildProjectAbbr('北斗物流', '保守運用', '運用', 'C'),
-    department: '第三開発部',
+    departmentId: 'dept-0003',
     name: '保守・運用',
   },
   {
     // 内・退職（この項目の要員はグレー表示にする）
-    key: 'pj-0006',
-    id: '',
+    projectId: 'pj-0006',
+    projectCode: '',
     customer: '内',
     caseName: '退職',
     team: '',
     subTeam: '',
     abbr: buildProjectAbbr('内', '退職', '', ''),
-    department: '第三開発部',
+    departmentId: 'dept-0003',
     name: '内・退職',
   },
 ];
 
 const PERSONNEL_2025: Personnel[] = [
   // 第一開発部（2026 では 第二開発部 になるメンバーを含む）
-  { id: 'p01', employeeNo: '10001', name: '田中 太郎', department: '第一開発部', role: 'T11E03', projectKey: 'pj-0001' },
-  { id: 'p02', employeeNo: '10002', name: '佐藤 花子', department: '第一開発部', role: 'T09E01', projectKey: 'pj-0001' },
-  { id: 'p03', employeeNo: '10003', name: '鈴木 一郎', department: '第一開発部', role: 'T08E02', projectKey: 'pj-0003' },
-  { id: 'p04', employeeNo: '10004', name: '高橋 美咲', department: '第一開発部', role: 'T10E04', projectKey: 'pj-0003' },
-  { id: 'p05', employeeNo: '10005', name: '渡辺 大輝', department: '第一開発部', role: 'T09E02', projectKey: 'pj-0003' },
-  { id: 'p06', employeeNo: '10006', name: '伊藤 健太', department: '第一開発部', role: 'T11E05', projectKey: 'pj-0001' },
-  { id: 'p07', employeeNo: '10007', name: '山本 彩', department: '第一開発部', role: 'T09E03', projectKey: 'pj-0001' },
-  { id: 'p08', employeeNo: '10008', name: '中村 拓也', department: '第一開発部', role: 'T08E01', projectKey: 'pj-0003' },
-  { id: 'p09', employeeNo: '10009', name: '小林 沙耶', department: '第一開発部', role: 'T07E02', projectKey: 'pj-0003' },
-  { id: 'p10', employeeNo: '10010', name: '加藤 亮', department: '第一開発部', role: 'T10E01', projectKey: 'pj-0003' },
-  { id: 'p11', employeeNo: '10011', name: '吉田 恵', department: '第一開発部', role: 'T12E01', projectKey: 'pj-0003' },
-  { id: 'p12', employeeNo: '10012', name: '山田 剛', department: '第一開発部', role: 'T11E02', projectKey: 'pj-0004' },
-  { id: 'p13', employeeNo: '10013', name: '松本 芽衣', department: '第一開発部', role: 'T10E03', projectKey: 'pj-0004' },
+  { employeeNo: '10001', name: '田中 太郎', departmentId: 'dept-0001', role: 'T11E03' },
+  { employeeNo: '10002', name: '佐藤 花子', departmentId: 'dept-0001', role: 'T09E01' },
+  { employeeNo: '10003', name: '鈴木 一郎', departmentId: 'dept-0001', role: 'T08E02' },
+  { employeeNo: '10004', name: '高橋 美咲', departmentId: 'dept-0001', role: 'T10E04' },
+  { employeeNo: '10005', name: '渡辺 大輝', departmentId: 'dept-0001', role: 'T09E02' },
+  { employeeNo: '10006', name: '伊藤 健太', departmentId: 'dept-0001', role: 'T11E05' },
+  { employeeNo: '10007', name: '山本 彩', departmentId: 'dept-0001', role: 'T09E03' },
+  { employeeNo: '10008', name: '中村 拓也', departmentId: 'dept-0001', role: 'T08E01' },
+  { employeeNo: '10009', name: '小林 沙耶', departmentId: 'dept-0001', role: 'T07E02' },
+  { employeeNo: '10010', name: '加藤 亮', departmentId: 'dept-0001', role: 'T10E01' },
+  { employeeNo: '10011', name: '吉田 恵', departmentId: 'dept-0001', role: 'T12E01' },
+  { employeeNo: '10012', name: '山田 剛', departmentId: 'dept-0001', role: 'T11E02' },
+  { employeeNo: '10013', name: '松本 芽衣', departmentId: 'dept-0001', role: 'T10E03' },
   // 第三開発部
-  { id: 'p21', employeeNo: '10021', name: '斎藤 美穂', department: '第三開発部', role: 'T08E04', projectKey: 'pj-0006' },
-  { id: 'p22', employeeNo: '10022', name: '石川 真', department: '第三開発部', role: 'T11E07', projectKey: 'pj-0001' },
-  { id: 'p23', employeeNo: '10023', name: '前田 亜美', department: '第三開発部', role: 'T10E02', projectKey: 'pj-0003' },
-  { id: 'p24', employeeNo: '10024', name: '藤田 浩', department: '第三開発部', role: 'T08E05', projectKey: 'pj-0003' },
-  { id: 'p25', employeeNo: '10025', name: '岡本 千夏', department: '第三開発部', role: 'T07E03', projectKey: 'pj-0006' },
-  { id: 'p26', employeeNo: '10026', name: '長谷川 舞', department: '第三開発部', role: 'T12E02', projectKey: 'pj-0004' },
-  { id: 'p27', employeeNo: '10027', name: '後藤 秀', department: '第三開発部', role: 'T11E08', projectKey: 'pj-0006' },
-  { id: 'p28', employeeNo: '10028', name: '小川 結衣', department: '第三開発部', role: 'T09E06', projectKey: 'pj-0006' },
-  { id: 'p29', employeeNo: '10029', name: '三浦 陽介', department: '第三開発部', role: 'T08E06', projectKey: 'pj-0006' },
+  { employeeNo: '10021', name: '斎藤 美穂', departmentId: 'dept-0003', role: 'T08E04' },
+  { employeeNo: '10022', name: '石川 真', departmentId: 'dept-0003', role: 'T11E07' },
+  { employeeNo: '10023', name: '前田 亜美', departmentId: 'dept-0003', role: 'T10E02' },
+  { employeeNo: '10024', name: '藤田 浩', departmentId: 'dept-0003', role: 'T08E05' },
+  { employeeNo: '10025', name: '岡本 千夏', departmentId: 'dept-0003', role: 'T07E03' },
+  { employeeNo: '10026', name: '長谷川 舞', departmentId: 'dept-0003', role: 'T12E02' },
+  { employeeNo: '10027', name: '後藤 秀', departmentId: 'dept-0003', role: 'T11E08' },
+  { employeeNo: '10028', name: '小川 結衣', departmentId: 'dept-0003', role: 'T09E06' },
+  { employeeNo: '10029', name: '三浦 陽介', departmentId: 'dept-0003', role: 'T08E06' },
 ];
 
 const HOLIDAYS_2025: Holiday[] = [
@@ -200,12 +205,6 @@ const HOLIDAYS_2026: Holiday[] = [
   { id: 'y26-h12', date: '2026-12-29', name: '年末年始休暇', kind: '会社休日' },
 ];
 
-/** 2025 年度の主担当プロジェクト（社員ID -> プロジェクトキー） */
-const PERSON_MAIN_PROJECT_2025: Record<string, string> = {};
-PERSONNEL_2025.forEach((p) => {
-  PERSON_MAIN_PROJECT_2025[p.id] = p.projectKey ?? PROJECTS_2025[0].key;
-});
-
 /* ------------------------------------------------------------------ */
 /* 年度データの定義                                                    */
 /* ------------------------------------------------------------------ */
@@ -214,7 +213,6 @@ interface YearSourceData {
   departments: Department[];
   personnel: Personnel[];
   projects: Project[];
-  personMainProject: Record<string, string>;
   holidays: Holiday[];
 }
 
@@ -223,14 +221,12 @@ const YEAR_DATA: Record<number, YearSourceData> = {
     departments: DEPARTMENTS_2025,
     personnel: PERSONNEL_2025,
     projects: PROJECTS_2025,
-    personMainProject: PERSON_MAIN_PROJECT_2025,
     holidays: HOLIDAYS_2025,
   },
   2026: {
     departments: MOCK_DEPARTMENTS,
     personnel: MOCK_PERSONNEL,
     projects: MOCK_PROJECTS,
-    personMainProject: PERSON_MAIN_PROJECT,
     holidays: HOLIDAYS_2026,
   },
 };
@@ -249,23 +245,18 @@ export const createYearStore = (year: number): YearStore => {
   const departments = source ? source.departments : [];
   const personnel = source ? source.personnel : [];
   const projects = source ? source.projects : [];
-  const personMainProject = source ? source.personMainProject : {};
   const holidays = source ? source.holidays : [];
 
-  const weeks = buildYearWeeks(year);
-  const today = dayjs();
-  const isCurrentYear = year === today.year();
-
+  // 初期表示はマスタの全要員。週次割当は空で、画面で入力して保存する。
+  // 行は「所属＋有効期間」を持つ（年途中の部門異動は行を分けて表現する）
+  const rows: WorkStatusRows = personnel.map((p, i) => ({
+    key: `r-${i + 1}`,
+    employeeNo: p.employeeNo,
+    departmentId: p.departmentId,
+  }));
   const assignment: AssignmentMap = {};
-  personnel.forEach((p) => {
-    const cell: Record<string, string | null> = {};
-    weeks.forEach((w) => {
-      // 当年は「開始済みの週（月曜 <= 今日）」まで、
-      // それ以外の年度は「第 1 週から」主担当プロジェクトを入れておく
-      if (isCurrentYear && w.monday.isAfter(today, 'day')) return;
-      cell[w.key] = personMainProject[p.id] ?? null;
-    });
-    assignment[p.id] = cell;
+  rows.forEach((row) => {
+    assignment[row.employeeNo] = {};
   });
 
   // 済南統計は部門別（済南全社 は画面側で合算する）
@@ -278,10 +269,9 @@ export const createYearStore = (year: number): YearStore => {
     departments,
     personnel,
     projects,
-    personMainProject,
     holidays,
     jinan,
-    workStatus: { assignment, unpaid: {} },
+    workStatus: { rows, assignment, unpaid: {} },
   };
 };
 

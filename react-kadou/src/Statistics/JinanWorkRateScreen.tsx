@@ -17,11 +17,13 @@ import {
   JINAN_ALL_LABEL,
   JINAN_TARGET_RATE,
   getJinanDepartments,
-  getJinanWeeklyStats,
 } from '../data/mockJinanStats';
 import type { JinanDept, JinanWeeklyStat } from '../data/mockJinanStats';
-import type { Department } from '../WorkStatus/types';
-import { buildYearWeeks, weekKeyOf } from '../data/yearWeeks';
+import type { Department, Project } from '../WorkStatus/types';
+import type { WorkStatusData } from '../data/yearStore';
+import { getWorkStatusJinanWeeklyStats } from '../data/jinanStatsFromWorkStatus';
+import { departmentLabelOf, departmentNameOf } from '../data/departmentUtils';
+import { weekKeyOf } from '../data/yearWeeks';
 import './JinanWorkRateScreen.css';
 
 const { Title, Text } = Typography;
@@ -158,6 +160,8 @@ interface MetricRow {
   metric: string;
   /** 部門（済南全社 を含む） */
   department: string;
+  /** 部門ID（済南全社 は特別値） */
+  departmentId: string;
   /** 済南全社（3 部門の合計行）か */
   isTotal: boolean;
   /** 同じ指標の先頭行（第一開発部）か（指標列のセル結合に使う） */
@@ -175,17 +179,23 @@ interface JinanWorkRateScreenProps {
   year: number;
   /** 部門マスタ（拠点が済南の部門だけを集計対象にする） */
   departments: Department[];
+  /** 保存済みの稼働表（行の所属・有効期間・割当・BUFFER） */
+  workStatus: WorkStatusData;
+  /** プロジェクト一覧（「内・退職」の判定に使う） */
+  projects: Project[];
 }
 
 /**
  * 済南拠点 稼働率統計 画面（メニュー「済南稼働率統計」で切り替わる画面）
  * 週単位（月曜〜日曜）で 総人数 / 離職人数 / 稼動人数 / 稼動率 などを集計して表示する
  * ※部門（行）は年度の部門マスタに従う（2025 は 2 部門、2026 は 3 部門）
- * ※現状はモックデータ表示（バックエンド未接続）
+ * ※数値は保存済みの稼働表（行の所属＋有効期間＋割当＋BUFFER）から算出する
  */
 const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   year,
   departments: departmentMaster,
+  workStatus,
+  projects,
 }) => {
   /**
    * 対象年度の済南拠点の部門（部門マスタで拠点＝済南の部門のみ）
@@ -194,24 +204,41 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   const departments = useMemo(() => {
     const jinanTargets = new Set(getJinanDepartments(year));
     return departmentMaster
-      .filter((d) => d.location === '済南' && jinanTargets.has(d.name))
-      .map((d) => d.name);
+      .filter(
+        (d) => d.location === '済南' && jinanTargets.has(d.departmentId),
+      )
+      .map((d) => d.departmentId);
   }, [departmentMaster, year]);
+
+  /** 画面表示用の部門ラベル */
+  const departmentLabels = useMemo(
+    () =>
+      departments.map((departmentId) =>
+        departmentLabelOf(departmentMaster, departmentId),
+      ),
+    [departments, departmentMaster],
+  );
+
+  /** グラフ系列の表示名 */
+  const seriesLabelOf = (departmentId: string): string =>
+    departmentId === JINAN_ALL_LABEL
+      ? JINAN_ALL_LABEL
+      : departmentLabelOf(departmentMaster, departmentId);
 
   /** 当年か（当年だけ「今週の集計」を出す） */
   const isCurrentYear = year === dayjs().year();
 
-  /** 当年は今日を含む週、それ以外の年度は年度末の週 */
-  const currentWeekKey = useMemo(() => {
-    if (isCurrentYear) return weekKeyOf(dayjs());
-    const weeks = buildYearWeeks(year);
-    return weeks.length > 0 ? weeks[weeks.length - 1].key : '';
-  }, [year, isCurrentYear]);
-
-  /** 済南全社（対象部門の合計）の週次統計 */
+  /** 済南全社（対象部門の合計）の週次統計（保存済みの稼働表から算出） */
   const allStats = useMemo(
-    () => getJinanWeeklyStats(JINAN_ALL_LABEL, year, departments),
-    [departments, year],
+    () =>
+      getWorkStatusJinanWeeklyStats(
+        JINAN_ALL_LABEL,
+        year,
+        departments,
+        workStatus,
+        projects,
+      ),
+    [departments, year, workStatus, projects],
   );
 
   /** 週列（当年分／月曜始まり） */
@@ -223,6 +250,12 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
       }),
     [allStats],
   );
+
+  /** 当年は今日を含む週、それ以外の年度は年度末の週 */
+  const currentWeekKey = useMemo(() => {
+    if (isCurrentYear) return weekKeyOf(dayjs());
+    return weeks.length > 0 ? weeks[weeks.length - 1].key : '';
+  }, [weeks, isCurrentYear]);
 
   /** 月ごとの週グループ（ヘッダー 2 段組み） */
   const monthGroups: MonthGroup[] = useMemo(() => {
@@ -264,17 +297,27 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     const deptRows: JinanDept[] = [...departments, JINAN_ALL_LABEL];
     const rows: MetricRow[] = [];
     METRICS.forEach((m) => {
-      deptRows.forEach((department, dIdx) => {
+      deptRows.forEach((departmentId, dIdx) => {
         /** 週キー → 値 */
         const values: Record<string, number> = {};
-        getJinanWeeklyStats(department, year, departments).forEach((s) => {
+        getWorkStatusJinanWeeklyStats(
+          departmentId,
+          year,
+          departments,
+          workStatus,
+          projects,
+        ).forEach((s) => {
           values[s.weekKey] = m.value(s);
         });
         rows.push({
-          key: `${m.key}|${department}`,
+          key: `${m.key}|${departmentId}`,
           metric: m.label,
-          department,
-          isTotal: department === JINAN_ALL_LABEL,
+          department:
+            departmentId === JINAN_ALL_LABEL
+              ? JINAN_ALL_LABEL
+              : departmentNameOf(departmentMaster, departmentId),
+          departmentId,
+          isTotal: departmentId === JINAN_ALL_LABEL,
           isFirstOfMetric: dIdx === 0,
           unit: m.unit,
           isRate: m.isRate,
@@ -283,7 +326,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
       });
     });
     return rows;
-  }, [departments, year]);
+  }, [departments, departmentMaster, year, workStatus, projects]);
 
   /**
    * 今週の集計（当週 = 今日を含む週の実績値）
@@ -354,12 +397,18 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     () =>
       METRICS.map((m) => {
         const valuesByDept = new Map<string, Map<string, number>>();
-        chartSeries.forEach((department) => {
+        chartSeries.forEach((departmentId) => {
           const values = new Map<string, number>();
-          getJinanWeeklyStats(department, year, departments).forEach((s) => {
+          getWorkStatusJinanWeeklyStats(
+            departmentId,
+            year,
+            departments,
+            workStatus,
+            projects,
+          ).forEach((s) => {
             values.set(s.weekKey, m.value(s));
           });
-          valuesByDept.set(department, values);
+          valuesByDept.set(departmentId, values);
         });
 
         const data = weeks.map((w) => {
@@ -367,15 +416,16 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
             weekKey: w.key,
             label: w.monday.format('M/D'),
           };
-          chartSeries.forEach((department) => {
-            point[department] = valuesByDept.get(department)?.get(w.key) ?? 0;
+          chartSeries.forEach((departmentId) => {
+            point[departmentId] =
+              valuesByDept.get(departmentId)?.get(w.key) ?? 0;
           });
           return point;
         });
 
         return { metric: m, data };
       }),
-    [chartSeries, departments, weeks, year],
+    [chartSeries, departments, weeks, year, workStatus, projects],
   );
 
   /** 今週のサマリ（9 項目） */
@@ -497,7 +547,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
             {year}年度　済南稼働率統計（週単位）
           </Title>
           <Text type='secondary'>
-            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departments, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。指標ごとの折れ線グラフと週次テーブルで表示します。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
+            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departmentLabels, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。指標ごとの折れ線グラフと週次テーブルで表示します。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
           </Text>
         </div>
         <Space>
@@ -569,7 +619,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
                     tick={{ fontSize: 11 }}
                     width={44}
                     domain={metric.isRate ? [0, 100] : [0, 'auto']}
-                    allowDecimals={metric.isRate}
+                    allowDecimals={Boolean(metric.isRate)}
                     unit={metric.unit === '%' ? '%' : undefined}
                   />
                   <Tooltip
@@ -593,14 +643,14 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
                       }}
                     />
                   )}
-                  {chartSeries.map((department, index) => (
+                  {chartSeries.map((departmentId, index) => (
                     <Line
-                      key={department}
+                      key={departmentId}
                       type='monotone'
-                      dataKey={department}
-                      name={department}
-                      stroke={chartColorOf(department, index)}
-                      strokeWidth={department === JINAN_ALL_LABEL ? 2.5 : 2}
+                      dataKey={departmentId}
+                      name={seriesLabelOf(departmentId)}
+                      stroke={chartColorOf(departmentId, index)}
+                      strokeWidth={departmentId === JINAN_ALL_LABEL ? 2.5 : 2}
                       dot={false}
                       activeDot={{ r: 4 }}
                       connectNulls
@@ -612,7 +662,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
           ))}
         </div>
         <Text type='secondary' className='jinan-note'>
-          ※ 各グラフは指標ごとに、{departments.join('・')} と {JINAN_ALL_LABEL}（合計）の週次推移を表示します。稼動率のグラフの赤破線は目標値 {JINAN_TARGET_RATE}% です。
+          ※ 各グラフは指標ごとに、{departmentLabels.join('・')} と {JINAN_ALL_LABEL}（合計）の週次推移を表示します。稼動率のグラフの赤破線は目標値 {JINAN_TARGET_RATE}% です。
         </Text>
       </Card>
 
@@ -637,7 +687,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
           rowClassName={(r) => (r.isTotal ? 'jinan-total-row' : '')}
         />
         <Text type='secondary' className='jinan-note'>
-          ※ 行 = 指標 × 部門（{[...departments, `${JINAN_ALL_LABEL} = ${departments.length} 部門の合計`].join('／')}）、列 = 週（月曜〜日曜）。「{isCurrentYear ? '今週' : '年度末週'}の列」（{currentWeekKey} の週）はハイライト表示。
+          ※ 行 = 指標 × 部門（{[...departmentLabels, `${JINAN_ALL_LABEL} = ${departments.length} 部門の合計`].join('／')}）、列 = 週（月曜〜日曜）。「{isCurrentYear ? '今週' : '年度末週'}の列」（{currentWeekKey} の週）はハイライト表示。
         </Text>
       </Card>
 

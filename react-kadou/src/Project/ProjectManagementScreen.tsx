@@ -22,6 +22,10 @@ import {
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { Department, Project } from '../WorkStatus/types';
+import {
+  departmentLabelOf,
+  resolveDepartmentIdByName,
+} from '../data/departmentUtils';
 import { buildProjectAbbr } from './projectAbbr';
 import {
   PROJECT_IMPORT_ACCEPT,
@@ -46,10 +50,10 @@ interface ProjectFormValues {
   team: string;
   /** Subチーム */
   subTeam: string;
-  /** 所属部門 */
-  department: string;
+  /** 所属部門ID */
+  departmentId: string;
   /** 項目ID */
-  id: string;
+  projectCode: string;
   /** Project名称 */
   name: string;
 }
@@ -60,8 +64,8 @@ const EMPTY_FORM: ProjectFormValues = {
   caseName: '',
   team: '',
   subTeam: '',
-  department: '',
-  id: '',
+  departmentId: '',
+  projectCode: '',
   name: '',
 };
 
@@ -69,7 +73,7 @@ const EMPTY_FORM: ProjectFormValues = {
 const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
   ['customer', '顧客'],
   ['caseName', '案件'],
-  ['department', '所属部門'],
+  ['departmentId', '所属部門'],
 ];
 
 /**
@@ -78,26 +82,30 @@ const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
  */
 const nextProjectNumber = (list: Project[]): number => {
   const numbers = list
-    .map((p) => /^pj-(\d+)$/.exec(p.key))
+    .map((p) => /^pj-(\d+)$/.exec(p.projectId))
     .filter((m): m is RegExpExecArray => m !== null)
     .map((m) => Number(m[1]));
   return (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
 };
 
 /** 次の内部キー（例：pj-0008） */
-const buildNextProjectKey = (list: Project[]): string =>
+const buildNextProjectId = (list: Project[]): string =>
   `pj-${String(nextProjectNumber(list)).padStart(4, '0')}`;
 
 /** 一括読み込みの1行をプロジェクトへ変換する（略称は自動生成） */
-const toProject = (row: ProjectImportRow, key: string): Project => ({
-  key,
-  id: row.id,
+const toProject = (
+  row: ProjectImportRow,
+  projectId: string,
+  departmentId: string,
+): Project => ({
+  projectId,
+  projectCode: row.projectCode,
   customer: row.customer,
   caseName: row.caseName,
   team: row.team,
   subTeam: row.subTeam,
   abbr: buildProjectAbbr(row.customer, row.caseName, row.team, row.subTeam),
-  department: row.department,
+  departmentId,
   name: row.name,
 });
 
@@ -182,14 +190,14 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
 
   /** 修正（選択したプロジェクトをフォームへ読み込む） */
   const handleEdit = useCallback((row: Project) => {
-    setEditingKey(row.key);
+    setEditingKey(row.projectId);
     setForm({
       customer: row.customer,
       caseName: row.caseName,
       team: row.team,
       subTeam: row.subTeam,
-      department: row.department,
-      id: row.id,
+      departmentId: row.departmentId,
+      projectCode: row.projectCode,
       name: row.name,
     });
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -198,8 +206,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   /** 削除 */
   const handleDelete = useCallback(
     (row: Project) => {
-      setProjects((prev) => prev.filter((p) => p.key !== row.key));
-      setEditingKey((prev) => (prev === row.key ? null : prev));
+      setProjects((prev) => prev.filter((p) => p.projectId !== row.projectId));
+      setEditingKey((prev) => (prev === row.projectId ? null : prev));
       message.success(
         `プロジェクト「${projectLabel(row)}」を削除しました（モック）。`,
       );
@@ -217,21 +225,21 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
 
     const values: Project = {
       // 内部キーは一意な自動採番（修正時は元のキーを維持）
-      key: editingKey ?? buildNextProjectKey(projects),
+      projectId: editingKey ?? buildNextProjectId(projects),
       // 項目ID は任意入力（空欄可・重複可。主キーではない）
-      id: form.id.trim(),
+      projectCode: form.projectCode.trim(),
       customer: form.customer.trim(),
       caseName: form.caseName.trim(),
       team: form.team.trim(),
       subTeam: form.subTeam.trim(),
       abbr: buildProjectAbbr(form.customer, form.caseName, form.team, form.subTeam),
-      department: form.department,
+      departmentId: form.departmentId,
       name: form.name.trim(),
     };
 
     if (editingKey) {
       setProjects((prev) =>
-        prev.map((p) => (p.key === editingKey ? values : p)),
+        prev.map((p) => (p.projectId === editingKey ? values : p)),
       );
       message.success(
         `プロジェクト「${projectLabel(values)}」を修正しました（モック）。`,
@@ -266,13 +274,16 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         return;
       }
 
-      // 部門マスタに無い所属部門（取り込み自体は行う）
-      const deptNames = new Set(departments.map((d) => d.name));
+      // 部門名から部門IDを解決できない行（未登録・同名重複）を警告する
       const unknownDepartments = Array.from(
         new Set(
           result.rows
             .map((r) => r.department)
-            .filter((d) => d !== '' && !deptNames.has(d)),
+            .filter(
+              (name) =>
+                name !== '' &&
+                resolveDepartmentIdByName(departments, name) === null,
+            ),
         ),
       );
 
@@ -280,7 +291,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       setProjects((prev) => {
         const start = nextProjectNumber(prev);
         const added = result.rows.map((row, i) =>
-          toProject(row, `pj-${String(start + i).padStart(4, '0')}`),
+          toProject(
+            row,
+            `pj-${String(start + i).padStart(4, '0')}`,
+            resolveDepartmentIdByName(departments, row.department) ?? '',
+          ),
         );
         return [...prev, ...added];
       });
@@ -292,7 +307,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       const notes: string[] = [];
       if (unknownDepartments.length > 0) {
         notes.push(
-          `部門マスタに無い所属部門：${unknownDepartments.join(
+          `部門マスタに無い、または同名で特定できない所属部門：${unknownDepartments.join(
             '、',
           )}（部門管理画面で登録してください）`,
         );
@@ -355,14 +370,15 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       },
       {
         title: '所属部門',
-        dataIndex: 'department',
-        key: 'department',
+        dataIndex: 'departmentId',
+        key: 'departmentId',
         width: 140,
+        render: (v: string) => departmentLabelOf(departments, v),
       },
       {
         title: '項目ID',
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: 'projectCode',
+        key: 'projectCode',
         width: 120,
         render: (v: string) => v || <Text type='secondary'>－</Text>,
       },
@@ -376,8 +392,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       {
         // 主キー（システム採番）。一覧の最右に表示する
         title: 'システム項目ID',
-        dataIndex: 'key',
-        key: 'key',
+        dataIndex: 'projectId',
+        key: 'projectId',
         width: 140,
         fixed: 'right',
       },
@@ -413,7 +429,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         ),
       },
     ],
-    [handleEdit, handleDelete],
+    [handleEdit, handleDelete, departments],
   );
 
   return (
@@ -529,12 +545,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               <div>
                 <div className='form-label'>所属部門（必須）</div>
                 <Select
-                  value={form.department || undefined}
+                  value={form.departmentId || undefined}
                   placeholder='部門を選択'
-                  onChange={(v: string) => setField('department', v)}
+                  onChange={(v: string) => setField('departmentId', v)}
                   options={departments.map((d) => ({
-                    value: d.name,
-                    label: d.name,
+                    value: d.departmentId,
+                    label: departmentLabelOf(departments, d.departmentId),
                   }))}
                   style={{ width: '100%' }}
                 />
@@ -543,9 +559,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <div className='form-label'>項目ID（任意）</div>
                 <Input
                   placeholder='例：PRJ-0006'
-                  value={form.id}
+                  value={form.projectCode}
                   maxLength={20}
-                  onChange={(e) => setField('id', e.target.value)}
+                  onChange={(e) => setField('projectCode', e.target.value)}
                 />
               </div>
             </div>
@@ -592,12 +608,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         }
       >
         <Table<Project>
-          rowKey='key'
+          rowKey='projectId'
           size='small'
           columns={columns}
           dataSource={projects}
           rowClassName={(row) =>
-            row.key === editingKey ? 'project-row-editing' : ''
+            row.projectId === editingKey ? 'project-row-editing' : ''
           }
           scroll={{ x: 1440 }}
           pagination={{
