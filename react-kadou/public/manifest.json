@@ -1,0 +1,8 @@
+{
+  "short_name": "Kadou",
+  "name": "要員 日単位 稼働管理",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1677ff",
+  "background_color": "#ffffff"
+}

@@ -1,0 +1,25 @@
+/* ===== ユーザー管理画面 ===== */
+.user-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.user-form .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.user-form-actions {
+  margin-left: auto;
+}
+
+.user-note {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  white-space: pre-line;
+}
