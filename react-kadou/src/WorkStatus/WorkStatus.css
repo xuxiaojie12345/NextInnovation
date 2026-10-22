@@ -1,0 +1,275 @@
+/* ===== 要員 週別 プロジェクト稼働管理 画面 ===== */
+
+.ws-page {
+  padding: 16px;
+  min-height: 100%;
+  background: #f0f2f5;
+  box-sizing: border-box;
+}
+
+.ws-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.ws-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.ws-table-card {
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.ws-legend {
+  margin-top: 8px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.ws-legend .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 16px;
+  color: #555;
+}
+
+/* ===== ヘッダー（月・週） ===== */
+.month-head {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.week-head {
+  text-align: center;
+  line-height: 1.3;
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* ===== 退場予定（ヘッダー2行） ===== */
+.leave-head {
+  line-height: 1.3;
+}
+
+.leave-head-note {
+  font-size: 10px;
+  font-weight: 400;
+  color: #999;
+  white-space: normal;
+}
+
+/* ===== 無償支援（契約外・非計費）===== */
+
+/* セルのラッパー（バッジの位置基準 / 斜紋の背景） */
+.ws-week-cell {
+  position: relative;
+}
+
+/* 無償支援のセルはピンクで表示（色だけに依存しないよう斜紋も入れる） */
+.ws-week-cell-unpaid {
+  background: repeating-linear-gradient(45deg, #ffd6e7 0 6px, #ffc4dd 6px 12px);
+  border-radius: 2px;
+}
+
+.ws-week-cell-unpaid .ant-select-selector {
+  background-color: transparent !important;
+  border-color: #ff9ec7 !important;
+}
+
+.ws-week-cell-unpaid .cell-chip {
+  border-color: #ff9ec7;
+}
+
+/* 「無償」バッジ */
+.ws-unpaid-badge {
+  display: inline-block;
+  padding: 0 3px;
+  font-size: 9px;
+  line-height: 12px;
+  color: #fff;
+  background: #c41d7f;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.ws-unpaid-badge-corner {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 凡例の無償支援 */
+.ws-legend-unpaid {
+  background: repeating-linear-gradient(45deg, #ffd6e7 0 6px, #ffc4dd 6px 12px);
+  border: 1px solid #ff9ec7;
+  border-radius: 3px;
+  padding: 0 6px;
+}
+
+/* ===== セルの右クリックメニュー ===== */
+.ws-cell-menu {
+  position: fixed;
+  z-index: 1100;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== 集計行・集計値 ===== */
+.total-row td {
+  background: #f7f8fa !important;
+}
+
+/* 「内・退職」が設定された行はグレー表示 */
+.row-leave-planned > td {
+  background: #f0f0f0 !important;
+  color: #8c8c8c;
+}
+
+.row-leave-planned .ant-input,
+.row-leave-planned .ant-select-selection-item,
+.row-leave-planned .cell-chip-text {
+  color: #8c8c8c;
+}
+
+.row-leave-planned .ant-input {
+  background: #f5f5f5;
+}
+
+.total-label {
+  font-weight: 700;
+}
+
+.total-value {
+  font-weight: 600;
+}
+
+/* ===== 要員検索・表示期間 バー ===== */
+.ws-filter-bar {
+  display: flex;
+  /* 条件は 1 行、ヒントは次の行に置いて余白を詰める */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 12px;
+  background: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.ws-filter-bar .filter-title {
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+.ws-filter-bar .filter-arrow {
+  color: #999;
+  font-weight: 700;
+}
+
+.ws-filter-bar .filter-hint {
+  font-size: 12px;
+}
+
+/* ===== 複数セル選択 → 貼り付け バー ===== */
+.ws-select-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  background: #e6f4ff;
+  border: 1px dashed #91caff;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+.ws-select-bar > .ant-typography {
+  font-size: 12px;
+}
+
+/* ===== 選択モード用 セル（チップ） ===== */
+.cell-chip {
+  position: relative;
+  min-height: 26px;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.1s ease;
+}
+
+.ws-table-card-select .cell-chip {
+  cursor: crosshair;
+}
+
+.cell-chip:hover {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+}
+
+.cell-chip-empty {
+  color: #bbb;
+}
+
+.cell-chip-text {
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cell-chip-selected {
+  outline: 2px solid #1677ff;
+  outline-offset: -2px;
+  box-shadow: 0 0 0 2px #fff inset;
+}
+
+.cell-chip-mark {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 14px;
+  height: 14px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 0 4px 0 4px;
+}
+
+.ws-table-card .ant-table-cell {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}

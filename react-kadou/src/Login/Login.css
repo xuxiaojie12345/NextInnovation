@@ -1,0 +1,82 @@
+/* ===== ログイン画面 ===== */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #e6f0ff 0%, #f0f2f5 55%, #eef7ff 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.login-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-lead {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.login-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #cf1322;
+  font-size: 13px;
+}
+
+/* ===== テスト用アカウントの案内 ===== */
+.login-hint {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px dashed #e5e5e5;
+}
+
+.login-hint-list {
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-hint-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.login-hint-note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
