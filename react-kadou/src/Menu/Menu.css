@@ -1,0 +1,94 @@
+/* ===== アプリ共通メニュー（ヘッダー） ===== */
+
+.app-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.app-menu-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-menu-title {
+  font-weight: 700;
+  color: #1f1f1f;
+}
+
+.app-menu-list {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+}
+
+/* antd 横型メニューの下線を消してヘッダーに馴染ませる */
+.app-menu-list.ant-menu-horizontal {
+  border-bottom: none;
+  line-height: 46px;
+}
+
+/* ログインユーザー表示＋ログアウト */
+.app-menu-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* ヘッダーの年度セレクタ */
+.app-menu-year {
+  width: 110px;
+}
+
+.app-menu-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.app-menu-user-name {
+  font-size: 13px;
+  color: #1f1f1f;
+}
+
+@media (max-width: 640px) {
+  .app-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .app-menu-brand {
+    padding-top: 8px;
+  }
+
+  .app-menu-user {
+    padding: 8px 0;
+  }
+}
