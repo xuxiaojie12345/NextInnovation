@@ -5,16 +5,17 @@
  * 将来バックエンドができたら、この interface の実装を HTTP 版に差し替えるだけで
  * 画面側は変更不要になる（保存＝POST、取得＝GET ?year=）。
  */
-import { AssignmentMap, Personnel } from '../WorkStatus/types';
+import { AssignmentMap, WorkStatusRows } from '../WorkStatus/types';
 import {
   UnpaidMap,
   YearStore,
   createYearStore,
 } from './yearStore';
 
-/** 要員稼動管理の保存ペイロード */
+/** 要員稼動管理の保存ペイロード（要員マスタは含めない） */
 export interface WorkStatusPayload {
-  personnel: Personnel[];
+  /** 稼働表に表示する行（社員番号・所属・有効期間） */
+  rows: WorkStatusRows;
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
 }
@@ -68,8 +69,9 @@ class MemoryKadouRepository implements KadouRepository {
     payload: WorkStatusPayload,
   ): Promise<void> {
     const store = this.ensure(year);
-    store.personnel = payload.personnel;
+    // 要員マスタは変更しない（稼働表は表示行と割当のみ保存する）
     store.workStatus = {
+      rows: payload.rows,
       assignment: payload.assignment,
       unpaid: payload.unpaid,
     };

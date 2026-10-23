@@ -20,6 +20,7 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import { Department, Personnel } from '../WorkStatus/types';
+import { departmentLabelOf } from '../data/departmentUtils';
 import {
   PERSONNEL_IMPORT_ACCEPT,
   PERSONNEL_IMPORT_FORMAT_HINT,
@@ -44,7 +45,7 @@ interface PersonnelInfoScreenProps {
   onSubmit: (values: {
     employeeNo: string;
     name: string;
-    department: string;
+    departmentId: string;
     role: string;
   }) => void;
   /**
@@ -72,8 +73,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [role, setRole] = useState('');
   // 名前（編集可）
   const [name, setName] = useState('');
-  // 所属（編集可。部門マスタの部門名）
-  const [dept, setDept] = useState<string | undefined>(undefined);
+  // 所属（編集可。部門マスタの departmentId）
+  const [deptId, setDeptId] = useState<string | undefined>(undefined);
   // 「新規追加してよい」と確認済みの社員番号（同じ番号での二重確認を防ぐ）
   const [confirmedNo, setConfirmedNo] = useState('');
   // 一括読み込み：ファイル解析中フラグ
@@ -99,7 +100,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setEmployeeNo('');
     setRole('');
     setName('');
-    setDept(undefined);
+    setDeptId(undefined);
     setConfirmedNo('');
   };
 
@@ -120,7 +121,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setEmployeeNo(no);
       setRole(master.role);
       setName(master.name);
-      setDept(master.department || undefined);
+      setDeptId(master.departmentId || undefined);
       setConfirmedNo('');
       message.success(`社員番号「${no}」の要員情報を表示しました。`);
       return;
@@ -136,7 +137,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       onOk: () => {
         setRole('');
         setName('');
-        setDept(undefined);
+        setDeptId(undefined);
         setConfirmedNo(no);
         message.info(
           `社員番号「${no}」を新規追加します。役割・名前・所属を入力してください。`,
@@ -150,7 +151,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     onSubmit({
       employeeNo: no,
       name: name.trim(),
-      department: dept ?? departments[0]?.name ?? '',
+      departmentId: deptId ?? departments[0]?.departmentId ?? '',
       role: role.trim() || '要員',
     });
     message.success(
@@ -390,9 +391,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             <div className='form-label'>所属</div>
             <Select
               placeholder='所属を選択'
-              value={dept}
-              onChange={(v?: string) => setDept(v)}
-              options={departments.map((d) => ({ value: d.name, label: d.name }))}
+              value={deptId}
+              onChange={(v?: string) => setDeptId(v)}
+              options={departments.map((d) => ({
+                value: d.departmentId,
+                label: departmentLabelOf(departments, d.departmentId),
+              }))}
               style={{ width: '100%' }}
             />
           </div>
