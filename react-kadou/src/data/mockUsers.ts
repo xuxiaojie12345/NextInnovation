@@ -25,8 +25,8 @@ export interface AuthUser {
   role: UserRole;
   /** ロール表示名（部長 / 事業部長 / 管理者） */
   roleLabel: string;
-  /** 部長のみ：担当部門（部門マスタの部門名）。事業部長・管理者は未設定（＝全部門） */
-  department?: string;
+  /** 部長のみ：担当部門ID（部門マスタの departmentId）。事業部長・管理者は未設定（＝全部門） */
+  departmentId?: string;
 }
 
 /** モックログインユーザー一覧（パスワードはすべて pass1234） */
@@ -38,7 +38,7 @@ export const MOCK_USERS: AuthUser[] = [
     name: '山田 一郎',
     role: 'bucho',
     roleLabel: '部長',
-    department: '第一開発部',
+    departmentId: 'dept-0001',
   },
   {
     userId: 'bucho2',
@@ -46,7 +46,7 @@ export const MOCK_USERS: AuthUser[] = [
     name: '佐藤 二郎',
     role: 'bucho',
     roleLabel: '部長',
-    department: '第二開発部',
+    departmentId: 'dept-0002',
   },
   {
     userId: 'bucho3',
@@ -54,7 +54,7 @@ export const MOCK_USERS: AuthUser[] = [
     name: '鈴木 三郎',
     role: 'bucho',
     roleLabel: '部長',
-    department: '第三開発部',
+    departmentId: 'dept-0003',
   },
   // 事業部長（部長の上位）
   {
@@ -84,4 +84,4 @@ export const MOCK_USERS: AuthUser[] = [
  *   閲覧できる（データ集約）。あくまで画面を開いたときの既定値。
  */
 export const defaultDepartmentsOf = (user: AuthUser): string[] =>
-  user.role === 'bucho' && user.department ? [user.department] : [];
+  user.role === 'bucho' && user.departmentId ? [user.departmentId] : [];

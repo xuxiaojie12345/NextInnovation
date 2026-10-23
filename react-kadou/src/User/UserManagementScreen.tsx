@@ -19,6 +19,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { AuthUser, UserRole } from '../data/mockUsers';
+import type { Department } from '../WorkStatus/types';
+import { departmentLabelOf } from '../data/departmentUtils';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -48,7 +50,7 @@ interface UserManagementScreenProps {
   /** ログイン中のユーザーID（自分自身の削除・降格を禁止するため） */
   currentUserId: string | null;
   /** 所属部門の選択肢（現在選択中の年度の部門マスタ） */
-  departments: string[];
+  departments: Department[];
   /** 管理権限（管理者のみ true） */
   allowManage: boolean;
 }
@@ -57,7 +59,7 @@ interface UserManagementScreenProps {
  * ユーザー管理 画面（管理者のみ）
  *
  * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者）の設定を行う。
- * ※この画面のデータは年度に依存しない（全年度で共通）。
+ * ※ユーザー自体は全年度共通。所属部門は選択中年度の部門マスタを参照する。
  */
 const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   users,
@@ -72,7 +74,9 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   const [userId, setUserId] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('bucho');
-  const [department, setDepartment] = useState<string | undefined>(undefined);
+  const [departmentId, setDepartmentId] = useState<string | undefined>(
+    undefined,
+  );
   const [password, setPassword] = useState('pass1234');
 
   const isEditing = editingId !== null;
@@ -83,7 +87,10 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     [users],
   );
 
-  const deptOptions = departments.map((d) => ({ value: d, label: d }));
+  const deptOptions = departments.map((d) => ({
+    value: d.departmentId,
+    label: departmentLabelOf(departments, d.departmentId),
+  }));
 
   /** フォームの初期化 */
   const resetForm = () => {
@@ -91,7 +98,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     setUserId('');
     setName('');
     setRole('bucho');
-    setDepartment(undefined);
+    setDepartmentId(undefined);
     setPassword('pass1234');
   };
 
@@ -101,7 +108,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     setUserId(user.userId);
     setName(user.name);
     setRole(user.role);
-    setDepartment(user.department);
+    setDepartmentId(user.departmentId);
     setPassword(user.password);
   };
 
@@ -143,7 +150,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
                 name: nm,
                 role,
                 roleLabel: roleLabelOf(role),
-                department: department || undefined,
+                departmentId: departmentId || undefined,
                 password,
               }
             : u,
@@ -161,7 +168,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         name: nm,
         role,
         roleLabel: roleLabelOf(role),
-        department: department || undefined,
+        departmentId: departmentId || undefined,
         password: password || 'pass1234',
       },
     ]);
@@ -210,10 +217,11 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     },
     {
       title: '所属部門',
-      dataIndex: 'department',
-      key: 'department',
+      dataIndex: 'departmentId',
+      key: 'departmentId',
       width: 140,
-      render: (v?: string) => v || '（全部門）',
+      render: (v?: string) =>
+        v ? departmentLabelOf(departments, v) : '（全部門）',
     },
     { title: 'パスワード（モック）', dataIndex: 'password', key: 'password', width: 160 },
     {
@@ -321,11 +329,11 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           <div className='form-field'>
             <span className='form-label'>所属部門</span>
             <Select
-              value={department}
+              value={departmentId}
               options={deptOptions}
               allowClear
               placeholder='（未選択＝全部門）'
-              onChange={(v?: string) => setDepartment(v)}
+              onChange={(v?: string) => setDepartmentId(v)}
               style={{ width: '100%' }}
             />
           </div>

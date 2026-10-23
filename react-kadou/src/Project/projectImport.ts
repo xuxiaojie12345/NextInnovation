@@ -34,7 +34,7 @@ export interface ProjectImportRow {
   /** 所属部門（必須） */
   department: string;
   /** 項目ID（任意） */
-  id: string;
+  projectCode: string;
   /** Project名称（任意） */
   name: string;
 }
@@ -66,7 +66,7 @@ const HEADER_ALIASES: Record<keyof ProjectImportRow, string[]> = {
   team: ['チーム', 'team'],
   subTeam: ['subチーム', 'サブチーム', 'subteam'],
   department: ['所属部門', '部門', '部署', 'department', 'dept'],
-  id: ['項目id', 'id', 'projectid'],
+  projectCode: ['項目id', 'id', 'projectid'],
   name: [
     'project名称',
     'プロジェクト名称',
@@ -91,7 +91,7 @@ const FIELD_ORDER: Array<keyof ProjectImportRow> = [
   'team',
   'subTeam',
   'department',
-  'id',
+  'projectCode',
   'name',
 ];
 
@@ -155,7 +155,7 @@ const buildRows = (
     const team = (row[columns.team] ?? '').trim();
     const subTeam = (row[columns.subTeam] ?? '').trim();
     const department = (row[columns.department] ?? '').trim();
-    const id = (row[columns.id] ?? '').trim();
+    const projectCode = (row[columns.projectCode] ?? '').trim();
     const name = (row[columns.name] ?? '').trim();
 
     // 完全な空行はスキップする
@@ -165,7 +165,7 @@ const buildRows = (
       !team &&
       !subTeam &&
       !department &&
-      !id &&
+      !projectCode &&
       !name
     ) {
       return;
@@ -184,7 +184,7 @@ const buildRows = (
       return;
     }
 
-    rows.push({ customer, caseName, team, subTeam, department, id, name });
+    rows.push({ customer, caseName, team, subTeam, department, projectCode, name });
   });
 
   return { rows, warnings, source };

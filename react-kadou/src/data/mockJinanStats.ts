@@ -13,8 +13,8 @@ export const JINAN_TARGET_RATE = 50;
  *   稼働率統計の集計対象外のため、この一覧には含めない。
  */
 export const JINAN_DEPARTMENTS_BY_YEAR: Record<number, string[]> = {
-  2025: ['第一開発部', '第三開発部'],
-  2026: ['第一開発部', '第二開発部', '第三開発部'],
+  2025: ['dept-0001', 'dept-0003'],
+  2026: ['dept-0001', 'dept-0002', 'dept-0003'],
 };
 
 /** 済南全社（全部門の合計）を表すラベル */
@@ -35,8 +35,8 @@ export interface JinanWeeklyStat {
   start: string;
   /** 週の終了日（日曜）'YYYY/M/D' */
   end: string;
-  /** 部門（済南全社 は 3 部門の合計として算出する） */
-  department: JinanDept;
+  /** 部門ID（済南全社 は 各部門の合計として算出する） */
+  departmentId: string;
   /** 総人数（在籍者数） */
   headcount: number;
   /** 離職人数 */
@@ -56,8 +56,8 @@ const mondayOf = (d: Dayjs): Dayjs => d.subtract((d.day() + 6) % 7, 'day');
 
 /** 年度・部門ごとの年始在籍数 */
 const BASE_HEADCOUNT_BY_YEAR: Record<number, Record<string, number>> = {
-  2025: { 第一開発部: 20, 第三開発部: 11 },
-  2026: { 第一開発部: 22, 第二開発部: 18, 第三開発部: 12 },
+  2025: { 'dept-0001': 20, 'dept-0003': 11 },
+  2026: { 'dept-0001': 22, 'dept-0002': 18, 'dept-0003': 12 },
 };
 
 /**
@@ -80,7 +80,7 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
   while (!cur.isAfter(lastMonday, 'day') && i < 60) {
     // for で回す（コールバックをループ内に作らない＝no-loop-func 回避）
     for (let d = 0; d < departments.length; d += 1) {
-      const department = departments[d];
+      const departmentId = departments[d];
       const leavers = (i + d) % 13 === 3 ? 1 : 0; // 四半期ごとに 1 名離職
       const recruit = (i + d) % 13 === 8 ? 1 : 0; // 離職の数週後に 1 名補充
       headcounts[d] = headcounts[d] - leavers + recruit;
@@ -102,7 +102,7 @@ const buildWeeklyStats = (year: number): JinanWeeklyStat[] => {
         weekKey: cur.format('YYYY-MM-DD'),
         start: cur.format('YYYY/M/D'),
         end: cur.add(6, 'day').format('YYYY/M/D'),
-        department,
+        departmentId,
         headcount,
         leavers,
         activeTotal,
@@ -136,10 +136,10 @@ export const getJinanWeeklyStats = (
 ): JinanWeeklyStat[] => {
   const all = JINAN_STATS_BY_YEAR[year] ?? [];
   const targets = targetDepartments
-    ? all.filter((s) => targetDepartments.includes(s.department))
+    ? all.filter((s) => targetDepartments.includes(s.departmentId))
     : all;
   if (department !== JINAN_ALL_LABEL) {
-    return targets.filter((s) => s.department === department);
+    return targets.filter((s) => s.departmentId === department);
   }
   const weekKeys = Array.from(new Set(targets.map((s) => s.weekKey)));
   return weekKeys.map((weekKey) => {
@@ -150,7 +150,7 @@ export const getJinanWeeklyStats = (
       weekKey,
       start: list[0].start,
       end: list[0].end,
-      department: JINAN_ALL_LABEL,
+      departmentId: JINAN_ALL_LABEL,
       headcount: sum((s) => s.headcount),
       leavers: sum((s) => s.leavers),
       activeTotal: sum((s) => s.activeTotal),

@@ -137,11 +137,6 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-/* ===== 集計行・集計値 ===== */
-.total-row td {
-  background: #f7f8fa !important;
-}
-
 /* 「内・退職」が設定された行はグレー表示 */
 .row-leave-planned > td {
   background: #f0f0f0 !important;
@@ -158,12 +153,51 @@
   background: #f5f5f5;
 }
 
-.total-label {
-  font-weight: 700;
+/* 「行追加」で追加した空行（社員番号未入力）は薄い背景で区別する */
+.row-draft > td {
+  background: #fffbe6 !important;
 }
 
-.total-value {
-  font-weight: 600;
+.row-draft:hover > td {
+  background: #fff7d6 !important;
+}
+
+/* 所属変更（異動）の期間外セル（空欄・編集不可） */
+.ws-week-cell-inactive {
+  display: block;
+  min-height: 24px;
+}
+
+/* 異動で分割された行の社員番号（編集不可） */
+.ws-employee-no-locked {
+  display: block;
+  padding: 0 4px;
+  color: #595959;
+}
+
+/* 所属変更（異動）ダイアログ */
+.ws-transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ws-transfer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ws-transfer-label {
+  width: 90px;
+  flex: 0 0 auto;
+  color: #666;
+}
+
+.ws-transfer-note {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
 }
 
 /* ===== 要員検索・表示期間 バー ===== */
