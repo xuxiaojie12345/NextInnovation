@@ -18,6 +18,11 @@ export interface WorkStatusPayload {
   rows: WorkStatusRows;
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
+  /**
+   * 行削除で業務データを削除した社員番号。
+   * バックエンドは当該年度の割当・BUFFER を削除してから assignment / unpaid を反映する
+   */
+  deletedEmployeeNos?: string[];
 }
 
 /** 年度のマスタ系データ（部門・要員・項目・休日）の保存パッチ */
@@ -32,6 +37,11 @@ export interface KadouRepository {
   saveMaster(year: number, patch: YearMasterPatch): Promise<void>;
   /** 要員稼動管理の保存（将来: POST） */
   saveWorkStatus(year: number, payload: WorkStatusPayload): Promise<void>;
+  /**
+   * 要員マスタの削除（将来: DELETE）
+   * 当年度の稼働データ（行・割当・BUFFER）も同時に削除する（他年度は変更しない）
+   */
+  deletePersonnel(year: number, employeeNo: string): Promise<void>;
 }
 
 /**
@@ -70,10 +80,33 @@ class MemoryKadouRepository implements KadouRepository {
   ): Promise<void> {
     const store = this.ensure(year);
     // 要員マスタは変更しない（稼働表は表示行と割当のみ保存する）
+    // ※メモリ実装は「保存内容＝そのまま正」で全量置換するため、
+    //   deletedEmployeeNos は意識しなくても削除済みになる
+    //   （HTTP 実装では当該年度の業務データを削除してから反映する）
     store.workStatus = {
       rows: payload.rows,
       assignment: payload.assignment,
       unpaid: payload.unpaid,
+    };
+  }
+
+  async deletePersonnel(year: number, employeeNo: string): Promise<void> {
+    const store = this.ensure(year);
+    // 要員マスタを削除する
+    store.personnel = store.personnel.filter(
+      (p) => p.employeeNo !== employeeNo,
+    );
+    // 当年度の稼働データ（行・割当・BUFFER）も削除する（他年度は変更しない）
+    const assignment = { ...store.workStatus.assignment };
+    delete assignment[employeeNo];
+    const unpaid = { ...store.workStatus.unpaid };
+    delete unpaid[employeeNo];
+    store.workStatus = {
+      rows: store.workStatus.rows.filter(
+        (r) => r.employeeNo !== employeeNo,
+      ),
+      assignment,
+      unpaid,
     };
   }
 }
