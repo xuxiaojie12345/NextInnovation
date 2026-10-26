@@ -35,7 +35,7 @@ export interface WorkStatusRow {
   activeFrom?: string;
   /** 有効終了週（月曜 'YYYY-MM-DD'）。未指定 = 年度末 */
   activeTo?: string;
-  /** 社員番号の編集をロックする（異動で分割された行） */
+  /** 異動で分割された行のマーカー（社員番号は 2 行まとめて変更する） */
   employeeNoLocked?: boolean;
   /** この行を分割して作られた元の行キー（異動取消時の復元用） */
   splitFromKey?: string;

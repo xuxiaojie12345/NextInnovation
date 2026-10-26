@@ -12,6 +12,7 @@ import {
   Space,
   Table,
   Tag,
+  Tooltip,
   Typography,
 } from 'antd';
 import type { TableColumnsType } from 'antd';
@@ -44,6 +45,14 @@ import {
 } from '../data/yearWeeks';
 import type { UnpaidMap, WorkStatusData } from '../data/yearStore';
 import type { WorkStatusPayload } from '../data/kadouRepository';
+import {
+  currentWeekKey,
+  hasPastActualsForEmployee,
+  hasPastActualsForRow,
+  hasWorkData,
+  isPastWeek,
+} from './pastActuals';
+import type { SavedBaseline } from './pastActuals';
 
 const { Title, Text } = Typography;
 
@@ -122,7 +131,7 @@ interface Row {
   activeFrom?: string;
   /** 有効終了週（月曜） */
   activeTo?: string;
-  /** 社員番号の編集ロック */
+  /** 異動で分割された行のマーカー（社員番号は 2 行まとめて変更する） */
   employeeNoLocked?: boolean;
 }
 
@@ -373,6 +382,40 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     ...initialWorkStatus.unpaid,
   }));
 
+  // 行削除で業務データ（割当・BUFFER）を削除した要員。
+  // 保存時にバックエンドへ渡し、DB 側でも当該年度の業務データを削除する
+  const [deletedEmployeeNos, setDeletedEmployeeNos] = useState<string[]>([]);
+
+  // 保存済みデータ（過去実績の判定基準）。保存時に更新する
+  // ※判定は未保存の下書きではなく保存済みデータで行う（設計 7.4）
+  const [savedBaseline, setSavedBaseline] = useState<SavedBaseline>(() => ({
+    assignment: initialWorkStatus.assignment,
+    unpaid: initialWorkStatus.unpaid,
+  }));
+
+  // 今週の月曜（過去週の判定基準）。週が変わったら 1 分以内に再計算する
+  const [currentMonday, setCurrentMonday] = useState<string>(() =>
+    currentWeekKey(),
+  );
+  // 現在の年（過年度判定用）。週の切り替えと同じタイマーで更新する
+  const [currentYear, setCurrentYear] = useState<number>(() => dayjs().year());
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentMonday((prev) => {
+        const next = currentWeekKey();
+        return next === prev ? prev : next;
+      });
+      setCurrentYear((prev) => {
+        const next = dayjs().year();
+        return next === prev ? prev : next;
+      });
+    }, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  // 過年度（現在年より前）は参照のみ
+  const pastYear = year < currentYear;
+
   // ---- セルの右クリックメニュー ----
   // 対象セルと表示位置（画面座標）
   const [cellMenu, setCellMenu] = useState<{
@@ -435,58 +478,75 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   }, [dirty, onDirtyChange]);
 
   /**
-   * 社員番号の確定（表示行の employeeNo を差し替えるだけ。要員マスタは変更しない）
-   * 戻り値: true = 採用 / false = 処理中止（重複・マスタ未登録・割当あり）
+   * 社員番号の確定（表示行の employeeNo を差し替える。要員マスタは変更しない）
+   * 戻り値: true = 採用 / false = 処理中止
+   * （過去実績・重複・マスタ未登録・データありのクリア・異動中のクリア）
    */
   const commitEmployeeNo = useCallback(
     (rowKey: string, employeeNo: string): boolean => {
       const no = employeeNo.trim();
       const current = draftRows.find((r) => r.key === rowKey);
-      const currentNo = current?.employeeNo ?? '';
-
-      // 異動で分割された行は社員番号を変更できない
-      if (current?.employeeNoLocked) return false;
+      if (!current) return false;
+      // 過年度は参照のみ
+      if (pastYear) return false;
+      const currentNo = current.employeeNo;
 
       // 変更なし
       if (no === currentNo) return true;
 
-      // 重複チェック：同じ社員番号は「有効期間が重ならない場合のみ」許可する
-      // （年途中の部門異動で旧所属行・新所属行の2行になるため）
-      if (no !== '') {
-        const conflict = draftRows.some(
-          (r) =>
-            r.key !== rowKey &&
-            r.employeeNo === no &&
-            periodsOverlap(current ?? {}, r),
-        );
-        if (conflict) {
-          message.error(
-            `社員番号「${no}」は同じ期間に既に表示されているため、処理を中止しました。`,
-          );
-          return false;
-        }
+      // 過去実績がある社員は変更できない（入力欄も無効化されているが念のため）
+      if (
+        currentNo &&
+        hasPastActualsForEmployee(
+          draftRows,
+          currentNo,
+          savedBaseline,
+          currentMonday,
+        )
+      ) {
+        message.error('過去実績があるため社員番号を変更できません。');
+        return false;
       }
 
-      // 割当がある行の社員番号変更はブロックする
-      // （割当は employeeNo をキーに保持しているため、別の社員に移るのを防ぐ）
-      if (currentNo) {
-        const hasAssignment =
-          Object.keys(assignment[currentNo] ?? {}).length > 0 ||
-          Object.keys(unpaid[currentNo] ?? {}).length > 0;
-        if (hasAssignment) {
-          message.error(
-            'この行には割当があるため、社員番号を変更できません。行削除→行追加で対応してください。',
-          );
-          return false;
-        }
-      }
+      // 同じ社員の行（異動の 2 行）はまとめて変更する
+      const myRows = currentNo
+        ? draftRows.filter((r) => r.employeeNo === currentNo)
+        : [current];
 
-      // 社員番号をクリアする場合は空行に戻す
+      // 社員番号を空にする場合は空行に戻す
       if (no === '') {
+        // 異動中の 2 行は空にできない（行削除で対応）
+        if (myRows.length > 1) {
+          message.error(
+            '異動中の行は社員番号を空にできません。行削除で対応してください。',
+          );
+          return false;
+        }
+        // 業務データ（割当・BUFFER）がある場合は空にできない
+        // （下書き・保存済みのどちらかにデータがあれば不可）
+        if (
+          hasWorkData(currentNo, assignment, unpaid) ||
+          hasWorkData(
+            currentNo,
+            savedBaseline.assignment,
+            savedBaseline.unpaid,
+          )
+        ) {
+          message.error(
+            '割当・BUFFERが登録されているため、社員番号を空にできません。行を削除してください。',
+          );
+          return false;
+        }
         setDraftRows((prev) =>
           prev.map((r) =>
             r.key === rowKey
-              ? { ...r, employeeNo: '', departmentId: '' }
+              ? {
+                  ...r,
+                  employeeNo: '',
+                  departmentId: '',
+                  employeeNoLocked: undefined,
+                  splitFromKey: undefined,
+                }
               : r,
           ),
         );
@@ -502,10 +562,55 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         return false;
       }
 
+      // 重複チェック：同じ社員番号は「有効期間が重ならない場合のみ」許可する
+      // （異動の 2 行も含めて、変更後の行すべてで判定する）
+      const targetRows = draftRows.filter(
+        (r) => r.employeeNo === no && !myRows.some((my) => my.key === r.key),
+      );
+      const conflict = targetRows.some((target) =>
+        myRows.some((my) => periodsOverlap(my, target)),
+      );
+      if (conflict) {
+        message.error(
+          `社員番号「${no}」は同じ期間に既に表示されているため、処理を中止しました。`,
+        );
+        return false;
+      }
+      // 同一社員の行は 1 年度につき最大 2 行（異動 1 回）
+      if (targetRows.length + myRows.length > 2) {
+        message.error(
+          `社員番号「${no}」の行が 2 行を超えるため、処理を中止しました。`,
+        );
+        return false;
+      }
+
       const master = employeeMaster.get(no);
+      // 割当・BUFFER を新しい社員番号へ引き継ぐ
+      // （新しい社員番号に既存データがある場合は、引き継いだデータで上書きする）
+      setAssignment((prev) => {
+        if (!currentNo || !prev[currentNo]) return prev;
+        const next = { ...prev };
+        next[no] = { ...(next[no] ?? {}), ...prev[currentNo] };
+        delete next[currentNo];
+        return next;
+      });
+      setUnpaid((prev) => {
+        if (!currentNo || !prev[currentNo]) return prev;
+        const next = { ...prev };
+        next[no] = { ...(next[no] ?? {}), ...prev[currentNo] };
+        delete next[currentNo];
+        return next;
+      });
+      // 旧社員番号の当年度データは残さない（API は削除→payload 反映の順）
+      if (currentNo) {
+        setDeletedEmployeeNos((prev) =>
+          prev.includes(currentNo) ? prev : [...prev, currentNo],
+        );
+      }
+      // 異動で分割されている場合は 2 行まとめて同じ社員番号に変更する
       setDraftRows((prev) =>
         prev.map((r) =>
-          r.key === rowKey
+          myRows.some((my) => my.key === r.key)
             ? {
                 ...r,
                 employeeNo: no,
@@ -518,21 +623,33 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       setDirty(true);
       return true;
     },
-    [assignment, unpaid, draftRows, employeeMaster],
+    [
+      assignment,
+      unpaid,
+      draftRows,
+      employeeMaster,
+      savedBaseline,
+      currentMonday,
+      pastYear,
+    ],
   );
 
   /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
   const commitLeavePlan = useCallback(
     (rowKey: string, leavePlan: string) => {
+      // 過年度は参照のみ
+      if (pastYear) return;
       const row = draftRows.find((r) => r.key === rowKey);
       if (!row?.employeeNo) return;
       onUpdateLeavePlan(row.employeeNo, leavePlan);
     },
-    [draftRows, onUpdateLeavePlan],
+    [draftRows, onUpdateLeavePlan, pastYear],
   );
 
   /** 行追加（社員番号未入力の行を表示行に追加する。要員マスタは変更しない） */
   const handleAddRow = useCallback(() => {
+    // 過年度は参照のみ
+    if (pastYear) return;
     const key = nextRowKey();
     setDraftRows((prev) => [
       ...prev,
@@ -550,26 +667,47 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     message.success(
       '空の行を追加しました（フィルタ適用中でも表示されます。未保存・社員番号を入力してください）。',
     );
-  }, [nextRowKey]);
+  }, [nextRowKey, pastYear]);
 
   /**
-   * 行削除（その行の有効期間内の稼働実績も削除する。
-   * 異動で分割された行を消したら、異動元の行の有効終了週を元に戻す）
+   * 行削除（要員マスタは削除せず、その行の業務データだけを削除する）
+   * ・過去実績（保存済みデータ）がある行は削除できない
+   * ・異動で分割された行はどちらでも削除でき、残った行が期間を吸収する
+   * ・最後の行を削除した場合は当年度の業務データを全件削除する
    */
   const handleDeleteRow = useCallback(
     (rowKey: string) => {
-      // 異動元の行は削除できない（先に異動先の行を削除して戻す）
-      if (draftRows.some((r) => r.splitFromKey === rowKey)) {
-        message.error(
-          '所属変更（異動）元の行は削除できません。先に異動先の行を削除してください。',
-        );
+      const target = draftRows.find((r) => r.key === rowKey);
+      if (!target) return;
+      // 過年度は参照のみ
+      if (pastYear) return;
+      // 過去実績（保存済みデータ）がある行は削除できない
+      if (hasPastActualsForRow(target, savedBaseline, currentMonday)) {
+        message.error('過去実績がある行は削除できません。');
         return;
       }
-      const target = draftRows.find((r) => r.key === rowKey);
-      // その行の有効期間内の稼働実績（割当・BUFFER）を削除する
-      // ※異動で分割された行は、有効期間外の週（別の行の期間）の実績を残す
-      if (target?.employeeNo) {
-        const employeeNo = target.employeeNo;
+      const employeeNo = target.employeeNo;
+      // その社員の最後の行を削除するか（＝再追加時に全週「未割当」で表示する）
+      const isLastRowOfEmployee =
+        employeeNo !== '' &&
+        !draftRows.some((r) => r.key !== rowKey && r.employeeNo === employeeNo);
+      // 業務データ（割当・BUFFER）を削除する。要員マスタは削除しない
+      // ・異動で分割された行は、有効期間外の週（別の行の期間）の実績を残す
+      // ・最後の行を削除した場合は、再追加しても過去の割当が戻らないよう全件削除する
+      if (isLastRowOfEmployee) {
+        setAssignment((prev) => {
+          if (!prev[employeeNo]) return prev;
+          const next = { ...prev };
+          delete next[employeeNo];
+          return next;
+        });
+        setUnpaid((prev) => {
+          if (!prev[employeeNo]) return prev;
+          const next = { ...prev };
+          delete next[employeeNo];
+          return next;
+        });
+      } else if (employeeNo) {
         setAssignment((prev) => {
           const weeksOfEmployee = prev[employeeNo];
           if (!weeksOfEmployee) return prev;
@@ -615,13 +753,44 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           return next;
         });
       }
+      // 保存時は「削除 → payload 反映」の順で処理するため、
+      // 残りの行がある場合（一部の行の削除）も対象社員を削除リストに入れる
+      if (employeeNo) {
+        setDeletedEmployeeNos((prev) =>
+          prev.includes(employeeNo) ? prev : [...prev, employeeNo],
+        );
+      }
       setDraftRows((prev) => {
-        const row = prev.find((r) => r.key === rowKey);
-        const next = prev.filter((r) => r.key !== rowKey);
-        // 異動先の行を削除したら、異動元の行の有効終了週を元に戻す
-        if (row?.splitFromKey) {
-          return next.map((r) =>
-            r.key === row.splitFromKey ? { ...r, activeTo: row.activeTo } : r,
+        const deleted = prev.find((r) => r.key === rowKey);
+        if (!deleted) return prev;
+        let next = prev.filter((r) => r.key !== rowKey);
+        // 削除した行の後段（異動先）があれば、その行が削除した行の期間を吸収する
+        const child = next.find((r) => r.splitFromKey === rowKey);
+        if (child) {
+          next = next.map((r) =>
+            r.key === child.key
+              ? {
+                  ...r,
+                  activeFrom: deleted.activeFrom,
+                  splitFromKey: deleted.splitFromKey,
+                  employeeNoLocked: deleted.splitFromKey ? true : undefined,
+                }
+              : r,
+          );
+        } else if (deleted.splitFromKey) {
+          // 異動先を削除した場合は、異動元が期間を吸収して異動前の状態に戻す
+          const parentKey = deleted.splitFromKey;
+          const hasOtherChild = next.some((r) => r.splitFromKey === parentKey);
+          next = next.map((r) =>
+            r.key === parentKey
+              ? {
+                  ...r,
+                  activeTo: deleted.activeTo,
+                  ...(hasOtherChild
+                    ? {}
+                    : { splitFromKey: undefined, employeeNoLocked: undefined }),
+                }
+              : r,
           );
         }
         return next;
@@ -634,13 +803,20 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         return next;
       });
       setDirty(true);
-      message.success('行と稼働実績を削除しました（未保存）。');
+      message.success(
+        '行と業務データ（割当・BUFFER）を削除しました（未保存）。要員マスタは変更していません。',
+      );
     },
-    [draftRows],
+    [draftRows, savedBaseline, currentMonday, pastYear],
   );
 
   /** 保存（下書きを確定して親へ渡す。要員マスタは含めない） */
   const handleSave = useCallback(() => {
+    // 過年度は参照のみ
+    if (pastYear) {
+      message.error('過年度は参照のみです。');
+      return;
+    }
     // 社員番号が空の行があると保存できない（マスタ未登録の行は表示できない）
     if (draftRows.some((r) => r.employeeNo === '')) {
       message.error(
@@ -660,10 +836,25 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       })),
       assignment,
       unpaid,
+      // 行削除で業務データを消した要員（DB 側でも当該年度の分を削除する）
+      deletedEmployeeNos,
     });
+    // 保存した内容を過去実績判定の基準に反映する
+    // （メモリ実装のため即時。API 接続時は保存成功後に更新する）
+    setSavedBaseline({ assignment, unpaid });
+    // 保存済みの削除情報はクリアする（次回の保存で再送しない）
+    setDeletedEmployeeNos((prev) => (prev.length === 0 ? prev : []));
     // ※保存では追加行の表示を解除しない（次にフィルタを適用したときに解除する）
     setDirty(false);
-  }, [draftRows, assignment, unpaid, onSave, employeeMaster]);
+  }, [
+    draftRows,
+    assignment,
+    unpaid,
+    deletedEmployeeNos,
+    onSave,
+    employeeMaster,
+    pastYear,
+  ]);
 
   /** 未保存確認ダイアログから呼べるように「保存」処理を登録する */
   useEffect(() => {
@@ -734,29 +925,40 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   /** 所属変更（異動）ダイアログを開く */
   const openTransfer = useCallback(
     (rowKey: string) => {
+      // 過年度は参照のみ
+      if (pastYear) return;
       const row = draftRows.find((r) => r.key === rowKey);
       if (!row?.employeeNo) {
         message.warning('社員番号を入力してから所属変更してください。');
         return;
       }
-      const firstWeek = row.activeFrom ?? allWeeks[0]?.key ?? '';
-      // 開始週の候補 = 行の有効期間内かつ「行の初週より後」
-      const candidates = allWeeks.filter(
-        (w) => isWeekActive(row, w.key) && w.key > firstWeek,
-      );
-      if (candidates.length === 0) {
-        message.warning('この行には所属変更できる週がありません。');
+      // 同一社員は 1 年度につき 1 回まで（すでに 2 行なら異動できない）
+      if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
+        message.error('1年度につき異動は1回までです。');
         return;
       }
-      const todayKey = mondayOf(dayjs()).format('YYYY-MM-DD');
+      const firstWeek = row.activeFrom ?? allWeeks[0]?.key ?? '';
+      // 開始週の候補 = 行の有効期間内かつ「行の初週より後」かつ「今週以降」
+      const candidates = allWeeks.filter(
+        (w) =>
+          isWeekActive(row, w.key) &&
+          w.key > firstWeek &&
+          w.key >= currentMonday,
+      );
+      if (candidates.length === 0) {
+        message.warning(
+          'この行には所属変更できる週がありません（適用開始週は今週以降のみです）。',
+        );
+        return;
+      }
       const initial =
-        candidates.find((w) => w.key === todayKey) ??
+        candidates.find((w) => w.key === currentMonday) ??
         candidates[candidates.length - 1];
       setTransferRowKey(rowKey);
       setTransferDeptId(undefined);
       setTransferWeekKey(initial.key);
     },
-    [draftRows, allWeeks],
+    [draftRows, allWeeks, currentMonday, pastYear],
   );
 
   /** 所属変更（異動）を確定する */
@@ -764,6 +966,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     if (!transferRowKey) return;
     const row = draftRows.find((r) => r.key === transferRowKey);
     if (!row) return;
+    // 同一社員は 1 年度につき 1 回まで
+    if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
+      message.error('1年度につき異動は1回までです。');
+      return;
+    }
     if (!transferDeptId) {
       message.error('新しい所属を選択してください。');
       return;
@@ -779,6 +986,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     }
     if (row.activeTo && transferWeekKey > row.activeTo) {
       message.error('適用開始週が、この行の有効期間外です。');
+      return;
+    }
+    // 適用開始週は今週の月曜以降のみ（過去週には異動できない）
+    if (transferWeekKey < currentMonday) {
+      message.error('適用開始週は今週の月曜以降にしてください。');
       return;
     }
     const prevWeekKey = dayjs(transferWeekKey)
@@ -827,6 +1039,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     nextRowKey,
     departments,
     onUpdateDepartment,
+    currentMonday,
   ]);
 
   /** 所属変更ダイアログの対象行 */
@@ -839,12 +1052,17 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     if (!transferRow) return [];
     const firstWeek = transferRow.activeFrom ?? allWeeks[0]?.key ?? '';
     return allWeeks
-      .filter((w) => isWeekActive(transferRow, w.key) && w.key > firstWeek)
+      .filter(
+        (w) =>
+          isWeekActive(transferRow, w.key) &&
+          w.key > firstWeek &&
+          w.key >= currentMonday,
+      )
       .map((w) => ({
         value: w.key,
         label: `${w.monday.format('YYYY/M/D')} 〜 ${w.sunday.format('M/D')}`,
       }));
-  }, [transferRow, allWeeks]);
+  }, [transferRow, allWeeks, currentMonday]);
 
   // 表示期間（From / To）で絞り込んだ週列（From / To とも未指定なら全週）
   const weeks: WeekCol[] = useMemo(() => {
@@ -1117,6 +1335,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const handleChangeCellProject = useCallback(
     (personId: string, weekKey: string, projectId?: string) => {
       if (!personId) return;
+      // 過去週は変更できない（念のためのガード）
+      if (isPastWeek(weekKey, currentMonday)) {
+        message.warning('過去の週は変更できません。');
+        return;
+      }
       const from = weeks.findIndex((w) => w.key === weekKey);
       if (projectId && projectId === leaveProjectKey && from >= 0) {
         // 選択した週 〜 12月31日を含む週 までを一括設定
@@ -1137,7 +1360,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       }
       setAssignmentAt(personId, weekKey, projectId ?? null);
     },
-    [leaveProjectKey, setAssignmentAt, weeks, clearUnpaidAt],
+    [leaveProjectKey, setAssignmentAt, weeks, clearUnpaidAt, currentMonday],
   );
 
   /** 「内・退職」が設定されている行（該当行をグレー表示する） */
@@ -1230,14 +1453,15 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         if (!row.employeeNo) continue;
         for (let c = Math.min(c0, c1); c <= Math.max(c0, c1); c += 1) {
           const weekKey = weeks[c].key;
-          // 行の有効期間外のセルは選択しない
+          // 行の有効期間外・過去週のセルは選択しない
           if (!isWeekActive(row, weekKey)) continue;
+          if (isPastWeek(weekKey, currentMonday)) continue;
           next.add(cellKey(row.key, weekKey));
         }
       }
       return next;
     },
-    [rowIndexByKey, weekIndexByKey, visiblePersonnel, weeks],
+    [rowIndexByKey, weekIndexByKey, visiblePersonnel, weeks, currentMonday],
   );
 
   // ---- ドラッグで矩形選択（mousedown → 他セルへ mouseenter） ----
@@ -1253,6 +1477,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
    */
   const handleCellMouseDown = useCallback(
     (rowKey: string, weekKey: string, shift: boolean) => {
+      // 過去週は選択・編集できない
+      if (isPastWeek(weekKey, currentMonday)) return;
       const key = cellKey(rowKey, weekKey);
       if (shift) {
         dragStartRef.current = null;
@@ -1270,19 +1496,21 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       dragMovedRef.current = false;
       setAnchorCell(key);
     },
-    [anchorCell, buildRange],
+    [anchorCell, buildRange, currentMonday],
   );
 
   /** ドラッグ中に別セルへ入ったら 起点→現在セル の矩形へ選択を更新 */
   const handleCellDragEnter = useCallback(
     (rowKey: string, weekKey: string) => {
+      // 過去週は選択・編集できない
+      if (isPastWeek(weekKey, currentMonday)) return;
       const startKey = dragStartRef.current;
       if (!startKey) return;
       dragMovedRef.current = true;
       const rect = buildRange(startKey, cellKey(rowKey, weekKey));
       if (rect) setSelectedCells(rect);
     },
-    [buildRange],
+    [buildRange, currentMonday],
   );
 
   /** マウスアップ: ドラッグせずに離した場合はクリック（1セル ON/OFF） */
@@ -1306,6 +1534,21 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     return () => window.removeEventListener('mouseup', onMouseUp);
   }, [selectMode]);
 
+  /** 週が変わって過去になったセルは選択から外す */
+  useEffect(() => {
+    setSelectedCells((prev) => {
+      if (prev.size === 0) return prev;
+      const next = new Set<string>();
+      let changed = false;
+      prev.forEach((key) => {
+        const { weekKey } = parseCellKey(key);
+        if (isPastWeek(weekKey, currentMonday)) changed = true;
+        else next.add(key);
+      });
+      return changed ? next : prev;
+    });
+  }, [currentMonday]);
+
   /** 選択モードの ON/OFF（OFF 時は選択を初期化） */
   const toggleSelectMode = (on: boolean) => {
     setSelectMode(on);
@@ -1326,6 +1569,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         const next: AssignmentMap = { ...prev };
         selectedCells.forEach((key) => {
           const { rowKey, weekKey } = parseCellKey(key);
+          // 過去週は変更しない
+          if (isPastWeek(weekKey, currentMonday)) return;
           const employeeNo = employeeNoByRowKey.get(rowKey);
           if (!employeeNo) return;
           const cell = { ...(next[employeeNo] ?? {}) };
@@ -1337,12 +1582,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       });
       selectedCells.forEach((key) => {
         const { rowKey, weekKey } = parseCellKey(key);
+        // 過去週は変更しない
+        if (isPastWeek(weekKey, currentMonday)) return;
         const employeeNo = employeeNoByRowKey.get(rowKey);
         if (employeeNo) clearUnpaidAt(employeeNo, weekKey);
       });
       setDirty(true);
     },
-    [selectedCells, clearUnpaidAt, employeeNoByRowKey],
+    [selectedCells, clearUnpaidAt, employeeNoByRowKey, currentMonday],
   );
 
   /** 選択セル（割当済みのみ）の「無償支援」を一括設定/解除する */
@@ -1353,6 +1600,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         const next = { ...prev };
         selectedCells.forEach((key) => {
           const { rowKey, weekKey } = parseCellKey(key);
+          // 過去週は変更しない
+          if (isPastWeek(weekKey, currentMonday)) return;
           const employeeNo = employeeNoByRowKey.get(rowKey);
           if (!employeeNo) return;
           const cell = { ...(next[employeeNo] ?? {}) };
@@ -1365,7 +1614,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       });
       setDirty(true);
     },
-    [selectedCells, assignment, employeeNoByRowKey],
+    [selectedCells, assignment, employeeNoByRowKey, currentMonday],
   );
 
   /** 選択セルからコピー（先頭セルの値。未割当なら「未割当」扱い。無償支援も引き継ぐ） */
@@ -1448,6 +1697,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const openCellMenu = useCallback(
     (personId: string, weekKey: string, e: React.MouseEvent) => {
       e.preventDefault();
+      // 過去週は「コピー」だけのメニューを開く（項目は cellMenuItems 側で制御）
       const MENU_W = 210;
       const MENU_H = 175;
       setCellMenu({
@@ -1477,12 +1727,22 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     };
   }, [cellMenu]);
 
-  /** 右クリックメニューの項目 */
+  /** 右クリックメニューの項目（過去週は「コピー」のみ） */
   const cellMenuItems = useMemo(() => {
     const personId = cellMenu?.personId ?? '';
     const weekKey = cellMenu?.weekKey ?? '';
     const hasProject = !!assignment[personId]?.[weekKey];
     const unpaidCell = isUnpaidAt(personId, weekKey);
+    const copyItem = {
+      key: 'copy',
+      label: 'コピー',
+      icon: <CopyOutlined />,
+      disabled: !hasProject,
+    };
+    // 過去週はコピー（読み取り）だけを許可する
+    if (isPastWeek(weekKey, currentMonday)) {
+      return [copyItem];
+    }
     return [
       {
         key: 'unpaid-on',
@@ -1497,12 +1757,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         disabled: !unpaidCell,
       },
       { type: 'divider' as const },
-      {
-        key: 'copy',
-        label: 'コピー',
-        icon: <CopyOutlined />,
-        disabled: !hasProject,
-      },
+      copyItem,
       {
         key: 'clear',
         label: '未割当にする',
@@ -1510,13 +1765,18 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         disabled: !hasProject,
       },
     ];
-  }, [cellMenu, assignment, isUnpaidAt]);
+  }, [cellMenu, assignment, isUnpaidAt, currentMonday]);
 
   /** 右クリックメニューの実行 */
   const handleCellMenuClick = useCallback(
     ({ key }: { key: string }) => {
       if (!cellMenu) return;
       const { personId, weekKey } = cellMenu;
+      // 過去週はコピーのみ（古いメニューが残っていても編集系は実行しない）
+      if (isPastWeek(weekKey, currentMonday) && key !== 'copy') {
+        setCellMenu(null);
+        return;
+      }
       if (key === 'unpaid-on') {
         setUnpaidAt(personId, weekKey, true);
       } else if (key === 'unpaid-off') {
@@ -1533,8 +1793,45 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       }
       setCellMenu(null);
     },
-    [cellMenu, assignment, isUnpaidAt, projectMap, setUnpaidAt, setAssignmentAt],
+    [
+      cellMenu,
+      assignment,
+      isUnpaidAt,
+      projectMap,
+      setUnpaidAt,
+      setAssignmentAt,
+      currentMonday,
+    ],
   );
+
+  /** 過去実績がある社員（社員番号）。社員番号欄の編集可否に使う */
+  const employeesWithPastActuals = useMemo(() => {
+    const set = new Set<string>();
+    draftRows.forEach((row) => {
+      if (!row.employeeNo || set.has(row.employeeNo)) return;
+      if (
+        hasPastActualsForEmployee(
+          draftRows,
+          row.employeeNo,
+          savedBaseline,
+          currentMonday,
+        )
+      ) {
+        set.add(row.employeeNo);
+      }
+    });
+    return set;
+  }, [draftRows, savedBaseline, currentMonday]);
+
+  /** 社員ごとの表示行数（行削除のメッセージ用） */
+  const rowCountByEmployee = useMemo(() => {
+    const counts = new Map<string, number>();
+    draftRows.forEach((r) => {
+      if (!r.employeeNo) return;
+      counts.set(r.employeeNo, (counts.get(r.employeeNo) ?? 0) + 1);
+    });
+    return counts;
+  }, [draftRows]);
 
   /** テーブル列定義（要員 + 月グループ配下の週列 + 集計列） */
   const columns: TableColumnsType<Row> = useMemo(() => {
@@ -1570,7 +1867,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               size='small'
               defaultValue={row.leavePlan ?? ''}
               maxLength={30}
-              disabled={!row.employeeNo}
+              disabled={pastYear || !row.employeeNo}
               placeholder={`例：${year}/10/31`}
               onBlur={(e) => commitLeavePlan(row.key, e.target.value)}
               onPressEnter={(e) =>
@@ -1594,10 +1891,21 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         fixed: 'left',
         width: 90,
         render: (_, row) => {
-          // 異動で分割された行は社員番号を変更できない（表示のみ）
-          if (row.employeeNoLocked) {
+          // 過年度・過去実績がある社員は社員番号を変更できない（読み取り専用）
+          if (
+            pastYear ||
+            (row.employeeNo && employeesWithPastActuals.has(row.employeeNo))
+          ) {
             return (
-              <span className='ws-employee-no-locked'>{row.employeeNo}</span>
+              <Tooltip
+                title={
+                  pastYear
+                    ? '過年度は参照のみです'
+                    : '過去実績があるため社員番号を変更できません'
+                }
+              >
+                <span className='ws-employee-no-locked'>{row.employeeNo}</span>
+              </Tooltip>
             );
           }
           // 入力確定（フォーカスアウト / Enter）で社員マスタから 役割・名前・所属 を自動取得する。
@@ -1684,6 +1992,28 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
                 />
               );
             }
+            // 過去週（今週の月曜より前）は読み取り専用
+            // （略称を表示し、クリック・選択・プルダウン・BUFFER 切替・貼り付けは不可）
+            if (isPastWeek(w.key, currentMonday)) {
+              const pid = assignment[row.employeeNo]?.[w.key];
+              const prj = pid ? projectMap.get(pid) : undefined;
+              const unpaidCell = isUnpaidAt(row.employeeNo, w.key);
+              const label = prj ? prj.abbr || prj.name : pid || '－';
+              return (
+                <div
+                  className='ws-week-cell ws-week-cell-past'
+                  title={`${label}（過去の週は変更できません）`}
+                  onContextMenu={(e) => openCellMenu(row.employeeNo, w.key, e)}
+                >
+                  <span className='cell-chip-text'>{label}</span>
+                  {unpaidCell ? (
+                    <span className='ws-unpaid-badge ws-unpaid-badge-corner'>
+                      BUFFER
+                    </span>
+                  ) : null}
+                </div>
+              );
+            }
             // 複数セル選択モード: クリックで選択 / Shift+クリックで矩形選択
             if (selectMode) {
               const pid = assignment[row.employeeNo]?.[w.key];
@@ -1758,32 +2088,98 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       fixed: 'right',
       width: 150,
       align: 'center',
-      render: (_, row) => (
-        <Space size={0}>
-          <Popconfirm
-            title='行削除の確認'
-            description='稼働実績を削除される可能性がありますが、よろしいでしょうか'
-            okText='削除'
-            cancelText='キャンセル'
-            okButtonProps={{ danger: true }}
-            onConfirm={() => handleDeleteRow(row.key)}
-          >
-            <Button type='text' danger size='small' icon={<DeleteOutlined />}>
-              削除
-            </Button>
-          </Popconfirm>
-          <Button
-            type='text'
-            size='small'
-            icon={<SwapOutlined />}
-            disabled={!row.employeeNo}
-            title='所属変更（異動）'
-            onClick={() => openTransfer(row.key)}
-          >
-            異動
-          </Button>
-        </Space>
-      ),
+      render: (_, row) => {
+        // 過年度は参照のみ。過去実績（保存済みデータ）がある行は削除できない
+        const deleteBlocked =
+          pastYear ||
+          (!!row.employeeNo &&
+            hasPastActualsForRow(row, savedBaseline, currentMonday));
+        const transferBlockedByCount =
+          !!row.employeeNo &&
+          (rowCountByEmployee.get(row.employeeNo) ?? 0) >= 2;
+        const hasRemainingRows =
+          !!row.employeeNo &&
+          (rowCountByEmployee.get(row.employeeNo) ?? 0) > 1;
+        const description = !row.employeeNo
+          ? 'この行を削除します。'
+          : hasRemainingRows
+          ? 'この行と、この行の期間の業務データ（割当・BUFFER）を削除します。要員マスタは削除されません。残りの行は期間が自動で延長されます。'
+          : 'この行と、当年度の業務データ（割当・BUFFER）をすべて削除します。要員マスタは削除されません。';
+        return (
+          <Space size={0}>
+            {deleteBlocked ? (
+              <Tooltip
+                title={
+                  pastYear
+                    ? '過年度は参照のみです'
+                    : '過去実績があるため削除できません'
+                }
+              >
+                <span className='ws-disabled-action'>
+                  <Button
+                    type='text'
+                    danger
+                    size='small'
+                    icon={<DeleteOutlined />}
+                    disabled
+                  >
+                    削除
+                  </Button>
+                </span>
+              </Tooltip>
+            ) : (
+              <Popconfirm
+                title='行削除の確認'
+                description={description}
+                okText='削除'
+                cancelText='キャンセル'
+                okButtonProps={{ danger: true }}
+                onConfirm={() => handleDeleteRow(row.key)}
+              >
+                <Button
+                  type='text'
+                  danger
+                  size='small'
+                  icon={<DeleteOutlined />}
+                >
+                  削除
+                </Button>
+              </Popconfirm>
+            )}
+            {pastYear || transferBlockedByCount ? (
+              <Tooltip
+                title={
+                  pastYear
+                    ? '過年度は参照のみです'
+                    : '1年度につき異動は1回までです'
+                }
+              >
+                <span className='ws-disabled-action'>
+                  <Button
+                    type='text'
+                    size='small'
+                    icon={<SwapOutlined />}
+                    disabled
+                  >
+                    異動
+                  </Button>
+                </span>
+              </Tooltip>
+            ) : (
+              <Button
+                type='text'
+                size='small'
+                icon={<SwapOutlined />}
+                disabled={!row.employeeNo}
+                title='所属変更（異動）'
+                onClick={() => openTransfer(row.key)}
+              >
+                異動
+              </Button>
+            )}
+          </Space>
+        );
+      },
     });
 
     return cols;
@@ -1808,6 +2204,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     handleDeleteRow,
     openTransfer,
     departments,
+    currentMonday,
+    savedBaseline,
+    rowCountByEmployee,
+    employeesWithPastActuals,
+    pastYear,
   ]);
 
   /** テーブルデータ（表示中の要員） */
@@ -1903,13 +2304,19 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           </Tag>
         </Space>
         <Space wrap>
-          <Button icon={<PlusOutlined />} onClick={handleAddRow}>
+          {pastYear && <Tag color='default'>過年度は参照のみ</Tag>}
+          <Button
+            icon={<PlusOutlined />}
+            onClick={handleAddRow}
+            disabled={pastYear}
+          >
             行追加
           </Button>
           <Button
             type={selectMode ? 'primary' : 'default'}
             icon={<SelectOutlined />}
             onClick={() => toggleSelectMode(!selectMode)}
+            disabled={pastYear}
           >
             {selectMode ? '複数選択解除' : '複数選択'}
           </Button>
@@ -1918,7 +2325,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             type={dirty ? 'primary' : 'default'}
             icon={<SaveOutlined />}
             onClick={handleSave}
-            disabled={!dirty}
+            disabled={!dirty || pastYear}
           >
             保存（モック）
           </Button>
@@ -1957,6 +2364,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           From/To で表示する週を絞り込めます（From/To とも任意）。
           「全表示」で表示期間とすべての列フィルタを解除できます。
           「行追加」した行は、次に列フィルタを適用するまで絞り込みの対象外として表示されます。
+          過去の週（今週の月曜より前）は読み取り専用です。
         </Text>
       </div>
 
