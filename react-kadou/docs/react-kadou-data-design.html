@@ -153,6 +153,7 @@
     <li><a href="#validation">バリデーション</a></li>
     <li><a href="#migration">現行からの移行対応</a></li>
     <li><a href="#review">レビュー時の確認ポイント</a></li>
+    <li><a href="#changelog">改修履歴</a></li>
   </ol>
 </nav>
 
@@ -271,23 +272,34 @@ interface YearData {
 
   <h3>3.5 稼働データ</h3>
 <pre><code>interface WorkStatusData {
-  /** 稼働表に表示する要員（並び順） */
-  rows: EmployeeNo[];
-  /** 要員×週の割当 */
-  assignments: AssignmentMap;
+  /** 稼働表に表示する行（並び順） */
+  rows: WorkStatusRow[];
+  /** 要員×週の割当（projectId / null = 明示的な未割当） */
+  assignment: AssignmentMap;
+  /** 要員×週の BUFFER（無償支援） */
+  unpaid: UnpaidMap;
 }
 
-interface AssignmentCell {
-  projectId: ProjectId | null; // null = 未割当
-  unpaid: boolean;             // BUFFER
+interface WorkStatusRow {
+  key: string;                 // 行キー（異動で分割された行を区別する）
+  employeeNo: EmployeeNo;      // 業務上の同一性キー
+  departmentId: DepartmentId;  // この行の所属
+  activeFrom?: WeekKey;        // 未指定 = 年度初め
+  activeTo?: WeekKey;          // 未指定 = 年度末
+  employeeNoLocked?: boolean;  // 異動で分割された行（社員番号は 2 行まとめて変更する）
+  splitFromKey?: string;       // 異動元の行キー
 }
 
+/** 要員ID -> (週キー -> プロジェクトID または null) */
 type AssignmentMap = Record&lt;
   EmployeeNo,
-  Record&lt;WeekKey, AssignmentCell&gt;
-&gt;;</code></pre>
+  Record&lt;WeekKey, ProjectId | null&gt;
+&gt;;
+
+/** 要員ID -> (週キー -> true = BUFFER) */
+type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code></pre>
   <ul>
-    <li>稼働表行：<code>(year, employeeNo)</code></li>
+    <li>稼働表行：<code>(year, key)</code>。<code>employeeNo</code> は年度内で最大 2 行（異動 1 回・有効期間は重ならない）</li>
     <li>割当：<code>(year, employeeNo, weekKey)</code></li>
     <li>1人要員・1週につき1プロジェクト（＋BUFFERフラグ）</li>
   </ul>
@@ -315,7 +327,7 @@ type AssignmentMap = Record&lt;
       <tr><td>要員</td><td><code>(year, employeeNo)</code></td><td><code>(year, employeeNo)</code></td></tr>
       <tr><td>プロジェクト</td><td><code>(year, projectId)</code></td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
       <tr><td>休日</td><td><code>(year, holidayId)</code></td><td><code>(year, date)</code></td></tr>
-      <tr><td>稼働表行</td><td><code>(year, employeeNo)</code></td><td><code>(year, employeeNo)</code></td></tr>
+      <tr><td>稼働表行</td><td><code>(year, key)</code></td><td><code>employeeNo</code> は年度内で最大 2 行（異動 1 回）。同じ社員の行は有効期間が重ならない</td></tr>
       <tr><td>割当</td><td><code>(year, employeeNo, weekKey)</code></td><td><code>(year, employeeNo, weekKey)</code></td></tr>
       <tr><td>ユーザー所属</td><td><code>(year, userId)</code></td><td><code>(year, userId)</code></td></tr>
     </tbody>
@@ -365,7 +377,7 @@ type AssignmentMap = Record&lt;
       <tr><td>要員情報</td><td>要員マスタの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
       <tr><td>プロジェクト管理</td><td>プロジェクトの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
       <tr><td>休日設置</td><td>休日の追加・更新・削除・一括取込</td><td>即時保存</td></tr>
-      <tr><td>要員稼動管理</td><td>行追加・行削除、社員番号入力、割当、BUFFER</td><td>明示保存</td></tr>
+      <tr><td>要員稼動管理</td><td>行追加・行削除、社員番号入力、所属変更（異動）、割当、BUFFER（過去年度は参照のみ）</td><td>明示保存</td></tr>
       <tr><td>済南稼働率統計</td><td>表示のみ（初期時に計算）</td><td>保存しない</td></tr>
       <tr><td>ユーザー管理</td><td>ユーザー・年度別所属の管理</td><td>即時保存</td></tr>
     </tbody>
@@ -390,7 +402,7 @@ type AssignmentMap = Record&lt;
     <li>稼働表の社員番号欄は<strong>入力可能</strong></li>
     <li>入力確定（Enter / フォーカスアウト）時に要員マスタを検索</li>
     <li>一致する <code>employeeNo</code> がある場合のみ行を確定</li>
-    <li>同じ <code>employeeNo</code> が既に <code>rows</code> にある場合はエラー</li>
+    <li>同じ <code>employeeNo</code> が既に <code>rows</code> にある場合はエラー（異動による 2 行のみ、有効期間が重ならない場合に許可）</li>
     <li>社員番号の入力によって要員マスタを新規作成・更新しない</li>
     <li>氏名・役割・所属はマスタから自動表示し、稼働表では編集不可</li>
   </ul>
@@ -410,45 +422,132 @@ type AssignmentMap = Record&lt;
   </table>
   <p>氏名・役割・所属の変更は要員情報画面でのみ行います。マスタが更新されると、稼働表の表示にも自動反映されます。</p>
 
-  <h3>7.4 行削除</h3>
+  <h3>7.4 過去実績の保護（共通ルール）</h3>
   <ul>
-    <li><code>workStatus.rows</code> から対象の <code>employeeNo</code> を外す</li>
-    <li>要員マスタは削除しない</li>
-    <li>過去の割当は保持する（表示対象から外れるだけ）</li>
-    <li>同じ要員を再度行追加すると、過去の割当も再表示される</li>
-    <li>割当自体を削除したい場合は、行削除とは別の操作にする</li>
-  </ul>
-
-  <h3>7.5 社員番号の変更と割当</h3>
-  <ul>
-    <li>割当が無い行：社員番号の変更を許可する（入力ミスの訂正）</li>
-    <li>割当がある行：<strong>社員番号の変更はブロック</strong>する
+    <li><strong>過去実績</strong>＝当年度の「年度初め〜先週の日曜日」の週に、次のいずれかがあること
       <ul>
-        <li>行削除 → 行追加を案内する</li>
-        <li>理由：割当は <code>employeeNo</code> をキーに保持しているため、社員番号を変えると過去の割当が新しい社員に移る／消える危険がある</li>
+        <li>プロジェクトの割当（<code>projectId</code> が非 null。退職「内・退職」を含む）</li>
+        <li>BUFFER（無償支援）</li>
       </ul>
     </li>
-    <li>どうしても変更を許可する場合は、確認ダイアログと「旧社員の割当を保持する／新社員は空にする」などの仕様が必要</li>
+    <li>判定は<strong>保存済みデータ</strong>で行う（画面を開いた時点の内容。保存成功時にその payload で判定基準を更新する）</li>
+    <li>過去実績の判定範囲は操作によって異なる
+      <ul>
+        <li>行削除：<strong>対象行の有効期間</strong> ∩ 過去</li>
+        <li>社員番号変更：<strong>同じ社員の全行（1〜2 行）の有効期間</strong> ∩ 過去（2 行まとめて変更するため）</li>
+      </ul>
+    </li>
+    <li>過去実績がある場合は<strong>行削除・社員番号変更を禁止</strong>する（ボタン・入力欄を無効化し、ツールチップで理由を表示する）</li>
+    <li>過去年度は全期間が過去、未来年度は過去なし（＝制限なし）</li>
+    <li>過去週（今週の月曜より前）のセルは<strong>編集不可</strong>（読み取り専用）
+      <ul>
+        <li>セルには項目の略称を表示する（空白にしない）。グレー表示で、クリック・選択・プルダウンは不可</li>
+        <li>BUFFER の切替、貼り付け、矩形選択は不可。右クリックメニューは「コピー」のみ可（編集系メニューは不可）</li>
+        <li>「内・退職」も今週以降からしか設定できない</li>
+      </ul>
+    </li>
+    <li><strong>過去年度の稼働管理画面は参照のみ</strong>（行追加・行削除・異動・保存・退場予定の編集は不可）</li>
+    <li>今週（今週の月曜〜日曜）は編集できる。行削除で消えるのは今週以降の分だけ（過去実績がある行はそもそも削除できない）</li>
+    <li>画面を開いたまま週が変わった場合は、過去の範囲を再計算する</li>
+    <li>行削除・異動で行の所属や有効期間が変わると、済南稼働統計の過去の「人数」が変わることがある（人数は割当の有無に関係なく「行の所属 × 有効期間」で数えるため）。これは許容する</li>
   </ul>
 
-  <h3>7.6 保存ペイロード</h3>
+  <h3>7.5 行削除</h3>
+  <ul>
+    <li>削除できるのは、<strong>過去実績が無い行</strong>だけ（判定は 7.4 の行単位）</li>
+    <li>削除前に警告（確認ダイアログ）を表示する
+      <ul>
+        <li>残りの行がある場合：「この行（社員番号・所属・期間）と、この行の期間の業務データ（割当・BUFFER）を削除します。要員マスタは削除されません。残りの行は期間が自動で延長されます。」</li>
+        <li>最後の 1 行の場合：「この行と、当該年度の業務データ（割当・BUFFER）をすべて削除します。要員マスタは削除されません。」</li>
+        <li>キャンセルした場合は何も変更しない</li>
+      </ul>
+    </li>
+    <li>異動で分割された行は、前段（旧所属）・後段（新所属）の<strong>どちらでも削除できる</strong></li>
+    <li>削除したら、残った行が削除した行の期間を吸収する（＝行は 1 行に戻る）
+      <ul>
+        <li>前段を削除 → 残った後段の開始週を前段の開始週に合わせる（未指定なら年度初め）</li>
+        <li>後段を削除 → 残った前段の終了週を後段の終了週に合わせる（未指定なら年度末）</li>
+        <li>残った行の <code>splitFromKey</code> と <code>employeeNoLocked</code> を解除する</li>
+      </ul>
+    </li>
+    <li>業務データ（<code>assignment</code> / <code>unpaid</code>）は<strong>削除した行の期間内だけ</strong>削除する（残った行の期間の実績は保持する）</li>
+    <li>吸収された期間は割当が無いため「未割当」で表示される</li>
+    <li>要員マスタ（要員情報）は<strong>削除しない</strong>。稼働表の表示行から外すだけ</li>
+    <li>その社員の最後の行を削除した場合は、当該年度の業務データをすべて削除する</li>
+    <li>削除後に同じ社員番号を再入力して行追加しても、業務データが無いため<strong>全ての週が「未割当」</strong>で表示される（過去の割当は復元しない）</li>
+    <li>異動の行を削除した場合は「異動していない状態」に戻るため、同じ年度内で再度異動できる（削除した異動は無かったことになる）</li>
+    <li>行削除は明示保存。同じ社員の行が残る場合（一部の行の削除）も対象社員を <code>deletedEmployeeNos</code> に含める。API は「削除 → payload 反映」の順で処理するため、残った行の実績は保持され、削除した期間の実績だけが消える（7.8 参照）</li>
+  </ul>
+
+  <h3>7.6 所属変更（異動）の上限</h3>
+  <ul>
+    <li>1 人の社員が異動できるのは<strong>同一年度内で 1 回まで</strong>（＝行は最大 2 行）</li>
+    <li>異動で 2 行になっている間は、<strong>両方の行の「異動」ボタンを無効化</strong>する
+      <ul>
+        <li>無効化したボタンにはツールチップで「1年度につき異動は1回までです」と表示する</li>
+      </ul>
+    </li>
+    <li><strong>適用開始週は今週の月曜以降</strong>とする（過去週には異動できない）
+      <ul>
+        <li>過去年度は適用できる週が無いため、異動できない</li>
+      </ul>
+    </li>
+    <li>行削除で 1 行に戻った場合は、再度異動できる（削除した異動は無かったことになる）</li>
+    <li>保存（API）側でも、同一 <code>employeeNo</code> の行が 2 行を超える場合、適用開始週が今週の月曜より前の場合は保存を拒否する</li>
+  </ul>
+
+  <h3>7.7 社員番号の変更と割当</h3>
+  <ul>
+    <li><strong>過去実績が無い場合</strong>（7.4 の社員単位判定）、割当の有無に関係なく変更できる（入力ミスの訂正・異動取消後の修正を含む）</li>
+    <li>過去実績がある社員は、<strong>社員番号欄を編集できない</strong>（読み取り専用の表示＋ツールチップで理由を表示）</li>
+    <li>異動中の 2 行も変更できる。この場合は<strong>2 行まとめて同じ社員番号に変更</strong>する（片方だけの変更は不可）</li>
+    <li>変更すると、その社員の既存の割当・BUFFER は<strong>新しい社員番号へ引き継ぐ</strong>（行の表示は変わらない）</li>
+    <li>旧社員番号の当年度の業務データは残さない（新しい社員番号へ移す）</li>
+    <li>新しい社員番号に既存データがある場合は、引き継いだデータで<strong>上書きする</strong></li>
+    <li>保存時は旧社員番号を <code>deletedEmployeeNos</code> に含めて送る（バックエンドは旧番号のデータを削除してから、新番号のデータを反映する）</li>
+    <li>社員番号を空にできるのは、次をすべて満たす場合だけ
+      <ul>
+        <li>異動中の 2 行ではない（行削除で対応する）</li>
+        <li>当該社員の業務データ（割当・BUFFER）が下書き・保存済みのどちらにも無い</li>
+      </ul>
+    </li>
+    <li>空にできない場合はメッセージを表示し、入力前の社員番号に戻す</li>
+  </ul>
+
+  <h3>7.8 保存ペイロード</h3>
 <pre><code>interface WorkStatusPayload {
   year: Year;
-  rows: EmployeeNo[];
-  assignments: AssignmentMap;
+  rows: WorkStatusRow[];
+  assignment: AssignmentMap;
+  unpaid: UnpaidMap;
+  /** 行削除・社員番号変更で業務データを削除した社員番号 */
+  deletedEmployeeNos: EmployeeNo[];
 }</code></pre>
   <ul>
-    <li><code>personnel</code> は含めない</li>
-    <li><code>rows</code> に無い要員の割当は削除しない</li>
+    <li><code>personnel</code> は含めない（要員マスタは変更しない）</li>
+    <li><code>deletedEmployeeNos</code> の要員は、当該年度の割当・BUFFER を削除してから <code>assignment</code> / <code>unpaid</code> を反映する</li>
+    <li><code>deletedEmployeeNos</code> は「最後の行を削除した場合」だけでなく、「異動で分割された行の一部を削除した場合」も対象社員を含める（削除→反映の順のため、残った行の実績は保持される）</li>
+    <li><code>deletedEmployeeNos</code> に無い要員の割当は削除しない（画面に表示していないだけの実績を守る）</li>
     <li>社員番号が空の行がある場合は保存不可</li>
     <li>未保存フラグは稼働表のみ対象</li>
   </ul>
 
-  <h3>7.7 要員マスタ削除時</h3>
+  <h3>7.9 要員マスタ削除時</h3>
   <ul>
-    <li>その年度の割当が存在する場合は削除をブロックする</li>
-    <li>または「割当も削除する」確認付きのカスケード削除</li>
-    <li>推奨はブロック（誤削除防止）</li>
+    <li>割当の有無では削除をブロックしない（要員マスタは削除できる）</li>
+    <li>削除すると、<strong>選択中の年度の稼働データ（稼働表行・割当・BUFFER）も同時に削除</strong>する（カスケード）
+      <ul>
+        <li>過去実績も削除対象（7.4 の過去実績保護の例外）</li>
+        <li>他の年度のデータは削除しない</li>
+      </ul>
+    </li>
+    <li>当年度に稼働データ（稼働表行・割当・BUFFER）がある場合のみ、削除前に確認メッセージを表示する
+      <ul>
+        <li>「当年度の稼働表行・割当・BUFFERも削除されますが、よろしいでしょうか。」</li>
+        <li>稼働データが無い場合は確認なしで削除する</li>
+      </ul>
+    </li>
+    <li>削除は即時保存（要員情報画面）</li>
   </ul>
 </section>
 
@@ -602,10 +701,14 @@ type AssignmentMap = Record&lt;
     <li>プロジェクトの <code>departmentId</code> は存在する部門IDを参照</li>
     <li>割当の <code>projectId</code> は存在するプロジェクトIDを参照</li>
     <li>稼働表の <code>rows</code> は要員マスタに存在する <code>employeeNo</code> のみ</li>
-    <li>稼働表の <code>rows</code> 内で <code>employeeNo</code> は重複不可</li>
+    <li>稼働表の <code>rows</code> 内で <code>employeeNo</code> は重複不可（異動による 2 行のみ、有効期間が重ならない場合に許可）</li>
+    <li>同一 <code>employeeNo</code> の行は 1 年度につき最大 2 行（3 行以上になる保存は拒否）</li>
+    <li>過去週（年度初め〜先週の日曜）の <code>assignment</code> / <code>unpaid</code> が保存済みデータと異なる場合は保存を拒否</li>
+    <li>過去実績がある行の削除、および過去実績がある社員の社員番号変更を含む保存は拒否</li>
+    <li>異動（同一社員の 2 行）の適用開始週が今週の月曜より前の場合は保存を拒否</li>
     <li>社員番号が空の行がある場合は保存不可</li>
     <li>週キーは対象年度の週リスト内に存在</li>
-    <li>マスタ削除時は参照チェックを行う</li>
+    <li>マスタ削除時は参照チェックを行わない（当年度の稼働データも同時に削除する）</li>
   </ul>
   <p>部門名が重複可能になるため、部門選択肢は必要に応じて「部門名（部門ID）」のように区別できる表示にします。</p>
 </section>
@@ -656,15 +759,71 @@ type AssignmentMap = Record&lt;
     </tbody>
   </table>
 
-  <h3>14.2 未確定の確認ポイント</h3>
-  <ol>
-    <li>稼働表の行削除は「表示対象から外すだけで、過去の割当は保持」でよいか</li>
-    <li>要員マスタ削除は、その年度の割当がある場合ブロックしてよいか</li>
-    <li>部門名の重複を許容するため、部門選択肢の表示を「部門名（部門ID）」に変更してよいか</li>
-    <li>割当は「1人要員・1週に1プロジェクト」の前提でよいか</li>
-    <li>割当がある行の社員番号変更はブロックし、行削除→行追加を案内する案でよいか</li>
-    <li>マスタに無い社員番号を入力した場合、行を空のまま残すか、行自体を削除するか</li>
-  </ol>
+  <h3>14.2 確定した事項（行削除・異動・過去実績・要員マスタ）</h3>
+  <table>
+    <thead>
+      <tr><th>論点</th><th>確定内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>行削除で消すデータ</td><td>業務データ（割当・BUFFER）のみ。要員マスタは削除しない</td></tr>
+      <tr><td>行削除のデータ範囲</td><td>削除した行の有効期間内だけ。その社員の最後の行なら当該年度のすべて</td></tr>
+      <tr><td>異動行の削除</td><td>前段・後段のどちらも削除できる。残った行が期間を吸収して 1 行に戻る</td></tr>
+      <tr><td>削除後の再追加</td><td>全週「未割当」で表示する（過去の割当は復元しない）</td></tr>
+      <tr><td>異動の回数</td><td>同一社員・同一年度で 1 回まで（行は最大 2 行）。行削除で 1 行に戻れば再異動できる</td></tr>
+      <tr><td>異動ボタン</td><td>2 行になっている間は両方の行で無効化し、ツールチップで理由を表示する</td></tr>
+      <tr><td>保存（API）</td><td>同一社員の行が 3 行以上になる保存は拒否する</td></tr>
+      <tr><td>社員番号の変更</td><td>過去実績がある社員は編集不可（読み取り専用表示＋ツールチップ）。それ以外は割当があっても変更できる。異動中の 2 行は 2 行まとめて変更する。既存の割当・BUFFER は新しい社員番号へ引き継ぎ（新番号に既存データがあれば上書き）、旧社員番号のデータは残さない</td></tr>
+      <tr><td>社員番号を空にする</td><td>異動中の 2 行は不可（行削除で対応）。割当・BUFFER が下書き・保存済みのどちらかにある場合も不可（行削除でデータごと削除）。それ以外は空行に戻す</td></tr>
+      <tr><td>過去実績の定義</td><td>年度初め〜先週の日曜の週に、割当（退職「内・退職」を含む）または BUFFER があること。保存済みデータで判定する</td></tr>
+      <tr><td>行削除・社員番号変更の制限</td><td>過去実績がある行は削除できない（行単位判定）。過去実績がある社員は社員番号を変更できない（社員単位判定）</td></tr>
+      <tr><td>過去週の編集</td><td>過去週のセルは読み取り専用（略称を表示・グレー）。BUFFER・貼り付け・矩形選択は不可。右クリックは「コピー」のみ可。「内・退職」も今週以降のみ</td></tr>
+      <tr><td>過去年度</td><td>稼働管理画面は参照のみ（行追加・行削除・異動・保存・退場予定の編集は不可）</td></tr>
+      <tr><td>異動の適用開始週</td><td>今週の月曜以降のみ。過去年度は異動できない</td></tr>
+      <tr><td>一部の行を削除した場合</td><td>同じ社員の行が残っても <code>deletedEmployeeNos</code> に含める（削除→反映の順で残った行の実績は保持）</td></tr>
+      <tr><td>要員マスタ削除</td><td>ブロックしない。選択年度の稼働表行・割当・BUFFER も削除（過去実績含む）。稼働データがある場合のみ確認メッセージを表示。他年度は削除しない</td></tr>
+      <tr><td>部門選択肢の表示</td><td>現状維持（部門名のみ。部門IDは表示しない）</td></tr>
+      <tr><td>割当の前提</td><td>1人要員・1週につき1プロジェクト（＋BUFFERフラグ）</td></tr>
+      <tr><td>マスタに無い社員番号</td><td>入力不可（警告を表示し、入力前の値に戻す）。行はそのまま残る</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="changelog">
+  <h2>15. 改修履歴</h2>
+  <table>
+    <thead>
+      <tr><th>日付</th><th>改修内容</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2026-10-23</td>
+        <td>
+          過去実績の保護・要員マスタ削除のルールを追加
+          <ul>
+            <li>過去実績（年度初め〜先週の日曜の割当・BUFFER・退職）がある行は行削除・社員番号変更を禁止（行削除は行単位、社員番号変更は社員単位で判定）</li>
+            <li>過去週のセルは編集不可（略称を表示）。右クリックはコピーのみ可。「内・退職」も今週以降のみ</li>
+            <li>過去年度の稼働管理画面は参照のみ（行追加・行削除・異動・保存・退場予定の編集不可）</li>
+            <li>異動の適用開始週は今週の月曜以降に限定</li>
+            <li>一部の行を削除した場合も <code>deletedEmployeeNos</code> に含める（削除→反映の順で残った行の実績を保持）</li>
+            <li>API 側でも過去週の変更・過去実績がある行の削除/社員番号変更・過去の異動開始週を拒否</li>
+            <li>要員マスタ削除：割当の有無でブロックせず、選択年度の稼働表行・割当・BUFFER も削除（過去実績含む）。削除対象の稼働データがある場合のみ確認メッセージを表示</li>
+            <li>残りの確認ポイントを確定：部門選択肢は現状維持、1人要員・1週に1プロジェクト、マスタに無い社員番号は入力不可（元の値に戻す）</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2026-10-26</td>
+        <td>
+          社員番号変更の詳細を確定
+          <ul>
+            <li>過去実績がある社員は社員番号欄を編集不可（読み取り専用＋ツールチップ）</li>
+            <li>社員番号を空にできるのは、異動中でなく、割当・BUFFER が下書き・保存済みのどちらにも無い場合だけ。空にできない場合はメッセージ＋元の値に戻す</li>
+            <li>変更時は 2 行まとめて変更し、割当・BUFFER を新番号へ引き継ぐ（新番号に既存データがあれば上書き、旧番号のデータは残さない）</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </section>
 
 </main>

@@ -16,6 +16,7 @@ import {
 import type { TableColumnsType } from 'antd';
 import {
   CheckOutlined,
+  DeleteOutlined,
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
@@ -53,6 +54,13 @@ interface PersonnelInfoScreenProps {
    * 社員番号で突合し、既存は上書き（更新）・新規は追加する
    */
   onImport: (rows: PersonnelImportRow[]) => void;
+  /**
+   * 要員マスタの削除
+   * 当年度の稼働表行・割当・BUFFER も削除する（他年度は変更しない）
+   */
+  onDelete: (employeeNo: string) => void;
+  /** 当年度に稼働データ（行・割当・BUFFER）があるか（削除確認の表示判定） */
+  hasWorkData: (employeeNo: string) => boolean;
 }
 
 /**
@@ -66,6 +74,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   departments,
   onSubmit,
   onImport,
+  onDelete,
+  hasWorkData,
 }) => {
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState('');
@@ -102,6 +112,33 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setName('');
     setDeptId(undefined);
     setConfirmedNo('');
+  };
+
+  /**
+   * 表示中の要員を削除する。
+   * 当年度に稼働データ（行・割当・BUFFER）がある場合のみ確認する。
+   */
+  const handleDelete = () => {
+    const no = employeeNo.trim();
+    if (!no || !masterByNo.has(no)) return;
+    const doDelete = () => {
+      onDelete(no);
+      handleReset();
+      message.success(`社員番号「${no}」を削除しました。`);
+    };
+    if (hasWorkData(no)) {
+      Modal.confirm({
+        title: '要員の削除',
+        content:
+          '当年度の稼働表行・割当・BUFFERも削除されますが、よろしいでしょうか。',
+        okText: '削除',
+        cancelText: 'キャンセル',
+        okButtonProps: { danger: true },
+        onOk: doDelete,
+      });
+      return;
+    }
+    doDelete();
   };
 
   /**
@@ -412,6 +449,11 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             <Button type='text' onClick={handleReset}>
               クリア
             </Button>
+            {isExisting && (
+              <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+                削除する
+              </Button>
+            )}
           </Space>
         </Space>
       </Card>

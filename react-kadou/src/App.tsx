@@ -247,6 +247,62 @@ function App() {
   );
 
   /**
+   * 要員マスタの削除。
+   * 当年度の稼働表行・割当・BUFFER も削除する（他年度は変更しない）。
+   */
+  const handleDeletePersonnel = useCallback(
+    (employeeNo: string) => {
+      setStores((prev) => {
+        const current = prev[selectedYear];
+        if (!current) return prev;
+        const assignment = { ...current.workStatus.assignment };
+        delete assignment[employeeNo];
+        const unpaid = { ...current.workStatus.unpaid };
+        delete unpaid[employeeNo];
+        return {
+          ...prev,
+          [selectedYear]: {
+            ...current,
+            personnel: current.personnel.filter(
+              (p) => p.employeeNo !== employeeNo,
+            ),
+            workStatus: {
+              rows: current.workStatus.rows.filter(
+                (r) => r.employeeNo !== employeeNo,
+              ),
+              assignment,
+              unpaid,
+            },
+          },
+        };
+      });
+      void kadouRepository.deletePersonnel(selectedYear, employeeNo);
+    },
+    [selectedYear],
+  );
+
+  /**
+   * 当年度に稼働データ（稼働表行・割当・BUFFER）があるか。
+   * 要員マスタ削除の確認メッセージを出すかの判定に使う。
+   */
+  const hasWorkDataForPersonnel = useCallback(
+    (employeeNo: string) => {
+      const workStatus = stores[selectedYear]?.workStatus;
+      if (!workStatus) return false;
+      if (workStatus.rows.some((r) => r.employeeNo === employeeNo)) {
+        return true;
+      }
+      const assignments = workStatus.assignment[employeeNo] ?? {};
+      if (Object.keys(assignments).some((w) => assignments[w] != null)) {
+        return true;
+      }
+      const buffer = workStatus.unpaid[employeeNo] ?? {};
+      return Object.keys(buffer).some((w) => buffer[w] === true);
+    },
+    [stores, selectedYear],
+  );
+
+  /**
    * 要員マスタの項目（現在は退場予定）の更新。
    * 稼働表の備考欄から呼ばれる。マスタは即時保存する。
    */
@@ -416,6 +472,8 @@ function App() {
         departments={store.departments}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}
+        onDelete={handleDeletePersonnel}
+        hasWorkData={hasWorkDataForPersonnel}
       />
     ),
     'department-manage': (
