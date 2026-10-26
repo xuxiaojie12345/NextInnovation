@@ -1,17 +1,22 @@
-from pydantic import BaseModel
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
 
 
-class UserCreate(BaseModel):
-    """创建用户 - 接收前端入参"""
-    name: str
-    age: int
+class LoginRequest(BaseModel):
+    """ログインリクエスト（フロントエンドからの入参）"""
+
+    user_id: str
+    password: str
 
 
 class UserOut(BaseModel):
-    """返回给前端的数据"""
-    id: int
-    name: str
-    age: int
+    """ログイン成功時に返すユーザー情報"""
 
-    class Config:
-        orm_mode = True
+    user_id: str
+    name: str
+    role: str
+    role_label: str
+    department: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)

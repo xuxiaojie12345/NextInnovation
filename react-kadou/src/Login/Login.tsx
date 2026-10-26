@@ -4,6 +4,7 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { AuthUser } from '../data/mockUsers';
 import type { Department } from '../WorkStatus/types';
 import { departmentNameOf } from '../data/departmentUtils';
+import { loginApi } from '../api/auth';
 import './Login.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -25,27 +26,33 @@ const ROLE_COLOR: Record<AuthUser['role'], string> = {
 };
 
 /**
- * ログイン画面（モック）
- * フロント内の固定ユーザー（MOCK_USERS）でユーザーID・パスワードを照合する。
- * バックエンド実装時は認証 API に置き換える。
+ * ログイン画面
+ * バックエンドのログインAPI（POST /api/v1/login）でユーザーID・パスワードを照合する。
  */
 const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
   // 認証エラーのメッセージ（空 = エラーなし）
   const [error, setError] = useState('');
+  // ログイン処理中フラグ
+  const [loading, setLoading] = useState(false);
 
-  /** ログイン実行（ユーザーID・パスワードを MOCK_USERS と照合する） */
-  const handleFinish = (values: { userId: string; password: string }) => {
+  /** ログイン実行（バックエンドのログインAPIで照合する） */
+  const handleFinish = async (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
     const password = values.password.trim();
-    const user = users.find(
-      (u) => u.userId === userId && u.password === password,
-    );
-    if (!user) {
-      setError('ユーザーIDまたはパスワードが正しくありません。');
-      return;
-    }
+    setLoading(true);
     setError('');
-    onLogin(user);
+    try {
+      const user = await loginApi(userId, password);
+      onLogin(user);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'ユーザーIDまたはパスワードが正しくありません。',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,12 +106,12 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
               }}
             />
           </Form.Item>
-          <Button type='primary' size='large' htmlType='submit' block>
+          <Button type='primary' size='large' htmlType='submit' block loading={loading}>
             ログイン
           </Button>
         </Form>
 
-        {/* テスト用アカウント（モックのため画面上に案内する） */}
+        {/* 開発用テストアカウント（バックエンドに登録済み） */}
         <div className='login-hint'>
           <Text type='secondary'>
             テスト用アカウント（パスワードはすべて <code>pass1234</code>）

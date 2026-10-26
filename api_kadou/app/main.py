@@ -1,14 +1,26 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.v1.routes import router as api_v1_router
 from app.core.settings import settings
+from app.db.init_db import init_db
 
-app = FastAPI(title="React-FastAPI-MySQL 后端")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """起動時にテーブル作成と初期データ投入を行う"""
+    init_db()
+    yield
+
+
+app = FastAPI(title="React-FastAPI-MySQL バックエンド", lifespan=lifespan)
 
 # 跨域配置（允许React前端访问）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite默认前端地址
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,6 +37,7 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host=settings.SERVER_HOST,

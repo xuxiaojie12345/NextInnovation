@@ -7,7 +7,12 @@ DB_URL = (
     f"@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 )
 
-engine = create_engine(DB_URL, echo=False)  # echo=True 打印SQL调试
+engine = create_engine(
+    DB_URL,
+    echo=False,  # echo=True 打印SQL调试
+    pool_pre_ping=True,  # 接続前に疎通確認（再接続を自動化）
+    connect_args={"connect_timeout": 5},  # 接続タイムアウト（ハング防止）
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
