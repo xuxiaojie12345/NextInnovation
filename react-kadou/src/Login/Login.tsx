@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, Card, Form, Input, Tag, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { AuthUser } from '../data/mockUsers';
+import type { Department } from '../WorkStatus/types';
+import { departmentNameOf } from '../data/departmentUtils';
 import './Login.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -9,6 +11,8 @@ const { Title, Text, Paragraph } = Typography;
 interface LoginProps {
   /** ログインユーザー一覧（ユーザー管理画面で追加・変更・削除される） */
   users: AuthUser[];
+  /** 部門マスタ（ユーザーの担当部門名の表示に使用） */
+  departments: Department[];
   /** 認証成功時にログインユーザーを通知する */
   onLogin: (user: AuthUser) => void;
 }
@@ -25,7 +29,7 @@ const ROLE_COLOR: Record<AuthUser['role'], string> = {
  * フロント内の固定ユーザー（MOCK_USERS）でユーザーID・パスワードを照合する。
  * バックエンド実装時は認証 API に置き換える。
  */
-const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
+const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
   // 認証エラーのメッセージ（空 = エラーなし）
   const [error, setError] = useState('');
 
@@ -112,7 +116,9 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                 <code>{u.userId}</code>
                 <Text type='secondary'>
                   {u.name}
-                  {u.department ? `（${u.department}）` : ''}
+                  {u.departmentId
+                    ? `（${departmentNameOf(departments, u.departmentId)}）`
+                    : ''}
                 </Text>
               </li>
             ))}

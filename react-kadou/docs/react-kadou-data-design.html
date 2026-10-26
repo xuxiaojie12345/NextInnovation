@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>react-kadou データ構成 確定案</title>
+<style>
+  :root {
+    --accent: #1677ff;
+    --border: #e5e7eb;
+    --muted: #666;
+    --bg-soft: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 24px 64px;
+    background: #fff;
+    color: #24292f;
+    font-family: "Segoe UI", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+    line-height: 1.8;
+  }
+  main, header, nav, footer {
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--accent);
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 40px;
+    padding: 6px 0 6px 12px;
+    border-left: 5px solid var(--accent);
+    background: #f0f6ff;
+  }
+  h3 {
+    font-size: 17px;
+    margin-top: 28px;
+    color: #0f3d91;
+  }
+  p { margin: 8px 0; }
+  ul, ol { padding-left: 1.6em; }
+  li { margin: 4px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    vertical-align: top;
+    text-align: left;
+  }
+  th {
+    background: #f5f7fa;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background: #f3f4f6;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  pre {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 13px;
+  }
+  .toc {
+    margin-top: 24px;
+    padding: 16px 24px;
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .toc h2 {
+    margin: 0 0 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 18px;
+  }
+  .toc ol { margin: 0; }
+  .meta { color: var(--muted); margin: 0; }
+  .note {
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: #fffbe6;
+    border-left: 4px solid #faad14;
+  }
+  .decision {
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: #e6f4ff;
+    border-left: 4px solid var(--accent);
+  }
+  .small { font-size: 13px; color: var(--muted); }
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  @media print {
+    body { padding: 0; }
+    h2 { break-after: avoid; }
+    pre, table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>react-kadou データ構成 確定案</h1>
+  <p class="meta">レビュー用 / 2026-10-20 / ソースコード変更なし</p>
+  <div class="note">
+    本ドキュメントは設計案です。`react-kadou` のソースコードは変更していません。
+  </div>
+</header>
+
+<nav class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#policy">基本方針</a></li>
+    <li><a href="#overall">全体構成</a></li>
+    <li><a href="#entities">エンティティ定義</a></li>
+    <li><a href="#keys">主キー・一意制約一覧</a></li>
+    <li><a href="#er">関係一覧</a></li>
+    <li><a href="#screens">画面ごとの責務と保存</a></li>
+    <li><a href="#work-status">要員稼動管理の詳細</a></li>
+    <li><a href="#import">一括読み込み</a></li>
+    <li><a href="#jinan">済南稼働統計</a></li>
+    <li><a href="#user-department">ユーザー年度別所属</a></li>
+    <li><a href="#repository">保存・取得</a></li>
+    <li><a href="#validation">バリデーション</a></li>
+    <li><a href="#migration">現行からの移行対応</a></li>
+    <li><a href="#review">レビュー時の確認ポイント</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="policy">
+  <h2>1. 基本方針</h2>
+  <ul>
+    <li>年度を最上位キーとする</li>
+    <li>部門・要員・プロジェクト・休日は年度ごとに凍結</li>
+    <li>要員の同一性は <code>employeeNo</code></li>
+    <li>マスタは即時保存、稼働表は明示保存</li>
+    <li>稼働表では<strong>社員番号を入力できる</strong></li>
+    <li>氏名・役割・所属は要員マスタから表示し、稼働表では編集不可</li>
+    <li>要員マスタの追加・更新・削除は要員情報画面のみ</li>
+    <li>済南稼働統計は画面初期時に年度データから計算（当面モック）</li>
+    <li>ユーザーの所属部門は年度ごとに保持</li>
+    <li>一括読み込みの重複時は「上書き」か「中止」をユーザーが選択</li>
+    <li>部門の一意制約は <code>(year, departmentId)</code>（部門名の一意制約はなし）</li>
+    <li>プロジェクトの一意制約は <code>(year, customer, caseName, team, subTeam)</code>（現場の運用に合わせる）</li>
+  </ul>
+</section>
+
+<section id="overall">
+  <h2>2. 全体構成</h2>
+<pre><code>type Year = number;
+type WeekKey = string;      // 月曜 'YYYY-MM-DD'
+type DepartmentId = string;
+type ProjectId = string;
+type EmployeeNo = string;
+
+interface YearData {
+  year: Year;
+  departments: Department[];
+  personnel: Personnel[];
+  projects: Project[];
+  holidays: Holiday[];
+  workStatus: WorkStatusData;
+  userDepartments: UserDepartment[];
+}</code></pre>
+  <p><code>App</code> は <code>Record&lt;Year, YearData&gt;</code> を保持し、選択中の年度の <code>YearData</code> を各画面へ渡します。</p>
+</section>
+
+<section id="entities">
+  <h2>3. エンティティ定義</h2>
+
+  <h3>3.1 部門</h3>
+<pre><code>interface Department {
+  departmentId: DepartmentId;
+  name: string;
+  location: '天津' | '済南';
+  kind: 'dept' | 'partner';
+}</code></pre>
+  <ul>
+    <li>主キー：<code>(year, departmentId)</code></li>
+    <li>一意制約：<code>(year, departmentId)</code></li>
+    <li>部門名の一意制約は設けない（同一年度内で同名可）</li>
+    <li>参照はすべて <code>departmentId</code></li>
+  </ul>
+
+  <h3>3.2 要員</h3>
+<pre><code>interface Personnel {
+  employeeNo: EmployeeNo;      // 同一性・主キー
+  name: string;
+  departmentId: DepartmentId;
+  role: string;
+  leavePlan?: string;
+}</code></pre>
+  <ul>
+    <li>主キー：<code>(year, employeeNo)</code></li>
+    <li>画面の <code>rowKey</code> も <code>employeeNo</code></li>
+    <li><code>Personnel.id</code> のような行IDは保存データには持たせない</li>
+  </ul>
+
+  <h3>3.3 プロジェクト</h3>
+<pre><code>interface Project {
+  projectId: ProjectId;     // システム項目ID（主キー・システム採番）
+  customer: string;         // 顧客（必須）
+  caseName: string;         // 案件（必須）
+  team: string;             // チーム（任意）
+  subTeam: string;          // Subチーム（任意）
+  departmentId: DepartmentId;
+  name: string;
+  projectCode: string;      // 画面の「項目ID」（任意・重複可）
+  // abbr は派生値のため保存しない
+}</code></pre>
+  <ul>
+    <li>主キー：<code>(year, projectId)</code></li>
+    <li>一意制約：<code>(year, customer, caseName, team, subTeam)</code></li>
+    <li>取込時の重複判定：<code>(year, customer, caseName, team, subTeam)</code></li>
+    <li>比較時は前後空白のみ除去する。全角/半角・大文字/小文字は<strong>区別する</strong></li>
+    <li><code>projectCode</code>（画面の「項目ID」）は<strong>任意・重複可</strong>。一意判定には使わない</li>
+    <li>チーム・Subチームは任意のため、空欄も 1 つの値として扱う（空欄同士は同一とみなす）</li>
+    <li>所属部門（<code>departmentId</code>）は一意判定に含めない</li>
+    <li>手動登録で同じキーが既にある場合は<strong>エラーで拒否</strong>する（上書きはしない）</li>
+    <li><code>abbr</code> は「顧客の1文字目＋案件＋チーム＋Subチーム」から都度生成</li>
+  </ul>
+  <div class="note">
+    顧客・案件は必須、チーム・Subチームは任意です。そのため
+    「顧客・案件は同じで、チーム・Subチームがどちらも空欄」の 2 行は同一プロジェクトと判定されます。<br />
+    空欄と <code>-</code> や <code>なし</code> のような文字列は<strong>別の値</strong>として扱います。<br />
+    所属部門が異なっていても、顧客・案件・チーム・Subチームが一致すれば同一プロジェクト（重複）です。
+  </div>
+
+  <h3>3.4 休日</h3>
+<pre><code>interface Holiday {
+  holidayId: string;
+  date: string;    // 'YYYY-MM-DD'
+  name: string;
+  kind: '祝日' | '会社休日' | '振替休日';
+}</code></pre>
+  <ul>
+    <li>主キー：<code>(year, holidayId)</code></li>
+    <li>一意制約：<code>(year, date)</code></li>
+  </ul>
+
+  <h3>3.5 稼働データ</h3>
+<pre><code>interface WorkStatusData {
+  /** 稼働表に表示する要員（並び順） */
+  rows: EmployeeNo[];
+  /** 要員×週の割当 */
+  assignments: AssignmentMap;
+}
+
+interface AssignmentCell {
+  projectId: ProjectId | null; // null = 未割当
+  unpaid: boolean;             // BUFFER
+}
+
+type AssignmentMap = Record&lt;
+  EmployeeNo,
+  Record&lt;WeekKey, AssignmentCell&gt;
+&gt;;</code></pre>
+  <ul>
+    <li>稼働表行：<code>(year, employeeNo)</code></li>
+    <li>割当：<code>(year, employeeNo, weekKey)</code></li>
+    <li>1人要員・1週につき1プロジェクト（＋BUFFERフラグ）</li>
+  </ul>
+
+  <h3>3.6 ユーザー年度別所属</h3>
+<pre><code>interface UserDepartment {
+  userId: string;
+  year: Year;
+  departmentId?: DepartmentId; // undefined = 全部門
+}</code></pre>
+  <ul>
+    <li>主キー：<code>(year, userId)</code></li>
+    <li>未設定年度は「全部門表示」</li>
+  </ul>
+</section>
+
+<section id="keys">
+  <h2>4. 主キー・一意制約一覧</h2>
+  <table>
+    <thead>
+      <tr><th>データ</th><th>主キー</th><th>一意制約・重複判定</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>部門</td><td><code>(year, departmentId)</code></td><td><code>(year, departmentId)</code></td></tr>
+      <tr><td>要員</td><td><code>(year, employeeNo)</code></td><td><code>(year, employeeNo)</code></td></tr>
+      <tr><td>プロジェクト</td><td><code>(year, projectId)</code></td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
+      <tr><td>休日</td><td><code>(year, holidayId)</code></td><td><code>(year, date)</code></td></tr>
+      <tr><td>稼働表行</td><td><code>(year, employeeNo)</code></td><td><code>(year, employeeNo)</code></td></tr>
+      <tr><td>割当</td><td><code>(year, employeeNo, weekKey)</code></td><td><code>(year, employeeNo, weekKey)</code></td></tr>
+      <tr><td>ユーザー所属</td><td><code>(year, userId)</code></td><td><code>(year, userId)</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>割当の一意制約の目的</h3>
+  <ul>
+    <li>同じ要員・同じ週の二重登録を防ぐ</li>
+    <li>稼働人数・稼働率の二重計上を防ぐ</li>
+    <li>稼働表の「要員 × 週」セルを一意に特定する</li>
+    <li>保存時の登録／更新判定を明確にする</li>
+    <li><code>projectId = null</code> を「明示的な未割当」として扱えるようにする</li>
+  </ul>
+  <div class="note">
+    将来、1週間に複数プロジェクトへ工数配分する場合は、<code>(year, employeeNo, weekKey)</code> では足りません。
+    その場合は <code>projectId</code> や割当行ID、工数比率を追加してキーを見直す必要があります。
+  </div>
+</section>
+
+<section id="er">
+  <h2>5. 関係一覧</h2>
+  <table>
+    <thead>
+      <tr><th>親</th><th>子</th><th>関係</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>部門</td><td>要員</td><td>所属（<code>departmentId</code>）</td></tr>
+      <tr><td>部門</td><td>プロジェクト</td><td>所属部門（<code>departmentId</code>）</td></tr>
+      <tr><td>部門</td><td>済南稼働統計</td><td>集計（<code>departmentId</code>）</td></tr>
+      <tr><td>要員</td><td>稼働表行</td><td>表示対象（<code>employeeNo</code>）</td></tr>
+      <tr><td>要員</td><td>割当</td><td>割当（<code>employeeNo</code>）</td></tr>
+      <tr><td>プロジェクト</td><td>割当</td><td>割当先（<code>projectId</code>）</td></tr>
+      <tr><td>ユーザー</td><td>ユーザー年度別所属</td><td>年度所属（<code>userId</code>）</td></tr>
+      <tr><td>部門</td><td>ユーザー年度別所属</td><td>所属（<code>departmentId</code>）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="screens">
+  <h2>6. 画面ごとの責務と保存</h2>
+  <table>
+    <thead>
+      <tr><th>画面</th><th>できること</th><th>保存</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>部門管理</td><td>部門の追加・更新・削除</td><td>即時保存</td></tr>
+      <tr><td>要員情報</td><td>要員マスタの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
+      <tr><td>プロジェクト管理</td><td>プロジェクトの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
+      <tr><td>休日設置</td><td>休日の追加・更新・削除・一括取込</td><td>即時保存</td></tr>
+      <tr><td>要員稼動管理</td><td>行追加・行削除、社員番号入力、割当、BUFFER</td><td>明示保存</td></tr>
+      <tr><td>済南稼働率統計</td><td>表示のみ（初期時に計算）</td><td>保存しない</td></tr>
+      <tr><td>ユーザー管理</td><td>ユーザー・年度別所属の管理</td><td>即時保存</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="work-status">
+  <h2>7. 要員稼動管理の詳細</h2>
+
+  <h3>7.1 行追加</h3>
+  <ul>
+    <li>稼働表に空行を追加する</li>
+    <li>ユーザーが社員番号を入力する</li>
+    <li>入力確定時に要員マスタを検索する</li>
+    <li>マスタに存在すれば、氏名・役割・所属を表示する</li>
+    <li>マスタに存在しなければエラーを表示し、行は確定しない</li>
+    <li>新規要員は、先に要員情報画面でマスタ登録する</li>
+  </ul>
+
+  <h3>7.2 社員番号の入力</h3>
+  <ul>
+    <li>稼働表の社員番号欄は<strong>入力可能</strong></li>
+    <li>入力確定（Enter / フォーカスアウト）時に要員マスタを検索</li>
+    <li>一致する <code>employeeNo</code> がある場合のみ行を確定</li>
+    <li>同じ <code>employeeNo</code> が既に <code>rows</code> にある場合はエラー</li>
+    <li>社員番号の入力によって要員マスタを新規作成・更新しない</li>
+    <li>氏名・役割・所属はマスタから自動表示し、稼働表では編集不可</li>
+  </ul>
+
+  <h3>7.3 マスタ項目</h3>
+  <p>稼働表での扱いは次のとおりです。</p>
+  <table>
+    <thead>
+      <tr><th>項目</th><th>稼働表での扱い</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>社員番号</td><td>入力可（行の識別子）</td></tr>
+      <tr><td>氏名</td><td>表示のみ</td></tr>
+      <tr><td>役割</td><td>表示のみ</td></tr>
+      <tr><td>所属</td><td>表示のみ</td></tr>
+    </tbody>
+  </table>
+  <p>氏名・役割・所属の変更は要員情報画面でのみ行います。マスタが更新されると、稼働表の表示にも自動反映されます。</p>
+
+  <h3>7.4 行削除</h3>
+  <ul>
+    <li><code>workStatus.rows</code> から対象の <code>employeeNo</code> を外す</li>
+    <li>要員マスタは削除しない</li>
+    <li>過去の割当は保持する（表示対象から外れるだけ）</li>
+    <li>同じ要員を再度行追加すると、過去の割当も再表示される</li>
+    <li>割当自体を削除したい場合は、行削除とは別の操作にする</li>
+  </ul>
+
+  <h3>7.5 社員番号の変更と割当</h3>
+  <ul>
+    <li>割当が無い行：社員番号の変更を許可する（入力ミスの訂正）</li>
+    <li>割当がある行：<strong>社員番号の変更はブロック</strong>する
+      <ul>
+        <li>行削除 → 行追加を案内する</li>
+        <li>理由：割当は <code>employeeNo</code> をキーに保持しているため、社員番号を変えると過去の割当が新しい社員に移る／消える危険がある</li>
+      </ul>
+    </li>
+    <li>どうしても変更を許可する場合は、確認ダイアログと「旧社員の割当を保持する／新社員は空にする」などの仕様が必要</li>
+  </ul>
+
+  <h3>7.6 保存ペイロード</h3>
+<pre><code>interface WorkStatusPayload {
+  year: Year;
+  rows: EmployeeNo[];
+  assignments: AssignmentMap;
+}</code></pre>
+  <ul>
+    <li><code>personnel</code> は含めない</li>
+    <li><code>rows</code> に無い要員の割当は削除しない</li>
+    <li>社員番号が空の行がある場合は保存不可</li>
+    <li>未保存フラグは稼働表のみ対象</li>
+  </ul>
+
+  <h3>7.7 要員マスタ削除時</h3>
+  <ul>
+    <li>その年度の割当が存在する場合は削除をブロックする</li>
+    <li>または「割当も削除する」確認付きのカスケード削除</li>
+    <li>推奨はブロック（誤削除防止）</li>
+  </ul>
+</section>
+
+<section id="import">
+  <h2>8. 一括読み込み</h2>
+
+  <h3>8.1 共通フロー</h3>
+  <ol>
+    <li>ファイルを解析</li>
+    <li>必須項目・形式を検証</li>
+    <li>ファイル内の重複を検出</li>
+    <li>ファイル内重複があればエラーで中止</li>
+    <li>既存データとの重複を検出</li>
+    <li>重複がなければ、そのまま追加</li>
+    <li>重複があれば、ダイアログで選択</li>
+  </ol>
+<pre><code>重複が N 件あります
+[重複を上書きして取り込む] [中止]</code></pre>
+  <ul>
+    <li><strong>中止</strong>：ファイル全体を中止し、1件も反映しない</li>
+    <li><strong>上書き</strong>：重複分は更新、新規分は追加</li>
+    <li>結果は「追加 N 件 / 上書き M 件 / スキップ K 件 / 警告」で返す</li>
+  </ul>
+
+  <h3>8.2 重複キー</h3>
+  <table>
+    <thead>
+      <tr><th>マスタ</th><th>重複キー</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>要員</td><td><code>(year, employeeNo)</code></td></tr>
+      <tr><td>プロジェクト</td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
+      <tr><td>休日</td><td><code>(year, date)</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 プロジェクト取込のルール</h3>
+  <ul>
+    <li>重複キーは <code>(顧客, 案件, チーム, Subチーム)</code>。ファイル内・既存データの両方でこのキーを使う</li>
+    <li>顧客・案件は必須。<strong>空欄の行が 1 行でもあればファイル全体を中止</strong>する</li>
+    <li>ファイル内で同じ重複キーが複数ある場合もファイル全体を中止する</li>
+    <li>既存データと重複した場合は「上書き」か「中止」を選択</li>
+    <li><code>projectCode</code>（項目ID）は任意。空欄・重複とも可</li>
+    <li>上書き時は 所属部門・Project名称・項目ID を新しい値で更新し、<code>projectId</code> は維持する</li>
+    <li>比較時は前後空白のみ除去し、全角/半角・大文字/小文字は区別する</li>
+    <li>チーム・Subチームの空欄は空文字として比較する（<code>-</code> や <code>なし</code> とは別の値）</li>
+  </ul>
+
+  <h3>8.4 検証エラー</h3>
+  <ul>
+    <li>必須項目不足などは行単位で警告し、その行は取り込まない</li>
+    <li>重複エラーはファイル全体の中止対象</li>
+    <li>ただしプロジェクト取込では、顧客・案件の空欄とファイル内重複はファイル全体の中止対象</li>
+    <li>取込後の結果に、警告内容と行番号を含める</li>
+  </ul>
+</section>
+
+<section id="jinan">
+  <h2>9. 済南稼働統計</h2>
+
+  <h3>9.1 方針</h3>
+  <ul>
+    <li>画面初期時に <code>YearData</code> から計算する</li>
+    <li>当面はモック生成</li>
+    <li>統計は保存しない</li>
+    <li>年度データが変わったときだけ再計算する</li>
+  </ul>
+<pre><code>const jinanStats = useMemo(
+  () =&gt; calculateJinanWeeklyStats(yearData),
+  [yearData],
+);</code></pre>
+
+  <h3>9.2 指標</h3>
+  <ul>
+    <li>総人数</li>
+    <li>離職人数</li>
+    <li>総稼動人数</li>
+    <li>総稼動率</li>
+    <li>非契約稼動人数</li>
+    <li>教育実施人数</li>
+    <li>現地稼動人数（日本出張含）</li>
+    <li>現地稼動率</li>
+    <li>契約稼動率</li>
+  </ul>
+  <p>「天津出張人数」は削除済みです。現地稼動人数＝総稼動人数、現地稼動率＝総稼動率として扱います。</p>
+
+  <h3>9.3 派生値</h3>
+  <ul>
+    <li><code>start</code> / <code>end</code> は <code>weekKey</code> から生成</li>
+    <li>部門名は <code>departmentId</code> から取得</li>
+    <li>集計は <code>departmentId</code> 単位</li>
+  </ul>
+
+  <h3>9.4 将来</h3>
+  <ul>
+    <li>勤怠・契約・教育・勤務地の実データが入ったら、同じセレクタで計算する</li>
+    <li>過去年度の監査性が必要になった場合のみ、年度末に統計スナップショットを保存する</li>
+  </ul>
+</section>
+
+<section id="user-department">
+  <h2>10. ユーザー年度別所属</h2>
+  <ul>
+    <li><code>UserDepartment</code> を <code>(year, userId)</code> で保持</li>
+    <li>ユーザー管理画面は選択中の年度を受け取り、「YYYY年度の所属部門」として編集</li>
+    <li><code>defaultDepartmentsOf(user, year)</code> は年度別所属を参照</li>
+    <li>未設定年度は「全部門表示」</li>
+    <li>ログイン時は当年の所属を参照し、無ければ全部門表示</li>
+  </ul>
+</section>
+
+<section id="repository">
+  <h2>11. 保存・取得</h2>
+
+  <h3>11.1 リポジトリ</h3>
+<pre><code>interface KadouRepository {
+  loadYear(year: Year): Promise&lt;YearData&gt;;
+
+  saveDepartment(year: Year, department: Department): Promise&lt;void&gt;;
+  savePersonnel(year: Year, personnel: Personnel): Promise&lt;void&gt;;
+  saveProject(year: Year, project: Project): Promise&lt;void&gt;;
+  saveHoliday(year: Year, holiday: Holiday): Promise&lt;void&gt;;
+
+  saveWorkStatus(year: Year, payload: WorkStatusPayload): Promise&lt;void&gt;;
+}</code></pre>
+
+  <h3>11.2 保存単位</h3>
+  <ul>
+    <li>部門・要員・プロジェクト・休日：即時保存</li>
+    <li>稼働表：明示保存</li>
+    <li>一括読み込み：検証・重複確認後に即時保存</li>
+  </ul>
+
+  <h3>11.3 楽観ロック</h3>
+  <ul>
+    <li><code>YearData</code> に <code>version</code> / <code>updatedAt</code> を持たせる</li>
+    <li>稼働表保存時に <code>version</code> を検証する</li>
+  </ul>
+</section>
+
+<section id="validation">
+  <h2>12. バリデーション</h2>
+  <ul>
+    <li>部門ID：同一年度内で一意</li>
+    <li>部門名：一意制約なし（同名可）</li>
+    <li>社員番号：同一年度内で一意</li>
+    <li>プロジェクト：<code>(顧客, 案件, チーム, Subチーム)</code> が同一年度内で一意</li>
+    <li>プロジェクトの <code>projectCode</code>（項目ID）は一意制約なし（重複可）</li>
+    <li>休日：同一年度内で日付一意</li>
+    <li>要員の <code>departmentId</code> は存在する部門IDを参照</li>
+    <li>プロジェクトの <code>departmentId</code> は存在する部門IDを参照</li>
+    <li>割当の <code>projectId</code> は存在するプロジェクトIDを参照</li>
+    <li>稼働表の <code>rows</code> は要員マスタに存在する <code>employeeNo</code> のみ</li>
+    <li>稼働表の <code>rows</code> 内で <code>employeeNo</code> は重複不可</li>
+    <li>社員番号が空の行がある場合は保存不可</li>
+    <li>週キーは対象年度の週リスト内に存在</li>
+    <li>マスタ削除時は参照チェックを行う</li>
+  </ul>
+  <p>部門名が重複可能になるため、部門選択肢は必要に応じて「部門名（部門ID）」のように区別できる表示にします。</p>
+</section>
+
+<section id="migration">
+  <h2>13. 現行からの移行対応</h2>
+  <table>
+    <thead>
+      <tr><th>現行</th><th>確定案</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Department.name</code> の一意制約</td><td><code>(year, departmentId)</code> の一意制約</td></tr>
+      <tr><td><code>Personnel.department</code>（名称）</td><td><code>Personnel.departmentId</code></td></tr>
+      <tr><td><code>Personnel.id</code></td><td><code>Personnel.employeeNo</code></td></tr>
+      <tr><td><code>Project.key</code></td><td><code>Project.projectId</code></td></tr>
+      <tr><td><code>Project.id</code>（項目ID）</td><td><code>Project.projectCode</code>（任意・重複可）</td></tr>
+      <tr><td>プロジェクトの一意性</td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
+      <tr><td><code>Project.department</code>（名称）</td><td><code>Project.departmentId</code></td></tr>
+      <tr><td>割当キーの <code>personnel.id</code></td><td><code>employeeNo</code></td></tr>
+      <tr><td>別Mapの <code>unpaid</code></td><td><code>AssignmentCell.unpaid</code></td></tr>
+      <tr><td>稼働表で社員番号を入力</td><td>現行どおり入力可</td></tr>
+      <tr><td>稼働表で氏名・役割・所属を編集</td><td>表示のみ（要員情報画面で編集）</td></tr>
+      <tr><td><code>WorkStatusPayload.personnel</code></td><td><code>rows</code> + <code>assignments</code></td></tr>
+      <tr><td><code>JinanWeeklyStat.department</code>（名称）</td><td><code>departmentId</code></td></tr>
+      <tr><td><code>JinanWeeklyStat.start/end</code> 保存</td><td><code>weekKey</code> から派生</td></tr>
+      <tr><td><code>AuthUser.department</code>（名称）</td><td><code>UserDepartment</code>（年度別）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="review">
+  <h2>14. 決定事項と確認ポイント</h2>
+
+  <h3>14.1 確定した事項（プロジェクトの重複判定）</h3>
+  <table>
+    <thead>
+      <tr><th>論点</th><th>確定内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>重複キー</td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
+      <tr><td>正規化</td><td>前後空白のみ除去。全角/半角・大文字/小文字は区別する</td></tr>
+      <tr><td>空欄の扱い</td><td>チーム・Subチームの空欄は空文字として同一視する。<code>-</code> や <code>なし</code> は別の値</td></tr>
+      <tr><td>所属部門</td><td>重複キーに含めない</td></tr>
+      <tr><td>手動登録の重複</td><td>エラーで拒否する（上書き確認は出さない）</td></tr>
+      <tr><td>取込の上書き</td><td><code>projectId</code> を維持し、所属部門・名称・項目ID を更新する</td></tr>
+      <tr><td>取込の必須エラー</td><td>顧客・案件が空欄の行が 1 行でもあればファイル全体を中止する</td></tr>
+      <tr><td>ファイル内重複</td><td>ファイル全体を中止する</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.2 未確定の確認ポイント</h3>
+  <ol>
+    <li>稼働表の行削除は「表示対象から外すだけで、過去の割当は保持」でよいか</li>
+    <li>要員マスタ削除は、その年度の割当がある場合ブロックしてよいか</li>
+    <li>部門名の重複を許容するため、部門選択肢の表示を「部門名（部門ID）」に変更してよいか</li>
+    <li>割当は「1人要員・1週に1プロジェクト」の前提でよいか</li>
+    <li>割当がある行の社員番号変更はブロックし、行削除→行追加を案内する案でよいか</li>
+    <li>マスタに無い社員番号を入力した場合、行を空のまま残すか、行自体を削除するか</li>
+  </ol>
+</section>
+
+</main>
+
+<footer>
+  <p>react-kadou データ構成 確定案 / 2026-10-20</p>
+  <p class="small">このHTMLはレビュー用の設計資料です。外部CSS・JavaScriptには依存していません。</p>
+</footer>
+
+</body>
+</html>

@@ -16,6 +16,10 @@ import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
 import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
 import {
+  departmentNameOf,
+  resolveDepartmentIdByName,
+} from './data/departmentUtils';
+import {
   AVAILABLE_YEARS,
   Holiday,
   YearStore,
@@ -222,7 +226,7 @@ function App() {
     (values: {
       employeeNo: string;
       name: string;
-      department: string;
+      departmentId: string;
       role: string;
     }) => {
       setYearPersonnel((prev) => {
@@ -236,8 +240,38 @@ function App() {
           return next;
         }
         // 新規の社員番号 → 要員一覧へ追加する
-        return [...prev, { id: `p-${Date.now()}`, ...values }];
+        return [...prev, { ...values }];
       });
+    },
+    [setYearPersonnel],
+  );
+
+  /**
+   * 要員マスタの項目（現在は退場予定）の更新。
+   * 稼働表の備考欄から呼ばれる。マスタは即時保存する。
+   */
+  const handleUpdateLeavePlan = useCallback(
+    (employeeNo: string, leavePlan: string) => {
+      setYearPersonnel((prev) =>
+        prev.map((p) =>
+          p.employeeNo === employeeNo ? { ...p, leavePlan } : p,
+        ),
+      );
+    },
+    [setYearPersonnel],
+  );
+
+  /**
+   * 要員マスタの「現在の所属」の更新。
+   * 稼働表の「異動」で新しい所属を登録したときに呼ばれる。
+   */
+  const handleUpdateDepartment = useCallback(
+    (employeeNo: string, departmentId: string) => {
+      setYearPersonnel((prev) =>
+        prev.map((p) =>
+          p.employeeNo === employeeNo ? { ...p, departmentId } : p,
+        ),
+      );
     },
     [setYearPersonnel],
   );
@@ -248,52 +282,58 @@ function App() {
    */
   const handleImportPersonnel = useCallback(
     (rows: PersonnelImportRow[]) => {
+      const departments = stores[selectedYear]?.departments ?? [];
       setYearPersonnel((prev) => {
         const indexByNo = new Map(prev.map((p, i) => [p.employeeNo, i]));
         const next = [...prev];
 
         rows.forEach((row, i) => {
+          // 取込ファイルの「所属」は部門名のため、部門IDへ解決する
+          const resolvedDepartmentId = resolveDepartmentIdByName(
+            departments,
+            row.department,
+          );
           const index = indexByNo.get(row.employeeNo);
           if (index !== undefined) {
             // 既存の社員番号 → 社員情報の項目のみ上書きする
-            // （案件所属 projectKey / 退場予定 leavePlan は保持する）
+            // （退場予定 leavePlan は保持する）
             const current = next[index];
             next[index] = {
               ...current,
               name: row.name,
               role: row.role || current.role,
-              department: row.department || current.department,
+              departmentId:
+                resolvedDepartmentId ?? current.departmentId,
             };
             return;
           }
           // 新規の社員番号 → 要員一覧へ追加する
           indexByNo.set(row.employeeNo, next.length);
           next.push({
-            id: `p-imp-${row.employeeNo}-${i}`,
             employeeNo: row.employeeNo,
             name: row.name,
             role: row.role || '要員',
-            department: row.department,
+            departmentId: resolvedDepartmentId ?? '',
           });
         });
 
         return next;
       });
     },
-    [setYearPersonnel],
+    [selectedYear, setYearPersonnel, stores],
   );
 
   // ---- 要員稼動管理の保存 -------------------------------------------
 
-  /** 要員稼動管理の保存（下書きを確定してストアへ書き戻す） */
+  /** 要員稼動管理の保存（表示行・割当・BUFFER のみ。要員マスタは変更しない） */
   const handleSaveWorkStatus = useCallback(
     (payload: WorkStatusPayload) => {
       setStores((prev) => ({
         ...prev,
         [selectedYear]: {
           ...prev[selectedYear],
-          personnel: payload.personnel,
           workStatus: {
+            rows: payload.rows,
             assignment: payload.assignment,
             unpaid: payload.unpaid,
           },
@@ -323,8 +363,8 @@ function App() {
     if (!currentUser) return [];
     const wanted = defaultDepartmentsOf(currentUser);
     if (wanted.length === 0) return [];
-    const names = new Set(store.departments.map((d) => d.name));
-    return wanted.filter((n) => names.has(n));
+    const ids = new Set(store.departments.map((d) => d.departmentId));
+    return wanted.filter((id) => ids.has(id));
   }, [currentUser, store.departments]);
 
   /** 部長の自部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
@@ -332,14 +372,16 @@ function App() {
     if (!currentUser) return;
     const wanted = defaultDepartmentsOf(currentUser);
     if (wanted.length === 0) return;
-    const names = new Set(store.departments.map((d) => d.name));
-    const missing = wanted.filter((n) => !names.has(n));
+    const ids = new Set(store.departments.map((d) => d.departmentId));
+    const missing = wanted.filter((id) => !ids.has(id));
     if (missing.length === 0) return;
     const key = `${selectedYear}:${currentUser.userId}`;
     if (warnedDeptRef.current === key) return;
     warnedDeptRef.current = key;
     message.warning(
-      `${missing.join('・')} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
+      `${missing
+        .map((id) => departmentNameOf(store.departments, id))
+        .join('・')} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
     );
   }, [currentUser, selectedYear, store.departments]);
 
@@ -355,13 +397,14 @@ function App() {
     'work-status': (
       <WorkStatus
         year={selectedYear}
-        personnel={store.personnel}
         projects={store.projects}
         departments={store.departments}
         defaultDepartments={defaultDepartments}
         employeeMaster={employeeMaster}
         initialWorkStatus={store.workStatus}
         onSave={handleSaveWorkStatus}
+        onUpdateLeavePlan={handleUpdateLeavePlan}
+        onUpdateDepartment={handleUpdateDepartment}
         onDirtyChange={setDirty}
         registerSaveHandler={registerSaveHandler}
       />
@@ -394,6 +437,8 @@ function App() {
       <JinanWorkRateScreen
         year={selectedYear}
         departments={store.departments}
+        workStatus={store.workStatus}
+        projects={store.projects}
       />
     ),
     'holiday-settings': (
@@ -408,7 +453,7 @@ function App() {
         users={users}
         setUsers={setUsers}
         currentUserId={currentUserId}
-        departments={store.departments.map((d) => d.name)}
+        departments={store.departments}
         allowManage={currentUser?.role === 'admin'}
       />
     ),
@@ -416,7 +461,13 @@ function App() {
 
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {
-    return <Login users={users} onLogin={handleLogin} />;
+    return (
+      <Login
+        users={users}
+        departments={store.departments}
+        onLogin={handleLogin}
+      />
+    );
   }
 
   return (
@@ -426,6 +477,11 @@ function App() {
         activeKey={activeView}
         onSelect={setActiveView}
         user={currentUser}
+        departmentName={
+          currentUser.departmentId
+            ? departmentNameOf(store.departments, currentUser.departmentId)
+            : undefined
+        }
         onLogout={requestLogout}
         year={selectedYear}
         onYearChange={requestYearChange}

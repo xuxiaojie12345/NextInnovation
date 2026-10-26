@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
+from app.models.JnUserTable import JnUserTable
 from app.schemas.user import UserCreate, UserOut
 
 router = APIRouter(prefix="/api/v1")
@@ -16,9 +17,16 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
+# @router.get("/user/{user_id}", response_model=UserOut)
+# def get_user(user_id: int, db: Session = Depends(get_db)):
+#     user = db.query(User).filter(User.id == user_id).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="用户不存在")
+#     return user
+
 @router.get("/user/{user_id}", response_model=UserOut)
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(JnUserTable).filter(JnUserTable.userId == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
     return user

@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SERVER_HOST: str = os.getenv("SERVER_HOST", "0.0.0.0")
     SERVER_PORT: int = int(os.getenv("SERVER_PORT", 8000))
 
-    DB_HOST: str = os.getenv("DB_HOST", "127.0.0.1")
+    DB_HOST: str = os.getenv("DB_HOST", "172.17.0.63")
     DB_PORT: int = int(os.getenv("DB_PORT", 3306))
     DB_USER: str = os.getenv("DB_USER", "root")
     DB_PASS: str = os.getenv("DB_PASS", "1234")

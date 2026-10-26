@@ -9,9 +9,11 @@ class UserCreate(BaseModel):
 
 class UserOut(BaseModel):
     """返回给前端的数据"""
-    id: int
-    name: str
-    age: int
+    userId: str
+    shimei: str
+    yakushokuKubun: str
+    departmentId: str
+    password: str
 
     class Config:
         orm_mode = True
