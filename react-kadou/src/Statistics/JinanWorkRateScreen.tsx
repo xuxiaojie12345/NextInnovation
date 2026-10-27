@@ -181,7 +181,10 @@ interface JinanWorkRateScreenProps {
   departments: Department[];
   /** 保存済みの稼働表（行の所属・有効期間・割当・BUFFER） */
   workStatus: WorkStatusData;
-  /** プロジェクト一覧（「内・退職」の判定に使う） */
+  /**
+   * プロジェクト一覧
+   * （「内・退職」の判定と、有効flg・教育flg による集計に使う）
+   */
   projects: Project[];
 }
 
@@ -189,7 +192,10 @@ interface JinanWorkRateScreenProps {
  * 済南拠点 稼働率統計 画面（メニュー「済南稼働率統計」で切り替わる画面）
  * 週単位（月曜〜日曜）で 総人数 / 離職人数 / 稼動人数 / 稼動率 などを集計して表示する
  * ※部門（行）は年度の部門マスタに従う（2025 は 2 部門、2026 は 3 部門）
- * ※数値は保存済みの稼働表（行の所属＋有効期間＋割当＋BUFFER）から算出する
+ * ※数値は保存済みの稼働表（行の所属＋有効期間＋割当＋BUFFER）と、
+ *   プロジェクトの有効flg・教育flg から算出する
+ * ※総稼動人数は有効flg = true の割当だけを数え、
+ *   教育実施人数は教育flg = true の割当を数える（有効flg とは無関係）
  */
 const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   year,
@@ -547,7 +553,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
             {year}年度　済南稼働率統計（週単位）
           </Title>
           <Text type='secondary'>
-            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departmentLabels, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。指標ごとの折れ線グラフと週次テーブルで表示します。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）
+            済南拠点の稼動状況（総人数・離職・稼動人数・各種稼動率）を部門別（{[...departmentLabels, JINAN_ALL_LABEL].join('・')}）に週単位（月曜〜日曜）で集計した統計画面です。指標ごとの折れ線グラフと週次テーブルで表示します。対象期間：{period.first} の週 〜 {period.last} の週（全{period.weeks}週）。無効プロジェクトの割当は稼動系指標に計上せず、教育flg は教育実施人数にだけ作用します。
           </Text>
         </div>
         <Space>
@@ -699,6 +705,8 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
         style={{ marginTop: 12 }}
       >
         <ul className='jinan-formula-list'>
+          <li>総人数 = その週の部門行数 − 離職人数</li>
+          <li>離職人数 = その週に「内・退職」の人数（退職後は毎週計上）</li>
           <li>総稼動人数 = 契約稼動人数 + 非契約稼動人数</li>
           <li>契約稼動人数 = 総稼動人数 − 非契約稼動人数</li>
           <li>総稼動率 = 総稼動人数 ÷ 総人数 × 100</li>
@@ -707,7 +715,9 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
             現地稼動人数（日本出張含） = 総稼動人数
           </li>
           <li>現地稼動率 = 現地稼動人数 ÷ 総人数 × 100</li>
-          <li>教育実施人数は稼動人数には含めない（教育 = 非稼動として集計）</li>
+          <li>総稼動人数は、プロジェクトの有効flg = true の割当だけを数える（無効は計上しない）</li>
+          <li>教育実施人数は、プロジェクトの教育flg = true の割当を数える（有効flg とは無関係）</li>
+          <li>有効 + 教育のプロジェクトは、総稼動人数と教育実施人数の両方に計上する</li>
           <li>稼動率の目標値 = {JINAN_TARGET_RATE}%（目標以上を緑で表示）</li>
         </ul>
       </Card>

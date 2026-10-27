@@ -93,6 +93,17 @@ export interface Project {
   departmentId: string;
   /** Project名称（任意） */
   name: string;
+  /**
+   * 有効flg（既定 true）
+   * 統計の稼動系指標（総稼動人数・稼働率など）にだけ作用する。
+   * false = 無効（割当・BUFFER・選択肢には影響しない）
+   */
+  validFlg: boolean;
+  /**
+   * 教育flg（既定 false）
+   * 統計の教育実施人数にだけ作用する（有効flg とは無関係）。
+   */
+  educationFlg: boolean;
 }
 
 /**

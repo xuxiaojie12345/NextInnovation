@@ -95,6 +95,8 @@ const PROJECTS_2025: Project[] = [
     abbr: buildProjectAbbr('桜井商事', '基幹刷新', '第一', 'A'),
     departmentId: 'dept-0001',
     name: '基幹刷新',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0003',
@@ -106,6 +108,8 @@ const PROJECTS_2025: Project[] = [
     abbr: buildProjectAbbr('北斗物流', '業務効率化', '基盤', 'A'),
     departmentId: 'dept-0003',
     name: '業務効率化',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0004',
@@ -117,6 +121,22 @@ const PROJECTS_2025: Project[] = [
     abbr: buildProjectAbbr('北斗物流', '保守運用', '運用', 'C'),
     departmentId: 'dept-0003',
     name: '保守・運用',
+    validFlg: true,
+    educationFlg: false,
+  },
+  {
+    // 教育案件（2025 年度の教育実施人数を確認するためのデモ用データ）
+    projectId: 'pj-0005',
+    projectCode: 'PRJ-0005',
+    customer: 'みなと銀行',
+    caseName: '教育研修',
+    team: '企画',
+    subTeam: 'A',
+    abbr: buildProjectAbbr('みなと銀行', '教育研修', '企画', 'A'),
+    departmentId: 'dept-0003',
+    name: '教育・研修',
+    validFlg: true,
+    educationFlg: true,
   },
   {
     // 内・退職（この項目の要員はグレー表示にする）
@@ -129,8 +149,42 @@ const PROJECTS_2025: Project[] = [
     abbr: buildProjectAbbr('内', '退職', '', ''),
     departmentId: 'dept-0003',
     name: '内・退職',
+    // 統計では名前判定で先に除外されるため、フラグは既定値
+    validFlg: true,
+    educationFlg: false,
   },
 ];
+
+/**
+ * 教育実施人数を確認するためのデモ用シード（2025 年度のみ）
+ *
+ * 2025 年度は割当データが無いと統計がすべて 0 になるため、
+ * 第三開発部の 3 名を 2025-04-07 〜 2025-06-30 の 13 週、教育案件へ割り当てる。
+ * 本番ではバックエンドから取得するため、このシードは不要。
+ */
+const EDUCATION_SEED_2025: {
+  projectId: string;
+  employeeNos: string[];
+  weekKeys: string[];
+} = {
+  projectId: 'pj-0005',
+  employeeNos: ['10021', '10022', '10023'],
+  weekKeys: [
+    '2025-04-07',
+    '2025-04-14',
+    '2025-04-21',
+    '2025-04-28',
+    '2025-05-05',
+    '2025-05-12',
+    '2025-05-19',
+    '2025-05-26',
+    '2025-06-02',
+    '2025-06-09',
+    '2025-06-16',
+    '2025-06-23',
+    '2025-06-30',
+  ],
+};
 
 const PERSONNEL_2025: Personnel[] = [
   // 第一開発部（2026 では 第二開発部 になるメンバーを含む）
@@ -247,7 +301,8 @@ export const createYearStore = (year: number): YearStore => {
   const projects = source ? source.projects : [];
   const holidays = source ? source.holidays : [];
 
-  // 初期表示はマスタの全要員。週次割当は空で、画面で入力して保存する。
+  // 初期表示はマスタの全要員。週次割当は原則空で、画面で入力して保存する
+  // （2025 年度だけは教育実施人数の確認用にシードを入れる。下記）
   // 行は「所属＋有効期間」を持つ（年途中の部門異動は行を分けて表現する）
   const rows: WorkStatusRows = personnel.map((p, i) => ({
     key: `r-${i + 1}`,
@@ -258,6 +313,18 @@ export const createYearStore = (year: number): YearStore => {
   rows.forEach((row) => {
     assignment[row.employeeNo] = {};
   });
+
+  // 2025 年度だけ、教育実施人数を確認できるよう教育案件への割当をシードする
+  // （デモ用。要員マスタや他年度には影響しない）
+  if (year === 2025) {
+    EDUCATION_SEED_2025.employeeNos.forEach((employeeNo) => {
+      const cell = assignment[employeeNo];
+      if (!cell) return;
+      EDUCATION_SEED_2025.weekKeys.forEach((weekKey) => {
+        cell[weekKey] = EDUCATION_SEED_2025.projectId;
+      });
+    });
+  }
 
   // 済南統計は部門別（済南全社 は画面側で合算する）
   const jinan = getJinanDepartments(year).flatMap((d) =>

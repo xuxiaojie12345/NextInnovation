@@ -130,7 +130,7 @@
 
 <header>
   <h1>react-kadou データ構成 確定案</h1>
-  <p class="meta">レビュー用 / 2026-10-20 / ソースコード変更なし</p>
+  <p class="meta">レビュー用 / 2026-10-20 初版・2026-10-27 更新 / ソースコード変更なし</p>
   <div class="note">
     本ドキュメントは設計案です。`react-kadou` のソースコードは変更していません。
   </div>
@@ -169,11 +169,14 @@
     <li>稼働表では<strong>社員番号を入力できる</strong></li>
     <li>氏名・役割・所属は要員マスタから表示し、稼働表では編集不可</li>
     <li>要員マスタの追加・更新・削除は要員情報画面のみ</li>
-    <li>済南稼働統計は画面初期時に年度データから計算（当面モック）</li>
+    <li>済南稼働統計は画面初期時に年度データから計算（保存しない。教育実施人数も実データから算出）</li>
     <li>ユーザーの所属部門は年度ごとに保持</li>
     <li>一括読み込みの重複時は「上書き」か「中止」をユーザーが選択</li>
     <li>部門の一意制約は <code>(year, departmentId)</code>（部門名の一意制約はなし）</li>
     <li>プロジェクトの一意制約は <code>(year, customer, caseName, team, subTeam)</code>（現場の運用に合わせる）</li>
+    <li>プロジェクトは「有効flg」「教育flg」の 2 つの独立した真偽値を持つ（同時に true 可。有効期間は持たない）</li>
+    <li>既定値は 有効flg = <code>true</code> / 教育flg = <code>false</code>（新規登録・一括取込・既存データの補完すべて同じ）</li>
+    <li>2 つのフラグは<strong>統計の集計だけ</strong>に作用し、割当・BUFFER・選択肢・件数には影響しない</li>
   </ul>
 </section>
 
@@ -238,6 +241,8 @@ interface YearData {
   departmentId: DepartmentId;
   name: string;
   projectCode: string;      // 画面の「項目ID」（任意・重複可）
+  validFlg: boolean;        // 有効flg（既定 true。統計の稼動系指標に作用）
+  educationFlg: boolean;    // 教育flg（既定 false。統計の教育実施人数に作用）
   // abbr は派生値のため保存しない
 }</code></pre>
   <ul>
@@ -250,12 +255,33 @@ interface YearData {
     <li>所属部門（<code>departmentId</code>）は一意判定に含めない</li>
     <li>手動登録で同じキーが既にある場合は<strong>エラーで拒否</strong>する（上書きはしない）</li>
     <li><code>abbr</code> は「顧客の1文字目＋案件＋チーム＋Subチーム」から都度生成</li>
+    <li><code>validFlg</code> / <code>educationFlg</code> は主キー・一意制約・重複判定に含めない</li>
+    <li>「無効」は <code>validFlg = false</code> の別名で、独立した状態フィールドは持たない</li>
+    <li>フラグに有効期間は持たせない（統計は常に現在のマスタ値で計算するため、変更は過去週にも及ぶ）</li>
+    <li>フラグを変更しても、既存の割当・BUFFER は変更しない（運用で整合を保つ）</li>
   </ul>
   <div class="note">
     顧客・案件は必須、チーム・Subチームは任意です。そのため
     「顧客・案件は同じで、チーム・Subチームがどちらも空欄」の 2 行は同一プロジェクトと判定されます。<br />
     空欄と <code>-</code> や <code>なし</code> のような文字列は<strong>別の値</strong>として扱います。<br />
     所属部門が異なっていても、顧客・案件・チーム・Subチームが一致すれば同一プロジェクト（重複）です。
+  </div>
+
+  <p><strong>有効flg・教育flg の組み合わせ</strong></p>
+  <table>
+    <thead>
+      <tr><th>validFlg</th><th>educationFlg</th><th>意味</th><th>稼動系指標</th><th>教育実施人数</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>true</code></td><td><code>false</code></td><td>通常の有効プロジェクト</td><td>計上する</td><td>計上しない</td></tr>
+      <tr><td><code>true</code></td><td><code>true</code></td><td>有効な教育プロジェクト</td><td>計上する</td><td>計上する（重複計上）</td></tr>
+      <tr><td><code>false</code></td><td><code>false</code></td><td>無効</td><td>計上しない</td><td>計上しない</td></tr>
+      <tr><td><code>false</code></td><td><code>true</code></td><td>無効な教育プロジェクト</td><td>計上しない</td><td>計上する</td></tr>
+    </tbody>
+  </table>
+  <div class="decision">
+    2 つのフラグに優劣・排他はありません。教育flg は有効flg と無関係に判定します。
+    有効flg は「稼動」にだけ、教育flg は「教育実施人数」にだけ作用します。
   </div>
 
   <h3>3.4 休日</h3>
@@ -375,13 +401,23 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <tbody>
       <tr><td>部門管理</td><td>部門の追加・更新・削除</td><td>即時保存</td></tr>
       <tr><td>要員情報</td><td>要員マスタの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
-      <tr><td>プロジェクト管理</td><td>プロジェクトの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
+      <tr><td>プロジェクト管理</td><td>プロジェクトの追加・更新・削除・一括取込、有効稼働・教育かどうかの設定</td><td>即時保存</td></tr>
       <tr><td>休日設置</td><td>休日の追加・更新・削除・一括取込</td><td>即時保存</td></tr>
       <tr><td>要員稼動管理</td><td>行追加・行削除、社員番号入力、所属変更（異動）、割当、BUFFER（過去年度は参照のみ）</td><td>明示保存</td></tr>
       <tr><td>済南稼働率統計</td><td>表示のみ（初期時に計算）</td><td>保存しない</td></tr>
       <tr><td>ユーザー管理</td><td>ユーザー・年度別所属の管理</td><td>即時保存</td></tr>
     </tbody>
   </table>
+
+  <h3>6.1 プロジェクト管理のフラグ UI</h3>
+  <ul>
+    <li>登録・修正フォームに「有効稼働」「教育かどうか」のチェックボックスを置く（新規時は 有効 = ON、教育 = OFF）</li>
+    <li>一覧に「有効稼働」「教育かどうか」列を追加する（列幅の目安：110 / 150）</li>
+    <li>セルの表示は文字のみ（<code>有効</code> / <code>無効</code>、<code>教育</code> / <code>非教育</code>）。チェックボックスは置かず、入力はフォームで行う</li>
+    <li>一覧の列ヘッダーフィルタで「有効 / 無効」「教育 / 非教育」を単一選択で絞り込める（表示だけに作用し、データは変えない）</li>
+    <li>年度を切り替えたときは絞り込みを解除する</li>
+    <li>無効プロジェクトも要員稼動管理の週セルの選択肢・列フィルタの候補に残す（有効・無効は統計上の扱いだけ）</li>
+  </ul>
 </section>
 
 <section id="work-status">
@@ -591,7 +627,10 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>ファイル内で同じ重複キーが複数ある場合もファイル全体を中止する</li>
     <li>既存データと重複した場合は「上書き」か「中止」を選択</li>
     <li><code>projectCode</code>（項目ID）は任意。空欄・重複とも可</li>
+    <li>取込ファイルに「有効稼働」「教育かどうか」の列は存在しない前提。列があっても読み取らない</li>
+    <li>新規追加分のフラグは既定値（<code>validFlg=true</code> / <code>educationFlg=false</code>）にする</li>
     <li>上書き時は 所属部門・Project名称・項目ID を新しい値で更新し、<code>projectId</code> は維持する</li>
+    <li>上書き時のフラグは既存値を維持する（既定値に戻さない）</li>
     <li>比較時は前後空白のみ除去し、全角/半角・大文字/小文字は区別する</li>
     <li>チーム・Subチームの空欄は空文字として比較する（<code>-</code> や <code>なし</code> とは別の値）</li>
   </ul>
@@ -611,7 +650,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
   <h3>9.1 方針</h3>
   <ul>
     <li>画面初期時に <code>YearData</code> から計算する</li>
-    <li>当面はモック生成</li>
+    <li>モック生成は行わない（教育実施人数もプロジェクトマスタの教育flg から算出する）</li>
     <li>統計は保存しない</li>
     <li>年度データが変わったときだけ再計算する</li>
   </ul>
@@ -634,16 +673,66 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
   </ul>
   <p>「天津出張人数」は削除済みです。現地稼動人数＝総稼動人数、現地稼動率＝総稼動率として扱います。</p>
 
-  <h3>9.3 派生値</h3>
+  <h3>9.3 指標の定義と集計ルール</h3>
+  <table>
+    <thead>
+      <tr><th>指標</th><th>定義</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>総人数</td><td>その週の部門の有効行数 − 離職人数</td></tr>
+      <tr><td>離職人数</td><td>その週に「内・退職」が設定されている人数（退職後は毎週計上。総人数からは除外）</td></tr>
+      <tr><td>総稼動人数</td><td>割当あり かつ 有効稼働flg = true の人数（BUFFER を含む）</td></tr>
+      <tr><td>総稼動率</td><td>総稼動人数 ÷ 総人数 × 100</td></tr>
+      <tr><td>非契約稼動人数</td><td>有効稼働flg = true かつ BUFFER の人数（無効プロジェクトの BUFFER は含めない）</td></tr>
+      <tr><td>教育実施人数</td><td>割当あり かつ 教育flg = true の人数（有効/無効・BUFFER と無関係）</td></tr>
+      <tr><td>現地稼動人数（日本出張含）</td><td>総稼動人数</td></tr>
+      <tr><td>現地稼動率</td><td>現地稼動人数 ÷ 総人数 × 100（= 総稼動率）</td></tr>
+      <tr><td>契約稼働率</td><td>（総稼動人数 − 非契約稼動人数）÷ 総人数 × 100</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>率は小数第 1 位で四捨五入する。分母が 0 のときは 0% とする</li>
+    <li>総人数 + 離職人数 = その週の部門の有効行数</li>
+    <li>済南全社は対象部門の合計（率は合計値から計算する）</li>
+  </ul>
+
+  <p>1 人 × 1 週の判定は、次の前提の上で行います。</p>
+  <ul>
+    <li>行がその週の有効期間内、統計対象の <code>departmentId</code>、かつ「内・退職」でないこと</li>
+    <li>その週の割当（<code>assignment</code>）の <code>projectId</code> からプロジェクトを引き、フラグを判定する</li>
+  </ul>
+  <table>
+    <thead>
+      <tr><th>指標</th><th>計上条件</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>総稼動人数</td><td>割当あり かつ <code>validFlg = true</code>（BUFFER を含む）</td></tr>
+      <tr><td>非契約稼動人数</td><td>総稼動人数の条件を満たし、かつ BUFFER</td></tr>
+      <tr><td>教育実施人数</td><td>割当あり かつ <code>educationFlg = true</code>（<code>validFlg</code> は問わない。BUFFER でも計上）</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>無効プロジェクトの割当は、稼動系指標（総稼動人数・総稼動率・非契約稼動人数・現地稼動人数・現地稼動率・契約稼動率）に計上しない（「未割当」という指標は設けない）</li>
+    <li>有効かつ教育のプロジェクトは、総稼動人数と教育実施人数の<strong>両方</strong>に計上する（重複計上を許容）</li>
+    <li>無効かつ教育のプロジェクトは、教育実施人数にのみ計上する</li>
+    <li>「内・退職」は名称で判定し、フラグ判定より先に除外する（フラグの値は使わない）</li>
+    <li>フラグは保存時点のスナップショットではなく<strong>現在のプロジェクトマスタ値</strong>を使うため、後から変更すると過去週の値も変わる</li>
+    <li>フラグを変更しても割当・BUFFER は変更しない</li>
+  </ul>
+  <div class="note">
+    教育実施人数は 2026-10 以降、プロジェクトマスタの教育flg から算出します（従来のモック値を廃止）。
+  </div>
+
+  <h3>9.4 派生値</h3>
   <ul>
     <li><code>start</code> / <code>end</code> は <code>weekKey</code> から生成</li>
     <li>部門名は <code>departmentId</code> から取得</li>
     <li>集計は <code>departmentId</code> 単位</li>
   </ul>
 
-  <h3>9.4 将来</h3>
+  <h3>9.5 将来</h3>
   <ul>
-    <li>勤怠・契約・教育・勤務地の実データが入ったら、同じセレクタで計算する</li>
+    <li>勤怠・契約・勤務地の実データが入ったら、同じセレクタで計算する（教育は有効flg・教育flg で対応済み）</li>
     <li>過去年度の監査性が必要になった場合のみ、年度末に統計スナップショットを保存する</li>
   </ul>
 </section>
@@ -696,6 +785,8 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>社員番号：同一年度内で一意</li>
     <li>プロジェクト：<code>(顧客, 案件, チーム, Subチーム)</code> が同一年度内で一意</li>
     <li>プロジェクトの <code>projectCode</code>（項目ID）は一意制約なし（重複可）</li>
+    <li>プロジェクトの <code>validFlg</code> / <code>educationFlg</code> は必須の真偽値（<code>null</code>・未設定は不可。既存データは既定値で補完する）</li>
+    <li>2 つのフラグの組み合わせは検証しない（同時 true・無効 + 教育をいずれも許可する）</li>
     <li>休日：同一年度内で日付一意</li>
     <li>要員の <code>departmentId</code> は存在する部門IDを参照</li>
     <li>プロジェクトの <code>departmentId</code> は存在する部門IDを参照</li>
@@ -727,6 +818,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><td><code>Project.id</code>（項目ID）</td><td><code>Project.projectCode</code>（任意・重複可）</td></tr>
       <tr><td>プロジェクトの一意性</td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
       <tr><td><code>Project.department</code>（名称）</td><td><code>Project.departmentId</code></td></tr>
+      <tr><td>現行 <code>Project</code> に有効・教育フラグなし</td><td>全件を <code>validFlg=true</code> / <code>educationFlg=false</code> で補完</td></tr>
       <tr><td>割当キーの <code>personnel.id</code></td><td><code>employeeNo</code></td></tr>
       <tr><td>別Mapの <code>unpaid</code></td><td><code>AssignmentCell.unpaid</code></td></tr>
       <tr><td>稼働表で社員番号を入力</td><td>現行どおり入力可</td></tr>
@@ -786,6 +878,33 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><td>マスタに無い社員番号</td><td>入力不可（警告を表示し、入力前の値に戻す）。行はそのまま残る</td></tr>
     </tbody>
   </table>
+
+  <h3>14.3 確定した事項（有効flg・教育flg）</h3>
+  <table>
+    <thead>
+      <tr><th>論点</th><th>確定内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>教育と有効の関係</td><td>無関係。教育プロジェクトが有効・無効のどちらにもなり得る。同時に true も可</td></tr>
+      <tr><td>無効の扱い</td><td>有効でないプロジェクトはすべて無効（「無効」は <code>validFlg=false</code> の別名で、独立した状態は持たない）</td></tr>
+      <tr><td>既定値</td><td>新規登録・一括取込とも 有効flg = <code>true</code> / 教育flg = <code>false</code></td></tr>
+      <tr><td>既存データ</td><td>同じ既定値（<code>true</code> / <code>false</code>）で補完する</td></tr>
+      <tr><td>取込ファイル</td><td>有効・教育の列は存在しない前提。列があっても読み取らず、既定値を使う</td></tr>
+      <tr><td>取込の上書き時</td><td>フラグは既存値を維持する（新規追加分だけ既定値を適用）</td></tr>
+      <tr><td>無効プロジェクトの選択</td><td>要員稼動管理の週セルで選択できる（有効・無効は統計上の扱いだけ）</td></tr>
+      <tr><td>フラグ変更時の連動</td><td>既存の割当・BUFFER は変更しない</td></tr>
+      <tr><td>無効の割当と稼動指標</td><td>総稼動人数・稼動率に計上しない（未割当という指標は設けない）</td></tr>
+      <tr><td>教育の割当と稼動指標</td><td>稼動系の計上は有効flg だけで決める。教育flg は稼動判定に影響しない（有効 + 教育は両方に計上）</td></tr>
+      <tr><td>無効 + 教育</td><td>教育実施人数に計上する（教育flg は有効flg と無関係）</td></tr>
+      <tr><td>過去週の扱い</td><td>現在のマスタ値で再計算する（過去週の値も変わることを許容）</td></tr>
+      <tr><td>年度選択カードの項目件数</td><td>主データ全件（無効を含む）。フラグで変化しない</td></tr>
+      <tr><td>画面表示</td><td>一覧は「有効稼働」「教育かどうか」を文字のみ（有効/無効、教育/非教育）で表示し、両方の条件で絞り込める。フォームはチェックボックス</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    取込の上書き時にフラグを既存維持とする扱いで記載しています。
+    現行の取込は重複可の追加のみで、将来「上書き」を実装する場合の前提です。
+  </div>
 </section>
 
 <section id="changelog">
@@ -822,6 +941,21 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
           </ul>
         </td>
       </tr>
+      <tr>
+        <td>2026-10-27</td>
+        <td>
+          プロジェクトの「有効flg」「教育flg」を追加
+          <ul>
+            <li>2 つのフラグは独立（同時 true 可）。既定値は 有効 = <code>true</code> / 教育 = <code>false</code>（新規・取込・既存補完とも同じ）</li>
+            <li>無効は <code>validFlg=false</code> の別名。無効プロジェクトも週セルで選択でき、割当・BUFFER は変更しない</li>
+            <li>済南稼働統計の集計ルールを明記（無効は稼動系に計上しない／教育は有効flg と無関係に教育実施人数へ計上／有効 + 教育は重複計上）</li>
+            <li>済南稼働統計の 9 指標の定義を確定（離職人数 = 当週「内・退職」の人数（存量）、総人数 + 離職人数 = 部門行数、契約稼働率の分母 = 総人数、率は小数第 1 位・分母 0 は 0%）</li>
+            <li>教育実施人数をモックから実データ算出に変更</li>
+            <li>プロジェクト管理に「有効稼働」「教育かどうか」を追加（一覧セルは文字のみで「有効/無効」「教育/非教育」、フォームはチェックボックス）。一覧は両条件で絞り込み可能</li>
+            <li>2025 年度のモックに教育案件 <code>pj-0005</code> と、教育実施人数の確認用の初期割当（第三開発部 3 名 × 2025-04-07〜06-30 の 13 週）を追加</li>
+          </ul>
+        </td>
+      </tr>
     </tbody>
   </table>
 </section>
@@ -829,7 +963,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
 </main>
 
 <footer>
-  <p>react-kadou データ構成 確定案 / 2026-10-20</p>
+  <p>react-kadou データ構成 確定案 / 2026-10-20（2026-10-27 更新）</p>
   <p class="small">このHTMLはレビュー用の設計資料です。外部CSS・JavaScriptには依存していません。</p>
 </footer>
 
