@@ -4,12 +4,13 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { AuthUser, UserRole } from '../data/mockUsers';
 import type { Department } from '../WorkStatus/types';
 import { departmentNameOf } from '../data/departmentUtils';
-import axios from 'axios'
+import request from '../request';
 import './Login.css';
 import { LoginRequest,LoginResponse } from './LoginModel';
 import { roleMap, roleLabelMap } from '../common/commonUtils';
 
 const { Title, Text, Paragraph } = Typography;
+const loginUrl = '/api/auth/login';
 
 interface LoginProps {
   /** ログインユーザー一覧（ユーザー管理画面で追加・変更・削除される） */
@@ -46,7 +47,7 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
       password: password,
     };
 
-    const user = await axios.post('http://127.0.0.1:8000/api/auth/login',loginRequest);
+    const user = await request.post<LoginResponse>(loginUrl,loginRequest);
 
     const loginResponse: LoginResponse = user.data;
 
