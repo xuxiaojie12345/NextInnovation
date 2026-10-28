@@ -10,24 +10,7 @@
  * ※実運用では認証 API（api-ud）に置き換える。
  */
 
-/** ロール */
-export type UserRole = 'bucho' | 'jigyo-bucho' | 'admin';
-
-/** ログインユーザー */
-export interface AuthUser {
-  /** ログインID */
-  userId: string;
-  /** パスワード（モック。実運用ではバックエンドで照合する） */
-  password: string;
-  /** 氏名 */
-  name: string;
-  /** ロール */
-  role: UserRole;
-  /** ロール表示名（部長 / 事業部長 / 管理者） */
-  roleLabel: string;
-  /** 部長のみ：担当部門ID（部門マスタの departmentId）。事業部長・管理者は未設定（＝全部門） */
-  departmentId?: string;
-}
+import type { AuthUser } from '../types/user';
 
 /** モックログインユーザー一覧（パスワードはすべて pass1234） */
 export const MOCK_USERS: AuthUser[] = [

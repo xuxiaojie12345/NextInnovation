@@ -18,7 +18,7 @@ import {
   PlusOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { AuthUser, UserRole } from '../data/mockUsers';
+import type { AuthUser, UserRole } from '../types/user';
 import type { Department } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
 import './UserManagementScreen.css';

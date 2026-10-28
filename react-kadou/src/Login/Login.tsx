@@ -1,51 +1,45 @@
 import React, { useState } from 'react';
-import { Button, Card, Form, Input, Tag, Typography } from 'antd';
+import { Button, Card, Form, Input, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { AuthUser } from '../data/mockUsers';
-import type { Department } from '../WorkStatus/types';
-import { departmentNameOf } from '../data/departmentUtils';
+import type { AuthUser } from '../types/user';
+import { loginApi } from '../api/login';
 import './Login.css';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 interface LoginProps {
-  /** ログインユーザー一覧（ユーザー管理画面で追加・変更・削除される） */
-  users: AuthUser[];
-  /** 部門マスタ（ユーザーの担当部門名の表示に使用） */
-  departments: Department[];
   /** 認証成功時にログインユーザーを通知する */
   onLogin: (user: AuthUser) => void;
 }
 
-/** ロール → Tag の色 */
-const ROLE_COLOR: Record<AuthUser['role'], string> = {
-  bucho: 'blue',
-  'jigyo-bucho': 'geekblue',
-  admin: 'red',
-};
-
 /**
- * ログイン画面（モック）
- * フロント内の固定ユーザー（MOCK_USERS）でユーザーID・パスワードを照合する。
- * バックエンド実装時は認証 API に置き換える。
+ * ログイン画面
+ * バックエンドのログインAPI（POST /api/v1/login）でユーザーID・パスワードを照合する。
  */
-const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // 認証エラーのメッセージ（空 = エラーなし）
   const [error, setError] = useState('');
+  // ログイン処理中フラグ
+  const [loading, setLoading] = useState(false);
 
-  /** ログイン実行（ユーザーID・パスワードを MOCK_USERS と照合する） */
-  const handleFinish = (values: { userId: string; password: string }) => {
+  /** ログイン実行（バックエンドのログインAPIで照合する） */
+  const handleFinish = async (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
     const password = values.password.trim();
-    const user = users.find(
-      (u) => u.userId === userId && u.password === password,
-    );
-    if (!user) {
-      setError('ユーザーIDまたはパスワードが正しくありません。');
-      return;
-    }
+    setLoading(true);
     setError('');
-    onLogin(user);
+    try {
+      const user = await loginApi(userId, password);
+      onLogin(user);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'ユーザーIDまたはパスワードが正しくありません。',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,34 +93,10 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
               }}
             />
           </Form.Item>
-          <Button type='primary' size='large' htmlType='submit' block>
+          <Button type='primary' size='large' htmlType='submit' block loading={loading}>
             ログイン
           </Button>
         </Form>
-
-        {/* テスト用アカウント（モックのため画面上に案内する） */}
-        <div className='login-hint'>
-          <Text type='secondary'>
-            テスト用アカウント（パスワードはすべて <code>pass1234</code>）
-          </Text>
-          <ul className='login-hint-list'>
-            {users.map((u) => (
-              <li key={u.userId}>
-                <Tag color={ROLE_COLOR[u.role]}>{u.roleLabel}</Tag>
-                <code>{u.userId}</code>
-                <Text type='secondary'>
-                  {u.name}
-                  {u.departmentId
-                    ? `（${departmentNameOf(departments, u.departmentId)}）`
-                    : ''}
-                </Text>
-              </li>
-            ))}
-          </ul>
-          <Paragraph type='secondary' className='login-hint-note'>
-            ※部長はログイン直後に自部門のデータを表示します。他の部門も選んで閲覧できます（権限ではなく表示の既定値）。
-          </Paragraph>
-        </div>
       </Card>
     </div>
   );

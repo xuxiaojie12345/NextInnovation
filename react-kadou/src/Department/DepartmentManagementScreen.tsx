@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -7,6 +7,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Spin,
   Table,
   Tag,
   Typography,
@@ -24,6 +25,12 @@ import {
   DepartmentLocation,
 } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
+import {
+  addDepartment,
+  deleteDepartment,
+  fetchDepartments,
+  updateDepartment,
+} from '../api/departmentManagement';
 
 const { Title, Text } = Typography;
 
@@ -43,22 +50,14 @@ const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
 const kindLabelOf = (kind?: DepartmentKind): string =>
   kind === 'partner' ? '協力会社' : '部門';
 
-/** 部門ID の採番（既存の dept-xxxx の最大値 + 1） */
-const buildNextDepartmentId = (list: Department[]): string => {
-  const numbers = list
-    .map((d) => /^dept-(\d+)$/.exec(d.departmentId))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map((m) => Number(m[1]));
-  const next = (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
-  return `dept-${String(next).padStart(4, '0')}`;
-};
-
 interface DepartmentManagementScreenProps {
   /** 表示する年度 */
   year: number;
   /** 部門マスタ（App 側で年度ごとに保持。協力会社も含む） */
   departments: Department[];
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
+  /** 操作者（登録・更新者）のユーザーID */
+  operatorId?: string | null;
 }
 
 /**
@@ -75,6 +74,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   year,
   departments,
   setDepartments,
+  operatorId,
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
@@ -86,8 +86,38 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   );
   // 修正中の部門ID（null = 新規登録モード）
   const [editingId, setEditingId] = useState<string | null>(null);
+  // 初期データのロード中フラグ
+  const [loading, setLoading] = useState(false);
+  // 登録 / 修正 / 削除の実行中フラグ（二重送信防止）
+  const [saving, setSaving] = useState(false);
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
+  // 最新の setDepartments を保持する ref。
+  // setDepartments はストア更新のたびに再生成されるため、effect の依存に含めると
+  // 「更新→再フェッチ→更新」の無限ループになる。ここでは常に最新のものを参照する。
+  const setDepartmentsRef = useRef(setDepartments);
+  setDepartmentsRef.current = setDepartments;
+
+  // 年度が変わったらバックエンドから部門一覧を取得する
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const list = await fetchDepartments(year);
+        if (alive) setDepartmentsRef.current(list);
+      } catch (err) {
+        if (alive) message.error(err instanceof Error ? err.message : '部門一覧を取得できませんでした。');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+    // 依存は year のみ。setDepartments は ref 経由で常に最新を参照する
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year]);
 
   const isEditing = editingId !== null;
 
@@ -110,20 +140,30 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
 
   /** 削除 */
   const handleDelete = useCallback(
-    (row: Department) => {
-      setDepartments((prev) =>
-        prev.filter((d) => d.departmentId !== row.departmentId),
-      );
-      setEditingId((prev) => (prev === row.departmentId ? null : prev));
-      message.success(
-        `${kindLabelOf(row.kind)}「${row.name}」を削除しました（モック）。`,
-      );
+    async (row: Department) => {
+      setSaving(true);
+      try {
+        await deleteDepartment(year, row.departmentId);
+        setDepartments((prev) =>
+          prev.filter((d) => d.departmentId !== row.departmentId),
+        );
+        setEditingId((prev) => (prev === row.departmentId ? null : prev));
+        message.success(
+          `${kindLabelOf(row.kind)}「${row.name}」を削除しました。`,
+        );
+      } catch (err) {
+        message.error(
+          err instanceof Error ? err.message : '部門を削除できませんでした。',
+        );
+      } finally {
+        setSaving(false);
+      }
     },
-    [setDepartments],
+    [year, setDepartments],
   );
 
   /** 新規登録 / 修正の実行（名称・拠点は必須） */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       message.warning('名称を入力してください。');
@@ -133,33 +173,39 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       message.warning('拠点を選択してください。');
       return;
     }
+    if (saving) return;
 
-    if (editingId) {
-      setDepartments((prev) =>
-        prev.map((d) =>
-          d.departmentId === editingId
-            ? { ...d, name: trimmed, kind, location }
-            : d,
-        ),
+    const payload = { name: trimmed, location, kind };
+    setSaving(true);
+    try {
+      if (editingId) {
+        const updated = await updateDepartment(
+          year,
+          editingId,
+          payload,
+          operatorId,
+        );
+        setDepartments((prev) =>
+          prev.map((d) => (d.departmentId === editingId ? updated : d)),
+        );
+        message.success(
+          `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました。`,
+        );
+      } else {
+        const created = await addDepartment(year, payload, operatorId);
+        setDepartments((prev) => [...prev, created]);
+        message.success(
+          `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました。`,
+        );
+      }
+      handleResetForm();
+    } catch (err) {
+      message.error(
+        err instanceof Error ? err.message : '部門を保存できませんでした。',
       );
-      message.success(
-        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました（モック）。`,
-      );
-    } else {
-      setDepartments((prev) => [
-        ...prev,
-        {
-          departmentId: buildNextDepartmentId(prev),
-          name: trimmed,
-          kind,
-          location,
-        },
-      ]);
-      message.success(
-        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました（モック）。`,
-      );
+    } finally {
+      setSaving(false);
     }
-    handleResetForm();
   };
 
   const columns: TableColumnsType<Department> = useMemo(
@@ -239,7 +285,6 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             要員の「所属」・プロジェクトの「所属部門」として選択できる部門と協力会社を管理します。拠点（天津／済南）は必須で、済南稼働率統計は拠点が済南の部門のみを集計対象にします。部門名は同名可のため、同名部門がある場合は名称に部門IDを付けて表示します。協力会社は部門と平級の単位ですが、稼働率統計の対象外です。
           </Text>
         </div>
-        <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>
       </div>
 
       <div ref={formRef}>
@@ -257,6 +302,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
                 onChange={(v: DepartmentKind) => setKind(v)}
                 options={KIND_OPTIONS}
                 style={{ width: 140 }}
+                disabled={saving}
               />
             </div>
             <div>
@@ -268,6 +314,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 onPressEnter={handleSubmit}
                 style={{ width: 260 }}
+                disabled={saving}
               />
             </div>
             <div>
@@ -278,17 +325,23 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
                 onChange={(v: DepartmentLocation) => setLocation(v)}
                 options={LOCATION_OPTIONS}
                 style={{ width: 140 }}
+                disabled={saving}
               />
             </div>
             <Button
               type='primary'
               icon={isEditing ? <CheckOutlined /> : <PlusOutlined />}
               onClick={handleSubmit}
+              loading={saving}
             >
               {isEditing ? '修正する' : '登録する'}
             </Button>
-            {isEditing && <Button onClick={handleResetForm}>キャンセル</Button>}
-            <Button type='text' onClick={handleResetForm}>
+            {isEditing && (
+              <Button onClick={handleResetForm} disabled={saving}>
+                キャンセル
+              </Button>
+            )}
+            <Button type='text' onClick={handleResetForm} disabled={saving}>
               クリア
             </Button>
           </Space>
@@ -302,16 +355,18 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         style={{ marginTop: 12 }}
         extra={<Text type='secondary'>全 {departments.length} 件</Text>}
       >
-        <Table<Department>
-          rowKey='departmentId'
-          size='small'
-          columns={columns}
-          dataSource={departments}
-          rowClassName={(row) =>
-            row.departmentId === editingId ? 'project-row-editing' : ''
-          }
-          pagination={{ pageSize: 15, size: 'small', showSizeChanger: false }}
-        />
+        <Spin spinning={loading}>
+          <Table<Department>
+            rowKey='departmentId'
+            size='small'
+            columns={columns}
+            dataSource={departments}
+            rowClassName={(row) =>
+              row.departmentId === editingId ? 'project-row-editing' : ''
+            }
+            pagination={{ pageSize: 8, size: 'small', showSizeChanger: false }}
+          />
+        </Spin>
       </Card>
     </div>
   );

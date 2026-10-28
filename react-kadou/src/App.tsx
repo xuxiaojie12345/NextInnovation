@@ -14,7 +14,8 @@ import UserManagementScreen from './User/UserManagementScreen';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
 import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
-import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
+import type { AuthUser } from './types/user';
+import { MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
 import {
   departmentNameOf,
   resolveDepartmentIdByName,
@@ -24,7 +25,6 @@ import {
   Holiday,
   YearStore,
   currentYear,
-  getYearSummary,
 } from './data/yearStore';
 import { WorkStatusPayload, kadouRepository } from './data/kadouRepository';
 import './App.css';
@@ -43,8 +43,11 @@ type PendingAction =
 function App() {
   // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
   const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
-  // ログイン中のユーザーID（null = 未ログイン）
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // ログイン中のユーザー（null = 未ログイン）
+  // ※ログインAPIが返したユーザーをそのまま保持する。MOCK_USERS に無い
+  //   userId でも正しくログイン状態にするため lookup は行わない。
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const currentUserId = currentUser?.userId ?? null;
   // 選択中の年度（既定 = 当年）
   const [selectedYear, setSelectedYear] = useState<number>(() => currentYear());
   // 年度ごとのデータ（＝保存済みデータ）
@@ -62,28 +65,14 @@ function App() {
   // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
   const warnedDeptRef = useRef('');
 
-  const currentUser = useMemo(
-    () => users.find((u) => u.userId === currentUserId) ?? null,
-    [users, currentUserId],
-  );
-
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
-
-  /**
-   * 年度選択画面に表示する年度ごとの概要。
-   * 保存済みストア（＝編集中の内容）から作るため、マスタを編集すると件数も追随する。
-   */
-  const yearSummaries = useMemo(
-    () => AVAILABLE_YEARS.map((y) => getYearSummary(y, stores[y])),
-    [stores],
-  );
 
   // ---- ログイン / ログアウト ----------------------------------------
 
   /** ログイン（年度は当年に戻す） */
   const handleLogin = useCallback((user: AuthUser) => {
-    setCurrentUserId(user.userId);
+    setCurrentUser(user);
     setSelectedYear(currentYear());
     setActiveView('work-status');
     setDirty(false);
@@ -91,7 +80,7 @@ function App() {
 
   /** 実際のログアウト処理（年度は保持する） */
   const doLogout = useCallback(() => {
-    setCurrentUserId(null);
+    setCurrentUser(null);
     setActiveView('work-status');
     setDirty(false);
     setPendingAction(null);
@@ -447,7 +436,6 @@ function App() {
       <YearSelectScreen
         selectedYear={selectedYear}
         onSelect={requestYearChange}
-        summaries={yearSummaries}
       />
     ),
     'work-status': (
@@ -481,6 +469,7 @@ function App() {
         year={selectedYear}
         departments={store.departments}
         setDepartments={setYearDepartments}
+        operatorId={currentUserId}
       />
     ),
     'project-manage': (
@@ -520,11 +509,7 @@ function App() {
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {
     return (
-      <Login
-        users={users}
-        departments={store.departments}
-        onLogin={handleLogin}
-      />
+      <Login onLogin={handleLogin} />
     );
   }
 

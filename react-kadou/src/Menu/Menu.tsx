@@ -12,7 +12,7 @@ import {
   ProjectOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import type { AuthUser } from '../data/mockUsers';
+import type { AuthUser } from '../types/user';
 import { AVAILABLE_YEARS } from '../data/yearStore';
 import './Menu.css';
 
@@ -44,8 +44,11 @@ interface AppMenuProps {
   onYearChange: (year: number) => void;
 }
 
+/** メニュー項目の型（key を必ず持つように明示する） */
+type AppMenuItem = NonNullable<MenuProps['items']>[number];
+
 /** メニュー項目（年度選択 / 要員稼動管理 / ... / ユーザー管理） */
-const MENU_ITEMS: MenuProps['items'] = [
+const MENU_ITEMS: AppMenuItem[] = [
   {
     key: 'year-select',
     icon: <FieldTimeOutlined />,
@@ -119,8 +122,11 @@ const AppMenu: React.FC<AppMenuProps> = ({
 }) => {
   // 管理者以外には「ユーザー管理」を出さない
   const items = MENU_ITEMS.filter(
-    (item) =>
-      !ADMIN_ONLY_KEYS.includes(String(item?.key)) || user.role === 'admin',
+    (item): item is Exclude<AppMenuItem, null> =>
+      item !== null &&
+      (item.key === undefined ||
+        !ADMIN_ONLY_KEYS.includes(String(item.key)) ||
+        user.role === 'admin'),
   );
 
   return (
@@ -134,7 +140,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
         mode='horizontal'
         items={items}
         selectedKeys={[activeKey]}
-        onClick={({ key }) => onSelect(key as MenuKey)}
+        onClick={(info: { key: string }) => onSelect(info.key as MenuKey)}
       />
       <div className='app-menu-right'>
         <Select
