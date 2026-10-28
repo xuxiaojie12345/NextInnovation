@@ -1,51 +1,67 @@
-import React, { useState } from 'react';
-import { Button, Card, Form, Input, Tag, Typography } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { AuthUser } from '../data/mockUsers';
-import type { Department } from '../WorkStatus/types';
-import { departmentNameOf } from '../data/departmentUtils';
-import './Login.css';
+import React, { useState } from "react";
+import { Button, Card, Form, Input, Typography } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import "./Login.css";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
-interface LoginProps {
-  /** ログインユーザー一覧（ユーザー管理画面で追加・変更・削除される） */
-  users: AuthUser[];
-  /** 部門マスタ（ユーザーの担当部門名の表示に使用） */
-  departments: Department[];
-  /** 認証成功時にログインユーザーを通知する */
-  onLogin: (user: AuthUser) => void;
+// 后端返回user结构
+export interface LoginUser {
+  userId: string;
+  shimei: string;
+  yakushokuKubun: string;
+  departmentId: string;
+}
+interface LoginResp {
+  token: string;
+  user: LoginUser;
 }
 
-/** ロール → Tag の色 */
-const ROLE_COLOR: Record<AuthUser['role'], string> = {
-  bucho: 'blue',
-  'jigyo-bucho': 'geekblue',
-  admin: 'red',
-};
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
-/**
- * ログイン画面（モック）
- * フロント内の固定ユーザー（MOCK_USERS）でユーザーID・パスワードを照合する。
- * バックエンド実装時は認証 API に置き換える。
- */
-const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
-  // 認証エラーのメッセージ（空 = エラーなし）
-  const [error, setError] = useState('');
+interface LoginProps {
+  onLogin: (user: LoginUser) => void;
+}
 
-  /** ログイン実行（ユーザーID・パスワードを MOCK_USERS と照合する） */
-  const handleFinish = (values: { userId: string; password: string }) => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleFinish = async (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
-    const password = values.password.trim();
-    const user = users.find(
-      (u) => u.userId === userId && u.password === password,
-    );
-    if (!user) {
-      setError('ユーザーIDまたはパスワードが正しくありません。');
-      return;
+    const password = values.password;
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/login/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const msg = errJson?.detail ?? "ログイン処理に失敗しました";
+        setError(msg);
+        return;
+      }
+
+      const data: LoginResp = await res.json();
+
+      onLogin(data.user);
+    } catch (err) {
+      console.error(err);
+      setError(
+        "サーバーに接続できません。ネットワークまたはサーバー起動状況を確認してください。",
+      );
+    } finally {
+      setLoading(false);
     }
-    setError('');
-    onLogin(user);
   };
 
   return (
@@ -61,14 +77,15 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
           ログインしてください。
         </Text>
 
-        {/* 認証エラー */}
         {error && <div className='login-error'>{error}</div>}
 
         <Form layout='vertical' requiredMark={false} onFinish={handleFinish}>
           <Form.Item
             label='ユーザーID'
             name='userId'
-            rules={[{ required: true, message: 'ユーザーIDを入力してください。' }]}
+            rules={[
+              { required: true, message: "ユーザーIDを入力してください。" },
+            ]}
           >
             <Input
               size='large'
@@ -77,7 +94,7 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
               autoComplete='username'
               maxLength={20}
               onChange={() => {
-                if (error) setError('');
+                if (error) setError("");
               }}
             />
           </Form.Item>
@@ -85,7 +102,7 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
             label='パスワード'
             name='password'
             rules={[
-              { required: true, message: 'パスワードを入力してください。' },
+              { required: true, message: "パスワードを入力してください。" },
             ]}
           >
             <Input.Password
@@ -95,38 +112,20 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
               autoComplete='current-password'
               maxLength={32}
               onChange={() => {
-                if (error) setError('');
+                if (error) setError("");
               }}
             />
           </Form.Item>
-          <Button type='primary' size='large' htmlType='submit' block>
+          <Button
+            type='primary'
+            size='large'
+            htmlType='submit'
+            block
+            loading={loading}
+          >
             ログイン
           </Button>
         </Form>
-
-        {/* テスト用アカウント（モックのため画面上に案内する） */}
-        <div className='login-hint'>
-          <Text type='secondary'>
-            テスト用アカウント（パスワードはすべて <code>pass1234</code>）
-          </Text>
-          <ul className='login-hint-list'>
-            {users.map((u) => (
-              <li key={u.userId}>
-                <Tag color={ROLE_COLOR[u.role]}>{u.roleLabel}</Tag>
-                <code>{u.userId}</code>
-                <Text type='secondary'>
-                  {u.name}
-                  {u.departmentId
-                    ? `（${departmentNameOf(departments, u.departmentId)}）`
-                    : ''}
-                </Text>
-              </li>
-            ))}
-          </ul>
-          <Paragraph type='secondary' className='login-hint-note'>
-            ※部長はログイン直後に自部門のデータを表示します。他の部門も選んで閲覧できます（権限ではなく表示の既定値）。
-          </Paragraph>
-        </div>
       </Card>
     </div>
   );

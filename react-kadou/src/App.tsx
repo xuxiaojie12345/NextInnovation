@@ -1,33 +1,46 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { message } from 'antd';
-import AppMenu from './Menu/Menu';
-import type { MenuKey } from './Menu/Menu';
-import Login from './Login/Login';
-import HolidaySettingsScreen from './Holiday/HolidaySettingsScreen';
-import DepartmentManagementScreen from './Department/DepartmentManagementScreen';
-import PersonnelInfoScreen from './Personnel/PersonnelInfoScreen';
-import ProjectManagementScreen from './Project/ProjectManagementScreen';
-import JinanWorkRateScreen from './Statistics/JinanWorkRateScreen';
-import WorkStatus from './WorkStatus/WorkStatus';
-import YearSelectScreen from './YearSelect/YearSelectScreen';
-import UserManagementScreen from './User/UserManagementScreen';
-import UnsavedChangesModal from './components/UnsavedChangesModal';
-import { Department, Personnel, Project } from './WorkStatus/types';
-import type { PersonnelImportRow } from './Personnel/personnelImport';
-import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { message } from "antd";
+import AppMenu from "./Menu/Menu";
+import type { MenuKey } from "./Menu/Menu";
+import Login from "./Login/Login";
+import type { LoginUser } from "./Login/Login";
+import HolidaySettingsScreen from "./Holiday/HolidaySettingsScreen";
+import DepartmentManagementScreen from "./Department/DepartmentManagementScreen";
+import PersonnelInfoScreen from "./Personnel/PersonnelInfoScreen";
+import {
+  deletePersonnel as deletePersonnelApi,
+  importPersonnel as importPersonnelApi,
+  loadPersonnel,
+  savePersonnel as savePersonnelApi,
+} from "./Personnel/personnelApi";
+import ProjectManagementScreen from "./Project/ProjectManagementScreen";
+import JinanWorkRateScreen from "./Statistics/JinanWorkRateScreen";
+import WorkStatus from "./WorkStatus/WorkStatus";
+import YearSelectScreen from "./YearSelect/YearSelectScreen";
+import UserManagementScreen from "./User/UserManagementScreen";
+import UnsavedChangesModal from "./components/UnsavedChangesModal";
+import { Department, Personnel, Project } from "./WorkStatus/types";
+import type { PersonnelImportRow } from "./Personnel/personnelImport";
+import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from "./data/mockUsers";
 import {
   departmentNameOf,
   resolveDepartmentIdByName,
-} from './data/departmentUtils';
+} from "./data/departmentUtils";
 import {
   AVAILABLE_YEARS,
   Holiday,
   YearStore,
   currentYear,
   getYearSummary,
-} from './data/yearStore';
-import { WorkStatusPayload, kadouRepository } from './data/kadouRepository';
-import './App.css';
+} from "./data/yearStore";
+import { WorkStatusPayload, kadouRepository } from "./data/kadouRepository";
+import "./App.css";
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
 const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
@@ -35,24 +48,26 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
   : [...AVAILABLE_YEARS, currentYear()];
 
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
-type PendingAction =
-  | { type: 'year'; year: number }
-  | { type: 'logout' }
-  | null;
+type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
 function App() {
   // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
   const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
   // ログイン中のユーザーID（null = 未ログイン）
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // バックエンド認証済みユーザー
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   // 選択中の年度（既定 = 当年）
   const [selectedYear, setSelectedYear] = useState<number>(() => currentYear());
   // 年度ごとのデータ（＝保存済みデータ）
   const [stores, setStores] = useState<Record<number, YearStore>>(() =>
     kadouRepository.snapshot(INITIAL_YEARS),
   );
+  const [personnelLoadedYear, setPersonnelLoadedYear] = useState<
+    number | null
+  >(null);
   // 表示中の画面
-  const [activeView, setActiveView] = useState<MenuKey>('work-status');
+  const [activeView, setActiveView] = useState<MenuKey>("work-status");
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
   // 未保存確認ダイアログで保留中の操作
@@ -60,12 +75,7 @@ function App() {
   // 要員稼動管理の「保存」処理（WorkStatus から登録される）
   const saveHandlerRef = useRef<(() => void) | null>(null);
   // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
-  const warnedDeptRef = useRef('');
-
-  const currentUser = useMemo(
-    () => users.find((u) => u.userId === currentUserId) ?? null,
-    [users, currentUserId],
-  );
+  const warnedDeptRef = useRef("");
 
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
@@ -79,20 +89,66 @@ function App() {
     [stores],
   );
 
+  useEffect(() => {
+    let active = true;
+    loadPersonnel(selectedYear)
+      .then((personnel) => {
+        if (!active) return;
+        setStores((previous) => ({
+          ...previous,
+          [selectedYear]: {
+            ...previous[selectedYear],
+            personnel,
+          },
+        }));
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setStores((previous) => ({
+          ...previous,
+          [selectedYear]: {
+            ...previous[selectedYear],
+            personnel: [],
+          },
+        }));
+        const detail =
+          error instanceof Error ? error.message : "不明なエラー";
+        message.error(
+          `${selectedYear}年度の要員情報を取得できませんでした：${detail}`,
+        );
+      })
+      .finally(() => {
+        if (active) setPersonnelLoadedYear(selectedYear);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedYear]);
+
   // ---- ログイン / ログアウト ----------------------------------------
 
   /** ログイン（年度は当年に戻す） */
-  const handleLogin = useCallback((user: AuthUser) => {
+  const handleLogin = useCallback((user: LoginUser) => {
+    setCurrentUser({
+      userId: user.userId,
+      password: "",
+      name: user.shimei,
+      role: "bucho",
+      roleLabel: user.yakushokuKubun || "一般ユーザー",
+      departmentId: user.departmentId || undefined,
+    });
     setCurrentUserId(user.userId);
     setSelectedYear(currentYear());
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
   }, []);
 
   /** 実際のログアウト処理（年度は保持する） */
   const doLogout = useCallback(() => {
+    setCurrentUser(null);
     setCurrentUserId(null);
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
     setPendingAction(null);
   }, []);
@@ -100,7 +156,7 @@ function App() {
   /** ログアウト（未保存があれば確認ダイアログを出す） */
   const requestLogout = useCallback(() => {
     if (dirty) {
-      setPendingAction({ type: 'logout' });
+      setPendingAction({ type: "logout" });
       return;
     }
     doLogout();
@@ -111,7 +167,7 @@ function App() {
   /** 実際の年度切替（切替後は要員稼動管理へ移動する） */
   const applyYearChange = useCallback((year: number) => {
     setSelectedYear(year);
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
     setPendingAction(null);
   }, []);
@@ -121,7 +177,7 @@ function App() {
     (year: number) => {
       if (year === selectedYear) return;
       if (dirty) {
-        setPendingAction({ type: 'year', year });
+        setPendingAction({ type: "year", year });
         return;
       }
       applyYearChange(year);
@@ -133,9 +189,9 @@ function App() {
   const handleSaveAndContinue = useCallback(() => {
     saveHandlerRef.current?.();
     const action = pendingAction;
-    if (action?.type === 'year') {
+    if (action?.type === "year") {
       applyYearChange(action.year);
-    } else if (action?.type === 'logout') {
+    } else if (action?.type === "logout") {
       doLogout();
     } else {
       setPendingAction(null);
@@ -146,12 +202,12 @@ function App() {
   const handleDiscardAndContinue = useCallback(() => {
     const action = pendingAction;
     setDirty(false);
-    if (action?.type === 'year') {
+    if (action?.type === "year") {
       // 年度が変わるので WorkStatus は作り直され、下書きは破棄される
       applyYearChange(action.year);
       return;
     }
-    if (action?.type === 'logout') {
+    if (action?.type === "logout") {
       doLogout();
       return;
     }
@@ -178,7 +234,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.departments ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ departments: next });
     },
     [stores, selectedYear, updateStore],
@@ -190,7 +246,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.projects ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ projects: next });
     },
     [stores, selectedYear, updateStore],
@@ -202,7 +258,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.holidays ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ holidays: next });
     },
     [stores, selectedYear, updateStore],
@@ -218,21 +274,28 @@ function App() {
   );
 
   /**
-   * 要員情報の登録（モック：画面上のみ保持）
-   * 同じ社員番号が既にあれば更新、なければ新規追加する。
+   * 要員情報をバックエンドに登録する。
+   * 同じ社員番号が既にあれば更新レコードを追加し、なければ新規登録する。
    * ※追加しても要員稼動管理画面へは切り替えない
    */
   const handleSavePersonnel = useCallback(
-    (values: {
+    async (values: {
       employeeNo: string;
       name: string;
       departmentId: string;
       role: string;
     }) => {
+      const current = stores[selectedYear]?.personnel ?? [];
+      const existing = current.find(
+        (person) => person.employeeNo === values.employeeNo,
+      );
+      const savedPerson: Personnel = {
+        ...existing,
+        ...values,
+      };
+      await savePersonnelApi(selectedYear, savedPerson);
       setYearPersonnel((prev) => {
-        const index = prev.findIndex(
-          (p) => p.employeeNo === values.employeeNo,
-        );
+        const index = prev.findIndex((p) => p.employeeNo === values.employeeNo);
         // 既存の社員番号 → 役割・名前・所属 を更新する
         if (index >= 0) {
           const next = [...prev];
@@ -243,7 +306,7 @@ function App() {
         return [...prev, { ...values }];
       });
     },
-    [setYearPersonnel],
+    [selectedYear, setYearPersonnel, stores],
   );
 
   /**
@@ -251,7 +314,8 @@ function App() {
    * 当年度の稼働表行・割当・BUFFER も削除する（他年度は変更しない）。
    */
   const handleDeletePersonnel = useCallback(
-    (employeeNo: string) => {
+    async (employeeNo: string) => {
+      await deletePersonnelApi(selectedYear, employeeNo);
       setStores((prev) => {
         const current = prev[selectedYear];
         if (!current) return prev;
@@ -276,7 +340,7 @@ function App() {
           },
         };
       });
-      void kadouRepository.deletePersonnel(selectedYear, employeeNo);
+      await kadouRepository.deletePersonnel(selectedYear, employeeNo);
     },
     [selectedYear],
   );
@@ -307,14 +371,26 @@ function App() {
    * 稼働表の備考欄から呼ばれる。マスタは即時保存する。
    */
   const handleUpdateLeavePlan = useCallback(
-    (employeeNo: string, leavePlan: string) => {
+    async (employeeNo: string, leavePlan: string) => {
+      const person = stores[selectedYear]?.personnel.find(
+        (item) => item.employeeNo === employeeNo,
+      );
+      if (!person) return;
+      try {
+        await savePersonnelApi(selectedYear, { ...person, leavePlan });
+      } catch (error) {
+        const detail =
+          error instanceof Error ? error.message : "不明なエラー";
+        message.error(`退場予定を保存できませんでした：${detail}`);
+        return;
+      }
       setYearPersonnel((prev) =>
         prev.map((p) =>
           p.employeeNo === employeeNo ? { ...p, leavePlan } : p,
         ),
       );
     },
-    [setYearPersonnel],
+    [selectedYear, setYearPersonnel, stores],
   );
 
   /**
@@ -322,14 +398,26 @@ function App() {
    * 稼働表の「異動」で新しい所属を登録したときに呼ばれる。
    */
   const handleUpdateDepartment = useCallback(
-    (employeeNo: string, departmentId: string) => {
+    async (employeeNo: string, departmentId: string) => {
+      const person = stores[selectedYear]?.personnel.find(
+        (item) => item.employeeNo === employeeNo,
+      );
+      if (!person) return;
+      try {
+        await savePersonnelApi(selectedYear, { ...person, departmentId });
+      } catch (error) {
+        const detail =
+          error instanceof Error ? error.message : "不明なエラー";
+        message.error(`所属を保存できませんでした：${detail}`);
+        return;
+      }
       setYearPersonnel((prev) =>
         prev.map((p) =>
           p.employeeNo === employeeNo ? { ...p, departmentId } : p,
         ),
       );
     },
-    [setYearPersonnel],
+    [selectedYear, setYearPersonnel, stores],
   );
 
   /**
@@ -337,42 +425,44 @@ function App() {
    * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
    */
   const handleImportPersonnel = useCallback(
-    (rows: PersonnelImportRow[]) => {
+    async (rows: PersonnelImportRow[]) => {
       const departments = stores[selectedYear]?.departments ?? [];
-      setYearPersonnel((prev) => {
-        const indexByNo = new Map(prev.map((p, i) => [p.employeeNo, i]));
-        const next = [...prev];
+      const previous = stores[selectedYear]?.personnel ?? [];
+      const indexByNo = new Map(previous.map((person, i) => [person.employeeNo, i]));
+      const next = [...previous];
+      const importedPeople = new Map<string, Personnel>();
 
-        rows.forEach((row, i) => {
-          // 取込ファイルの「所属」は部門名のため、部門IDへ解決する
-          const resolvedDepartmentId = resolveDepartmentIdByName(
-            departments,
-            row.department,
-          );
-          const index = indexByNo.get(row.employeeNo);
-          if (index !== undefined) {
-            // 既存の社員番号 → 社員情報の項目のみ上書きする
-            // （退場予定 leavePlan は保持する）
-            const current = next[index];
-            next[index] = {
-              ...current,
+      rows.forEach((row) => {
+        const resolvedDepartmentId = resolveDepartmentIdByName(
+          departments,
+          row.department,
+        );
+        const index = indexByNo.get(row.employeeNo);
+        const existing = index === undefined ? undefined : next[index];
+        const person: Personnel = existing
+          ? {
+              ...existing,
               name: row.name,
-              role: row.role || current.role,
-              departmentId:
-                resolvedDepartmentId ?? current.departmentId,
+              role: row.role || existing.role,
+              departmentId: resolvedDepartmentId ?? existing.departmentId,
+            }
+          : {
+              employeeNo: row.employeeNo,
+              name: row.name,
+              role: row.role || "要員",
+              departmentId: resolvedDepartmentId ?? "",
             };
-            return;
-          }
-          // 新規の社員番号 → 要員一覧へ追加する
+        if (index !== undefined) {
+          next[index] = person;
+        } else {
           indexByNo.set(row.employeeNo, next.length);
-          next.push({
-            employeeNo: row.employeeNo,
-            name: row.name,
-            role: row.role || '要員',
-            departmentId: resolvedDepartmentId ?? '',
-          });
-        });
+          next.push(person);
+        }
+        importedPeople.set(row.employeeNo, person);
+      });
 
+      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()));
+      setYearPersonnel((prev) => {
         return next;
       });
     },
@@ -437,20 +527,22 @@ function App() {
     message.warning(
       `${missing
         .map((id) => departmentNameOf(store.departments, id))
-        .join('・')} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
+        .join(
+          "・",
+        )} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
     );
   }, [currentUser, selectedYear, store.departments]);
 
   /** メニューキー → 画面の対応（メニューの並び順とは独立） */
   const views: Record<MenuKey, React.ReactNode> = {
-    'year-select': (
+    "year-select": (
       <YearSelectScreen
         selectedYear={selectedYear}
         onSelect={requestYearChange}
         summaries={yearSummaries}
       />
     ),
-    'work-status': (
+    "work-status": (
       <WorkStatus
         year={selectedYear}
         projects={store.projects}
@@ -465,10 +557,11 @@ function App() {
         registerSaveHandler={registerSaveHandler}
       />
     ),
-    'personnel-info': (
+    "personnel-info": (
       <PersonnelInfoScreen
         year={selectedYear}
         personnel={store.personnel}
+        loading={personnelLoadedYear !== selectedYear}
         departments={store.departments}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}
@@ -476,14 +569,14 @@ function App() {
         hasWorkData={hasWorkDataForPersonnel}
       />
     ),
-    'department-manage': (
+    "department-manage": (
       <DepartmentManagementScreen
         year={selectedYear}
         departments={store.departments}
         setDepartments={setYearDepartments}
       />
     ),
-    'project-manage': (
+    "project-manage": (
       <ProjectManagementScreen
         year={selectedYear}
         projects={store.projects}
@@ -491,7 +584,7 @@ function App() {
         departments={store.departments}
       />
     ),
-    'jinan-work-rate': (
+    "jinan-work-rate": (
       <JinanWorkRateScreen
         year={selectedYear}
         departments={store.departments}
@@ -499,20 +592,20 @@ function App() {
         projects={store.projects}
       />
     ),
-    'holiday-settings': (
+    "holiday-settings": (
       <HolidaySettingsScreen
         year={selectedYear}
         holidays={store.holidays}
         setHolidays={setYearHolidays}
       />
     ),
-    'user-manage': (
+    "user-manage": (
       <UserManagementScreen
         users={users}
         setUsers={setUsers}
         currentUserId={currentUserId}
         departments={store.departments}
-        allowManage={currentUser?.role === 'admin'}
+        allowManage={currentUser?.role === "admin"}
       />
     ),
   };
@@ -520,11 +613,7 @@ function App() {
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {
     return (
-      <Login
-        users={users}
-        departments={store.departments}
-        onLogin={handleLogin}
-      />
+      <Login onLogin={handleLogin} />
     );
   }
 
@@ -553,7 +642,7 @@ function App() {
           <div
             key={key}
             className={
-              activeView === key ? 'app-view' : 'app-view app-view-hidden'
+              activeView === key ? "app-view" : "app-view app-view-hidden"
             }
           >
             {views[key]}

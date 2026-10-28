@@ -1,7 +1,7 @@
 /**
- * 要員情報（社員情報）の一括読み込み（フロント モック実装）
+ * 要員情報（社員情報）の一括読み込みファイル解析
  *
- * 「社員情報」の Excel を取り込み、社員番号で突合して要員一覧（モック DB）を上書きする。
+ * 「社員情報」の Excel を解析し、社員番号で突合できる形に整える。
  *
  * ■ 対応ファイル
  *   - Excel (.xlsx / .xlsm) … ZIP をネイティブ展開してセル値を読み取る（外部ライブラリ不要）
@@ -12,9 +12,7 @@
  *   社員番号 / 名前（氏名） / 役割 / 所属（部門）
  *   ※見出し行が見つからない場合は 社員番号, 名前, 役割, 所属 の並びとみなす
  *
- * NOTE: バックエンド実装時は、この parsePersonnelFile() を API 呼び出し
- *       （例：POST /api/kadou/personnel/import  multipart/form-data）に置き換える。
- *       画面側・App 側のインターフェース（PersonnelImportRow）はそのまま利用できる。
+ * NOTE: 解析結果は確認後、POST /api/personnel/import に JSON で送信する。
  * NOTE: 表形式ファイル（Excel / CSV）の読み取り処理（readSpreadsheetFile）は
  *       プロジェクト情報の一括読み込み（Project/projectImport.ts）と共用する。
  */

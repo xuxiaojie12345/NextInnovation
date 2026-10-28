@@ -8,7 +8,9 @@
 - React 18 + TypeScript (Create React App / react-scripts 5)
 - UI: Ant Design (antd 5) + @ant-design/icons
 - 日付: dayjs
-- データ: フロント内のモックデータ（バックエンド未接続）
+- ログイン: FastAPI のログイン API に接続
+- 要員情報: FastAPI の年度別 API に接続
+- その他の業務データ: フロント内のモックデータ（業務データ API は未接続）
 
 ## セットアップ & 起動
 
@@ -32,20 +34,25 @@ npx tsc --noEmit -p tsconfig.json
 npx eslint "src/**/*.{ts,tsx}"
 ```
 
-## ログイン（モック）
+## ログイン（FastAPI）
 
-バックエンド未接続のため、フロント内の固定ユーザー（`src/data/mockUsers.ts`）で照合します。
-パスワードはすべて `pass1234`（テスト用アカウントはログイン画面にも表示されます）。
+ログイン時に `POST /api/login/login` へ `{ "userId": "...", "password": "..." }` を送信します。
+FastAPI は `JN_USER_TABLE` で照合するため、先に `api_kadou` を起動して DB 接続を設定してください。
 
-| ユーザーID | 氏名 | 職級 | 所属部門 |
-| --- | --- | --- | --- |
-| bucho1 / bucho2 / bucho3 | 山田 一郎 / 佐藤 二郎 / 鈴木 三郎 | 部長 | 第一開発部 / 第二開発部 / 第三開発部 |
-| jigyo | 高橋 事業 | 事業部長 | （＝全部門） |
-| admin | システム管理者 | 管理者 | （＝全部門） |
+フロントの API 接続先は既定で `http://127.0.0.1:8000` です。変更する場合はプロジェクトルートに `.env.local` を作成します。
 
-- 職級は**権限ではなく初期表示の既定値**です。部長はログイン直後に自部門で絞り込まれますが、他部門を選んで閲覧することもできます。
-- 「ユーザー管理」メニューは管理者のみに表示されます。
+```text
+REACT_APP_API_BASE_URL=http://127.0.0.1:8000
+```
+
+`yakushokuKubun` と画面ロールの対応コードが未定義のため、ログインユーザーは最低の画面ロール（部長相当）で画面に入り、職級欄には API の値を表示します。管理者権限の割り当ては未接続です。これは画面表示上の扱いで、バックエンドの認可機能はまだありません。
+
 - セッションはメモリのみ（リロードで再ログイン）です。
+
+### 起動
+
+1. `api_kadou` の README に従って DB 設定と FastAPI を起動します（`http://127.0.0.1:8000`）。
+2. `react-kadou` で `npm start` を実行します（`http://localhost:3000`）。
 
 ## 画面
 
@@ -71,6 +78,7 @@ npx eslint "src/**/*.{ts,tsx}"
 
 ### 要員情報 `src/Personnel/PersonnelInfoScreen.tsx`
 
+- 年度別の要員一覧取得・追加／更新・削除・一括読み込みは FastAPI の `/api/personnel` API を使用します。
 - 社員番号を入力すると 役割・名前・所属 を表示し、全項目を編集できます。未登録の社員番号は確認のうえで新規追加。
 - 「一括読み込む」で **Excel(.xlsx/.xlsm) / CSV / TSV** を取り込みます（`src/Personnel/personnelImport.ts`・外部ライブラリなし）。社員番号で突合し、既存は上書き・新規は追加。
 - 検証用フィクスチャは `node scripts/gen-test-fixtures.cjs` で生成できます（OS の一時フォルダに出力）。

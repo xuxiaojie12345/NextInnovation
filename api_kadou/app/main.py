@@ -1,26 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.routes import router as api_v1_router
+from app.api.Login import router as user_router
+from app.api.Personnel import router as personnel_router
 from app.core.settings import settings
 
-app = FastAPI(title="React-FastAPI-MySQL 后端")
+app = FastAPI(title="要員稼動管理システム")
 
-# 跨域配置（允许React前端访问）
+# 跨域配置（允许本地 React 开发服务器访问）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite默认前端地址
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 注册路由
-app.include_router(api_v1_router)
-
-
-@app.get("/api/health")
-def health():
-    return {"status": "ok", "env": settings.APP_ENV}
+app.include_router(user_router, prefix="/api/login")
+app.include_router(personnel_router)
 
 
 if __name__ == "__main__":
