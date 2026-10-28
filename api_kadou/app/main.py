@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.Department import router as department_router
 from app.api.Login import router as user_router
 from app.api.Personnel import router as personnel_router
 from app.core.settings import settings
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(user_router, prefix="/api/login")
 app.include_router(personnel_router)
+app.include_router(department_router)
 
 
 if __name__ == "__main__":

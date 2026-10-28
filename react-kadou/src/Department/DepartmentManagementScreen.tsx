@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -24,6 +24,12 @@ import {
   DepartmentLocation,
 } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
+import {
+  deleteDepartment,
+  fetchDepartments,
+  registerDepartment,
+  updateDepartment,
+} from './departmentApi';
 
 const { Title, Text } = Typography;
 
@@ -42,16 +48,6 @@ const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
 /** 種別の表示名（未設定は部門扱い） */
 const kindLabelOf = (kind?: DepartmentKind): string =>
   kind === 'partner' ? '協力会社' : '部門';
-
-/** 部門ID の採番（既存の dept-xxxx の最大値 + 1） */
-const buildNextDepartmentId = (list: Department[]): string => {
-  const numbers = list
-    .map((d) => /^dept-(\d+)$/.exec(d.departmentId))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map((m) => Number(m[1]));
-  const next = (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
-  return `dept-${String(next).padStart(4, '0')}`;
-};
 
 interface DepartmentManagementScreenProps {
   /** 表示する年度 */
@@ -88,8 +84,49 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
+  // 新規登録 API の送信中フラグ
+  const [submitting, setSubmitting] = useState(false);
+  // 部門一覧の取得中フラグ
+  const [loading, setLoading] = useState(false);
+  // setDepartments は App 側で年度や保存内容が変わるたびに作り直されるため、
+  // 取得処理の依存配列から外すために最新の関数を参照で保持する
+  const setDepartmentsRef = useRef(setDepartments);
+
+  useEffect(() => {
+    setDepartmentsRef.current = setDepartments;
+  });
 
   const isEditing = editingId !== null;
+
+  /** 初期表示（および年度切替）時に、その年度の部門一覧を API から取得して一覧に表示する */
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchDepartments(year)
+      .then((list) => {
+        if (!cancelled) {
+          setDepartmentsRef.current(list);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          message.error(
+            error instanceof Error
+              ? error.message
+              : '部門一覧の取得に失敗しました。',
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    // 画面を離れた / 年度が変わった後に古い結果を反映しないよう中断する
+    return () => {
+      cancelled = true;
+    };
+  }, [year]);
 
   /** フォームを初期化（修正モードも解除） */
   const handleResetForm = useCallback(() => {
@@ -108,22 +145,29 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  /** 削除 */
+  /** 削除（バックエンドの API を呼び出し、成功したら一覧から取り除く） */
   const handleDelete = useCallback(
-    (row: Department) => {
-      setDepartments((prev) =>
-        prev.filter((d) => d.departmentId !== row.departmentId),
-      );
-      setEditingId((prev) => (prev === row.departmentId ? null : prev));
-      message.success(
-        `${kindLabelOf(row.kind)}「${row.name}」を削除しました（モック）。`,
-      );
+    async (row: Department) => {
+      try {
+        await deleteDepartment(year, row.departmentId);
+        setDepartments((prev) =>
+          prev.filter((d) => d.departmentId !== row.departmentId),
+        );
+        setEditingId((prev) => (prev === row.departmentId ? null : prev));
+        message.success(
+          `${kindLabelOf(row.kind)}「${row.name}」を削除しました。`,
+        );
+      } catch (error) {
+        message.error(
+          error instanceof Error ? error.message : '削除に失敗しました。',
+        );
+      }
     },
-    [setDepartments],
+    [setDepartments, year],
   );
 
   /** 新規登録 / 修正の実行（名称・拠点は必須） */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       message.warning('名称を入力してください。');
@@ -134,32 +178,50 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       return;
     }
 
+    // 修正：フォーム値と修正対象の部門IDで更新 API を呼び出し、応答を一覧へ反映する
     if (editingId) {
-      setDepartments((prev) =>
-        prev.map((d) =>
-          d.departmentId === editingId
-            ? { ...d, name: trimmed, kind, location }
-            : d,
-        ),
-      );
-      message.success(
-        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました（モック）。`,
-      );
-    } else {
-      setDepartments((prev) => [
-        ...prev,
-        {
-          departmentId: buildNextDepartmentId(prev),
-          name: trimmed,
+      setSubmitting(true);
+      try {
+        const updated = await updateDepartment({
+          departmentId: editingId,
+          year,
           kind,
+          name: trimmed,
           location,
-        },
-      ]);
-      message.success(
-        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました（モック）。`,
-      );
+        });
+        setDepartments((prev) =>
+          prev.map((d) => (d.departmentId === updated.departmentId ? updated : d)),
+        );
+        message.success(
+          `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました。`,
+        );
+        handleResetForm();
+      } catch (error) {
+        message.error(
+          error instanceof Error ? error.message : '修正に失敗しました。',
+        );
+      } finally {
+        setSubmitting(false);
+      }
+      return;
     }
-    handleResetForm();
+
+    // 新規登録：フォーム値と画面上の年度でバックエンド API を呼び出す
+    setSubmitting(true);
+    try {
+      const created = await registerDepartment({ year, kind, name: trimmed, location });
+      setDepartments((prev) => [...prev, created]);
+      message.success(
+        `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました。`,
+      );
+      handleResetForm();
+    } catch (error) {
+      message.error(
+        error instanceof Error ? error.message : '登録に失敗しました。',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const columns: TableColumnsType<Department> = useMemo(
@@ -283,6 +345,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             <Button
               type='primary'
               icon={isEditing ? <CheckOutlined /> : <PlusOutlined />}
+              loading={submitting}
               onClick={handleSubmit}
             >
               {isEditing ? '修正する' : '登録する'}
@@ -305,6 +368,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         <Table<Department>
           rowKey='departmentId'
           size='small'
+          loading={loading}
           columns={columns}
           dataSource={departments}
           rowClassName={(row) =>
