@@ -8,7 +8,7 @@ app = FastAPI(title="React-FastAPI-MySQL 后端")
 # 跨域配置（允许React前端访问）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite默认前端地址
+    allow_origins=["http://localhost:3000"],  # Vite默认前端地址
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

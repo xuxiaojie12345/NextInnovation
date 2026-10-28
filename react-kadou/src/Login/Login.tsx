@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Card, Form, Input, Tag, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { AuthUser } from '../data/mockUsers';
+import { AuthUser, UserRole } from '../data/mockUsers';
 import type { Department } from '../WorkStatus/types';
 import { departmentNameOf } from '../data/departmentUtils';
+import axios from 'axios'
 import './Login.css';
+import { LoginRequest,LoginResponse } from './LoginModel';
+import { roleMap, roleLabelMap } from '../common/commonUtils';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -34,24 +37,33 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
   const [error, setError] = useState('');
 
   /** ログイン実行（ユーザーID・パスワードを MOCK_USERS と照合する） */
-  const handleFinish = (values: { userId: string; password: string }) => {
+  const handleFinish = async (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
     const password = values.password.trim();
-    const user = users.find(
-      (u) => u.userId === userId && u.password === password,
-    );
 
-    const userinfo = axios.post('/api/v1/login', {
+    const loginRequest: LoginRequest = {
       userId: userId,
       password: password,
-    });
-    console.log(userinfo.data);
-    if (!user) {
+    };
+
+    const user = await axios.post('http://127.0.0.1:8000/api/auth/login',loginRequest);
+
+    const loginResponse: LoginResponse = user.data;
+
+    if (!loginResponse) {
       setError('ユーザーIDまたはパスワードが正しくありません。');
       return;
     }
+        
     setError('');
-    onLogin(user);
+    onLogin({
+      userId: loginResponse.userId,
+      password: password,
+      name: loginResponse.name,
+      role: roleMap[loginResponse.yakushokukubun],
+      roleLabel: roleLabelMap[loginResponse.yakushokukubun],
+      departmentId: loginResponse.department
+    });
   };
 
   return (

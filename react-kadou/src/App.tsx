@@ -62,10 +62,7 @@ function App() {
   // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
   const warnedDeptRef = useRef('');
 
-  const currentUser = useMemo(
-    () => users.find((u) => u.userId === currentUserId) ?? null,
-    [users, currentUserId],
-  );
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
 
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
@@ -84,6 +81,7 @@ function App() {
   /** ログイン（年度は当年に戻す） */
   const handleLogin = useCallback((user: AuthUser) => {
     setCurrentUserId(user.userId);
+    setCurrentUser(user);
     setSelectedYear(currentYear());
     setActiveView('work-status');
     setDirty(false);
@@ -92,6 +90,7 @@ function App() {
   /** 実際のログアウト処理（年度は保持する） */
   const doLogout = useCallback(() => {
     setCurrentUserId(null);
+    setCurrentUser(null);
     setActiveView('work-status');
     setDirty(false);
     setPendingAction(null);
