@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 
 class LoginUserRequest(BaseModel):
-    username: str
+    userId: str
     password: str
 
 class LoginUserResponse(BaseModel):

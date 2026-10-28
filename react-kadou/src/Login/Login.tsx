@@ -40,6 +40,12 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
     const user = users.find(
       (u) => u.userId === userId && u.password === password,
     );
+
+    const userinfo = axios.post('/api/v1/login', {
+      userId: userId,
+      password: password,
+    });
+    console.log(userinfo.data);
     if (!user) {
       setError('ユーザーIDまたはパスワードが正しくありません。');
       return;

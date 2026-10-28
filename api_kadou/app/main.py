@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.routes import router as api_v1_router
+from app.api.v1.Login import router as api_v1_Login
 from app.core.settings import settings
 
 app = FastAPI(title="React-FastAPI-MySQL 后端")
@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 # 注册路由
-app.include_router(api_v1_router)
+app.include_router(api_v1_Login)
 
 
 @app.get("/api/health")
