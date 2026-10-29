@@ -499,6 +499,11 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             <Button type='text' onClick={handleReset}>
               クリア
             </Button>
+            {isExisting && (
+              <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+                削除する
+              </Button>
+            )}
           </Space>
         </Space>
       </Card>
