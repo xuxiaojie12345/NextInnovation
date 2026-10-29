@@ -41,3 +41,15 @@ DELETE FROM `JN_PERSONNEL_MASTER`
 WHERE year_id = :year
 AND employee_no = :employeeNo
 """)
+
+SQL_UPDATE_JN_PERSONNEL_MASTER = text("""
+UPDATE `JN_PERSONNEL_MASTER`
+SET department_id = :departmentId,
+    person_name = :personName,
+    `role` = :role,
+    leave_plan = :leavePlan,
+    update_datetime = :updateDatetime,
+    update_user = :updateUser
+WHERE year_id = :year
+AND employee_no = :employeeNo
+""")

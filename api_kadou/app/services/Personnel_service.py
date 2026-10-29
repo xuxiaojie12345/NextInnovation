@@ -6,6 +6,7 @@ from app.sql.Personnel_sql import (
     SQL_GET_JN_PERSONNEL_MASTER,
     SQL_INSERT_JN_PERSONNEL_MASTER,
     SQL_LIST_JN_PERSONNEL_MASTER,
+    SQL_UPDATE_JN_PERSONNEL_MASTER,
 )
 
 
@@ -69,6 +70,29 @@ def delete_personnel(db: Session, year: int, employeeNo: str):
         result = db.execute(
             SQL_DELETE_JN_PERSONNEL_MASTER,
             {"year": year, "employeeNo": employeeNo},
+        )
+        db.commit()
+        return result.rowcount > 0
+    except Exception:
+        db.rollback()
+        raise
+
+
+def update_personnel(db: Session, data: dict):
+    """更新 JN_PERSONNEL_MASTER 表中の记录（角色、名前、所属等）"""
+    try:
+        result = db.execute(
+            SQL_UPDATE_JN_PERSONNEL_MASTER,
+            {
+                "year": data["year"],
+                "employeeNo": data["employeeNo"],
+                "departmentId": data["departmentId"],
+                "personName": data["personName"],
+                "role": data["role"],
+                "leavePlan": data.get("leavePlan", ""),
+                "updateDatetime": data["updateDatetime"],
+                "updateUser": data.get("updateUser", "admin"),
+            },
         )
         db.commit()
         return result.rowcount > 0

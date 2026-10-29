@@ -13,6 +13,7 @@ from app.services.Personnel_service import (
     get_personnel_list,
     insert_personnel,
     save_personnel_records,
+    update_personnel,
 )
 
 router = APIRouter(prefix="/api/personnel", tags=["人员主表"])
@@ -107,8 +108,29 @@ def save_person(
     person: PersonnelInput,
     db: Session = Depends(get_db),
 ):
-    save_personnel_records(db, [_record(year, person, datetime.now())])
-    return {"code": 200, "msg": "保存完了"}
+    # 检查记录是否已存在
+    existing = get_personnel_by_emp_no(db, year, person.employeeNo)
+    now = datetime.now()
+    
+    if existing:
+        # 记录已存在，执行更新（角色、名前、所属等）
+        update_data = {
+            "year": year,
+            "employeeNo": person.employeeNo,
+            "departmentId": person.departmentId,
+            "personName": person.name,
+            "role": person.role,
+            "leavePlan": person.leavePlan,
+            "updateDatetime": now,
+            "updateUser": "admin",
+        }
+        update_personnel(db, update_data)
+        return {"code": 200, "msg": "更新完了"}
+    else:
+        # 记录不存在，执行插入
+        record = _record(year, person, now)
+        save_personnel_records(db, [record])
+        return {"code": 200, "msg": "登録完了"}
 
 
 @router.post("/import")

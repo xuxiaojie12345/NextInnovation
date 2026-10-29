@@ -485,6 +485,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 label: departmentLabelOf(departments, d.departmentId),
               }))}
               style={{ width: "100%" }}
+              disabled={isExisting}
             />
           </div>
 
