@@ -19,15 +19,23 @@ export interface WorkStatusPayload {
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
   /**
+   * 異動で変更した要員の現在所属。
+   * 稼働表の保存と同一トランザクションで要員マスタへ反映する
+   */
+  departmentUpdates?: { employeeNo: string; departmentId: string }[];
+  /**
    * 行削除で業務データを削除した社員番号。
    * バックエンドは当該年度の割当・BUFFER を削除してから assignment / unpaid を反映する
    */
   deletedEmployeeNos?: string[];
 }
 
-/** 年度のマスタ系データ（部門・要員・項目・休日）の保存パッチ */
+/** 年度のマスタ系データ（部門・要員・項目・休日・部門採番）の保存パッチ */
 export type YearMasterPatch = Partial<
-  Pick<YearStore, 'departments' | 'personnel' | 'projects' | 'holidays'>
+  Pick<
+    YearStore,
+    'departments' | 'departmentSeq' | 'personnel' | 'projects' | 'holidays'
+  >
 >;
 
 export interface KadouRepository {
@@ -79,7 +87,20 @@ class MemoryKadouRepository implements KadouRepository {
     payload: WorkStatusPayload,
   ): Promise<void> {
     const store = this.ensure(year);
-    // 要員マスタは変更しない（稼働表は表示行と割当のみ保存する）
+    // 異動による要員の現在所属を先に反映する（稼働表と同一保存単位）
+    const departmentByEmployee = new Map(
+      (payload.departmentUpdates ?? []).map((update) => [
+        update.employeeNo,
+        update.departmentId,
+      ]),
+    );
+    if (departmentByEmployee.size > 0) {
+      store.personnel = store.personnel.map((p) => {
+        const departmentId = departmentByEmployee.get(p.employeeNo);
+        return departmentId ? { ...p, departmentId } : p;
+      });
+    }
+    // 稼働表（表示行・割当・BUFFER）を保存する
     // ※メモリ実装は「保存内容＝そのまま正」で全量置換するため、
     //   deletedEmployeeNos は意識しなくても削除済みになる
     //   （HTTP 実装では当該年度の業務データを削除してから反映する）

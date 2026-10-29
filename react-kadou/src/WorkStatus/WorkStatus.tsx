@@ -37,6 +37,12 @@ import {
 } from './types';
 import { departmentLabelOf } from '../data/departmentUtils';
 import {
+  buildDepartmentUpdates,
+  findMissingDepartmentEmployeeNo,
+  hasMissingDepartment,
+  hasSavedTransfer,
+} from '../data/departmentRules';
+import {
   WEEK_COL_WIDTH,
   FIXED_LEFT_WIDTH,
   WeekCol,
@@ -170,8 +176,6 @@ interface WorkStatusProps {
   onSave: (payload: WorkStatusPayload) => void;
   /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
   onUpdateLeavePlan: (employeeNo: string, leavePlan: string) => void;
-  /** 所属変更（異動）で要員マスタの現在所属を更新する */
-  onUpdateDepartment: (employeeNo: string, departmentId: string) => void;
   /** 未保存の変更があるかの通知 */
   onDirtyChange: (dirty: boolean) => void;
   /** 「保存」処理を親へ登録する（未保存確認ダイアログから呼ばれる） */
@@ -291,7 +295,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   initialWorkStatus,
   onSave,
   onUpdateLeavePlan,
-  onUpdateDepartment,
   onDirtyChange,
   registerSaveHandler,
 }) => {
@@ -393,6 +396,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     unpaid: initialWorkStatus.unpaid,
   }));
 
+  // 保存済みの行（保存済みの異動かどうかの判定に使う）
+  const [savedRows, setSavedRows] = useState<WorkStatusRow[]>(
+    () => initialWorkStatus.rows ?? [],
+  );
+
   // 今週の月曜（過去週の判定基準）。週が変わったら 1 分以内に再計算する
   const [currentMonday, setCurrentMonday] = useState<string>(() =>
     currentWeekKey(),
@@ -450,27 +458,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     rowIdRef.current += 1;
     return `r-${rowIdRef.current}`;
   }, []);
-
-  /**...r,
-          departmentId: r.departmentId || master?.departmentId || '',
-          name: master?.name ?? '',
-          role: master?.roleo(
-    () =>
-      draftRows.map((r) => {
-        const master = r.employeeNo
-          ? employeeMaster.get(r.employeeNo)
-          : undefined;
-        return {
-          key: r.key,
-          employeeNo: r.employeeNo,
-          name: master?.name ?? '',
-          role: master?.role ?? '',
-          departmentId: master?.departmentId ?? '',
-          leavePlan: master?.leavePlan,
-        };
-      }),
-    [draftRows, employeeMaster],
-  );
 
   /** 未保存かどうかを親（年度切替・ログアウトの確認）へ通知する */
   useEffect(() => {
@@ -686,6 +673,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         message.error('過去実績がある行は削除できません。');
         return;
       }
+      // 保存済みの異動で分割された行は削除できない（異動の取消は不可）
+      if (hasSavedTransfer(target.employeeNo, savedRows)) {
+        message.error('保存済みの異動は取り消せません。');
+        return;
+      }
       const employeeNo = target.employeeNo;
       // その社員の最後の行を削除するか（＝再追加時に全週「未割当」で表示する）
       const isLastRowOfEmployee =
@@ -807,7 +799,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         '行と業務データ（割当・BUFFER）を削除しました（未保存）。要員マスタは変更していません。',
       );
     },
-    [draftRows, savedBaseline, currentMonday, pastYear],
+    [draftRows, savedBaseline, savedRows, currentMonday, pastYear],
   );
 
   /** 保存（下書きを確定して親へ渡す。要員マスタは含めない） */
@@ -824,24 +816,46 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       );
       return;
     }
+    // 所属が未設定の要員は保存できない（要員情報／一括読み込みで設定する）
+    const missingDepartmentNo = findMissingDepartmentEmployeeNo(
+      draftRows,
+      (employeeNo) => employeeMaster.get(employeeNo)?.departmentId,
+    );
+    if (missingDepartmentNo) {
+      message.error(
+        `社員番号「${missingDepartmentNo}」の所属が未設定です。要員情報の一括読み込みで所属を設定してください。`,
+      );
+      return;
+    }
+
+    // 行は「社員番号・所属・有効期間」を持つ（年途中の部門異動は2行）
+    const rows = draftRows.map((r) => ({
+      ...r,
+      departmentId:
+        r.departmentId ||
+        employeeMaster.get(r.employeeNo)?.departmentId ||
+        '',
+    }));
+
+    // 異動（同一社員が 2 行）の新所属を、保存成功時に要員マスタへ反映する
+    const departmentUpdates = buildDepartmentUpdates(
+      rows,
+      savedRows,
+      (employeeNo) => employeeMaster.get(employeeNo)?.departmentId,
+    );
 
     onSave({
-      // 行は「社員番号・所属・有効期間」を持つ（年途中の部門異動は2行）
-      rows: draftRows.map((r) => ({
-        ...r,
-        departmentId:
-          r.departmentId ||
-          employeeMaster.get(r.employeeNo)?.departmentId ||
-          '',
-      })),
+      rows,
       assignment,
       unpaid,
+      departmentUpdates,
       // 行削除で業務データを消した要員（DB 側でも当該年度の分を削除する）
       deletedEmployeeNos,
     });
     // 保存した内容を過去実績判定の基準に反映する
     // （メモリ実装のため即時。API 接続時は保存成功後に更新する）
     setSavedBaseline({ assignment, unpaid });
+    setSavedRows(rows);
     // 保存済みの削除情報はクリアする（次回の保存で再送しない）
     setDeletedEmployeeNos((prev) => (prev.length === 0 ? prev : []));
     // ※保存では追加行の表示を解除しない（次にフィルタを適用したときに解除する）
@@ -853,6 +867,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     deletedEmployeeNos,
     onSave,
     employeeMaster,
+    savedRows,
     pastYear,
   ]);
 
@@ -966,6 +981,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     if (!transferRowKey) return;
     const row = draftRows.find((r) => r.key === transferRowKey);
     if (!row) return;
+    // 所属が未設定の要員は異動できない（先に一括読み込みで設定する）
+    if (hasMissingDepartment(employeeMaster.get(row.employeeNo))) {
+      message.error(
+        '所属が未設定の要員は異動できません。先に一括読み込みで所属を設定してください。',
+      );
+      return;
+    }
     // 同一社員は 1 年度につき 1 回まで
     if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
       message.error('1年度につき異動は1回までです。');
@@ -1021,14 +1043,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       });
       return next;
     });
-    // 要員マスタの「現在の所属」を新しい所属に更新する
-    onUpdateDepartment(row.employeeNo, transferDeptId);
+    // 要員マスタの「現在の所属」は、稼働表の保存成功時に反映する
     setTransferRowKey(null);
     setDirty(true);
     message.success(
       `${row.employeeNo} の所属を ${deptName} に変更しました（${dayjs(
         transferWeekKey,
-      ).format('YYYY/M/D')} の週から・未保存）。`,
+      ).format('YYYY/M/D')} の週から・未保存）。保存すると確定し、取り消せません。`,
     );
   }, [
     transferRowKey,
@@ -1038,7 +1059,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     allWeeks,
     nextRowKey,
     departments,
-    onUpdateDepartment,
+    employeeMaster,
     currentMonday,
   ]);
 
@@ -2090,13 +2111,22 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       align: 'center',
       render: (_, row) => {
         // 過年度は参照のみ。過去実績（保存済みデータ）がある行は削除できない
+        // 保存済みの異動で 2 行になっている場合も削除できない（異動の取消は不可）
+        const deleteBlockedBySavedTransfer = hasSavedTransfer(
+          row.employeeNo,
+          savedRows,
+        );
         const deleteBlocked =
           pastYear ||
+          deleteBlockedBySavedTransfer ||
           (!!row.employeeNo &&
             hasPastActualsForRow(row, savedBaseline, currentMonday));
         const transferBlockedByCount =
           !!row.employeeNo &&
           (rowCountByEmployee.get(row.employeeNo) ?? 0) >= 2;
+        const transferBlockedByEmptyDepartment =
+          !!row.employeeNo &&
+          hasMissingDepartment(employeeMaster.get(row.employeeNo));
         const hasRemainingRows =
           !!row.employeeNo &&
           (rowCountByEmployee.get(row.employeeNo) ?? 0) > 1;
@@ -2112,6 +2142,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
                 title={
                   pastYear
                     ? '過年度は参照のみです'
+                    : deleteBlockedBySavedTransfer
+                    ? '保存済みの異動は取り消せません'
                     : '過去実績があるため削除できません'
                 }
               >
@@ -2146,11 +2178,15 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
                 </Button>
               </Popconfirm>
             )}
-            {pastYear || transferBlockedByCount ? (
+            {pastYear ||
+            transferBlockedByCount ||
+            transferBlockedByEmptyDepartment ? (
               <Tooltip
                 title={
                   pastYear
                     ? '過年度は参照のみです'
+                    : transferBlockedByEmptyDepartment
+                    ? '所属が未設定のため異動できません'
                     : '1年度につき異動は1回までです'
                 }
               >
@@ -2206,7 +2242,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     departments,
     currentMonday,
     savedBaseline,
+    savedRows,
     rowCountByEmployee,
+    employeeMaster,
     employeesWithPastActuals,
     pastYear,
   ]);
@@ -2604,6 +2642,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               ※適用開始週の前週までを旧所属、開始週からを新所属の行に分けます。
               期間外の週は空欄（編集不可）になります。
               異動週以降の既存の割当は、そのまま新所属の行に引き継がれます。
+              <br />
+              <strong>保存すると異動が確定し、取り消すことはできません。</strong>
             </div>
           </div>
         )}

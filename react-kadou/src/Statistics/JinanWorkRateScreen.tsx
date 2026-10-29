@@ -16,12 +16,12 @@ import {
 import {
   JINAN_ALL_LABEL,
   JINAN_TARGET_RATE,
-  getJinanDepartments,
-} from '../data/mockJinanStats';
-import type { JinanDept, JinanWeeklyStat } from '../data/mockJinanStats';
+} from '../data/jinanStats';
+import type { JinanDept, JinanWeeklyStat } from '../data/jinanStats';
 import type { Department, Project } from '../WorkStatus/types';
 import type { WorkStatusData } from '../data/yearStore';
 import { getWorkStatusJinanWeeklyStats } from '../data/jinanStatsFromWorkStatus';
+import { getJinanTargetDepartmentIds } from '../data/departmentRules';
 import { departmentLabelOf, departmentNameOf } from '../data/departmentUtils';
 import { weekKeyOf } from '../data/yearWeeks';
 import './JinanWorkRateScreen.css';
@@ -204,17 +204,14 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   projects,
 }) => {
   /**
-   * 対象年度の済南拠点の部門（部門マスタで拠点＝済南の部門のみ）
-   * 拠点を天津に変更した部門は集計対象から外れる。
+   * 済南拠点の集計対象部門（部門マスタで 拠点＝済南 かつ 協力会社以外）
+   * 拠点を天津に変更した部門・協力会社は集計対象から外れる。
+   * 年度別の固定モック一覧は使わない（部門管理の追加・削除がそのまま反映される）。
    */
-  const departments = useMemo(() => {
-    const jinanTargets = new Set(getJinanDepartments(year));
-    return departmentMaster
-      .filter(
-        (d) => d.location === '済南' && jinanTargets.has(d.departmentId),
-      )
-      .map((d) => d.departmentId);
-  }, [departmentMaster, year]);
+  const departments = useMemo(
+    () => getJinanTargetDepartmentIds(departmentMaster),
+    [departmentMaster],
+  );
 
   /** 画面表示用の部門ラベル */
   const departmentLabels = useMemo(

@@ -1,8 +1,9 @@
 /**
  * 年度（日暦年）ごとのデータセット
  *
- * 部門・要員・プロジェクト・休日・済南統計は「年度ごとに変わる」
+ * 部門・要員・プロジェクト・休日は「年度ごとに変わる」
  * という前提で、年度をキーにしたストアとして持つ。
+ * 済南統計は保存せず、稼働表（保存済みデータ）から都度算出する。
  *
  *  - 2025 / 2026 のみモックデータを用意する（それ以外の年度は空＝空白表示）
  *  - 実運用ではバックエンドから年度を指定して取得する想定
@@ -22,11 +23,6 @@ import {
   MOCK_PERSONNEL,
   MOCK_PROJECTS,
 } from './mockData';
-import {
-  JinanWeeklyStat,
-  getJinanDepartments,
-  getJinanWeeklyStats,
-} from './mockJinanStats';
 import { buildYearWeeks } from './yearWeeks';
 
 /** 休日の区分 */
@@ -56,11 +52,11 @@ export interface WorkStatusData {
 export interface YearStore {
   year: number;
   departments: Department[];
+  /** 部門IDの採番カウンタ（削除しても戻さない。IDは再利用しない） */
+  departmentSeq: number;
   personnel: Personnel[];
   projects: Project[];
   holidays: Holiday[];
-  /** 済南拠点の週次統計（済南全社 は含まない） */
-  jinan: JinanWeeklyStat[];
   workStatus: WorkStatusData;
 }
 
@@ -301,6 +297,12 @@ export const createYearStore = (year: number): YearStore => {
   const projects = source ? source.projects : [];
   const holidays = source ? source.holidays : [];
 
+  // 部門IDは削除後も再利用しないため、既存の最大番号を採番カウンタの初期値にする
+  const departmentSeq = departments.reduce((max, d) => {
+    const match = /^dept-(\d+)$/.exec(d.departmentId);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+
   // 初期表示はマスタの全要員。週次割当は原則空で、画面で入力して保存する
   // （2025 年度だけは教育実施人数の確認用にシードを入れる。下記）
   // 行は「所属＋有効期間」を持つ（年途中の部門異動は行を分けて表現する）
@@ -326,18 +328,14 @@ export const createYearStore = (year: number): YearStore => {
     });
   }
 
-  // 済南統計は部門別（済南全社 は画面側で合算する）
-  const jinan = getJinanDepartments(year).flatMap((d) =>
-    getJinanWeeklyStats(d, year),
-  );
-
+  // 済南統計は保存せず、画面初期時に稼働表から算出する
   return {
     year,
     departments,
+    departmentSeq,
     personnel,
     projects,
     holidays,
-    jinan,
     workStatus: { rows, assignment, unpaid: {} },
   };
 };

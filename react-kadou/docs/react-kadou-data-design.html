@@ -130,7 +130,7 @@
 
 <header>
   <h1>react-kadou データ構成 確定案</h1>
-  <p class="meta">レビュー用 / 2026-10-20 初版・2026-10-27 更新 / ソースコード変更なし</p>
+  <p class="meta">レビュー用 / 2026-10-20 初版・2026-10-28 更新 / ソースコード変更なし</p>
   <div class="note">
     本ドキュメントは設計案です。`react-kadou` のソースコードは変更していません。
   </div>
@@ -167,10 +167,14 @@
     <li>要員の同一性は <code>employeeNo</code></li>
     <li>マスタは即時保存、稼働表は明示保存</li>
     <li>稼働表では<strong>社員番号を入力できる</strong></li>
-    <li>氏名・役割・所属は要員マスタから表示し、稼働表では編集不可</li>
-    <li>要員マスタの追加・更新・削除は要員情報画面のみ</li>
-    <li>済南稼働統計は画面初期時に年度データから計算（保存しない。教育実施人数も実データから算出）</li>
-    <li>ユーザーの所属部門は年度ごとに保持</li>
+    <li>氏名・役割・所属は要員マスタから表示し、稼働表では編集不可（所属は行が保持し、異動でのみ変わる）</li>
+    <li>要員マスタの追加・削除と氏名・役割の更新は要員情報画面で行う</li>
+    <li>要員の所属（<code>departmentId</code>）を更新できるのは「新規登録」「一括取込」「異動」だけ。要員情報画面の更新では変更できない</li>
+    <li>部門の削除は、同一性年度の要員・プロジェクト・稼働表行から参照されていない場合のみ許可する（ユーザーの所属はチェックしない）</li>
+    <li>部門IDは再利用しない（年度ごとの採番カウンタを保持する）</li>
+    <li>済南稼働統計は画面初期時に年度データから計算（保存しない。教育実施人数も実データから算出）。対象部門は部門マスタから動的生成する</li>
+    <li>ユーザーの所属部門は年度ごとに保持。所属部門が削除済みの場合は「全部門」として扱う</li>
+    <li>所属が未設定（空欄）の要員は、要員情報の保存・稼働表の保存・異動を拒否する</li>
     <li>一括読み込みの重複時は「上書き」か「中止」をユーザーが選択</li>
     <li>部門の一意制約は <code>(year, departmentId)</code>（部門名の一意制約はなし）</li>
     <li>プロジェクトの一意制約は <code>(year, customer, caseName, team, subTeam)</code>（現場の運用に合わせる）</li>
@@ -215,6 +219,9 @@ interface YearData {
     <li>一意制約：<code>(year, departmentId)</code></li>
     <li>部門名の一意制約は設けない（同一年度内で同名可）</li>
     <li>参照はすべて <code>departmentId</code></li>
+    <li>部門IDは年度内で採番し、<strong>削除後も再利用しない</strong>（年度ごとの採番カウンタを保持する）</li>
+    <li>名称・拠点・種別は随時変更できる（参照はIDのため、名称変更は参照側に影響しない）</li>
+    <li>削除できるのは、同一年度の要員・プロジェクト・稼働表行のいずれからも参照されていない場合のみ（ユーザー年度別所属はチェックしない）</li>
   </ul>
 
   <h3>3.2 要員</h3>
@@ -229,6 +236,9 @@ interface YearData {
     <li>主キー：<code>(year, employeeNo)</code></li>
     <li>画面の <code>rowKey</code> も <code>employeeNo</code></li>
     <li><code>Personnel.id</code> のような行IDは保存データには持たせない</li>
+    <li><code>departmentId</code> は新規登録時に必須（既定値は置かない）</li>
+    <li><code>departmentId</code> を更新できるのは新規登録・一括取込・異動（稼働表の保存成功時）だけ。要員情報画面の更新では変更しない</li>
+    <li>異動後は「現在の所属」として異動後の部門を持つ（異動履歴は稼働表行が保持する）</li>
   </ul>
 
   <h3>3.3 プロジェクト</h3>
@@ -349,11 +359,11 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><th>データ</th><th>主キー</th><th>一意制約・重複判定</th></tr>
     </thead>
     <tbody>
-      <tr><td>部門</td><td><code>(year, departmentId)</code></td><td><code>(year, departmentId)</code></td></tr>
+      <tr><td>部門</td><td><code>(year, departmentId)</code></td><td><code>(year, departmentId)</code>。IDは削除後も再利用しない</td></tr>
       <tr><td>要員</td><td><code>(year, employeeNo)</code></td><td><code>(year, employeeNo)</code></td></tr>
       <tr><td>プロジェクト</td><td><code>(year, projectId)</code></td><td><code>(year, customer, caseName, team, subTeam)</code></td></tr>
       <tr><td>休日</td><td><code>(year, holidayId)</code></td><td><code>(year, date)</code></td></tr>
-      <tr><td>稼働表行</td><td><code>(year, key)</code></td><td><code>employeeNo</code> は年度内で最大 2 行（異動 1 回）。同じ社員の行は有効期間が重ならない</td></tr>
+      <tr><td>稼働表行</td><td><code>(year, key)</code></td><td><code>employeeNo</code> は年度内で最大 2 行（異動 1 回）。同じ社員の行は有効期間が重ならない。異動で分割された行は保存後に削除できない</td></tr>
       <tr><td>割当</td><td><code>(year, employeeNo, weekKey)</code></td><td><code>(year, employeeNo, weekKey)</code></td></tr>
       <tr><td>ユーザー所属</td><td><code>(year, userId)</code></td><td><code>(year, userId)</code></td></tr>
     </tbody>
@@ -382,6 +392,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <tbody>
       <tr><td>部門</td><td>要員</td><td>所属（<code>departmentId</code>）</td></tr>
       <tr><td>部門</td><td>プロジェクト</td><td>所属部門（<code>departmentId</code>）</td></tr>
+      <tr><td>部門</td><td>稼働表行</td><td>行の所属（<code>departmentId</code>）。異動の旧行も含めて部門削除の参照チェック対象</td></tr>
       <tr><td>部門</td><td>済南稼働統計</td><td>集計（<code>departmentId</code>）</td></tr>
       <tr><td>要員</td><td>稼働表行</td><td>表示対象（<code>employeeNo</code>）</td></tr>
       <tr><td>要員</td><td>割当</td><td>割当（<code>employeeNo</code>）</td></tr>
@@ -399,13 +410,13 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><th>画面</th><th>できること</th><th>保存</th></tr>
     </thead>
     <tbody>
-      <tr><td>部門管理</td><td>部門の追加・更新・削除</td><td>即時保存</td></tr>
-      <tr><td>要員情報</td><td>要員マスタの追加・更新・削除・一括取込</td><td>即時保存</td></tr>
+      <tr><td>部門管理</td><td>部門の追加・更新・削除（削除は要員・プロジェクト・稼働表行から参照されていない場合のみ）</td><td>即時保存</td></tr>
+      <tr><td>要員情報</td><td>要員マスタの追加・削除・氏名／役割の更新・一括取込（所属は新規登録時のみ選択）</td><td>即時保存</td></tr>
       <tr><td>プロジェクト管理</td><td>プロジェクトの追加・更新・削除・一括取込、有効稼働・教育かどうかの設定</td><td>即時保存</td></tr>
       <tr><td>休日設置</td><td>休日の追加・更新・削除・一括取込</td><td>即時保存</td></tr>
       <tr><td>要員稼動管理</td><td>行追加・行削除、社員番号入力、所属変更（異動）、割当、BUFFER（過去年度は参照のみ）</td><td>明示保存</td></tr>
       <tr><td>済南稼働率統計</td><td>表示のみ（初期時に計算）</td><td>保存しない</td></tr>
-      <tr><td>ユーザー管理</td><td>ユーザー・年度別所属の管理</td><td>即時保存</td></tr>
+      <tr><td>ユーザー管理</td><td>ユーザー・年度別所属の管理（所属部門が削除済みの場合は保存時にクリアして全部門）</td><td>即時保存</td></tr>
     </tbody>
   </table>
 
@@ -440,7 +451,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>一致する <code>employeeNo</code> がある場合のみ行を確定</li>
     <li>同じ <code>employeeNo</code> が既に <code>rows</code> にある場合はエラー（異動による 2 行のみ、有効期間が重ならない場合に許可）</li>
     <li>社員番号の入力によって要員マスタを新規作成・更新しない</li>
-    <li>氏名・役割・所属はマスタから自動表示し、稼働表では編集不可</li>
+    <li>氏名・役割・所属はマスタから自動表示し、稼働表では編集不可（所属は行が保持する値を表示する）</li>
   </ul>
 
   <h3>7.3 マスタ項目</h3>
@@ -456,7 +467,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><td>所属</td><td>表示のみ</td></tr>
     </tbody>
   </table>
-  <p>氏名・役割・所属の変更は要員情報画面でのみ行います。マスタが更新されると、稼働表の表示にも自動反映されます。</p>
+  <p>氏名・役割の変更は要員情報画面で行います。所属の変更は稼働表の「異動」だけで行い、要員情報画面では変更できません。稼働表の「所属」列は<strong>行が保持する所属</strong>を表示するため、要員マスタの現在所属を変更しても、既存の行（過去の異動履歴）の所属は変わりません。</p>
 
   <h3>7.4 過去実績の保護（共通ルール）</h3>
   <ul>
@@ -485,7 +496,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li><strong>過去年度の稼働管理画面は参照のみ</strong>（行追加・行削除・異動・保存・退場予定の編集は不可）</li>
     <li>今週（今週の月曜〜日曜）は編集できる。行削除で消えるのは今週以降の分だけ（過去実績がある行はそもそも削除できない）</li>
     <li>画面を開いたまま週が変わった場合は、過去の範囲を再計算する</li>
-    <li>行削除・異動で行の所属や有効期間が変わると、済南稼働統計の過去の「人数」が変わることがある（人数は割当の有無に関係なく「行の所属 × 有効期間」で数えるため）。これは許容する</li>
+    <li>行削除で行の所属や有効期間が変わると、済南稼働統計の過去の「人数」が変わることがある（人数は割当の有無に関係なく「行の所属 × 有効期間」で数えるため）。これは許容する</li>
   </ul>
 
   <h3>7.5 行削除</h3>
@@ -493,26 +504,23 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>削除できるのは、<strong>過去実績が無い行</strong>だけ（判定は 7.4 の行単位）</li>
     <li>削除前に警告（確認ダイアログ）を表示する
       <ul>
-        <li>残りの行がある場合：「この行（社員番号・所属・期間）と、この行の期間の業務データ（割当・BUFFER）を削除します。要員マスタは削除されません。残りの行は期間が自動で延長されます。」</li>
+        <li>残りの行がある場合（未保存の異動を取り消す場合）：「この行（社員番号・所属・期間）と、この行の期間の業務データ（割当・BUFFER）を削除します。要員マスタは削除されません。残りの行は期間が自動で延長されます。」</li>
         <li>最後の 1 行の場合：「この行と、当該年度の業務データ（割当・BUFFER）をすべて削除します。要員マスタは削除されません。」</li>
         <li>キャンセルした場合は何も変更しない</li>
       </ul>
     </li>
-    <li>異動で分割された行は、前段（旧所属）・後段（新所属）の<strong>どちらでも削除できる</strong></li>
-    <li>削除したら、残った行が削除した行の期間を吸収する（＝行は 1 行に戻る）
+    <li><strong>保存済みの異動で分割された行は削除できない</strong>（異動の取消は不可）。削除ボタンを無効化し、ツールチップで理由を表示する
       <ul>
-        <li>前段を削除 → 残った後段の開始週を前段の開始週に合わせる（未指定なら年度初め）</li>
-        <li>後段を削除 → 残った前段の終了週を後段の終了週に合わせる（未指定なら年度末）</li>
-        <li>残った行の <code>splitFromKey</code> と <code>employeeNoLocked</code> を解除する</li>
+        <li>未保存（下書き）の異動は取り消せる。前段・後段のどちらかを削除すると、残った行が期間を吸収して 1 行に戻り、<code>splitFromKey</code> と <code>employeeNoLocked</code> を解除する</li>
+        <li>保存済みかどうかは、保存済みデータ（サーバー／ストア）に行が存在するかで判定する</li>
       </ul>
     </li>
-    <li>業務データ（<code>assignment</code> / <code>unpaid</code>）は<strong>削除した行の期間内だけ</strong>削除する（残った行の期間の実績は保持する）</li>
-    <li>吸収された期間は割当が無いため「未割当」で表示される</li>
+    <li>業務データ（<code>assignment</code> / <code>unpaid</code>）は、削除する行の期間内だけ削除する</li>
     <li>要員マスタ（要員情報）は<strong>削除しない</strong>。稼働表の表示行から外すだけ</li>
     <li>その社員の最後の行を削除した場合は、当該年度の業務データをすべて削除する</li>
     <li>削除後に同じ社員番号を再入力して行追加しても、業務データが無いため<strong>全ての週が「未割当」</strong>で表示される（過去の割当は復元しない）</li>
-    <li>異動の行を削除した場合は「異動していない状態」に戻るため、同じ年度内で再度異動できる（削除した異動は無かったことになる）</li>
-    <li>行削除は明示保存。同じ社員の行が残る場合（一部の行の削除）も対象社員を <code>deletedEmployeeNos</code> に含める。API は「削除 → payload 反映」の順で処理するため、残った行の実績は保持され、削除した期間の実績だけが消える（7.8 参照）</li>
+    <li>保存済みの異動は取り消せないため、行削除で 1 行に戻るのは未保存の異動だけである</li>
+    <li>行削除は明示保存。未保存の異動を取り消す場合など、同じ社員の行が残る場合も対象社員を <code>deletedEmployeeNos</code> に含める。API は「削除 → payload 反映」の順で処理するため、残った行の実績は保持され、削除した期間の実績だけが消える（7.8 参照）</li>
   </ul>
 
   <h3>7.6 所属変更（異動）の上限</h3>
@@ -528,13 +536,18 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
         <li>過去年度は適用できる週が無いため、異動できない</li>
       </ul>
     </li>
-    <li>行削除で 1 行に戻った場合は、再度異動できる（削除した異動は無かったことになる）</li>
+    <li>保存済みの異動は取り消せない（行削除を禁止）。そのため、保存した異動は年度内で確定し、同じ社員は再度異動できない
+      <ul>
+        <li>未保存（下書き）の異動は行削除で取り消せる</li>
+      </ul>
+    </li>
+    <li>異動の確定時は、保存後に取り消せない旨を確認ダイアログで明示する</li>
     <li>保存（API）側でも、同一 <code>employeeNo</code> の行が 2 行を超える場合、適用開始週が今週の月曜より前の場合は保存を拒否する</li>
   </ul>
 
   <h3>7.7 社員番号の変更と割当</h3>
   <ul>
-    <li><strong>過去実績が無い場合</strong>（7.4 の社員単位判定）、割当の有無に関係なく変更できる（入力ミスの訂正・異動取消後の修正を含む）</li>
+    <li><strong>過去実績が無い場合</strong>（7.4 の社員単位判定）、割当の有無に関係なく変更できる（入力ミスの訂正を含む）</li>
     <li>過去実績がある社員は、<strong>社員番号欄を編集できない</strong>（読み取り専用の表示＋ツールチップで理由を表示）</li>
     <li>異動中の 2 行も変更できる。この場合は<strong>2 行まとめて同じ社員番号に変更</strong>する（片方だけの変更は不可）</li>
     <li>変更すると、その社員の既存の割当・BUFFER は<strong>新しい社員番号へ引き継ぐ</strong>（行の表示は変わらない）</li>
@@ -543,7 +556,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>保存時は旧社員番号を <code>deletedEmployeeNos</code> に含めて送る（バックエンドは旧番号のデータを削除してから、新番号のデータを反映する）</li>
     <li>社員番号を空にできるのは、次をすべて満たす場合だけ
       <ul>
-        <li>異動中の 2 行ではない（行削除で対応する）</li>
+        <li>異動中の 2 行ではない（保存済みの異動は取り消せないため、2 行のままでは空にできない）</li>
         <li>当該社員の業務データ（割当・BUFFER）が下書き・保存済みのどちらにも無い</li>
       </ul>
     </li>
@@ -556,13 +569,16 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
   rows: WorkStatusRow[];
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
+  /** 異動で変更した要員の現在所属（保存成功時に要員マスタへ反映する） */
+  departmentUpdates: { employeeNo: EmployeeNo; departmentId: DepartmentId }[];
   /** 行削除・社員番号変更で業務データを削除した社員番号 */
   deletedEmployeeNos: EmployeeNo[];
 }</code></pre>
   <ul>
-    <li><code>personnel</code> は含めない（要員マスタは変更しない）</li>
+    <li><code>personnel</code>（氏名・役割など）は含めない。ただし<strong>異動による現在所属の更新だけは <code>departmentUpdates</code> として含める</strong></li>
+    <li><code>departmentUpdates</code> は稼働表の保存と同一トランザクションで要員マスタへ反映する（保存失敗時は反映しない。未保存の異動では現在所属を変更しない）</li>
     <li><code>deletedEmployeeNos</code> の要員は、当該年度の割当・BUFFER を削除してから <code>assignment</code> / <code>unpaid</code> を反映する</li>
-    <li><code>deletedEmployeeNos</code> は「最後の行を削除した場合」だけでなく、「異動で分割された行の一部を削除した場合」も対象社員を含める（削除→反映の順のため、残った行の実績は保持される）</li>
+    <li><code>deletedEmployeeNos</code> は「最後の行を削除した場合」だけでなく、「未保存の異動を取り消すなどして一部の行を削除した場合」も対象社員を含める（削除→反映の順のため、残った行の実績は保持される）</li>
     <li><code>deletedEmployeeNos</code> に無い要員の割当は削除しない（画面に表示していないだけの実績を守る）</li>
     <li>社員番号が空の行がある場合は保存不可</li>
     <li>未保存フラグは稼働表のみ対象</li>
@@ -583,6 +599,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
         <li>稼働データが無い場合は確認なしで削除する</li>
       </ul>
     </li>
+    <li>異動で 2 行になっている要員でも、要員マスタ削除は可能（行の削除禁止は「行削除」操作に対する制約で、要員マスタ削除のカスケードには適用しない）</li>
     <li>削除は即時保存（要員情報画面）</li>
   </ul>
 </section>
@@ -642,6 +659,15 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>ただしプロジェクト取込では、顧客・案件の空欄とファイル内重複はファイル全体の中止対象</li>
     <li>取込後の結果に、警告内容と行番号を含める</li>
   </ul>
+
+  <h3>8.5 要員取込の部門ルール</h3>
+  <ul>
+    <li>要員の一括取込は「所属を変更できる公式な例外」とする（要員情報画面の更新では所属を変更できない）</li>
+    <li><strong>新規社員</strong>：所属（部門名）は必須。空欄、部門マスタに存在しない、同名部門が複数で一意に決められない場合はエラーとし、その行は取り込まない</li>
+    <li><strong>既存社員</strong>：氏名・役割・所属を上書きする（所属もファイルの値で更新する）</li>
+    <li>所属列が空欄の既存社員は、現在の所属を保持する</li>
+    <li>新規社員の所属は、部門マスタに存在する部門IDに解決できた場合のみ登録する</li>
+  </ul>
 </section>
 
 <section id="jinan">
@@ -653,6 +679,8 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>モック生成は行わない（教育実施人数もプロジェクトマスタの教育flg から算出する）</li>
     <li>統計は保存しない</li>
     <li>年度データが変わったときだけ再計算する</li>
+    <li>対象部門は部門マスタから動的生成する（<code>location = '済南'</code> かつ <code>kind != 'partner'</code>）。年度別の固定モック一覧は使用しない</li>
+    <li>部門を追加・削除すると、統計の部門列も増減する</li>
   </ul>
 <pre><code>const jinanStats = useMemo(
   () =&gt; calculateJinanWeeklyStats(yearData),
@@ -745,6 +773,9 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li><code>defaultDepartmentsOf(user, year)</code> は年度別所属を参照</li>
     <li>未設定年度は「全部門表示」</li>
     <li>ログイン時は当年の所属を参照し、無ければ全部門表示</li>
+    <li><code>departmentId</code> が部門マスタに存在しない（部門が削除済み）場合も「全部門表示」として扱う</li>
+    <li>部門を削除しても、ユーザー年度別所属は一括変更しない</li>
+    <li>ユーザー管理画面で編集保存するとき、<code>departmentId</code> が部門マスタに存在しなければ <code>undefined</code>（＝全部門）として保存する</li>
   </ul>
 </section>
 
@@ -768,6 +799,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>部門・要員・プロジェクト・休日：即時保存</li>
     <li>稼働表：明示保存</li>
     <li>一括読み込み：検証・重複確認後に即時保存</li>
+    <li>異動による要員の現在所属の更新は、稼働表の保存と同一トランザクションで反映する</li>
   </ul>
 
   <h3>11.3 楽観ロック</h3>
@@ -781,6 +813,8 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
   <h2>12. バリデーション</h2>
   <ul>
     <li>部門ID：同一年度内で一意</li>
+    <li>部門IDは削除後も再利用しない（年度ごとの採番カウンタ）</li>
+    <li>部門削除時は、同一年度の要員・プロジェクト・稼働表行からの参照をチェックし、参照があれば削除を拒否する（ユーザー年度別所属はチェックしない）</li>
     <li>部門名：一意制約なし（同名可）</li>
     <li>社員番号：同一年度内で一意</li>
     <li>プロジェクト：<code>(顧客, 案件, チーム, Subチーム)</code> が同一年度内で一意</li>
@@ -788,7 +822,11 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>プロジェクトの <code>validFlg</code> / <code>educationFlg</code> は必須の真偽値（<code>null</code>・未設定は不可。既存データは既定値で補完する）</li>
     <li>2 つのフラグの組み合わせは検証しない（同時 true・無効 + 教育をいずれも許可する）</li>
     <li>休日：同一年度内で日付一意</li>
-    <li>要員の <code>departmentId</code> は存在する部門IDを参照</li>
+    <li>要員の <code>departmentId</code> は存在する部門IDを参照。新規登録時は必須（空欄不可）</li>
+    <li>要員の <code>departmentId</code> は、要員情報画面の更新では変更できない（新規登録・一括取込・異動のみ）</li>
+    <li>稼働表の保存で要員の現在所属を変更できるのは、異動（<code>departmentUpdates</code>）だけ</li>
+    <li>保存済みの異動で分割された行の削除を拒否する（未保存の異動の取消は許可）</li>
+    <li><code>departmentId</code> が空の要員が含まれる場合、要員情報の保存・稼働表の保存・異動を拒否する</li>
     <li>プロジェクトの <code>departmentId</code> は存在する部門IDを参照</li>
     <li>割当の <code>projectId</code> は存在するプロジェクトIDを参照</li>
     <li>稼働表の <code>rows</code> は要員マスタに存在する <code>employeeNo</code> のみ</li>
@@ -799,7 +837,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <li>異動（同一社員の 2 行）の適用開始週が今週の月曜より前の場合は保存を拒否</li>
     <li>社員番号が空の行がある場合は保存不可</li>
     <li>週キーは対象年度の週リスト内に存在</li>
-    <li>マスタ削除時は参照チェックを行わない（当年度の稼働データも同時に削除する）</li>
+    <li>要員マスタ削除時は参照チェックを行わない（当年度の稼働データも同時に削除する。異動済みの行も削除対象）</li>
   </ul>
   <p>部門名が重複可能になるため、部門選択肢は必要に応じて「部門名（部門ID）」のように区別できる表示にします。</p>
 </section>
@@ -822,11 +860,16 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
       <tr><td>割当キーの <code>personnel.id</code></td><td><code>employeeNo</code></td></tr>
       <tr><td>別Mapの <code>unpaid</code></td><td><code>AssignmentCell.unpaid</code></td></tr>
       <tr><td>稼働表で社員番号を入力</td><td>現行どおり入力可</td></tr>
-      <tr><td>稼働表で氏名・役割・所属を編集</td><td>表示のみ（要員情報画面で編集）</td></tr>
+      <tr><td>稼働表で氏名・役割・所属を編集</td><td>表示のみ（氏名・役割は要員情報画面、所属は異動で変更）</td></tr>
       <tr><td><code>WorkStatusPayload.personnel</code></td><td><code>rows</code> + <code>assignments</code></td></tr>
       <tr><td><code>JinanWeeklyStat.department</code>（名称）</td><td><code>departmentId</code></td></tr>
       <tr><td><code>JinanWeeklyStat.start/end</code> 保存</td><td><code>weekKey</code> から派生</td></tr>
       <tr><td><code>AuthUser.department</code>（名称）</td><td><code>UserDepartment</code>（年度別）</td></tr>
+      <tr><td>部門IDの採番（現行: 既存の最大値 + 1）</td><td>年度ごとの採番カウンタ（削除後も再利用しない）</td></tr>
+      <tr><td>要員の所属変更（現行: 要員情報画面で変更可）</td><td>新規登録・一括取込・異動のみ。要員情報画面の更新では変更不可</td></tr>
+      <tr><td>稼働表の所属（現行: 要員マスタの現在所属を表示）</td><td>行が所属を保持（異動履歴）。マスタ変更では既存行の所属は変わらない</td></tr>
+      <tr><td>済南統計の対象部門（現行: 年度別の固定モック）</td><td>部門マスタから動的生成（<code>location='済南'</code> かつ <code>kind!='partner'</code>）</td></tr>
+      <tr><td>所属が空欄の要員</td><td>既存データを洗い出し、部門設定まで要員情報の保存・稼働表の保存・異動を拒否する（設定手段は 14.5 参照）</td></tr>
     </tbody>
   </table>
 </section>
@@ -859,19 +902,19 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     <tbody>
       <tr><td>行削除で消すデータ</td><td>業務データ（割当・BUFFER）のみ。要員マスタは削除しない</td></tr>
       <tr><td>行削除のデータ範囲</td><td>削除した行の有効期間内だけ。その社員の最後の行なら当該年度のすべて</td></tr>
-      <tr><td>異動行の削除</td><td>前段・後段のどちらも削除できる。残った行が期間を吸収して 1 行に戻る</td></tr>
+      <tr><td>異動行の削除</td><td>保存済みの異動で分割された行は削除できない。未保存（下書き）の異動は取消でき、残った行が期間を吸収して 1 行に戻る</td></tr>
       <tr><td>削除後の再追加</td><td>全週「未割当」で表示する（過去の割当は復元しない）</td></tr>
-      <tr><td>異動の回数</td><td>同一社員・同一年度で 1 回まで（行は最大 2 行）。行削除で 1 行に戻れば再異動できる</td></tr>
+      <tr><td>異動の回数</td><td>同一社員・同一年度で 1 回まで（行は最大 2 行）。未保存の異動を取り消した場合のみ再異動できる（保存済みは不可）</td></tr>
       <tr><td>異動ボタン</td><td>2 行になっている間は両方の行で無効化し、ツールチップで理由を表示する</td></tr>
       <tr><td>保存（API）</td><td>同一社員の行が 3 行以上になる保存は拒否する</td></tr>
       <tr><td>社員番号の変更</td><td>過去実績がある社員は編集不可（読み取り専用表示＋ツールチップ）。それ以外は割当があっても変更できる。異動中の 2 行は 2 行まとめて変更する。既存の割当・BUFFER は新しい社員番号へ引き継ぎ（新番号に既存データがあれば上書き）、旧社員番号のデータは残さない</td></tr>
-      <tr><td>社員番号を空にする</td><td>異動中の 2 行は不可（行削除で対応）。割当・BUFFER が下書き・保存済みのどちらかにある場合も不可（行削除でデータごと削除）。それ以外は空行に戻す</td></tr>
+      <tr><td>社員番号を空にする</td><td>異動中の 2 行は不可（保存済みの異動は取り消せないため、2 行のままでは空にできない）。割当・BUFFER が下書き・保存済みのどちらかにある場合も不可（行削除でデータごと削除）。それ以外は空行に戻す</td></tr>
       <tr><td>過去実績の定義</td><td>年度初め〜先週の日曜の週に、割当（退職「内・退職」を含む）または BUFFER があること。保存済みデータで判定する</td></tr>
       <tr><td>行削除・社員番号変更の制限</td><td>過去実績がある行は削除できない（行単位判定）。過去実績がある社員は社員番号を変更できない（社員単位判定）</td></tr>
       <tr><td>過去週の編集</td><td>過去週のセルは読み取り専用（略称を表示・グレー）。BUFFER・貼り付け・矩形選択は不可。右クリックは「コピー」のみ可。「内・退職」も今週以降のみ</td></tr>
       <tr><td>過去年度</td><td>稼働管理画面は参照のみ（行追加・行削除・異動・保存・退場予定の編集は不可）</td></tr>
       <tr><td>異動の適用開始週</td><td>今週の月曜以降のみ。過去年度は異動できない</td></tr>
-      <tr><td>一部の行を削除した場合</td><td>同じ社員の行が残っても <code>deletedEmployeeNos</code> に含める（削除→反映の順で残った行の実績は保持）</td></tr>
+      <tr><td>一部の行を削除した場合</td><td>未保存の異動の取消などで同じ社員の行が残っても <code>deletedEmployeeNos</code> に含める（削除→反映の順で残った行の実績は保持）</td></tr>
       <tr><td>要員マスタ削除</td><td>ブロックしない。選択年度の稼働表行・割当・BUFFER も削除（過去実績含む）。稼働データがある場合のみ確認メッセージを表示。他年度は削除しない</td></tr>
       <tr><td>部門選択肢の表示</td><td>現状維持（部門名のみ。部門IDは表示しない）</td></tr>
       <tr><td>割当の前提</td><td>1人要員・1週につき1プロジェクト（＋BUFFERフラグ）</td></tr>
@@ -905,6 +948,40 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
     取込の上書き時にフラグを既存維持とする扱いで記載しています。
     現行の取込は重複可の追加のみで、将来「上書き」を実装する場合の前提です。
   </div>
+
+  <h3>14.4 確定した事項（部門の更新・削除）</h3>
+  <table>
+    <thead>
+      <tr><th>論点</th><th>確定内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>部門の削除条件</td><td>同一年度の要員・プロジェクト・稼働表行（異動の旧行を含む）のいずれからも参照されていないこと。ユーザー年度別所属はチェックしない</td></tr>
+      <tr><td>部門削除後のユーザー</td><td>所属部門が存在しなければ「全部門」として扱う。ユーザー管理画面で編集保存するときに <code>departmentId</code> をクリアする</td></tr>
+      <tr><td>部門IDの採番</td><td>削除後も再利用しない（年度ごとの採番カウンタを保持）</td></tr>
+      <tr><td>要員の所属の更新経路</td><td>新規登録・一括取込・異動のみ。要員情報画面の更新（氏名・役割）では変更しない</td></tr>
+      <tr><td>要員情報画面の新規登録</td><td>所属は必須（既定値なし）。更新時は氏名・役割のみ</td></tr>
+      <tr><td>異動の場所</td><td>稼働表のみ。異動で行が 2 行になることは許容する</td></tr>
+      <tr><td>異動後の要員情報</td><td>異動後の所属を表示し、編集できない</td></tr>
+      <tr><td>異動のマスタ反映</td><td>稼働表の保存成功時に、同一トランザクションで要員の現在所属を更新する</td></tr>
+      <tr><td>将来週の異動</td><td>保存成功した時点で新しい所属を表示する（適用週の到来を待たない）</td></tr>
+      <tr><td>異動の制約</td><td>当年度・適用開始週は今週以降・年 1 回・対象社員に行が存在することを維持する。訂正手段は用意しない</td></tr>
+      <tr><td>保存済みの異動の取消</td><td>禁止（分割行の削除をブロック）。未保存（下書き）の異動は取り消せる</td></tr>
+      <tr><td>一括取込の所属</td><td>既存社員も所属を上書きする（公式な例外）。新規社員の所属が解決できない場合はエラー</td></tr>
+      <tr><td>空所属の要員</td><td>部門を設定するまで、要員情報の保存・稼働表の保存・異動を拒否する</td></tr>
+      <tr><td>済南統計の対象部門</td><td>部門マスタから動的生成（<code>location='済南'</code> かつ <code>kind!='partner'</code>）</td></tr>
+      <tr><td>プロジェクトの所属部門</td><td>いつでも変更できる。統計はプロジェクトの所属部門を使わないため、変更は統計に影響しない</td></tr>
+      <tr><td>部長の可視範囲</td><td>所属部門が削除された場合は全部門を閲覧できる状態を許容する（データ集約であり権限ではない）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.5 残課題・要確認</h3>
+  <ul>
+    <li><strong>空所属の要員の修正手段</strong>：要員情報画面では所属を変更できず、異動もブロックされるため、修正は「一括取込」または「要員削除→再登録」だけになる。この運用でよいか</li>
+    <li><strong>要員マスタ削除のカスケード</strong>：異動済みの行も要員マスタ削除で消えるため、「保存済みの異動は取り消せない」に対する実質的な抜け道になる。許容するか</li>
+    <li><strong>取込エラーの粒度</strong>：所属が解決できない行を「行単位でスキップ」とするか「ファイル全体を中止」とするか（8.5 は行単位で記載）</li>
+    <li><strong>部門削除の実効性</strong>：稼働表行が参照している限り削除できないため、運用上はほとんど削除できない。この制約でよいか</li>
+    <li><strong>異動確定の確認ダイアログ</strong>：保存後に取り消せないことを明示する確認を出すか（7.6 に記載）</li>
+  </ul>
 </section>
 
 <section id="changelog">
@@ -956,6 +1033,23 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
           </ul>
         </td>
       </tr>
+      <tr>
+        <td>2026-10-28</td>
+        <td>
+          部門の更新・削除ルールを確定
+          <ul>
+            <li>部門削除は、同一年度の要員・プロジェクト・稼働表行（異動の旧行を含む）の参照チェックを行う。ユーザー年度別所属はチェックせず、削除済みの場合は全部門として扱う</li>
+            <li>部門IDは削除後も再利用しない（年度ごとの採番カウンタ）</li>
+            <li>要員の所属は新規登録・一括取込・異動のみ更新可。要員情報画面の更新では変更不可（氏名・役割のみ）</li>
+            <li>新規要員の所属は必須。所属が空の要員は要員情報の保存・稼働表の保存・異動を拒否する</li>
+            <li>異動は稼働表のみ。要員マスタへの反映は稼働表の保存成功時（同一トランザクション、<code>departmentUpdates</code>）</li>
+            <li>保存済みの異動は取り消せない（分割行の削除を禁止）。未保存の異動は取消可能</li>
+            <li>一括取込は所属変更の公式な例外。新規で所属が解決できない場合はエラー</li>
+            <li>済南稼働統計の対象部門を部門マスタから動的生成に変更</li>
+            <li>残課題を 14.5 に記載（空所属の修正手段、要員マスタ削除のカスケード、取込エラーの粒度など）</li>
+          </ul>
+        </td>
+      </tr>
     </tbody>
   </table>
 </section>
@@ -963,7 +1057,7 @@ type UnpaidMap = Record&lt;EmployeeNo, Record&lt;WeekKey, boolean&gt;&gt;;</code
 </main>
 
 <footer>
-  <p>react-kadou データ構成 確定案 / 2026-10-20（2026-10-27 更新）</p>
+  <p>react-kadou データ構成 確定案 / 2026-10-20（2026-10-28 更新）</p>
   <p class="small">このHTMLはレビュー用の設計資料です。外部CSS・JavaScriptには依存していません。</p>
 </footer>
 

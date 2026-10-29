@@ -43,22 +43,19 @@ const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
 const kindLabelOf = (kind?: DepartmentKind): string =>
   kind === 'partner' ? '協力会社' : '部門';
 
-/** 部門ID の採番（既存の dept-xxxx の最大値 + 1） */
-const buildNextDepartmentId = (list: Department[]): string => {
-  const numbers = list
-    .map((d) => /^dept-(\d+)$/.exec(d.departmentId))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map((m) => Number(m[1]));
-  const next = (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
-  return `dept-${String(next).padStart(4, '0')}`;
-};
-
 interface DepartmentManagementScreenProps {
   /** 表示する年度 */
   year: number;
   /** 部門マスタ（App 側で年度ごとに保持。協力会社も含む） */
   departments: Department[];
-  setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
+  /** 新規登録（部門IDは App 側で採番する） */
+  onAddDepartment: (
+    values: Pick<Department, 'name' | 'kind' | 'location'>,
+  ) => void;
+  /** 名称・拠点・種別の修正（部門IDは変更しない） */
+  onEditDepartment: (row: Department) => void;
+  /** 削除（要員・プロジェクト・稼働表行から参照されている場合は不可） */
+  onDeleteDepartment: (row: Department) => { ok: boolean; message?: string };
 }
 
 /**
@@ -74,7 +71,9 @@ interface DepartmentManagementScreenProps {
 const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   year,
   departments,
-  setDepartments,
+  onAddDepartment,
+  onEditDepartment,
+  onDeleteDepartment,
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
@@ -108,18 +107,20 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  /** 削除 */
+  /** 削除（参照がある場合は App 側で拒否される） */
   const handleDelete = useCallback(
     (row: Department) => {
-      setDepartments((prev) =>
-        prev.filter((d) => d.departmentId !== row.departmentId),
-      );
+      const result = onDeleteDepartment(row);
+      if (!result.ok) {
+        message.error(result.message ?? '削除できません。');
+        return;
+      }
       setEditingId((prev) => (prev === row.departmentId ? null : prev));
       message.success(
         `${kindLabelOf(row.kind)}「${row.name}」を削除しました（モック）。`,
       );
     },
-    [setDepartments],
+    [onDeleteDepartment],
   );
 
   /** 新規登録 / 修正の実行（名称・拠点は必須） */
@@ -135,26 +136,17 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     }
 
     if (editingId) {
-      setDepartments((prev) =>
-        prev.map((d) =>
-          d.departmentId === editingId
-            ? { ...d, name: trimmed, kind, location }
-            : d,
-        ),
-      );
+      onEditDepartment({
+        departmentId: editingId,
+        name: trimmed,
+        kind,
+        location,
+      });
       message.success(
         `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました（モック）。`,
       );
     } else {
-      setDepartments((prev) => [
-        ...prev,
-        {
-          departmentId: buildNextDepartmentId(prev),
-          name: trimmed,
-          kind,
-          location,
-        },
-      ]);
+      onAddDepartment({ name: trimmed, kind, location });
       message.success(
         `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました（モック）。`,
       );
@@ -236,7 +228,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             {year}年度　部門管理
           </Title>
           <Text type='secondary'>
-            要員の「所属」・プロジェクトの「所属部門」として選択できる部門と協力会社を管理します。拠点（天津／済南）は必須で、済南稼働率統計は拠点が済南の部門のみを集計対象にします。部門名は同名可のため、同名部門がある場合は名称に部門IDを付けて表示します。協力会社は部門と平級の単位ですが、稼働率統計の対象外です。
+            要員の「所属」・プロジェクトの「所属部門」として選択できる部門と協力会社を管理します。拠点（天津／済南）は必須で、済南稼働率統計は拠点が済南の部門のみを集計対象にします。部門名は同名可のため、同名部門がある場合は名称に部門IDを付けて表示します。協力会社は部門と平級の単位ですが、稼働率統計の対象外です。部門は、要員・プロジェクト・稼働表行から参照されている場合は削除できません。
           </Text>
         </div>
         <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>

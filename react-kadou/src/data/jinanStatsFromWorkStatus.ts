@@ -16,7 +16,8 @@
  */
 import type { Project, WorkStatusRow } from '../WorkStatus/types';
 import type { WorkStatusData } from './yearStore';
-import { JINAN_ALL_LABEL, JinanWeeklyStat } from './mockJinanStats';
+import { JINAN_ALL_LABEL } from './jinanStats';
+import type { JinanWeeklyStat } from './jinanStats';
 import { buildYearWeeks } from './yearWeeks';
 import type { WeekCol } from './yearWeeks';
 

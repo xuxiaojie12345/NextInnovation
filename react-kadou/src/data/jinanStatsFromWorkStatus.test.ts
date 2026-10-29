@@ -15,8 +15,8 @@ import type {
   WorkStatusRow,
 } from '../WorkStatus/types';
 import type { UnpaidMap, WorkStatusData } from './yearStore';
-import { JINAN_ALL_LABEL } from './mockJinanStats';
-import type { JinanWeeklyStat } from './mockJinanStats';
+import { JINAN_ALL_LABEL } from './jinanStats';
+import type { JinanWeeklyStat } from './jinanStats';
 import { getWorkStatusJinanWeeklyStats } from './jinanStatsFromWorkStatus';
 
 const YEAR = 2026;

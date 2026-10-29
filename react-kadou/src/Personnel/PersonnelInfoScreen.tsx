@@ -21,7 +21,15 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import { Department, Personnel } from '../WorkStatus/types';
-import { departmentLabelOf } from '../data/departmentUtils';
+import {
+  departmentLabelOf,
+  resolveDepartmentIdByName,
+} from '../data/departmentUtils';
+import {
+  buildPersonnelSaveValues,
+  departmentExists,
+  hasMissingDepartment,
+} from '../data/departmentRules';
 import {
   PERSONNEL_IMPORT_ACCEPT,
   PERSONNEL_IMPORT_FORMAT_HINT,
@@ -46,8 +54,9 @@ interface PersonnelInfoScreenProps {
   onSubmit: (values: {
     employeeNo: string;
     name: string;
-    departmentId: string;
     role: string;
+    /** 新規登録時のみ。既存の更新では指定しない（所属は異動でのみ変更する） */
+    departmentId?: string;
   }) => void;
   /**
    * 社員情報（Excel / CSV）の一括読み込みを実行する
@@ -185,12 +194,17 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 要員一覧へ反映する（追加／更新。画面遷移はしない） */
   const save = (no: string, isNew: boolean) => {
-    onSubmit({
-      employeeNo: no,
-      name: name.trim(),
-      departmentId: deptId ?? departments[0]?.departmentId ?? '',
-      role: role.trim() || '要員',
-    });
+    onSubmit(
+      buildPersonnelSaveValues(
+        {
+          employeeNo: no,
+          name: name.trim(),
+          role: role.trim() || '要員',
+          departmentId: deptId,
+        },
+        isNew,
+      ),
+    );
     message.success(
       isNew
         ? `社員番号「${no}」の要員情報を追加しました（モック）。`
@@ -211,9 +225,27 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       return;
     }
 
-    // 既存の要員 → そのまま更新する
-    if (masterByNo.has(no)) {
+    const master = masterByNo.get(no);
+
+    // 既存の要員 → 所属が未設定なら保存できない
+    if (master) {
+      if (hasMissingDepartment(master)) {
+        message.error(
+          '所属が未設定のため保存できません。一括読み込みで所属を設定してください。',
+        );
+        return;
+      }
       save(no, false);
+      return;
+    }
+
+    // 新規の要員 → 所属は必須
+    if (!deptId) {
+      message.warning('所属を選択してください。');
+      return;
+    }
+    if (!departmentExists(departments, deptId)) {
+      message.error('選択した所属は部門マスタに存在しません。');
       return;
     }
 
@@ -270,9 +302,37 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setImportSource('');
   };
 
+  /** 一括読み込み：所属の解決エラー（1 件でもあれば取り込まない） */
+  const importDepartmentErrors = useMemo(() => {
+    if (!importRows) return [];
+    const errors: string[] = [];
+    importRows.forEach((row) => {
+      const isNew = !masterByNo.has(row.employeeNo);
+      const departmentName = row.department.trim();
+      if (departmentName === '') {
+        if (isNew) {
+          errors.push(`社員番号 ${row.employeeNo}：新規社員は所属が必須です`);
+        }
+        return;
+      }
+      if (resolveDepartmentIdByName(departments, departmentName) === null) {
+        errors.push(
+          `社員番号 ${row.employeeNo}：所属「${departmentName}」が部門マスタに存在しないか、同名部門が複数あります`,
+        );
+      }
+    });
+    return errors;
+  }, [departments, importRows, masterByNo]);
+
   /** 一括読み込み：プレビュー内容で要員一覧（モック DB）を上書きする */
   const handleImportConfirm = () => {
     if (!importRows) return;
+    if (importDepartmentErrors.length > 0) {
+      message.error(
+        '所属が解決できない行があるため取り込みできません。内容を修正してください。',
+      );
+      return;
+    }
     const { added, updated } = countPersonnelImport(personnel, importRows);
     onImport(importRows);
     message.success(
@@ -296,19 +356,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         : { added: 0, updated: 0 },
     [personnel, importRows],
   );
-
-  /** 一括読み込み：部門マスタに存在しない所属（警告表示用） */
-  const unknownDepartments = useMemo(() => {
-    if (!importRows) return [];
-    const names = new Set(departments.map((d) => d.name));
-    return Array.from(
-      new Set(
-        importRows
-          .map((r) => r.department)
-          .filter((d) => d !== '' && !names.has(d)),
-      ),
-    );
-  }, [departments, importRows]);
 
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<PersonnelImportRow> = [
@@ -339,7 +386,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
           </Title>
           <Text type='secondary'>
             社員番号を入力すると、該当する要員の 役割・名前・所属
-            を表示します。すべての項目は編集でき、存在しない社員番号は確認のうえで新規追加できます。
+            を表示します。役割・名前は編集できますが、所属は新規登録時のみ選択でき、
+            変更は稼働表の「異動」で行います。存在しない社員番号は確認のうえで新規追加できます。
           </Text>
         </div>
 
@@ -394,6 +442,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                   setEmployeeNo(e.target.value);
                   // 表示中の社員番号が変わったら「追加確認済み」を解除する
                   setConfirmedNo('');
+                  // 別の社員の所属を引き継がないようにクリアする
+                  setDeptId(undefined);
                 }}
                 onPressEnter={() => handleLookup(employeeNo)}
               />
@@ -426,16 +476,35 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
           </div>
           <div>
             <div className='form-label'>所属</div>
-            <Select
-              placeholder='所属を選択'
-              value={deptId}
-              onChange={(v?: string) => setDeptId(v)}
-              options={departments.map((d) => ({
-                value: d.departmentId,
-                label: departmentLabelOf(departments, d.departmentId),
-              }))}
-              style={{ width: '100%' }}
-            />
+            {isExisting ? (
+              <>
+                <Input
+                  value={
+                    masterByNo.get(employeeNo.trim())?.departmentId
+                      ? departmentLabelOf(
+                          departments,
+                          masterByNo.get(employeeNo.trim())?.departmentId ?? '',
+                        )
+                      : '（未設定）'
+                  }
+                  disabled
+                />
+                <Text type='secondary' className='personnel-import-hint'>
+                  所属は稼働表の「異動」でのみ変更できます。
+                </Text>
+              </>
+            ) : (
+              <Select
+                placeholder='所属を選択'
+                value={deptId}
+                onChange={(v?: string) => setDeptId(v)}
+                options={departments.map((d) => ({
+                  value: d.departmentId,
+                  label: departmentLabelOf(departments, d.departmentId),
+                }))}
+                style={{ width: '100%' }}
+              />
+            )}
           </div>
 
           <Space wrap>
@@ -466,6 +535,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         cancelText='キャンセル'
         onOk={handleImportConfirm}
         onCancel={handleImportCancel}
+        okButtonProps={{ disabled: importDepartmentErrors.length > 0 }}
         width={760}
       >
         {importRows && (
@@ -474,7 +544,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               type='warning'
               showIcon
               message='既存の要員情報を上書きします'
-              description={`${importFileName}（${importSource}）を読み込みました。同じ社員番号の要員は 名前・役割・所属 を上書きし、Excel に無い要員はそのまま残します。`}
+              description={`${importFileName}（${importSource}）を読み込みました。同じ社員番号の要員は 名前・役割・所属 を上書きし（所属列が空欄なら現在の所属を保持）、Excel に無い要員はそのまま残します。`}
             />
             <Space size='large' wrap>
               <Text>
@@ -495,14 +565,21 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 件
               </Text>
             </Space>
-            {unknownDepartments.length > 0 && (
+            {importDepartmentErrors.length > 0 && (
               <Alert
-                type='info'
+                type='error'
                 showIcon
-                message='部門マスタに無い所属があります'
-                description={`${unknownDepartments.join(
-                  '、',
-                )}（取り込み自体は行います。部門管理画面で登録してください）`}
+                message={`所属を解決できない行：${importDepartmentErrors.length} 件`}
+                description={
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {importDepartmentErrors.slice(0, 5).map((error) => (
+                      <li key={error}>{error}</li>
+                    ))}
+                    {importDepartmentErrors.length > 5 && (
+                      <li>ほか {importDepartmentErrors.length - 5} 件</li>
+                    )}
+                  </ul>
+                }
               />
             )}
             {importWarnings.length > 0 && (

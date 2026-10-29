@@ -20,6 +20,13 @@ import {
   resolveDepartmentIdByName,
 } from './data/departmentUtils';
 import {
+  countDepartmentReferences,
+  departmentDeleteBlockMessage,
+  departmentExists,
+  hasMissingDepartment,
+  nextDepartmentId,
+} from './data/departmentRules';
+import {
   AVAILABLE_YEARS,
   Holiday,
   YearStore,
@@ -172,14 +179,65 @@ function App() {
     [selectedYear],
   );
 
-  /** 部門マスタ（部門管理画面） */
-  const setYearDepartments = useCallback<
-    React.Dispatch<React.SetStateAction<Department[]>>
-  >(
-    (action) => {
-      const current = stores[selectedYear]?.departments ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
-      updateStore({ departments: next });
+  /** 部門マスタ：追加（部門IDは年度内で再利用しない） */
+  const handleAddDepartment = useCallback(
+    (values: Pick<Department, 'name' | 'kind' | 'location'>) => {
+      const current = stores[selectedYear];
+      if (!current) return;
+      const allocation = nextDepartmentId(current.departmentSeq ?? 0);
+      updateStore({
+        departments: [
+          ...current.departments,
+          { departmentId: allocation.departmentId, ...values },
+        ],
+        departmentSeq: allocation.seq,
+      });
+    },
+    [stores, selectedYear, updateStore],
+  );
+
+  /** 部門マスタ：名称・拠点・種別の修正（部門IDは変更しない） */
+  const handleEditDepartment = useCallback(
+    (row: Department) => {
+      const current = stores[selectedYear];
+      if (!current) return;
+      updateStore({
+        departments: current.departments.map((d) =>
+          d.departmentId === row.departmentId ? { ...d, ...row } : d,
+        ),
+      });
+    },
+    [stores, selectedYear, updateStore],
+  );
+
+  /**
+   * 部門マスタ：削除。
+   * 当年度の要員・プロジェクト・稼働表行（異動の旧行を含む）から
+   * 参照されている場合は削除しない。
+   */
+  const handleDeleteDepartment = useCallback(
+    (row: Department): { ok: boolean; message?: string } => {
+      const current = stores[selectedYear];
+      if (!current) {
+        return { ok: false, message: '年度データがありません。' };
+      }
+
+      const references = countDepartmentReferences(row.departmentId, {
+        personnel: current.personnel,
+        projects: current.projects,
+        workStatusRows: current.workStatus.rows,
+      });
+      const blockMessage = departmentDeleteBlockMessage(row, references);
+      if (blockMessage) {
+        return { ok: false, message: blockMessage };
+      }
+
+      updateStore({
+        departments: current.departments.filter(
+          (d) => d.departmentId !== row.departmentId,
+        ),
+      });
+      return { ok: true };
     },
     [stores, selectedYear, updateStore],
   );
@@ -219,31 +277,63 @@ function App() {
 
   /**
    * 要員情報の登録（モック：画面上のみ保持）
-   * 同じ社員番号が既にあれば更新、なければ新規追加する。
+   * 同じ社員番号が既にあれば氏名・役割のみ更新し、所属は変更しない。
+   * 新規は所属必須で追加する。
    * ※追加しても要員稼動管理画面へは切り替えない
    */
   const handleSavePersonnel = useCallback(
     (values: {
       employeeNo: string;
       name: string;
-      departmentId: string;
       role: string;
+      departmentId?: string;
     }) => {
-      setYearPersonnel((prev) => {
-        const index = prev.findIndex(
-          (p) => p.employeeNo === values.employeeNo,
-        );
-        // 既存の社員番号 → 役割・名前・所属 を更新する
-        if (index >= 0) {
-          const next = [...prev];
-          next[index] = { ...next[index], ...values };
-          return next;
+      const current = stores[selectedYear]?.personnel ?? [];
+      const existing = current.find(
+        (p) => p.employeeNo === values.employeeNo,
+      );
+
+      // 既存の社員番号 → 氏名・役割のみ更新する（所属は異動でのみ変更する）
+      if (existing) {
+        if (hasMissingDepartment(existing)) {
+          message.error(
+            '所属が未設定のため保存できません。一括読み込みで所属を設定してください。',
+          );
+          return;
         }
-        // 新規の社員番号 → 要員一覧へ追加する
-        return [...prev, { ...values }];
-      });
+        setYearPersonnel((prev) =>
+          prev.map((p) =>
+            p.employeeNo === values.employeeNo
+              ? { ...p, name: values.name, role: values.role }
+              : p,
+          ),
+        );
+        return;
+      }
+
+      // 新規の社員番号 → 所属は必須
+      const departmentId = values.departmentId;
+      if (!departmentId) {
+        message.error('所属を選択してください。');
+        return;
+      }
+      const departments = stores[selectedYear]?.departments ?? [];
+      if (!departmentExists(departments, departmentId)) {
+        message.error('選択した所属は部門マスタに存在しません。');
+        return;
+      }
+
+      setYearPersonnel((prev) => [
+        ...prev,
+        {
+          employeeNo: values.employeeNo,
+          name: values.name,
+          role: values.role,
+          departmentId,
+        },
+      ]);
     },
-    [setYearPersonnel],
+    [stores, selectedYear, setYearPersonnel],
   );
 
   /**
@@ -318,23 +408,9 @@ function App() {
   );
 
   /**
-   * 要員マスタの「現在の所属」の更新。
-   * 稼働表の「異動」で新しい所属を登録したときに呼ばれる。
-   */
-  const handleUpdateDepartment = useCallback(
-    (employeeNo: string, departmentId: string) => {
-      setYearPersonnel((prev) =>
-        prev.map((p) =>
-          p.employeeNo === employeeNo ? { ...p, departmentId } : p,
-        ),
-      );
-    },
-    [setYearPersonnel],
-  );
-
-  /**
    * 社員情報（Excel / CSV）の一括読み込み（モック：画面上のみ保持）
-   * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
+   * 社員番号で突合し、既存は 名前・役割（所属は入力がある場合のみ）を上書き、
+   * 新規は所属必須で追加する。
    */
   const handleImportPersonnel = useCallback(
     (rows: PersonnelImportRow[]) => {
@@ -343,15 +419,16 @@ function App() {
         const indexByNo = new Map(prev.map((p, i) => [p.employeeNo, i]));
         const next = [...prev];
 
-        rows.forEach((row, i) => {
+        rows.forEach((row) => {
           // 取込ファイルの「所属」は部門名のため、部門IDへ解決する
-          const resolvedDepartmentId = resolveDepartmentIdByName(
-            departments,
-            row.department,
-          );
+          const departmentName = row.department.trim();
+          const resolvedDepartmentId =
+            departmentName === ''
+              ? null
+              : resolveDepartmentIdByName(departments, departmentName);
           const index = indexByNo.get(row.employeeNo);
           if (index !== undefined) {
-            // 既存の社員番号 → 社員情報の項目のみ上書きする
+            // 既存の社員番号 → 氏名・役割を上書きし、所属は入力があるときだけ更新する
             // （退場予定 leavePlan は保持する）
             const current = next[index];
             next[index] = {
@@ -359,17 +436,20 @@ function App() {
               name: row.name,
               role: row.role || current.role,
               departmentId:
-                resolvedDepartmentId ?? current.departmentId,
+                departmentName === ''
+                  ? current.departmentId
+                  : resolvedDepartmentId ?? current.departmentId,
             };
             return;
           }
-          // 新規の社員番号 → 要員一覧へ追加する
+          // 新規の社員番号 → 所属は必須（解決できない行は画面側で取り込みをブロックする）
+          if (!resolvedDepartmentId) return;
           indexByNo.set(row.employeeNo, next.length);
           next.push({
             employeeNo: row.employeeNo,
             name: row.name,
             role: row.role || '要員',
-            departmentId: resolvedDepartmentId ?? '',
+            departmentId: resolvedDepartmentId,
           });
         });
 
@@ -381,20 +461,37 @@ function App() {
 
   // ---- 要員稼動管理の保存 -------------------------------------------
 
-  /** 要員稼動管理の保存（表示行・割当・BUFFER のみ。要員マスタは変更しない） */
+  /** 要員稼動管理の保存（表示行・割当・BUFFER と、異動による現在所属の更新） */
   const handleSaveWorkStatus = useCallback(
     (payload: WorkStatusPayload) => {
-      setStores((prev) => ({
-        ...prev,
-        [selectedYear]: {
-          ...prev[selectedYear],
-          workStatus: {
-            rows: payload.rows,
-            assignment: payload.assignment,
-            unpaid: payload.unpaid,
+      const departmentByEmployee = new Map(
+        (payload.departmentUpdates ?? []).map(
+          (update) => [update.employeeNo, update.departmentId] as const,
+        ),
+      );
+      setStores((prev) => {
+        const current = prev[selectedYear];
+        if (!current) return prev;
+        const personnel =
+          departmentByEmployee.size === 0
+            ? current.personnel
+            : current.personnel.map((p) => {
+                const departmentId = departmentByEmployee.get(p.employeeNo);
+                return departmentId ? { ...p, departmentId } : p;
+              });
+        return {
+          ...prev,
+          [selectedYear]: {
+            ...current,
+            personnel,
+            workStatus: {
+              rows: payload.rows,
+              assignment: payload.assignment,
+              unpaid: payload.unpaid,
+            },
           },
-        },
-      }));
+        };
+      });
       void kadouRepository.saveWorkStatus(selectedYear, payload);
       message.success(
         `${selectedYear}年度の内容を保存しました（モック：サーバー未接続）。`,
@@ -460,7 +557,6 @@ function App() {
         initialWorkStatus={store.workStatus}
         onSave={handleSaveWorkStatus}
         onUpdateLeavePlan={handleUpdateLeavePlan}
-        onUpdateDepartment={handleUpdateDepartment}
         onDirtyChange={setDirty}
         registerSaveHandler={registerSaveHandler}
       />
@@ -480,7 +576,9 @@ function App() {
       <DepartmentManagementScreen
         year={selectedYear}
         departments={store.departments}
-        setDepartments={setYearDepartments}
+        onAddDepartment={handleAddDepartment}
+        onEditDepartment={handleEditDepartment}
+        onDeleteDepartment={handleDeleteDepartment}
       />
     ),
     'project-manage': (
