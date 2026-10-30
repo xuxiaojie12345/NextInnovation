@@ -30,6 +30,7 @@ import {
   countPersonnelImport,
   parsePersonnelFile,
 } from "./personnelImport";
+import { getPersonnelInfo } from "./personnelApi";
 
 const { Title, Text } = Typography;
 
@@ -159,22 +160,57 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    * 社員番号で要員情報を表示する。
    * マスタに存在しない場合は、新規追加するか確認する。
    */
-  const handleLookup = (rawNo: string) => {
+  const handleLookup = async (rawNo: string) => {
     const no = rawNo.trim();
     if (!no) {
       message.warning("社員番号を入力してください。");
       return;
     }
 
-    const master = masterByNo.get(no);
-    if (master) {
-      // 既存の要員 → 役割・名前・所属 を表示する
-      setEmployeeNo(no);
-      setRole(master.role);
-      setName(master.name);
-      setDeptId(master.departmentId || undefined);
-      setConfirmedNo("");
-      message.success(`社員番号「${no}」の要員情報を表示しました。`);
+    try {
+      // 后台 API から社員情報を取得
+      const data = await getPersonnelInfo(year, no);
+      const person = data.person;
+      
+      if (person) {
+        // 既存の要員 → 役割・名前・所属 を表示する
+        setEmployeeNo(person.employeeNo);
+        setRole(person.role || "");
+        setName(person.name || "");
+        setDeptId(person.departmentId || undefined);
+        setConfirmedNo("");
+        message.success(`社員番号「${no}」の要員情報を表示しました。`);
+        return;
+      }
+    } catch (error) {
+      // 404 エラー → 存在しない社員番号
+      if (error instanceof Error && error.message.includes("404")) {
+        // 存在しない社員番号 → 追加するか確認する
+        setEmployeeNo(no);
+        Modal.confirm({
+          title: "社員番号が存在しません",
+          content: `社員番号「${no}」は要員マスタに存在しません。新規要員として追加しますか？`,
+          okText: "追加する",
+          cancelText: "キャンセル",
+          onOk: () => {
+            setRole("");
+            setName("");
+            setDeptId(undefined);
+            setConfirmedNo(no);
+            message.info(
+              `社員番号「${no}」を新規追加します。役割・名前・所属を入力してください。`,
+            );
+          },
+        });
+        return;
+      }
+      
+      // その他のエラー
+      message.error(
+        error instanceof Error
+          ? `検索に失敗しました：${error.message}`
+          : "検索に失敗しました。",
+      );
       return;
     }
 

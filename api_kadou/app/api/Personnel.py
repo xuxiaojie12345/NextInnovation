@@ -59,7 +59,8 @@ def get_person_info(year: int, employeeNo: str, db: Session = Depends(get_db)):
     if not person_info:
         raise HTTPException(status_code=404, detail="対象の従業員データが存在しません")
 
-    dept_info = get_dept_name(db, year, person_info["department_id"])
+    # SQL查询使用了别名，所以需要使用别名後の键名
+    dept_info = get_dept_name(db, year, person_info["departmentId"])
     return {
         "code": 200,
         "msg": "success",

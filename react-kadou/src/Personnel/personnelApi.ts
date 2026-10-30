@@ -99,3 +99,16 @@ export const deletePersonnel = async (
     { method: 'DELETE' },
   );
 };
+
+/**
+ * 获取单个社员信息（通过社员番号检索）
+ */
+export const getPersonnelInfo = async (
+  year: number,
+  employeeNo: string,
+): Promise<{ person: PersonnelRecord; department: { department_name: string } | null }> => {
+  const response = await request<ApiResponse<{ person: PersonnelRecord; department: { department_name: string } | null }>>(
+    `/api/personnel/info?year=${year}&employeeNo=${encodeURIComponent(employeeNo)}`,
+  );
+  return response.data;
+};
