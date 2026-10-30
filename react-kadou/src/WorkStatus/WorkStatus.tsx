@@ -172,6 +172,8 @@ interface WorkStatusProps {
   employeeMaster: Map<string, Personnel>;
   /** 保存済みの稼働表（表示行 rows・割当・BUFFER） */
   initialWorkStatus: WorkStatusData;
+    /** 所属変更（異動）で要員マスタの現在所属を更新する */
+  onUpdateDepartment: (employeeNo: string, departmentId: string) => void;
   /** 保存（下書きを確定して親へ渡す） */
   onSave: (payload: WorkStatusPayload) => void;
   /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
@@ -295,6 +297,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   initialWorkStatus,
   onSave,
   onUpdateLeavePlan,
+  onUpdateDepartment,
   onDirtyChange,
   registerSaveHandler,
 }) => {
@@ -1043,6 +1046,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       });
       return next;
     });
+        // 要員マスタの「現在の所属」を新しい所属に更新する
+    onUpdateDepartment(row.employeeNo, transferDeptId);
     // 要員マスタの「現在の所属」は、稼働表の保存成功時に反映する
     setTransferRowKey(null);
     setDirty(true);
@@ -1060,6 +1065,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     nextRowKey,
     departments,
     employeeMaster,
+    onUpdateDepartment,
     currentMonday,
   ]);
 
