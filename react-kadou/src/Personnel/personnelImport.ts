@@ -29,7 +29,12 @@ export interface PersonnelImportRow {
   department: string;
   /** 役割コード（空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
   role: string;
+  /** ファイル上の行番号（警告メッセージの表示用） */
+  line?: number;
 }
+
+/** 一括読み込みで列を持つ項目（行番号 line は除く） */
+type ImportColumnKey = Exclude<keyof PersonnelImportRow, 'line'>;
 
 /** 一括読み込みの結果 */
 export interface PersonnelImportResult {
@@ -52,7 +57,7 @@ export const PERSONNEL_IMPORT_FORMAT_HINT =
   '形式：社員番号／名前／役割／所属（1行目は見出し行）。Excel(.xlsx)・CSV に対応。同じ社員番号は上書きします。';
 
 /** 見出し（列名）の候補。表記ゆれを吸収して判定する */
-const HEADER_ALIASES: Record<keyof PersonnelImportRow, string[]> = {
+const HEADER_ALIASES: Record<ImportColumnKey, string[]> = {
   employeeNo: ['社員番号', '社員no', '社員コード', 'employeeno', 'employeenumber'],
   name: ['名前', '氏名', 'namae', 'name'],
   role: ['役割', 'ロール', 'role'],
@@ -275,15 +280,56 @@ const parseXml = (xml: string): Document => {
   return doc;
 };
 
-/** xl/sharedStrings.xml を文字列配列へ変換する */
+/**
+ * 要素直下の <t> だけを連結して文字列にする。
+ *
+ * NOTE: Excel は振り仮名（ふりがな）を <rPh><t>ヤマダ</t></rPh> として
+ *       同じ <si> の中に持つ。getElementsByTagName('t') だと <rPh> 内の
+ *       <t> も拾ってしまい「山田太郎ヤマダタロウ」になるため、
+ *       <rPh>（および <phoneticPr>）配下の <t> は必ず除外する。
+ */
+const readTextElement = (el: Element): string => {
+  // 文字列は <si> 直下の <t>、または <r><t> の 2 パターン
+  const direct = Array.from(el.children).filter((c) => {
+    const name = c.tagName.toLowerCase();
+    return name === 't' || name === 'r';
+  });
+  if (direct.length === 0) {
+    // <si> 直下に <t> が無い場合は従来どおり（注音だけ除外して）連結する
+    return readTextExcludingPhonetic(el);
+  }
+  return direct
+    .map((c) =>
+      c.tagName.toLowerCase() === 't'
+        ? c.textContent ?? ''
+        : readTextExcludingPhonetic(c),
+    )
+    .join('');
+};
+
+/** 注音（rPh / phoneticPr）配下の <t> を除いて <t> を連結する */
+const readTextExcludingPhonetic = (el: Element): string =>
+  Array.from(el.getElementsByTagName('t'))
+    .filter((t) => !isInsidePhonetic(t))
+    .map((t) => t.textContent ?? '')
+    .join('');
+
+/** <rPh> / <phoneticPr> 配下かどうか */
+const isInsidePhonetic = (el: Element): boolean => {
+  let node: Element | null = el.parentElement;
+  while (node) {
+    const name = node.tagName.toLowerCase();
+    if (name === 'rph' || name === 'phoneticpr') return true;
+    node = node.parentElement;
+  }
+  return false;
+};
+
+/** xl/sharedStrings.xml を文字列配列へ変換する（振り仮名は除外する） */
 const parseSharedStrings = (xml: string | undefined): string[] => {
   if (!xml) return [];
   const doc = parseXml(xml);
-  return Array.from(doc.getElementsByTagName('si')).map((si) =>
-    Array.from(si.getElementsByTagName('t'))
-      .map((t) => t.textContent ?? '')
-      .join(''),
-  );
+  return Array.from(doc.getElementsByTagName('si')).map(readTextElement);
 };
 
 /** セル参照（例 "C12"）から 0 始まりの列番号を得る */
@@ -316,9 +362,9 @@ const parseSheet = (xml: string, sharedStrings: string[]): string[][] => {
         const index = Number(cellEl.getElementsByTagName('v')[0]?.textContent ?? '');
         raw = Number.isInteger(index) ? sharedStrings[index] ?? '' : '';
       } else if (type === 'inlineStr') {
-        raw = Array.from(cellEl.getElementsByTagName('t'))
-          .map((t) => t.textContent ?? '')
-          .join('');
+        // セル内文字列。<is> 直下の <t> のみを対象とし、振り仮名（<rPh>）は除外する
+        const is = cellEl.getElementsByTagName('is')[0];
+        raw = is ? readTextElement(is) : '';
       } else {
         raw = cellEl.getElementsByTagName('v')[0]?.textContent ?? '';
       }
@@ -393,32 +439,34 @@ const readXlsx = async (
 /** 見出し行から列の対応を判定する（見出し行でなければ null） */
 const detectColumns = (
   row: string[] | undefined,
-): Record<keyof PersonnelImportRow, number> | null => {
+): Record<ImportColumnKey, number> | null => {
   if (!row) return null;
-  const found: Partial<Record<keyof PersonnelImportRow, number>> = {};
+  const found: Partial<Record<ImportColumnKey, number>> = {};
 
   row.forEach((cell, index) => {
     const key = normalizeKey(cell);
     if (!key) return;
-    (Object.keys(HEADER_ALIASES) as Array<keyof PersonnelImportRow>).forEach(
-      (field) => {
-        if (found[field] !== undefined) return;
-        if (HEADER_ALIASES[field].some((alias) => normalizeKey(alias) === key)) {
-          found[field] = index;
-        }
-      },
-    );
+    (Object.keys(HEADER_ALIASES) as ImportColumnKey[]).forEach((field) => {
+      if (found[field] !== undefined) return;
+      if (
+        HEADER_ALIASES[field].some(
+          (alias: string) => normalizeKey(alias) === key,
+        )
+      ) {
+        found[field] = index;
+      }
+    });
   });
 
   if (Object.keys(found).length < HEADER_MATCH_MIN) return null;
   // 見つからなかった列は「社員番号, 名前, 役割, 所属」の並びで補完する
-  const fallback: Array<keyof PersonnelImportRow> = [
+  const fallback: ImportColumnKey[] = [
     'employeeNo',
     'name',
     'role',
     'department',
   ];
-  const result = {} as Record<keyof PersonnelImportRow, number>;
+  const result = {} as Record<ImportColumnKey, number>;
   fallback.forEach((field, index) => {
     result[field] = found[field] ?? index;
   });
@@ -435,7 +483,7 @@ const buildRows = (
 
   // 見出し行を探す（見つからない場合は先頭から 社員番号/名前/役割/所属 の並びとみなす）
   let headerIndex = -1;
-  let columns: Record<keyof PersonnelImportRow, number> = {
+  let columns: Record<ImportColumnKey, number> = {
     employeeNo: 0,
     name: 1,
     role: 2,
@@ -449,9 +497,6 @@ const buildRows = (
       break;
     }
   }
-
-  /** 社員番号 → rows のインデックス（ファイル内の重複検出用） */
-  const indexByNo = new Map<string, number>();
 
   matrix.forEach((row, index) => {
     if (index <= headerIndex) return;
@@ -476,18 +521,9 @@ const buildRows = (
       return;
     }
 
-    // ファイル内で同じ社員番号が複数ある場合は後ろの行を優先する
-    const duplicate = indexByNo.get(employeeNo);
-    if (duplicate !== undefined) {
-      warnings.push(
-        `${lineNo}行目：社員番号 ${employeeNo} が重複しています（後ろの行を優先）`,
-      );
-      rows[duplicate] = { employeeNo, name, department, role };
-      return;
-    }
-
-    indexByNo.set(employeeNo, rows.length);
-    rows.push({ employeeNo, name, department, role });
+    // ファイル内の重複はそのまま保持し、行番号を付けてバックエンドで判定させる
+    // （docs 8.1：ファイル内重複があればファイル全体を中止する）
+    rows.push({ employeeNo, name, department, role, line: lineNo });
   });
 
   return { rows, warnings, source };
