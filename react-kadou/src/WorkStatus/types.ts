@@ -47,8 +47,8 @@ export type WorkStatusRows = WorkStatusRow[];
 /** 部門の種別（部門 / 協力会社） */
 export type DepartmentKind = 'dept' | 'partner';
 
-/** 拠点（部門の所在地。固定 2 択） */
-export type DepartmentLocation = '天津' | '済南';
+/** 拠点（部門の所在地。固定 2 択：JN=済南 / TJ=天津） */
+export type DepartmentLocation = 'JN' | 'TJ';
 
 /** 部門（部門マスタ）。協力会社も同じマスタで部門と平級に管理する */
 export interface Department {

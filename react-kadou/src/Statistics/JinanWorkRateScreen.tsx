@@ -205,7 +205,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     const jinanTargets = new Set(getJinanDepartments(year));
     return departmentMaster
       .filter(
-        (d) => d.location === '済南' && jinanTargets.has(d.departmentId),
+        (d) => d.location === 'JN' && jinanTargets.has(d.departmentId),
       )
       .map((d) => d.departmentId);
   }, [departmentMaster, year]);

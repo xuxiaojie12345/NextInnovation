@@ -1,6 +1,7 @@
 """部門サービス（部門管理画面用）"""
 import re
 
+from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -23,7 +24,7 @@ def list_departments(db: Session, year_id: str) -> list[dict]:
     """指定年度の部門一覧を返す。"""
     rows = (
         db.execute(
-            text(load_sql("departments_select.sql")), {"year_id": year_id}
+            text(load_sql("department.sql", "list")), {"year_id": year_id}
         )
         .mappings()
         .all()
@@ -32,16 +33,14 @@ def list_departments(db: Session, year_id: str) -> list[dict]:
 
 
 def _next_department_id(db: Session, year_id: str) -> str:
-    """既存の dept-xxxx の最大値 + 1 で部門IDを採番する。"""
-    nums = [
-        int(m.group(1))
-        for r in list_departments(db, year_id)
-        for m in [re.fullmatch(r"dept-(\d+)", r["departmentId"])]
-        if m
-    ]
+    """既存の department_id（3桁ゼロ埋めの数値）の最大値 + 1 で採番する（例：001, 002）。"""
+    nums = []
+    for r in list_departments(db, year_id):
+        m = re.fullmatch(r"(\d+)", str(r["departmentId"]))
+        if m:
+            nums.append(int(m.group(1)))
     nxt = (max(nums) if nums else 0) + 1
-    return f"dept-{nxt:04d}"
-
+    return f"{nxt:03d}"
 
 def create_department(
     db: Session, year_id: str, data: dict, op_user: str = _DEFAULT_OP_USER
@@ -49,7 +48,7 @@ def create_department(
     """部門を追加し、作成した部門を返す。"""
     department_id = _next_department_id(db, year_id)
     db.execute(
-        text(load_sql("department_insert.sql")),
+        text(load_sql("department.sql", "insert")),
         {
             "year_id": year_id,
             "department_id": department_id,
@@ -77,7 +76,7 @@ def update_department(
 ) -> dict | None:
     """部門を更新する。存在しない場合は None を返す。"""
     res = db.execute(
-        text(load_sql("department_update.sql")),
+        text(load_sql("department.sql", "update")),
         {
             "year_id": year_id,
             "department_id": department_id,
@@ -99,9 +98,23 @@ def update_department(
 
 
 def delete_department(db: Session, year_id: str, department_id: str) -> bool:
-    """部門を削除する。削除できた場合は True を返す。"""
+    """部門を削除する。該当部門に要員が存在する場合は削除せず例外を投げる。
+
+    削除できた場合は True を返す。
+    """
+    # 削除対象の部門に所属する要員（jn_personnel_master）をチェック
+    assigned = db.execute(
+        text(load_sql("department.sql", "personnel_count")),
+        {"year_id": year_id, "department_id": department_id},
+    ).scalar_one()
+    if assigned:
+        raise HTTPException(
+            status_code=403,
+            detail="この部門には要員が所属しているため削除できません。",
+        )
+
     res = db.execute(
-        text(load_sql("department_delete.sql")),
+        text(load_sql("department.sql", "delete")),
         {"year_id": year_id, "department_id": department_id},
     )
     db.commit()

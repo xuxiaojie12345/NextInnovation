@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.login import router as api_v1_router
 from app.api.yearSelect import router as year_router
 from app.api.department import router as kadou_router
+from app.api.personnel import router as personnel_router
 from app.core.settings import settings
 # from app.db.init_db import init_db
 
@@ -32,6 +33,7 @@ app.add_middleware(
 app.include_router(api_v1_router)
 app.include_router(year_router)
 app.include_router(kadou_router)
+app.include_router(personnel_router)
 
 
 @app.get("/api/health")

@@ -16,20 +16,20 @@ LEFT JOIN (
     SELECT year_id, COUNT(DISTINCT department_id) AS departmentCount
     FROM jn_department_master
     GROUP BY year_id
-) dept ON base.year_id = dept.year_id
+) dept ON base.year_id COLLATE utf8mb4_unicode_ci = dept.year_id COLLATE utf8mb4_unicode_ci
 LEFT JOIN (
     SELECT year_id, COUNT(DISTINCT employee_no) AS personnelCount
     FROM jn_weekly_assignment_table
     GROUP BY year_id
-) person ON base.year_id = person.year_id
+) person ON base.year_id COLLATE utf8mb4_unicode_ci = person.year_id COLLATE utf8mb4_unicode_ci
 LEFT JOIN (
     SELECT year_id, COUNT(DISTINCT sys_project_id) AS projectCount
     FROM jn_project_master
     GROUP BY year_id
-) proj ON base.year_id = proj.year_id
+) proj ON base.year_id COLLATE utf8mb4_unicode_ci = proj.year_id COLLATE utf8mb4_unicode_ci
 LEFT JOIN (
     SELECT year_id, COUNT(DISTINCT holiday_date) AS holidayCount
     FROM jn_holiday_master
     GROUP BY year_id
-) hol ON base.year_id = hol.year_id
+) hol ON base.year_id COLLATE utf8mb4_unicode_ci = hol.year_id COLLATE utf8mb4_unicode_ci
 ORDER BY base.year_id;

@@ -42,8 +42,8 @@ const KIND_OPTIONS: { value: DepartmentKind; label: string }[] = [
 
 /** 拠点の選択肢（固定 2 択） */
 const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
-  { value: '天津', label: '天津' },
-  { value: '済南', label: '済南' },
+  { value: 'TJ', label: '天津' },
+  { value: 'JN', label: '済南' },
 ];
 
 /** 種別の表示名（未設定は部門扱い） */
@@ -224,7 +224,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         key: 'location',
         width: 100,
         render: (v: DepartmentLocation) =>
-          v === '天津' ? <Tag color='cyan'>天津</Tag> : <Tag color='geekblue'>済南</Tag>,
+          v === 'TJ' ? <Tag color='cyan'>天津</Tag> : <Tag color='geekblue'>済南</Tag>,
       },
       {
         // 種別（部門 / 協力会社）。協力会社は稼働率統計の対象外

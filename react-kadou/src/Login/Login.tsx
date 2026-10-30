@@ -69,7 +69,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               prefix={<UserOutlined />}
               placeholder='ユーザーID'
               autoComplete='username'
-              maxLength={20}
+              maxLength={5}
               onChange={() => {
                 if (error) setError('');
               }}
@@ -87,7 +87,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               prefix={<LockOutlined />}
               placeholder='パスワード'
               autoComplete='current-password'
-              maxLength={32}
+              maxLength={50}
               onChange={() => {
                 if (error) setError('');
               }}
