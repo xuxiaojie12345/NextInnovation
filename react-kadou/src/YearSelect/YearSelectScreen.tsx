@@ -15,6 +15,8 @@ interface YearSelectScreenProps {
   selectedYear: number;
   /** 年度を選択したとき（App 側で未保存チェックを行う） */
   onSelect: (year: number) => void;
+  /** この画面が表示中かどうか（表示中になったときにDBから再取得する） */
+  active: boolean;
 }
 
 /**
@@ -27,14 +29,18 @@ interface YearSelectScreenProps {
 const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
   selectedYear,
   onSelect,
+  active,
 }) => {
   // ロード中フラグ
   const [loading, setLoading] = useState(true);
   // 年度ごとのデータ概要（バックエンドから取得）
   const [summaries, setSummaries] = useState<YearSelectItemView[]>([]);
 
-  // マウント時にバックエンドから年度概要を取得する
+  // この画面が表示中になったときにバックエンドから年度概要を取得する。
+  // ※全画面は常時マウントされているため、マウント時だけだと画面を開き直しても
+  //   再取得が走らず最新のDBデータが反映されない。active が true になったら再取得する。
   useEffect(() => {
+    if (!active) return;
     let alive = true;
     (async () => {
       setLoading(true);
@@ -62,7 +68,7 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
     return () => {
       alive = false;
     };
-  }, []);
+  }, [active]);
 
   /**
    * 表示する年度の並び。

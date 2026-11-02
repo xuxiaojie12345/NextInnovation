@@ -40,22 +40,74 @@ type PendingAction =
   | { type: 'logout' }
   | null;
 
+/** ログインセッションを保持する localStorage キー（ブラウザ更新後もログイン状態を維持する） */
+const AUTH_STORAGE_KEY = 'kadou.auth.user';
+
+/** localStorage からログインユーザーを復元する（不正値・未ログインは null） */
+const loadStoredUser = (): AuthUser | null => {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as AuthUser) : null;
+  } catch {
+    return null;
+  }
+};
+
+/** 表示中画面・選択年度を保持する localStorage キー（リフレッシュ後も同じ画面に留まるようにする） */
+const ACTIVE_VIEW_STORAGE_KEY = 'kadou.activeView';
+const SELECTED_YEAR_STORAGE_KEY = 'kadou.selectedYear';
+
+/** 有効な画面キーの一覧（localStorage 復元時の検証用） */
+const MENU_KEYS: MenuKey[] = [
+  'year-select',
+  'work-status',
+  'personnel-info',
+  'department-manage',
+  'project-manage',
+  'jinan-work-rate',
+  'holiday-settings',
+  'user-manage',
+];
+
+/** localStorage から表示中画面を復元する（不正値は work-status を返す） */
+const loadStoredActiveView = (): MenuKey => {
+  const v = localStorage.getItem(ACTIVE_VIEW_STORAGE_KEY) as MenuKey | null;
+  return v && MENU_KEYS.includes(v) ? v : 'work-status';
+};
+
+/** localStorage から選択年度を復元する（不正値・未保存なら当年） */
+const loadStoredSelectedYear = (): number => {
+  const raw = localStorage.getItem(SELECTED_YEAR_STORAGE_KEY);
+  if (raw) {
+    const n = Number(raw);
+    if (Number.isInteger(n)) return n;
+  }
+  return currentYear();
+};
+
 function App() {
   // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
   const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
   // ログイン中のユーザー（null = 未ログイン）
   // ※ログインAPIが返したユーザーをそのまま保持する。MOCK_USERS に無い
   //   userId でも正しくログイン状態にするため lookup は行わない。
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  // ※ブラウザ更新後もログイン状態を維持するため、初期値を localStorage から復元する。
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() =>
+    loadStoredUser(),
+  );
   const currentUserId = currentUser?.userId ?? null;
-  // 選択中の年度（既定 = 当年）
-  const [selectedYear, setSelectedYear] = useState<number>(() => currentYear());
+  // 選択中の年度（既定 = 当年。リフレッシュ後は前回の年度を復元する）
+  const [selectedYear, setSelectedYear] = useState<number>(() =>
+    loadStoredSelectedYear(),
+  );
   // 年度ごとのデータ（＝保存済みデータ）
   const [stores, setStores] = useState<Record<number, YearStore>>(() =>
     kadouRepository.snapshot(INITIAL_YEARS),
   );
-  // 表示中の画面
-  const [activeView, setActiveView] = useState<MenuKey>('work-status');
+  // 表示中の画面（リフレッシュ後も前回の画面を復元する）
+  const [activeView, setActiveView] = useState<MenuKey>(() =>
+    loadStoredActiveView(),
+  );
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
   // 未保存確認ダイアログで保留中の操作
@@ -68,10 +120,32 @@ function App() {
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
 
+  // 表示中画面・選択年度の変更を localStorage へ保存する（リフレッシュ後も復元するため）
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACTIVE_VIEW_STORAGE_KEY, activeView);
+    } catch {
+      // ストレージ不可は無視する
+    }
+  }, [activeView]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SELECTED_YEAR_STORAGE_KEY, String(selectedYear));
+    } catch {
+      // ストレージ不可は無視する
+    }
+  }, [selectedYear]);
+
   // ---- ログイン / ログアウト ----------------------------------------
 
   /** ログイン（年度は当年に戻す） */
   const handleLogin = useCallback((user: AuthUser) => {
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } catch {
+      // ストレージ不可（プライベートモード等）でもログイン自体は続行する
+    }
     setCurrentUser(user);
     setSelectedYear(currentYear());
     setActiveView('work-status');
@@ -80,6 +154,11 @@ function App() {
 
   /** 実際のログアウト処理（年度は保持する） */
   const doLogout = useCallback(() => {
+    try {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch {
+      // ストレージ不可は無視する
+    }
     setCurrentUser(null);
     setActiveView('work-status');
     setDirty(false);
@@ -436,6 +515,7 @@ function App() {
       <YearSelectScreen
         selectedYear={selectedYear}
         onSelect={requestYearChange}
+        active={activeView === 'year-select'}
       />
     ),
     'work-status': (
@@ -470,6 +550,7 @@ function App() {
         departments={store.departments}
         setDepartments={setYearDepartments}
         operatorId={currentUserId}
+        active={activeView === 'department-manage'}
       />
     ),
     'project-manage': (

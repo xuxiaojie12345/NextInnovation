@@ -33,6 +33,19 @@ WHERE year_id = :year_id AND department_id = :department_id
 
 -- :name: personnel_count
 -- 部門に所属する要員数を取得（削除可否チェック用）
+-- department_id は数値・文字列（例 '1' / '001'）で不整合があるため両辺を数値化して比較する
 SELECT COUNT(*) AS cnt
 FROM jn_personnel_master
-WHERE year_id = :year_id AND department_id = :department_id
+WHERE year_id = :year_id AND CAST(department_id AS UNSIGNED) = CAST(:department_id AS UNSIGNED)
+
+-- :name: project_count
+-- 部門を参照するプロジェクト数を取得（削除可否チェック用）
+SELECT COUNT(*) AS cnt
+FROM jn_project_master
+WHERE year_id = :year_id AND CAST(department_id AS UNSIGNED) = CAST(:department_id AS UNSIGNED)
+
+-- :name: assignment_count
+-- 部門を参照する稼働表行数を取得（削除可否チェック用。異動の旧行を含む全部署の行を対象）
+SELECT COUNT(*) AS cnt
+FROM jn_weekly_assignment_table
+WHERE year_id = :year_id AND CAST(department_id AS UNSIGNED) = CAST(:department_id AS UNSIGNED)

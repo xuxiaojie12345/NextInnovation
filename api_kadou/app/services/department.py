@@ -13,7 +13,7 @@ _DEFAULT_OP_USER = "ADMIN"
 
 def _row_to_department(r) -> dict:
     return {
-        "departmentId": r["department_id"],
+        "departmentId": f'{int(r["department_id"]):03d}',
         "name": r["department_name"],
         "location": r["location"],
         "kind": r["kind"] or "dept",
@@ -98,19 +98,32 @@ def update_department(
 
 
 def delete_department(db: Session, year_id: str, department_id: str) -> bool:
-    """部門を削除する。該当部門に要員が存在する場合は削除せず例外を投げる。
+    """部門を削除する。
 
+    同一年度の 要員 / プロジェクト / 稼働表行（異動の旧行を含む）のいずれかから
+    参照されている場合は削除せず例外を投げる。ユーザー年度別所属はチェックしない。
     削除できた場合は True を返す。
     """
-    # 削除対象の部門に所属する要員（jn_personnel_master）をチェック
-    assigned = db.execute(
-        text(load_sql("department.sql", "personnel_count")),
-        {"year_id": year_id, "department_id": department_id},
-    ).scalar_one()
-    if assigned:
+    counts = {
+        name: db.execute(
+            text(load_sql("department.sql", name)),
+            {"year_id": year_id, "department_id": department_id},
+        ).scalar_one()
+        for name in ("personnel_count", "project_count", "assignment_count")
+    }
+    reasons = [
+        reason
+        for name, reason in (
+            ("personnel_count", "要員"),
+            ("project_count", "プロジェクト"),
+            ("assignment_count", "要員稼働データ（異動の旧行を含む）"),
+        )
+        if counts[name]
+    ]
+    if reasons:
         raise HTTPException(
             status_code=403,
-            detail="この部門には要員が所属しているため削除できません。",
+            detail=f"この部門は{ '・'.join(reasons) }で参照されているため削除できません。",
         )
 
     res = db.execute(

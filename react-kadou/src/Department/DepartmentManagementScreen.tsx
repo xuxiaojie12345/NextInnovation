@@ -58,6 +58,8 @@ interface DepartmentManagementScreenProps {
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
   /** 操作者（登録・更新者）のユーザーID */
   operatorId?: string | null;
+  /** この画面が表示中かどうか（表示中になったときに一覧をDBから再取得する） */
+  active: boolean;
 }
 
 /**
@@ -75,6 +77,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   departments,
   setDepartments,
   operatorId,
+  active,
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
@@ -86,8 +89,10 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   );
   // 修正中の部門ID（null = 新規登録モード）
   const [editingId, setEditingId] = useState<string | null>(null);
-  // 初期データのロード中フラグ
-  const [loading, setLoading] = useState(false);
+  // 初期データのロード中フラグ。
+  // ※ストアの初期値はモックデータのため、最初の表示では実データ取得が終わるまで
+  //   待機する（true で開始し、最初のフェッチ完了までモックを表示しない）。
+  const [loading, setLoading] = useState(true);
   // 登録 / 修正 / 削除の実行中フラグ（二重送信防止）
   const [saving, setSaving] = useState(false);
   // 修正開始時にフォームへスクロールするための参照
@@ -98,8 +103,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const setDepartmentsRef = useRef(setDepartments);
   setDepartmentsRef.current = setDepartments;
 
-  // 年度が変わったらバックエンドから部門一覧を取得する
+  // 年度が変わったとき・この画面が表示されたときにバックエンドから部門一覧を取得する。
+  // ※全画面は常時マウントされているため、画面を開き直しても再取得が走らない。
+  //   「表示中（active）」になったタイミングで再取得して最新のDBデータを反映する。
   useEffect(() => {
+    if (!active) return;
     let alive = true;
     (async () => {
       setLoading(true);
@@ -115,9 +123,9 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     return () => {
       alive = false;
     };
-    // 依存は year のみ。setDepartments は ref 経由で常に最新を参照する
+    // 依存は year と active。setDepartments は ref 経由で常に最新を参照する
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year]);
+  }, [year, active]);
 
   const isEditing = editingId !== null;
 

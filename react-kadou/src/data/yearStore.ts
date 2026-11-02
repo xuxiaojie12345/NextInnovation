@@ -17,11 +17,7 @@ import {
   WorkStatusRows,
 } from '../WorkStatus/types';
 import { buildProjectAbbr } from '../Project/projectAbbr';
-import {
-  MOCK_DEPARTMENTS,
-  MOCK_PERSONNEL,
-  MOCK_PROJECTS,
-} from './mockData';
+import { MOCK_PERSONNEL, MOCK_PROJECTS } from './mockData';
 import {
   JinanWeeklyStat,
   getJinanDepartments,
@@ -78,11 +74,6 @@ export const currentYear = (): number => dayjs().year();
 /* ・2025 は 第二開発部 が無い（2026 で新設）                          */
 /* ・同じ社員番号の要員が年度で所属・案件を変える例を含む               */
 /* ------------------------------------------------------------------ */
-
-const DEPARTMENTS_2025: Department[] = [
-  { departmentId: 'dept-0001', name: '第一開発部', location: 'JN' },
-  { departmentId: 'dept-0003', name: '第三開発部', location: 'JN' },
-];
 
 const PROJECTS_2025: Project[] = [
   {
@@ -218,13 +209,15 @@ interface YearSourceData {
 
 const YEAR_DATA: Record<number, YearSourceData> = {
   2025: {
-    departments: DEPARTMENTS_2025,
+    // 部門はバックエンド（jn_department_master）から取得するためモックを持たない
+    departments: [],
     personnel: PERSONNEL_2025,
     projects: PROJECTS_2025,
     holidays: HOLIDAYS_2025,
   },
   2026: {
-    departments: MOCK_DEPARTMENTS,
+    // 部門はバックエンド（jn_department_master）から取得するためモックを持たない
+    departments: [],
     personnel: MOCK_PERSONNEL,
     projects: MOCK_PROJECTS,
     holidays: HOLIDAYS_2026,

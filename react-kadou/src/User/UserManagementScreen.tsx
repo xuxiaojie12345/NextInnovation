@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons';
 import type { AuthUser, UserRole } from '../types/user';
 import type { Department } from '../WorkStatus/types';
-import { departmentLabelOf } from '../data/departmentUtils';
+import { departmentLabelOf, findDepartment } from '../data/departmentUtils';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -91,6 +91,13 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     value: d.departmentId,
     label: departmentLabelOf(departments, d.departmentId),
   }));
+
+  /**
+   * 保存する所属部門を解決する。
+   * 対象の部門が（部門マスタに存在しない＝削除された場合）は undefined（全部門）にクリアする。
+   */
+  const resolveDept = (id?: string): string | undefined =>
+    id && findDepartment(departments, id) ? id : undefined;
 
   /** フォームの初期化 */
   const resetForm = () => {
