@@ -9,6 +9,7 @@ NOTE: 既存の部門管理（app/api/department.py）と同じ router に相乗
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.audit import normalize_op_user
 from app.db.session import get_db
 from app.schemas.personnel import (
     PersonnelCount,
@@ -49,8 +50,12 @@ def post_personnel_import(
     - dryRun=true  : 検証のみ（DB へは書き込まない）
     - overwrite=false かつ既存データと重複 : ファイル全体を中止（409）
     - ファイル内で社員番号が重複 : ファイル全体を中止（409）
+
+    新規追加時は登録日時／登録者 = システム日時／ログインユーザー、
+    更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
+    更新時は更新日時／更新者のみ書き換える。
     """
-    op_user = (x_user_id or "").strip() or "ADMIN"
+    op_user = normalize_op_user(x_user_id)
     result = import_personnel(db, year, payload, op_user)
 
     # ファイル全体を中止した場合は 409 で返す（1件も反映していない）
@@ -91,15 +96,24 @@ def put_personnel(
     db: Session = Depends(get_db),
     x_user_id: str | None = Header(default=None, alias="X-User-Id"),
 ):
-    """要員情報画面：要員を保存する（存在すれば更新・なければ追加）。"""
+    """要員情報画面：要員を保存する（存在すれば更新・なければ追加）。
+
+    新規追加時は登録日時／登録者 = システム日時／ログインユーザー、
+    更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
+    更新時は更新日時／更新者のみ書き換える。
+    """
     employee_no = employeeNo.strip()
     if not employee_no:
         raise HTTPException(status_code=400, detail="社員番号を指定してください。")
     if not payload.name.strip():
         raise HTTPException(status_code=400, detail="名前を入力してください。")
 
-    op_user = (x_user_id or "").strip() or "ADMIN"
-    saved, _created = save_personnel(db, year, employee_no, payload, op_user)
+    op_user = normalize_op_user(x_user_id)
+    try:
+        saved, _created = save_personnel(db, year, employee_no, payload, op_user)
+    except ValueError as e:
+        # 部門マスタ未登録など、入力内容ではなくマスタ不足による保存不可
+        raise HTTPException(status_code=400, detail=str(e)) from e
     return PersonnelInfo(**saved)
 
 

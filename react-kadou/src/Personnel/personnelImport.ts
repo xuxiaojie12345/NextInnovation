@@ -25,7 +25,7 @@ export interface PersonnelImportRow {
   employeeNo: string;
   /** 氏名（必須） */
   name: string;
-  /** 所属（部門マスタの部門名。空欄も許容 → 取込時に既存値を保持） */
+  /** 所属（部門マスタの部門名。必須） */
   department: string;
   /** 役割コード（空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
   role: string;
@@ -517,6 +517,13 @@ const buildRows = (
     if (!name) {
       warnings.push(
         `${lineNo}行目：名前が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
+      );
+      return;
+    }
+    // 所属は必須（空欄は取り込まない。呼び出し側でファイル全体を中止する）
+    if (!department) {
+      warnings.push(
+        `${lineNo}行目：所属が空のため取り込みを中止しました（社員番号 ${employeeNo}）`,
       );
       return;
     }

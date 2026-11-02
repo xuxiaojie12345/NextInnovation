@@ -27,6 +27,11 @@ import {
   currentYear,
 } from './data/yearStore';
 import { WorkStatusPayload, kadouRepository } from './data/kadouRepository';
+import {
+  clearSession,
+  loadSession,
+  saveSession,
+} from './data/sessionStore';
 import './App.css';
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
@@ -86,27 +91,38 @@ const loadStoredSelectedYear = (): number => {
 };
 
 function App() {
+  // ブラウザのリロードでログイン画面に戻らないよう、sessionStorage から復元する
+  const restored = loadSession();
+
   // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
   const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
   // ログイン中のユーザー（null = 未ログイン）
   // ※ログインAPIが返したユーザーをそのまま保持する。MOCK_USERS に無い
   //   userId でも正しくログイン状態にするため lookup は行わない。
-  // ※ブラウザ更新後もログイン状態を維持するため、初期値を localStorage から復元する。
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() =>
-    loadStoredUser(),
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(
+    () => restored?.user ?? null,
   );
   const currentUserId = currentUser?.userId ?? null;
-  // 選択中の年度（既定 = 当年。リフレッシュ後は前回の年度を復元する）
-  const [selectedYear, setSelectedYear] = useState<number>(() =>
-    loadStoredSelectedYear(),
+  // 選択中の年度（既定 = 当年。リロード時は前回の年度を復元）
+  const [selectedYear, setSelectedYear] = useState<number>(
+    () => restored?.year ?? currentYear(),
   );
   // 年度ごとのデータ（＝保存済みデータ）
-  const [stores, setStores] = useState<Record<number, YearStore>>(() =>
-    kadouRepository.snapshot(INITIAL_YEARS),
-  );
-  // 表示中の画面（リフレッシュ後も前回の画面を復元する）
-  const [activeView, setActiveView] = useState<MenuKey>(() =>
-    loadStoredActiveView(),
+  // リロード時は sessionStorage に保存した内容を優先して復元する
+  const [stores, setStores] = useState<Record<number, YearStore>>(() => {
+    const snapshot = kadouRepository.snapshot(INITIAL_YEARS);
+    if (!restored) return snapshot;
+    // 保存済みの年度データで上書きする（画面での編集結果を維持する）
+    const merged: Record<number, YearStore> = { ...snapshot };
+    Object.entries(restored.stores).forEach(([y, store]) => {
+      const year = Number(y);
+      if (store) merged[year] = store;
+    });
+    return merged;
+  });
+  // 表示中の画面（リロード時は前回の画面を復元）
+  const [activeView, setActiveView] = useState<MenuKey>(
+    () => restored?.view ?? 'work-status',
   );
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
@@ -120,22 +136,25 @@ function App() {
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
 
-  // 表示中画面・選択年度の変更を localStorage へ保存する（リフレッシュ後も復元するため）
+  /**
+   * リロードしても同じ画面に留まれるよう、状態を sessionStorage へ保存する。
+   * 未ログイン時は保存しない（ログイン画面が復元されないようにする）。
+   *
+   * NOTE: stores は編集のたびに新しいオブジェクトになるため、
+   *       ここで毎回まとめて書き出す（量はたかが知れている）。
+   */
   useEffect(() => {
-    try {
-      localStorage.setItem(ACTIVE_VIEW_STORAGE_KEY, activeView);
-    } catch {
-      // ストレージ不可は無視する
+    if (!currentUser) {
+      clearSession();
+      return;
     }
-  }, [activeView]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(SELECTED_YEAR_STORAGE_KEY, String(selectedYear));
-    } catch {
-      // ストレージ不可は無視する
-    }
-  }, [selectedYear]);
+    saveSession({
+      user: currentUser,
+      year: selectedYear,
+      view: activeView,
+      stores,
+    });
+  }, [currentUser, selectedYear, activeView, stores]);
 
   // ---- ログイン / ログアウト ----------------------------------------
 
@@ -163,6 +182,8 @@ function App() {
     setActiveView('work-status');
     setDirty(false);
     setPendingAction(null);
+    // 保存済みセッションも消す（リロードで勝手にログインされないように）
+    clearSession();
   }, []);
 
   /** ログアウト（未保存があれば確認ダイアログを出す） */
@@ -537,7 +558,7 @@ function App() {
       <PersonnelInfoScreen
         year={selectedYear}
         personnel={store.personnel}
-        departments={store.departments}
+        operatorId={currentUserId}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}
         onDelete={handleDeletePersonnel}

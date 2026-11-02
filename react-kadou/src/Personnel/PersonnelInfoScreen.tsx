@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons';
 import { Department, Personnel } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
+import { fetchDepartments } from '../api/departmentManagement';
 import {
   PERSONNEL_IMPORT_ACCEPT,
   PERSONNEL_IMPORT_FORMAT_HINT,
@@ -55,8 +56,8 @@ interface PersonnelInfoScreenProps {
   year: number;
   /** 要員一覧（社員番号で 役割・名前・所属 を引く。マスタを兼ねる） */
   personnel: Personnel[];
-  /** 部門マスタ（所属の選択肢。部門管理画面で管理する） */
-  departments: Department[];
+  /** 操作者（登録・更新者）。リクエストヘッダー X-User-Id に付与する */
+  operatorId?: string | null;
   /**
    * 登録実行（App 側で要員一覧へ追加／更新する）
    * ※追加しても画面遷移はしない
@@ -89,12 +90,55 @@ interface PersonnelInfoScreenProps {
 const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   year,
   personnel,
-  departments,
+  operatorId,
   onSubmit,
   onImport,
   onDelete,
   hasWorkData,
 }) => {
+  /**
+   * 部門マスタ（所属の選択肢）。
+   *
+   * NOTE: この画面は要員を DB へ直接登録するため、所属も DB の
+   *       jn_department_master から取得する（App の store.departments は
+   *       モックで、departmentId が 'dept-0001' 形式のため使えない）。
+   */
+  const [departments, setDepartments] = useState<Department[]>([]);
+  /** 部門マスタ取得中フラグ（所属が選べない理由を画面に出すため） */
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  /** 部門マスタの取得に失敗したか（空との区別。再取得ボタンの表示に使う） */
+  const [departmentsError, setDepartmentsError] = useState(false);
+  /** 部門マスタの再取得トリガー（「再読み込み」ボタンで加算する） */
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // 年度が変わったら部門マスタを取り直す
+  useEffect(() => {
+    let alive = true;
+    setLoadingDepartments(true);
+    setDepartmentsError(false);
+
+    (async () => {
+      try {
+        const list = await fetchDepartments(year);
+        if (!alive) return;
+        setDepartments(list);
+      } catch {
+        // 取得できなかった場合は空にする（所属が必須のため登録はできない）
+        if (!alive) return;
+        setDepartments([]);
+        setDepartmentsError(true);
+      } finally {
+        // NOTE: アンマウント済みでもフラグは必ず戻す。
+        //       （alive 判定で return してしまうと loading のまま固まる）
+        if (alive) setLoadingDepartments(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [year, reloadKey]);
+
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState('');
   // 役割（編集可）
@@ -103,6 +147,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [name, setName] = useState('');
   // 所属（編集可。部門マスタの departmentId）
   const [deptId, setDeptId] = useState<string | undefined>(undefined);
+  /**
+   * 所属の未選択エラーを表示するか。
+   * 登録（保存）を押したときに未選択だった場合だけ true にする。
+   * 所属を選択すると解除する。
+   */
+  const [deptError, setDeptError] = useState(false);
   // 一括読み込み：ファイル解析中フラグ
   const [importing, setImporting] = useState(false);
   // 一括読み込み：解析結果（プレビュー用。null = ダイアログ非表示）
@@ -189,9 +239,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     original === null ||
     original.name !== name.trim() ||
     original.role !== (role.trim() || '要員') ||
-    (!isExisting &&
-      original.deptId !==
-        (deptId ?? departments[0]?.departmentId ?? undefined));
+    (!isExisting && original.deptId !== deptId);
+
+  /** 所属を選択したら未選択エラーを解除する */
+  const handleDeptChange = (v?: string) => {
+    setDeptId(v);
+    if (v) setDeptError(false);
+  };
 
   /** 入力値を初期化 */
   const handleReset = () => {
@@ -199,6 +253,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setRole('');
     setName('');
     setDeptId(undefined);
+    setDeptError(false);
     setVerifiedNo('');
     setVerifiedExists(false);
     setOriginal(null);
@@ -290,7 +345,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setOriginal({
         name: (info.name ?? '').trim(),
         role: (info.role ?? '').trim() || '要員',
-        deptId: deptId ?? departments[0]?.departmentId ?? undefined,
+        deptId,
       });
       message.success(`社員番号「${no}」の要員情報を表示しました。`);
     } catch (e) {
@@ -322,19 +377,31 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 要員を DB へ保存する（新規追加／更新。画面遷移はしない） */
   const save = async (no: string, isNew: boolean) => {
+    // 所属は必須（未選択のまま送信しない）
+    if (!deptId) {
+      setDeptError(true);
+      message.warning('所属を選択してください。');
+      return;
+    }
+
     setSaving(true);
     try {
-      await savePersonnel(no, year, {
-        name: name.trim(),
-        departmentId: deptId ?? departments[0]?.departmentId ?? undefined,
-        role: role.trim() || '要員',
-      });
+      await savePersonnel(
+        no,
+        year,
+        {
+          name: name.trim(),
+          departmentId: deptId,
+          role: role.trim() || '要員',
+        },
+        operatorId,
+      );
 
       // 画面側（App の要員一覧）にも反映する
       onSubmit({
         employeeNo: no,
         name: name.trim(),
-        departmentId: deptId ?? departments[0]?.departmentId ?? '',
+        departmentId: deptId,
         role: role.trim() || '要員',
       });
 
@@ -347,7 +414,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setOriginal({
         name: name.trim(),
         role: role.trim() || '要員',
-        deptId: deptId ?? departments[0]?.departmentId ?? undefined,
+        deptId,
       });
 
       message.success(
@@ -383,6 +450,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.warning('名前を入力してください。');
       return;
     }
+    // 新規追加時は所属が必須（既存の更新時は所属変更不可なので不要）
+    if (!isExisting && !deptId) {
+      setDeptError(true);
+      message.warning('所属を選択してください。');
+      return;
+    }
 
     // --- 送信時点の DB の状態を必ず確認する ---
     setSaving(true);
@@ -401,7 +474,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       const savedDeptId =
         (existing.department
           ? deptIdByName.get(existing.department)
-          : undefined) ?? departments[0]?.departmentId;
+          : undefined) ?? undefined;
       // NOTE: 登録済みの要員は所属を変更できないため、所属は比較対象に含めない
       const noChange =
         name.trim() === (existing.name ?? '').trim() &&
@@ -484,7 +557,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       const apiRows = toApiRows(parsed.rows);
       let check: PersonnelImportApiResult;
       try {
-        check = await importPersonnelRows(year, apiRows, { dryRun: true });
+        check = await importPersonnelRows(year, apiRows, {
+          dryRun: true,
+          opUser: operatorId,
+        });
         setImportCheck(check);
         setImportRows(parsed.rows);
       } catch (e) {
@@ -545,12 +621,20 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
+    // 所属が必須のため、不備があるファイルは 1 件も反映しない
+    if (importBlocked) {
+      message.error(
+        '所属が空欄、または部門マスタに無い所属があるため取り込みできません。',
+      );
+      return;
+    }
     const hasDuplicates = (importCheck?.duplicated ?? 0) > 0;
     setSubmittingImport(true);
     try {
       // 年度 + 社員番号で判定し、存在すれば更新・なければ追加する（バックエンド側で実施）
       const result = await importPersonnelRows(year, toApiRows(importRows), {
         overwrite: hasDuplicates,
+        opUser: operatorId,
       });
 
       // 画面側（App の要員一覧）にも反映する
@@ -602,18 +686,24 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     [importCheck],
   );
 
-  /** 一括読み込み：部門マスタに存在しない所属（警告表示用） */
+  /** 一括読み込み：部門マスタに存在しない所属（取り込み不可） */
   const unknownDepartments = useMemo(() => {
     if (!importRows) return [];
     const names = new Set(departments.map((d) => d.name));
     return Array.from(
-      new Set(
-        importRows
-          .map((r) => r.department)
-          .filter((d) => d !== '' && !names.has(d)),
-      ),
+      new Set(importRows.map((r) => r.department).filter((d) => !names.has(d))),
     );
   }, [departments, importRows]);
+
+  /**
+   * 一括読み込み：ファイル全体の取り込みを中止したか。
+   *
+   * 所属は必須なため、次のいずれかがあれば 1 件も反映しない。
+   *   - 所属が空欄の行がある（解析時に warnings へ積まれる）
+   *   - 所属が部門マスタに存在しない
+   */
+  const importBlocked =
+    importWarnings.length > 0 || unknownDepartments.length > 0;
 
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<PersonnelImportRow> = [
@@ -738,22 +828,49 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             />
           </div>
           <div>
-            <div className='form-label'>所属</div>
+            <div className='form-label'>所属（必須）</div>
             {/*
               新規追加時のみ選択可。検索で DB に存在した要員（isExisting）は
               所属の変更を禁止してグレーアウトする。
             */}
             <Select
-              placeholder='所属を選択'
+              placeholder={loadingDepartments ? '所属を読み込み中...' : '所属を選択'}
               value={deptId}
-              onChange={(v?: string) => setDeptId(v)}
+              onChange={handleDeptChange}
+              loading={loadingDepartments}
+              notFoundContent={
+                loadingDepartments ? '読み込み中...' : '部門が登録されていません'
+              }
               options={departments.map((d) => ({
                 value: d.departmentId,
                 label: departmentLabelOf(departments, d.departmentId),
               }))}
               disabled={isExisting}
+              status={!isExisting && deptError ? 'error' : undefined}
               style={{ width: '100%' }}
             />
+            {!isExisting && !loadingDepartments && departments.length === 0 && (
+              <Space direction='vertical' size={2} style={{ marginTop: 4 }}>
+                <Text type='danger' style={{ fontSize: 12 }}>
+                  {departmentsError
+                    ? '部門マスタを取得できませんでした。'
+                    : '部門マスタに部門が登録されていません。'}
+                </Text>
+                {departmentsError && (
+                  <Button
+                    size='small'
+                    onClick={() => setReloadKey((k) => k + 1)}
+                  >
+                    再読み込み
+                  </Button>
+                )}
+              </Space>
+            )}
+            {!isExisting && deptError && (
+              <Text type='danger' style={{ fontSize: 12 }}>
+                所属を選択してください。
+              </Text>
+            )}
             {isExisting && (
               <Text type='secondary' style={{ fontSize: 12 }}>
                 登録済みの要員は所属を変更できません。
@@ -793,6 +910,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         }
         cancelText='中止'
         confirmLoading={submittingImport}
+        okButtonProps={{ disabled: importBlocked }}
         onOk={() => void handleImportConfirm()}
         onCancel={handleImportCancel}
         width={760}
@@ -843,19 +961,19 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             </Space>
             {unknownDepartments.length > 0 && (
               <Alert
-                type='info'
+                type='error'
                 showIcon
                 message='部門マスタに無い所属があります'
                 description={`${unknownDepartments.join(
                   '、',
-                )}（取り込み自体は行います。部門管理画面で登録してください）`}
+                )}（部門管理画面で登録してから取り込み直してください。取り込みは中止されます）`}
               />
             )}
             {importWarnings.length > 0 && (
               <Alert
                 type='error'
                 showIcon
-                message={`取り込まなかった行：${importWarnings.length} 件`}
+                message={`取り込めない行があります：${importWarnings.length} 件（取り込みは中止されます）`}
                 description={
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {importWarnings.slice(0, 5).map((w) => (
