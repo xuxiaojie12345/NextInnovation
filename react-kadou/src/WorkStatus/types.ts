@@ -35,7 +35,7 @@ export interface WorkStatusRow {
   activeFrom?: string;
   /** 有効終了週（月曜 'YYYY-MM-DD'）。未指定 = 年度末 */
   activeTo?: string;
-  /** 社員番号の編集をロックする（異動で分割された行） */
+  /** 異動で分割された行のマーカー（社員番号は 2 行まとめて変更する） */
   employeeNoLocked?: boolean;
   /** この行を分割して作られた元の行キー（異動取消時の復元用） */
   splitFromKey?: string;
@@ -93,6 +93,17 @@ export interface Project {
   departmentId: string;
   /** Project名称（任意） */
   name: string;
+  /**
+   * 有効flg（既定 true）
+   * 統計の稼動系指標（総稼動人数・稼働率など）にだけ作用する。
+   * false = 無効（割当・BUFFER・選択肢には影響しない）
+   */
+  validFlg: boolean;
+  /**
+   * 教育flg（既定 false）
+   * 統計の教育実施人数にだけ作用する（有効flg とは無関係）。
+   */
+  educationFlg: boolean;
 }
 
 /**

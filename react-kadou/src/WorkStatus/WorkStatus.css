@@ -168,11 +168,30 @@
   min-height: 24px;
 }
 
+/* 過去週（今週の月曜より前）のセル（読み取り専用） */
+.ws-week-cell-past {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 2px 6px;
+  color: #8c8c8c;
+  background: #fafafa;
+  border-radius: 2px;
+  cursor: default;
+  user-select: none;
+}
+
 /* 異動で分割された行の社員番号（編集不可） */
 .ws-employee-no-locked {
   display: block;
   padding: 0 4px;
   color: #595959;
+}
+
+/* 無効化したボタンでもツールチップを表示するためのラッパー */
+.ws-disabled-action {
+  display: inline-block;
 }
 
 /* 所属変更（異動）ダイアログ */

@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Card,
+  Checkbox,
   Input,
   message,
   Popconfirm,
@@ -56,6 +57,10 @@ interface ProjectFormValues {
   projectCode: string;
   /** Project名称 */
   name: string;
+  /** 有効flg（true = 有効） */
+  validFlg: boolean;
+  /** 教育flg（true = 教育） */
+  educationFlg: boolean;
 }
 
 /** フォームの初期値（新規登録モード） */
@@ -67,6 +72,9 @@ const EMPTY_FORM: ProjectFormValues = {
   departmentId: '',
   projectCode: '',
   name: '',
+  // 既定値：有効 / 非教育
+  validFlg: true,
+  educationFlg: false,
 };
 
 /** 必須項目（入力順）。この3項目以外は任意入力 */
@@ -92,7 +100,10 @@ const nextProjectNumber = (list: Project[]): number => {
 const buildNextProjectId = (list: Project[]): string =>
   `pj-${String(nextProjectNumber(list)).padStart(4, '0')}`;
 
-/** 一括読み込みの1行をプロジェクトへ変換する（略称は自動生成） */
+/**
+ * 一括読み込みの1行をプロジェクトへ変換する（略称は自動生成）。
+ * 取込ファイルにフラグ列は無いため、常に既定値（有効 / 非教育）にする。
+ */
 const toProject = (
   row: ProjectImportRow,
   projectId: string,
@@ -107,6 +118,8 @@ const toProject = (
   abbr: buildProjectAbbr(row.customer, row.caseName, row.team, row.subTeam),
   departmentId,
   name: row.name,
+  validFlg: true,
+  educationFlg: false,
 });
 
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
@@ -151,10 +164,20 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const [editingKey, setEditingKey] = useState<string | null>(null);
   // 一括読み込み：ファイル解析中フラグ
   const [importing, setImporting] = useState(false);
+  // 一覧の絞り込み（有効稼働 / 教育かどうか）。antd のフィルタ値は文字列で扱う
+  const [validFilter, setValidFilter] = useState<string[]>([]);
+  const [educationFilter, setEducationFilter] = useState<string[]>([]);
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
 
   const isEditing = editingKey !== null;
+
+  // 年度を切り替えたら絞り込みを解除する
+  // （前年度の条件が残って一覧が全件非表示になるのを防ぐ）
+  useEffect(() => {
+    setValidFilter([]);
+    setEducationFilter([]);
+  }, [year]);
 
   /** 当週の週数（画面右上に表示） */
   const week = useMemo(() => {
@@ -199,6 +222,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       departmentId: row.departmentId,
       projectCode: row.projectCode,
       name: row.name,
+      validFlg: row.validFlg,
+      educationFlg: row.educationFlg,
     });
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
@@ -235,6 +260,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       abbr: buildProjectAbbr(form.customer, form.caseName, form.team, form.subTeam),
       departmentId: form.departmentId,
       name: form.name.trim(),
+      validFlg: form.validFlg,
+      educationFlg: form.educationFlg,
     };
 
     if (editingKey) {
@@ -376,6 +403,38 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         render: (v: string) => departmentLabelOf(departments, v),
       },
       {
+        // 有効flg（統計の稼動系指標にだけ作用する）
+        title: '有効稼働',
+        dataIndex: 'validFlg',
+        key: 'validFlg',
+        width: 110,
+        filters: [
+          { text: '有効', value: 'valid' },
+          { text: '無効', value: 'invalid' },
+        ],
+        filterMultiple: false,
+        filteredValue: validFilter.length > 0 ? validFilter : null,
+        onFilter: (value, row) => (value === 'valid') === row.validFlg,
+        // 一覧は文字のみ（チェックボックスは置かない。入力はフォームで行う）
+        render: (v: boolean) => (v ? '有効' : '無効'),
+      },
+      {
+        // 教育flg（統計の教育実施人数にだけ作用する）
+        title: '教育かどうか',
+        dataIndex: 'educationFlg',
+        key: 'educationFlg',
+        width: 150,
+        filters: [
+          { text: '教育', value: 'edu' },
+          { text: '非教育', value: 'non-edu' },
+        ],
+        filterMultiple: false,
+        filteredValue: educationFilter.length > 0 ? educationFilter : null,
+        onFilter: (value, row) => (value === 'edu') === row.educationFlg,
+        // 一覧は文字のみ（チェックボックスは置かない。入力はフォームで行う）
+        render: (v: boolean) => (v ? '教育' : '非教育'),
+      },
+      {
         title: '項目ID',
         dataIndex: 'projectCode',
         key: 'projectCode',
@@ -429,7 +488,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         ),
       },
     ],
-    [handleEdit, handleDelete, departments],
+    [handleEdit, handleDelete, departments, validFilter, educationFilter],
   );
 
   return (
@@ -441,7 +500,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
-            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。右上の「一括読み込む」から Excel / CSV を取り込めます。
+            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは済南稼働統計の集計にだけ影響します（既定：有効 / 非教育）。右上の「一括読み込む」から Excel / CSV を取り込めます。
           </Text>
         </div>
 
@@ -564,6 +623,27 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   onChange={(e) => setField('projectCode', e.target.value)}
                 />
               </div>
+              {/* 有効稼働 / 教育かどうか は隣接して各半分の幅で表示する */}
+              <div className='project-field-pair'>
+                <div>
+                  <div className='form-label'>有効稼働</div>
+                  <Checkbox
+                    checked={form.validFlg}
+                    onChange={(e) => setField('validFlg', e.target.checked)}
+                  >
+                    {form.validFlg ? '有効' : '無効'}
+                  </Checkbox>
+                </div>
+                <div>
+                  <div className='form-label'>教育かどうか</div>
+                  <Checkbox
+                    checked={form.educationFlg}
+                    onChange={(e) => setField('educationFlg', e.target.checked)}
+                  >
+                    {form.educationFlg ? '教育' : '非教育'}
+                  </Checkbox>
+                </div>
+              </div>
             </div>
 
             <Space wrap style={{ marginTop: 16 }}>
@@ -615,7 +695,20 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
           rowClassName={(row) =>
             row.projectId === editingKey ? 'project-row-editing' : ''
           }
-          scroll={{ x: 1440 }}
+          // 列ヘッダーフィルタ（有効稼働 / 教育かどうか）→ 絞り込み条件へ反映する
+          onChange={(_pagination, filters) => {
+            const rawValid = filters.validFlg;
+            setValidFilter(
+              Array.isArray(rawValid) ? rawValid.map((v) => String(v)) : [],
+            );
+            const rawEducation = filters.educationFlg;
+            setEducationFilter(
+              Array.isArray(rawEducation)
+                ? rawEducation.map((v) => String(v))
+                : [],
+            );
+          }}
+          scroll={{ x: 1720 }}
           pagination={{
             pageSize: PAGE_SIZE,
             showSizeChanger: false,

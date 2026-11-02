@@ -21,6 +21,10 @@ import {
 import { AuthUser, UserRole } from '../data/mockUsers';
 import type { Department } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
+import {
+  departmentExists,
+  normalizeUserDepartmentId,
+} from '../data/departmentRules';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -130,6 +134,12 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       return;
     }
 
+    // 選択中の年度に存在しない部門は「未設定（全ての部門）」として保存する
+    const normalizedDepartmentId = normalizeUserDepartmentId(
+      departments,
+      departmentId,
+    );
+
     if (isEditing && editingId) {
       const target = users.find((u) => u.userId === editingId);
       // 最後の管理者を降格させない
@@ -150,7 +160,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
                 name: nm,
                 role,
                 roleLabel: roleLabelOf(role),
-                departmentId: departmentId || undefined,
+                departmentId: normalizedDepartmentId,
                 password,
               }
             : u,
@@ -168,7 +178,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         name: nm,
         role,
         roleLabel: roleLabelOf(role),
-        departmentId: departmentId || undefined,
+        departmentId: normalizedDepartmentId,
         password: password || 'pass1234',
       },
     ]);
@@ -221,7 +231,9 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       key: 'departmentId',
       width: 140,
       render: (v?: string) =>
-        v ? departmentLabelOf(departments, v) : '（全部門）',
+        v && departmentExists(departments, v)
+          ? departmentLabelOf(departments, v)
+          : '（全部門）',
     },
     { title: 'パスワード（モック）', dataIndex: 'password', key: 'password', width: 160 },
     {
@@ -286,7 +298,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           </Title>
           <Text type='secondary'>
             ログインユーザーの追加・変更・削除と、職級（部長｜事業部長｜管理者）の設定を行います。
-            この画面の内容は年度に依存しません。
+            ユーザー自体は全年度共通ですが、所属部門は選択中の年度の部門マスタを参照します。
           </Text>
         </div>
         <Tag color='red'>管理者のみ</Tag>
@@ -336,6 +348,12 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               onChange={(v?: string) => setDepartmentId(v)}
               style={{ width: '100%' }}
             />
+            {departmentId &&
+              !departmentExists(departments, departmentId) && (
+                <Text type='warning'>
+                  選択中の所属部門は選択中の年度に存在しません。保存すると「全部門」になります。
+                </Text>
+              )}
           </div>
           <div className='form-field'>
             <span className='form-label'>パスワード</span>
@@ -354,6 +372,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         </div>
         <Text type='secondary' className='user-note'>
           ※ 部長は「所属部門」を設定すると、ログイン直後にその部門で絞り込まれます（未設定＝全部門）。
+          所属部門が削除された場合は、保存時に「未設定（全ての部門）」になります。
           パスワードはモック表示です（実運用ではバックエンドで管理）。
         </Text>
       </Card>

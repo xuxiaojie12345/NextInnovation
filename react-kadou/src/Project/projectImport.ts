@@ -15,13 +15,20 @@
  *   - 取り込んだ行はすべて「新しいプロジェクト」として追加する（重複可）
  *   - 顧客・案件・所属部門が空の行は取り込まない（警告を表示）
  *   - 所属部門が部門マスタに無くても取り込む（画面側で警告を表示）
+ *   - 有効flg / 教育flg は取込対象外
+ *     （ファイルに列があっても読み取らず、Project 生成時に既定値 有効 / 非教育 を設定する）
  */
 import {
   normalizeKey,
   readSpreadsheetFile,
 } from '../Personnel/personnelImport';
 
-/** 一括読み込みで受け取る1件分のプロジェクト情報 */
+/**
+ * 一括読み込みで受け取る1件分のプロジェクト情報
+ *
+ * ※有効flg / 教育flg は取込対象外。ファイルの列は無視し、
+ *   Project 生成時に既定値（有効 / 非教育）を設定する。
+ */
 export interface ProjectImportRow {
   /** 顧客（必須） */
   customer: string;
@@ -59,7 +66,10 @@ export const PROJECT_IMPORT_ACCEPT =
 export const PROJECT_IMPORT_FORMAT_HINT =
   '形式：顧客／案件／チーム／Subチーム／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。取り込むと新しいプロジェクトとして追加されます。';
 
-/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
+/**
+ * 見出し（列名）の候補。表記ゆれを吸収して判定する。
+ * ※有効flg・教育flg は取込対象外のため候補に含めない（列があっても無視される）
+ */
 const HEADER_ALIASES: Record<keyof ProjectImportRow, string[]> = {
   customer: ['顧客', '顧客名', 'customer', 'client'],
   caseName: ['案件', '案件名', 'casename', 'case'],
