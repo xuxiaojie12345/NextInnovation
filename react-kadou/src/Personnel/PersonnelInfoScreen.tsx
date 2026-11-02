@@ -171,7 +171,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       // 后台 API から社員情報を取得
       const data = await getPersonnelInfo(year, no);
       const person = data.person;
-      
+
       if (person) {
         // 既存の要員 → 役割・名前・所属 を表示する
         setEmployeeNo(person.employeeNo);
@@ -204,7 +204,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         });
         return;
       }
-      
+
       // その他のエラー
       message.error(
         error instanceof Error
@@ -393,14 +393,25 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         ),
     },
     {
-      title: "社員番号",
+      title: "社員ID",
       dataIndex: "employeeNo",
       key: "employeeNo",
       width: 110,
     },
-    { title: "名前", dataIndex: "name", key: "name", width: 140 },
-    { title: "役割", dataIndex: "role", key: "role", width: 100 },
-    { title: "所属", dataIndex: "department", key: "department", width: 130 },
+    { title: "氏名", dataIndex: "name", key: "name", width: 140 },
+    {
+      title: "所属部門",
+      dataIndex: "department",
+      key: "department",
+      width: 130,
+    },
+    {
+      title: "労働関係所属地",
+      dataIndex: "location",
+      key: "location",
+      width: 130,
+    },
+    { title: "26年ポスト", dataIndex: "role", key: "role", width: 100 },
   ];
 
   if (loading) {

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.Personnel_service import (
     delete_personnel,
+    get_department_id_by_alias_and_location,
     get_dept_name,
     get_personnel_by_emp_no,
     get_personnel_list,
@@ -21,7 +22,9 @@ router = APIRouter(prefix="/api/personnel", tags=["人员主表"])
 
 class PersonnelInput(BaseModel):
     employeeNo: str
-    departmentId: str
+    departmentAlias: str = ""  # 所属部門（department_alias）
+    location: str = ""  # 労働関係所属地（location）
+    departmentId: str = ""  # 部門ID（直接指定，優先級高于 alias+location）
     name: str
     role: str = "要員"
     leavePlan: str = ""
@@ -138,10 +141,43 @@ def save_person(
 def import_personnel(
     year: int,
     people: List[PersonnelInput],
+    userId: str = "admin",  # 默认值为 "admin"
     db: Session = Depends(get_db),
 ):
     now = datetime.now()
-    records = [_record(year, person, now) for person in people]
+    records = []
+    for person in people:
+        # 确定 departmentId 的值
+        department_id = person.departmentId  # 直接指定の优先级最高
+        
+        # 如果没有直接指定 departmentId，则根据 departmentAlias + location 查询
+        if not department_id and person.departmentAlias and person.location:
+            dept_info = get_department_id_by_alias_and_location(
+                db, year, person.departmentAlias, person.location
+            )
+            if dept_info:
+                department_id = dept_info["department_id"]
+        
+        # 如果仍然没有 departmentId，设为空字符串
+        if not department_id:
+            department_id = ""
+        
+        record = {
+            "year": year,
+            "employeeNo": person.employeeNo,
+            "departmentId": department_id,
+            "idouFlag": "0",
+            "idoubi": "",
+            "personName": person.name,
+            "role": person.role,
+            "leavePlan": person.leavePlan,
+            "registerDatetime": now,
+            "registerUser": userId,
+            "updateDatetime": now,
+            "updateUser": userId,
+        }
+        records.append(record)
+    
     save_personnel_records(db, records)
     return {"code": 200, "msg": "导入完成", "count": len(people)}
 

@@ -10,6 +10,10 @@ export interface Personnel {
   name: string;
   /** 所属部門ID（部門マスタの departmentId） */
   departmentId: string;
+  /** 所属部門名（インポート時の一時的な保持用） */
+  department?: string;
+  /** 労働関係所属地（インポート時の一時的な保持用） */
+  location?: string;
   /** 役割コード（例: T11E03 / T09E01 / T08E02） */
   role: string;
   /**

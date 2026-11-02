@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.sql.Personnel_sql import (
     SQL_DELETE_JN_PERSONNEL_MASTER,
+    SQL_GET_DEPARTMENT_ID_BY_ALIAS_AND_LOCATION,
     SQL_GET_JN_DEPARTMENT_MASTER,
     SQL_GET_JN_PERSONNEL_MASTER,
     SQL_INSERT_JN_PERSONNEL_MASTER,
@@ -43,6 +44,18 @@ def get_dept_name(db: Session, year: int, departmentId: str):
     result = db.execute(
         SQL_GET_JN_DEPARTMENT_MASTER,
         {"year": year, "departmentId": departmentId},
+    )
+    row = result.fetchone()
+    if not row:
+        return None
+    return row._asdict()
+
+
+def get_department_id_by_alias_and_location(db: Session, year: int, departmentAlias: str, location: str):
+    """根据 department_alias + location 查询 department_id"""
+    result = db.execute(
+        SQL_GET_DEPARTMENT_ID_BY_ALIAS_AND_LOCATION,
+        {"year": year, "departmentAlias": departmentAlias, "location": location},
     )
     row = result.fetchone()
     if not row:
