@@ -2,6 +2,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.audit import normalize_op_user, system_now
 from app.schemas.personnel import (
     PersonnelImportRequest,
     PersonnelImportResult,
@@ -11,11 +12,11 @@ from app.schemas.personnel import (
 from app.sql import load_sql
 
 # 操作者が指定されない場合のフォールバック（認証情報が取れないとき用）
-_DEFAULT_OP_USER = "ADMIN"
+_DEFAULT_OP_USER = normalize_op_user(None)
 
 # 未指定時の既定値（DB の NOT NULL 制約を満たすため）
-_DEFAULT_DEPARTMENT_ID = "D001"
 _DEFAULT_ROLE = "要員"
+# 異動フラグの初期値：0 = 異動なし
 _DEFAULT_IDOU_FLAG = "0"
 
 # 文字列長の上限（DB 定義に合わせる）
@@ -66,8 +67,13 @@ def save_personnel(
     """要員を保存する（年度 + 社員番号で upsert）。
 
     既存データがあれば更新し、なければ追加する。
+    - 新規追加時：登録日時／登録者 = システム日時／ログインユーザー、
+      更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
+    - 更新時：更新日時／更新者だけを書き換える（登録日時／登録者は保持）。
     戻り値は (保存後の要員情報, 新規追加だったか)。
     """
+    op_user = normalize_op_user(op_user)
+    now_dt = system_now(db)
     current = get_personnel(db, year_id, employee_no)
 
     if current is not None:
@@ -91,6 +97,7 @@ def save_personnel(
                     if data.leavePlan is not None
                     else current.get("leavePlan")
                 ),
+                "now_dt": now_dt,
                 "op_user": op_user,
             },
         )
@@ -99,17 +106,22 @@ def save_personnel(
         return saved, False
 
     # 新規データ → 追加
+    # 所属は必須（未指定のまま登録すると誤った部門に紐づくため、推測での補完はしない）
+    if not data.departmentId:
+        raise ValueError("所属を選択してください。")
+
     db.execute(
         text(load_sql("personnel/personnel_insert.sql")),
         {
             "year_id": year_id,
             "employee_no": employee_no,
-            "department_id": data.departmentId or _DEFAULT_DEPARTMENT_ID,
+            "department_id": int(data.departmentId),
             "idou_flag": _DEFAULT_IDOU_FLAG,
             "idoubi": None,
             "person_name": data.name,
             "role": data.role or _DEFAULT_ROLE,
             "leave_plan": data.leavePlan,
+            "now_dt": now_dt,
             "op_user": op_user,
         },
     )
@@ -164,7 +176,10 @@ def _label(row: PersonnelImportRow) -> str:
 
 
 def _validate(row: PersonnelImportRow) -> str | None:
-    """取り込み行の検証。問題があれば警告メッセージを返す。"""
+    """取り込み行の検証。問題があれば警告メッセージを返す。
+
+    所属は必須のため、空欄の行は取り込まない（画面の登録と同じ扱い）。
+    """
     label = _label(row)
     if not row.employeeNo:
         return f"{label}社員番号が空欄"
@@ -180,6 +195,8 @@ def _validate(row: PersonnelImportRow) -> str | None:
             f"{label}社員番号「{row.employeeNo}」の名前が "
             f"{_MAX_PERSON_NAME} 文字を超えています"
         )
+    if not row.department:
+        return f"{label}社員番号「{row.employeeNo}」の所属が空欄"
     if len(row.role) > _MAX_ROLE:
         return (
             f"{label}社員番号「{row.employeeNo}」の役割が "
@@ -206,21 +223,34 @@ def import_personnel(
 
     仕様（docs/react-kadou-data-design.html 8.1 / 8.4）:
       - ファイル内で社員番号が重複している場合はファイル全体を中止する
+      - 所属が空欄、または部門マスタに存在しない場合はファイル全体を中止する
       - 既存データと重複している場合、overwrite=False ならファイル全体を中止する
       - dryRun=True のときは検証のみ行い、DB へは書き込まない
     """
     result = PersonnelImportResult()
+    op_user = normalize_op_user(op_user)
+    now_dt = system_now(db)
 
-    # --- 1) 行単位の検証 ---
+    # --- 1) 行単位の検証（所属空欄はここで検出してファイル全体を中止） ---
     valid_rows: list[PersonnelImportRow] = []
+    invalid_messages: list[str] = []
     for raw in payload.rows:
         row = _normalize(raw)
         warning = _validate(row)
         if warning is not None:
-            result.warnings.append(warning)
-            result.skipped += 1
+            invalid_messages.append(warning)
             continue
         valid_rows.append(row)
+
+    if invalid_messages:
+        result.aborted = True
+        result.abortReason = (
+            f"入力内容に不備が {len(invalid_messages)} 件あります。"
+            "所属（部門）は必須です。ファイル全体の取り込みを中止しました。"
+        )
+        result.warnings.extend(invalid_messages)
+        result.skipped = len(payload.rows)
+        return result
 
     # --- 2) ファイル内の重複を検出（重複があればファイル全体を中止） ---
     seen: dict[str, PersonnelImportRow] = {}
@@ -247,10 +277,18 @@ def import_personnel(
         return result
 
     # --- 3) 既存データとの重複を検出 ---
+    # 所属が部門マスタに存在しない行があれば、誤った部門で登録しないよう全体を中止する
+    unknown_departments: list[str] = []
     new_rows: list[tuple[PersonnelImportRow, str]] = []
     dup_rows: list[tuple[PersonnelImportRow, str]] = []
     for row in valid_rows:
         department_id = _resolve_department_id(db, year_id, row.department)
+        if department_id is None:
+            unknown_departments.append(
+                f"{_label(row)}社員番号「{row.employeeNo}」の所属「{row.department}」が"
+                "部門マスタにありません"
+            )
+            continue
         exists = (
             db.execute(
                 text(load_sql("personnel/personnel_exists.sql")),
@@ -262,6 +300,16 @@ def import_personnel(
             dup_rows.append((row, department_id))
         else:
             new_rows.append((row, department_id))
+
+    if unknown_departments:
+        result.aborted = True
+        result.abortReason = (
+            f"部門マスタに存在しない所属が {len(unknown_departments)} 件あります。"
+            "ファイル全体の取り込みを中止しました。"
+        )
+        result.warnings.extend(unknown_departments)
+        result.skipped = len(payload.rows)
+        return result
 
     result.duplicated = len(dup_rows)
 
@@ -289,27 +337,22 @@ def import_personnel(
         return result
 
     # --- 5) 新規追加 ---
+    # 所属はここまでで必ず解決済み（空欄・部門マスタに無い行は上で全体中止している）
     for row, department_id in new_rows:
         no = row.employeeNo
-        if department_id is None:
-            if row.department:
-                result.warnings.append(
-                    f"{_label(row)}社員番号「{no}」の所属「{row.department}」が"
-                    f"部門マスタに無いため、既定値「{_DEFAULT_DEPARTMENT_ID}」で登録しました"
-                )
-            department_id = _DEFAULT_DEPARTMENT_ID
 
         db.execute(
             text(load_sql("personnel/personnel_insert.sql")),
             {
                 "year_id": year_id,
                 "employee_no": no,
-                "department_id": department_id,
+                "department_id": int(department_id),
                 "idou_flag": _DEFAULT_IDOU_FLAG,
                 "idoubi": None,
                 "person_name": row.name,
                 "role": row.role or _DEFAULT_ROLE,
                 "leave_plan": None,
+                "now_dt": now_dt,
                 "op_user": op_user,
             },
         )
@@ -329,15 +372,6 @@ def import_personnel(
         if current is None:
             continue
 
-        # 所属が空欄 or 部門マスタに無い場合は、現在の所属を維持する
-        if department_id is None:
-            if row.department:
-                result.warnings.append(
-                    f"{_label(row)}社員番号「{no}」の所属「{row.department}」が"
-                    "部門マスタに無いため、現在の所属を維持しました"
-                )
-            department_id = current["department_id"]
-
         # 役割が空欄の場合は現在の役割を維持する
         role = row.role or current["role"]
 
@@ -349,6 +383,7 @@ def import_personnel(
                 "department_id": department_id,
                 "person_name": row.name,
                 "role": role,
+                "now_dt": now_dt,
                 "op_user": op_user,
             },
         )

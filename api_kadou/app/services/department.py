@@ -12,8 +12,11 @@ _DEFAULT_OP_USER = "ADMIN"
 
 
 def _row_to_department(r) -> dict:
+    # NOTE: jn_department_master.department_id は int 型。
+    #       画面・API の契約は文字列（例："1"）なので、ここで必ず文字列に揃える。
+    #       （int のまま返すとレスポンスモデル（departmentId: str）で検証エラー→500 になる）
     return {
-        "departmentId": r["department_id"],
+        "departmentId": str(r["department_id"]),
         "name": r["department_name"],
         "location": r["location"],
         "kind": r["kind"] or "dept",

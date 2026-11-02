@@ -277,4 +277,29 @@ describe('parsePersonnelFile', () => {
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].name).toBe('佐藤 花子');
   });
+
+  it('所属が空の行は取り込まず警告する（所属は必須）', async () => {
+    const strings = sharedStrings([
+      '<t>社員番号</t>',
+      '<t>名前</t>',
+      '<t>役割</t>',
+      '<t>所属</t>',
+      '<t>10003</t>',
+      '<t>鈴木 一郎</t>',
+      '<t>T03</t>',
+      '<t></t>',
+    ]);
+    const sheet = sheetWithRows([
+      ['0', '1', '2', '3'],
+      ['4', '5', '6', '7'],
+    ]);
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toContain('所属が空');
+    expect(result.warnings[0]).toContain('取り込みを中止');
+    expect(result.warnings[0]).toContain('10003');
+  });
 });
