@@ -6,7 +6,7 @@ API_PATH: /api/kadou/personnel/{employeeNo}/{year}  (GET)
 NOTE: 既存の部門管理（app/api/department.py）と同じ router に相乗りせず、
       独立した router として登録する（既存コードへ影響を与えないため）。
 """
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.audit import normalize_op_user
@@ -18,9 +18,11 @@ from app.schemas.personnel import (
     PersonnelImportResult,
     PersonnelInfo,
     PersonnelSaveRequest,
+    PersonnelWeeklyCount,
 )
 from app.services.personnel import (
     count_personnel,
+    count_weekly_assignments,
     delete_personnel,
     get_personnel,
     import_personnel,
@@ -117,17 +119,52 @@ def put_personnel(
     return PersonnelInfo(**saved)
 
 
-@router.delete("/{employeeNo}/{year}", response_model=PersonnelDeleteResult)
-def remove_personnel(
+@router.get("/{employeeNo}/{year}/weekly-count", response_model=PersonnelWeeklyCount)
+def get_weekly_count(
     employeeNo: str, year: str, db: Session = Depends(get_db)
 ):
-    """要員情報画面：要員を削除する。"""
+    """要員情報画面：指定年度 + 社員番号の週割当件数を返す（削除確認用）。
+
+    jn_weekly_assignment_table を year_id と employee_no で絞り込んで数える。
+    """
     employee_no = employeeNo.strip()
     if not employee_no:
         raise HTTPException(status_code=400, detail="社員番号を指定してください。")
-    if not delete_personnel(db, year, employee_no):
+    return PersonnelWeeklyCount(
+        year=year,
+        employeeNo=employee_no,
+        count=count_weekly_assignments(db, year, employee_no),
+    )
+
+
+@router.delete("/{employeeNo}/{year}", response_model=PersonnelDeleteResult)
+def remove_personnel(
+    employeeNo: str,
+    year: str,
+    deleteWeekly: bool = Query(
+        default=False,
+        description="true のとき、jn_weekly_assignment_table の当該年度・社員番号の週割当も削除する",
+    ),
+    db: Session = Depends(get_db),
+):
+    """要員情報画面：要員を削除する。
+
+    deleteWeekly=true の場合、年度 + 社員番号を検索条件として
+    jn_weekly_assignment_table（要員稼動管理の週割当）も同時に削除する。
+    """
+    employee_no = employeeNo.strip()
+    if not employee_no:
+        raise HTTPException(status_code=400, detail="社員番号を指定してください。")
+
+    # 削除前に件数を控える（実際に消えた件数を返すため）
+    weekly_count = count_weekly_assignments(db, year, employee_no)
+
+    if not delete_personnel(db, year, employee_no, delete_weekly=deleteWeekly):
         raise HTTPException(
             status_code=404,
             detail=f"社員番号「{employee_no}」の要員情報が見つかりません。",
         )
-    return PersonnelDeleteResult(code=0)
+    return PersonnelDeleteResult(
+        code=0,
+        deletedWeeklyCount=weekly_count if deleteWeekly else 0,
+    )

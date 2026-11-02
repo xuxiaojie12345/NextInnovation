@@ -1,19 +1,24 @@
 /**
- * 要員情報（社員情報）の一括読み込み（フロント モック実装）
+ * 要員情報（社員情報）の一括読み込み
  *
- * 「社員情報」の Excel を取り込み、社員番号で突合して要員一覧（モック DB）を上書きする。
+ * 「社員情報」の固定テンプレート Excel を取り込み、社員番号で突合して
+ * 要員一覧を上書きする。
  *
  * ■ 対応ファイル
  *   - Excel (.xlsx / .xlsm) … ZIP をネイティブ展開してセル値を読み取る（外部ライブラリ不要）
- *   - CSV / タブ区切りテキスト
+ *   - CSV / タブ区切りテキスト（同じセル位置で読み取る）
  *   - Excel (.xls 旧形式) … 非対応（.xlsx か CSV で保存し直してもらう）
  *
- * ■ 想定する列（1行目は見出し行。列順は自由、見出し名で判定する）
- *   社員番号 / 名前（氏名） / 役割 / 所属（部門）
- *   ※見出し行が見つからない場合は 社員番号, 名前, 役割, 所属 の並びとみなす
+ * ■ 固定テンプレートのレイアウト
+ *   3 行目からデータが始まる（1〜2 行目は見出し等の固定行なので読み飛ばす）。
+ *   B 列 … 社員番号（B3 が 1 件目）
+ *   C 列 … 氏名（C3 が 1 件目）
+ *   R 列 … 役割（R3 が 1 件目）
+ *   T 列 … 所属（T3 が 1 件目。部門マスタの部門名）
  *
- * NOTE: バックエンド実装時は、この parsePersonnelFile() を API 呼び出し
- *       （例：POST /api/kadou/personnel/import  multipart/form-data）に置き換える。
+ *   ※見出し名による列判定は行わない（列位置が固定のため）。
+ *
+ * NOTE: バックエンド実装時は、この parsePersonnelFile() を API 呼び出しに置き換える。
  *       画面側・App 側のインターフェース（PersonnelImportRow）はそのまま利用できる。
  * NOTE: 表形式ファイル（Excel / CSV）の読み取り処理（readSpreadsheetFile）は
  *       プロジェクト情報の一括読み込み（Project/projectImport.ts）と共用する。
@@ -33,9 +38,6 @@ export interface PersonnelImportRow {
   line?: number;
 }
 
-/** 一括読み込みで列を持つ項目（行番号 line は除く） */
-type ImportColumnKey = Exclude<keyof PersonnelImportRow, 'line'>;
-
 /** 一括読み込みの結果 */
 export interface PersonnelImportResult {
   /** 取り込み対象になった社員情報 */
@@ -52,23 +54,25 @@ export const PERSONNEL_IMPORT_ACCEPT =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,' +
   'application/vnd.ms-excel';
 
-/** 画面に表示する形式の説明 */
+/**
+ * 固定テンプレートのレイアウト。
+ * 列は 0 始まりのインデックス（B=1, C=2, R=17, T=19）。
+ */
+export const PERSONNEL_TEMPLATE = {
+  /** データが始まる行（1 始まり）。B3 が 1 件目 */
+  startRow: 3,
+  /** 列位置（0 始まり） */
+  columns: {
+    employeeNo: 1, // B
+    name: 2, // C
+    role: 17, // R
+    department: 19, // T
+  },
+} as const;
+
+/** 画面に表示する形式の説明（固定テンプレート） */
 export const PERSONNEL_IMPORT_FORMAT_HINT =
-  '形式：社員番号／名前／役割／所属（1行目は見出し行）。Excel(.xlsx)・CSV に対応。同じ社員番号は上書きします。';
-
-/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
-const HEADER_ALIASES: Record<ImportColumnKey, string[]> = {
-  employeeNo: ['社員番号', '社員no', '社員コード', 'employeeno', 'employeenumber'],
-  name: ['名前', '氏名', 'namae', 'name'],
-  role: ['役割', 'ロール', 'role'],
-  department: ['所属', '部門', '部署', 'department', 'dept'],
-};
-
-/** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
-const HEADER_MATCH_MIN = 2;
-
-/** 見出し行を探す範囲（先頭からの行数） */
-const HEADER_SEARCH_ROWS = 5;
+  '固定テンプレート：3行目から 社員番号＝B列／氏名＝C列／役割＝R列／所属＝T列 を読み取ります（B3 が1件目）。同じ社員番号は上書きします。';
 
 // ---------------------------------------------------------------------------
 // 文字列ユーティリティ
@@ -436,102 +440,69 @@ const readXlsx = async (
 // 行列 → 社員情報
 // ---------------------------------------------------------------------------
 
-/** 見出し行から列の対応を判定する（見出し行でなければ null） */
-const detectColumns = (
-  row: string[] | undefined,
-): Record<ImportColumnKey, number> | null => {
-  if (!row) return null;
-  const found: Partial<Record<ImportColumnKey, number>> = {};
+/** 行列から固定テンプレートのセル値を取り出す */
+const cellAt = (row: string[] | undefined, columnIndex: number): string =>
+  (row?.[columnIndex] ?? '').trim();
 
-  row.forEach((cell, index) => {
-    const key = normalizeKey(cell);
-    if (!key) return;
-    (Object.keys(HEADER_ALIASES) as ImportColumnKey[]).forEach((field) => {
-      if (found[field] !== undefined) return;
-      if (
-        HEADER_ALIASES[field].some(
-          (alias: string) => normalizeKey(alias) === key,
-        )
-      ) {
-        found[field] = index;
-      }
-    });
-  });
-
-  if (Object.keys(found).length < HEADER_MATCH_MIN) return null;
-  // 見つからなかった列は「社員番号, 名前, 役割, 所属」の並びで補完する
-  const fallback: ImportColumnKey[] = [
-    'employeeNo',
-    'name',
-    'role',
-    'department',
-  ];
-  const result = {} as Record<ImportColumnKey, number>;
-  fallback.forEach((field, index) => {
-    result[field] = found[field] ?? index;
-  });
-  return result;
-};
-
-/** 行列を検証して社員情報の一覧を作る */
+/**
+ * 行列を検証して社員情報の一覧を作る（固定テンプレート）。
+ *
+ * レイアウト：
+ *   3 行目からデータ開始（2 行目までは読み飛ばす）
+ *   B 列：社員番号 / C 列：氏名 / R 列：役割 / T 列：所属
+ */
 const buildRows = (
   matrix: string[][],
   source: string,
 ): PersonnelImportResult => {
   const warnings: string[] = [];
   const rows: PersonnelImportRow[] = [];
+  const { startRow, columns } = PERSONNEL_TEMPLATE;
 
-  // 見出し行を探す（見つからない場合は先頭から 社員番号/名前/役割/所属 の並びとみなす）
-  let headerIndex = -1;
-  let columns: Record<ImportColumnKey, number> = {
-    employeeNo: 0,
-    name: 1,
-    role: 2,
-    department: 3,
-  };
-  for (let i = 0; i < Math.min(matrix.length, HEADER_SEARCH_ROWS); i += 1) {
-    const detected = detectColumns(matrix[i]);
-    if (detected) {
-      headerIndex = i;
-      columns = detected;
-      break;
-    }
+  // データ行が 1 行も無い（＝テンプレートの形になっていない）場合は明示的にエラー
+  if (matrix.length < startRow - 1) {
+    throw new Error(
+      `テンプレートの形式ではありません。${startRow} 行目からデータを入力してください。`,
+    );
   }
 
-  matrix.forEach((row, index) => {
-    if (index <= headerIndex) return;
+  // 3 行目（index 2）以降を読み取る
+  for (let index = startRow - 1; index < matrix.length; index += 1) {
+    const row = matrix[index];
     const lineNo = index + 1;
 
-    const employeeNo = (row[columns.employeeNo] ?? '').trim();
-    const name = (row[columns.name] ?? '').trim();
-    const role = (row[columns.role] ?? '').trim();
-    const department = (row[columns.department] ?? '').trim();
+    const employeeNo = cellAt(row, columns.employeeNo);
+    const name = cellAt(row, columns.name);
+    const role = cellAt(row, columns.role);
+    const department = cellAt(row, columns.department);
 
-    // 完全な空行はスキップする
-    if (!employeeNo && !name && !role && !department) return;
+    // 完全な空行はスキップする（テンプレート下部の余白行など）
+    if (!employeeNo && !name && !role && !department) continue;
 
     if (!employeeNo) {
-      warnings.push(`${lineNo}行目：社員番号が空のため取り込みませんでした`);
-      return;
+      warnings.push(
+        `${lineNo}行目：B 列（社員番号）が空のため取り込みませんでした`,
+      );
+      continue;
     }
     if (!name) {
       warnings.push(
-        `${lineNo}行目：名前が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
+        `${lineNo}行目：C 列（氏名）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
       );
-      return;
+      continue;
     }
     // 所属は必須（空欄は取り込まない。呼び出し側でファイル全体を中止する）
     if (!department) {
       warnings.push(
-        `${lineNo}行目：所属が空のため取り込みを中止しました（社員番号 ${employeeNo}）`,
+        `${lineNo}行目：T 列（所属）が空のため取り込みを中止しました（社員番号 ${employeeNo}）`,
       );
-      return;
+      continue;
     }
 
     // ファイル内の重複はそのまま保持し、行番号を付けてバックエンドで判定させる
     // （docs 8.1：ファイル内重複があればファイル全体を中止する）
     rows.push({ employeeNo, name, department, role, line: lineNo });
-  });
+  }
 
   return { rows, warnings, source };
 };

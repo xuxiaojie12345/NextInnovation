@@ -193,13 +193,43 @@ export async function savePersonnel(
   );
 }
 
-/** 要員を削除する（DELETE /api/kadou/personnel/{employeeNo}/{year}） */
+/**
+ * 指定年度 + 社員番号の週割当件数を取得する
+ * （GET /api/kadou/personnel/{employeeNo}/{year}/weekly-count）
+ *
+ * 要員削除の確認ダイアログで「週割当も削除するか」を判断するために使う。
+ */
+export async function fetchWeeklyCount(
+  employeeNo: string,
+  year: number,
+): Promise<number> {
+  const data = await request<{ year: string; employeeNo: string; count: number }>(
+    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}/weekly-count`,
+  );
+  return data.count;
+}
+
+/** 要員削除の結果 */
+export interface PersonnelDeleteResponse {
+  code: number;
+  /** 実際に削除した週割当件数（deleteWeekly=false なら 0） */
+  deletedWeeklyCount: number;
+}
+
+/**
+ * 要員を削除する（DELETE /api/kadou/personnel/{employeeNo}/{year}）。
+ *
+ * @param deleteWeekly true のとき、jn_weekly_assignment_table の
+ *                     当該年度・当該社員番号の週割当も同時に削除する
+ */
 export async function deletePersonnel(
   employeeNo: string,
   year: number,
-): Promise<void> {
-  await request<{ code: number }>(
-    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}`,
+  deleteWeekly = false,
+): Promise<PersonnelDeleteResponse> {
+  const query = deleteWeekly ? '?deleteWeekly=true' : '';
+  return request<PersonnelDeleteResponse>(
+    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}${query}`,
     { method: 'DELETE' },
   );
 }

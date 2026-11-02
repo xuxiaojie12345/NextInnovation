@@ -75,3 +75,17 @@ class PersonnelDeleteResult(BaseModel):
     """要員削除レスポンス（DELETE）"""
 
     code: int = 0
+    # 実際に削除した週割当件数（deleteWeekly=false なら 0）
+    deletedWeeklyCount: int = 0
+
+
+class PersonnelWeeklyCount(BaseModel):
+    """週割当件数（GET /api/kadou/personnel/{employeeNo}/{year}/weekly-count）
+
+    要員削除の確認ダイアログで「週割当も削除するか」を判断するために使う。
+    """
+
+    year: str
+    employeeNo: str
+    # jn_weekly_assignment_table の当該年度・社員番号の件数
+    count: int

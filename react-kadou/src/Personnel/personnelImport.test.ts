@@ -203,21 +203,36 @@ const makeXlsxFile = (
   } as unknown as File;
 };
 
-/** 見出し行 + データ行を持つシート XML を作る（全セル共有文字列参照） */
-const sheetWithRows = (rows: string[][]): string =>
-  `<worksheet><sheetData>${rows
+/**
+ * セル配置を指定してシート XML を作る。
+ * cells: { 'B3': sharedStringIndex, 'C3': ... } の形で指定する。
+ */
+const sheetFromCells = (cells: Record<string, string>): string => {
+  const byRow = new Map<
+    number,
+    Array<{ col: number; ref: string; v: string }>
+  >();
+  Object.entries(cells).forEach(([ref, v]) => {
+    const m = /^([A-Z]+)(\d+)$/.exec(ref);
+    if (!m) return;
+    const row = Number(m[2]);
+    let col = 0;
+    for (const ch of m[1]) col = col * 26 + (ch.charCodeAt(0) - 64);
+    col -= 1;
+    if (!byRow.has(row)) byRow.set(row, []);
+    byRow.get(row)!.push({ col, ref, v });
+  });
+  const rows = [...byRow.entries()].sort((a, b) => a[0] - b[0]);
+  return `<worksheet><sheetData>${rows
     .map(
-      (cells, r) =>
-        `<row r="${r + 1}">${cells
-          .map(
-            (cell, c) =>
-              `<c r="${String.fromCharCode(65 + c)}${
-                r + 1
-              }" t="s"><v>${cell}</v></c>`,
-          )
+      ([rowNum, list]) =>
+        `<row r="${rowNum}">${list
+          .sort((a, b) => a.col - b.col)
+          .map((c) => `<c r="${c.ref}" t="s"><v>${c.v}</v></c>`)
           .join('')}</row>`,
     )
     .join('')}</sheetData></worksheet>`;
+};
 
 /** 共有文字列 XML を作る */
 const sharedStrings = (items: string[]): string =>
@@ -231,23 +246,71 @@ describe('normalizeKey', () => {
   });
 });
 
-describe('parsePersonnelFile', () => {
+describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
+  it('3行目の B/C/R/T から1件目を読み取る', async () => {
+    const strings = sharedStrings([
+      '<t>10001</t>',
+      '<t>山田 太郎</t>',
+      '<t>T01</t>',
+      '<t>システム開発部</t>',
+    ]);
+    // B3=0, C3=1, R3=2, T3=3
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+      T3: '3',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0]).toMatchObject({
+      employeeNo: '10001',
+      name: '山田 太郎',
+      role: 'T01',
+      department: 'システム開発部',
+      line: 3,
+    });
+  });
+
+  it('1〜2行目は読み飛ばし、B4 以降を続きとして読み取る', async () => {
+    const strings = sharedStrings([
+      '<t>見出し</t>',
+      '<t>10002</t>',
+      '<t>佐藤 花子</t>',
+      '<t>T02</t>',
+      '<t>営業部</t>',
+    ]);
+    const sheet = sheetFromCells({
+      A1: '0',
+      B3: '1',
+      C3: '2',
+      R3: '3',
+      T3: '4',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].employeeNo).toBe('10002');
+    expect(result.rows[0].line).toBe(3);
+  });
+
   it('Excel の振り仮名（<rPh>）を名前に混入させない', async () => {
     const strings = sharedStrings([
-      '<t>社員番号</t>',
-      '<t>名前</t>',
-      '<t>役割</t>',
-      '<t>所属</t>',
       '<t>10001</t>',
       // 漢字 + 振り仮名（実 Excel と同じ構造）
       '<t>山田 太郎</t><rPh sb="0" eb="4"><t>ヤマダ タロウ</t></rPh>',
       '<t>T01</t>',
       '<t>開発部</t>',
     ]);
-    const sheet = sheetWithRows([
-      ['0', '1', '2', '3'],
-      ['4', '5', '6', '7'],
-    ]);
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+      T3: '3',
+    });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
 
@@ -256,50 +319,56 @@ describe('parsePersonnelFile', () => {
     expect(result.rows[0].name).toBe('山田 太郎');
   });
 
-  it('振り仮名の無い名前はそのまま取り込む', async () => {
+  it('T列（所属）が空の行は取り込まず警告する（所属は必須）', async () => {
     const strings = sharedStrings([
-      '<t>社員番号</t>',
-      '<t>名前</t>',
-      '<t>役割</t>',
-      '<t>所属</t>',
-      '<t>10002</t>',
-      '<t>佐藤 花子</t>',
-      '<t>T02</t>',
-      '<t>営業部</t>',
-    ]);
-    const sheet = sheetWithRows([
-      ['0', '1', '2', '3'],
-      ['4', '5', '6', '7'],
-    ]);
-
-    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
-
-    expect(result.rows).toHaveLength(1);
-    expect(result.rows[0].name).toBe('佐藤 花子');
-  });
-
-  it('所属が空の行は取り込まず警告する（所属は必須）', async () => {
-    const strings = sharedStrings([
-      '<t>社員番号</t>',
-      '<t>名前</t>',
-      '<t>役割</t>',
-      '<t>所属</t>',
       '<t>10003</t>',
       '<t>鈴木 一郎</t>',
       '<t>T03</t>',
-      '<t></t>',
     ]);
-    const sheet = sheetWithRows([
-      ['0', '1', '2', '3'],
-      ['4', '5', '6', '7'],
-    ]);
+    // T3 は空（セル自体を置かない）
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+    });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
 
     expect(result.rows).toHaveLength(0);
     expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0]).toContain('所属が空');
+    expect(result.warnings[0]).toContain('T 列（所属）が空');
     expect(result.warnings[0]).toContain('取り込みを中止');
     expect(result.warnings[0]).toContain('10003');
+  });
+
+  it('C列（氏名）が空の行は取り込まず警告する', async () => {
+    const strings = sharedStrings([
+      '<t>10004</t>',
+      '<t>T04</t>',
+      '<t>品質管理部</t>',
+    ]);
+    const sheet = sheetFromCells({
+      B3: '0',
+      R3: '1',
+      T3: '2',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(0);
+    expect(result.warnings[0]).toContain('C 列（氏名）が空');
+  });
+
+  it('B/C/R/T が全て空の行はスキップする（警告なし）', async () => {
+    const strings = sharedStrings(['<t>10005</t>', '<t>高橋 美咲</t>']);
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1); // T列が空のため1件警告
   });
 });

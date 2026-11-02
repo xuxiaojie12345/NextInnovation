@@ -137,14 +137,50 @@ def save_personnel(
     return saved, True
 
 
-def delete_personnel(db: Session, year_id: str, employee_no: str) -> bool:
-    """要員を削除する。削除できた場合は True を返す。"""
+def count_weekly_assignments(db: Session, year_id: str, employee_no: str) -> int:
+    """指定年度 + 社員番号の週割当件数（jn_weekly_assignment_table）を返す。
+
+    要員削除の確認ダイアログで「週割当も削除するか」を判断させるために使う。
+    """
+    return int(
+        db.execute(
+            text(load_sql("personnel/weekly_assignment_count.sql")),
+            {"year_id": year_id, "employee_no": employee_no},
+        ).scalar_one()
+    )
+
+
+def delete_personnel(
+    db: Session,
+    year_id: str,
+    employee_no: str,
+    delete_weekly: bool = False,
+) -> bool:
+    """要員を削除する。削除できた場合は True を返す。
+
+    Args:
+        delete_weekly: True のとき、jn_weekly_assignment_table の当該年度・
+            当該社員番号の週割当も同時に削除する（年度 + 社員番号で特定）。
+
+    NOTE: 週割当の削除は「画面の要員情報を消すので、稼働管理の実データも
+          消すか」を利用者に選ばせる仕様のため、既定は False（消さない）。
+          どちらも同一トランザクションで実行する。
+    """
     res = db.execute(
         text(load_sql("personnel/personnel_delete.sql")),
         {"year_id": year_id, "employee_no": employee_no},
     )
+    deleted = res.rowcount > 0
+
+    if deleted and delete_weekly:
+        # 年度 + 社員番号を検索条件として週割当を削除する
+        db.execute(
+            text(load_sql("personnel/weekly_assignment_delete.sql")),
+            {"year_id": year_id, "employee_no": employee_no},
+        )
+
     db.commit()
-    return res.rowcount > 0
+    return deleted
 
 
 def _resolve_department_id(
