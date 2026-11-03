@@ -105,6 +105,7 @@ npx eslint "src/**/*.{ts,tsx}"
 
 - 休日の 追加 / 編集 / 削除 と **CSV 出力**（BOM 付き UTF-8 / CRLF）。
 - 区分 = 祝日 / 会社休日 / 振替休日。休日は年度ごとのデータです。
+- 一覧・追加・編集・削除はバックエンド API（`/api/holidays`、テーブル `JN_HOLIDAY_MASTER`）と連携します。同一日付の休日は登録できません（追加・更新時にチェック）。削除は確認ダイアログで「削除」を押すとテーブルからも削除されます。
 
 ### ユーザー管理 `src/User/UserManagementScreen.tsx`
 
