@@ -16,6 +16,7 @@ def _row_to_department(r) -> dict:
     return {
         "departmentId": str(int(r["department_id"])),
         "name": r["department_name"],
+        "alisa": r["department_alisa"] or "",
         "location": r["location"],
         "kind": r["kind"] or "dept",
     }

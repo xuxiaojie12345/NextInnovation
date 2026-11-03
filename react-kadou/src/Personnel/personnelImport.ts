@@ -30,8 +30,27 @@ export interface PersonnelImportRow {
   employeeNo: string;
   /** 氏名（必須） */
   name: string;
-  /** 所属（部門マスタの部門名。必須） */
+  /**
+   * 所属（部門マスタの部門名）。
+   * 取込時に E 列×N 列で部門を確定してから設定する（それまでは空）。
+   */
   department: string;
+  /**
+   * E 列【所属部門】（部門マスタの部門別名と照合する）
+   */
+  departmentAlias?: string;
+  /**
+   * N 列【労働関係所属地】（部門マスタの拠点と照合する）
+   */
+  workLocation?: string;
+  /** 所属の確定に使った部門ID（部門マスタに一致した場合のみ） */
+  departmentId?: string;
+  /**
+   * E 列×N 列の自動照合で所属が確定したか。
+   * true = 自動確定（プレビューではテキスト表示）
+   * false/未設定 = 手動選択（プレビューではプルダウン表示を維持）
+   */
+  departmentAutoMatched?: boolean;
   /** 役割コード（空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
   role: string;
   /** ファイル上の行番号（警告メッセージの表示用） */
@@ -56,7 +75,7 @@ export const PERSONNEL_IMPORT_ACCEPT =
 
 /**
  * 固定テンプレートのレイアウト。
- * 列は 0 始まりのインデックス（B=1, C=2, R=17, T=19）。
+ * 列は 0 始まりのインデックス（B=1, C=2, E=4, N=13, R=17）。
  */
 export const PERSONNEL_TEMPLATE = {
   /** データが始まる行（1 始まり）。B3 が 1 件目 */
@@ -65,14 +84,17 @@ export const PERSONNEL_TEMPLATE = {
   columns: {
     employeeNo: 1, // B
     name: 2, // C
+    /** E 列：所属部門（部門マスタの「部門別名」と照合） */
+    departmentAlias: 4, // E
+    /** N 列：労働関係所属地（部門マスタの「拠点」と照合） */
+    workLocation: 13, // N
     role: 17, // R
-    department: 19, // T
   },
 } as const;
 
 /** 画面に表示する形式の説明（固定テンプレート） */
 export const PERSONNEL_IMPORT_FORMAT_HINT =
-  '固定テンプレート：3行目から 社員番号＝B列／氏名＝C列／役割＝R列／所属＝T列 を読み取ります（B3 が1件目）。同じ社員番号は 氏名・役割 のみ上書きし、所属は変更しません。';
+  '固定テンプレート：3行目から 社員番号＝B列／氏名＝C列／所属部門＝E列／労働関係所属地＝N列／役割＝R列 を読み取ります（B3 が1件目）。E列とN列で部門マスタ（部門別名・拠点）を照合して所属を確定します。';
 
 // ---------------------------------------------------------------------------
 // 文字列ユーティリティ
@@ -474,10 +496,19 @@ const buildRows = (
     const employeeNo = cellAt(row, columns.employeeNo);
     const name = cellAt(row, columns.name);
     const role = cellAt(row, columns.role);
-    const department = cellAt(row, columns.department);
+    const departmentAlias = cellAt(row, columns.departmentAlias);
+    const workLocation = cellAt(row, columns.workLocation);
 
     // 完全な空行はスキップする（テンプレート下部の余白行など）
-    if (!employeeNo && !name && !role && !department) continue;
+    if (
+      !employeeNo &&
+      !name &&
+      !role &&
+      !departmentAlias &&
+      !workLocation
+    ) {
+      continue;
+    }
 
     if (!employeeNo) {
       warnings.push(
@@ -491,17 +522,32 @@ const buildRows = (
       );
       continue;
     }
-    // 所属は必須（空欄は取り込まない。呼び出し側でファイル全体を中止する）
-    if (!department) {
+    // 所属部門・労働関係所属地は必須（空欄は取り込まない）
+    if (!departmentAlias) {
       warnings.push(
-        `${lineNo}行目：T 列（所属）が空のため取り込みを中止しました（社員番号 ${employeeNo}）`,
+        `${lineNo}行目：E 列（所属部門）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
+      );
+      continue;
+    }
+    if (!workLocation) {
+      warnings.push(
+        `${lineNo}行目：N 列（労働関係所属地）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
       );
       continue;
     }
 
+    // 所属（department）は E 列×N 列で部門マスタを照合してから確定する。
     // ファイル内の重複はそのまま保持し、行番号を付けてバックエンドで判定させる
     // （docs 8.1：ファイル内重複があればファイル全体を中止する）
-    rows.push({ employeeNo, name, department, role, line: lineNo });
+    rows.push({
+      employeeNo,
+      name,
+      department: '',
+      departmentAlias,
+      workLocation,
+      role,
+      line: lineNo,
+    });
   }
 
   return { rows, warnings, source };

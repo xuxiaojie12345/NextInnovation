@@ -205,10 +205,12 @@ def _label(row: PersonnelImportRow) -> str:
     return f"{row.line}行目：" if row.line else ""
 
 
-def _validate(row: PersonnelImportRow) -> str | None:
+def _validate(row: PersonnelImportRow, require_department: bool = True) -> str | None:
     """取り込み行の検証。問題があれば警告メッセージを返す。
 
-    所属は必須のため、空欄の行は取り込まない（画面の登録と同じ扱い）。
+    Args:
+        require_department: 所属の必須チェックを行うか。
+            既存データの上書き行は所属を更新しないため、False で呼ぶ。
     """
     label = _label(row)
     if not row.employeeNo:
@@ -225,7 +227,7 @@ def _validate(row: PersonnelImportRow) -> str | None:
             f"{label}社員番号「{row.employeeNo}」の名前が "
             f"{_MAX_PERSON_NAME} 文字を超えています"
         )
-    if not row.department:
+    if require_department and not row.department:
         return f"{label}社員番号「{row.employeeNo}」の所属が空欄"
     if len(row.role) > _MAX_ROLE:
         return (
@@ -265,11 +267,18 @@ def import_personnel(
     # --- 1) 行単位の検証（所属空欄はここで検出してファイル全体を中止） ---
     valid_rows: list[PersonnelImportRow] = []
     invalid_messages: list[str] = []
+    # 所属だけが空欄の行（dryRun では画面で選び直せるため中止しない）
+    pending_department_rows: list[PersonnelImportRow] = []
     for raw in payload.rows:
         row = _normalize(raw)
-        warning = _validate(row)
+        # 所属が空欄の行は、既存データと重複していれば「上書き（所属は変更しない）」
+        # として扱えるため、所属必須チェックを保留して先に登録有無を調べる。
+        warning = _validate(row, require_department=bool(row.department))
         if warning is not None:
             invalid_messages.append(warning)
+            continue
+        if not row.department:
+            pending_department_rows.append(row)
             continue
         valid_rows.append(row)
 
@@ -286,7 +295,7 @@ def import_personnel(
     # --- 2) ファイル内の重複を検出（重複があればファイル全体を中止） ---
     seen: dict[str, PersonnelImportRow] = {}
     duplicates: list[str] = []
-    for row in valid_rows:
+    for row in valid_rows + pending_department_rows:
         first = seen.get(row.employeeNo)
         if first is not None:
             origin = f"{first.line}行目の" if first.line else "同一ファイル内の"
@@ -306,6 +315,37 @@ def import_personnel(
         result.warnings.extend(duplicates)
         result.skipped = len(payload.rows)
         return result
+
+    # --- 2.5) 所属が未確定の行（E列×N列が部門マスタに一致しない）---
+    # 既存データと重複する行（＝上書き）は所属を更新しないため、未確定でも取り込める。
+    # 新規追加の行だけは所属が必須なので、確定していない場合はファイル全体を中止する。
+    pending_existing_rows: list[PersonnelImportRow] = []
+    pending_new_rows: list[PersonnelImportRow] = []
+    for r in pending_department_rows:
+        exists = (
+            db.execute(
+                text(load_sql("personnel/personnel_exists.sql")),
+                {"year_id": year_id, "employee_no": r.employeeNo},
+            ).first()
+            is not None
+        )
+        (pending_existing_rows if exists else pending_new_rows).append(r)
+
+    if pending_new_rows and not payload.dryRun:
+        result.aborted = True
+        result.abortReason = (
+            f"所属を特定できない行が {len(pending_new_rows)} 件あります。"
+            "プレビュー上で所属を選択してください。"
+        )
+        result.warnings.extend(
+            f"{_label(r)}社員番号「{r.employeeNo}」の所属が未確定です"
+            for r in pending_new_rows
+        )
+        result.skipped = len(payload.rows)
+        return result
+
+    if pending_department_rows:
+        result.pendingDepartmentNos = [r.employeeNo for r in pending_department_rows]
 
     # --- 3) 既存データとの重複を検出 ---
     # 所属が部門マスタに存在しない行があれば、誤った部門で登録しないよう全体を中止する
@@ -342,12 +382,32 @@ def import_personnel(
         result.skipped = len(payload.rows)
         return result
 
+    # 所属が未確定でも既存データと重複する行は「上書き（所属は変更しない）」対象にする
+    for row in pending_existing_rows:
+        dup_rows.append((row, ""))
+
     result.duplicated = len(dup_rows)
     # 画面で「追加／上書き」を行単位で判定できるよう、重複した社員番号を返す
     result.duplicatedEmployeeNos = [row.employeeNo for row, _ in dup_rows]
 
+    # 上書き行の所属は更新しないため、画面には DB 上の既存所属を表示する
+    for row, _ in dup_rows:
+        existing = (
+            db.execute(
+                text(load_sql("personnel/personnel_select.sql")),
+                {"year_id": year_id, "employee_no": row.employeeNo},
+            )
+            .mappings()
+            .first()
+        )
+        if existing and existing["department_name"]:
+            result.duplicatedDepartments[row.employeeNo] = existing[
+                "department_name"
+            ]
+
     # 重複があり、上書きが許可されていない → ファイル全体を中止する
-    if dup_rows and not payload.overwrite:
+    # NOTE: dryRun はプレビュー表示が目的のため中止しない（画面で選択させる）
+    if dup_rows and not payload.overwrite and not payload.dryRun:
         result.aborted = True
         result.abortReason = (
             f"既存データと重複する社員番号が {len(dup_rows)} 件あります。"
@@ -365,7 +425,12 @@ def import_personnel(
 
     # --- 4) 検証のみ（dryRun）→ ここで終了 ---
     if payload.dryRun:
-        result.added = len(new_rows)
+        # 追加件数 = 所属確定済みの新規行 + 未確定行のうち既存に無い行
+        dup_nos = {row.employeeNo for row, _ in dup_rows}
+        pending_new = [
+            r for r in pending_department_rows if r.employeeNo not in dup_nos
+        ]
+        result.added = len(new_rows) + len(pending_new)
         result.updated = len(dup_rows)
         return result
 

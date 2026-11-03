@@ -8,6 +8,8 @@ class Department(BaseModel):
 
     departmentId: str
     name: str
+    # 部門別名（一括取入の E 列【所属部門】との照合に使う）
+    alisa: Optional[str] = ""
     location: str
     kind: Optional[str] = "dept"
 

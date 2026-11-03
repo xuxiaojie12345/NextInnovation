@@ -44,6 +44,11 @@ export interface PersonnelImportApiResult {
   duplicated: number;
   /** 既存データと重複した社員番号（画面で「追加／上書き」を判定する用） */
   duplicatedEmployeeNos?: string[];
+  /**
+   * 既存データと重複した行の「DB 上の所属部門名」。
+   * 上書き時は所属を更新しないため、プレビューはこの値をグレー表示する。
+   */
+  duplicatedDepartments?: Record<string, string>;
   /** ファイル全体を中止したか */
   aborted: boolean;
   /** ファイル全体を中止した理由 */

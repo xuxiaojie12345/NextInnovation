@@ -53,6 +53,10 @@ class PersonnelImportResult(BaseModel):
     duplicated: int = 0
     # 既存データと重複した社員番号の一覧（画面で「追加／上書き」を判定する用）
     duplicatedEmployeeNos: list[str] = []
+    # 既存データと重複した行の「DB 上の所属部門名」（所属は更新しないため表示用）
+    duplicatedDepartments: dict[str, str] = {}
+    # 所属が未確定の社員番号（dryRun 時のみ。画面で所属を選択させる）
+    pendingDepartmentNos: list[str] = []
     # ファイル全体を中止したか（重複エラーなどの致命的な問題）
     aborted: bool = False
     # ファイル全体を中止した理由（aborted=true のときのみ）

@@ -11,6 +11,7 @@ import {
   Space,
   Table,
   Tag,
+  Tooltip,
   Typography,
   Upload,
 } from 'antd';
@@ -50,6 +51,8 @@ const toApiRows = (rows: PersonnelImportRow[]) =>
     name: r.name,
     role: r.role,
     department: r.department,
+    departmentAlias: r.departmentAlias,
+    workLocation: r.workLocation,
     line: r.line,
   }));
 
@@ -244,6 +247,71 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   );
 
   /**
+   * 一括取り込み：「E 列（所属部門）× N 列（労働関係所属地）」で部門マスタを照合する。
+   *
+   * 照合ルール（仕様）：
+   *   E 列 → 部門マスタの「部門別名（department_alisa）」
+   *   N 列 → 部門マスタの「拠点（location）」
+   *   両方が一致した部門だけを候補とする（完全一致・全半角/大文字小文字は正規化）。
+   *
+   * 一致した場合は所属（部門名称）と部門ID を確定して「ロック」する。
+   * 一致しない場合は department を空にして、プレビュー上で手動選択させる。
+   */
+  const resolveImportDepartment = useCallback(
+    (row: PersonnelImportRow): PersonnelImportRow => {
+      const normalize = (v: string | undefined) =>
+        (v ?? '').replace(/\u3000/g, ' ').trim().toLowerCase();
+      const alias = normalize(row.departmentAlias);
+      const loc = normalize(row.workLocation);
+
+      const hit = departments.filter(
+        (d) =>
+          normalize(d.alisa) === alias && normalize(d.location) === loc,
+      );
+
+      // 一致が 1 件に絞れたときだけ確定する（同名・同拠点が複数ある場合は選ばせる）
+      if (hit.length === 1) {
+        return {
+          ...row,
+          department: hit[0].name,
+          departmentId: hit[0].departmentId,
+          departmentAutoMatched: true,
+        };
+      }
+      return {
+        ...row,
+        department: '',
+        departmentId: undefined,
+        departmentAutoMatched: false,
+      };
+    },
+    [departments],
+  );
+
+  /** 一括取り込み：プレビュー行の所属を手動で選び直す（一致しなかった行のみ） */
+  const handleImportDepartmentChange = useCallback(
+    (employeeNo: string, departmentId: string) => {
+      const dept = departments.find((d) => d.departmentId === departmentId);
+      setImportRows((prev) =>
+        prev
+          ? prev.map((r) =>
+              r.employeeNo === employeeNo
+                ? {
+                    ...r,
+                    departmentId,
+                    department: dept?.name ?? '',
+                    // 手動選択はプルダウンのまま維持する（自動確定とは区別）
+                    departmentAutoMatched: false,
+                  }
+                : r,
+            )
+          : prev,
+      );
+    },
+    [departments],
+  );
+
+  /**
    * 一括取り込みで「既存データと重複（＝上書き）」となる社員番号。
    *
    * NOTE: 画面の personnel（App のストア）はモックで DB と一致しないため、
@@ -253,6 +321,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     () => new Set(importCheck?.duplicatedEmployeeNos ?? []),
     [importCheck],
   );
+
+  /**
+   * 上書き（既存データと重複）行の「DB 上の所属部門名」。
+   * 上書き時は所属を更新しないため、プレビューはこの値をグレー表示する。
+   */
+  const importDuplicatedDepartments =
+    importCheck?.duplicatedDepartments ?? {};
 
   /** 入力中の社員番号が、検索済みかつ DB に存在する要員か（更新／削除ボタンの表示に使用） */
   const isVerified = verifiedNo !== '' && verifiedNo === employeeNo.trim();
@@ -586,8 +661,11 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setImportSource(parsed.source);
       setImportWarnings(parsed.warnings);
 
+      // E 列（所属部門）× N 列（労働関係所属地）で部門マスタを照合し、所属を確定する
+      const resolved = parsed.rows.map(resolveImportDepartment);
+
       // 事前検証（DB へは書き込まない）
-      const apiRows = toApiRows(parsed.rows);
+      const apiRows = toApiRows(resolved);
       let check: PersonnelImportApiResult;
       try {
         check = await importPersonnelRows(year, apiRows, {
@@ -595,14 +673,14 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
           opUser: operatorId,
         });
         setImportCheck(check);
-        setImportRows(parsed.rows);
+        setImportRows(resolved);
       } catch (e) {
         if (e instanceof PersonnelImportAbortedError) {
           // 409 = ファイル全体中止。既存データとの重複は「上書きして取り込む」で
           // 続行できるため、その場合はプレビューを開いてボタンで選ばせる。
           setImportCheck(e.result);
           if (e.result.duplicated > 0) {
-            setImportRows(parsed.rows);
+            setImportRows(resolved);
             return;
           }
 
@@ -654,6 +732,16 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
+    // 新規追加行は所属が必須。既存データの上書き行は所属を更新しないので不要
+    const unresolved = importRows.filter(
+      (r) => !r.departmentId && !importDuplicatedNos.has(r.employeeNo),
+    );
+    if (unresolved.length > 0) {
+      message.error(
+        `E 列（所属部門）× N 列（労働関係所属地）で部門を特定できない行が ${unresolved.length} 件あります。プレビュー上で所属を選択してください。`,
+      );
+      return;
+    }
     // 所属が必須のため、不備があるファイルは 1 件も反映しない
     if (importBlocked) {
       message.error(
@@ -719,24 +807,30 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     [importCheck],
   );
 
-  /** 一括読み込み：部門マスタに存在しない所属（取り込み不可） */
-  const unknownDepartments = useMemo(() => {
-    if (!importRows) return [];
-    const names = new Set(departments.map((d) => d.name));
-    return Array.from(
-      new Set(importRows.map((r) => r.department).filter((d) => !names.has(d))),
-    );
-  }, [departments, importRows]);
+  /**
+   * 一括読み込み：所属が未確定の行（E 列×N 列で部門マスタに一致しなかった）。
+   * プレビュー上で手動選択すれば解消する。
+   *
+   * NOTE: 既存データと重複する行（＝上書き）は所属を更新しないため、
+   *       未確定でも取り込みを止めない。
+   */
+  const unresolvedRows = useMemo(
+    () =>
+      (importRows ?? []).filter(
+        (r) => !r.departmentId && !importDuplicatedNos.has(r.employeeNo),
+      ),
+    [importRows, importDuplicatedNos],
+  );
 
   /**
    * 一括読み込み：ファイル全体の取り込みを中止したか。
    *
    * 所属は必須なため、次のいずれかがあれば 1 件も反映しない。
-   *   - 所属が空欄の行がある（解析時に warnings へ積まれる）
-   *   - 所属が部門マスタに存在しない
+   *   - ファイル解析で警告が出た行がある
+   *   - 所属が未確定（E 列×N 列が部門マスタに一致しない）行がある
    */
   const importBlocked =
-    importWarnings.length > 0 || unknownDepartments.length > 0;
+    importWarnings.length > 0 || unresolvedRows.length > 0;
 
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<PersonnelImportRow> = [
@@ -758,19 +852,58 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       title: '所属',
       dataIndex: 'department',
       key: 'department',
-      width: 130,
+      width: 180,
       /**
-       * 既存データ（上書き）の行は所属が更新されないため、
-       * グレー文字で表示して「変更されない」ことを示す。
+       * 所属の表示：
+       *   1) 既存データと重複（＝上書き）行 → 所属は更新しないのでグレー表示
+       *      （表示値は DB に登録済みの所属部門名。「DB」バッジで由来を示す）
+       *   2) 新規追加で E 列×N 列の自動照合が成功した行 → 黒字のテキスト表示
+       *   3) 上記以外（照合できなかった行）→ プルダウンで選択させる。
+       *      手動で選んでもプルダウンのまま残す（誤選択を修正できるようにする）。
        */
-      render: (department: string, row) =>
-        importDuplicatedNos.has(row.employeeNo) ? (
-          <Text type='secondary' style={{ color: '#bfbfbf' }}>
-            {department}
-          </Text>
-        ) : (
-          department
-        ),
+      render: (_: string, row) => {
+        const isUpdate = importDuplicatedNos.has(row.employeeNo);
+        if (isUpdate) {
+          const existing = importDuplicatedDepartments[row.employeeNo] ?? '';
+          return (
+            <Space size={4}>
+              <Text type='secondary' style={{ color: '#bfbfbf' }}>
+                {existing || '－'}
+              </Text>
+              <Tooltip title='DB に登録済みの所属です（ファイルの値では更新されません）'>
+                <Tag
+                  color='default'
+                  style={{ marginInlineEnd: 0, fontSize: 11, lineHeight: '16px' }}
+                >
+                  既存
+                </Tag>
+              </Tooltip>
+            </Space>
+          );
+        }
+        // 自動照合で確定した行だけテキスト表示
+        if (row.departmentAutoMatched) {
+          return row.department || '－';
+        }
+        return (
+          <Select
+            size='small'
+            showSearch
+            optionFilterProp='label'
+            placeholder='所属を選択'
+            status={row.departmentId ? undefined : 'error'}
+            style={{ width: '100%' }}
+            value={row.departmentId || undefined}
+            options={departments.map((d) => ({
+              value: d.departmentId,
+              label: d.name,
+            }))}
+            onChange={(v: string) =>
+              handleImportDepartmentChange(row.employeeNo, v)
+            }
+          />
+        );
+      },
     },
   ];
 
@@ -1009,14 +1142,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 </Text>
               )}
             </Space>
-            {unknownDepartments.length > 0 && (
+            {unresolvedRows.length > 0 && (
               <Alert
                 type='error'
                 showIcon
-                message='部門マスタに無い所属があります'
-                description={`${unknownDepartments.join(
-                  '、',
-                )}（部門管理画面で登録してから取り込み直してください。取り込みは中止されます）`}
+                message={`所属を特定できない行が ${unresolvedRows.length} 件あります`}
+                description={`E 列（所属部門）× N 列（労働関係所属地）が部門マスタ（部門別名・拠点）に一致しませんでした。プレビュー表の「所属」で選択してください。未選択のままでは取り込めません。`}
               />
             )}
             {importWarnings.length > 0 && (
