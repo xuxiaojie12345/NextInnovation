@@ -1,69 +1,21 @@
-from sqlalchemy.orm import Session
 from typing import List
-import random
+
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
 from app.models.department import Department
 from app.schemas.department import DepartmentCreate, DepartmentOut, DepartmentQueryOut
 from app.sql.Department_sql import (
-    DEPARTMENT_SELECT_BY_YEAR,
-    DEPARTMENT_INSERT,
-    DEPARTMENT_UPDATE,
     DEPARTMENT_DELETE,
+    DEPARTMENT_INSERT,
+    DEPARTMENT_SELECT_BY_YEAR,
+    DEPARTMENT_UPDATE,
 )
 
 
-def generate_department_id(db: Session, year_id: str, max_retries: int = 10) -> str:
-    """随机生成 department_id (varchar(10))，避免与已有数据冲突"""
-    for _ in range(max_retries):
-        new_id = str(random.randint(1000000000, 9999999999))  # 10位数字字符串
-        exists = (
-            db.query(Department)
-            .filter(
-                Department.department_id == new_id,
-                Department.year_id == year_id,
-            )
-            .first()
-        )
-        if not exists:
-            return new_id
-    # 重试耗尽，改用 count + 1
-    count = db.query(Department).filter(Department.year_id == year_id).count()
-    return str(count + 1).zfill(10)
-
-
-def create_department(db: Session, department: DepartmentCreate) -> DepartmentOut:
-    """创建部門"""
-    new_department_id = generate_department_id(db, department.year_id)
-
-    db.execute(
-        DEPARTMENT_INSERT,
-        {
-            "department_id": new_department_id,
-            "year_id": department.year_id,
-            "department_name": department.name,
-            "location": department.location,
-            "kind": department.kind,
-            "register_user": "SYS",
-            "update_user": "SYS",
-        },
-    )
-    db.commit()
-
-    # 插入后用 ORM 查回完整数据
-    db_department = (
-        db.query(Department)
-        .filter(Department.department_id == new_department_id)
-        .first()
-    )
-    # Pydantic v2: 显式校验 ORM 对象
-    return DepartmentOut.model_validate(db_department)
-
-
-def update_department(
-    db: Session, year: str, dept_id: str, department: DepartmentCreate
-) -> DepartmentOut:
-    """更新部門"""
-    # 先查记录是否存在
-    exists = (
+def _find_department(db: Session, year: str, dept_id: int) -> Department:
+    """主键（department_id + year_id）で 1 件取得する（存在しなければ 404）"""
+    department = (
         db.query(Department)
         .filter(
             Department.year_id == year,
@@ -71,13 +23,44 @@ def update_department(
         )
         .first()
     )
-    if not exists:
-        from fastapi import HTTPException
-
+    if not department:
         raise HTTPException(
             status_code=404,
             detail=f"部門不存在: year={year}, department_id={dept_id}",
         )
+    return department
+
+
+def create_department(db: Session, department: DepartmentCreate) -> DepartmentOut:
+    """创建部門"""
+    result = db.execute(
+        DEPARTMENT_INSERT,
+        {
+            "year_id": department.year_id,
+            "department_name": department.name,
+            "department_alisa": department.department_alisa,
+            "location": department.location,
+            "kind": department.kind,
+            "register_user": "SYS",
+            "update_user": "SYS",
+        },
+    )
+    # AUTO_INCREMENT で採番された部門ID
+    new_department_id = result.lastrowid
+    db.commit()
+
+    # 插入后用 ORM 查回完整数据（主键为 department_id + year_id 的复合主键）
+    db_department = _find_department(db, department.year_id, new_department_id)
+    # Pydantic v2: 显式校验 ORM 对象
+    return DepartmentOut.model_validate(db_department)
+
+
+def update_department(
+    db: Session, year: str, dept_id: int, department: DepartmentCreate
+) -> DepartmentOut:
+    """更新部門"""
+    # 先查记录是否存在
+    _find_department(db, year, dept_id)
 
     db.execute(
         DEPARTMENT_UPDATE,
@@ -85,6 +68,7 @@ def update_department(
             "year_id": year,
             "department_id": dept_id,
             "department_name": department.name,
+            "department_alisa": department.department_alisa,
             "location": department.location,
             "kind": department.kind,
             "update_user": "SYS",
@@ -93,35 +77,14 @@ def update_department(
     db.commit()
 
     # 查回更新后的数据
-    db_department = (
-        db.query(Department)
-        .filter(
-            Department.year_id == year,
-            Department.department_id == dept_id,
-        )
-        .first()
-    )
+    db_department = _find_department(db, year, dept_id)
     return DepartmentOut.model_validate(db_department)
 
 
-def delete_department(db: Session, year: str, dept_id: str) -> None:
+def delete_department(db: Session, year: str, dept_id: int) -> None:
     """删除部門"""
     # 先查记录是否存在
-    exists = (
-        db.query(Department)
-        .filter(
-            Department.year_id == year,
-            Department.department_id == dept_id,
-        )
-        .first()
-    )
-    if not exists:
-        from fastapi import HTTPException
-
-        raise HTTPException(
-            status_code=404,
-            detail=f"部門不存在: year={year}, department_id={dept_id}",
-        )
+    _find_department(db, year, dept_id)
 
     db.execute(
         DEPARTMENT_DELETE,

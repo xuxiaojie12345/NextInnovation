@@ -31,6 +31,8 @@ export interface DepartmentFormValues {
   kind: DepartmentKind;
   /** 名称（必須） */
   name: string;
+  /** 略称（任意） */
+  alias?: string;
   /** 拠点（必須） */
   location: DepartmentLocation;
 }
@@ -41,6 +43,8 @@ export interface DepartmentCreateRequest {
   yearid: string;
   /** 部門名 */
   department_name: string;
+  /** 部門名略称（任意） */
+  department_alisa?: string | null;
   /** 拠点 */
   location: DepartmentLocation;
   /** 種別 */
@@ -52,6 +56,8 @@ export interface DepartmentResponse {
   department_id: string;
   year_id: string;
   department_name: string;
+  /** 部門名略称 */
+  department_alisa?: string | null;
   location: DepartmentLocation;
   kind: DepartmentKind;
   register_datetime?: string | null;
@@ -81,6 +87,8 @@ export const buildCreateRequest = (
     // パスパラメータと body の yearid は一致必須のため、同じ値から生成する
     yearid: String(values.year),
     department_name: name,
+    // 略称は任意。未入力なら null を送る
+    department_alisa: values.alias?.trim() ? values.alias.trim() : null,
     location: values.location,
     kind: values.kind,
   };
@@ -89,7 +97,7 @@ export const buildCreateRequest = (
 /** API レスポンスを画面の Department 型へ変換するのに必要な項目（登録 / 一覧で共通） */
 type DepartmentFields = Pick<
   DepartmentResponse,
-  'department_id' | 'department_name' | 'location' | 'kind'
+  'department_id' | 'department_name' | 'department_alisa' | 'location' | 'kind'
 >;
 
 /** 部門一覧取得 API のレスポンス（バックエンドの DepartmentQueryOut に対応） */
@@ -99,6 +107,7 @@ export type DepartmentQueryResponse = DepartmentFields;
 export const toDepartment = (response: DepartmentFields): Department => ({
   departmentId: response.department_id,
   name: response.department_name,
+  alias: response.department_alisa ?? '',
   location: response.location,
   kind: response.kind,
 });

@@ -23,15 +23,18 @@ import {
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { Department, Project } from '../WorkStatus/types';
-import {
-  departmentLabelOf,
-  resolveDepartmentIdByName,
-} from '../data/departmentUtils';
+import { departmentLabelOf } from '../data/departmentUtils';
 import { buildProjectAbbr } from './projectAbbr';
+import {
+  createProject,
+  deleteProject,
+  fetchProjects,
+  importProjects,
+  updateProject,
+} from './projectApi';
 import {
   PROJECT_IMPORT_ACCEPT,
   PROJECT_IMPORT_FORMAT_HINT,
-  ProjectImportRow,
   parseProjectFile,
 } from './projectImport';
 import './ProjectManagementScreen.css';
@@ -84,44 +87,6 @@ const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
   ['departmentId', '所属部門'],
 ];
 
-/**
- * 内部キーの採番（既存の pj-xxxx の最大値 + 1）。
- * 項目ID は任意入力（空欄・重複可）のため、一意キーは内部で自動採番する。
- */
-const nextProjectNumber = (list: Project[]): number => {
-  const numbers = list
-    .map((p) => /^pj-(\d+)$/.exec(p.projectId))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map((m) => Number(m[1]));
-  return (numbers.length > 0 ? Math.max(...numbers) : 0) + 1;
-};
-
-/** 次の内部キー（例：pj-0008） */
-const buildNextProjectId = (list: Project[]): string =>
-  `pj-${String(nextProjectNumber(list)).padStart(4, '0')}`;
-
-/**
- * 一括読み込みの1行をプロジェクトへ変換する（略称は自動生成）。
- * 取込ファイルにフラグ列は無いため、常に既定値（有効 / 非教育）にする。
- */
-const toProject = (
-  row: ProjectImportRow,
-  projectId: string,
-  departmentId: string,
-): Project => ({
-  projectId,
-  projectCode: row.projectCode,
-  customer: row.customer,
-  caseName: row.caseName,
-  team: row.team,
-  subTeam: row.subTeam,
-  abbr: buildProjectAbbr(row.customer, row.caseName, row.team, row.subTeam),
-  departmentId,
-  name: row.name,
-  validFlg: true,
-  educationFlg: false,
-});
-
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
 const projectLabel = (p: Project): string =>
   p.name || p.abbr || '（名称未設定）';
@@ -169,6 +134,19 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const [educationFilter, setEducationFilter] = useState<string[]>([]);
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
+  // 一覧の取得中フラグ
+  const [loading, setLoading] = useState(false);
+  // 新規登録 API の送信中フラグ
+  const [submitting, setSubmitting] = useState(false);
+  // 連続実行時に古いレスポンスを無視するためのリクエスト連番
+  const requestIdRef = useRef(0);
+  // setProjects は App 側で年度や保存内容が変わるたびに作り直されるため、
+  // 取得処理の依存配列から外すために最新の関数を参照で保持する
+  const setProjectsRef = useRef(setProjects);
+
+  useEffect(() => {
+    setProjectsRef.current = setProjects;
+  });
 
   const isEditing = editingKey !== null;
 
@@ -178,6 +156,40 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     setValidFilter([]);
     setEducationFilter([]);
   }, [year]);
+
+  /**
+   * その年度のプロジェクト一覧を API から取得して一覧へ反映する。
+   * 画面初期表示・年度切替・登録/削除後の再取得で共用する。
+   */
+  const reloadProjects = useCallback(async () => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    setLoading(true);
+    try {
+      const list = await fetchProjects(year);
+      // 年度切替や連続実行で古い結果になった場合は反映しない
+      if (requestId === requestIdRef.current) {
+        setProjectsRef.current(list);
+      }
+    } catch (error) {
+      if (requestId === requestIdRef.current) {
+        message.error(
+          error instanceof Error
+            ? error.message
+            : 'プロジェクト一覧の取得に失敗しました。',
+        );
+      }
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
+    }
+  }, [year]);
+
+  /** 初期表示（および年度切替）時に一覧を取得する */
+  useEffect(() => {
+    void reloadProjects();
+  }, [reloadProjects]);
 
   /** 当週の週数（画面右上に表示） */
   const week = useMemo(() => {
@@ -228,71 +240,94 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  /** 削除 */
+  /** 削除（API で削除し、成功後に一覧を再取得する） */
   const handleDelete = useCallback(
-    (row: Project) => {
-      setProjects((prev) => prev.filter((p) => p.projectId !== row.projectId));
-      setEditingKey((prev) => (prev === row.projectId ? null : prev));
-      message.success(
-        `プロジェクト「${projectLabel(row)}」を削除しました（モック）。`,
-      );
+    async (row: Project) => {
+      try {
+        await deleteProject(year, row.projectId);
+        setEditingKey((prev) => (prev === row.projectId ? null : prev));
+        message.success(`プロジェクト「${projectLabel(row)}」を削除しました。`);
+        await reloadProjects();
+      } catch (error) {
+        message.error(
+          error instanceof Error ? error.message : '削除に失敗しました。',
+        );
+      }
     },
-    [setProjects],
+    [year, reloadProjects],
   );
 
   /** 新規登録 / 修正の実行 */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const missing = REQUIRED_FIELDS.find(([key]) => !String(form[key]).trim());
     if (missing) {
       message.warning(`${missing[1]} を入力してください。`);
       return;
     }
 
-    const values: Project = {
-      // 内部キーは一意な自動採番（修正時は元のキーを維持）
-      projectId: editingKey ?? buildNextProjectId(projects),
-      // 項目ID は任意入力（空欄可・重複可。主キーではない）
-      projectCode: form.projectCode.trim(),
-      customer: form.customer.trim(),
-      caseName: form.caseName.trim(),
-      team: form.team.trim(),
-      subTeam: form.subTeam.trim(),
-      abbr: buildProjectAbbr(form.customer, form.caseName, form.team, form.subTeam),
-      departmentId: form.departmentId,
-      name: form.name.trim(),
-      validFlg: form.validFlg,
-      educationFlg: form.educationFlg,
-    };
-
+    // 修正：API で更新し、成功後に一覧をサーバーから再取得する
     if (editingKey) {
-      setProjects((prev) =>
-        prev.map((p) => (p.projectId === editingKey ? values : p)),
-      );
-      message.success(
-        `プロジェクト「${projectLabel(values)}」を修正しました（モック）。`,
-      );
-    } else {
-      setProjects((prev) => [...prev, values]);
-      message.success(
-        `プロジェクト「${projectLabel(values)}」を登録しました（モック）。`,
-      );
+      setSubmitting(true);
+      try {
+        await updateProject(year, editingKey, {
+          projectCode: form.projectCode,
+          customer: form.customer,
+          caseName: form.caseName,
+          team: form.team,
+          subTeam: form.subTeam,
+          departmentId: form.departmentId,
+          name: form.name,
+        });
+        message.success(`プロジェクト「${abbr}」を修正しました。`);
+        handleResetForm();
+        await reloadProjects();
+      } catch (error) {
+        message.error(
+          error instanceof Error ? error.message : '更新に失敗しました。',
+        );
+      } finally {
+        setSubmitting(false);
+      }
+      return;
     }
-    handleResetForm();
+
+    // 新規登録：API で登録し、成功後に一覧をサーバーから再取得する
+    setSubmitting(true);
+    try {
+      await createProject(year, {
+        projectCode: form.projectCode,
+        customer: form.customer,
+        caseName: form.caseName,
+        team: form.team,
+        subTeam: form.subTeam,
+        departmentId: form.departmentId,
+        name: form.name,
+      });
+      message.success(`プロジェクト「${abbr}」を登録しました。`);
+      handleResetForm();
+      await reloadProjects();
+    } catch (error) {
+      message.error(
+        error instanceof Error ? error.message : '登録に失敗しました。',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   /**
    * 一括読み込み：プロジェクト情報ファイル（Excel / CSV）を解析し、
-   * そのまま一覧へ追加する（重複可・確認なし）。
+   * 解析結果を API へ送って DB に登録する。登録後は一覧を再取得する。
    */
   const handleImportFile = async (file: File) => {
     setImporting(true);
     try {
-      const result = await parseProjectFile(file);
-      if (result.rows.length === 0) {
+      const parsed = await parseProjectFile(file);
+      if (parsed.rows.length === 0) {
         const detail =
-          result.warnings.length > 0
-            ? `（${result.warnings[0]}${
-                result.warnings.length > 1 ? ' ほか' : ''
+          parsed.warnings.length > 0
+            ? `（${parsed.warnings[0]}${
+                parsed.warnings.length > 1 ? ' ほか' : ''
               }）`
             : '';
         message.error(
@@ -301,54 +336,39 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         return;
       }
 
-      // 部門名から部門IDを解決できない行（未登録・同名重複）を警告する
-      const unknownDepartments = Array.from(
-        new Set(
-          result.rows
-            .map((r) => r.department)
-            .filter(
-              (name) =>
-                name !== '' &&
-                resolveDepartmentIdByName(departments, name) === null,
-            ),
-        ),
-      );
+      // 所属部門（部門名）はバックエンドで department_id に解決される
+      const result = await importProjects(year, parsed.rows);
 
-      // 内部キーは既存の最大値 + 1 から連番で採番する
-      setProjects((prev) => {
-        const start = nextProjectNumber(prev);
-        const added = result.rows.map((row, i) =>
-          toProject(
-            row,
-            `pj-${String(start + i).padStart(4, '0')}`,
-            resolveDepartmentIdByName(departments, row.department) ?? '',
-          ),
+      if (result.imported > 0) {
+        message.success(
+          `プロジェクトを一括読み込みしました：${result.imported} 件を登録しました。`,
         );
-        return [...prev, ...added];
-      });
-
-      message.success(
-        `プロジェクトを一括読み込みしました：${result.rows.length} 件を追加しました（モック）。`,
-      );
+      } else {
+        message.error(
+          `一括読み込み：登録できたプロジェクトはありませんでした（${parsed.rows.length} 件）`,
+        );
+      }
 
       const notes: string[] = [];
-      if (unknownDepartments.length > 0) {
+      if (parsed.warnings.length > 0) {
         notes.push(
-          `部門マスタに無い、または同名で特定できない所属部門：${unknownDepartments.join(
-            '、',
-          )}（部門管理画面で登録してください）`,
+          `取り込まなかった行：${parsed.warnings.length} 件（${parsed.warnings[0]}${
+            parsed.warnings.length > 1 ? ' ほか' : ''
+          }）`,
         );
       }
       if (result.warnings.length > 0) {
         notes.push(
-          `取り込まなかった行：${result.warnings.length} 件（${result.warnings[0]}${
-            result.warnings.length > 1 ? ' ほか' : ''
-          }）`,
+          `登録できなかった行：${result.warnings
+            .map((w) => `${w.row}行目 ${w.message}`)
+            .join(' / ')}`,
         );
       }
       if (notes.length > 0) {
         message.warning(notes.join(' / '));
       }
+
+      await reloadProjects();
     } catch (e) {
       message.error(
         e instanceof Error
@@ -650,6 +670,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               <Button
                 type='primary'
                 icon={isEditing ? <CheckOutlined /> : <PlusOutlined />}
+                loading={submitting}
                 onClick={handleSubmit}
               >
                 {isEditing ? '修正する' : '登録する'}
@@ -690,6 +711,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         <Table<Project>
           rowKey='projectId'
           size='small'
+          loading={loading}
           columns={columns}
           dataSource={projects}
           rowClassName={(row) =>

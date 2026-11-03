@@ -56,6 +56,8 @@ export interface Department {
   departmentId: string;
   /** 部門名（協力会社は会社名） */
   name: string;
+  /** 部門名略称（任意。未設定は空文字） */
+  alias?: string;
   /** 拠点（必須。天津 / 済南） */
   location: DepartmentLocation;
   /**

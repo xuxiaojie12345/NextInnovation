@@ -39,14 +39,14 @@ def create_department(
 @router.put("/departments/{year}/{id}", response_model=DepartmentOut)
 def update_department(
     year: str,
-    id: str,
+    id: int,
     department: DepartmentCreate,
     db: Session = Depends(get_db),
 ):
     """更新部門。
 
     - 路径参数 year: 年度ID
-    - 路径参数 id: 部門ID（更新对象）
+    - 路径参数 id: 部門ID（int、更新对象）
     - 请求体: 更新后的部門情報（yearid 必須与路径参数 year 一致）
     - 返回: 更新后的部門对象
     """
@@ -62,13 +62,13 @@ def update_department(
 @router.delete("/departments/{year}/{id}")
 def delete_department(
     year: str,
-    id: str,
+    id: int,
     db: Session = Depends(get_db),
 ):
     """根据 year_id + department_id 删除部門。
 
     - 路径参数 year: 年度ID
-    - 路径参数 id: 部門ID（删除对象）
+    - 路径参数 id: 部門ID（int、删除对象）
     - 请求体: 无
     - 返回: 固定 {"code": 0}（成功时）
     """

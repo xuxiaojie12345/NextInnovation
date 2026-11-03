@@ -74,6 +74,8 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
+  // 略称（新規登録 / 修正で共用。任意）
+  const [alias, setAlias] = useState('');
   // 種別（新規登録 / 修正で共用）
   const [kind, setKind] = useState<DepartmentKind>('dept');
   // 拠点（新規登録 / 修正で共用。必須のため未選択を許可する）
@@ -132,6 +134,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleResetForm = useCallback(() => {
     setEditingId(null);
     setName('');
+    setAlias('');
     setKind('dept');
     setLocation(undefined);
   }, []);
@@ -140,6 +143,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleEdit = useCallback((row: Department) => {
     setEditingId(row.departmentId);
     setName(row.name);
+    setAlias(row.alias ?? '');
     setKind(row.kind ?? 'dept');
     setLocation(row.location);
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -177,6 +181,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       message.warning('拠点を選択してください。');
       return;
     }
+    const trimmedAlias = alias.trim();
 
     // 修正：フォーム値と修正対象の部門IDで更新 API を呼び出し、応答を一覧へ反映する
     if (editingId) {
@@ -187,6 +192,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           year,
           kind,
           name: trimmed,
+          alias: trimmedAlias,
           location,
         });
         setDepartments((prev) =>
@@ -209,7 +215,13 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     // 新規登録：フォーム値と画面上の年度でバックエンド API を呼び出す
     setSubmitting(true);
     try {
-      const created = await registerDepartment({ year, kind, name: trimmed, location });
+      const created = await registerDepartment({
+        year,
+        kind,
+        name: trimmed,
+        alias: trimmedAlias,
+        location,
+      });
       setDepartments((prev) => [...prev, created]);
       message.success(
         `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました。`,
@@ -232,6 +244,15 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         key: 'name',
         render: (_: string, row) =>
           departmentLabelOf(departments, row.departmentId),
+      },
+      {
+        // 部門名略称（任意）
+        title: '略称',
+        dataIndex: 'alias',
+        key: 'alias',
+        width: 140,
+        render: (v: string | undefined) =>
+          v ? v : <Text type='secondary'>-</Text>,
       },
       {
         // 拠点（天津 / 済南）
@@ -326,10 +347,21 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
               <Input
                 placeholder='例：人事部／協力会社B'
                 value={name}
-                maxLength={30}
+                maxLength={20}
                 onChange={(e) => setName(e.target.value)}
                 onPressEnter={handleSubmit}
                 style={{ width: 260 }}
+              />
+            </div>
+            <div>
+              <div className='form-label'>略称（任意）</div>
+              <Input
+                placeholder='例：人事'
+                value={alias}
+                maxLength={20}
+                onChange={(e) => setAlias(e.target.value)}
+                onPressEnter={handleSubmit}
+                style={{ width: 180 }}
               />
             </div>
             <div>
