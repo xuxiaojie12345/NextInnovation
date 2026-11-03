@@ -1,6 +1,4 @@
 """部門サービス（部門管理画面用）"""
-import re
-
 from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -16,7 +14,7 @@ def _row_to_department(r) -> dict:
     #       画面・API の契約は文字列（例："1"）なので、ここで必ず文字列に揃える。
     #       （int のまま返すとレスポンスモデル（departmentId: str）で検証エラー→500 になる）
     return {
-        "departmentId": f'{int(r["department_id"]):03d}',
+        "departmentId": str(int(r["department_id"])),
         "name": r["department_name"],
         "location": r["location"],
         "kind": r["kind"] or "dept",
@@ -35,26 +33,18 @@ def list_departments(db: Session, year_id: str) -> list[dict]:
     return [_row_to_department(r) for r in rows]
 
 
-def _next_department_id(db: Session, year_id: str) -> str:
-    """既存の department_id（3桁ゼロ埋めの数値）の最大値 + 1 で採番する（例：001, 002）。"""
-    nums = []
-    for r in list_departments(db, year_id):
-        m = re.fullmatch(r"(\d+)", str(r["departmentId"]))
-        if m:
-            nums.append(int(m.group(1)))
-    nxt = (max(nums) if nums else 0) + 1
-    return f"{nxt:03d}"
-
 def create_department(
     db: Session, year_id: str, data: dict, op_user: str = _DEFAULT_OP_USER
 ) -> dict:
-    """部門を追加し、作成した部門を返す。"""
-    department_id = _next_department_id(db, year_id)
-    db.execute(
+    """部門を追加し、作成した部門を返す。
+
+    department_id は DB の AUTO_INCREMENT で採番し、挿入後に発番された ID を
+    文字列に整形して返す（例："1"）。
+    """
+    res = db.execute(
         text(load_sql("department.sql", "insert")),
         {
             "year_id": year_id,
-            "department_id": department_id,
             "department_name": data["name"],
             "location": data["location"],
             "kind": data["kind"] or "dept",
@@ -62,6 +52,7 @@ def create_department(
         },
     )
     db.commit()
+    department_id = str(res.lastrowid)
     return {
         "departmentId": department_id,
         "name": data["name"],

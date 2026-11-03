@@ -12,12 +12,12 @@ export interface LoginResponse {
 /**
  * 役職区分（yakushokukubun）→ ロール・表示名の変換。
  * 個別のロール判定（部長／事業部長／管理者）はこのマップで行う。
- * ※マスター未整備のため、現時点は既定値フォールバック付きの暫定実装。
+ * ※jn_user_table の区分値：部長=0 / 管理者=1 / 事業部長=2 に合わせる。
  */
 const YAKUSHOKU_ROLE_MAP: Record<string, { role: AuthUser['role']; roleLabel: string }> = {
-  '01': { role: 'bucho', roleLabel: '部長' },
-  '02': { role: 'jigyo-bucho', roleLabel: '事業部長' },
-  '03': { role: 'admin', roleLabel: '管理者' },
+  '0': { role: 'bucho', roleLabel: '部長' },
+  '1': { role: 'admin', roleLabel: '管理者' },
+  '2': { role: 'jigyo-bucho', roleLabel: '事業部長' },
 };
 
 const DEFAULT_ROLE = { role: 'bucho', roleLabel: '部長' };

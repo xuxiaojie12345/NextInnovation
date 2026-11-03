@@ -8,12 +8,12 @@ WHERE year_id = :year_id
 ORDER BY department_id
 
 -- :name: insert
--- 部門追加
+-- 部門追加（department_id は AUTO_INCREMENT で自動採番）
 INSERT INTO jn_department_master
-  (year_id, department_id, department_name, location, kind,
+  (year_id, department_name, location, kind,
    register_datetime, register_user, update_datetime, update_user)
 VALUES
-  (:year_id, :department_id, :department_name, :location, :kind,
+  (:year_id, :department_name, :location, :kind,
    NOW(), :op_user, NOW(), :op_user)
 
 -- :name: update
