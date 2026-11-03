@@ -421,7 +421,7 @@ function App() {
   );
 
   /**
-   * 社員情報（Excel / CSV）の一括読み込み（モック：画面上のみ保持）
+   * 社員情報（Excel / CSV）の一括読み込み
    * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
    */
   const handleImportPersonnel = useCallback(
@@ -432,25 +432,38 @@ function App() {
       const next = [...previous];
       const importedPeople = new Map<string, Personnel>();
 
+      // 当前登录用户的ID（从localStorage获取）
+      const currentUserId = localStorage.getItem('currentUser') || 'admin';
+
       rows.forEach((row) => {
-        const resolvedDepartmentId = resolveDepartmentIdByName(
-          departments,
-          row.department,
+        // 根据 department_alias + location 查找 departmentId
+        const departmentAlias = row.department || '';
+        const location = row.location || '';
+        
+        // 查找匹配的部门（使用部门别名 + 工作地点）
+        const matchedDept = departments.find(
+          (d) => d.name === departmentAlias && d.location === location
         );
+        const departmentId = matchedDept?.departmentId || '';
+
         const index = indexByNo.get(row.employeeNo);
         const existing = index === undefined ? undefined : next[index];
         const person: Personnel = existing
           ? {
               ...existing,
-              name: row.name,
+              name: row.name,  // 只读取Excel中的姓名，不添加额外内容
               role: row.role || existing.role,
-              departmentId: resolvedDepartmentId ?? existing.departmentId,
+              departmentId: departmentId || existing.departmentId,
+              department: departmentAlias,  // 保存部门别名
+              location: location,  // 保存工作地点
             }
           : {
               employeeNo: row.employeeNo,
-              name: row.name,
+              name: row.name,  // 只读取Excel中的姓名，不添加额外内容
               role: row.role || "要員",
-              departmentId: resolvedDepartmentId ?? "",
+              departmentId: departmentId,  // 保存根据department_alias + location查询出的department_id
+              department: departmentAlias,  // 保存部门别名
+              location: location,  // 保存工作地点
             };
         if (index !== undefined) {
           next[index] = person;
@@ -461,7 +474,7 @@ function App() {
         importedPeople.set(row.employeeNo, person);
       });
 
-      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()));
+      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()), currentUserId);
       setYearPersonnel((prev) => {
         return next;
       });

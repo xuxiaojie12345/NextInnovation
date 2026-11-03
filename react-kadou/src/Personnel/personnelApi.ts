@@ -73,13 +73,16 @@ export const savePersonnel = async (
 export const importPersonnel = async (
   year: number,
   people: Personnel[],
+  userId: string = 'admin',
 ): Promise<void> => {
-  await request(`/api/personnel/import?year=${year}`, {
+  await request(`/api/personnel/import?year=${year}&userId=${encodeURIComponent(userId)}`, {
     method: 'POST',
     body: JSON.stringify(
       people.map((person) => ({
         employeeNo: person.employeeNo,
-        departmentId: person.departmentId,
+        departmentAlias: person.department ?? '',  // 传递部门别名
+        location: person.location ?? '',  // 传递工作地点
+        departmentId: person.departmentId ?? '',  // 如果有直接指定的 departmentId 也传递
         name: person.name,
         role: person.role,
         leavePlan: person.leavePlan ?? '',
@@ -98,4 +101,17 @@ export const deletePersonnel = async (
     )}`,
     { method: 'DELETE' },
   );
+};
+
+/**
+ * 获取单个社员信息（通过社员番号检索）
+ */
+export const getPersonnelInfo = async (
+  year: number,
+  employeeNo: string,
+): Promise<{ person: PersonnelRecord; department: { department_name: string } | null }> => {
+  const response = await request<ApiResponse<{ person: PersonnelRecord; department: { department_name: string } | null }>>(
+    `/api/personnel/info?year=${year}&employeeNo=${encodeURIComponent(employeeNo)}`,
+  );
+  return response.data;
 };

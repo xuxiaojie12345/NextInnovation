@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.Department import router as department_router
+from app.api.HolidaySettings import router as holiday_router
 from app.api.Login import router as user_router
 from app.api.Personnel import router as personnel_router
 from app.api.Project import router as project_router
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(user_router, prefix="/api/login")
 app.include_router(personnel_router)
 app.include_router(department_router)
+app.include_router(holiday_router)
 app.include_router(project_router)
 
 

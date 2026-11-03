@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Card,
   DatePicker,
   Input,
   message,
+  Popconfirm,
   Select,
   Space,
   Table,
@@ -27,6 +28,13 @@ import {
   HOLIDAY_IMPORT_FORMAT_HINT,
   parseHolidayFile,
 } from './holidayImport';
+import {
+  HolidayApiError,
+  addHoliday,
+  deleteHoliday,
+  loadHolidays,
+  updateHoliday,
+} from './holidayApi';
 import './HolidaySettingsScreen.css';
 
 const { Title, Text } = Typography;
@@ -86,6 +94,43 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   // 一括読み込み：ファイル解析中フラグ
   const [importing, setImporting] = useState(false);
 
+  // 一覧取得中 / 登録中フラグ
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // setHolidays は App 側で年度や保存内容が変わるたびに作り直されるため、
+  // 取得処理の依存配列から外すために最新の関数を参照で保持する
+  const setHolidaysRef = useRef(setHolidays);
+
+  useEffect(() => {
+    setHolidaysRef.current = setHolidays;
+  });
+
+  /** 初期表示（および年度切替）時に、その年度の休日一覧を API から取得する */
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    loadHolidays(year)
+      .then((list) => {
+        if (!cancelled) setHolidaysRef.current(list);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        const detail =
+          error instanceof Error ? error.message : '不明なエラー';
+        message.error(
+          `${year}年度の休日情報を取得できませんでした：${detail}`,
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [year]);
+
   const isEditing = editingId !== null;
 
   /** 選択中年度の休日のみを対象にした集計 */
@@ -116,7 +161,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   }, []);
 
   /** 追加 or 更新（日付・名称は必須 / 同一日付は登録不可） */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!newDate) {
       message.warning('日付を選択してください。');
       return;
@@ -134,18 +179,69 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     }
 
     if (editingId) {
-      setHolidays((prev) =>
-        prev.map((h) => (h.id === editingId ? { ...h, date, name, kind: newKind } : h)),
-      );
-      message.success(`${formatDate(date)}「${name}」を更新しました（モック）。`);
-    } else {
-      setHolidays((prev) => [
-        ...prev,
-        { id: `h-${Date.now()}`, date, name, kind: newKind },
-      ]);
-      message.success(`${formatDate(date)}「${name}」を追加しました（モック）。`);
+      // 一括読み込みなどフロントのみの行は従来どおりローカル更新する
+      if (!editingId.startsWith('db-')) {
+        setHolidays((prev) =>
+          prev.map((h) =>
+            h.id === editingId ? { ...h, date, name, kind: newKind } : h,
+          ),
+        );
+        message.success(
+          `${formatDate(date)}「${name}」を更新しました（モック）。`,
+        );
+        handleResetForm();
+        return;
+      }
+
+      // テーブル（JN_HOLIDAY_MASTER）のレコードを更新し、一覧を即時反映する
+      setSubmitting(true);
+      try {
+        const updated = await updateHoliday(year, editingId.slice('db-'.length), {
+          date,
+          name,
+          kind: newKind,
+        });
+        setHolidays((prev) =>
+          prev.map((h) => (h.id === editingId ? updated : h)),
+        );
+        message.success(`${formatDate(date)}「${name}」を更新しました。`);
+        handleResetForm();
+      } catch (error) {
+        if (error instanceof HolidayApiError && error.status === 409) {
+          message.warning(error.message);
+        } else {
+          const detail =
+            error instanceof Error ? error.message : '不明なエラー';
+          message.error(`休日の更新に失敗しました：${detail}`);
+        }
+      } finally {
+        setSubmitting(false);
+      }
+      return;
     }
-    handleResetForm();
+
+    // 新規追加：テーブル（JN_HOLIDAY_MASTER）に同一日付がなければ登録する。
+    // 登録後は一覧へ即時反映する（重複はバックエンドが 409 で返す）。
+    setSubmitting(true);
+    try {
+      const created = await addHoliday(year, { date, name, kind: newKind });
+      setHolidays((prev) => [
+        ...prev.filter((h) => h.date !== created.date),
+        created,
+      ]);
+      message.success(`${formatDate(date)}「${name}」を登録しました。`);
+      handleResetForm();
+    } catch (error) {
+      if (error instanceof HolidayApiError && error.status === 409) {
+        message.warning(error.message);
+      } else {
+        const detail =
+          error instanceof Error ? error.message : '不明なエラー';
+        message.error(`休日の登録に失敗しました：${detail}`);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   /** 編集（選択した休日をフォームへ読み込む） */
@@ -157,17 +253,35 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  /** 削除 */
+  /** 削除（確認ダイアログで「削除」を押した後に実行） */
   const handleDelete = useCallback(
-    (row: Holiday) => {
-      setHolidays((prev) => prev.filter((h) => h.id !== row.id));
-      // 削除した行を編集中だった場合はフォームを初期化
-      setEditingId((prev) => (prev === row.id ? null : prev));
-      message.success(
-        `${formatDate(row.date)}「${row.name}」を削除しました（モック）。`,
-      );
+    async (row: Holiday) => {
+      // 一括読み込みなどフロントのみの行はローカルから削除する
+      if (!row.id.startsWith('db-')) {
+        setHolidays((prev) => prev.filter((h) => h.id !== row.id));
+        setEditingId((prev) => (prev === row.id ? null : prev));
+        message.success(
+          `${formatDate(row.date)}「${row.name}」を削除しました。`,
+        );
+        return;
+      }
+
+      // テーブル（JN_HOLIDAY_MASTER）から削除し、一覧を即時反映する
+      try {
+        await deleteHoliday(year, row.id.slice('db-'.length));
+        setHolidays((prev) => prev.filter((h) => h.id !== row.id));
+        // 削除した行を編集中だった場合はフォームを初期化
+        setEditingId((prev) => (prev === row.id ? null : prev));
+        message.success(
+          `${formatDate(row.date)}「${row.name}」を削除しました。`,
+        );
+      } catch (error) {
+        const detail =
+          error instanceof Error ? error.message : '不明なエラー';
+        message.error(`休日の削除に失敗しました：${detail}`);
+      }
     },
-    [setHolidays],
+    [year, setHolidays],
   );
 
   /** CSV 出力（Excel で開けるよう BOM 付き UTF-8 / CRLF） */
@@ -292,15 +406,23 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             >
               編集
             </Button>
-            <Button
-              type='text'
-              danger
-              size='small'
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(row)}
+            <Popconfirm
+              title='削除の確認'
+              description={`${formatDate(row.date)}「${row.name}」を削除しますか？`}
+              okText='削除'
+              cancelText='キャンセル'
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDelete(row)}
             >
-              削除
-            </Button>
+              <Button
+                type='text'
+                danger
+                size='small'
+                icon={<DeleteOutlined />}
+              >
+                削除
+              </Button>
+            </Popconfirm>
           </Space>
         ),
       },
@@ -320,7 +442,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。休日は年度ごとのデータで、年度切替で表示が切り替わります。
           </Text>
         </div>
-        <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>
+        <Tag color='green'>バックエンド接続（一覧・追加・編集・削除）</Tag>
       </div>
 
       <div ref={formRef}>
@@ -365,6 +487,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
               type='primary'
               icon={<CheckOutlined />}
               onClick={handleSubmit}
+              loading={submitting}
             >
               {isEditing ? '更新する' : '追加する'}
             </Button>
@@ -426,6 +549,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         <Table<Holiday>
           rowKey='id'
           size='small'
+          loading={loading}
           columns={columns}
           dataSource={sortedHolidays}
           rowClassName={(row) => (row.id === editingId ? 'holiday-row-editing' : '')}

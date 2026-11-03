@@ -23,9 +23,11 @@ export interface PersonnelImportRow {
   employeeNo: string;
   /** 氏名（必須） */
   name: string;
-  /** 所属（部門マスタの部門名。空欄も許容 → 取込時に既存値を保持） */
+  /** 所属部門（部門マスタの department_alias。空欄も許容） */
   department: string;
-  /** 役割コード（空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
+  /** 労働関係所属地（部門マスタの location。空欄も許容） */
+  location: string;
+  /** 役割コード（26年ポスト。空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
   role: string;
 }
 
@@ -51,10 +53,11 @@ export const PERSONNEL_IMPORT_FORMAT_HINT =
 
 /** 見出し（列名）の候補。表記ゆれを吸収して判定する */
 const HEADER_ALIASES: Record<keyof PersonnelImportRow, string[]> = {
-  employeeNo: ['社員番号', '社員no', '社員コード', 'employeeno', 'employeenumber'],
+  employeeNo: ['社員ID', '社員番号', '社員no', '社員コード', 'employeeno', 'employeenumber'],
   name: ['名前', '氏名', 'namae', 'name'],
-  role: ['役割', 'ロール', 'role'],
-  department: ['所属', '部門', '部署', 'department', 'dept'],
+  role: ['26年ポスト', '役割', 'ロール', 'role', 'ポスト'],
+  department: ['所属部門', '所属', '部門', '部署', 'department', 'dept'],
+  location: ['労働関係所属地', '所属地', 'location', '勤務地'],
 };
 
 /** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
@@ -277,11 +280,11 @@ const parseXml = (xml: string): Document => {
 const parseSharedStrings = (xml: string | undefined): string[] => {
   if (!xml) return [];
   const doc = parseXml(xml);
-  return Array.from(doc.getElementsByTagName('si')).map((si) =>
-    Array.from(si.getElementsByTagName('t'))
-      .map((t) => t.textContent ?? '')
-      .join(''),
-  );
+  return Array.from(doc.getElementsByTagName('si')).map((si) => {
+    // 只取第一个 <t> 标签的内容，避免富文本格式导致のテキスト合并
+    const firstT = si.getElementsByTagName('t')[0];
+    return firstT?.textContent ?? '';
+  });
 };
 
 /** セル参照（例 "C12"）から 0 始まりの列番号を得る */
@@ -409,12 +412,13 @@ const detectColumns = (
   });
 
   if (Object.keys(found).length < HEADER_MATCH_MIN) return null;
-  // 見つからなかった列は「社員番号, 名前, 役割, 所属」の並びで補完する
+  // 見つからなかった列は「社員番号, 名前, 役割, 所属, 労働関係所属地」の並びで補完する
   const fallback: Array<keyof PersonnelImportRow> = [
     'employeeNo',
     'name',
     'role',
     'department',
+    'location',
   ];
   const result = {} as Record<keyof PersonnelImportRow, number>;
   fallback.forEach((field, index) => {
@@ -431,13 +435,14 @@ const buildRows = (
   const warnings: string[] = [];
   const rows: PersonnelImportRow[] = [];
 
-  // 見出し行を探す（見つからない場合は先頭から 社員番号/名前/役割/所属 の並びとみなす）
+  // 見出し行を探す（見つからない場合は先頭から 区分/社員ID/氏名/所属部門/労働関係所属地/26年ポスト の並びとみなす）
   let headerIndex = -1;
   let columns: Record<keyof PersonnelImportRow, number> = {
-    employeeNo: 0,
-    name: 1,
-    role: 2,
-    department: 3,
+    employeeNo: 1,  // 社員ID（区分の次）
+    name: 2,        // 氏名
+    department: 3,  // 所属部門
+    location: 4,    // 労働関係所属地
+    role: 5,        // 26年ポスト
   };
   for (let i = 0; i < Math.min(matrix.length, HEADER_SEARCH_ROWS); i += 1) {
     const detected = detectColumns(matrix[i]);
@@ -459,17 +464,18 @@ const buildRows = (
     const name = (row[columns.name] ?? '').trim();
     const role = (row[columns.role] ?? '').trim();
     const department = (row[columns.department] ?? '').trim();
+    const location = (row[columns.location] ?? '').trim();
 
     // 完全な空行はスキップする
-    if (!employeeNo && !name && !role && !department) return;
+    if (!employeeNo && !name && !role && !department && !location) return;
 
     if (!employeeNo) {
-      warnings.push(`${lineNo}行目：社員番号が空のため取り込みませんでした`);
+      warnings.push(`${lineNo}行目：社員IDが空のため取り込みませんでした`);
       return;
     }
     if (!name) {
       warnings.push(
-        `${lineNo}行目：名前が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
+        `${lineNo}行目：氏名が空のため取り込みませんでした（社員ID ${employeeNo}）`,
       );
       return;
     }
@@ -478,14 +484,14 @@ const buildRows = (
     const duplicate = indexByNo.get(employeeNo);
     if (duplicate !== undefined) {
       warnings.push(
-        `${lineNo}行目：社員番号 ${employeeNo} が重複しています（後ろの行を優先）`,
+        `${lineNo}行目：社員ID ${employeeNo} が重複しています（後ろの行を優先）`,
       );
-      rows[duplicate] = { employeeNo, name, department, role };
+      rows[duplicate] = { employeeNo, name, department, location, role };
       return;
     }
 
     indexByNo.set(employeeNo, rows.length);
-    rows.push({ employeeNo, name, department, role });
+    rows.push({ employeeNo, name, department, location, role });
   });
 
   return { rows, warnings, source };

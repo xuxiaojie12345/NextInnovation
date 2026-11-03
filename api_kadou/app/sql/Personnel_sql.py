@@ -1,7 +1,11 @@
 from sqlalchemy import text
 
 SQL_GET_JN_PERSONNEL_MASTER = text("""
-    SELECT employee_no AS employeeNo, department_id, person_name, `role`, leave_plan
+    SELECT employee_no AS employeeNo, 
+           department_id AS departmentId, 
+           person_name AS name, 
+           `role` AS role, 
+           leave_plan AS leavePlan
     FROM `JN_PERSONNEL_MASTER`
     WHERE year_id = :year
     AND employee_no = :employeeNo
@@ -23,6 +27,16 @@ SQL_GET_JN_DEPARTMENT_MASTER = text("""
     FROM `JN_DEPARTMENT_MASTER`
     WHERE year_id = :year
     AND department_id = :departmentId
+""")
+
+# 根据 department_alias + location 查询 department_id
+SQL_GET_DEPARTMENT_ID_BY_ALIAS_AND_LOCATION = text("""
+    SELECT department_id
+    FROM `JN_DEPARTMENT_MASTER`
+    WHERE year_id = :year
+    AND department_alias = :departmentAlias
+    AND location = :location
+    LIMIT 1
 """)
 
 SQL_INSERT_JN_PERSONNEL_MASTER = text("""
