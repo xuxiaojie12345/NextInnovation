@@ -42,6 +42,8 @@ export interface PersonnelImportApiResult {
   skipped: number;
   /** 既存データと重複した件数 */
   duplicated: number;
+  /** 既存データと重複した社員番号（画面で「追加／上書き」を判定する用） */
+  duplicatedEmployeeNos?: string[];
   /** ファイル全体を中止したか */
   aborted: boolean;
   /** ファイル全体を中止した理由 */

@@ -72,7 +72,7 @@ interface PersonnelInfoScreenProps {
   }) => void;
   /**
    * 社員情報（Excel / CSV）の一括読み込みを実行する
-   * 社員番号で突合し、既存は上書き（更新）・新規は追加する
+   * 社員番号で突合し、既存は上書き（更新。所属は変更しない）・新規は追加する
    */
   onImport: (rows: PersonnelImportRow[]) => void;
   /**
@@ -241,6 +241,17 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const masterByNo = useMemo(
     () => new Map(personnel.map((p) => [p.employeeNo, p])),
     [personnel],
+  );
+
+  /**
+   * 一括取り込みで「既存データと重複（＝上書き）」となる社員番号。
+   *
+   * NOTE: 画面の personnel（App のストア）はモックで DB と一致しないため、
+   *       判定にはバックエンドの事前検証（dryRun）の結果を使う。
+   */
+  const importDuplicatedNos = useMemo(
+    () => new Set(importCheck?.duplicatedEmployeeNos ?? []),
+    [importCheck],
   );
 
   /** 入力中の社員番号が、検索済みかつ DB に存在する要員か（更新／削除ボタンの表示に使用） */
@@ -734,7 +745,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       key: 'kind',
       width: 72,
       render: (_, row) =>
-        masterByNo.has(row.employeeNo) ? (
+        importDuplicatedNos.has(row.employeeNo) ? (
           <Tag color='gold'>上書き</Tag>
         ) : (
           <Tag color='green'>追加</Tag>
@@ -743,7 +754,24 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     { title: '社員番号', dataIndex: 'employeeNo', key: 'employeeNo', width: 110 },
     { title: '名前', dataIndex: 'name', key: 'name', width: 140 },
     { title: '役割', dataIndex: 'role', key: 'role', width: 100 },
-    { title: '所属', dataIndex: 'department', key: 'department', width: 130 },
+    {
+      title: '所属',
+      dataIndex: 'department',
+      key: 'department',
+      width: 130,
+      /**
+       * 既存データ（上書き）の行は所属が更新されないため、
+       * グレー文字で表示して「変更されない」ことを示す。
+       */
+      render: (department: string, row) =>
+        importDuplicatedNos.has(row.employeeNo) ? (
+          <Text type='secondary' style={{ color: '#bfbfbf' }}>
+            {department}
+          </Text>
+        ) : (
+          department
+        ),
+    },
   ];
 
   return (
@@ -949,7 +977,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               }
               description={
                 importCounts.duplicated > 0
-                  ? `${importFileName}（${importSource}）を読み込みました。重複した社員番号は 名前・役割・所属 を上書きし、新規の社員番号は追加します。中止した場合は 1 件も反映されません。`
+                  ? `${importFileName}（${importSource}）を読み込みました。重複した社員番号は 名前・役割 を上書きし（所属は変更できません）、新規の社員番号は所属を含めて追加します。中止した場合は 1 件も反映されません。`
                   : `${importFileName}（${importSource}）を読み込みました。新規 ${importCounts.added} 件を追加します。`
               }
             />
@@ -1015,6 +1043,11 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               dataSource={importRows}
               pagination={{ pageSize: 5, size: 'small', showSizeChanger: false }}
             />
+            {importCounts.duplicated > 0 && (
+              <Text type='secondary' style={{ fontSize: 12 }}>
+                グレー表示の所属は更新されません（上書き時は 名前・役割 のみ更新）。
+              </Text>
+            )}
           </Space>
         )}
       </Modal>

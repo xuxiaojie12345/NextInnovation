@@ -51,6 +51,8 @@ class PersonnelImportResult(BaseModel):
     skipped: int = 0
     # 既存データと重複した件数（新規追加・更新の対象外）
     duplicated: int = 0
+    # 既存データと重複した社員番号の一覧（画面で「追加／上書き」を判定する用）
+    duplicatedEmployeeNos: list[str] = []
     # ファイル全体を中止したか（重複エラーなどの致命的な問題）
     aborted: bool = False
     # ファイル全体を中止した理由（aborted=true のときのみ）

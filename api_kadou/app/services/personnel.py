@@ -78,18 +78,12 @@ def save_personnel(
 
     if current is not None:
         # 既存データ → 更新
-        # 所属が未指定なら現在の所属を維持する
-        department_id = data.departmentId or db.execute(
-            text(load_sql("personnel/personnel_select.sql")),
-            {"year_id": year_id, "employee_no": employee_no},
-        ).mappings().first()["department_id"]
-
+        # NOTE: 所属は更新時に変更できない（画面の「所属は変更不可」仕様）
         db.execute(
             text(load_sql("personnel/personnel_save_update.sql")),
             {
                 "year_id": year_id,
                 "employee_no": employee_no,
-                "department_id": department_id,
                 "person_name": data.name,
                 "role": data.role or current.get("role") or _DEFAULT_ROLE,
                 "leave_plan": (
@@ -261,6 +255,7 @@ def import_personnel(
       - ファイル内で社員番号が重複している場合はファイル全体を中止する
       - 所属が空欄、または部門マスタに存在しない場合はファイル全体を中止する
       - 既存データと重複している場合、overwrite=False ならファイル全体を中止する
+      - 既存データの更新時は所属を変更しない（新規追加時のみ所属を設定する）
       - dryRun=True のときは検証のみ行い、DB へは書き込まない
     """
     result = PersonnelImportResult()
@@ -348,6 +343,8 @@ def import_personnel(
         return result
 
     result.duplicated = len(dup_rows)
+    # 画面で「追加／上書き」を行単位で判定できるよう、重複した社員番号を返す
+    result.duplicatedEmployeeNos = [row.employeeNo for row, _ in dup_rows]
 
     # 重複があり、上書きが許可されていない → ファイル全体を中止する
     if dup_rows and not payload.overwrite:
@@ -395,6 +392,8 @@ def import_personnel(
         result.added += 1
 
     # --- 6) 既存データの更新（重複分を上書き） ---
+    # NOTE: 所属は更新時に変更できない（画面の「所属は変更不可」仕様）。
+    #       所属がファイル内容と違っても、DB の既存値を維持する。
     for row, department_id in dup_rows:
         no = row.employeeNo
         current = (
@@ -416,7 +415,6 @@ def import_personnel(
             {
                 "year_id": year_id,
                 "employee_no": no,
-                "department_id": department_id,
                 "person_name": row.name,
                 "role": role,
                 "now_dt": now_dt,
