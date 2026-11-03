@@ -118,47 +118,49 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
       </div>
 
       <Card className='screen-card' style={{ marginTop: 12 }}>
-        {loading ? (
+        {loading && summaries.length === 0 ? (
           <div className='year-loading'>
             <Spin tip='年度データを読み込み中...' />
           </div>
         ) : (
-          <div className='year-grid'>
-            {viewYears.map((s) => {
-              const selected = s.year === selectedYear;
-              return (
-                <button
-                  key={s.year}
-                  type='button'
-                  className={`year-card${selected ? ' year-card-selected' : ''}${
-                    s.hasData ? '' : ' year-card-empty'
-                  }`}
-                  onClick={() => onSelect(s.year)}
-                >
-                  <div className='year-card-head'>
-                    <CalendarOutlined />
-                    <span className='year-card-year'>{s.year}</span>
-                    {selected && <CheckCircleFilled className='year-card-check' />}
-                  </div>
-                  {s.hasData ? (
-                    <ul className='year-card-body'>
-                      <li>部門 {s.departmentCount}</li>
-                      <li>要員 {s.personnelCount}</li>
-                      <li>項目 {s.projectCount}</li>
-                      <li>休日 {s.holidayCount}</li>
-                      <li>{s.weekCount} 週</li>
-                    </ul>
-                  ) : (
-                    <Empty
-                      className='year-card-empty-body'
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      description='データ未準備'
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          <Spin spinning={loading}>
+            <div className='year-grid'>
+              {viewYears.map((s) => {
+                const selected = s.year === selectedYear;
+                return (
+                  <button
+                    key={s.year}
+                    type='button'
+                    className={`year-card${selected ? ' year-card-selected' : ''}${
+                      s.hasData ? '' : ' year-card-empty'
+                    }`}
+                    onClick={() => onSelect(s.year)}
+                  >
+                    <div className='year-card-head'>
+                      <CalendarOutlined />
+                      <span className='year-card-year'>{s.year}</span>
+                      {selected && <CheckCircleFilled className='year-card-check' />}
+                    </div>
+                    {s.hasData ? (
+                      <ul className='year-card-body'>
+                        <li>部門 {s.departmentCount}</li>
+                        <li>要員 {s.personnelCount}</li>
+                        <li>項目 {s.projectCount}</li>
+                        <li>休日 {s.holidayCount}</li>
+                        <li>{s.weekCount} 週</li>
+                      </ul>
+                    ) : (
+                      <Empty
+                        className='year-card-empty-body'
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description='データ未準備'
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </Spin>
         )}
         <Text type='secondary' className='year-note'>
           ※「データ未準備」の年度は中身が空（空白）で表示されます。

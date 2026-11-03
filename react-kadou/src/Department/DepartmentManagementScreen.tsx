@@ -90,9 +90,10 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   // 修正中の部門ID（null = 新規登録モード）
   const [editingId, setEditingId] = useState<string | null>(null);
   // 初期データのロード中フラグ。
-  // ※ストアの初期値はモックデータのため、最初の表示では実データ取得が終わるまで
-  //   待機する（true で開始し、最初のフェッチ完了までモックを表示しない）。
-  const [loading, setLoading] = useState(true);
+  // ※モックは削除済みで、リロード時は前回の実データが復元されるため、全画面を
+  //   スピナーで空にしないように false で開始する。再取得時は下の Table を覆う
+  //   Spin オーバーレイで「詳細（一覧）だけ」が静かに更新される。
+  const [loading, setLoading] = useState(false);
   // 登録 / 修正 / 削除の実行中フラグ（二重送信防止）
   const [saving, setSaving] = useState(false);
   // 修正開始時にフォームへスクロールするための参照
