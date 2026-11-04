@@ -30,11 +30,12 @@ SQL_GET_JN_DEPARTMENT_MASTER = text("""
 """)
 
 # 根据 department_alias + location 查询 department_id
+# ※ DB 上の列名は department_alisa（既存スキーマの綴り）
 SQL_GET_DEPARTMENT_ID_BY_ALIAS_AND_LOCATION = text("""
     SELECT department_id
     FROM `JN_DEPARTMENT_MASTER`
     WHERE year_id = :year
-    AND department_alias = :departmentAlias
+    AND department_alisa = :departmentAlias
     AND location = :location
     LIMIT 1
 """)

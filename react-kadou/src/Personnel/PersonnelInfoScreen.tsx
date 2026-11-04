@@ -65,6 +65,8 @@ interface PersonnelInfoScreenProps {
   onDelete: (employeeNo: string) => Promise<void>;
   /** 当年度に稼働データ（行・割当・BUFFER）があるか（削除確認の表示判定） */
   hasWorkData: (employeeNo: string) => boolean;
+  /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
+  currentUserId: string;
 }
 
 /**
@@ -81,6 +83,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   onImport,
   onDelete,
   hasWorkData,
+  currentUserId,
 }) => {
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState("");
@@ -169,7 +172,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
     try {
       // 后台 API から社員情報を取得
-      const data = await getPersonnelInfo(year, no);
+      const data = await getPersonnelInfo(year, no, currentUserId);
       const person = data.person;
 
       if (person) {

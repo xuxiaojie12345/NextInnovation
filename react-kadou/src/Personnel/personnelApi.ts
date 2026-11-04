@@ -18,13 +18,19 @@ interface PersonnelRecord {
   leavePlan: string | null;
 }
 
-const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
+/** ログインユーザーIDを X-User-Id ヘッダで送信する（register_user / update_user に保存される） */
+const request = async <T>(
+  path: string,
+  userId: string,
+  init?: RequestInit,
+): Promise<T> => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
     headers: {
       'Content-Type': 'application/json',
+      'X-User-Id': userId,
       ...init?.headers,
     },
-    ...init,
   });
 
   if (!response.ok) {
@@ -47,9 +53,17 @@ const toPersonnel = (record: PersonnelRecord): Personnel => ({
   leavePlan: record.leavePlan ?? undefined,
 });
 
-export const loadPersonnel = async (year: number): Promise<Personnel[]> => {
+/** 部門IDはDB側で int のため、数値以外（未登録・モックID）は送らない */
+const toDepartmentIdParam = (departmentId: string | undefined): string =>
+  departmentId && /^\d+$/.test(departmentId) ? departmentId : '';
+
+export const loadPersonnel = async (
+  year: number,
+  userId: string,
+): Promise<Personnel[]> => {
   const response = await request<ApiResponse<PersonnelRecord[]>>(
     `/api/personnel/list?year=${year}`,
+    userId,
   );
   return response.data.map(toPersonnel);
 };
@@ -57,14 +71,15 @@ export const loadPersonnel = async (year: number): Promise<Personnel[]> => {
 export const savePersonnel = async (
   year: number,
   person: Personnel,
+  userId: string,
 ): Promise<void> => {
-  await request(`/api/personnel/save?year=${year}`, {
+  await request(`/api/personnel/save?year=${year}`, userId, {
     method: 'POST',
     body: JSON.stringify({
       employeeNo: person.employeeNo,
-      departmentId: person.departmentId,
-      name: person.name,
-      role: person.role,
+      departmentId: toDepartmentIdParam(person.departmentId),
+      name: person.name ?? '',
+      role: person.role || '要員',
       leavePlan: person.leavePlan ?? '',
     }),
   });
@@ -73,18 +88,18 @@ export const savePersonnel = async (
 export const importPersonnel = async (
   year: number,
   people: Personnel[],
-  userId: string = 'admin',
+  userId: string,
 ): Promise<void> => {
-  await request(`/api/personnel/import?year=${year}&userId=${encodeURIComponent(userId)}`, {
+  await request(`/api/personnel/import?year=${year}`, userId, {
     method: 'POST',
     body: JSON.stringify(
       people.map((person) => ({
         employeeNo: person.employeeNo,
-        departmentAlias: person.department ?? '',  // 传递部门别名
-        location: person.location ?? '',  // 传递工作地点
-        departmentId: person.departmentId ?? '',  // 如果有直接指定的 departmentId 也传递
-        name: person.name,
-        role: person.role,
+        departmentAlias: person.department ?? '',  // 部门别名
+        location: person.location ?? '',  // 工作地点
+        departmentId: toDepartmentIdParam(person.departmentId),
+        name: person.name ?? '',
+        role: person.role || '要員',
         leavePlan: person.leavePlan ?? '',
       })),
     ),
@@ -94,11 +109,13 @@ export const importPersonnel = async (
 export const deletePersonnel = async (
   year: number,
   employeeNo: string,
+  userId: string,
 ): Promise<void> => {
   await request(
     `/api/personnel/delete?year=${year}&employeeNo=${encodeURIComponent(
       employeeNo,
     )}`,
+    userId,
     { method: 'DELETE' },
   );
 };
@@ -109,9 +126,11 @@ export const deletePersonnel = async (
 export const getPersonnelInfo = async (
   year: number,
   employeeNo: string,
+  userId: string,
 ): Promise<{ person: PersonnelRecord; department: { department_name: string } | null }> => {
   const response = await request<ApiResponse<{ person: PersonnelRecord; department: { department_name: string } | null }>>(
     `/api/personnel/info?year=${year}&employeeNo=${encodeURIComponent(employeeNo)}`,
+    userId,
   );
   return response.data;
 };

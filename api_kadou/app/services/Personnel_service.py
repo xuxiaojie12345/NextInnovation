@@ -1,5 +1,8 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
+from app.core.user import normalize_user_id
 from app.sql.Personnel_sql import (
     SQL_DELETE_JN_PERSONNEL_MASTER,
     SQL_GET_DEPARTMENT_ID_BY_ALIAS_AND_LOCATION,
@@ -10,6 +13,29 @@ from app.sql.Personnel_sql import (
     SQL_UPDATE_JN_PERSONNEL_MASTER,
 )
 
+# 未登録の所属（部門マスタに無い）を表す department_id
+UNREGISTERED_DEPARTMENT_ID = 0
+
+
+def to_database_department_id(value: Optional[str]) -> int:
+    """画面の departmentId を DB の int 列へ変換する。
+
+    空文字・数値でない値（マスタ未登録やモック ID）は 0（未登録）として扱う。
+    """
+    if value is None:
+        return UNREGISTERED_DEPARTMENT_ID
+    text = str(value).strip()
+    if not text.isdigit():
+        return UNREGISTERED_DEPARTMENT_ID
+    return int(text)
+
+
+def _to_screen_department_id(value) -> str:
+    """DB の department_id（int）を画面用の文字列へ変換する（0 = 未登録は空文字）"""
+    if value in (None, 0, "0", ""):
+        return ""
+    return str(value)
+
 
 def get_personnel_by_emp_no(db: Session, year: int, employeeNo: str):
     result = db.execute(
@@ -19,7 +45,9 @@ def get_personnel_by_emp_no(db: Session, year: int, employeeNo: str):
     row = result.fetchone()
     if not row:
         return None
-    return row._asdict()
+    person = row._asdict()
+    person["departmentId"] = _to_screen_department_id(person["departmentId"])
+    return person
 
 
 def get_personnel_list(db: Session, year: int):
@@ -31,7 +59,7 @@ def get_personnel_list(db: Session, year: int):
             person["employeeNo"],
             {
                 "employeeNo": person["employeeNo"],
-                "departmentId": person["departmentId"],
+                "departmentId": _to_screen_department_id(person["departmentId"]),
                 "name": person["name"],
                 "role": person["role"],
                 "leavePlan": person["leavePlan"],
@@ -99,12 +127,13 @@ def update_personnel(db: Session, data: dict):
             {
                 "year": data["year"],
                 "employeeNo": data["employeeNo"],
-                "departmentId": data["departmentId"],
+                "departmentId": to_database_department_id(data["departmentId"]),
                 "personName": data["personName"],
                 "role": data["role"],
                 "leavePlan": data.get("leavePlan", ""),
                 "updateDatetime": data["updateDatetime"],
-                "updateUser": data.get("updateUser", "admin"),
+                # ログインユーザーID（未指定時は SYS）
+                "updateUser": normalize_user_id(data.get("updateUser")),
             },
         )
         db.commit()

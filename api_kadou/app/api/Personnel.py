@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
+from app.core.user import current_user_id
 from app.db.session import get_db
 from app.services.Personnel_service import (
     delete_personnel,
@@ -14,6 +15,7 @@ from app.services.Personnel_service import (
     get_personnel_list,
     insert_personnel,
     save_personnel_records,
+    to_database_department_id,
     update_personnel,
 )
 
@@ -22,28 +24,41 @@ router = APIRouter(prefix="/api/personnel", tags=["人员主表"])
 
 class PersonnelInput(BaseModel):
     employeeNo: str
-    departmentAlias: str = ""  # 所属部門（department_alias）
-    location: str = ""  # 労働関係所属地（location）
-    departmentId: str = ""  # 部門ID（直接指定，優先級高于 alias+location）
-    name: str
-    role: str = "要員"
-    leavePlan: str = ""
+    departmentAlias: Optional[str] = ""  # 所属部門（department_alias）
+    location: Optional[str] = ""  # 労働関係所属地（location）
+    departmentId: Optional[str] = ""  # 部門ID（直接指定，優先級高于 alias+location）
+    name: Optional[str] = ""
+    role: Optional[str] = "要員"
+    leavePlan: Optional[str] = ""
+
+    @field_validator(
+        "departmentAlias", "location", "departmentId", "name", "role", "leavePlan",
+        mode="before",
+    )
+    @classmethod
+    def _none_to_empty(cls, value):
+        """null は空文字として扱う（不要な 422 を避ける）"""
+        if value is None:
+            return ""
+        return value
 
 
-def _record(year: int, person: PersonnelInput, now: datetime) -> dict:
+def _record(
+    year: int, person: PersonnelInput, now: datetime, user_id: str
+) -> dict:
     return {
         "year": year,
         "employeeNo": person.employeeNo,
-        "departmentId": person.departmentId,
+        "departmentId": to_database_department_id(person.departmentId),
         "idouFlag": "0",
         "idoubi": "",
         "personName": person.name,
         "role": person.role,
         "leavePlan": person.leavePlan,
         "registerDatetime": now,
-        "registerUser": "admin",
+        "registerUser": user_id,
         "updateDatetime": now,
-        "updateUser": "admin",
+        "updateUser": user_id,
     }
 
 
@@ -82,22 +97,23 @@ def add_person(
     personName: str,
     role: str,
     leavePlan: str,
+    user_id: str = Depends(current_user_id),
     db: Session = Depends(get_db),
 ):
     now = datetime.now()
     record = {
         "year": year,
         "employeeNo": employeeNo,
-        "departmentId": departmentId,
+        "departmentId": to_database_department_id(departmentId),
         "idouFlag": idouFlag,
         "idoubi": idoubi,
         "personName": personName,
         "role": role,
         "leavePlan": leavePlan,
         "registerDatetime": now,
-        "registerUser": "admin",
+        "registerUser": user_id,
         "updateDatetime": now,
-        "updateUser": "admin",
+        "updateUser": user_id,
     }
     try:
         insert_personnel(db, record)
@@ -110,12 +126,13 @@ def add_person(
 def save_person(
     year: int,
     person: PersonnelInput,
+    user_id: str = Depends(current_user_id),
     db: Session = Depends(get_db),
 ):
     # 检查记录是否已存在
     existing = get_personnel_by_emp_no(db, year, person.employeeNo)
     now = datetime.now()
-    
+
     if existing:
         # 记录已存在，执行更新（角色、名前、所属等）
         update_data = {
@@ -126,13 +143,13 @@ def save_person(
             "role": person.role,
             "leavePlan": person.leavePlan,
             "updateDatetime": now,
-            "updateUser": "admin",
+            "updateUser": user_id,
         }
         update_personnel(db, update_data)
         return {"code": 200, "msg": "更新完了"}
     else:
         # 记录不存在，执行插入
-        record = _record(year, person, now)
+        record = _record(year, person, now, user_id)
         save_personnel_records(db, [record])
         return {"code": 200, "msg": "登録完了"}
 
@@ -141,7 +158,7 @@ def save_person(
 def import_personnel(
     year: int,
     people: List[PersonnelInput],
-    userId: str = "admin",  # 默认值为 "admin"
+    user_id: str = Depends(current_user_id),
     db: Session = Depends(get_db),
 ):
     now = datetime.now()
@@ -149,7 +166,7 @@ def import_personnel(
     for person in people:
         # 确定 departmentId 的值
         department_id = person.departmentId  # 直接指定の优先级最高
-        
+
         # 如果没有直接指定 departmentId，则根据 departmentAlias + location 查询
         if not department_id and person.departmentAlias and person.location:
             dept_info = get_department_id_by_alias_and_location(
@@ -157,27 +174,27 @@ def import_personnel(
             )
             if dept_info:
                 department_id = dept_info["department_id"]
-        
-        # 如果仍然没有 departmentId，设为空字符串
-        if not department_id:
-            department_id = ""
-        
+
         record = {
             "year": year,
             "employeeNo": person.employeeNo,
-            "departmentId": department_id,
+            "departmentId": to_database_department_id(department_id),
             "idouFlag": "0",
             "idoubi": "",
             "personName": person.name,
             "role": person.role,
             "leavePlan": person.leavePlan,
             "registerDatetime": now,
-            "registerUser": userId,
+            "registerUser": user_id,
             "updateDatetime": now,
-            "updateUser": userId,
+            "updateUser": user_id,
         }
         records.append(record)
-    
+
+    # 同一社員番号の既存レコードは上書きする（主キー重複を避けるため先に削除する）
+    for employee_no in {person.employeeNo for person in people}:
+        delete_personnel(db, year, employee_no)
+
     save_personnel_records(db, records)
     return {"code": 200, "msg": "导入完成", "count": len(people)}
 

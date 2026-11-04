@@ -80,6 +80,9 @@ function App() {
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
 
+  /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
+  const loginUserId = currentUser?.userId ?? '';
+
   /**
    * 年度選択画面に表示する年度ごとの概要。
    * 保存済みストア（＝編集中の内容）から作るため、マスタを編集すると件数も追随する。
@@ -91,7 +94,7 @@ function App() {
 
   useEffect(() => {
     let active = true;
-    loadPersonnel(selectedYear)
+    loadPersonnel(selectedYear, loginUserId)
       .then((personnel) => {
         if (!active) return;
         setStores((previous) => ({
@@ -293,7 +296,7 @@ function App() {
         ...existing,
         ...values,
       };
-      await savePersonnelApi(selectedYear, savedPerson);
+      await savePersonnelApi(selectedYear, savedPerson, loginUserId);
       setYearPersonnel((prev) => {
         const index = prev.findIndex((p) => p.employeeNo === values.employeeNo);
         // 既存の社員番号 → 役割・名前・所属 を更新する
@@ -306,7 +309,7 @@ function App() {
         return [...prev, { ...values }];
       });
     },
-    [selectedYear, setYearPersonnel, stores],
+    [selectedYear, setYearPersonnel, stores, loginUserId],
   );
 
   /**
@@ -315,7 +318,7 @@ function App() {
    */
   const handleDeletePersonnel = useCallback(
     async (employeeNo: string) => {
-      await deletePersonnelApi(selectedYear, employeeNo);
+      await deletePersonnelApi(selectedYear, employeeNo, loginUserId);
       setStores((prev) => {
         const current = prev[selectedYear];
         if (!current) return prev;
@@ -377,7 +380,7 @@ function App() {
       );
       if (!person) return;
       try {
-        await savePersonnelApi(selectedYear, { ...person, leavePlan });
+        await savePersonnelApi(selectedYear, { ...person, leavePlan }, loginUserId);
       } catch (error) {
         const detail =
           error instanceof Error ? error.message : "不明なエラー";
@@ -390,7 +393,7 @@ function App() {
         ),
       );
     },
-    [selectedYear, setYearPersonnel, stores],
+    [selectedYear, setYearPersonnel, stores, loginUserId],
   );
 
   /**
@@ -404,7 +407,7 @@ function App() {
       );
       if (!person) return;
       try {
-        await savePersonnelApi(selectedYear, { ...person, departmentId });
+        await savePersonnelApi(selectedYear, { ...person, departmentId }, loginUserId);
       } catch (error) {
         const detail =
           error instanceof Error ? error.message : "不明なエラー";
@@ -417,7 +420,7 @@ function App() {
         ),
       );
     },
-    [selectedYear, setYearPersonnel, stores],
+    [selectedYear, setYearPersonnel, stores, loginUserId],
   );
 
   /**
@@ -432,17 +435,15 @@ function App() {
       const next = [...previous];
       const importedPeople = new Map<string, Personnel>();
 
-      // 当前登录用户的ID（从localStorage获取）
-      const currentUserId = localStorage.getItem('currentUser') || 'admin';
-
       rows.forEach((row) => {
-        // 根据 department_alias + location 查找 departmentId
+        // 部門マスタの別名（department_alias）+ 拠点（location）で department_id を解決する
         const departmentAlias = row.department || '';
         const location = row.location || '';
-        
-        // 查找匹配的部门（使用部门别名 + 工作地点）
+
         const matchedDept = departments.find(
-          (d) => d.name === departmentAlias && d.location === location
+          (d) =>
+            (d.alias ?? '').trim() === departmentAlias.trim() &&
+            d.location === location,
         );
         const departmentId = matchedDept?.departmentId || '';
 
@@ -474,12 +475,12 @@ function App() {
         importedPeople.set(row.employeeNo, person);
       });
 
-      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()), currentUserId);
+      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()), loginUserId);
       setYearPersonnel((prev) => {
         return next;
       });
     },
-    [selectedYear, setYearPersonnel, stores],
+    [selectedYear, setYearPersonnel, stores, loginUserId],
   );
 
   // ---- 要員稼動管理の保存 -------------------------------------------
@@ -580,6 +581,7 @@ function App() {
         onImport={handleImportPersonnel}
         onDelete={handleDeletePersonnel}
         hasWorkData={hasWorkDataForPersonnel}
+        currentUserId={loginUserId}
       />
     ),
     "department-manage": (
