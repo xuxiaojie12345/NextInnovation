@@ -20,21 +20,11 @@ import {
 } from '@ant-design/icons';
 import type { AuthUser, UserRole } from '../types/user';
 import type { Department } from '../WorkStatus/types';
+import { ROLE_OPTIONS, roleLabelOf } from '../constants/options';
 import { departmentLabelOf, findDepartment } from '../data/departmentUtils';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
-
-/** 職級（ロール）の選択肢 */
-const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
-  { value: 'bucho', label: '部長' },
-  { value: 'jigyo-bucho', label: '事業部長' },
-  { value: 'admin', label: '管理者' },
-];
-
-/** 職級（ロール）→ 表示名 */
-const roleLabelOf = (role: UserRole): string =>
-  ROLE_OPTIONS.find((r) => r.value === role)?.label ?? role;
 
 /** 職級（ロール）→ Tag 色 */
 const ROLE_COLOR: Record<UserRole, string> = {

@@ -28,13 +28,14 @@ import {
   HOLIDAY_IMPORT_FORMAT_HINT,
   parseHolidayFile,
 } from './holidayImport';
+import {
+  HOLIDAY_KINDS as KINDS,
+  HOLIDAY_KIND_OPTIONS as KIND_OPTIONS,
+} from '../constants/options';
 import './HolidaySettingsScreen.css';
 import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
 
 const { Title, Text } = Typography;
-
-/** 区分一覧 */
-const KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
 
 /** 区分ごとの表示色 */
 const KIND_COLOR: Record<HolidayKind, string> = {
@@ -42,9 +43,6 @@ const KIND_COLOR: Record<HolidayKind, string> = {
   会社休日: 'blue',
   振替休日: 'orange',
 };
-
-/** 区分の選択肢 */
-const KIND_OPTIONS = KINDS.map((k) => ({ value: k, label: k }));
 
 /** CSV 出力の見出し */
 const CSV_HEADER = '日付,名称,区分';

@@ -24,6 +24,11 @@ import {
   DepartmentKind,
   DepartmentLocation,
 } from '../WorkStatus/types';
+import {
+  DEPT_KIND_OPTIONS as KIND_OPTIONS,
+  LOCATION_OPTIONS,
+  kindLabelOf,
+} from '../constants/options';
 import { departmentLabelOf } from '../data/departmentUtils';
 import {
   addDepartment,
@@ -33,22 +38,6 @@ import {
 } from '../api/departmentManagement';
 
 const { Title, Text } = Typography;
-
-/** 種別の選択肢 */
-const KIND_OPTIONS: { value: DepartmentKind; label: string }[] = [
-  { value: 'dept', label: '部門' },
-  { value: 'partner', label: '協力会社' },
-];
-
-/** 拠点の選択肢（固定 2 択） */
-const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
-  { value: 'TJ', label: '天津' },
-  { value: 'JN', label: '済南' },
-];
-
-/** 種別の表示名（未設定は部門扱い） */
-const kindLabelOf = (kind?: DepartmentKind): string =>
-  kind === 'partner' ? '協力会社' : '部門';
 
 interface DepartmentManagementScreenProps {
   /** 表示する年度 */
