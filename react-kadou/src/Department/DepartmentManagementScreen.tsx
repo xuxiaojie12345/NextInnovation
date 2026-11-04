@@ -81,6 +81,8 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
+  // 部門別名（新規登録 / 修正で共用。任意入力）
+  const [alisa, setAlisa] = useState('');
   // 種別（新規登録 / 修正で共用）
   const [kind, setKind] = useState<DepartmentKind>('dept');
   // 拠点（新規登録 / 修正で共用。必須のため未選択を許可する）
@@ -134,6 +136,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleResetForm = useCallback(() => {
     setEditingId(null);
     setName('');
+    setAlisa('');
     setKind('dept');
     setLocation(undefined);
   }, []);
@@ -142,6 +145,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleEdit = useCallback((row: Department) => {
     setEditingId(row.departmentId);
     setName(row.name);
+    setAlisa(row.alisa ?? '');
     setKind(row.kind ?? 'dept');
     setLocation(row.location);
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -184,7 +188,12 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
     }
     if (saving) return;
 
-    const payload = { name: trimmed, location, kind };
+    const payload = {
+      name: trimmed,
+      alisa: alisa.trim(),
+      location,
+      kind,
+    };
     setSaving(true);
     try {
       if (editingId) {
@@ -223,8 +232,17 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+        width: 300,
         render: (_: string, row) =>
           departmentLabelOf(departments, row.departmentId),
+      },
+      {
+        // 部門別名（任意。一括取入の「所属部門」列との照合に使う）
+        title: '部門別名',
+        dataIndex: 'alisa',
+        key: 'alisa',
+        width: 320,
+        render: (v: string | undefined) => v && v.trim() ? v : <Text type='secondary'>—</Text>,
       },
       {
         // 拠点（天津 / 済南）
@@ -300,7 +318,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         {/* 新規登録 / 修正フォーム */}
         <Card
           title={isEditing ? '部門／協力会社の修正' : '部門／協力会社の新規登録'}
-          className='screen-card'
+          className='screen-card dept-wide-card'
           extra={isEditing ? <Tag color='blue'>修正中</Tag> : undefined}
         >
           <Space wrap align='end' size='middle'>
@@ -322,7 +340,19 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
                 maxLength={30}
                 onChange={(e) => setName(e.target.value)}
                 onPressEnter={handleSubmit}
-                style={{ width: 260 }}
+                style={{ width: 220 }}
+                disabled={saving}
+              />
+            </div>
+            <div>
+              <div className='form-label'>部門別名</div>
+              <Input
+                placeholder='例：人事部（一括取入用）'
+                value={alisa}
+                maxLength={50}
+                onChange={(e) => setAlisa(e.target.value)}
+                onPressEnter={handleSubmit}
+                style={{ width: 200 }}
                 disabled={saving}
               />
             </div>
@@ -360,7 +390,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       {/* 一覧（名称と種別のみ表示。協力会社も同じ一覧） */}
       <Card
         title='部門一覧（協力会社を含む）'
-        className='screen-card'
+        className='screen-card dept-wide-card'
         style={{ marginTop: 12 }}
         extra={<Text type='secondary'>全 {departments.length} 件</Text>}
       >

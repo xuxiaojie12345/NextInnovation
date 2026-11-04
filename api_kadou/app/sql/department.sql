@@ -10,16 +10,17 @@ ORDER BY department_id
 -- :name: insert
 -- 部門追加（department_id は AUTO_INCREMENT で自動採番）
 INSERT INTO jn_department_master
-  (year_id, department_name, location, kind,
+  (year_id, department_name, department_alisa, location, kind,
    register_datetime, register_user, update_datetime, update_user)
 VALUES
-  (:year_id, :department_name, :location, :kind,
+  (:year_id, :department_name, :department_alisa, :location, :kind,
    NOW(), :op_user, NOW(), :op_user)
 
 -- :name: update
 -- 部門更新
 UPDATE jn_department_master
 SET department_name = :department_name,
+    department_alisa = :department_alisa,
     location = :location,
     kind = :kind,
     update_datetime = NOW(),

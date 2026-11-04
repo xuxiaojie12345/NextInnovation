@@ -18,6 +18,8 @@ class DepartmentCreate(BaseModel):
     """部門追加リクエスト（POST /api/kadou/departments/{year}）"""
 
     name: str
+    # 部門別名（任意入力。一括取入の「所属部門」列との照合に使う）
+    alisa: Optional[str] = ""
     location: str
     kind: Optional[str] = "dept"
 
@@ -26,6 +28,8 @@ class DepartmentUpdate(BaseModel):
     """部門更新リクエスト（PUT /api/kadou/departments/{year}/{id}）"""
 
     name: str
+    # 部門別名（任意入力。一括取入の「所属部門」列との照合に使う）
+    alisa: Optional[str] = ""
     location: str
     kind: Optional[str] = "dept"
 

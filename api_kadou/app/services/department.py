@@ -47,6 +47,7 @@ def create_department(
         {
             "year_id": year_id,
             "department_name": data["name"],
+            "department_alisa": data.get("alisa") or "",
             "location": data["location"],
             "kind": data["kind"] or "dept",
             "op_user": op_user,
@@ -57,6 +58,7 @@ def create_department(
     return {
         "departmentId": department_id,
         "name": data["name"],
+        "alisa": data.get("alisa") or "",
         "location": data["location"],
         "kind": data["kind"] or "dept",
     }
@@ -76,6 +78,7 @@ def update_department(
             "year_id": year_id,
             "department_id": department_id,
             "department_name": data["name"],
+            "department_alisa": data.get("alisa") or "",
             "location": data["location"],
             "kind": data["kind"] or "dept",
             "op_user": op_user,
@@ -87,6 +90,7 @@ def update_department(
     return {
         "departmentId": department_id,
         "name": data["name"],
+        "alisa": data.get("alisa") or "",
         "location": data["location"],
         "kind": data["kind"] or "dept",
     }
