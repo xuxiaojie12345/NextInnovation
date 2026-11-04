@@ -30,7 +30,7 @@ export type HolidayKind = '祝日' | '会社休日' | '振替休日';
 
 /** 休日設定の1件 */
 export interface Holiday {
-  id: string;
+  id: string | null;
   /** 'YYYY-MM-DD' */
   date: string;
   name: string;

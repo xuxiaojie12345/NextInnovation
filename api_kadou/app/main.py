@@ -8,6 +8,7 @@ from app.api.yearSelect import router as year_router
 from app.api.department import router as kadou_router
 from app.api.personnel import router as personnel_router
 from app.api.project import router as project_router
+from app.api.holiday import router as holiday_router
 from app.core.settings import settings
 # from app.db.init_db import init_db
 
@@ -36,6 +37,7 @@ app.include_router(year_router)
 app.include_router(kadou_router)
 app.include_router(personnel_router)
 app.include_router(project_router)
+app.include_router(holiday_router)
 
 
 @app.get("/api/health")
