@@ -7,6 +7,9 @@
   align-items: flex-end;
   gap: 4px;
   text-align: right;
+  /* 要員情報画面と同じく、ヘッダー右端に固定する */
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .project-import-hint {

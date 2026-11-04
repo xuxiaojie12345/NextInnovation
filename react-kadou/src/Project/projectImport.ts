@@ -14,7 +14,9 @@
  * ■ 取込ルール
  *   - 取り込んだ行はすべて「新しいプロジェクト」として追加する（重複可）
  *   - 顧客・案件・所属部門が空の行は取り込まない（警告を表示）
- *   - 所属部門が部門マスタに無くても取り込む（画面側で警告を表示）
+ *   - 所属部門（「所属部門」列）は、部門マスタの「部門別名（department_alisa）」と
+ *     照合して部門IDへ解決する（要員情報の一括取り込みと同じルール）
+ *   - 部門別名に一致しない行は登録せず、警告を表示する
  */
 import {
   normalizeKey,
@@ -31,7 +33,7 @@ export interface ProjectImportRow {
   team: string;
   /** Subチーム（任意） */
   subTeam: string;
-  /** 所属部門（必須） */
+  /** 所属部門（必須。部門マスタの部門別名と照合する） */
   department: string;
   /** 項目ID（任意） */
   projectCode: string;
@@ -57,7 +59,7 @@ export const PROJECT_IMPORT_ACCEPT =
 
 /** 画面に表示する形式の説明 */
 export const PROJECT_IMPORT_FORMAT_HINT =
-  '形式：顧客／案件／チーム／Subチーム／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。取り込むと新しいプロジェクトとして追加されます。';
+  '形式：顧客／案件／チーム／Subチーム／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。「所属部門」は部門マスタの部門別名と照合します。取り込むと新しいプロジェクトとして追加されます。';
 
 /** 見出し（列名）の候補。表記ゆれを吸収して判定する */
 const HEADER_ALIASES: Record<keyof ProjectImportRow, string[]> = {

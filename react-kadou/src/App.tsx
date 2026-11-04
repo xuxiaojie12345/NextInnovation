@@ -580,6 +580,7 @@ function App() {
         projects={store.projects}
         setProjects={setYearProjects}
         departments={store.departments}
+        operatorId={currentUserId}
       />
     ),
     'jinan-work-rate': (

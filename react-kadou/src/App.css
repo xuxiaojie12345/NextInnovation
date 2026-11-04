@@ -33,6 +33,18 @@
   margin-bottom: 12px;
 }
 
+/* ヘッダーの左（タイトル・説明）は残り幅いっぱい、右（一括読み込み）は右端に寄せる */
+.screen-header > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 右上の「一括読み込む」ブロックは常に右端に固定する */
+.screen-header > div[class$='header-side'] {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
 .screen-card {
   max-width: 960px;
 }
