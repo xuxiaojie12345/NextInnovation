@@ -215,26 +215,6 @@ def delete_project(db: Session, year_id: str, sys_project_id: str) -> bool:
     return res.rowcount > 0
 
 
-def _resolve_department_id(
-    db: Session, year_id: str, department_alias: str
-) -> str | None:
-    """所属部門（部門別名）から部門IDを引く。特定できない場合は None を返す。
-
-    取込ファイルの「所属部門」列は、要員情報の一括取り込みと同じく
-    部門マスタの「部門別名（department_alisa）」と照合する
-    （部門名 department_name ではない）。
-
-    別名は重複し得るため、一致が 1 件に絞れたときだけ部門IDを返す。
-    """
-    if not department_alias:
-        return None
-    rows = db.execute(
-        text(load_sql("project/department_by_alias.sql")),
-        {"year_id": year_id, "department_alias": department_alias},
-    ).scalars().all()
-    return rows[0] if len(rows) == 1 else None
-
-
 def _label(line: int | None) -> str:
     """警告メッセージ用の行ラベル（「3行目：」形式）。"""
     return f"{line}行目：" if line else ""
@@ -264,19 +244,149 @@ def _validate(row) -> str | None:
     return None
 
 
+def _abbr_key(customer, case_name, team, sub_team) -> str:
+    """重複判定用の「略称」キー（全角スペース除去・トリム・小文字化）。"""
+    return _norm(
+        build_project_abbr(
+            _norm(customer), _norm(case_name), _norm(team), _norm(sub_team)
+        )
+    ).lower()
+
+
+def _text_key(value) -> str:
+    """重複判定用の文字列キー（全角スペース除去・トリム・小文字化）。"""
+    return _norm(value).lower()
+
+
+def _existing_keys(db: Session, year_id: str) -> tuple[set, set, set, set]:
+    """指定年度の既存プロジェクトから重複判定用のキー集合を作る。
+
+    判定条件（いずれか一致で重複）：
+      1) 略称（顧客の1文字目・案件・チーム・Subチーム）
+      2) 項目ID（project_id）
+      3) Project名称（project_name）
+    空文字のキーは集合に含めない（未入力同士を重複扱いしないため）。
+
+    4つ目は「全項目完全一致」判定用のキー集合
+    （顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称 を連結したもの）。
+    """
+    rows = (
+        db.execute(
+            text(load_sql("project/project_duplicate_select.sql")),
+            {"year_id": year_id},
+        )
+        .mappings()
+        .all()
+    )
+    abbrs: set[str] = set()
+    codes: set[str] = set()
+    names: set[str] = set()
+    fulls: set[str] = set()
+    for r in rows:
+        abbr = _text_key(r["abbr"])
+        if abbr:
+            abbrs.add(abbr)
+        code = _text_key(r["project_id"])
+        if code:
+            codes.add(code)
+        name = _text_key(r["project_name"])
+        if name:
+            names.add(name)
+        fulls.add(
+            _full_key(
+                r["customer"],
+                r["case_name"],
+                r["team"],
+                r["sub_team"],
+                r["department_id"],
+                r["project_id"],
+                r["project_name"],
+            )
+        )
+    return abbrs, codes, names, fulls
+
+
+def _full_key(
+    customer, case_name, team, sub_team, department, project_code, project_name
+) -> str:
+    """全項目完全一致の判定用キー（1行分の全フィールドを連結）。
+
+    対象: 顧客 / 案件 / チーム / Subチーム / 所属部門 / 項目ID / Project名称
+    正規化（全角スペース→半角、前後トリム、小文字化）したうえで連結する。
+    """
+    return "\x1f".join(
+        [
+            _text_key(customer),
+            _text_key(case_name),
+            _text_key(team),
+            _text_key(sub_team),
+            _text_key(department),
+            _text_key(project_code),
+            _text_key(project_name),
+        ]
+    )
+
+
 def import_projects(
     db: Session,
     year_id: str,
     payload: ProjectImportRequest,
     op_user: str = _DEFAULT_OP_USER,
 ) -> ProjectImportResult:
-    """プロジェクト情報を一括取り込みする（すべて新規追加）。
+    """プロジェクト情報を一括取り込みする。
 
-    仕様（要員情報の一括取り込みと同じ流れ）:
-      - 行単位で検証し、問題のある行はスキップして警告を返す
-      - dryRun=True のときは検証のみ行い、DB へは書き込まない
+    取り込みルール（画面の仕様と 1 対 1 で対応）:
+      1) 既存データと重複しない行 ……… そのまま追加する
+      2) 既存データと「全項目完全一致」の行 … 追加しない（強制。ユーザー選択不可）
+      3) ファイル内に「全項目完全一致」の行が 2 行以上ある … ファイル全体を中止する
+         （1 件も登録しない / aborted=True）
+      4) 略称・項目ID・Project名称 のいずれかだけが一致する行（部分重複）
+         … 既定では追加する。画面でユーザーが「取り込まない」を選んだ行
+         （payload.skipLines）だけ追加しない
+      5) 上記が混在する場合 … 行ごとに上記を判定し、1)〜4) を同時に適用する
+
+    dryRun=True のときは検証のみ行い、DB へは書き込まない。
+    「所属部門」列の値は部門マスタと照合せず、書かれている内容を
+    そのまま jn_project_master.department_id へ登録する。
     """
     result = ProjectImportResult()
+
+    # --- 0) ファイル内の「全項目完全一致」行を検出（行番号ベース）---
+    # 上記(3): ファイル内に同じ内容の行が 2 行以上あれば、行の追加可否に
+    #          関係なくファイル全体を中止する（1 件も登録しない）
+    file_dup_lines: list[int] = []
+    if payload.abortOnFileDuplicate:
+        seen_full: dict[str, int] = {}
+        for row in payload.rows:
+            full = _full_key(
+                row.customer,
+                row.caseName,
+                row.team,
+                row.subTeam,
+                row.department,
+                row.projectCode,
+                row.project_name,
+            )
+            first_line = seen_full.get(full)
+            if first_line is None:
+                seen_full[full] = row.line if row.line is not None else 0
+                continue
+            # 2 行目以降（1 行目も含めて中止対象として報告する）
+            if first_line not in file_dup_lines:
+                file_dup_lines.append(first_line)
+            if row.line is not None and row.line not in file_dup_lines:
+                file_dup_lines.append(row.line)
+        if file_dup_lines:
+            result.aborted = True
+            result.abortReason = (
+                "取り込みファイル内に、全項目（顧客/案件/チーム/Subチーム/"
+                "所属部門/項目ID/Project名称）が完全に一致する行が複数あります"
+                f"（{', '.join(str(n) for n in sorted(file_dup_lines))} 行目）。"
+                "重複行を削除してから、もう一度取り込んでください。"
+                "このファイルの内容は 1 件も登録していません。"
+            )
+            result.skipped = len(payload.rows)
+            return result
 
     # --- 1) 行単位の検証 ---
     valid_rows = []
@@ -288,24 +398,76 @@ def import_projects(
             continue
         valid_rows.append(row)
 
-    result.added = len(valid_rows)
+    # --- 2) 既存データとの重複判定（DB を参照）---
+    # 完全重複（全項目一致）は強制的に取り込まない。
+    # 部分重複（略称/項目ID/Project名称のいずれか）は既定で取り込むが、
+    # 画面でユーザーが外した行（skipLines）は取り込まない。
+    skip_lines = set(payload.skipLines or [])
+    abbrs, codes, names, fulls = _existing_keys(db, year_id)
+    to_add = []
+    for row in valid_rows:
+        abbr = _abbr_key(row.customer, row.caseName, row.team, row.subTeam)
+        code = _text_key(row.projectCode)
+        name = _text_key(row.project_name)
+        full = _full_key(
+            row.customer,
+            row.caseName,
+            row.team,
+            row.subTeam,
+            row.department,
+            row.projectCode,
+            row.project_name,
+        )
+        # 該当した条件をすべて集める（画面で「どれが重複したか」を出すため）
+        reasons: list[str] = []
+        if abbr and abbr in abbrs:
+            reasons.append("略称")
+        if code and code in codes:
+            reasons.append("項目ID")
+        if name and name in names:
+            reasons.append("Project名称")
 
-    # --- 2) 検証のみ（dryRun）→ ここで終了 ---
+        # (2) 既存データと全項目完全一致 → 強制的に取り込まない
+        if full in fulls:
+            result.duplicated += 1
+            if row.line is not None:
+                result.duplicatedLines.append(row.line)
+                result.duplicatedReasons[row.line] = ["全項目一致"]
+                result.fullDuplicateLines.append(row.line)
+            continue
+
+        # (4) 部分重複 → 既定は取り込む。ユーザーが外した行だけ取り込まない
+        if reasons:
+            result.duplicated += 1
+            if row.line is not None:
+                result.duplicatedLines.append(row.line)
+                result.duplicatedReasons[row.line] = reasons
+                result.partialDuplicateLines.append(row.line)
+                if row.line in skip_lines:
+                    # ユーザーが取り込まないことを選んだ行
+                    result.skipped += 1
+                    continue
+
+        # (1) 追加する行のキーを集合へ入れて、以降の行を重複として判定する
+        if abbr:
+            abbrs.add(abbr)
+        if code:
+            codes.add(code)
+        if name:
+            names.add(name)
+        fulls.add(full)
+        if row.line is not None:
+            result.addableLines.append(row.line)
+        to_add.append(row)
+
+    result.added = len(to_add)
+
+    # --- 3) 検証のみ（dryRun）→ ここで終了 ---
     if payload.dryRun:
         return result
 
-    # --- 3) 新規追加 ---
-    for row in valid_rows:
-        department_id = _resolve_department_id(db, year_id, _norm(row.department))
-        if department_id is None:
-            result.warnings.append(
-                f"{_label(row.line)}所属部門「{_norm(row.department)}」が"
-                "部門マスタの部門別名に無いため、その行は登録しませんでした"
-            )
-            result.skipped += 1
-            result.added -= 1
-            continue
-
+    # --- 4) 新規追加（完全重複・ユーザーが除外した行は追加しない）---
+    for row in to_add:
         create_project(
             db,
             year_id,
@@ -314,7 +476,8 @@ def import_projects(
                 "caseName": _norm(row.caseName),
                 "team": _norm(row.team),
                 "subTeam": _norm(row.subTeam),
-                "departmentId": department_id,
+                # 部門マスタとの照合は行わない（ファイルの値をそのまま登録する）
+                "departmentId": _norm(row.department),
                 "projectCode": _norm(row.projectCode),
                 "project_name": _norm(row.project_name),
             },

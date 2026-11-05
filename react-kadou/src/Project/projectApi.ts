@@ -63,6 +63,21 @@ export interface ProjectImportApiRow {
 export interface ProjectImportApiResult {
   added: number;
   skipped: number;
+  /** 既存データと重複した件数（略称 / 項目ID / Project名称 のいずれか一致） */
+  duplicated?: number;
+  /** 既存データと重複した行のファイル上での行番号 */
+  duplicatedLines?: number[];
+  /** 重複した行ごとの理由（行番号 → ['略称','項目ID','Project名称'] の部分集合） */
+  duplicatedReasons?: Record<number, string[]>;
+  /** 全項目（顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称）が完全一致した行番号（強制スキップ） */
+  fullDuplicateLines?: number[];
+  /**
+   * 略称 / 項目ID / Project名称 のいずれかだけが一致した行番号（部分重複）。
+   * 既定は取り込み対象で、ユーザーが外した行だけ取り込まない。
+   */
+  partialDuplicateLines?: number[];
+  /** 重複せず、そのまま追加できる行番号 */
+  addableLines?: number[];
   /** ファイル全体を中止したか */
   aborted: boolean;
   /** ファイル全体を中止した理由 */
@@ -156,7 +171,12 @@ export async function deleteProject(
 export async function importProjectRows(
   year: number,
   rows: ProjectImportApiRow[],
-  options: { dryRun?: boolean; opUser?: string | null } = {},
+  options: {
+    dryRun?: boolean;
+    opUser?: string | null;
+    /** ユーザーが「取り込まない」を選んだ行番号（部分重複行のみ有効） */
+    skipLines?: number[];
+  } = {},
 ): Promise<ProjectImportApiResult> {
   return request<ProjectImportApiResult>(
     `/api/kadou/projects/import/${year}`,
@@ -166,6 +186,7 @@ export async function importProjectRows(
       body: JSON.stringify({
         rows,
         dryRun: options.dryRun ?? false,
+        skipLines: options.skipLines ?? [],
       }),
     },
   );

@@ -92,6 +92,11 @@
   background: #e6f4ff !important;
 }
 
+/* 一括読み込みプレビュー：重複行（取り込まない行）を薄くハイライト */
+.project-import-row-dup > td {
+  background: #fffbe6 !important;
+}
+
 /* フォームは残りの幅いっぱい、一覧もカード幅いっぱいに広げる */
 .screen-card.project-form-card {
   flex: 1 1 auto;
