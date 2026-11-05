@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
@@ -46,11 +46,12 @@ def _to_display_date(date: str) -> str:
 
 def _to_output(row) -> dict:
     """DB の行をフロント用の休日オブジェクトへ変換する"""
+    holiday_kind = row.holiday_kind or ""
     return {
         "holidayId": str(row.holiday_id),
         "date": _to_display_date(row.holiday_date),
-        "name": row.holiday_name,
-        "kind": HOLIDAY_CODE_TO_KIND.get(row.holiday_kind, row.holiday_kind),
+        "name": row.holiday_name or "",
+        "kind": HOLIDAY_CODE_TO_KIND.get(holiday_kind, holiday_kind),
     }
 
 
@@ -73,14 +74,21 @@ def holiday_exists(db: Session, year: int, date: str) -> bool:
 
 
 def _validate_input(kind: str, name: str) -> Tuple[str, str]:
-    """区分・名称を検証し、(区分コード, 前後空白除去済み名称) を返す"""
-    holiday_kind = HOLIDAY_KIND_TO_CODE.get(kind)
-    if holiday_kind is None:
-        raise HTTPException(status_code=400, detail=f"区分が不正です：{kind}")
+    """区分・名称を検証し、(区分コード, 前後空白除去済み名称) を返す。
 
-    holiday_name = name.strip()
-    if not holiday_name:
-        raise HTTPException(status_code=400, detail="休日名称を入力してください。")
+    区分・名称はいずれも任意入力。
+    ・区分が空文字の場合は未設定（空文字）として扱う
+    ・名称が空文字の場合は未設定（空文字）として扱う
+    """
+    kind = (kind or "").strip()
+    if kind:
+        holiday_kind = HOLIDAY_KIND_TO_CODE.get(kind)
+        if holiday_kind is None:
+            raise HTTPException(status_code=400, detail=f"区分が不正です：{kind}")
+    else:
+        holiday_kind = ""
+
+    holiday_name = (name or "").strip()
     if len(holiday_name) > HOLIDAY_NAME_MAX_LENGTH:
         raise HTTPException(
             status_code=400,
@@ -125,6 +133,67 @@ def add_holiday(
     if row is None:
         raise HTTPException(status_code=500, detail="休日の登録に失敗しました。")
     return _to_output(row)
+
+
+def import_holidays(db: Session, year: int, holidays: List[dict]) -> dict:
+    """休日を一括登録する（同一日付は上書き、新規日付は追加）。
+
+    1 件でも不正な値があれば全件を登録せずにロールバックする。
+    戻り値は追加件数・上書き件数と、登録後の年度内休日一覧。
+    """
+    added = 0
+    updated = 0
+
+    try:
+        for holiday in holidays:
+            holiday_kind, holiday_name = _validate_input(
+                holiday.get("kind", "") or "", holiday.get("name", "") or ""
+            )
+            db_date = _to_db_date(holiday.get("date", "") or "")
+            params = {"yearId": str(year), "holidayDate": db_date}
+
+            # 同一日付の既存レコードがあれば上書き、なければ追加する
+            existing = db.execute(SQL_SELECT_HOLIDAY_BY_DATE, params).first()
+            if existing is None:
+                db.execute(
+                    SQL_INSERT_HOLIDAY_MASTER,
+                    {
+                        **params,
+                        "holidayKind": holiday_kind,
+                        "holidayName": holiday_name,
+                        "registerUser": REGISTER_USER,
+                        "updateUser": REGISTER_USER,
+                    },
+                )
+                added += 1
+            else:
+                db.execute(
+                    SQL_UPDATE_HOLIDAY_MASTER,
+                    {
+                        "yearId": str(year),
+                        "holidayId": existing.holiday_id,
+                        "holidayKind": holiday_kind,
+                        "holidayDate": db_date,
+                        "holidayName": holiday_name,
+                        "updateUser": REGISTER_USER,
+                    },
+                )
+                updated += 1
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409, detail="同一日付の休日が既に登録されています。"
+        )
+    except HTTPException:
+        db.rollback()
+        raise
+
+    return {
+        "added": added,
+        "updated": updated,
+        "holidays": get_holidays(db, year),
+    }
 
 
 def _get_holiday_or_404(db: Session, year: int, holiday_id: int):

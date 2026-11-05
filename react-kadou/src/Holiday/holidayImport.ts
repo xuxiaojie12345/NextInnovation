@@ -15,7 +15,7 @@
  *   - 同一日付の既存休日は上書き（名称・区分を更新）
  *   - ファイル内で同一日付が複数ある場合は後ろの行を優先
  *   - 選択中年度以外の日付は取り込まない（警告）
- *   - 区分が空・未知の場合は「会社休日」として取り込む（警告）
+ *   - 区分が空の場合は未設定（空）として取り込む（未知の区分は警告）
  */
 import dayjs from 'dayjs';
 import { HolidayKind } from '../data/yearStore';
@@ -28,10 +28,10 @@ import {
 export interface HolidayImportRow {
   /** 日付（'YYYY-MM-DD'） */
   date: string;
-  /** 休日名称 */
+  /** 休日名称（任意。未入力の場合は空文字） */
   name: string;
-  /** 区分 */
-  kind: HolidayKind;
+  /** 区分（任意。未入力の場合は空文字） */
+  kind: HolidayKind | '';
 }
 
 /** 一括読み込みの結果 */
@@ -52,7 +52,7 @@ export const HOLIDAY_IMPORT_ACCEPT =
 
 /** 画面に表示する形式の説明 */
 export const HOLIDAY_IMPORT_FORMAT_HINT =
-  '形式：日付／名称／区分（1行目は見出し行）。日付は YYYY-MM-DD / YYYY/MM/DD、Excel の日付セルに対応。同じ日付は上書きします。';
+  '形式：日付／名称／区分（1行目は見出し行）。日付は YYYY-MM-DD / YYYY/MM/DD、Excel の日付セルに対応。名称・区分は任意です。同じ日付は上書きします。';
 
 /** 見出し（列名）の候補。表記ゆれを吸収して判定する */
 const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
@@ -223,19 +223,14 @@ const buildRows = (
       return;
     }
 
-    if (!name) {
-      warnings.push(`${lineNo}行目：名称が空のため取り込みませんでした`);
-      return;
-    }
-
-    // 区分が空・未知の場合は「会社休日」として取り込む
-    let kind = parseKind(rawKind);
-    if (!kind) {
-      kind = '会社休日';
+    // 名称は任意のため、空のままでも取り込む
+    // 区分も任意。空の場合は未設定（空文字）として取り込み、
+    // 未知の区分が指定された場合だけ警告する
+    const parsedKind = parseKind(rawKind);
+    const kind: HolidayImportRow['kind'] = parsedKind ?? '';
+    if (rawKind && !parsedKind) {
       warnings.push(
-        rawKind
-          ? `${lineNo}行目：区分「${rawKind}」を認識できないため会社休日として取り込みました`
-          : `${lineNo}行目：区分が空のため会社休日として取り込みました`,
+        `${lineNo}行目：区分「${rawKind}」を認識できないため未設定として取り込みました`,
       );
     }
 

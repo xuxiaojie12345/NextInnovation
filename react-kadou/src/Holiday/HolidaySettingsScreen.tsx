@@ -32,6 +32,7 @@ import {
   HolidayApiError,
   addHoliday,
   deleteHoliday,
+  importHolidays,
   loadHolidays,
   updateHoliday,
 } from './holidayApi';
@@ -51,6 +52,16 @@ const KIND_COLOR: Record<HolidayKind, string> = {
 
 /** 区分の選択肢 */
 const KIND_OPTIONS = KINDS.map((k) => ({ value: k, label: k }));
+
+/** 区分の表示色（未設定は既定色） */
+const kindColor = (kind: HolidayKind | '') =>
+  kind ? KIND_COLOR[kind] : 'default';
+
+/** 区分の表示名（未設定を含む） */
+const kindLabel = (kind: HolidayKind | '') => kind || '未設定';
+
+/** メッセージ用の休日名称（未入力の場合の表記） */
+const holidayNameLabel = (name: string) => name || '名称未設定';
 
 /** CSV 出力の見出し */
 const CSV_HEADER = '日付,名称,区分';
@@ -86,7 +97,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   // フォーム（新規追加 / 編集で共用）
   const [newDate, setNewDate] = useState<Dayjs | null>(null);
   const [newName, setNewName] = useState('');
-  const [newKind, setNewKind] = useState<HolidayKind>('会社休日');
+  const [newKind, setNewKind] = useState<HolidayKind | ''>('');
 
   // 編集開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
@@ -139,6 +150,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     return {
       year,
       total: list.length,
+      unset: list.filter((h) => !h.kind).length,
       byKind: KINDS.map((k) => ({
         kind: k,
         count: list.filter((h) => h.kind === k).length,
@@ -157,20 +169,17 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     setEditingId(null);
     setNewDate(null);
     setNewName('');
-    setNewKind('会社休日');
+    setNewKind('');
   }, []);
 
-  /** 追加 or 更新（日付・名称は必須 / 同一日付は登録不可） */
+  /** 追加 or 更新（日付のみ必須 / 名称・区分は任意 / 同一日付は登録不可） */
   const handleSubmit = async () => {
     if (!newDate) {
       message.warning('日付を選択してください。');
       return;
     }
+    // 名称は任意のため、未入力（空文字）でも登録できる
     const name = newName.trim();
-    if (!name) {
-      message.warning('休日名称を入力してください。');
-      return;
-    }
     const date = newDate.format('YYYY-MM-DD');
     const duplicate = holidays.find((h) => h.date === date && h.id !== editingId);
     if (duplicate) {
@@ -187,7 +196,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           ),
         );
         message.success(
-          `${formatDate(date)}「${name}」を更新しました（モック）。`,
+          `${formatDate(date)}「${holidayNameLabel(name)}」を更新しました（モック）。`,
         );
         handleResetForm();
         return;
@@ -204,7 +213,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         setHolidays((prev) =>
           prev.map((h) => (h.id === editingId ? updated : h)),
         );
-        message.success(`${formatDate(date)}「${name}」を更新しました。`);
+        message.success(`${formatDate(date)}「${holidayNameLabel(name)}」を更新しました。`);
         handleResetForm();
       } catch (error) {
         if (error instanceof HolidayApiError && error.status === 409) {
@@ -229,7 +238,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         ...prev.filter((h) => h.date !== created.date),
         created,
       ]);
-      message.success(`${formatDate(date)}「${name}」を登録しました。`);
+      message.success(`${formatDate(date)}「${holidayNameLabel(name)}」を登録しました。`);
       handleResetForm();
     } catch (error) {
       if (error instanceof HolidayApiError && error.status === 409) {
@@ -261,7 +270,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         setHolidays((prev) => prev.filter((h) => h.id !== row.id));
         setEditingId((prev) => (prev === row.id ? null : prev));
         message.success(
-          `${formatDate(row.date)}「${row.name}」を削除しました。`,
+          `${formatDate(row.date)}「${holidayNameLabel(row.name)}」を削除しました。`,
         );
         return;
       }
@@ -273,7 +282,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         // 削除した行を編集中だった場合はフォームを初期化
         setEditingId((prev) => (prev === row.id ? null : prev));
         message.success(
-          `${formatDate(row.date)}「${row.name}」を削除しました。`,
+          `${formatDate(row.date)}「${holidayNameLabel(row.name)}」を削除しました。`,
         );
       } catch (error) {
         const detail =
@@ -304,7 +313,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
 
   /**
    * 一括読み込み：休日情報ファイル（Excel / CSV）を解析し、
-   * 同一日付は上書き・新規日付は追加する（確認なし）。
+   * JN_HOLIDAY_MASTER へ一括登録する（同一日付は上書き・新規日付は追加）。
    */
   const handleImportFile = async (file: File) => {
     setImporting(true);
@@ -323,34 +332,24 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         return;
       }
 
-      // 既存日付は上書き、新規日付は追加する
-      const existingDates = new Set(holidays.map((h) => h.date));
-      const updated = result.rows.filter((r) =>
-        existingDates.has(r.date),
-      ).length;
-      const added = result.rows.length - updated;
+      // 読み込んだ休日をテーブル（JN_HOLIDAY_MASTER）へ一括登録する。
+      // 同一日付の既存レコードは上書き、新規日付は追加される。
+      const saved = await importHolidays(
+        year,
+        result.rows.map((row) => ({
+          date: row.date,
+          name: row.name,
+          kind: row.kind,
+        })),
+      );
 
-      setHolidays((prev) => {
-        const next = [...prev];
-        result.rows.forEach((row) => {
-          const index = next.findIndex((h) => h.date === row.date);
-          if (index >= 0) {
-            next[index] = { ...next[index], name: row.name, kind: row.kind };
-          } else {
-            next.push({
-              id: `h-imp-${row.date}`,
-              date: row.date,
-              name: row.name,
-              kind: row.kind,
-            });
-          }
-        });
-        return next;
-      });
+      // 登録後の一覧で画面を更新する
+      setHolidays(saved.holidays);
 
       message.success(
-        `休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`,
+        `休日を一括読み込みしました：追加 ${saved.added} 件 / 上書き ${saved.updated} 件。`,
       );
+
       if (result.warnings.length > 0) {
         message.warning(
           `取り込まなかった行などが ${result.warnings.length} 件あります（${result.warnings[0]}${
@@ -382,6 +381,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+        render: (v: string) => v || <Text type='secondary'>未設定</Text>,
       },
       {
         title: '区分',
@@ -389,7 +389,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         key: 'kind',
         width: 120,
         align: 'center',
-        render: (v: HolidayKind) => <Tag color={KIND_COLOR[v]}>{v}</Tag>,
+        render: (v: HolidayKind | '') => (
+          <Tag color={kindColor(v)}>{kindLabel(v)}</Tag>
+        ),
       },
       {
         title: '操作',
@@ -408,7 +410,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             </Button>
             <Popconfirm
               title='削除の確認'
-              description={`${formatDate(row.date)}「${row.name}」を削除しますか？`}
+              description={`${formatDate(row.date)}「${holidayNameLabel(
+                row.name,
+              )}」を削除しますか？`}
               okText='削除'
               cancelText='キャンセル'
               okButtonProps={{ danger: true }}
@@ -439,10 +443,12 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             {year}年度　休日設置
           </Title>
           <Text type='secondary'>
-            稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。休日は年度ごとのデータで、年度切替で表示が切り替わります。
+            稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。日付のみ必須で、名称・区分は任意です。休日は年度ごとのデータで、年度切替で表示が切り替わります。
           </Text>
         </div>
-        <Tag color='green'>バックエンド接続（一覧・追加・編集・削除）</Tag>
+        <Tag color='green'>
+          バックエンド接続（一覧・一括読込・追加・編集・削除）
+        </Tag>
       </div>
 
       <div ref={formRef}>
@@ -464,7 +470,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
               />
             </div>
             <div>
-              <div className='form-label'>休日名称（必須）</div>
+              <div className='form-label'>休日名称（任意）</div>
               <Input
                 placeholder='例：創立記念日'
                 value={newName}
@@ -475,11 +481,13 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
               />
             </div>
             <div>
-              <div className='form-label'>区分</div>
+              <div className='form-label'>区分（任意）</div>
               <Select
-                value={newKind}
-                onChange={(v: HolidayKind) => setNewKind(v)}
+                value={newKind || undefined}
+                onChange={(v?: HolidayKind) => setNewKind(v ?? '')}
                 options={KIND_OPTIONS}
+                allowClear
+                placeholder='未選択'
                 style={{ width: 140 }}
               />
             </div>
@@ -514,6 +522,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
                 {k.kind} {k.count}
               </Tag>
             ))}
+            {summary.unset > 0 && <Tag>未設定 {summary.unset}</Tag>}
           </Space>
         }
       >
@@ -525,7 +534,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             multiple={false}
             disabled={importing}
             beforeUpload={(file) => {
-              // サーバーへは送信せず、フロントのみで解析する（モック）
+              // ファイルはフロントで解析し、内容を API で一括登録する
               void handleImportFile(file);
               return false;
             }}

@@ -460,7 +460,7 @@ function App() {
             }
           : {
               employeeNo: row.employeeNo,
-              name: row.name,  // 只读取Excel中的姓名，不添加额外内容
+              name: row.name,  // 只读取Excel中の姓名，不添加额外内容
               role: row.role || "要員",
               departmentId: departmentId,  // 保存根据department_alias + location查询出的department_id
               department: departmentAlias,  // 保存部门别名
@@ -576,7 +576,6 @@ function App() {
         year={selectedYear}
         personnel={store.personnel}
         loading={personnelLoadedYear !== selectedYear}
-        departments={store.departments}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}
         onDelete={handleDeletePersonnel}

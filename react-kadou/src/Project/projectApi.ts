@@ -9,11 +9,13 @@ import { Project } from '../WorkStatus/types';
 
 /**
  * API クライアント。
- * 開発時は CRA の proxy（package.json の proxy）経由で同一オリジンに送るため baseURL は空。
- * 本番など別オリジンに送る場合は REACT_APP_API_BASE_URL で上書きする。
+ * 開発時はバックエンド（FastAPI）の既定アドレスへ直接アクセスする。
+ * 別オリジン / 別ポートに送る場合は REACT_APP_API_BASE_URL で上書きする。
  */
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL ?? '',
+  baseURL: (
+    process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000'
+  ).replace(/\/+$/, ''),
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });

@@ -25,7 +25,7 @@ import {
 } from './mockData';
 import { buildYearWeeks } from './yearWeeks';
 
-/** 休日の区分 */
+/** 休日の区分（未設定の場合は空文字） */
 export type HolidayKind = '祝日' | '会社休日' | '振替休日';
 
 /** 休日設定の1件 */
@@ -33,8 +33,10 @@ export interface Holiday {
   id: string;
   /** 'YYYY-MM-DD' */
   date: string;
+  /** 休日名称（任意。未入力の場合は空文字） */
   name: string;
-  kind: HolidayKind;
+  /** 区分（任意。未選択の場合は空文字） */
+  kind: HolidayKind | '';
 }
 
 /** 無償支援（BUFFER）: 要員ID -> (週キー -> true) */

@@ -22,8 +22,17 @@ export interface HolidayRecord {
   holidayId: string;
   /** 'YYYY-MM-DD' */
   date: string;
+  /** 休日名称（任意） */
   name: string;
-  kind: HolidayKind;
+  /** 区分（任意。未設定の場合は空文字） */
+  kind: HolidayKind | '';
+}
+
+/** 休日の登録・更新で送信する値（名称・区分は任意） */
+export interface HolidayInput {
+  date: string;
+  name: string;
+  kind: HolidayKind | '';
 }
 
 /** HTTP ステータスを保持する API エラー（409 = 同一日付の登録済み） */
@@ -81,7 +90,7 @@ export const loadHolidays = async (year: number): Promise<Holiday[]> => {
 /** 休日を登録する（同一日付が既にある場合は status=409 のエラー） */
 export const addHoliday = async (
   year: number,
-  values: { date: string; name: string; kind: HolidayKind },
+  values: HolidayInput,
 ): Promise<Holiday> => {
   const response = await request<ApiResponse<HolidayRecord>>(
     `/api/holidays?year=${encodeURIComponent(String(year))}`,
@@ -97,7 +106,7 @@ export const addHoliday = async (
 export const updateHoliday = async (
   year: number,
   holidayId: string,
-  values: { date: string; name: string; kind: HolidayKind },
+  values: HolidayInput,
 ): Promise<Holiday> => {
   const response = await request<ApiResponse<HolidayRecord>>(
     `/api/holidays/${encodeURIComponent(
@@ -122,4 +131,36 @@ export const deleteHoliday = async (
     )}?year=${encodeURIComponent(String(year))}`,
     { method: 'DELETE' },
   );
+};
+
+/** 一括読み込みの登録結果（追加件数・上書き件数・登録後の一覧） */
+export interface HolidayImportSaveResult {
+  added: number;
+  updated: number;
+  holidays: Holiday[];
+}
+
+/** 休日を一括登録する（同一日付は上書き、新規日付は追加） */
+export const importHolidays = async (
+  year: number,
+  values: HolidayInput[],
+): Promise<HolidayImportSaveResult> => {
+  const response = await request<
+    ApiResponse<{
+      added: number;
+      updated: number;
+      holidays: HolidayRecord[];
+    }>
+  >(
+    `/api/holidays/import?year=${encodeURIComponent(String(year))}`,
+    {
+      method: 'POST',
+      body: JSON.stringify(values),
+    },
+  );
+  return {
+    added: response.data.added,
+    updated: response.data.updated,
+    holidays: response.data.holidays.map(toHoliday),
+  };
 };
