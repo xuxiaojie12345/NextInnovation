@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect} from 'react';
+import { Modal } from 'antd';
 import {
   Button,
   Card,
@@ -27,12 +28,14 @@ import {
   HOLIDAY_IMPORT_FORMAT_HINT,
   parseHolidayFile,
 } from './holidayImport';
+import {
+  HOLIDAY_KINDS as KINDS,
+  HOLIDAY_KIND_OPTIONS as KIND_OPTIONS,
+} from '../constants/options';
 import './HolidaySettingsScreen.css';
+import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
 
 const { Title, Text } = Typography;
-
-/** 区分一覧 */
-const KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
 
 /** 区分ごとの表示色 */
 const KIND_COLOR: Record<HolidayKind, string> = {
@@ -40,9 +43,6 @@ const KIND_COLOR: Record<HolidayKind, string> = {
   会社休日: 'blue',
   振替休日: 'orange',
 };
-
-/** 区分の選択肢 */
-const KIND_OPTIONS = KINDS.map((k) => ({ value: k, label: k }));
 
 /** CSV 出力の見出し */
 const CSV_HEADER = '日付,名称,区分';
@@ -60,6 +60,7 @@ interface HolidaySettingsScreenProps {
   /** その年度の休日（App 側で年度ごとに保持） */
   holidays: Holiday[];
   setHolidays: React.Dispatch<React.SetStateAction<Holiday[]>>;
+  currentUserId: string | null;
 }
 
 /**
@@ -71,8 +72,17 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   year,
   holidays,
   setHolidays,
-}) => {
-  // 編集中の休日ID（null = 新規追加モード）
+  currentUserId
+}) => {  
+  useEffect(() => {
+  // 初始化：请求后台接口、加载数据
+    HolidayInitApi(year).then((data) => {
+    if (data) {
+      setHolidays(data);
+    }
+  });
+  }, [year])
+
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // フォーム（新規追加 / 編集で共用）
@@ -97,7 +107,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       byKind: KINDS.map((k) => ({
         kind: k,
         count: list.filter((h) => h.kind === k).length,
-      })),
+      })),holidays
     };
   }, [holidays, year]);
 
@@ -128,22 +138,28 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     }
     const date = newDate.format('YYYY-MM-DD');
     const duplicate = holidays.find((h) => h.date === date && h.id !== editingId);
+
     if (duplicate) {
       message.warning(`${formatDate(date)} は既に登録されています。`);
       return;
     }
 
     if (editingId) {
-      setHolidays((prev) =>
-        prev.map((h) => (h.id === editingId ? { ...h, date, name, kind: newKind } : h)),
-      );
-      message.success(`${formatDate(date)}「${name}」を更新しました（モック）。`);
+      HolidayUpdateApi(year, currentUserId, {date : date, name:newName, kind: newKind,id:editingId}).then((data) => {
+        setHolidays(data);        
+        handleResetForm();
+      }).catch((error) => {
+        message.error(`休日情報の更新に失敗しました：${error.message}`);
+      });
+      message.success(`${formatDate(date)}「${name}」を更新しました。`);
     } else {
-      setHolidays((prev) => [
-        ...prev,
-        { id: `h-${Date.now()}`, date, name, kind: newKind },
-      ]);
-      message.success(`${formatDate(date)}「${name}」を追加しました（モック）。`);
+      HolidayAddApi(year, currentUserId, {date : date, name:newName, kind: newKind,id:"0"}).then((data) => {
+        setHolidays(data);        
+        handleResetForm();
+      }).catch((error) => {
+        message.error(`休日情報の追加に失敗しました：${error.message}`);
+      });
+      message.success(`${formatDate(date)}「${name}」を追加しました。`);
     }
     handleResetForm();
   };
@@ -160,9 +176,11 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   /** 削除 */
   const handleDelete = useCallback(
     (row: Holiday) => {
-      setHolidays((prev) => prev.filter((h) => h.id !== row.id));
-      // 削除した行を編集中だった場合はフォームを初期化
-      setEditingId((prev) => (prev === row.id ? null : prev));
+      HolidayDeleteApi(year, row.id).then((data) => {
+        setHolidays(data);
+      }).catch((error) => {
+        message.error(`休日情報の削除に失敗しました：${error.message}`);
+      });
       message.success(
         `${formatDate(row.date)}「${row.name}」を削除しました（モック）。`,
       );
@@ -195,7 +213,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   const handleImportFile = async (file: File) => {
     setImporting(true);
     try {
-      const result = await parseHolidayFile(file, year);
+      const result = await parseHolidayFile(file, year);      
       if (result.rows.length === 0) {
         const detail =
           result.warnings.length > 0
@@ -215,28 +233,37 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         existingDates.has(r.date),
       ).length;
       const added = result.rows.length - updated;
+      const requestDatas: Holiday[] = result.rows.map((item) => ({              
+        id: holidays.find((h) => h.date === item.date)?.id || null,
+        date: item.date,
+        name: item.name,
+        kind: item.kind,
+      }));      
 
-      setHolidays((prev) => {
-        const next = [...prev];
-        result.rows.forEach((row) => {
-          const index = next.findIndex((h) => h.date === row.date);
-          if (index >= 0) {
-            next[index] = { ...next[index], name: row.name, kind: row.kind };
-          } else {
-            next.push({
-              id: `h-imp-${row.date}`,
-              date: row.date,
-              name: row.name,
-              kind: row.kind,
-            });
+      if (updated > 0) {
+        Modal.confirm({
+          title: '確認',
+          content: `重複が ${updated} 件あります`,
+          okText: '重複を上書きして取り込む',
+          cancelText: '中止',
+          onOk: () => {              
+            HolidayImportApi(year, currentUserId, requestDatas).then((data) => {
+            setHolidays(data);
+            message.success(`休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`);              
+            }).catch((error) => {
+              message.error(`休日情報の一括読み込みに失敗しました：${error.message}`);
+            }); 
           }
-        });
-        return next;
-      });
+        });      
+      }else {
+        HolidayImportApi(year, currentUserId, requestDatas).then((data) => {
+        setHolidays(data);
+        message.success(`休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`);              
+        }).catch((error) => {
+          message.error(`休日情報の一括読み込みに失敗しました：${error.message}`);
+        }); 
+      }
 
-      message.success(
-        `休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`,
-      );
       if (result.warnings.length > 0) {
         message.warning(
           `取り込まなかった行などが ${result.warnings.length} 件あります（${result.warnings[0]}${

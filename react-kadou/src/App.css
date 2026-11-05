@@ -49,6 +49,11 @@
   max-width: 960px;
 }
 
+/* 部門管理のカード：項目が増えたため、デフォルトより広げてボタン等を折り返さない */
+.screen-card.dept-wide-card {
+  max-width: 1200px;
+}
+
 /* モーダル等のフォーム項目ラベル（共通） */
 .form-label {
   margin-bottom: 4px;

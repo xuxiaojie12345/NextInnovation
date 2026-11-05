@@ -596,6 +596,7 @@ function App() {
         year={selectedYear}
         holidays={store.holidays}
         setHolidays={setYearHolidays}
+        currentUserId={currentUserId}
       />
     ),
     'user-manage': (

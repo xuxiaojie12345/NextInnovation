@@ -29,6 +29,7 @@ function operatorHeaders(opUser?: string | null): Record<string, string> {
 
 /** 部門の追加 / 更新ペイロード（departmentId はバックエンド側で採番・特定する） */
 export type DepartmentPayload = Pick<Department, 'name' | 'location'> & {
+  alisa?: Department['alisa'];
   kind?: Department['kind'];
 };
 
