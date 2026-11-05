@@ -63,15 +63,11 @@ const kindLabel = (kind: HolidayKind | '') => kind || '未設定';
 /** メッセージ用の休日名称（未入力の場合の表記） */
 const holidayNameLabel = (name: string) => name || '名称未設定';
 
-/** CSV 出力の見出し */
-const CSV_HEADER = '日付,名称,区分';
-
 /** 日付の表示形式 */
 const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)');
 
-/** CSV 出力用に値をエスケープする */
-const csvEscape = (v: string): string =>
-  /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+/** CSV 出力用の日付形式（先頭ゼロなし：YYYY/M/D） */
+const formatCsvDate = (date: string) => dayjs(date).format('YYYY/M/D');
 
 interface HolidaySettingsScreenProps {
   /** 表示する年度 */
@@ -293,22 +289,33 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     [year, setHolidays],
   );
 
-  /** CSV 出力（Excel で開けるよう BOM 付き UTF-8 / CRLF） */
+  /**
+   * CSV 出力（見出し行なし・日付列のみ／先頭ゼロなしの YYYY/M/D）。
+   * Excel でそのまま開けるよう BOM 付き UTF-8・CRLF で出力する。
+   */
   const handleExport = () => {
-    const rows = sortedHolidays.map((h) =>
-      [h.date, h.name, h.kind].map(csvEscape).join(','),
-    );
-    const csv = `\uFEFF${[CSV_HEADER, ...rows].join('\r\n')}\r\n`;
+    // 選択中年度の休日のみを日付順に 1 行 1 日付で出力する
+    const dates = sortedHolidays
+      .filter((h) => dayjs(h.date).year() === year)
+      .map((h) => formatCsvDate(h.date));
+    if (dates.length === 0) {
+      message.warning(`${year}年度の休日が登録されていません。`);
+      return;
+    }
+
+    const csv = `\uFEFF${dates.join('\r\n')}\r\n`;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `休日一覧_${dayjs().format('YYYYMMDD')}.csv`;
+    a.download = `休日一覧_${year}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    message.success(`${sortedHolidays.length} 件を CSV 出力しました。`);
+    message.success(
+      `${year}年度の休日日付を ${dates.length} 件 CSV 出力しました。`,
+    );
   };
 
   /**
