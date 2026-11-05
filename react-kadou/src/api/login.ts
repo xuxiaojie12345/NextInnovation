@@ -1,5 +1,8 @@
 import type { AuthUser } from '../types/user';
 import { YAKUSHOKU_ROLE_MAP, DEFAULT_ROLE } from '../constants/options';
+import { httpRequest } from './http';
+import type { ApiError } from './ApiError';
+import { isApiError } from './ApiError';
 
 /** バックエンドのログインAPIレスポンス */
 export interface LoginResponse {
@@ -12,30 +15,19 @@ export interface LoginResponse {
 
 /**
  * ログインAPIを呼び出す（POST /api/auth/loginAPI）。
- * 成功時は AuthUser を返し、認証失敗時は Error を投げる。
+ * 成功時は AuthUser を返し、失敗時は ApiError を投げる。
+ * ・認証失敗（401）は kind=auth
+ * ・タイムアウト / ネットワーク断は取得できない（通信異常は kind=timeout/offline/network）
  */
 export async function loginApi(
   userId: string,
   password: string,
 ): Promise<AuthUser> {
-  const res = await fetch('/api/auth/loginAPI', {
+  const data = await httpRequest<LoginResponse>('/api/auth/loginAPI', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, password }),
+    body: { userId, password },
+    timeoutMs: 10_000,
   });
-
-  if (!res.ok) {
-    let message = 'ユーザーIDまたはパスワードが正しくありません。';
-    try {
-      const data = await res.json();
-      if (data && typeof data.detail === 'string') message = data.detail;
-    } catch {
-      // JSON でないレスポンスは既定メッセージを使う
-    }
-    throw new Error(message);
-  }
-
-  const data = (await res.json()) as LoginResponse;
   const { role, roleLabel } =
     YAKUSHOKU_ROLE_MAP[data.yakushokukubun] ?? DEFAULT_ROLE;
   return {
@@ -46,4 +38,16 @@ export async function loginApi(
     roleLabel,
     departmentId: data.department ?? undefined,
   };
+}
+
+/** ログイン画面で表示するメッセージを返す（認証失敗と通信異常を区別する） */
+export function loginErrorMessage(e: unknown): string {
+  if (isApiError(e)) {
+    const err = e as ApiError;
+    if (err.kind === 'auth') return 'ユーザーIDまたはパスワードが正しくありません。';
+    return err.message;
+  }
+  return e instanceof Error && e.message
+    ? e.message
+    : 'ユーザーIDまたはパスワードが正しくありません。';
 }

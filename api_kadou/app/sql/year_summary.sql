@@ -8,9 +8,19 @@ SELECT
     COALESCE(proj.projectCount, 0)     AS projectCount,
     COALESCE(hol.holidayCount, 0)      AS holidayCount
 FROM (
-    -- ここがポイント：指定部門が存在する年度だけ抽出
-    SELECT DISTINCT year_id
-    FROM jn_department_master
+    -- 固定 2025〜2036 の年度を常に返す（データが無い年度は 0 件表示）
+    SELECT '2025' AS year_id
+    UNION ALL SELECT '2026'
+    UNION ALL SELECT '2027'
+    UNION ALL SELECT '2028'
+    UNION ALL SELECT '2029'
+    UNION ALL SELECT '2030'
+    UNION ALL SELECT '2031'
+    UNION ALL SELECT '2032'
+    UNION ALL SELECT '2033'
+    UNION ALL SELECT '2034'
+    UNION ALL SELECT '2035'
+    UNION ALL SELECT '2036'
 ) base
 LEFT JOIN (
     SELECT year_id, COUNT(DISTINCT department_id) AS departmentCount

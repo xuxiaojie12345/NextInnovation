@@ -208,7 +208,12 @@ function App() {
   /** 年度切替（未保存があれば確認ダイアログを出す） */
   const requestYearChange = useCallback(
     (year: number) => {
-      if (year === selectedYear) return;
+      // 同じ年度の再選択：年度は変わらないが「この年度で開く」意図なので稼働管理画面へ移動する
+      // （dirty も潰してはならないため、年度が変わる時だけ未保存確認を行う）
+      if (year === selectedYear) {
+        setActiveView('work-status');
+        return;
+      }
       if (dirty) {
         setPendingAction({ type: 'year', year });
         return;

@@ -326,7 +326,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
               <Input
                 placeholder='例：人事部／協力会社B'
                 value={name}
-                maxLength={30}
+                maxLength={20}
                 onChange={(e) => setName(e.target.value)}
                 onPressEnter={handleSubmit}
                 style={{ width: 220 }}
@@ -338,7 +338,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
               <Input
                 placeholder='例：人事部（一括取入用）'
                 value={alisa}
-                maxLength={50}
+                maxLength={20}
                 onChange={(e) => setAlisa(e.target.value)}
                 onPressEnter={handleSubmit}
                 style={{ width: 200 }}

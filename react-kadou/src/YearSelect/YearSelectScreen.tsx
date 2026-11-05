@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Empty, Spin, Tag, Typography, message } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Button, Card, Empty, Spin, Tag, Typography } from 'antd';
 import { CalendarOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { AVAILABLE_YEARS } from '../data/yearStore';
 import { fetchYearSelect } from '../api/yearSelect';
+import { displayMessage } from '../api/normalizeError';
 import type { YearSelectItem } from '../api/yearSelect';
 import './YearSelectScreen.css';
 
@@ -22,6 +24,7 @@ interface YearSelectScreenProps {
 /**
  * 年度選択 画面
  *
+ * 表示対象は 2025年度〜2036年度（MIN_YEAR〜MAX_YEAR）のデータ。
  * すべてのデータ（部門・要員・プロジェクト・休日・済南統計・稼動グリッド）は
  * 年度に紐づく。ここで年度を切り替えると、全画面がその年度のデータに切り替わる。
  * ※バックエンド /api/year-summaries から年度ごとのデータ概要を取得して表示する。
@@ -33,63 +36,61 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
 }) => {
   // ロード中フラグ
   const [loading, setLoading] = useState(true);
+  // 取得エラーの表示メッセージ（空 = エラーなし）。設計案の起動時エラーに相当。
+  const [error, setError] = useState('');
   // 年度ごとのデータ概要（バックエンドから取得）
   const [summaries, setSummaries] = useState<YearSelectItemView[]>([]);
+
+  /** バックエンドから年度概要を取得して画面状態を更新する（再試行時も呼ばれる） */
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const list = await fetchYearSelect();
+      setSummaries(
+        list.map((s) => ({
+          ...s,
+          hasData:
+            s.departmentCount +
+              s.personnelCount +
+              s.projectCount +
+              s.holidayCount >
+            0,
+        })),
+      );
+    } catch (err) {
+      setError(
+        displayMessage(err, '年度データを取得できませんでした。'),
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // この画面が表示中になったときにバックエンドから年度概要を取得する。
   // ※全画面は常時マウントされているため、マウント時だけだと画面を開き直しても
   //   再取得が走らず最新のDBデータが反映されない。active が true になったら再取得する。
   useEffect(() => {
     if (!active) return;
-    let alive = true;
-    (async () => {
-      setLoading(true);
-      try {
-        const list = await fetchYearSelect();
-        if (!alive) return;
-        setSummaries(
-          list.map((s) => ({
-            ...s,
-            hasData:
-              s.departmentCount +
-                s.personnelCount +
-                s.projectCount +
-                s.holidayCount >
-              0,
-          })),
-        );
-      } catch {
-        if (!alive) return;
-        message.error('年度データを取得できませんでした。');
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [active]);
+    load();
+  }, [active, load]);
 
   /**
    * 表示する年度の並び。
-   * 「既存データがある年度」から「既存データの最新年度 + 未来3年」までを連番で並べる。
-   * 未来でデータが無い年は hasData=false（データ未準備の空カード）で表示する。
+   * 2025年度〜2036年度（MIN_YEAR〜MAX_YEAR）の各年度を連番で並べる。
+   * データが無い年は hasData=false（データ未準備の空カード）で表示する。
    */
   const viewYears = useMemo(() => {
-    const existingYears = summaries.map((s) => s.year);
-    const earliest = existingYears.length
-      ? Math.min(...existingYears)
-      : selectedYear;
-    const latest = existingYears.length
-      ? Math.max(...existingYears)
-      : selectedYear;
-    const startYear = Math.min(earliest, selectedYear);
-    const endYear = Math.max(latest + 3, selectedYear);
-    const byYear = new Map(summaries.map((s) => [s.year, s]));
-    const years: YearSelectItemView[] = [];
-    for (let y = startYear; y <= endYear; y += 1) {
-      years.push(
-        byYear.get(y) ?? {
+  const byYear = new Map(summaries.map((s) => [s.year, s]));
+  return AVAILABLE_YEARS.map((y) => {
+    const s = byYear.get(y);
+    return s
+      ? {
+          ...s,
+          hasData:
+            s.departmentCount + s.personnelCount + s.projectCount + s.holidayCount > 0,
+        }
+      : {
           year: y,
           departmentCount: 0,
           personnelCount: 0,
@@ -97,11 +98,9 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
           holidayCount: 0,
           weekCount: 0,
           hasData: false,
-        },
-      );
-    }
-    return years;
-  }, [summaries, selectedYear]);
+        };
+  });
+}, [summaries]);
 
   return (
     <div className='screen-page'>
@@ -118,12 +117,38 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
       </div>
 
       <Card className='screen-card' style={{ marginTop: 12 }}>
-        {loading && summaries.length === 0 ? (
-          <div className='year-loading'>
-            <Spin tip='年度データを読み込み中...' />
+        {error && summaries.length === 0 && !loading ? (
+          // 設計案 4.5 / 5：年度一覧の取得失敗は画面内エラーとして全面表示し、再試行できる
+          <div className='year-error'>
+            <Alert
+              type='error'
+              showIcon
+              message='年度データを取得できませんでした'
+              description={error}
+              action={
+                <Button size='small' onClick={load}>
+                  再試行
+                </Button>
+              }
+            />
           </div>
         ) : (
           <Spin spinning={loading}>
+            {error && (
+              // 既に表示済みデータがあり、再取得だけ失敗した場合はリストを維持して再試行を促す
+              <Alert
+                type='error'
+                showIcon
+                message='年度データを更新できませんでした'
+                description={error}
+                action={
+                  <Button size='small' onClick={load}>
+                    再試行
+                  </Button>
+                }
+                style={{ marginBottom: 12 }}
+              />
+            )}
             <div className='year-grid'>
               {viewYears.map((s) => {
                 const selected = s.year === selectedYear;

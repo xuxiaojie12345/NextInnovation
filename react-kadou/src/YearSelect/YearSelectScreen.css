@@ -66,6 +66,24 @@
   height: 22px;
 }
 
+.year-loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+/* 全面エラー表示（年度一覧の取得失敗時） */
+.year-error {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.year-error .ant-alert {
+  max-width: 560px;
+  width: 100%;
+}
+
 .year-note {
   display: block;
   margin-top: 12px;
