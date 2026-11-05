@@ -49,3 +49,27 @@ WHERE year_id = :year_id
 DELETE FROM jn_holiday_master
 WHERE year_id = :year_id
   AND holiday_id = :holiday_id;
+
+-- :name: findby_holiday_date_all
+-- 休日一覧取得（年度指定）
+SELECT holiday_date
+FROM jn_holiday_master
+ORDER BY holiday_date
+
+-- :name: import_holiday
+-- 休日追加
+INSERT INTO jn_holiday_master (
+    year_id,
+    holiday_date,
+    register_datetime,
+    register_user,
+    update_datetime,
+    update_user
+) VALUES (
+    :year_id,    
+    :holiday_date,
+    CURRENT_TIMESTAMP,
+    :user_id,
+    CURRENT_TIMESTAMP,
+    :user_id
+);

@@ -36,5 +36,5 @@ def delete_holiday(year: str, id: int, db: Session = Depends(get_db)):
     return delete_holiday_Service(db, id, year)
 
 @router.post("/export/{year}", response_model=List[HolidaysResponse])
-def import_holiday(year: str, importHolidayRequests: List[HolidayImportRequest], x_user_id: str | None = Header(default=None, alias="X-User-Id"),db: Session = Depends(get_db)):    
-    return import_holiday_Service(db, importHolidayRequests, x_user_id,year) 
+def import_holiday(year: str, holidayImportRequest: HolidayImportRequest, x_user_id: str | None = Header(default=None, alias="X-User-Id"),db: Session = Depends(get_db)):    
+    return import_holiday_Service(db, holidayImportRequest, x_user_id,year) 

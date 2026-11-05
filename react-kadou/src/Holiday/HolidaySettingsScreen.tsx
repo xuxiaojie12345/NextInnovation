@@ -34,6 +34,7 @@ import {
 } from '../constants/options';
 import './HolidaySettingsScreen.css';
 import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
+import Item from 'antd/es/list/Item';
 
 const { Title, Text } = Typography;
 
@@ -42,6 +43,7 @@ const KIND_COLOR: Record<HolidayKind, string> = {
   祝日: 'red',
   会社休日: 'blue',
   振替休日: 'orange',
+  '': 'default',
 };
 
 /** CSV 出力の見出し */
@@ -213,7 +215,15 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   const handleImportFile = async (file: File) => {
     setImporting(true);
     try {
-      const result = await parseHolidayFile(file, year);      
+      const result = await parseHolidayFile(file, year);        
+      
+      if (result.error.length > 0) {
+        message.error(
+          `一括読み込み：解析に失敗しました（${file.name}）\n${result.error.join('\n')}`,
+        );
+        return;
+      }
+      
       if (result.rows.length === 0) {
         const detail =
           result.warnings.length > 0
@@ -228,42 +238,16 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       }
 
       // 既存日付は上書き、新規日付は追加する
-      const existingDates = new Set(holidays.map((h) => h.date));
-      const updated = result.rows.filter((r) =>
-        existingDates.has(r.date),
-      ).length;
-      const added = result.rows.length - updated;
-      const requestDatas: Holiday[] = result.rows.map((item) => ({              
-        id: holidays.find((h) => h.date === item.date)?.id || null,
-        date: item.date,
-        name: item.name,
-        kind: item.kind,
-      }));      
+      // 返回更新条数和新增条数
 
-      if (updated > 0) {
-        Modal.confirm({
-          title: '確認',
-          content: `重複が ${updated} 件あります`,
-          okText: '重複を上書きして取り込む',
-          cancelText: '中止',
-          onOk: () => {              
-            HolidayImportApi(year, currentUserId, requestDatas).then((data) => {
-            setHolidays(data);
-            message.success(`休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`);              
-            }).catch((error) => {
-              message.error(`休日情報の一括読み込みに失敗しました：${error.message}`);
-            }); 
-          }
-        });      
-      }else {
-        HolidayImportApi(year, currentUserId, requestDatas).then((data) => {
-        setHolidays(data);
-        message.success(`休日を一括読み込みしました：追加 ${added} 件 / 上書き ${updated} 件（モック）。`);              
-        }).catch((error) => {
-          message.error(`休日情報の一括読み込みに失敗しました：${error.message}`);
-        }); 
-      }
-
+      const requestDatas: string[] = result.rows.map((Item)=> Item.date)      
+      HolidayImportApi(year, currentUserId, requestDatas).then((data) => {
+      setHolidays(data);
+      message.success(`休日を一括読み込みしました。`);
+      }).catch((error) => {
+        message.error(`休日情報の一括読み込みに失敗しました：${error.message}`);
+      }); 
+      
       if (result.warnings.length > 0) {
         message.warning(
           `取り込まなかった行などが ${result.warnings.length} 件あります（${result.warnings[0]}${

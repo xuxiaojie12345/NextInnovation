@@ -28,10 +28,6 @@ import {
 export interface HolidayImportRow {
   /** 日付（'YYYY-MM-DD'） */
   date: string;
-  /** 休日名称 */
-  name: string;
-  /** 区分 */
-  kind: HolidayKind;
 }
 
 /** 一括読み込みの結果 */
@@ -40,6 +36,7 @@ export interface HolidayImportResult {
   rows: HolidayImportRow[];
   /** 取り込めなかった行の警告（「n行目：〜」形式） */
   warnings: string[];
+  error: string[];
   /** 読み取り元の説明（結果メッセージ用。例：'Excel(.xlsx) / シート:Sheet1'） */
   source: string;
 }
@@ -57,8 +54,6 @@ export const HOLIDAY_IMPORT_FORMAT_HINT =
 /** 見出し（列名）の候補。表記ゆれを吸収して判定する */
 const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
   date: ['日付', '休日', '休日付', 'date'],
-  name: ['名称', '休日名称', '名前', 'name'],
-  kind: ['区分', '種別', 'kind', 'type'],
 };
 
 /** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
@@ -68,7 +63,7 @@ const HEADER_MATCH_MIN = 2;
 const HEADER_SEARCH_ROWS = 5;
 
 /** 項目の並び（見出し行が無い場合のフォールバック） */
-const FIELD_ORDER: Array<keyof HolidayImportRow> = ['date', 'name', 'kind'];
+const FIELD_ORDER: Array<keyof HolidayImportRow> = ['date'];
 
 /** 区分の表記ゆれを吸収する */
 const KIND_ALIASES: Record<string, HolidayKind> = {
@@ -171,6 +166,7 @@ const buildRows = (
   source: string,
 ): HolidayImportResult => {
   const warnings: string[] = [];
+  const error: string[] = [];
   const rows: HolidayImportRow[] = [];
 
   // 見出し行を探す（見つからない場合は先頭から FIELD_ORDER の並びとみなす）
@@ -196,11 +192,9 @@ const buildRows = (
     const lineNo = index + 1;
 
     const rawDate = (row[columns.date] ?? '').trim();
-    const name = (row[columns.name] ?? '').trim();
-    const rawKind = (row[columns.kind] ?? '').trim();
 
     // 完全な空行はスキップする
-    if (!rawDate && !name && !rawKind) return;
+    if (!rawDate) return;
 
     if (!rawDate) {
       warnings.push(`${lineNo}行目：日付が空のため取り込みませんでした`);
@@ -215,45 +209,29 @@ const buildRows = (
       return;
     }
 
-    // 選択中年度以外は取り込まない（年度ごとのデータのため）
-    if (dayjs(date).year() !== year) {
-      warnings.push(
-        `${lineNo}行目：${date} は ${year}年度外のため取り込みませんでした`,
-      );
-      return;
-    }
-
-    if (!name) {
-      warnings.push(`${lineNo}行目：名称が空のため取り込みませんでした`);
-      return;
-    }
-
-    // 区分が空・未知の場合は「会社休日」として取り込む
-    let kind = parseKind(rawKind);
-    if (!kind) {
-      kind = '会社休日';
-      warnings.push(
-        rawKind
-          ? `${lineNo}行目：区分「${rawKind}」を認識できないため会社休日として取り込みました`
-          : `${lineNo}行目：区分が空のため会社休日として取り込みました`,
-      );
-    }
+    // // 選択中年度以外は取り込まない（年度ごとのデータのため）
+    // if (dayjs(date).year() !== year) {
+    //   warnings.push(
+    //     `${lineNo}行目：${date} は ${year}年度外のため取り込みませんでした`,
+    //   );
+    //   return;
+    // }
 
     // ファイル内で同じ日付が複数ある場合は後ろの行を優先する
     const duplicate = indexByDate.get(date);
     if (duplicate !== undefined) {
-      warnings.push(
+      error.push(
         `${lineNo}行目：日付 ${date} が重複しています（後ろの行を優先）`,
       );
-      rows[duplicate] = { date, name, kind };
+      rows[duplicate] = { date };
       return;
     }
 
     indexByDate.set(date, rows.length);
-    rows.push({ date, name, kind });
+    rows.push({ date });
   });
 
-  return { rows, warnings, source };
+  return { rows, warnings, error, source };
 };
 
 /**

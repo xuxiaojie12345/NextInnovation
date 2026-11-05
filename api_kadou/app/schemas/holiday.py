@@ -4,9 +4,9 @@ from pydantic import BaseModel
 class HolidaysResponse(BaseModel):    
     id: int
     year: str
-    kind: str
+    kind: str | None
     data: str
-    name: str    
+    name: str | None   
 
 """休日追加リクエスト"""
 class HolidayRequest(BaseModel):
@@ -15,7 +15,4 @@ class HolidayRequest(BaseModel):
     name: str
 
 class HolidayImportRequest(BaseModel):
-    id: str | None
-    kind: str
-    data: str
-    name: str
+    data: list[str]

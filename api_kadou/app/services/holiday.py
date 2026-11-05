@@ -42,15 +42,16 @@ def delete_holiday(db: Session, id: int, year: str) -> List[HolidaysResponse]:
     return findby_holidays(db, year)
 
 """休日情報一括追加"""
-def import_holiday(db: Session, importHolidayRequests: List[HolidayImportRequest], x_user_id: str | None,year: str) -> List[HolidaysResponse]:
-    for importHolidayRequest in importHolidayRequests:
-        if importHolidayRequest.id is None:
-            sql = load_sql("holidays.sql","add_holiday")
-            result = db.execute(text(sql), {"year_id": year, "holiday_date": importHolidayRequest.data, "holiday_name": importHolidayRequest.name, "holiday_kind": importHolidayRequest.kind, "user_id": x_user_id})          
-        else:
-            sql = load_sql("holidays.sql","update_holiday")
-            result = db.execute(text(sql), {"year_id": year,"holiday_id": importHolidayRequest.id, "holiday_date": importHolidayRequest.data, "holiday_name": importHolidayRequest.name, "holiday_kind": importHolidayRequest.kind, "user_id": x_user_id})
-        if result.rowcount <= 0:
+def import_holiday(db: Session, holidayImportRequest: HolidayImportRequest, x_user_id: str | None,year: str) -> List[HolidaysResponse]:
+    findby_sql = load_sql("holidays.sql","findby_holiday_date_all") 
+    findby_result = db.execute(text(findby_sql)).fetchall()
+    holidayDate: list[str] = [row.holiday_date for row in findby_result]
+    addDataList = list(filter(lambda d: d.strip() not in holidayDate, holidayImportRequest.data))
+    import_sql = load_sql("holidays.sql","import_holiday")
+    for addData in addDataList:
+        import_result = db.execute(text(import_sql), {"year_id": addData[:4], "holiday_date": addData, "user_id": x_user_id})
+        if import_result.rowcount <= 0:
             raise Exception("休日情報一括追加に失敗しました。")    
     db.commit()
+
     return findby_holidays(db, year)

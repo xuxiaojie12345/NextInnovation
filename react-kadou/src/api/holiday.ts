@@ -1,4 +1,6 @@
+import Item from 'antd/es/list/Item';
 import { Holiday, HolidayKind } from '../data/yearStore';
+import dayjs from 'dayjs';
 
 export interface HolidayResponse {
     id: number;
@@ -15,10 +17,7 @@ export interface HolidayRequest {
 }
 
 export interface HolidayImportRequest {
-    id: string | null;
-    kind: string;
-    data: string;
-    name: string; 
+    data: string[];
 }
 
 /**
@@ -153,14 +152,9 @@ export async function HolidayDeleteApi(year: number,id: string | null): Promise<
  * @param year 
  * @returns 
  */
-export async function HolidayImportApi(year: number,currentUserId: string | null,addData: Holiday[]): Promise<Holiday[]> {
+export async function HolidayImportApi(year: number,currentUserId: string | null,addData: string[]): Promise<Holiday[]> {
 
-  const requestDatas: HolidayImportRequest[] = addData.map((item) => ({
-    id: item.id,
-    kind: getKindNo(item.kind),
-    data: item.date.replace(/-/g, ''),
-    name: item.name,
-  }));
+  const requestDatas: HolidayImportRequest = {data: addData.map(d => dayjs(d).format('YYYYMMDD'))}
 
   const res = await fetch(`/api/kadouholidays/export/${year}`, {
     method: 'post',
