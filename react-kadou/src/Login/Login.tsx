@@ -3,11 +3,12 @@ import { Button, Card, Form, Input, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import type { AuthUser } from '../types/user';
 import { loginApi, loginErrorMessage } from '../api/login';
+import { validatePassword, PASSWORD_MAX_LENGTH } from './passwordRules';
 import './Login.css';
 
 const { Title, Text } = Typography;
 
-/** ユーザーID / パスワードで許可する文字（半角英数のみ） */
+/** ユーザーIDで許可する文字（半角英数のみ） */
 const HALF_WIDTH_ONLY = /^[a-zA-Z0-9]+$/;
 const HALF_WIDTH_CHARS = /[^a-zA-Z0-9]/g;
 const HALF_WIDTH_MSG = '半角英数字のみ入力できます。';
@@ -29,26 +30,35 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // ログイン処理中フラグ
   const [loading, setLoading] = useState(false);
 
-  /** 入力値から半角英数字以外を取り除く（それ以外の文字は入力させない） */
-  const sanitizeHalfWidth = (value: string) => value.replace(HALF_WIDTH_CHARS, '');
+  /** 入力値を許可文字だけで構成する（許可外の文字は削除） */
+  const sanitize = (value: string, invalidChars: RegExp) => value.replace(invalidChars, '');
 
-  /** 入力文字列を半角英数字のみに制限し、エラー表示も消す */
-  const restrictHalfWidth = (name: 'userId' | 'password') => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const limited = sanitizeHalfWidth(e.target.value);
-    if (limited !== e.target.value) {
-      form.setFieldValue(name, limited);
-    }
+  /** ユーザーID：半角英数のみ入力できるように制限 */
+  const restrictUserId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const limited = sanitize(e.target.value, HALF_WIDTH_CHARS);
+    if (limited !== e.target.value) form.setFieldValue('userId', limited);
     if (error) setError('');
+  };
+
+  /** パスワード：エラー表示を消しつつ、入力そのものは passwordRules のルールに任せる */
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (error) setError('');
+  };
+
+  /** ユーザーID：必須・半角英数のみ（入力中に即時検証） */
+  const userIdValidator = (_: unknown, value: string | undefined) => {
+    const input = (value ?? '').trim();
+    if (input === '') return Promise.reject(new Error('ユーザーIDを入力してください。'));
+    if (!HALF_WIDTH_ONLY.test(input)) return Promise.reject(new Error(HALF_WIDTH_MSG));
+    return Promise.resolve();
   };
 
   /** ログイン実行（バックエンドのログインAPIで照合する） */
   const handleFinish = async (values: { userId: string; password: string }) => {
+    // ユーザーID・パスワードはフォームの検証ルールで既に検証済み。
+    // パスワードは仕様どおり trim せず、入力値をそのまま照合する。
     const userId = values.userId.trim();
-    const password = values.password.trim();
-    if (!HALF_WIDTH_ONLY.test(userId) || !HALF_WIDTH_ONLY.test(password)) {
-      setError(HALF_WIDTH_MSG);
-      return;
-    }
+    const password = values.password;
     setLoading(true);
     setError('');
     try {
@@ -82,10 +92,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <Form.Item
             label='ユーザーID'
             name='userId'
-            rules={[
-              { required: true, message: 'ユーザーIDを入力してください。' },
-              { pattern: HALF_WIDTH_ONLY, message: HALF_WIDTH_MSG },
-            ]}
+            rules={[{ validator: userIdValidator }]}
           >
             <Input
               size='large'
@@ -93,15 +100,19 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               placeholder='ユーザーID'
               autoComplete='username'
               maxLength={5}
-              onChange={restrictHalfWidth('userId')}
+              onChange={restrictUserId}
             />
           </Form.Item>
           <Form.Item
             label='パスワード'
             name='password'
             rules={[
-              { required: true, message: 'パスワードを入力してください。' },
-              { pattern: HALF_WIDTH_ONLY, message: HALF_WIDTH_MSG },
+              {
+                validator: (_, value) => {
+                  const msg = validatePassword(value);
+                  return msg ? Promise.reject(new Error(msg)) : Promise.resolve();
+                },
+              },
             ]}
           >
             <Input.Password
@@ -109,8 +120,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               prefix={<LockOutlined />}
               placeholder='パスワード'
               autoComplete='current-password'
-              maxLength={50}
-              onChange={restrictHalfWidth('password')}
+              maxLength={PASSWORD_MAX_LENGTH}
+              onChange={onChangePassword}
             />
           </Form.Item>
           <Button type='primary' size='large' htmlType='submit' block loading={loading}>
