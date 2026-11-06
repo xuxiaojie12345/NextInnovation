@@ -25,6 +25,7 @@ import {
   departmentExists,
   normalizeUserDepartmentId,
 } from '../data/departmentRules';
+import { PASSWORD_MAX_LENGTH, validatePassword } from '../Login/passwordRules';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -126,6 +127,12 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     }
     if (!nm) {
       message.error('氏名を入力してください。');
+      return;
+    }
+    // パスワードの形式チェック（ログイン画面と同じルール）
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      message.error(passwordError);
       return;
     }
     // ユーザーID の重複チェック（編集中の自分自身は除く）
@@ -357,9 +364,9 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           </div>
           <div className='form-field'>
             <span className='form-label'>パスワード</span>
-            <Input
+            <Input.Password
               value={password}
-              maxLength={32}
+              maxLength={PASSWORD_MAX_LENGTH}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>

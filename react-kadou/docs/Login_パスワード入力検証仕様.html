@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ログイン画面 パスワード入力検証仕様書</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --paper: #ffffff;
+    --ink: #1f2937;
+    --ink-sub: #4b5563;
+    --line: #e5e7eb;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --warn: #b45309;
+    --warn-soft: #fffbeb;
+    --danger: #b91c1c;
+    --danger-soft: #fef2f2;
+    --ok: #047857;
+    --ok-soft: #ecfdf5;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Yu Gothic UI",
+      "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .page {
+    max-width: 1120px;
+    margin: 32px auto 64px;
+    padding: 0 20px;
+  }
+
+  header.hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #0ea5e9 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
+  }
+
+  header.hero h1 {
+    margin: 0 0 8px;
+    font-size: 27px;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+
+  header.hero p {
+    margin: 4px 0;
+    opacity: 0.92;
+    font-size: 14px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .hero-tags span {
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .docinfo {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 20px;
+    margin: 20px 0 24px;
+  }
+
+  .docinfo table { margin: 12px 0; }
+
+  nav.toc {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin: 0 0 24px;
+  }
+
+  nav.toc h2 {
+    font-size: 14px;
+    margin: 8px 0 10px;
+    color: var(--ink-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  nav.toc ol {
+    margin: 0 0 12px;
+    padding-left: 22px;
+    columns: 2;
+    column-gap: 40px;
+  }
+
+  nav.toc li { margin: 2px 0; }
+
+  nav.toc a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  nav.toc a:hover { text-decoration: underline; }
+
+  section.card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 26px 30px 30px;
+    margin: 0 0 24px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  }
+
+  section.card > h2 {
+    font-size: 20px;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-soft);
+    color: #1e3a8a;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin: 26px 0 10px;
+    color: var(--ink);
+    padding-left: 10px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.4;
+  }
+
+  h3:first-of-type { margin-top: 0; }
+
+  p { margin: 8px 0; }
+
+  ul, ol { margin: 8px 0 8px 4px; padding-left: 22px; }
+
+  li { margin: 4px 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 14px;
+  }
+
+  th, td {
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: #f1f5f9;
+    color: #1e3a8a;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody tr:nth-child(even) { background: #fafbfc; }
+
+  td.center, th.center { text-align: center; }
+
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    background: #f1f5f9;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.9em;
+    color: #0f172a;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 10px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 12px 0 18px;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .note {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+
+  .warn {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+
+  .danger {
+    background: var(--danger-soft);
+    border-left: 4px solid var(--danger);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+
+  .note strong, .warn strong, .danger strong { display: inline-block; margin-bottom: 2px; }
+
+  .badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 1px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-ok { background: var(--ok-soft); color: var(--ok); }
+  .badge-ng { background: var(--danger-soft); color: var(--danger); }
+  .badge-mid { background: var(--warn-soft); color: var(--warn); }
+
+  .muted { color: var(--ink-sub); font-size: 13px; }
+
+  footer {
+    text-align: center;
+    color: var(--ink-sub);
+    font-size: 12.5px;
+    margin-top: 32px;
+  }
+
+  @media (max-width: 720px) {
+    nav.toc ol { columns: 1; }
+    section.card { padding: 20px 18px 24px; }
+    header.hero { padding: 26px 22px; }
+    header.hero h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <h1>ログイン画面 パスワード入力検証仕様書</h1>
+    <p>react-kadou / Login.tsx — 使用コンポーネントと入力検証ルールの整理</p>
+    <div class="hero-tags">
+      <span>Ant Design v5 / Input.Password</span>
+      <span>半角英数字＋ASCII 記号</span>
+      <span>最大 50 文字</span>
+      <span>実装済み（2026-11-06）</span>
+    </div>
+  </header>
+
+  <div class="docinfo">
+    <table>
+      <tbody>
+        <tr>
+          <th style="width:140px">文書番号</th>
+          <td>SPEC-KADOU-LOGIN-PWD-001</td>
+          <th style="width:110px">版数</th>
+          <td>v1.0（実装済）</td>
+        </tr>
+        <tr>
+          <th>対象画面</th>
+          <td>ログイン画面（<code>react-kadou/src/Login/Login.tsx</code>）</td>
+          <th>作成日</th>
+          <td>2026-11-06</td>
+        </tr>
+        <tr>
+          <th>ステータス</th>
+          <td><span class="badge badge-ok">実装済み</span></td>
+          <th>関連文書</th>
+          <td><code>react-kadou/src/data/mockUsers.ts</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="toc">
+    <h2>目次</h2>
+    <ol>
+      <li><a href="#s1">現状（As-Is）</a></li>
+      <li><a href="#s2">検証ルール（To-Be）</a></li>
+      <li><a href="#s3">文字種の定義</a></li>
+      <li><a href="#s4">実装方針</a></li>
+      <li><a href="#s5">バックエンド・DB との整合</a></li>
+      <li><a href="#s6">パスワード強度ルール（参考・対象外）</a></li>
+      <li><a href="#s7">テスト観点</a></li>
+      <li><a href="#s8">決定事項・未決事項</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 1 ============ -->
+  <section class="card" id="s1">
+    <h2>1. 改修前の状態（As-Is）</h2>
+
+    <div class="note">
+      <strong>本章の位置づけ</strong>
+      <p style="margin-bottom:0">本章は改修前（v0.3 時点）の状態を記録したものです。改修後の実装内容は第 4 章・第 5 章を参照してください。</p>
+    </div>
+
+    <h3>1.1 使用コンポーネント</h3>
+    <table>
+      <thead>
+        <tr><th style="width:180px">項目</th><th>現状値</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>UI ライブラリ</td><td>Ant Design v5（<code>antd ^5.29.1</code>）</td></tr>
+        <tr><td>コンポーネント</td><td><strong><code>Input.Password</code></strong>（<code>Login.tsx</code> L91〜L100）</td></tr>
+        <tr><td>親要素</td><td><code>Form.Item name='password'</code>（<code>label='パスワード'</code>）</td></tr>
+        <tr><td>主な属性</td>
+          <td><code>size='large'</code>、<code>prefix={&lt;LockOutlined /&gt;}</code>、<code>placeholder='パスワード'</code>、<code>autoComplete='current-password'</code>、<code>maxLength={32}</code></td>
+        </tr>
+        <tr><td>マスク表示</td><td>既定値（表示／非表示の切替アイコンあり）</td></tr>
+        <tr><td>検証ルール</td><td><strong>必須チェックのみ</strong>（L87〜L89）</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.2 現状の検証内容</h3>
+    <pre><code>rules={[{ required: true, message: 'パスワードを入力してください。' }]}</code></pre>
+    <ul>
+      <li>空文字のみエラー。空白のみの入力、文字種、最小／最大桁数の検証は<strong>未実装</strong>。</li>
+      <li>送信時に <code>values.password.trim()</code> を実行してから照合している（L39）。</li>
+    </ul>
+
+    <h3>1.3 現状の課題</h3>
+    <table>
+      <thead>
+        <tr><th class="center" style="width:48px">No</th><th style="width:34%">課題</th><th>影響</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>空白のみの入力でも必須チェックを通過する</td><td>不要な認証リクエストが発生する</td></tr>
+        <tr><td class="center">2</td><td>文字種の制限がない（全角・日本語・絵文字などが入力可能）</td><td>後続のユーザー管理・API 連携時に不整合が起きる</td></tr>
+        <tr><td class="center">3</td><td><code>trim()</code> をパスワードに適用している</td><td>前後空白を含む正当なパスワードが認証失敗する</td></tr>
+        <tr><td class="center">4</td><td><code>maxLength={32}</code> による<strong>無言の切り捨て</strong></td><td>33 文字目以降が入力できず、入力誤りに気付けない</td></tr>
+        <tr><td class="center">5</td><td>ユーザー管理画面のパスワード欄は<strong>通常の <code>Input</code>（平文表示）</strong></td><td>画面間でコンポーネント・ルールが不統一</td></tr>
+        <tr><td class="center">6</td><td>react-ud（<code>Login_内部設計.md</code>）と検証方式が異なる</td><td>プロジェクト間で仕様が分岐する</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="card" id="s2">
+    <h2>2. 検証ルール（To-Be）</h2>
+
+    <h3>2.1 ルール一覧</h3>
+    <table>
+      <thead>
+        <tr>
+          <th class="center" style="width:48px">No</th>
+          <th style="width:110px">検査項目</th>
+          <th style="width:130px">検査タイミング</th>
+          <th>検査条件</th>
+          <th style="width:250px">エラーメッセージ</th>
+          <th style="width:150px">動作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center">1</td>
+          <td>必須</td>
+          <td>入力時（onChange）／送信時</td>
+          <td>未入力、または空白のみ（<code>trim()</code> 後に空）</td>
+          <td><code>パスワードを入力してください。</code></td>
+          <td>送信中断（API 呼出なし）</td>
+        </tr>
+        <tr>
+          <td class="center">2</td>
+          <td>最大桁数</td>
+          <td>入力時（onChange）／送信時</td>
+          <td>50 文字を超える</td>
+          <td><code>パスワードは50文字以内で入力してください。</code></td>
+          <td>送信中断</td>
+        </tr>
+        <tr>
+          <td class="center">3</td>
+          <td>文字種（許容）</td>
+          <td>入力時（onChange）／送信時</td>
+          <td>半角英数字および ASCII 記号（<code>0x21</code>〜<code>0x7E</code>）以外を含む</td>
+          <td><code>パスワードは半角英数字と記号で入力してください。</code></td>
+          <td>送信中断</td>
+        </tr>
+        <tr>
+          <td class="center">4</td>
+          <td>最小桁数</td>
+          <td>―</td>
+          <td><strong>ログイン画面では検査しない</strong></td>
+          <td>―</td>
+          <td>―</td>
+        </tr>
+        <tr>
+          <td class="center">5</td>
+          <td>認証結果</td>
+          <td>送信時（API 応答後）</td>
+          <td>ユーザーID またはパスワードが不一致</td>
+          <td><code>ユーザーIDまたはパスワードが正しくありません。</code></td>
+          <td>エラー表示、画面遷移なし</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>補足</strong>
+      <ul style="margin-bottom:0">
+        <li>ログイン画面の検証は「形式チェック」のみとし、パスワード強度（英大文字・小文字・数字・記号の組み合わせ、8 文字以上など）の検査は<strong>行わない</strong>。理由は 2.2 のとおり。</li>
+        <li>認証失敗時のメッセージは、ユーザーID の存在有無やパスワード規則を推測されないよう<strong>曖昧な表現に統一</strong>する。</li>
+      </ul>
+    </div>
+
+    <h3>2.2 最小桁数を設けない理由</h3>
+    <ol>
+      <li>既存ユーザーの中に短いパスワードのアカウントが存在する可能性があり、ログイン時に弾くと<strong>正当なユーザーがログイン不能</strong>になる。</li>
+      <li>ログイン画面で桁数下限を提示すると、パスワードポリシーが外部に漏れる。</li>
+      <li>桁数下限は「新規登録／パスワード変更」画面でのみ適用するのが一般的な設計である。</li>
+    </ol>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="card" id="s3">
+    <h2>3. 文字種の定義</h2>
+
+    <h3>3.1 許容文字</h3>
+    <table>
+      <thead>
+        <tr><th style="width:150px">区分</th><th style="width:42%">対象</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>半角英字</td><td><code>A-Z</code>、<code>a-z</code></td><td>―</td></tr>
+        <tr><td>半角数字</td><td><code>0-9</code></td><td>―</td></tr>
+        <tr>
+          <td>ASCII 記号</td>
+          <td><code>!</code> <code>"</code> <code>#</code> <code>$</code> <code>%</code> <code>&amp;</code> <code>'</code> <code>(</code> <code>)</code> <code>*</code> <code>+</code> <code>,</code> <code>-</code> <code>.</code> <code>/</code> <code>:</code> <code>;</code> <code>&lt;</code> <code>=</code> <code>&gt;</code> <code>?</code> <code>@</code> <code>[</code> <code>\</code> <code>]</code> <code>^</code> <code>_</code> <code>`</code> <code>{</code> <code>|</code> <code>}</code> <code>~</code></td>
+          <td>表示可能な ASCII 記号（<code>0x21</code>〜<code>0x7E</code>）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 禁止文字</h3>
+    <table>
+      <thead>
+        <tr><th style="width:180px">区分</th><th style="width:36%">例</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>全角文字</td><td><code>ａ</code> <code>１</code> <code>あ</code> <code>ア</code> <code>漢</code></td><td>IME 経由の入力を含む</td></tr>
+        <tr><td>空白類</td><td>半角スペース、全角スペース、タブ</td><td>前後空白も許容しない</td></tr>
+        <tr><td>制御文字</td><td>改行、<code>0x7F</code>、<code>0x00</code>〜<code>0x20</code></td><td>―</td></tr>
+        <tr><td>マルチバイト記号・絵文字</td><td><code>￥</code> <code>〜</code> <code>😀</code></td><td>―</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.3 正規表現</h3>
+    <p><strong>ホワイトリスト方式</strong>（ブラックリスト方式は使用しない）を採用する。</p>
+    <pre><code>/^[\x21-\x7E]+$/</code></pre>
+    <p class="muted">補足：<code>0x21</code>〜<code>0x7E</code> は「半角英数字＋ASCII 記号」と「空白・制御文字を含まない」を同時に満たす。</p>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="card" id="s4">
+    <h2>4. 実装方針</h2>
+
+    <h3>4.1 コンポーネント</h3>
+    <table>
+      <thead>
+        <tr><th style="width:150px">項目</th><th>方針</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>コンポーネント</td><td><code>Input.Password</code> を継続使用（マスク表示・表示切替は既定のまま）</td></tr>
+        <tr><td><code>autoComplete</code></td><td><code>current-password</code> を維持</td></tr>
+        <tr><td><code>maxLength</code></td><td>50 を維持（<strong>保険</strong>としての上限。単独でエラーを表現しない）</td></tr>
+        <tr><td>表示切替</td><td><code>visibilityToggle</code> は既定（有効）とする</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.2 検証の実装分担</h3>
+    <table>
+      <thead>
+        <tr><th style="width:180px">役割</th><th style="width:270px">実装方法</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>入力の制限（サニタイズ）</td>
+          <td><strong>実施しない</strong></td>
+          <td>入力自体は制限せず、許容外の文字は <code>rules</code> でエラー表示する</td>
+        </tr>
+        <tr><td>エラー表示</td><td><code>Form.Item</code> の <code>rules</code></td><td>必須・最大桁数・文字種の 3 ルール</td></tr>
+        <tr><td>検証タイミング</td><td>antd 既定の <code>onChange</code>（入力時）＋送信時</td><td>入力中も即時にエラーを表示する（<code>validateTrigger</code> は指定しない）</td></tr>
+        <tr><td>照合</td><td><code>onFinish</code> 内</td><td>パスワードは<strong>加工せず</strong>そのまま送信する</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.3 パスワードの取り扱い</h3>
+    <table>
+      <thead>
+        <tr><th class="center" style="width:48px">No</th><th style="width:40%">方針</th><th>理由</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>パスワードに対して <code>trim()</code> を<strong>行わない</strong></td><td>前後空白は仕様上禁止（第 3 章）であり、加工すると認証結果が変わる恐れがある</td></tr>
+        <tr><td class="center">2</td><td>ユーザーID のみ <code>trim()</code> する</td><td>入力補助として妥当。パスワードとは扱いを分ける</td></tr>
+        <tr><td class="center">3</td><td><code>normalize()</code> などの文字列正規化を行わない</td><td>パスワードの意味が変わる</td></tr>
+        <tr><td class="center">4</td><td>パスワードをログ出力・<code>localStorage</code> 保存しない</td><td>セキュリティ要件</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.4 ユーザー管理画面との統一</h3>
+    <p><code>User/UserManagementScreen.tsx</code> のパスワード欄は <code>Input.Password</code> に変更し、共通の <code>validatePassword()</code> で保存前に検証する。</p>
+
+    <h3>4.5 実装ファイル</h3>
+    <table>
+      <thead>
+        <tr><th style="width:300px">ファイル</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>src/Login/passwordRules.ts</code></td><td>検証ルールの共通定義（最大桁数・許容文字・エラーメッセージ・<code>validatePassword()</code>・antd 用 <code>passwordFormRules</code>）</td></tr>
+        <tr><td><code>src/Login/passwordRules.test.ts</code></td><td>単体テスト（第 7 章のテスト観点）</td></tr>
+        <tr><td><code>src/Login/Login.tsx</code></td><td>ログイン画面に検証ルールを適用、パスワードの <code>trim()</code> を廃止</td></tr>
+        <tr><td><code>src/User/UserManagementScreen.tsx</code></td><td>パスワード欄を <code>Input.Password</code> に変更し、保存前に同一検証を適用</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="card" id="s5">
+    <h2>5. バックエンド・DB との整合</h2>
+    <table>
+      <thead>
+        <tr><th style="width:150px">項目</th><th>要件</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>最大桁数</td><td>フロント <code>50</code> / API リクエスト項目 / DB カラム長を<strong>同一</strong>にする</td></tr>
+        <tr><td>文字種</td><td>API 側でもホワイトリスト検証を実施する（フロント検証は UX 目的であり、防御ではない）</td></tr>
+        <tr><td>保存方式</td><td>パスワードは<strong>平文</strong>で保存・照合する（少人数・クローズド環境での利用を前提とするため、ハッシュ化は行わない）</td></tr>
+        <tr><td>注意点</td><td>将来、利用者数の増加や外部公開を行う場合は、ハッシュ化（bcrypt / Argon2 等）への移行を再検討する</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>現状の扱い</strong>
+      <p style="margin-bottom:0"><code>mockUsers.ts</code> の<strong>平文パスワード（<code>pass1234</code>）</strong>をそのまま踏襲し、DB 側でも平文で保持する。ただし、パスワードをログに出力したり <code>localStorage</code> に保存したりしないこと（4.3 No.4）。</p>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="card" id="s6">
+    <h2>6. パスワード強度ルール（参考・本画面の対象外）</h2>
+    <p>新規登録・パスワード変更画面では、以下を適用することを想定する（本仕様では検査しない）。</p>
+    <ul>
+      <li>8 文字以上 50 文字以内</li>
+      <li>英大文字・英小文字・数字・記号のうち 3 種類以上</li>
+      <li>ユーザーID と同一文字列の禁止</li>
+    </ul>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="card" id="s7">
+    <h2>7. テスト観点</h2>
+    <table>
+      <thead>
+        <tr><th class="center" style="width:48px">No</th><th style="width:34%">入力値</th><th>期待結果</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>未入力</td><td>「パスワードを入力してください。」</td></tr>
+        <tr><td class="center">2</td><td>半角スペースのみ</td><td>「パスワードを入力してください。」</td></tr>
+        <tr><td class="center">3</td><td><code>pass1234</code></td><td>エラーなし（認証処理へ進む）</td></tr>
+        <tr><td class="center">4</td><td><code>P@ssw0rd!#$</code></td><td>エラーなし</td></tr>
+        <tr><td class="center">5</td><td><code>ｐａｓｓ１２３４</code>（全角）</td><td>「半角英数字と記号で入力してください。」</td></tr>
+        <tr><td class="center">6</td><td><code>ぱすわーど</code>（日本語）</td><td>同上</td></tr>
+        <tr><td class="center">7</td><td><code>pass 1234</code>（途中に半角スペース）</td><td>同上（または入力時点で除外）</td></tr>
+        <tr><td class="center">8</td><td>50 文字</td><td>エラーなし</td></tr>
+        <tr><td class="center">9</td><td>51 文字</td><td>「パスワードは50文字以内で入力してください。」</td></tr>
+        <tr><td class="center">10</td><td>正しい形式・誤ったパスワード</td><td>「ユーザーIDまたはパスワードが正しくありません。」</td></tr>
+        <tr><td class="center">11</td><td>表示切替アイコン押下</td><td>平文／マスクが切り替わる</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="card" id="s8">
+    <h2>8. 決定事項・未決事項</h2>
+    <table>
+      <thead>
+        <tr><th class="center" style="width:48px">No</th><th>事項</th><th style="width:290px">決定内容 / 確認先</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="center">1</td><td>最大桁数</td><td><strong>50 文字で確定</strong>（2026-11-06 決定）</td></tr>
+        <tr><td class="center">2</td><td>入力方式</td><td><strong>入力時のフィルタは行わず、入力時（onChange）／送信時にエラー表示</strong>（2026-11-06 決定）</td></tr>
+        <tr><td class="center">3</td><td>パスワードの <code>trim()</code> 廃止</td><td><strong>実施済み・既存モックデータへの影響なし</strong>（全ユーザーのパスワードは <code>pass1234</code>）</td></tr>
+        <tr><td class="center">4</td><td>許容記号の範囲を「ASCII 記号すべて」で確定してよいか</td><td>セキュリティ担当</td></tr>
+        <tr><td class="center">5</td><td>最大桁数を API・DB 側の項目長と一致させる対応</td><td>バックエンド担当</td></tr>
+        <tr><td class="center">6</td><td>検証のタイミング</td><td><strong>入力時（onChange）／送信時で確定</strong>（<code>validateTrigger</code> は antd 既定のまま）</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    本仕様は実装済みです（<code>src/Login/passwordRules.ts</code>）。— 2026-11-06
+  </footer>
+
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { AuthUser } from '../data/mockUsers';
 import type { Department } from '../WorkStatus/types';
 import { departmentNameOf } from '../data/departmentUtils';
+import { PASSWORD_MAX_LENGTH, passwordFormRules } from './passwordRules';
 import './Login.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -36,7 +37,8 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
   /** ログイン実行（ユーザーID・パスワードを MOCK_USERS と照合する） */
   const handleFinish = (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
-    const password = values.password.trim();
+    // パスワードは trim() などの加工をしない（前後の空白も許容しないため、そのまま照合する）
+    const password = values.password;
     const user = users.find(
       (u) => u.userId === userId && u.password === password,
     );
@@ -84,16 +86,14 @@ const Login: React.FC<LoginProps> = ({ users, departments, onLogin }) => {
           <Form.Item
             label='パスワード'
             name='password'
-            rules={[
-              { required: true, message: 'パスワードを入力してください。' },
-            ]}
+            rules={passwordFormRules}
           >
             <Input.Password
               size='large'
               prefix={<LockOutlined />}
               placeholder='パスワード'
               autoComplete='current-password'
-              maxLength={32}
+              maxLength={PASSWORD_MAX_LENGTH}
               onChange={() => {
                 if (error) setError('');
               }}
