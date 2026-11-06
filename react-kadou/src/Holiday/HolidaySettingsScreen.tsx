@@ -180,7 +180,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         message.error(`休日情報の削除に失敗しました：${error.message}`);
       });
       message.success(
-        `${formatDate(row.date)}「${row.name}」を削除しました（モック）。`,
+        `休日情報${formatDate(row.date)}を削除しました。`,
       );
     },
     [setHolidays],
