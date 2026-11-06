@@ -193,9 +193,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   /** CSV 出力（Excel で開けるよう BOM 付き UTF-8 / CRLF） */
   const handleExport = () => {
     const rows = sortedHolidays.map((h) =>
-      [h.date, h.name, h.kind].map(csvEscape).join(','),
+      [h.date].map(csvEscape),
     );
-    const csv = `\uFEFF${[CSV_HEADER, ...rows].join('\r\n')}\r\n`;
+    const csv = `\uFEFF${[...rows].join('\r\n')}\r\n`;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
