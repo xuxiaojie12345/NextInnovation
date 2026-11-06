@@ -200,6 +200,14 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 削除処理（件数取得・実行）中フラグ */
   const [deleting, setDeleting] = useState(false);
   /**
+   * 入力チェック結果（入力欄の下に赤字で表示する）。
+   * '' = エラーなし。フォーカスが外れたタイミングで判定する。
+   */
+  const [employeeNoError, setEmployeeNoError] = useState('');
+  const [roleError, setRoleError] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  /**
    * 直近の検索（または保存）が成功した社員番号。
    * 入力欄の社員番号がこれと一致している間だけ「DB で確認済み」とみなす。
    * 入力内容が変わると無効になる（＝ボタンの表示が「保存する」に戻る）。
@@ -333,6 +341,60 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const isVerified = verifiedNo !== '' && verifiedNo === employeeNo.trim();
   const isExisting = isVerified && verifiedExists;
 
+  // --- 入力チェック -----------------------------------------------
+  /** 社員番号：5 桁以内の半角数字のみ */
+  const validateEmployeeNo = (v: string): string => {
+    const t = v.trim();
+    if (t === '') return '社員番号を入力してください。';
+    if (!/^[0-9]{1,5}$/.test(t)) {
+      return '社員番号は5桁以内の半角数字で入力してください。';
+    }
+    return '';
+  };
+
+  /** 役割：必須・6 桁の半角英数字のみ */
+  const validateRole = (v: string): string => {
+    const t = v.trim();
+    if (t === '') return '役割を入力してください。';
+    if (!/^[a-zA-Z0-9]{6}$/.test(t)) {
+      return '役割は6桁の半角英数字で入力してください。';
+    }
+    return '';
+  };
+
+  /** 名前：20 文字以内 */
+  const validateName = (v: string): string => {
+    if (v.trim().length > 20) {
+      return '名前は20文字以内で入力してください。';
+    }
+    return '';
+  };
+
+  /** 社員番号の入力チェック（フォーカスアウト時に呼ぶ） */
+  const handleEmployeeNoBlur = () => {
+    // 空欄は blurred 時にエラーにしない（必須エラーは送信時に出す）
+    if (employeeNo.trim() === '') {
+      setEmployeeNoError('');
+      return;
+    }
+    setEmployeeNoError(validateEmployeeNo(employeeNo));
+  };
+
+  /** 役割の入力チェック（フォーカスアウト時に呼ぶ） */
+  const handleRoleBlur = () => {
+    // 空欄はフォーカスアウト時にエラーにしない（必須エラーは送信時に出す）
+    if (role.trim() === '') {
+      setRoleError('');
+      return;
+    }
+    setRoleError(validateRole(role));
+  };
+
+  /** 名前の入力チェック（フォーカスアウト時に呼ぶ） */
+  const handleNameBlur = () => {
+    setNameError(validateName(name));
+  };
+
   /**
    * 検索結果から変更があったか。
    * 未検索（original が null）の場合は true（＝比較対象なし）。
@@ -360,6 +422,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setName('');
     setDeptId(undefined);
     setDeptError(false);
+    setEmployeeNoError('');
+    setRoleError('');
+    setNameError('');
     setVerifiedNo('');
     setVerifiedExists(false);
     setOriginal(null);
@@ -429,7 +494,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const handleLookup = async (rawNo: string) => {
     const no = rawNo.trim();
     if (!no) {
-      message.warning('社員番号を入力してください。');
+      setEmployeeNoError('社員番号を入力してください。');
+      return;
+    }
+    // 形式チェック（5 桁の半角数字）。NG の場合は検索しない
+    const noError = validateEmployeeNo(no);
+    if (noError) {
+      setEmployeeNoError(noError);
       return;
     }
 
@@ -456,28 +527,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         deptId,
       });
       message.success(`社員番号「${no}」の要員情報を表示しました。`);
-    } catch (e) {
-      // 該当なし（404 など）→ 新規追加するか確認する
+    } catch {
+      // 該当なし（404 など）→ ダイアログは出さず、そのまま新規登録の入力状態にする
+      // NOTE: 入力中の 役割・名前・所属 と各入力欄下のエラー表示は消さない
       setEmployeeNo(no);
       setVerifiedNo(no);
       setVerifiedExists(false);
-      Modal.confirm({
-        title: '社員番号が存在しません',
-        content:
-          e instanceof Error && e.message.includes('見つかりません')
-            ? e.message
-            : `社員番号「${no}」は要員マスタに存在しません。新規要員として追加しますか？`,
-        okText: '追加する',
-        cancelText: 'キャンセル',
-        onOk: () => {
-          setRole('');
-          setName('');
-          setDeptId(undefined);
-          message.info(
-            `社員番号「${no}」を新規追加します。役割・名前・所属を入力してください。`,
-          );
-        },
-      });
+      message.info(`社員番号「${no}」は未登録です。`);
     } finally {
       setSearching(false);
     }
@@ -485,10 +541,20 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 要員を DB へ保存する（新規追加／更新。画面遷移はしない） */
   const save = async (no: string, isNew: boolean) => {
+    // 入力チェック（不正な値は送信しない）
+    const noError = validateEmployeeNo(no);
+    const rError = validateRole(role);
+    const nError = name.trim() === '' ? '名前を入力してください。' : validateName(name);
+    setEmployeeNoError(noError);
+    setRoleError(rError);
+    setNameError(nError);
+    if (noError || rError || nError) {
+      return;
+    }
+
     // 所属は必須（未選択のまま送信しない）
     if (!deptId) {
       setDeptError(true);
-      message.warning('所属を選択してください。');
       return;
     }
 
@@ -550,18 +616,19 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleSubmit = async () => {
     const no = employeeNo.trim();
-    if (!no) {
-      message.warning('社員番号を入力してください。');
-      return;
-    }
-    if (!name.trim()) {
-      message.warning('名前を入力してください。');
-      return;
-    }
-    // 新規追加時は所属が必須（既存の更新時は所属変更不可なので不要）
-    if (!isExisting && !deptId) {
-      setDeptError(true);
-      message.warning('所属を選択してください。');
+    // 入力チェック（空欄・形式 NG はまとめて判定し、入力欄の下に赤字で表示する）
+    const noError = validateEmployeeNo(no);
+    const rError = validateRole(role);
+    const nError = name.trim() === ''
+      ? '名前を入力してください。'
+      : validateName(name);
+    // 所属は必須（登録済みの要員は所属変更不可のため対象外）
+    const dError = !isExisting && !deptId ? '所属を選択してください。' : '';
+    setEmployeeNoError(noError);
+    setRoleError(rError);
+    setNameError(nError);
+    setDeptError(dError !== '');
+    if (noError || rError || nError || dError) {
       return;
     }
 
@@ -630,16 +697,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       return;
     }
 
-    // DB に存在しない → 新規追加してよいか確認する
-    Modal.confirm({
-      title: '社員番号が存在しません',
-      content: `社員番号「${no}」は要員マスタに存在しません。新規要員として追加しますか？`,
-      okText: '追加する',
-      cancelText: 'キャンセル',
-      onOk: () => {
-        void save(no, true);
-      },
-    });
+    // DB に存在しない → 確認ダイアログは出さず、そのまま新規追加する
+    // （存在しない場合は「保存する」ボタンでの新規登録が既定の動作）
+    void save(no, true);
   };
 
   /**
@@ -940,7 +1000,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 一括読み込む
               </Button>
             </Upload>
-            <Tag color='green'>バックエンド連携</Tag>
           </Space>
           <Text type='secondary' className='personnel-import-hint'>
             {PERSONNEL_IMPORT_FORMAT_HINT}
@@ -969,7 +1028,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               <Input
                 placeholder='例：10001'
                 value={employeeNo}
-                maxLength={10}
+                maxLength={20}
+                status={employeeNoError ? 'error' : undefined}
                 onChange={(e) => {
                   const next = e.target.value;
                   setEmployeeNo(next);
@@ -980,6 +1040,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                     setVerifiedExists(false);
                   }
                 }}
+                onBlur={handleEmployeeNoBlur}
                 onPressEnter={() => void handleLookup(employeeNo)}
               />
               <Button
@@ -990,25 +1051,44 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 検索
               </Button>
             </Space.Compact>
+            {employeeNoError && (
+              <Text type='danger' style={{ fontSize: 12 }}>
+                {employeeNoError}
+              </Text>
+            )}
           </div>
           <div>
-            <div className='form-label'>役割</div>
+            <div className='form-label'>役割（必須）</div>
             <Input
               placeholder='例：T11E03'
               value={role}
-              maxLength={30}
+              maxLength={20}
+              status={roleError ? 'error' : undefined}
               onChange={(e) => setRole(e.target.value)}
+              onBlur={handleRoleBlur}
             />
+            {roleError && (
+              <Text type='danger' style={{ fontSize: 12 }}>
+                {roleError}
+              </Text>
+            )}
           </div>
           <div>
             <div className='form-label'>名前（必須）</div>
             <Input
               placeholder='例：山田 花子'
               value={name}
-              maxLength={30}
+              maxLength={50}
+              status={nameError ? 'error' : undefined}
               onChange={(e) => setName(e.target.value)}
+              onBlur={handleNameBlur}
               onPressEnter={handleSubmit}
             />
+            {nameError && (
+              <Text type='danger' style={{ fontSize: 12 }}>
+                {nameError}
+              </Text>
+            )}
           </div>
           <div>
             <div className='form-label'>所属（必須）</div>

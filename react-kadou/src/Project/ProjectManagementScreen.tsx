@@ -108,6 +108,53 @@ const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
   ['departmentId', '所属部門'],
 ];
 
+/** 入力項目ごとの最大長（DB 定義に合わせる） */
+const FIELD_LIMITS: Partial<Record<keyof ProjectFormValues, [number, string]>> = {
+  customer: [100, '顧客'],
+  caseName: [100, '案件'],
+  team: [30, 'チーム'],
+  subTeam: [30, 'Subチーム'],
+  projectCode: [20, '項目ID'],
+  name: [30, 'Project名称'],
+};
+
+/** フォームの入力エラー（キーごとの赤字メッセージ。'' = エラーなし） */
+type FormErrors = Partial<Record<keyof ProjectFormValues, string>>;
+
+/** 入力値を検証する（必須チェック + 最大長チェック） */
+const validateForm = (
+  form: ProjectFormValues,
+  options: { required: boolean },
+): FormErrors => {
+  const errors: FormErrors = {};
+
+  (Object.keys(FIELD_LIMITS) as Array<keyof ProjectFormValues>).forEach(
+    (key) => {
+      const limit = FIELD_LIMITS[key];
+      if (!limit) return;
+      const [max, label] = limit;
+      if (form[key].trim().length > max) {
+        errors[key] = `${label}は${max}文字以内で入力してください。`;
+      }
+    },
+  );
+
+  // 必須チェック（登録・修正時のみ）
+  if (options.required) {
+    REQUIRED_FIELDS.forEach(([key, label]) => {
+      if (errors[key]) return;
+      if (!String(form[key] ?? '').trim()) {
+        errors[key] =
+          key === 'departmentId'
+            ? `${label}を選択してください。`
+            : `${label}を入力してください。`;
+      }
+    });
+  }
+
+  return errors;
+};
+
 /** 一括読み込みの1行を API 送信形式へ変換する */
 const toApiRow = (row: ProjectImportRow, index: number) => ({
   customer: row.customer,
@@ -478,27 +525,26 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   }, [year]);
 
   /**
-   * 所属部門の選択肢（値 = 部門番号、表示 = 部門別名（department_alisa））。
+   * 所属部門の選択肢（値 = 部門番号、表示 = 部門名称（department_name））。
    * 部門番号は DB の department_id（3桁ゼロ埋め文字列）を使う。
-   * 部門別名が未設定の部門は部門名称で表示する。
    */
   const departmentOptions = useMemo(
     () =>
       deptMaster.map((d) => ({
         value: d.departmentId,
-        label: d.alisa || d.name,
+        label: d.name,
       })),
     [deptMaster],
   );
 
   /**
-   * 部門番号（department_id）で表示用の部門別名を返す（修正フォームの選択値確認用）。
+   * 部門番号（department_id）で表示用の部門名称を返す（修正フォームの選択値確認用）。
    * 部門マスタに無い場合は undefined。
    */
   const departmentNameOfId = useCallback(
     (departmentId: string): string | undefined => {
       const found = findDepartment(deptMaster, departmentId);
-      return found ? found.alisa || found.name : undefined;
+      return found ? found.name : undefined;
     },
     [deptMaster],
   );
@@ -561,16 +607,24 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     form.subTeam,
   );
 
+  /** フォームの入力エラー（入力欄の下に赤字で表示する） */
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+
   /** フォームの1項目を更新 */
   const setField = <K extends keyof ProjectFormValues>(
     key: K,
     value: ProjectFormValues[K],
-  ) => setForm((prev) => ({ ...prev, [key]: value }));
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    // 入力し直したらその項目のエラーを解除する
+    setFormErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
+  };
 
   /** フォームを初期化（修正モードも解除） */
   const handleResetForm = useCallback(() => {
     setEditingKey(null);
     setForm(EMPTY_FORM);
+    setFormErrors({});
   }, []);
 
   /** 修正（選択したプロジェクトをフォームへ読み込む） */
@@ -585,6 +639,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       projectCode: row.projectCode,
       name: row.name,
     });
+    setFormErrors({});
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
@@ -614,11 +669,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
 
   /** 新規登録 / 修正の実行（DB の jn_project_master へ保存する） */
   const handleSubmit = async () => {
-    const missing = REQUIRED_FIELDS.find(([key]) => !String(form[key]).trim());
-    if (missing) {
-      message.warning(`${missing[1]} を入力してください。`);
-      return;
-    }
+    // 入力チェック（必須・最大長）。不正な場合は入力欄の下に赤字で表示する
+    const errors = validateForm(form, { required: true });
+    setFormErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
 
     const payload = {
       customer: form.customer.trim(),
@@ -844,14 +898,14 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         dataIndex: 'departmentId',
         key: 'departmentId',
         width: 140,
-        // 一覧は部門マスタ（jn_department_master）の「部門別名（department_alisa）」を表示する
+        // 一覧は部門マスタ（jn_department_master）の「部門名称（department_name）」を表示する
         render: (v: string) => {
           if (!v) return <Text type='secondary'>－</Text>;
           const found = findDepartment(deptMaster, v);
           // 部門マスタに無い値（旧データなど）は赤字で示して修正を促す
           if (!found) return <Text type='danger'>{v}</Text>;
-          // 部門別名が未設定の場合は空欄に見えるため「－」を表示する
-          return found.alisa ? found.alisa : <Text type='secondary'>－</Text>;
+          // 部門名称が未設定の場合は空欄に見えるため「－」を表示する
+          return found.name ? found.name : <Text type='secondary'>－</Text>;
         },
       },
       {
@@ -875,6 +929,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         key: 'projectId',
         width: 140,
         fixed: 'right',
+        // DB の sys_project_id（INT）を「PJ.0000」の形式で表示する（4桁ゼロ埋め）
+        render: (v: string) =>
+          v ? `PJ.${v.padStart(4, '0')}` : <Text type='secondary'>－</Text>,
       },
       {
         title: '操作',
@@ -1043,7 +1100,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 一括読み込む
               </Button>
             </Upload>
-            <Tag color='green'>バックエンド連携</Tag>
           </Space>
           <Text type='secondary' className='project-import-hint'>
             {PROJECT_IMPORT_FORMAT_HINT}
@@ -1065,18 +1121,30 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：桜井商事'
                   value={form.customer}
-                  maxLength={100}
+                  maxLength={200}
+                  status={formErrors.customer ? 'error' : undefined}
                   onChange={(e) => setField('customer', e.target.value)}
                 />
+                {formErrors.customer && (
+                  <Text type='danger' style={{ fontSize: 12 }}>
+                    {formErrors.customer}
+                  </Text>
+                )}
               </div>
               <div>
                 <div className='form-label'>案件（必須）</div>
                 <Input
                   placeholder='例：基幹刷新'
                   value={form.caseName}
-                  maxLength={100}
+                  maxLength={200}
+                  status={formErrors.caseName ? 'error' : undefined}
                   onChange={(e) => setField('caseName', e.target.value)}
                 />
+                {formErrors.caseName && (
+                  <Text type='danger' style={{ fontSize: 12 }}>
+                    {formErrors.caseName}
+                  </Text>
+                )}
               </div>
               {/* チーム / Subチーム は隣接して各半分の幅で表示する */}
               <div className='project-field-pair'>
@@ -1085,18 +1153,30 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   <Input
                     placeholder='例：第一'
                     value={form.team}
-                    maxLength={30}
+                    maxLength={60}
+                    status={formErrors.team ? 'error' : undefined}
                     onChange={(e) => setField('team', e.target.value)}
                   />
+                  {formErrors.team && (
+                    <Text type='danger' style={{ fontSize: 12 }}>
+                      {formErrors.team}
+                    </Text>
+                  )}
                 </div>
                 <div>
                   <div className='form-label'>Subチーム（任意）</div>
                   <Input
                     placeholder='例：A'
                     value={form.subTeam}
-                    maxLength={30}
+                    maxLength={60}
+                    status={formErrors.subTeam ? 'error' : undefined}
                     onChange={(e) => setField('subTeam', e.target.value)}
                   />
+                  {formErrors.subTeam && (
+                    <Text type='danger' style={{ fontSize: 12 }}>
+                      {formErrors.subTeam}
+                    </Text>
+                  )}
                 </div>
               </div>
               <div>
@@ -1104,11 +1184,17 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：次期基幹システム'
                   value={form.name}
-                  maxLength={30}
+                  maxLength={60}
+                  status={formErrors.name ? 'error' : undefined}
                   onChange={(e) => setField('name', e.target.value)}
                 />
+                {formErrors.name && (
+                  <Text type='danger' style={{ fontSize: 12 }}>
+                    {formErrors.name}
+                  </Text>
+                )}
               </div>
-              <div>
+              <div className='project-field-abbr'>
                 <div className='form-label'>略称（自動生成・編集不可）</div>
                 <Input
                   value={abbr}
@@ -1117,7 +1203,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   placeholder='顧客・案件・チーム・Subチーム から自動生成'
                 />
               </div>
-              <div>
+              <div className='project-field-dept'>
                 <div className='form-label'>所属部門（必須）</div>
                 {/* 選択肢は部門名称を表示し、内部値は部門番号を保持する */}
                 <Select
@@ -1135,29 +1221,51 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   }
                   onChange={(v: string) => setField('departmentId', v)}
                   options={departmentOptions}
+                  status={formErrors.departmentId ? 'error' : undefined}
                   style={{ width: '100%' }}
                 />
                 {/*
                   既存データの部門番号が部門マスタに無い場合、
                   選択肢に無いため空表示になる。修正を促すメッセージを出す。
+                  NOTE: 絶対配置にして、メッセージが出ても下のボタン群が
+                        下にずれないようにする。
                 */}
                 {form.departmentId &&
                   !loadingDepartments &&
                   !departmentNameOfId(form.departmentId) && (
-                    <Text type='danger' style={{ fontSize: 12 }}>
-                      登録済みの部門番号「{form.departmentId}
+                    <Text
+                      type='danger'
+                      className='project-field-dept-error'
+                      style={{ fontSize: 12 }}
+                    >
+                      登録済みの所属部門名「{form.departmentId}
                       」が部門マスタにありません。選択し直してください。
                     </Text>
                   )}
+                {formErrors.departmentId && (
+                  <Text
+                    type='danger'
+                    className='project-field-dept-error'
+                    style={{ fontSize: 12 }}
+                  >
+                    {formErrors.departmentId}
+                  </Text>
+                )}
               </div>
-              <div>
+              <div className='project-field-code'>
                 <div className='form-label'>項目ID（任意）</div>
                 <Input
                   placeholder='例：PRJ-0006'
                   value={form.projectCode}
-                  maxLength={20}
+                  maxLength={40}
+                  status={formErrors.projectCode ? 'error' : undefined}
                   onChange={(e) => setField('projectCode', e.target.value)}
                 />
+                {formErrors.projectCode && (
+                  <Text type='danger' style={{ fontSize: 12 }}>
+                    {formErrors.projectCode}
+                  </Text>
+                )}
               </div>
             </div>
 

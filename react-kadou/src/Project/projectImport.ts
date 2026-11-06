@@ -7,8 +7,10 @@
  *   - Excel (.xls 旧形式) … 非対応（.xlsx か CSV で保存し直してもらう）
  *
  * ■ 想定する列（1行目は見出し行。列順は自由、見出し名で判定する）
- *   顧客 / 案件 / チーム / Subチーム / 所属部門 / 項目ID / Project名称
- *   ※見出し行が見つからない場合は上記の並びとみなす
+ *   顧客 / 案件 / チーム / Subチーム / Subチーム / 略称 / 所属部門 / 項目ID / Project名称
+ *   ※4 列目と 5 列目の Subチームのうち、取り込むのは左側（先に見つかった方）のみ。
+ *     右側はテンプレート識別用で取込対象外。
+ *   ※見出し行が見つからない場合は取込エラー（他画面のテンプレート誤取込を防ぐ）
  *   ※略称は自動生成するため取り込まない（システム項目IDも自動採番）
  *
  * ■ 取込ルール
@@ -18,6 +20,7 @@
  *     ファイルに書かれている内容をそのまま登録する
  */
 import {
+  assertImportTemplate,
   normalizeKey,
   readSpreadsheetFile,
 } from '../Personnel/personnelImport';
@@ -58,9 +61,14 @@ export const PROJECT_IMPORT_ACCEPT =
 
 /** 画面に表示する形式の説明 */
 export const PROJECT_IMPORT_FORMAT_HINT =
-  '形式：顧客／案件／チーム／Subチーム／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。「所属部門」は入力どおり登録します。取り込むと新しいプロジェクトとして追加されます。';
+  '形式：顧客／案件／チーム／Subチーム／Subチーム／略称／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。E 列の Subチームは取込対象外です。「所属部門」は入力どおり登録します。取り込むと新しいプロジェクトとして追加されます。';
 
-/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
+/**
+ * 見出し（列名）の候補。表記ゆれを吸収して判定する。
+ *
+ * NOTE: E 列（2 つ目の Subチーム）はテンプレート識別用の列で、取込対象外。
+ *       取込に使う Subチームは D 列（最初に見つかった Subチーム列）のみ。
+ */
 const HEADER_ALIASES: Record<keyof ProjectImportRow, string[]> = {
   customer: ['顧客', '顧客名', 'customer', 'client'],
   caseName: ['案件', '案件名', 'casename', 'case'],
@@ -108,6 +116,9 @@ const detectColumns = (
     if (!key) return;
     (Object.keys(HEADER_ALIASES) as Array<keyof ProjectImportRow>).forEach(
       (field) => {
+        // NOTE: 同じ見出しが複数ある場合（テンプレートの Subチームは D 列と E 列）
+        //       は、先に見つかった列（左側）だけを採用する。
+        //       → 取込に使うのは D 列の Subチームで、E 列は取込対象外。
         if (found[field] !== undefined) return;
         if (HEADER_ALIASES[field].some((alias) => normalizeKey(alias) === key)) {
           found[field] = index;
@@ -132,7 +143,7 @@ const buildRows = (
   const warnings: string[] = [];
   const rows: ProjectImportRow[] = [];
 
-  // 見出し行を探す（見つからない場合は先頭から FIELD_ORDER の並びとみなす）
+  // 見出し行を探す（テンプレートは固定のため、見つからなければエラー）
   let headerIndex = -1;
   let columns = {} as Record<keyof ProjectImportRow, number>;
   FIELD_ORDER.forEach((field, index) => {
@@ -145,6 +156,14 @@ const buildRows = (
       columns = detected;
       break;
     }
+  }
+
+  // NOTE: 以前は「見出し行が無ければ列順固定として読み込む」フォールバックが
+  //       あったが、他のテンプレートの Excel を誤って取り込んでしまうため廃止した。
+  if (headerIndex < 0) {
+    throw new Error(
+      '見出し行を認識できませんでした。1行目が 顧客／案件／チーム／Subチーム／Subチーム／略称／所属部門／項目ID／Project名称 になっているか確認してください。',
+    );
   }
 
   matrix.forEach((row, index) => {
@@ -199,5 +218,7 @@ export const parseProjectFile = async (
   file: File,
 ): Promise<ProjectImportResult> => {
   const { matrix, source } = await readSpreadsheetFile(file);
+  // テンプレート違い（要員情報の Excel など）を先に弾く
+  assertImportTemplate(matrix, 'project');
   return buildRows(matrix, source);
 };

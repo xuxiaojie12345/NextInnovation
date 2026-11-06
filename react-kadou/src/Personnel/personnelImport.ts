@@ -17,6 +17,7 @@
  *   T 列 … 所属（T3 が 1 件目。部門マスタの部門名）
  *
  *   ※見出し名による列判定は行わない（列位置が固定のため）。
+ *   ※B 列が「人員」の行に達したら、それ以降の行は読み込まない（終端マーカー）。
  *
  * NOTE: バックエンド実装時は、この parsePersonnelFile() を API 呼び出しに置き換える。
  *       画面側・App 側のインターフェース（PersonnelImportRow）はそのまま利用できる。
@@ -120,6 +121,152 @@ const normalizeCellValue = (raw: string): string => {
   const value = raw.replace(/\u00a0/g, ' ').trim();
   // Excel が数値セルを "10001.0" のように返す場合があるため整数表記へ寄せる
   return /^-?\d+\.0+$/.test(value) ? value.replace(/\.0+$/, '') : value;
+};
+
+// ---------------------------------------------------------------------------
+// テンプレート種別の判定（要員情報 / プロジェクト管理）
+// ---------------------------------------------------------------------------
+
+/** 一括読み込みテンプレートの種別 */
+export type ImportTemplateKind = 'personnel' | 'project' | 'unknown';
+
+/**
+ * プロジェクト管理テンプレートの見出し（1 行目の A〜I 列）。
+ *
+ * NOTE: テンプレートは変更不可。列の並び順は問わず、A〜I 列に
+ *       指定の見出しがすべて含まれているかで判定する。
+ */
+const PROJECT_HEADER_KEYS = [
+  '顧客',
+  '案件',
+  'チーム',
+  'subチーム',
+  'subチーム',
+  '略称aa',
+  '所属部門',
+  '項目id',
+  'project名称',
+];
+
+/**
+ * 要員情報テンプレートの見出し（2 行目の A〜N 列）。
+ *
+ * NOTE: テンプレートは変更不可。列の並び順は問わず、A〜N 列に
+ *       指定の見出しがすべて含まれているかで判定する。
+ */
+const PERSONNEL_HEADER_KEYS = [
+  'no.',
+  '社員id',
+  '氏名',
+  '性別',
+  '所属部門',
+  '採用形式',
+  '卒業学校',
+  '学歴',
+  '生年月日',
+  '年齢',
+  '卒業日付',
+  '入社日付',
+  '人員種別',
+  '労働関係所属地',
+];
+
+/** 要員情報テンプレートの判定に最低限必要な見出し（A〜I 列） */
+const PERSONNEL_REQUIRED_KEYS = [
+  'no.',
+  '社員id',
+  '氏名',
+  '性別',
+  '所属部門',
+  '採用形式',
+  '卒業学校',
+  '学歴',
+  '生年月日',
+];
+
+/**
+ * 見出しの読み替え（表記ゆれの吸収）。
+ *
+ * NOTE: 実際のテンプレートは中国語簡体字の「采用形式」（采 = U+91C7）だが、
+ *       仕様書では日本語漢字の「採用形式」（採 = U+63A1）と記載されている。
+ *       また「採用形態」と書かれる版もあるため、これらを同一視する。
+ */
+const HEADER_KEY_ALIASES: Record<string, string[]> = {
+  採用形式: ['採用形式', '採用形態', '采用形式', '采用形態'],
+};
+
+/** 見出しの等価判定（別名を考慮する） */
+const isSameHeader = (cell: string, header: string): boolean => {
+  if (cell === header) return true;
+  const aliases = HEADER_KEY_ALIASES[header];
+  return aliases ? aliases.includes(cell) : false;
+};
+
+/** 検証対象の列数（A〜I） */
+const TEMPLATE_CHECK_COLUMNS = 9;
+
+/**
+ * 指定行の A〜I 列に見出しがすべて含まれているかを判定する。
+ *
+ * NOTE: 並び順は問わない。ただし「subチーム」のように同じ見出しが
+ *       複数回現れるテンプレートがあるため、出現回数も含めて比較する。
+ */
+const hasAllHeaders = (
+  row: string[] | undefined,
+  headers: string[],
+): boolean => {
+  if (!row) return false;
+  const cells = row
+    .slice(0, TEMPLATE_CHECK_COLUMNS)
+    .map((cell) => normalizeKey(cell))
+    .filter((cell) => cell !== '');
+
+  // 必要な見出し（重複含む）を 1 つずつ消費できるか確認する
+  const rest = [...cells];
+  return headers.every((header) => {
+    const index = rest.findIndex((cell) => isSameHeader(cell, header));
+    if (index < 0) return false;
+    rest.splice(index, 1);
+    return true;
+  });
+};
+
+/**
+ * 表形式ファイルの行列からテンプレート種別を判定する。
+ *
+ * 判定ルール（テンプレートは変更不可の前提）：
+ *   1) 1 行目の A〜I 列にプロジェクト管理の見出しがすべてある → 'project'
+ *   2) 2 行目の A〜I 列に要員情報の主要な見出しがすべてある → 'personnel'
+ *   3) どちらにも該当しなければ 'unknown'
+ *
+ * NOTE: 要員情報は A〜I 列を判定に使い、J〜N 列（年齢・卒業日付・入社日付・
+ *       人員種別・労働関係所属地）は参考情報として定義だけ持つ。
+ *       判定に使うのは PERSONNEL_REQUIRED_KEYS。
+ */
+export const detectImportTemplate = (
+  matrix: string[][],
+): ImportTemplateKind => {
+  if (hasAllHeaders(matrix[0], PROJECT_HEADER_KEYS)) return 'project';
+  if (hasAllHeaders(matrix[1], PERSONNEL_REQUIRED_KEYS)) return 'personnel';
+  return 'unknown';
+};
+
+/**
+ * 一括読み込みのテンプレート種別を検証する。
+ * 期待する種別と異なる場合は Error（日本語メッセージ）を投げる。
+ *
+ * NOTE: 他の画面（休日など）のテンプレートも存在するため、
+ *       「選択したファイルが何の画面のものか」は判定・表示しない。
+ *       （本画面のテンプレートではない、とだけ伝える）
+ */
+export const assertImportTemplate = (
+  matrix: string[][],
+  expected: Exclude<ImportTemplateKind, 'unknown'>,
+): void => {
+  const detected = detectImportTemplate(matrix);
+  if (detected === expected) return;
+
+  throw new Error('この画面の一括読み込み用テンプレートではありません。');
 };
 
 // ---------------------------------------------------------------------------
@@ -499,6 +646,12 @@ const buildRows = (
     const departmentAlias = cellAt(row, columns.departmentAlias);
     const workLocation = cellAt(row, columns.workLocation);
 
+    // B 列が「人員」で始まる行は終端マーカーとみなし、それ以降は読み込まない
+    // （「人員」「人員合计」「人員 小計」など表記ゆれも含めて停止する）
+    if (employeeNo.startsWith('人員')) {
+      break;
+    }
+
     // 完全な空行はスキップする（テンプレート下部の余白行など）
     if (
       !employeeNo &&
@@ -588,6 +741,8 @@ export const parsePersonnelFile = async (
   file: File,
 ): Promise<PersonnelImportResult> => {
   const { matrix, source } = await readSpreadsheetFile(file);
+  // テンプレート違い（プロジェクト管理の Excel など）を先に弾く
+  assertImportTemplate(matrix, 'personnel');
   return buildRows(matrix, source);
 };
 
