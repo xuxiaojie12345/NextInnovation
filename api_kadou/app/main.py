@@ -5,6 +5,7 @@ from app.api.HolidaySettings import router as holiday_router
 from app.api.Login import router as user_router
 from app.api.Personnel import router as personnel_router
 from app.api.Project import router as project_router
+from app.api.YearSummary import router as year_summary_router
 from app.core.settings import settings
 
 app = FastAPI(title="要員稼動管理システム")
@@ -26,6 +27,7 @@ app.include_router(personnel_router)
 app.include_router(department_router)
 app.include_router(holiday_router)
 app.include_router(project_router)
+app.include_router(year_summary_router)
 
 
 if __name__ == "__main__":
