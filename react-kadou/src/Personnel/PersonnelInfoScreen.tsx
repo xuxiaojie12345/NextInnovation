@@ -277,7 +277,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         employeeNo: no,
         name: name.trim(),
         departmentId: deptId ?? departmentOptions[0]?.departmentId ?? "",
-        role: role.trim() || "要員",
+        role: role.trim(),
       });
       message.success(
         isNew
@@ -299,6 +299,11 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     const no = employeeNo.trim();
     if (!no) {
       message.warning("社員番号を入力してください。");
+      return;
+    }
+    // 役割は必須入力（未入力では登録できない）
+    if (!role.trim()) {
+      message.warning("役割を入力してください。");
       return;
     }
     if (!name.trim()) {
@@ -540,7 +545,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             </Space.Compact>
           </div>
           <div>
-            <div className='form-label'>役割</div>
+            <div className='form-label'>役割（必須）</div>
             <Input
               placeholder='例：T11E03'
               value={role}

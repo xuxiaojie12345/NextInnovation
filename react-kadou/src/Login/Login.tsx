@@ -103,6 +103,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             name='password'
             rules={[
               { required: true, message: "パスワードを入力してください。" },
+              {
+                // 半角英数字（0-9A-Za-z）と ASC 記号（半角記号）のみ許可する
+                pattern: /^[0-9A-Za-z\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]+$/,
+                message:
+                  "パスワードは半角英数字と半角記号（ASC 記号）で入力してください。",
+              },
             ]}
           >
             <Input.Password
@@ -110,7 +116,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               prefix={<LockOutlined />}
               placeholder='パスワード'
               autoComplete='current-password'
-              maxLength={32}
+              maxLength={50}
               onChange={() => {
                 if (error) setError("");
               }}
