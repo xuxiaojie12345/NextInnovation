@@ -221,7 +221,7 @@ const buildRows = (
     const duplicate = indexByDate.get(date);
     if (duplicate !== undefined) {
       error.push(
-        `${lineNo}行目：日付 ${date} が重複しています（後ろの行を優先）`,
+        `${lineNo}行目：日付 ${date} が重複しています。`,
       );
       rows[duplicate] = { date };
       return;

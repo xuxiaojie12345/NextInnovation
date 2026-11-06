@@ -71,6 +71,8 @@ export const DEFAULT_ROLE = { role: 'bucho', roleLabel: '部長' };
 /** 休日の区分一覧 */
 export const HOLIDAY_KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
 
+export const HOLIDAY_KINDS_COUNT: HolidayKind[] = ['祝日', '会社休日', '振替休日','未指定'];
+
 /** 休日設定の「区分」選択肢 */
 export const HOLIDAY_KIND_OPTIONS: { value: HolidayKind; label: string }[] =
   HOLIDAY_KINDS.map((k) => ({ value: k, label: k }));

@@ -31,6 +31,7 @@ import {
 import {
   HOLIDAY_KINDS as KINDS,
   HOLIDAY_KIND_OPTIONS as KIND_OPTIONS,
+  HOLIDAY_KINDS_COUNT as KINDS_COUNT,
 } from '../constants/options';
 import './HolidaySettingsScreen.css';
 import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
@@ -43,7 +44,7 @@ const KIND_COLOR: Record<HolidayKind, string> = {
   祝日: 'red',
   会社休日: 'blue',
   振替休日: 'orange',
-  '': 'default',
+  未指定: 'default',
 };
 
 /** CSV 出力の見出し */
@@ -90,7 +91,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   // フォーム（新規追加 / 編集で共用）
   const [newDate, setNewDate] = useState<Dayjs | null>(null);
   const [newName, setNewName] = useState('');
-  const [newKind, setNewKind] = useState<HolidayKind>('会社休日');
+  const [newKind, setNewKind] = useState<HolidayKind | null>(null);
 
   // 編集開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
@@ -106,7 +107,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     return {
       year,
       total: list.length,
-      byKind: KINDS.map((k) => ({
+      byKind: KINDS_COUNT.map((k) => ({
         kind: k,
         count: list.filter((h) => h.kind === k).length,
       })),holidays
@@ -124,18 +125,13 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     setEditingId(null);
     setNewDate(null);
     setNewName('');
-    setNewKind('会社休日');
+    setNewKind(null);
   }, []);
 
   /** 追加 or 更新（日付・名称は必須 / 同一日付は登録不可） */
   const handleSubmit = () => {
     if (!newDate) {
       message.warning('日付を選択してください。');
-      return;
-    }
-    const name = newName.trim();
-    if (!name) {
-      message.warning('休日名称を入力してください。');
       return;
     }
     const date = newDate.format('YYYY-MM-DD');
@@ -153,7 +149,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       }).catch((error) => {
         message.error(`休日情報の更新に失敗しました：${error.message}`);
       });
-      message.success(`${formatDate(date)}「${name}」を更新しました。`);
+      message.success(`休日情報${formatDate(date)}を更新しました。`);
     } else {
       HolidayAddApi(year, currentUserId, {date : date, name:newName, kind: newKind,id:"0"}).then((data) => {
         setHolidays(data);        
@@ -161,7 +157,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       }).catch((error) => {
         message.error(`休日情報の追加に失敗しました：${error.message}`);
       });
-      message.success(`${formatDate(date)}「${name}」を追加しました。`);
+      message.success(`休日情報${formatDate(date)}を追加しました。`);
     }
     handleResetForm();
   };
@@ -170,8 +166,8 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   const handleEdit = useCallback((row: Holiday) => {
     setEditingId(row.id);
     setNewDate(dayjs(row.date));
-    setNewName(row.name);
-    setNewKind(row.kind);
+    setNewName(row.name);    
+    setNewKind(row.kind == '未指定' ? null : row.kind);
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
@@ -330,8 +326,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           <Text type='secondary'>
             稼働管理の対象となる休日（祝日・会社休日・振替休日）を登録します。休日は年度ごとのデータで、年度切替で表示が切り替わります。
           </Text>
-        </div>
-        <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>
+        </div>        
       </div>
 
       <div ref={formRef}>
@@ -353,7 +348,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
               />
             </div>
             <div>
-              <div className='form-label'>休日名称（必須）</div>
+              <div className='form-label'>休日名称</div>
               <Input
                 placeholder='例：創立記念日'
                 value={newName}
@@ -366,6 +361,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
             <div>
               <div className='form-label'>区分</div>
               <Select
+                placeholder='例：会社休日'
                 value={newKind}
                 onChange={(v: HolidayKind) => setNewKind(v)}
                 options={KIND_OPTIONS}

@@ -183,11 +183,11 @@ function getKindTxt(kind: String): string {
     case '03':
       return '振替休日';
     default:
-      return '';
+      return '未指定';
   }
 }
 
-function getKindNo(kindTxt: String): string {
+function getKindNo(kindTxt: String | null): string {
   switch (kindTxt) {
     case '祝日':
       return '01';

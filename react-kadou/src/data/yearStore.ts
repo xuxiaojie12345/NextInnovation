@@ -24,7 +24,10 @@ import {
 import { buildYearWeeks } from './yearWeeks';
 
 /** 休日の区分 */
-export type HolidayKind = '祝日' | '会社休日' | '振替休日' | '';
+export type HolidayKind = '祝日' | '会社休日' | '振替休日' | '未指定';
+
+export type HolidayKindSelect = '祝日' | '会社休日' | '振替休日';
+
 
 /** 休日設定の1件 */
 export interface Holiday {
@@ -32,7 +35,7 @@ export interface Holiday {
   /** 'YYYY-MM-DD' */
   date: string;
   name: string;
-  kind: HolidayKind;
+  kind: HolidayKind | null;
 }
 
 /** 無償支援（BUFFER）: 要員ID -> (週キー -> true) */
