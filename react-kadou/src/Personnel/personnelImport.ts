@@ -130,144 +130,10 @@ const normalizeCellValue = (raw: string): string => {
 /** 一括読み込みテンプレートの種別 */
 export type ImportTemplateKind = 'personnel' | 'project' | 'unknown';
 
-/**
- * プロジェクト管理テンプレートの見出し（1 行目の A〜I 列）。
- *
- * NOTE: テンプレートは変更不可。列の並び順は問わず、A〜I 列に
- *       指定の見出しがすべて含まれているかで判定する。
- */
-const PROJECT_HEADER_KEYS = [
-  '顧客',
-  '案件',
-  'チーム',
-  'subチーム',
-  'subチーム',
-  '略称aa',
-  '所属部門',
-  '項目id',
-  'project名称',
-];
-
-/**
- * 要員情報テンプレートの見出し（2 行目の A〜N 列）。
- *
- * NOTE: テンプレートは変更不可。列の並び順は問わず、A〜N 列に
- *       指定の見出しがすべて含まれているかで判定する。
- */
-const PERSONNEL_HEADER_KEYS = [
-  'no.',
-  '社員id',
-  '氏名',
-  '性別',
-  '所属部門',
-  '採用形式',
-  '卒業学校',
-  '学歴',
-  '生年月日',
-  '年齢',
-  '卒業日付',
-  '入社日付',
-  '人員種別',
-  '労働関係所属地',
-];
-
-/** 要員情報テンプレートの判定に最低限必要な見出し（A〜I 列） */
-const PERSONNEL_REQUIRED_KEYS = [
-  'no.',
-  '社員id',
-  '氏名',
-  '性別',
-  '所属部門',
-  '採用形式',
-  '卒業学校',
-  '学歴',
-  '生年月日',
-];
-
-/**
- * 見出しの読み替え（表記ゆれの吸収）。
- *
- * NOTE: 実際のテンプレートは中国語簡体字の「采用形式」（采 = U+91C7）だが、
- *       仕様書では日本語漢字の「採用形式」（採 = U+63A1）と記載されている。
- *       また「採用形態」と書かれる版もあるため、これらを同一視する。
- */
-const HEADER_KEY_ALIASES: Record<string, string[]> = {
-  採用形式: ['採用形式', '採用形態', '采用形式', '采用形態'],
-};
-
-/** 見出しの等価判定（別名を考慮する） */
-const isSameHeader = (cell: string, header: string): boolean => {
-  if (cell === header) return true;
-  const aliases = HEADER_KEY_ALIASES[header];
-  return aliases ? aliases.includes(cell) : false;
-};
-
-/** 検証対象の列数（A〜I） */
-const TEMPLATE_CHECK_COLUMNS = 9;
-
-/**
- * 指定行の A〜I 列に見出しがすべて含まれているかを判定する。
- *
- * NOTE: 並び順は問わない。ただし「subチーム」のように同じ見出しが
- *       複数回現れるテンプレートがあるため、出現回数も含めて比較する。
- */
-const hasAllHeaders = (
-  row: string[] | undefined,
-  headers: string[],
-): boolean => {
-  if (!row) return false;
-  const cells = row
-    .slice(0, TEMPLATE_CHECK_COLUMNS)
-    .map((cell) => normalizeKey(cell))
-    .filter((cell) => cell !== '');
-
-  // 必要な見出し（重複含む）を 1 つずつ消費できるか確認する
-  const rest = [...cells];
-  return headers.every((header) => {
-    const index = rest.findIndex((cell) => isSameHeader(cell, header));
-    if (index < 0) return false;
-    rest.splice(index, 1);
-    return true;
-  });
-};
-
-/**
- * 表形式ファイルの行列からテンプレート種別を判定する。
- *
- * 判定ルール（テンプレートは変更不可の前提）：
- *   1) 1 行目の A〜I 列にプロジェクト管理の見出しがすべてある → 'project'
- *   2) 2 行目の A〜I 列に要員情報の主要な見出しがすべてある → 'personnel'
- *   3) どちらにも該当しなければ 'unknown'
- *
- * NOTE: 要員情報は A〜I 列を判定に使い、J〜N 列（年齢・卒業日付・入社日付・
- *       人員種別・労働関係所属地）は参考情報として定義だけ持つ。
- *       判定に使うのは PERSONNEL_REQUIRED_KEYS。
- */
-export const detectImportTemplate = (
-  matrix: string[][],
-): ImportTemplateKind => {
-  if (hasAllHeaders(matrix[0], PROJECT_HEADER_KEYS)) return 'project';
-  if (hasAllHeaders(matrix[1], PERSONNEL_REQUIRED_KEYS)) return 'personnel';
-  return 'unknown';
-};
-
-/**
- * 一括読み込みのテンプレート種別を検証する。
- * 期待する種別と異なる場合は Error（日本語メッセージ）を投げる。
- *
- * NOTE: 他の画面（休日など）のテンプレートも存在するため、
- *       「選択したファイルが何の画面のものか」は判定・表示しない。
- *       （本画面のテンプレートではない、とだけ伝える）
- */
-export const assertImportTemplate = (
-  matrix: string[][],
-  expected: Exclude<ImportTemplateKind, 'unknown'>,
-): void => {
-  const detected = detectImportTemplate(matrix);
-  if (detected === expected) return;
-
-  throw new Error('この画面の一括読み込み用テンプレートではありません。');
-};
+// NOTE: テンプレートの判定は「シート名」で行う（IMPORT_SHEET_RULES /
+//       detectTemplateBySheetName を参照）。以前は 1 ファイル＝1 テンプレート
+//       だったためセルの見出し行で判定していたが、現在は 1 ファイルに
+//       複数シート（全員情報 / マスタ）が入る構成のためシート名で判定する。
 
 // ---------------------------------------------------------------------------
 // CSV / 区切りテキスト
@@ -559,48 +425,168 @@ const parseSheet = (xml: string, sharedStrings: string[]): string[][] => {
   return rows;
 };
 
-/** 読み取り対象のシート（1枚目）を選ぶ */
-const pickSheetEntry = (entries: ZipEntry[]): ZipEntry | undefined =>
-  entries.find((e) => e.name === 'xl/worksheets/sheet1.xml') ??
-  entries.find((e) => /^xl\/worksheets\/[^/]+\.xml$/i.test(e.name));
+/**
+ * 一括読み込みで使用するシート（シート名）の判定ルール。
+ *
+ * NOTE: テンプレートは「1 ファイル・複数シート」構成になったため、
+ *       シート名でどの画面のデータかを判定する。
+ *       シート名が変わった場合はここの定数だけを直せばよい。
+ */
+export const IMPORT_SHEET_RULES = {
+  /** 要員情報画面：シート名にこの文字列が「含まれていれば」要員情報 */
+  personnel: '全員情報',
+  /** プロジェクト管理画面：シート名がこの文字列と「一致すれば」プロジェクト管理 */
+  project: 'マスタ',
+} as const;
 
-/** シート名（結果表示用）を workbook.xml から取得する */
-const readFirstSheetName = (xml: string | undefined): string => {
-  if (!xml) return '';
+/** シート名の正規化（前後空白除去・全角スペース除去） */
+const normalizeSheetName = (name: string): string =>
+  (name ?? '').replace(/\u3000/g, ' ').trim();
+
+/** シート名からテンプレート種別を判定する */
+export const detectTemplateBySheetName = (
+  sheetName: string,
+): ImportTemplateKind => {
+  const name = normalizeSheetName(sheetName);
+  if (!name) return 'unknown';
+  if (name.includes(IMPORT_SHEET_RULES.personnel)) return 'personnel';
+  if (name === IMPORT_SHEET_RULES.project) return 'project';
+  return 'unknown';
+};
+
+/** ワークブック内の1シート分の情報 */
+interface SheetInfo {
+  /** シート名（workbook.xml の name 属性） */
+  name: string;
+  /** シート XML（xl/worksheets/*.xml）の ZIP パス */
+  entryName: string;
+}
+
+/**
+ * workbook.xml と workbook.xml.rels からシート一覧を得る。
+ *
+ * NOTE: workbook.xml の <sheet> 要素は r:id（リレーション ID）しか持たないため、
+ *       workbook.xml.rels で r:id → sheets/sheetN.xml の対応を解決する。
+ *       シート名と XML ファイルの番号は一致しないことがあるので必須。
+ */
+const listSheets = (
+  workbookXml: string | undefined,
+  relsXml: string | undefined,
+): SheetInfo[] => {
+  if (!workbookXml) return [];
+
   try {
-    const doc = parseXml(xml);
-    return doc.getElementsByTagName('sheet')[0]?.getAttribute('name') ?? '';
+    const doc = parseXml(workbookXml);
+    const sheets = Array.from(doc.getElementsByTagName('sheet'));
+
+    // r:id → ターゲット（worksheets/sheetN.xml）の対応表
+    const relTargets = new Map<string, string>();
+    if (relsXml) {
+      const relsDoc = parseXml(relsXml);
+      Array.from(relsDoc.getElementsByTagName('Relationship')).forEach(
+        (rel) => {
+          const id = rel.getAttribute('Id') ?? '';
+          const target = rel.getAttribute('Target') ?? '';
+          if (!id || !target) return;
+          // "worksheets/sheet1.xml" 形式（先頭 / 付きの場合も考慮）
+          const normalized = target.replace(/^\/?xl\//, '').replace(/^\//, '');
+          relTargets.set(id, `xl/${normalized}`);
+        },
+      );
+    }
+
+    return sheets
+      .map((sheet, index) => {
+        const name = sheet.getAttribute('name') ?? '';
+        // r: プレフィックスは環境により異なるため、ローカル名 e:id を拾う
+        let relId = '';
+        for (const attr of Array.from(sheet.attributes)) {
+          if (attr.localName === 'id' || attr.name === 'r:id') {
+            relId = attr.value;
+            break;
+          }
+        }
+        const entryName =
+          relTargets.get(relId) ?? `xl/worksheets/sheet${index + 1}.xml`;
+        return { name, entryName };
+      })
+      .filter((s) => s.name !== '');
   } catch {
-    return '';
+    return [];
   }
 };
 
-/** .xlsx を読み取って行列へ変換する */
+/**
+ * .xlsx を読み取り、シート名で選んだ 1 シートを行列へ変換する。
+ *
+ * 期待するテンプレートが指定された場合（expected）は、
+ * その画面のシートを探して読む。見つからなければ Error。
+ *
+ * expected が未指定の場合は先頭のシートを読む。
+ */
 const readXlsx = async (
   buffer: ArrayBuffer,
-): Promise<{ matrix: string[][]; source: string }> => {
+  expected?: Exclude<ImportTemplateKind, 'unknown'>,
+): Promise<{ matrix: string[][]; source: string; sheetName: string }> => {
   const bytes = new Uint8Array(buffer);
   const view = new DataView(buffer);
   const entries = listZipEntries(view);
 
-  const sheetEntry = pickSheetEntry(entries);
-  if (!sheetEntry) {
+  const sharedEntry = entries.find((e) => e.name === 'xl/sharedStrings.xml');
+  const workbookEntry = entries.find((e) => e.name === 'xl/workbook.xml');
+  const relsEntry = entries.find(
+    (e) => e.name === 'xl/_rels/workbook.xml.rels',
+  );
+
+  const [sharedXml, workbookXml, relsXml] = await Promise.all([
+    sharedEntry
+      ? readZipEntryText(bytes, view, sharedEntry)
+      : Promise.resolve(undefined),
+    workbookEntry
+      ? readZipEntryText(bytes, view, workbookEntry)
+      : Promise.resolve(undefined),
+    relsEntry
+      ? readZipEntryText(bytes, view, relsEntry)
+      : Promise.resolve(undefined),
+  ]);
+
+  const sheets = listSheets(workbookXml, relsXml);
+
+  // 読むシートを決める（expected が指定されていればシート名で判定する）
+  let target: SheetInfo | undefined;
+  if (expected) {
+    target = sheets.find(
+      (s) => detectTemplateBySheetName(s.name) === expected,
+    );
+    if (!target) {
+      throw new Error('この画面の一括読み込み用テンプレートではありません。');
+    }
+  } else {
+    target = sheets[0];
+  }
+
+  // NOTE: シート情報が取れない（workbook.xml が無い等）場合は
+  //       従来どおり先頭のシート XML を探して読む。
+  const targetEntryName = target?.entryName;
+  const sheetEntry = targetEntryName
+    ? entries.find((e) => e.name === targetEntryName)
+    : undefined;
+  const fallbackEntry =
+    sheetEntry ??
+    entries.find((e) => e.name === 'xl/worksheets/sheet1.xml') ??
+    entries.find((e) => /^xl\/worksheets\/[^/]+\.xml$/i.test(e.name));
+
+  if (!fallbackEntry) {
     throw new Error('Excel にシートが見つかりませんでした。');
   }
 
-  const sharedEntry = entries.find((e) => e.name === 'xl/sharedStrings.xml');
-  const workbookEntry = entries.find((e) => e.name === 'xl/workbook.xml');
-
-  const [sheetXml, sharedXml, workbookXml] = await Promise.all([
-    readZipEntryText(bytes, view, sheetEntry),
-    sharedEntry ? readZipEntryText(bytes, view, sharedEntry) : Promise.resolve(undefined),
-    workbookEntry ? readZipEntryText(bytes, view, workbookEntry) : Promise.resolve(undefined),
-  ]);
-
+  const sheetXml = await readZipEntryText(bytes, view, fallbackEntry);
   const matrix = parseSheet(sheetXml, parseSharedStrings(sharedXml));
-  const sheetName = readFirstSheetName(workbookXml);
+  const sheetName = target?.name ?? '';
+
   return {
     matrix,
+    sheetName,
     source: sheetName ? `Excel(.xlsx) / シート：${sheetName}` : 'Excel(.xlsx)',
   };
 };
@@ -713,14 +699,22 @@ const buildRows = (
 /**
  * 表形式ファイル（Excel / CSV）を読み取り、セルの行列と読み取り元を返す。
  * ※要員情報・プロジェクト情報の一括読み込みで共用する。
+ *
+ * expected を指定すると、Excel はシート名で対象シートを選ぶ
+ * （要員情報＝シート名に「全員情報」を含む、プロジェクト管理＝「マスタ」）。
  */
 export const readSpreadsheetFile = async (
   file: File,
+  expected?: Exclude<ImportTemplateKind, 'unknown'>,
 ): Promise<{ matrix: string[][]; source: string }> => {
   const fileName = file.name.toLowerCase();
 
   if (fileName.endsWith('.xlsx') || fileName.endsWith('.xlsm')) {
-    return readXlsx(await file.arrayBuffer());
+    const { matrix, source } = await readXlsx(
+      await file.arrayBuffer(),
+      expected,
+    );
+    return { matrix, source };
   }
 
   if (fileName.endsWith('.xls')) {
@@ -729,20 +723,21 @@ export const readSpreadsheetFile = async (
     );
   }
 
-  // CSV / タブ区切りテキスト
+  // CSV / タブ区切りテキスト（シートの概念が無いため従来どおり）
   return { matrix: parseDelimitedText(await file.text()), source: 'CSV' };
 };
 
 /**
  * 社員情報ファイル（Excel / CSV）を読み取り、取り込み可能な行を返す。
  * 解析に失敗した場合は Error（日本語メッセージ）を投げる。
+ *
+ * Excel は「シート名に全員情報を含むシート」を読む。
  */
 export const parsePersonnelFile = async (
   file: File,
 ): Promise<PersonnelImportResult> => {
-  const { matrix, source } = await readSpreadsheetFile(file);
-  // テンプレート違い（プロジェクト管理の Excel など）を先に弾く
-  assertImportTemplate(matrix, 'personnel');
+  // NOTE: シート名で対象シートを選ぶため、テンプレート検証は readXlsx 内で行う。
+  const { matrix, source } = await readSpreadsheetFile(file, 'personnel');
   return buildRows(matrix, source);
 };
 

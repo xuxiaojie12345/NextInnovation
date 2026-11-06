@@ -19,11 +19,7 @@
  *   - 所属部門（「所属部門」列）は部門マスタと照合せず、
  *     ファイルに書かれている内容をそのまま登録する
  */
-import {
-  assertImportTemplate,
-  normalizeKey,
-  readSpreadsheetFile,
-} from '../Personnel/personnelImport';
+import { normalizeKey, readSpreadsheetFile } from '../Personnel/personnelImport';
 
 /** 一括読み込みで受け取る1件分のプロジェクト情報 */
 export interface ProjectImportRow {
@@ -217,8 +213,7 @@ const buildRows = (
 export const parseProjectFile = async (
   file: File,
 ): Promise<ProjectImportResult> => {
-  const { matrix, source } = await readSpreadsheetFile(file);
-  // テンプレート違い（要員情報の Excel など）を先に弾く
-  assertImportTemplate(matrix, 'project');
+  // NOTE: シート名で対象シートを選ぶため、テンプレート検証は readXlsx 内で行う。
+  const { matrix, source } = await readSpreadsheetFile(file, 'project');
   return buildRows(matrix, source);
 };
