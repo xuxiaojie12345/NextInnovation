@@ -551,6 +551,18 @@ app/middleware/request_id.py     # X-Request-Id 受理・採番・返却</div>
       <strong>補足：</strong>現状の <code>get_db()</code> は <code>finally: db.close()</code> のみです。
       例外時に明示的な <code>rollback()</code> を入れるか、例外ハンドラ側で必ず rollback する設計にしてください。
     </div>
+
+    <h3>3.1 実装状況（補足・更新）</h3>
+    <p>（A 案実施時点）上記 3 のうち、以下の部分を実装済み。</p>
+    <ul>
+      <li><strong>共通フィールド</strong>：<code>requestId</code>（= <code>X-Request-Id</code> 相当の trace id）、<code>timestamp</code>、<code>trace_id</code> をエラー時に返却。（2.1 のボディに整合）</li>
+      <li><strong>RequestValidationError</strong>：422 / <code>VALIDATION_ERROR</code> / <code>fieldErrors</code>（<code>loc</code> の末尾要素を項目名として生成）。</li>
+      <li><strong>HTTPException</strong>：ステータスに応じた <code>code</code> へ変換（<code>detail</code> は文字列なら <code>message</code> へ）。</li>
+      <li><strong>IntegrityError</strong>：409 / <code>KADOU_REFERENCE_IN_USE</code>（FK 参照中の削除など）。</li>
+      <li><strong>想定外 Exception</strong>：500 / <code>SYSTEM_ERROR</code>（レスポンスにはスタックトレースを出さない）。</li>
+      <li><strong>get_db()</strong>：<code>except BaseException → rollback()</code> を追加し、例外時は必ずロールバック。</li>
+      <li><strong>未実装（後続タスク）</strong>：フィールド単位の <code>AppError</code>／<code>errorMessages.ts</code>（code→文言）／フロントの <code>notify.ts</code>／<code>X-Request-Id</code> 採番ミドルウェアの体系化。</li>
+    </ul>
   </section>
 
   <section id="sec4">

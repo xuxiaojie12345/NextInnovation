@@ -30,6 +30,7 @@ import {
   kindLabelOf,
 } from '../constants/options';
 import { departmentLabelOf } from '../data/departmentUtils';
+import { t } from '../constants/messages';
 import {
   addDepartment,
   deleteDepartment,
@@ -107,7 +108,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         const list = await fetchDepartments(year);
         if (alive) setDepartmentsRef.current(list);
       } catch (err) {
-        if (alive) message.error(err instanceof Error ? err.message : '部門一覧を取得できませんでした。');
+        if (alive) message.error(err instanceof Error ? err.message : t('E_KADOU_020'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -151,11 +152,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         );
         setEditingId((prev) => (prev === row.departmentId ? null : prev));
         message.success(
-          `${kindLabelOf(row.kind)}「${row.name}」を削除しました。`,
+          t('I_KADOU_003', [row.location, kindLabelOf(row.kind), row.name]),
         );
       } catch (err) {
         message.error(
-          err instanceof Error ? err.message : '部門を削除できませんでした。',
+          err instanceof Error ? err.message : t('E_KADOU_022'),
         );
       } finally {
         setSaving(false);
@@ -168,11 +169,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      message.warning('名称を入力してください。');
+      message.warning(t('W_KADOU_001', ['名称']));
       return;
     }
     if (!location) {
-      message.warning('拠点を選択してください。');
+      message.warning(t('W_KADOU_002', ['拠点']));
       return;
     }
     if (saving) return;
@@ -196,19 +197,19 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           prev.map((d) => (d.departmentId === editingId ? updated : d)),
         );
         message.success(
-          `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を修正しました。`,
+          t('I_KADOU_002', [location, kindLabelOf(kind), trimmed]),
         );
       } else {
         const created = await addDepartment(year, payload, operatorId);
         setDepartments((prev) => [...prev, created]);
         message.success(
-          `${location}拠点の${kindLabelOf(kind)}「${trimmed}」を登録しました。`,
+          t('I_KADOU_001', [location, kindLabelOf(kind), trimmed]),
         );
       }
       handleResetForm();
     } catch (err) {
       message.error(
-        err instanceof Error ? err.message : '部門を保存できませんでした。',
+        err instanceof Error ? err.message : t('E_KADOU_022'),
       );
     } finally {
       setSaving(false);
@@ -272,7 +273,10 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             </Button>
             <Popconfirm
               title='削除の確認'
-              description={`${kindLabelOf(row.kind)}「${row.name}」を削除しますか？`}
+              description={t('I_KADOU_004', [
+                kindLabelOf(row.kind),
+                row.name,
+              ])}
               okText='削除'
               cancelText='キャンセル'
               okButtonProps={{ danger: true }}

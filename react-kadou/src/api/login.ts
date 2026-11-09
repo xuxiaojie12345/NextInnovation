@@ -1,8 +1,7 @@
 import type { AuthUser } from '../types/user';
 import { YAKUSHOKU_ROLE_MAP, DEFAULT_ROLE } from '../constants/options';
+import { t } from '../constants/messages';
 import { httpRequest } from './http';
-import type { ApiError } from './ApiError';
-import { isApiError } from './ApiError';
 
 /** バックエンドのログインAPIレスポンス */
 export interface LoginResponse {
@@ -40,14 +39,8 @@ export async function loginApi(
   };
 }
 
-/** ログイン画面で表示するメッセージを返す（認証失敗と通信異常を区別する） */
+/** ログイン失敗時のメッセージを返す（バックエンドの message を優先。未取得時は定数 E_KADOU_001 へ） */
 export function loginErrorMessage(e: unknown): string {
-  if (isApiError(e)) {
-    const err = e as ApiError;
-    if (err.kind === 'auth') return 'ユーザーIDまたはパスワードが正しくありません。';
-    return err.message;
-  }
-  return e instanceof Error && e.message
-    ? e.message
-    : 'ユーザーIDまたはパスワードが正しくありません。';
+  if (e instanceof Error && e.message) return e.message;
+  return t('E_KADOU_001');
 }

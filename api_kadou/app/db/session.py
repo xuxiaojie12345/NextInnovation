@@ -17,9 +17,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    """FastAPI依赖：获取数据库会话"""
+    """FastAPI依赖：获取数据库会话（请求异常时自动 rollback）"""
     db = SessionLocal()
     try:
         yield db
+    except BaseException:
+        db.rollback()
+        raise
     finally:
         db.close()

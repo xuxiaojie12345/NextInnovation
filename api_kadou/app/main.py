@@ -1,16 +1,20 @@
 import time
 import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from types import SimpleNamespace
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logger import get_logger, setup_logging, trace_id_var
 from app.core.settings import BaseSettings
+from app.core.errors import code_from_status
 from app.api.login import router as api_v1_router
 from app.api.yearSelect import router as year_router
 from app.api.department import router as kadou_router
@@ -69,18 +73,36 @@ async def trace_log_middleware(request: Request, call_next):
 
 # ---- 全局异常处理（记录日志并返回统一 JSON，携带 trace_id） ----
 
+def _error_body(request: Request, *, code: str, message: str, detail=None) -> dict:
+    """错误响应的公共字段（设计案 2.1 の契約）"""
+    body: dict = {
+        "code": code,
+        "message": message,
+        "requestId": getattr(request.state, "trace_id", "no-trace"),
+        "trace_id": getattr(request.state, "trace_id", "no-trace"),
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    if detail is not None:
+        body["detail"] = detail
+    return body
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     logger.warning(
         "HTTPエラー: method=%s path=%s status=%s detail=%s",
         request.method, request.url.path, exc.status_code, exc.detail,
     )
+    message = str(exc.detail)
+    if message.startswith("{") and isinstance(exc.detail, dict):
+        message = str(exc.detail.get("message") or exc.detail)
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "detail": str(exc.detail),
-            "trace_id": getattr(request.state, "trace_id", "no-trace"),
-        },
+        content=_error_body(
+            request,
+            code=code_from_status(exc.status_code),
+            message=message,
+            detail=exc.detail,
+        ),
         headers=exc.headers,
     )
 
@@ -91,12 +113,37 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         "リクエスト検証エラー: method=%s path=%s errors=%s",
         request.method, request.url.path, exc.errors(),
     )
+    field_errors: dict = {}
+    for err in exc.errors():
+        loc = err.get("loc") or []
+        # loc の末尾はフィールド名（body.xxx → xxx）
+        field = str(loc[-1]) if loc else "body"
+        field_errors[field] = str(err.get("msg", ""))
     return JSONResponse(
         status_code=422,
-        content={
-            "detail": exc.errors(),
-            "trace_id": getattr(request.state, "trace_id", "no-trace"),
-        },
+        content=_error_body(
+            request,
+            code=code_from_status(422),
+            message="入力内容に誤りがあります。",
+            detail=exc.errors(),
+        )
+        | {"fieldErrors": field_errors},
+    )
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_exception_handler(request: Request, exc: IntegrityError):
+    logger.warning(
+        "DB整合性エラー: method=%s path=%s error=%s",
+        request.method, request.url.path, exc,
+    )
+    return JSONResponse(
+        status_code=409,
+        content=_error_body(
+            request,
+            code="KADOU_REFERENCE_IN_USE",
+            message="データが他のレコードから参照されているため、処理できませんでした。",
+        ),
     )
 
 
@@ -116,7 +163,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         trace_id_var.reset(token)
     return JSONResponse(
         status_code=500,
-        content={"code": 500, "msg": "サーバー内部エラー", "trace_id": trace_id},
+        content=_error_body(
+            Request(state=SimpleNamespace(trace_id=trace_id)),
+            code="SYSTEM_ERROR",
+            message="サーバー内部エラー",
+        ),
         headers={"X-Trace-Id": trace_id},
     )
     
