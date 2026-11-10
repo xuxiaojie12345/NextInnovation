@@ -18,11 +18,11 @@
  *   - 区分が空・未知の場合は「会社休日」として取り込む（警告）
  */
 import dayjs from 'dayjs';
-import { HolidayKind } from '../data/yearStore';
 import {
   normalizeKey,
   readSpreadsheetFile,
 } from '../Personnel/personnelImport';
+import { HolidayKind } from './HolidaySettingMode';
 
 /** 一括読み込みで受け取る1件分の休日情報 */
 export interface HolidayImportRow {

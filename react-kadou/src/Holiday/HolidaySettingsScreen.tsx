@@ -22,7 +22,6 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
-import { Holiday, HolidayKind } from '../data/yearStore';
 import {
   HOLIDAY_IMPORT_ACCEPT,
   HOLIDAY_IMPORT_FORMAT_HINT,
@@ -32,39 +31,16 @@ import {
   HOLIDAY_KINDS as KINDS,
   HOLIDAY_KIND_OPTIONS as KIND_OPTIONS,
   HOLIDAY_KINDS_COUNT as KINDS_COUNT,
+  formatDate,
+  csvEscape,
+  KIND_COLOR,
 } from '../constants/options';
 import './HolidaySettingsScreen.css';
 import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
 import Item from 'antd/es/list/Item';
+import { Holiday, HolidayKind, HolidaySettingsScreenProps } from './HolidaySettingMode';
 
 const { Title, Text } = Typography;
-
-/** 区分ごとの表示色 */
-const KIND_COLOR: Record<HolidayKind, string> = {
-  祝日: 'red',
-  会社休日: 'blue',
-  振替休日: 'orange',
-  未指定: 'default',
-};
-
-/** CSV 出力の見出し */
-const CSV_HEADER = '日付,名称,区分';
-
-/** 日付の表示形式 */
-const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)');
-
-/** CSV 出力用に値をエスケープする */
-const csvEscape = (v: string): string =>
-  /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-
-interface HolidaySettingsScreenProps {
-  /** 表示する年度 */
-  year: number;
-  /** その年度の休日（App 側で年度ごとに保持） */
-  holidays: Holiday[];
-  setHolidays: React.Dispatch<React.SetStateAction<Holiday[]>>;
-  currentUserId: string | null;
-}
 
 /**
  * 休日設置 画面（メニュー「休日設置」で切り替わる画面）

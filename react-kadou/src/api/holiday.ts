@@ -1,6 +1,5 @@
-import Item from 'antd/es/list/Item';
-import { Holiday, HolidayKind } from '../data/yearStore';
 import dayjs from 'dayjs';
+import { Holiday, HolidayKind } from '../Holiday/HolidaySettingMode';
 
 export interface HolidayResponse {
     id: number;
