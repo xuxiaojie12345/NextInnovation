@@ -4,11 +4,11 @@ from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.login import UserOut
+from app.schemas.login import LoginResponse
 from app.sql import load_sql
 
 
-def authenticate(db: Session, user_id: str, password: str) -> UserOut | None:
+def authenticate(db: Session, user_id: str, password: str) -> LoginResponse | None:
     """jn_user_table からユーザーをSELECT文のみで照合する。
 
     部門名は jn_department_master と結合して取得する（year_id は現在の西暦）。
@@ -29,7 +29,7 @@ def authenticate(db: Session, user_id: str, password: str) -> UserOut | None:
     )
     if row is None:
         return None
-    return UserOut(
+    return LoginResponse(
         userId=row["user_id"],
         name=row["shimei"],
         yakushokukubun=row["yakushoku_kubun"],

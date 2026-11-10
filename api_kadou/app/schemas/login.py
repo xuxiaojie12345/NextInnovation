@@ -10,7 +10,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class UserOut(BaseModel):
+class LoginResponse(BaseModel):
     """ログイン成功時に返すユーザー情報"""
 
     userId: str
