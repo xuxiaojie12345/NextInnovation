@@ -23,22 +23,18 @@ import {
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import {
-  HOLIDAY_IMPORT_ACCEPT,
-  HOLIDAY_IMPORT_FORMAT_HINT,
-  parseHolidayFile,
-} from './holidayImport';
-import {
   HOLIDAY_KINDS as KINDS,
   HOLIDAY_KIND_OPTIONS as KIND_OPTIONS,
   HOLIDAY_KINDS_COUNT as KINDS_COUNT,
   formatDate,
   csvEscape,
   KIND_COLOR,
+  HOLIDAY_IMPORT_ACCEPT  
 } from '../constants/options';
 import './HolidaySettingsScreen.css';
 import { HolidayInitApi,HolidayAddApi,HolidayUpdateApi,HolidayDeleteApi,HolidayImportApi } from '../api/holiday';
-import Item from 'antd/es/list/Item';
 import { Holiday, HolidayKind, HolidaySettingsScreenProps } from './HolidaySettingMode';
+import { parseHolidayFile } from './HolidayImport';
 
 const { Title, Text } = Typography;
 
@@ -403,9 +399,8 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           </Button>
         </div>
         <Text type='secondary' className='holiday-import-hint'>
-          {HOLIDAY_IMPORT_FORMAT_HINT}
+          '形式：日付／名称／区分（1行目は見出し行）。日付は YYYY-MM-DD / YYYY/MM/DD、Excel の日付セルに対応。同じ日付は上書きします。'
         </Text>
-
         <Table<Holiday>
           rowKey='id'
           size='small'

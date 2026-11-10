@@ -5,7 +5,7 @@
  * 「値」はデータ、それ以外の選択肢情報はここで一元管理する。
  * ※派生値（YEAR_OPTIONS 等）や列名別名マップ（HEADER_ALIASES 等）は対象外。
  */
-import { HolidayKind } from '../Holiday/HolidaySettingMode';
+import { HolidayImportRow, HolidayKind } from '../Holiday/HolidaySettingMode';
 import type { DepartmentKind, DepartmentLocation } from '../WorkStatus/types';
 import type { UserRole } from '../types/user';
 import dayjs from 'dayjs';
@@ -93,4 +93,15 @@ export const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)
 
 // CSV 出力用に値をエスケープする
 export const csvEscape = (v: string): string =>/[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+
+/** ファイル選択ダイアログで許可する拡張子 */
+export const HOLIDAY_IMPORT_ACCEPT =
+  '.xlsx,.xlsm,.xls,.csv,text/csv,' +
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,' +
+  'application/vnd.ms-excel';
+
+/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
+export const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
+  date: ['日付', '休日', '休日付', 'date'],
+};
 

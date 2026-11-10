@@ -1,60 +1,10 @@
-/**
- * 休日情報の一括読み込み（フロント モック実装）
- *
- * ■ 対応ファイル
- *   - Excel (.xlsx / .xlsm) … 要員情報の一括読み込みと同じ読み取り処理を利用
- *   - CSV / タブ区切りテキスト
- *   - Excel (.xls 旧形式) … 非対応（.xlsx か CSV で保存し直してもらう）
- *
- * ■ 想定する列（1行目は見出し行。列順は自由、見出し名で判定する）
- *   日付 / 名称 / 区分
- *   ※日付は YYYY-MM-DD / YYYY/MM/DD / Excel の日付セル（シリアル値）に対応
- *   ※見出し行が見つからない場合は上記の並びとみなす
- *
- * ■ 取込ルール
- *   - 同一日付の既存休日は上書き（名称・区分を更新）
- *   - ファイル内で同一日付が複数ある場合は後ろの行を優先
- *   - 選択中年度以外の日付は取り込まない（警告）
- *   - 区分が空・未知の場合は「会社休日」として取り込む（警告）
- */
 import dayjs from 'dayjs';
 import {
   normalizeKey,
   readSpreadsheetFile,
 } from '../Personnel/personnelImport';
-import { HolidayKind } from './HolidaySettingMode';
-
-/** 一括読み込みで受け取る1件分の休日情報 */
-export interface HolidayImportRow {
-  /** 日付（'YYYY-MM-DD'） */
-  date: string;
-}
-
-/** 一括読み込みの結果 */
-export interface HolidayImportResult {
-  /** 取り込み対象になった休日情報（日付は一意） */
-  rows: HolidayImportRow[];
-  /** 取り込めなかった行の警告（「n行目：〜」形式） */
-  warnings: string[];
-  error: string[];
-  /** 読み取り元の説明（結果メッセージ用。例：'Excel(.xlsx) / シート:Sheet1'） */
-  source: string;
-}
-
-/** ファイル選択ダイアログで許可する拡張子 */
-export const HOLIDAY_IMPORT_ACCEPT =
-  '.xlsx,.xlsm,.xls,.csv,text/csv,' +
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,' +
-  'application/vnd.ms-excel';
-
-/** 画面に表示する形式の説明 */
-export const HOLIDAY_IMPORT_FORMAT_HINT =
-  '形式：日付／名称／区分（1行目は見出し行）。日付は YYYY-MM-DD / YYYY/MM/DD、Excel の日付セルに対応。同じ日付は上書きします。';
-
-/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
-const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
-  date: ['日付', '休日', '休日付', 'date'],
-};
+import { HolidayImportResult, HolidayImportRow, HolidayKind } from './HolidaySettingMode';
+import { HEADER_ALIASES } from '../constants/options';
 
 /** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
 const HEADER_MATCH_MIN = 2;
