@@ -42,6 +42,8 @@ export class ApiError extends Error {
   readonly status?: number;
   /** バックエンドの error code（例: KADOU_CONFLICT） */
   readonly code?: string;
+  /** メッセージプレースホルダの位置引数（code とセットで返る） */
+  readonly params?: Array<string | number>;
   /** フィールド単位のエラー（422 の loc から生成） */
   readonly fieldErrors?: Record<string, string>;
   /** X-Request-Id（バックエンドが返す場合） */
@@ -52,6 +54,7 @@ export class ApiError extends Error {
     message: string;
     status?: number;
     code?: string;
+    params?: Array<string | number>;
     fieldErrors?: Record<string, string>;
     requestId?: string;
   }) {
@@ -60,6 +63,7 @@ export class ApiError extends Error {
     this.kind = opts.kind;
     this.status = opts.status;
     this.code = opts.code;
+    this.params = opts.params;
     this.fieldErrors = opts.fieldErrors;
     this.requestId = opts.requestId;
   }

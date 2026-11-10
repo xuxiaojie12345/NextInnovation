@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Input, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import type { AuthUser } from '../types/user';
-import { loginApi, loginErrorMessage } from '../api/login';
+import { loginApi } from '../api/login';
 import { isApiError } from '../utils/ApiError';
+import { apiErrorMessage } from '../utils/errorMessage';
 import { t } from '../constants/messages';
 import { validatePassword, PASSWORD_MAX_LENGTH } from './passwordRules';
 import './Login.css';
@@ -83,7 +84,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         ? 'network'
         : 'auth';
       setErrorKind(kind);
-      setError(loginErrorMessage(err));
+      setError(apiErrorMessage(err));
     } finally {
       setLoading(false);
     }

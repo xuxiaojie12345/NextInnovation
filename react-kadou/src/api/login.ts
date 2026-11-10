@@ -1,8 +1,6 @@
 import type { AuthUser } from '../types/user';
 import { YAKUSHOKU_ROLE_MAP, DEFAULT_ROLE } from '../constants/options';
-import { t } from '../constants/messages';
 import { httpRequest } from '../utils/http';
-import { isApiError } from '../utils/ApiError';
 
 /** バックエンドのログインAPIレスポンス */
 export interface LoginResponse {
@@ -38,16 +36,4 @@ export async function loginApi(
     roleLabel,
     departmentId: data.department ?? undefined,
   };
-}
-
-/** ログイン失敗時のメッセージを返す。
- * ユーザー不存在などの DB 関連判断は后端で行い、后端は business code を返す。
- * 前端は code で文案を引く（E_KADOU_001）。通信異常時は ApiError の message をそのまま使う。
- */
-export function loginErrorMessage(e: unknown): string {
-  if (isApiError(e) && e.code) {
-    // 后端から返った business code で定数を引く（未定義 code は t() が汎用でフォールバック）
-    return t(e.code);
-  }
-  return e instanceof Error && e.message ? e.message : '';
 }

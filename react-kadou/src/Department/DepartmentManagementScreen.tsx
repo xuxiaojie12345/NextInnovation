@@ -31,6 +31,7 @@ import {
 } from '../constants/options';
 import { departmentLabelOf } from '../data/departmentUtils';
 import { t } from '../constants/messages';
+import { apiErrorMessage } from '../utils/errorMessage';
 import {
   addDepartment,
   deleteDepartment,
@@ -108,7 +109,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         const list = await fetchDepartments(year);
         if (alive) setDepartmentsRef.current(list);
       } catch (err) {
-        if (alive) message.error(err instanceof Error ? err.message : t('E_KADOU_020'));
+        if (alive) message.error(apiErrorMessage(err, t('E_KADOU_020')));
       } finally {
         if (alive) setLoading(false);
       }
@@ -156,7 +157,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         );
       } catch (err) {
         message.error(
-          err instanceof Error ? err.message : t('E_KADOU_022'),
+          apiErrorMessage(err, t('E_KADOU_022'))
         );
       } finally {
         setSaving(false);
@@ -208,9 +209,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       }
       handleResetForm();
     } catch (err) {
-      message.error(
-        err instanceof Error ? err.message : t('E_KADOU_022'),
-      );
+      message.error(apiErrorMessage(err, t('E_KADOU_022')));
     } finally {
       setSaving(false);
     }
