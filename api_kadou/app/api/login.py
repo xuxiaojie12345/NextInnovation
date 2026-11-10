@@ -15,5 +15,5 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = authenticate(db, payload.userId.strip(), payload.password)
     if user is None:
         # ユーザー不存在 / パスワード不一致：后端只返回业务 code，文案由前端按 code 映射
-        raise BusinessException(401, "E_KADOU_001")
+        raise BusinessException(status_code=401, message_id="E_KADOU_001")
     return user

@@ -28,78 +28,92 @@ def code_from_status(status: int) -> str:
     return "SYSTEM_ERROR" if status >= 500 else "KADOU_BAD_REQUEST"
 
 
-def BusinessException(code: Number, message: str, params: list[str] | None = None):
-    match code:
+def BusinessException(status_code: Number, message_id: str, params: list[str] | None = None):
+    match status_code:
         case 400:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
+                    status_code=status_code,
                     detail={
                         "code": "KADOU_BAD_REQUEST",
-                        "message": message,
+                        "message": message_id,
                         "detail": "	business",
                         "params": params,
                     },
                 )
             return HTTPException(
-                status_code=code, detail={"code": "KADOU_BAD_REQUEST", "message": message, "detail": "business"}
+                status_code=status_code,
+                detail={"code": "KADOU_BAD_REQUEST", "message": message_id, "detail": "business"},
             )
         case 401:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
-                    detail={"code": "AUTH_REQUIRED", "message": message, "detail": "auth", "params": params},
+                    status_code=status_code,
+                    detail={"code": "AUTH_REQUIRED", "message": message_id, "detail": "auth", "params": params},
                 )
             return HTTPException(
-                status_code=code, detail={"code": "KADOU_BAD_REQUEST", "message": message, "detail": "auth"}
+                status_code=status_code, detail={"code": "KADOU_BAD_REQUEST", "message": message_id, "detail": "auth"}
             )
         case 403:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
-                    detail={"code": "AUTH_FORBIDDEN", "message": message, "detail": "	forbidden", "params": params},
+                    status_code=status_code,
+                    detail={
+                        "code": "AUTH_FORBIDDEN",
+                        "message": message_id,
+                        "detail": "	forbidden",
+                        "params": params,
+                    },
                 )
             return HTTPException(
-                status_code=code, detail={"code": "AUTH_FORBIDDEN", "message": message, "detail": "	forbidden"}
+                status_code=status_code,
+                detail={"code": "AUTH_FORBIDDEN", "message": message_id, "detail": "	forbidden"},
             )
         case 404:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
-                    detail={"code": "KADOU_NOT_FOUND", "message": message, "detail": "notFound", "params": params},
+                    status_code=status_code,
+                    detail={"code": "KADOU_NOT_FOUND", "message": message_id, "detail": "notFound", "params": params},
                 )
             return HTTPException(
-                status_code=code, detail={"code": "KADOU_NOT_FOUND", "message": message, "detail": "notFound"}
+                status_code=status_code, detail={"code": "KADOU_NOT_FOUND", "message": message_id, "detail": "notFound"}
             )
         case 409:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
+                    status_code=status_code,
                     detail={
                         "code": "KADOU_REFERENCE_IN_USE",
-                        "message": message,
+                        "message": message_id,
                         "detail": "business",
                         "params": params,
                     },
                 )
             return HTTPException(
-                status_code=code, detail={"code": "KADOU_REFERENCE_IN_USE", "message": message, "detail": "business"}
+                status_code=status_code,
+                detail={"code": "KADOU_REFERENCE_IN_USE", "message": message_id, "detail": "business"},
             )
         case 422:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
-                    detail={"code": "VALIDATION_ERROR", "message": message, "detail": "validation", "params": params},
+                    status_code=status_code,
+                    detail={
+                        "code": "VALIDATION_ERROR",
+                        "message": message_id,
+                        "detail": "validation",
+                        "params": params,
+                    },
                 )
             return HTTPException(
-                status_code=code, detail={"code": "VALIDATION_ERROR", "message": message, "detail": "validation"}
+                status_code=status_code,
+                detail={"code": "VALIDATION_ERROR", "message": message_id, "detail": "validation"},
             )
         case 500:
             if params is not None:
                 return HTTPException(
-                    status_code=code,
-                    detail={"code": "KADOU_BAD_REQUEST", "message": message, "detail": "auth", "params": params},
+                    status_code=status_code,
+                    detail={"code": "KADOU_BAD_REQUEST", "message": message_id, "detail": "auth", "params": params},
                 )
             return HTTPException(
-                status_code=code, detail={"code": "SYSTEM_ERROR", "message": message, "detail": "server"}
+                status_code=status_code, detail={"code": "SYSTEM_ERROR", "message": message_id, "detail": "server"}
             )
