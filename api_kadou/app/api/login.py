@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.errors import BusinessException
 from app.db.session import get_db
 from app.schemas.login import LoginRequest, LoginResponse
 from app.services.login import authenticate
@@ -14,5 +15,5 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = authenticate(db, payload.userId.strip(), payload.password)
     if user is None:
         # ユーザー不存在 / パスワード不一致：后端只返回业务 code，文案由前端按 code 映射
-        raise HTTPException(status_code=401, detail={"code": "E_KADOU_001"})
+        raise BusinessException(401, "E_KADOU_001")
     return user
