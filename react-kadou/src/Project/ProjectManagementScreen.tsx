@@ -122,7 +122,51 @@ const FIELD_LIMITS: Partial<Record<keyof ProjectFormValues, [number, string]>> =
 /** フォームの入力エラー（キーごとの赤字メッセージ。'' = エラーなし） */
 type FormErrors = Partial<Record<keyof ProjectFormValues, string>>;
 
-/** 入力値を検証する（必須チェック + 最大長チェック） */
+/**
+ * 1項目分の入力チェック（最大長 + 必須）。
+ *
+ * NOTE: フォーカスを失った時点（onBlur）でこの関数だけを呼び、
+ *       その項目の赤字メッセージを即時に出せるようにしている。
+ *
+ * @param key     チェック対象の項目
+ * @param value   入力値
+ * @param options.required 必須チェックを行うか（登録・修正時のみ true）
+ * @returns エラー文言。問題なければ undefined
+ */
+const validateField = (
+  key: keyof ProjectFormValues,
+  value: string,
+  options: { required: boolean },
+): string | undefined => {
+  // 1) 最大長チェック
+  const limit = FIELD_LIMITS[key];
+  if (limit) {
+    const [max, label] = limit;
+    if (value.trim().length > max) {
+      return `${label}は${max}文字以内で入力してください。`;
+    }
+  }
+
+  // 2) 必須チェック（登録・修正時のみ）
+  if (options.required) {
+    const required = REQUIRED_FIELDS.find(([k]) => k === key);
+    if (required) {
+      const label = required[1];
+      if (!String(value ?? '').trim()) {
+        return key === 'departmentId'
+          ? `${label}を選択してください。`
+          : `${label}を入力してください。`;
+      }
+    }
+  }
+
+  return undefined;
+};
+
+/**
+ * 入力値を検証する（必須チェック + 最大長チェック）。
+ * 1項目ずつ validateField に委譲し、画面全体のエラー表を組み立てる。
+ */
 const validateForm = (
   form: ProjectFormValues,
   options: { required: boolean },
@@ -131,27 +175,10 @@ const validateForm = (
 
   (Object.keys(FIELD_LIMITS) as Array<keyof ProjectFormValues>).forEach(
     (key) => {
-      const limit = FIELD_LIMITS[key];
-      if (!limit) return;
-      const [max, label] = limit;
-      if (form[key].trim().length > max) {
-        errors[key] = `${label}は${max}文字以内で入力してください。`;
-      }
+      const message = validateField(key, form[key], options);
+      if (message) errors[key] = message;
     },
   );
-
-  // 必須チェック（登録・修正時のみ）
-  if (options.required) {
-    REQUIRED_FIELDS.forEach(([key, label]) => {
-      if (errors[key]) return;
-      if (!String(form[key] ?? '').trim()) {
-        errors[key] =
-          key === 'departmentId'
-            ? `${label}を選択してください。`
-            : `${label}を入力してください。`;
-      }
-    });
-  }
 
   return errors;
 };
@@ -631,7 +658,47 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     setFormErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
   };
 
-  /** フォームを初期化（修正モードも解除） */
+  /**
+   * 入力欄からフォーカスが外れたときに、その項目の最大長だけをチェックして
+   * 問題があれば赤字メッセージを即時表示する。
+   *
+   * NOTE: 必須チェックはここでは行わない（入力途中に「入力してください」が
+   *       出ると煩わしいため）。必須チェックは「登録する」「修正する」押下時に
+   *       validateForm(required: true) でまとめて判定する。
+   *       部門（Select）は選択時に値が入るため対象外（onBlur を付けていない）。
+   */
+  const handleBlur = (key: keyof ProjectFormValues) => {
+    // 必須チェックは押下時のみ。ここでは最大長だけを見る
+    const message = validateField(key, form[key], { required: false });
+    setFormErrors((prev) => {
+      // 変化なしなら再レンダーを避ける
+      if (prev[key] === message) return prev;
+      return { ...prev, [key]: message };
+    });
+  };
+
+  /**
+   * クリア：入力内容をすべて消去する（エラー表示も解除）。
+   * 修正モードは維持するため、項目を入力し直して「修正する」を押せる。
+   */
+  const clearForm = useCallback(() => {
+    setForm(EMPTY_FORM);
+    setFormErrors({});
+  }, []);
+
+  /**
+   * キャンセル：修正を中止して新規登録モードへ戻る（入力内容は消去）。
+   * クリアとの違いは「修正モードを解除するかどうか」。キャンセルは解除する。
+   */
+  const cancelEdit = useCallback(() => {
+    setEditingKey(null);
+    setForm(EMPTY_FORM);
+    setFormErrors({});
+  }, []);
+
+  /**
+   * 保存成功後にフォームを初期状態へ戻す（新規登録モードへ）。
+   */
   const handleResetForm = useCallback(() => {
     setEditingKey(null);
     setForm(EMPTY_FORM);
@@ -1166,6 +1233,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   maxLength={200}
                   status={formErrors.customer ? 'error' : undefined}
                   onChange={(e) => setField('customer', e.target.value)}
+                  onBlur={() => handleBlur('customer')}
                 />
                 {formErrors.customer && (
                   <Text type='danger' style={{ fontSize: 12 }}>
@@ -1181,6 +1249,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   maxLength={200}
                   status={formErrors.caseName ? 'error' : undefined}
                   onChange={(e) => setField('caseName', e.target.value)}
+                  onBlur={() => handleBlur('caseName')}
                 />
                 {formErrors.caseName && (
                   <Text type='danger' style={{ fontSize: 12 }}>
@@ -1198,6 +1267,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                     maxLength={60}
                     status={formErrors.team ? 'error' : undefined}
                     onChange={(e) => setField('team', e.target.value)}
+                    onBlur={() => handleBlur('team')}
                   />
                   {formErrors.team && (
                     <Text type='danger' style={{ fontSize: 12 }}>
@@ -1213,6 +1283,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                     maxLength={60}
                     status={formErrors.subTeam ? 'error' : undefined}
                     onChange={(e) => setField('subTeam', e.target.value)}
+                    onBlur={() => handleBlur('subTeam')}
                   />
                   {formErrors.subTeam && (
                     <Text type='danger' style={{ fontSize: 12 }}>
@@ -1229,6 +1300,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   maxLength={60}
                   status={formErrors.name ? 'error' : undefined}
                   onChange={(e) => setField('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
                 />
                 {formErrors.name && (
                   <Text type='danger' style={{ fontSize: 12 }}>
@@ -1302,6 +1374,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   maxLength={40}
                   status={formErrors.projectCode ? 'error' : undefined}
                   onChange={(e) => setField('projectCode', e.target.value)}
+                  onBlur={() => handleBlur('projectCode')}
                 />
                 {formErrors.projectCode && (
                   <Text type='danger' style={{ fontSize: 12 }}>
@@ -1320,8 +1393,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               >
                 {isEditing ? '修正する' : '登録する'}
               </Button>
-              {isEditing && <Button onClick={handleResetForm}>キャンセル</Button>}
-              <Button type='text' onClick={handleResetForm}>
+              {isEditing && <Button onClick={cancelEdit}>キャンセル</Button>}
+              <Button type='text' onClick={clearForm}>
                 クリア
               </Button>
             </Space>
