@@ -5,7 +5,11 @@
  *       parsePersonnelFile() を通して検証する（DOMParser / File は jsdom で利用可能）。
  */
 import { describe, expect, it } from '@jest/globals';
-import { normalizeKey, parsePersonnelFile } from './personnelImport';
+import {
+  normalizeKey,
+  parsePersonnelFile,
+  validatePersonnelImportRows,
+} from './personnelImport';
 
 // ---------------------------------------------------------------------------
 // 最小構成の .xlsx（無圧縮 ZIP）を組み立てるヘルパー
@@ -186,8 +190,10 @@ const makeXlsxFile = (
   const zip = buildZip([
     {
       name: 'xl/workbook.xml',
+      // NOTE: 要員情報の一括読み込みはシート名に「全員情報」を含むシートを読む
+      //       （IMPORT_SHEET_RULES.personnel）。テスト用フィクスチャも合わせる。
       data: utf8(
-        '<workbook><sheets><sheet name="Sheet1"/></sheets></workbook>',
+        '<workbook><sheets><sheet name="全員情報"/></sheets></workbook>',
       ),
     },
     { name: 'xl/sharedStrings.xml', data: utf8(sharedStringsXml) },
@@ -246,20 +252,22 @@ describe('normalizeKey', () => {
   });
 });
 
-describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
-  it('3行目の B/C/R/T から1件目を読み取る', async () => {
+describe('parsePersonnelFile（固定テンプレート B3/C3/E3/N3/R3）', () => {
+  it('3行目の B/C/E/N/R から1件目を読み取る', async () => {
     const strings = sharedStrings([
       '<t>10001</t>',
       '<t>山田 太郎</t>',
-      '<t>T01</t>',
       '<t>システム開発部</t>',
+      '<t>T01</t>',
+      '<t>東京</t>',
     ]);
-    // B3=0, C3=1, R3=2, T3=3
+    // B3=0, C3=1, E3=2, R3=3, N3=4
     const sheet = sheetFromCells({
       B3: '0',
       C3: '1',
-      R3: '2',
-      T3: '3',
+      E3: '2',
+      R3: '3',
+      N3: '4',
     });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
@@ -269,7 +277,8 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
       employeeNo: '10001',
       name: '山田 太郎',
       role: 'T01',
-      department: 'システム開発部',
+      departmentAlias: 'システム開発部',
+      workLocation: '東京',
       line: 3,
     });
   });
@@ -281,13 +290,15 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
       '<t>佐藤 花子</t>',
       '<t>T02</t>',
       '<t>営業部</t>',
+      '<t>大阪</t>',
     ]);
     const sheet = sheetFromCells({
       A1: '0',
       B3: '1',
       C3: '2',
       R3: '3',
-      T3: '4',
+      E3: '4',
+      N3: '5',
     });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
@@ -304,12 +315,14 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
       '<t>山田 太郎</t><rPh sb="0" eb="4"><t>ヤマダ タロウ</t></rPh>',
       '<t>T01</t>',
       '<t>開発部</t>',
+      '<t>東京</t>',
     ]);
     const sheet = sheetFromCells({
       B3: '0',
       C3: '1',
       R3: '2',
-      T3: '3',
+      E3: '3',
+      N3: '4',
     });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
@@ -319,26 +332,48 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
     expect(result.rows[0].name).toBe('山田 太郎');
   });
 
-  it('T列（所属）が空の行は取り込まず警告する（所属は必須）', async () => {
+  it('E列（所属部門）が空の行は取り込まず警告する（所属は必須）', async () => {
     const strings = sharedStrings([
       '<t>10003</t>',
       '<t>鈴木 一郎</t>',
       '<t>T03</t>',
+      '<t>東京</t>',
     ]);
-    // T3 は空（セル自体を置かない）
+    // E3 は空（セル自体を置かない）
     const sheet = sheetFromCells({
       B3: '0',
       C3: '1',
       R3: '2',
+      N3: '3',
     });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
 
     expect(result.rows).toHaveLength(0);
     expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0]).toContain('T 列（所属）が空');
-    expect(result.warnings[0]).toContain('取り込みを中止');
+    expect(result.warnings[0]).toContain('E 列（所属部門）が空');
     expect(result.warnings[0]).toContain('10003');
+  });
+
+  it('N列（労働関係所属地）が空の行は取り込まず警告する', async () => {
+    const strings = sharedStrings([
+      '<t>10006</t>',
+      '<t>田中 次郎</t>',
+      '<t>T06</t>',
+      '<t>品質管理部</t>',
+    ]);
+    // N3 は空
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+      E3: '3',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(0);
+    expect(result.warnings[0]).toContain('N 列（労働関係所属地）が空');
   });
 
   it('C列（氏名）が空の行は取り込まず警告する', async () => {
@@ -346,11 +381,13 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
       '<t>10004</t>',
       '<t>T04</t>',
       '<t>品質管理部</t>',
+      '<t>東京</t>',
     ]);
     const sheet = sheetFromCells({
       B3: '0',
       R3: '1',
-      T3: '2',
+      E3: '2',
+      N3: '3',
     });
 
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
@@ -359,7 +396,7 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
     expect(result.warnings[0]).toContain('C 列（氏名）が空');
   });
 
-  it('B/C/R/T が全て空の行はスキップする（警告なし）', async () => {
+  it('B/C/E/N/R が全て空の行はスキップする（警告なし）', async () => {
     const strings = sharedStrings(['<t>10005</t>', '<t>高橋 美咲</t>']);
     const sheet = sheetFromCells({
       B3: '0',
@@ -369,6 +406,66 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/R3/T3）', () => {
     const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
 
     expect(result.rows).toHaveLength(0);
-    expect(result.warnings).toHaveLength(1); // T列が空のため1件警告
+    expect(result.warnings).toHaveLength(1); // E列が空のため1件警告
+  });
+});
+
+describe('validatePersonnelImportRows（取り込み時の桁数チェック）', () => {
+  const base = {
+    employeeNo: '10001',
+    name: '山田 太郎',
+    department: 'システム開発部',
+    role: 'T01',
+    line: 3,
+  };
+
+  it('制限内なら空配列を返す', () => {
+    expect(
+      validatePersonnelImportRows([
+        base,
+        { ...base, employeeNo: '99999', role: 'ABCDEF', line: 4 },
+      ]),
+    ).toEqual([]);
+  });
+
+  it('役割が6桁を超える行を検出する', () => {
+    const problems = validatePersonnelImportRows([
+      { ...base, role: 'ABCDEFG' },
+    ]);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain('3行目');
+    expect(problems[0]).toContain('役割');
+    expect(problems[0]).toContain('6桁以内の半角英数字');
+  });
+
+  it('全角の役割を検出する（半角英数字のみ許可）', () => {
+    const problems = validatePersonnelImportRows([
+      { ...base, role: 'Ｔ１１Ｅ０３' },
+    ]);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain('役割');
+  });
+
+  it('役割が空欄ならエラーにしない（取込時に既存値を保持）', () => {
+    expect(validatePersonnelImportRows([{ ...base, role: '' }])).toEqual([]);
+  });
+
+  it('社員番号が5桁を超える・数字以外の行を検出する', () => {
+    const problems = validatePersonnelImportRows([
+      { ...base, employeeNo: '123456' },
+      { ...base, employeeNo: 'A0001', line: 4 },
+    ]);
+    expect(problems).toHaveLength(2);
+    expect(problems[0]).toContain('社員番号');
+    expect(problems[1]).toContain('4行目');
+  });
+
+  it('名前が20文字を超える行を検出する', () => {
+    const problems = validatePersonnelImportRows([
+      { ...base, name: 'あ'.repeat(21) },
+    ]);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain('名前');
+    expect(problems[0]).toContain('20文字以内');
   });
 });

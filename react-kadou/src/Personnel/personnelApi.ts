@@ -72,36 +72,112 @@ function operatorHeaders(opUser?: string | null): Record<string, string> {
   return opUser ? { 'X-User-Id': opUser } : {};
 }
 
-/** 共通リクエストヘルパー（エラー時は detail を Error にして投げる） */
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
-  });
-  if (!res.ok) {
-    let detail = 'サーバーエラーが発生しました。';
-    try {
-      const data = await res.json();
-      if (data && typeof data.detail === 'string') detail = data.detail;
-    } catch {
-      // JSON でないレスポンスは既定メッセージを使う
+/** バックエンドの統一エラー形式（app/main.py の _error_body） */
+interface BackendErrorBody {
+  code?: string;
+  message?: string;
+  detail?: unknown;
+  requestId?: string;
+  trace_id?: string;
+}
+
+/** 未登録（404）を表す Error（画面で「未登録」処理を行うため、システムエラーと区別する） */
+export class PersonnelNotFoundError extends Error {
+  constructor(message = '要員情報が見つかりません。') {
+    super(message);
+    this.name = 'PersonnelNotFoundError';
+  }
+}
+
+/** システムエラー（500 系・DB 接続不可など）を表す Error */
+export class PersonnelSystemError extends Error {
+  readonly code?: string;
+  readonly requestId?: string;
+
+  constructor(message: string, code?: string, requestId?: string) {
+    super(message);
+    this.name = 'PersonnelSystemError';
+    this.code = code;
+    this.requestId = requestId;
+  }
+}
+
+/** サーバーが返したエラーレスポンスから、画面に出す Error を組み立てる */
+async function toRequestError(res: Response): Promise<Error> {
+  const isServer = res.status >= 500;
+  let body: BackendErrorBody | null = null;
+  try {
+    body = (await res.json()) as BackendErrorBody;
+  } catch {
+    body = null; // JSON でないレスポンス（HTML の 500 など）
+  }
+
+  // バックエンドの統一形式：code / message / trace_id（500 系は SYSTEM_ERROR）
+  if (body && typeof body.message === 'string' && body.message) {
+    const code = body.code ?? (isServer ? 'SYSTEM_ERROR' : undefined);
+    const requestId = body.requestId ?? body.trace_id;
+    if (isServer || code === 'SYSTEM_ERROR' || code === 'MAINTENANCE') {
+      return new PersonnelSystemError(body.message, code, requestId);
     }
-    throw new Error(detail);
+    return new Error(body.message);
+  }
+
+  // FastAPI 標準形式：detail が文字列
+  if (body && typeof body.detail === 'string') {
+    return isServer
+      ? new PersonnelSystemError(body.detail, 'SYSTEM_ERROR')
+      : new Error(body.detail);
+  }
+
+  // 解釈できないレスポンス
+  return isServer
+    ? new PersonnelSystemError(
+        'データベースに接続できないか、サーバー内部でエラーが発生しました。しばらく経ってから再度お試しください。',
+        'SYSTEM_ERROR',
+      )
+    : new Error(`リクエストに失敗しました（ステータス: ${res.status}）。`);
+}
+
+/** 共通リクエストヘルパー（エラー時はサーバーのメッセージを Error にして投げる） */
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    });
+  } catch {
+    // 通信到達前のエラー（プロキシ・ネットワーク断など）
+    throw new PersonnelSystemError(
+      'サーバーに接続できませんでした。通信環境を確認してください。',
+      'NETWORK_ERROR',
+    );
+  }
+  if (!res.ok) {
+    throw await toRequestError(res);
   }
   return (await res.json()) as T;
 }
 
 /**
  * 社員番号で要員情報を取得する（GET /api/kadou/personnel/{employeeNo}/{year}）。
- * 該当なしの場合は 404 → Error('…見つかりません。') を投げる。
+ * 該当なしの場合は 404 → PersonnelNotFoundError を投げる。
+ * DB 接続不可などのサーバーエラーは PersonnelSystemError を投げる（未登録とは区別する）。
  */
 export async function fetchPersonnelInfo(
   employeeNo: string,
   year: number,
 ): Promise<PersonnelInfoResponse> {
-  return request<PersonnelInfoResponse>(
-    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}`,
-  );
+  try {
+    return await request<PersonnelInfoResponse>(
+      `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}`,
+    );
+  } catch (e) {
+    if (e instanceof Error && /見つかりません/.test(e.message)) {
+      throw new PersonnelNotFoundError(e.message);
+    }
+    throw e;
+  }
 }
 
 /** 現在の登録要員数を取得する（GET /api/kadou/personnel/count/{year}） */

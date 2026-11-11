@@ -649,28 +649,28 @@ const buildRows = (
       continue;
     }
 
+    // 必須項目のチェック。1 行に複数の不備があっても、最初の 1 件で打ち切らず
+    // すべての不備を警告に積む（ユーザーが 1 回の確認ダイアログで全部直せるようにする）。
+    const missing: string[] = [];
     if (!employeeNo) {
-      warnings.push(
-        `${lineNo}行目：B 列（社員番号）が空のため取り込みませんでした`,
-      );
-      continue;
+      missing.push('B 列（社員番号）');
     }
     if (!name) {
-      warnings.push(
-        `${lineNo}行目：C 列（氏名）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
-      );
-      continue;
+      missing.push('C 列（氏名）');
     }
     // 所属部門・労働関係所属地は必須（空欄は取り込まない）
     if (!departmentAlias) {
-      warnings.push(
-        `${lineNo}行目：E 列（所属部門）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
-      );
-      continue;
+      missing.push('E 列（所属部門）');
     }
     if (!workLocation) {
+      missing.push('N 列（労働関係所属地）');
+    }
+
+    if (missing.length > 0) {
       warnings.push(
-        `${lineNo}行目：N 列（労働関係所属地）が空のため取り込みませんでした（社員番号 ${employeeNo}）`,
+        `${lineNo}行目：${missing.join('・')}が空のため取り込みませんでした${
+          employeeNo ? `（社員番号 ${employeeNo}）` : ''
+        }`,
       );
       continue;
     }
@@ -739,6 +739,63 @@ export const parsePersonnelFile = async (
   // NOTE: シート名で対象シートを選ぶため、テンプレート検証は readXlsx 内で行う。
   const { matrix, source } = await readSpreadsheetFile(file, 'personnel');
   return buildRows(matrix, source);
+};
+
+// ---------------------------------------------------------------------------
+// 取り込み時の桁数チェック（画面の入力欄と同じ制限に合わせる）
+// ---------------------------------------------------------------------------
+
+/** 取り込み時の桁数チェックで使う上限（画面の入力欄と同じ値） */
+export const PERSONNEL_IMPORT_LIMITS = {
+  /** 社員番号：5 桁以内の半角数字 */
+  employeeNo: { max: 5, label: '社員番号', pattern: /^[0-9]{1,5}$/, rule: '5桁以内の半角数字' },
+  /** 役割：6 桁以内（空欄可）の半角英数字 */
+  role: { max: 6, label: '役割', pattern: /^[a-zA-Z0-9]{1,6}$/, rule: '6桁以内の半角英数字' },
+  /** 名前：20 文字以内 */
+  name: { max: 20, label: '名前', pattern: null, rule: '20文字以内' },
+} as const;
+
+/**
+ * 取り込み行の桁数・形式を検証する（点【取り込む】時に呼ぶ）。
+ *
+ * 空欄チェックはプレビュー前に済んでいるため、ここでは
+ * 「入力欄と同じ桁数・半角制限」に違反している行だけを返す。
+ * 返す値は「3行目：役割「ＡＢＣＤＥＦＧ」が6桁以内の半角英数字ではありません」形式。
+ */
+export const validatePersonnelImportRows = (
+  rows: ReadonlyArray<PersonnelImportRow>,
+): string[] => {
+  const problems: string[] = [];
+
+  const check = (
+    row: PersonnelImportRow,
+    value: string,
+    spec: {
+      max: number;
+      label: string;
+      pattern: RegExp | null;
+      rule: string;
+    },
+  ) => {
+    if (value === '') return;
+    const ok = spec.pattern ? spec.pattern.test(value) : value.length <= spec.max;
+    if (!ok) {
+      problems.push(
+        `${row.line ? `${row.line}行目：` : ''}${spec.label}「${value}」が${spec.rule}ではありません`,
+      );
+    }
+  };
+
+  rows.forEach((row) => {
+    // 社員番号は必須・5桁以内の半角数字
+    check(row, row.employeeNo, PERSONNEL_IMPORT_LIMITS.employeeNo);
+    // 役割は空欄可（取込時に既存値を保持／新規は「要員」）。入力時と同じ制限
+    check(row, row.role, PERSONNEL_IMPORT_LIMITS.role);
+    // 名前は空欄不可のため、空欄はプレビュー前に弾かれている
+    check(row, row.name, PERSONNEL_IMPORT_LIMITS.name);
+  });
+
+  return problems;
 };
 
 /** 取り込み前後の増減（追加・上書き件数）を数える */

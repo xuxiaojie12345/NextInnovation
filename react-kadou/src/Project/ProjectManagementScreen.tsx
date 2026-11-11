@@ -32,6 +32,7 @@ import {
   PROJECT_IMPORT_FORMAT_HINT,
   ProjectImportRow,
   parseProjectFile,
+  validateProjectImportRows,
 } from './projectImport';
 import {
   ProjectApiInfo,
@@ -326,6 +327,12 @@ interface ProjectManagementScreenProps {
   departments: Department[];
   /** 操作者（登録・更新者）。リクエストヘッダー X-User-Id に付与する */
   operatorId?: string | null;
+  /**
+   * この画面が表示中か。
+   * 全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
+   * 再取得が走らない。「表示中」になったタイミングで部門マスタを取り直す。
+   */
+  active?: boolean;
 }
 
 /**
@@ -341,6 +348,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   setProjects,
   departments,
   operatorId,
+  active = true,
 }) => {
   // 登録 / 修正フォームの入力値
   const [form, setForm] = useState<ProjectFormValues>(EMPTY_FORM);
@@ -505,8 +513,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    */
   const importNothingToAdd = !importAborted && importCounts.willAdd === 0;
 
-  // 年度が変わったら部門マスタを取り直す
+  // 年度が変わったとき・この画面が表示されたときに部門マスタを取り直す。
+  // ※全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
+  //   再取得が走らない。「表示中（active）」になったタイミングで取り直す。
   useEffect(() => {
+    if (!active) return;
     let alive = true;
     setLoadingDepartments(true);
     fetchDepartments(year)
@@ -522,7 +533,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     return () => {
       alive = false;
     };
-  }, [year]);
+  }, [year, active]);
 
   /**
    * 所属部門の選択肢（値 = 部門番号、表示 = 部門名称（department_name））。
@@ -798,6 +809,37 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
+    // 桁数チェック（画面上の入力欄と同じ制限）。不備があれば何行目の何が
+    // 問題かを確認ダイアログに一覧表示し、取り込みは行わない。
+    const formatProblems = validateProjectImportRows(importRows);
+    if (formatProblems.length > 0) {
+      Modal.warning({
+        title: '取り込めない行があります',
+        width: 620,
+        okText: '閉じる',
+        content: (
+          <Space direction='vertical' style={{ width: '100%' }}>
+            <Text>
+              以下の行は入力欄と同じ桁数の制限を満たしていません。
+              ファイルを修正してから取り込んでください。
+            </Text>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                maxHeight: 260,
+                overflow: 'auto',
+              }}
+            >
+              {formatProblems.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </Space>
+        ),
+      });
+      return;
+    }
     if (importAborted) {
       message.error(
         '取り込みファイル内に完全に同じ行が複数あるため、このファイルは取り込めません。',

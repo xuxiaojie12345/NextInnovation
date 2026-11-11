@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logger import get_logger, setup_logging, trace_id_var
@@ -146,6 +146,28 @@ async def integrity_exception_handler(request: Request, exc: IntegrityError):
             request,
             code="KADOU_REFERENCE_IN_USE",
             message="データが他のレコードから参照されているため、処理できませんでした。",
+        ),
+    )
+
+
+@app.exception_handler(OperationalError)
+async def db_connection_exception_handler(request: Request, exc: OperationalError):
+    """DB に接続できない（切断・タイムアウトなど）場合の専用ハンドラ。
+
+    NOTE: これが無いと Exception ハンドラに落ち、「サーバー内部エラー」という
+          原因不明の文言になり、フロントもエラーを握り潰して「未登録」表示になる。
+          ここで 503 + SYSTEM_ERROR を返し、画面にシステムエラーを出させる。
+    """
+    logger.error(
+        "DB接続エラー: method=%s path=%s error=%s",
+        request.method, request.url.path, exc, exc_info=True,
+    )
+    return JSONResponse(
+        status_code=503,
+        content=_error_body(
+            request,
+            code="SYSTEM_ERROR",
+            message="システムエラーが発生しました。データベースに接続できませんでした。",
         ),
     )
 

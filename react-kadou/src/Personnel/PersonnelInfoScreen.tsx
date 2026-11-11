@@ -30,10 +30,13 @@ import {
   PERSONNEL_IMPORT_FORMAT_HINT,
   PersonnelImportRow,
   parsePersonnelFile,
+  validatePersonnelImportRows,
 } from './personnelImport';
 import {
   PersonnelImportAbortedError,
   PersonnelImportApiResult,
+  PersonnelNotFoundError,
+  PersonnelSystemError,
   deletePersonnel,
   fetchPersonnelCount,
   fetchPersonnelInfo,
@@ -41,8 +44,36 @@ import {
   importPersonnelRows,
   savePersonnel,
 } from './personnelApi';
+import { ApiError, isApiError } from '../utils/ApiError';
 
 const { Title, Text } = Typography;
+
+/** バックエンドのシステムエラー（DB 接続不可など）を画面に出す共通メッセージ */
+const SYSTEM_ERROR_MESSAGE =
+  'DB に接続できない可能性があります。しばらく経ってから再度お試しください。';
+
+/**
+ * DB 接続不可などのシステムエラーかどうかを判定する。
+ *
+ * NOTE: この画面は API 経路が 2 種類あるため、両方を判定する必要がある。
+ *   ① personnelApi.ts（fetch 直接）→ PersonnelSystemError
+ *   ② departmentManagement.ts など（httpRequest 経由）→ ApiError(kind='server')
+ *   PersonnelSystemError と ApiError に継承関係は無いので、
+ *   instanceof PersonnelSystemError だけでは ② を取りこぼす。
+ */
+const isSystemError = (e: unknown): boolean => {
+  if (e instanceof PersonnelSystemError) return true;
+  if (isApiError(e)) {
+    return (
+      e.kind === 'server' ||
+      e.kind === 'maintenance' ||
+      e.kind === 'timeout' ||
+      e.kind === 'offline' ||
+      e.kind === 'network'
+    );
+  }
+  return false;
+};
 
 /** 解析結果の行をバックエンドへ送る形式へ変換する */
 const toApiRows = (rows: PersonnelImportRow[]) =>
@@ -91,6 +122,12 @@ interface PersonnelInfoScreenProps {
    *       この画面では現在未使用（App 側のインターフェース維持のため残す）。
    */
   hasWorkData?: (employeeNo: string) => boolean;
+  /**
+   * この画面が表示中か。
+   * 全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
+   * 再取得が走らない。「表示中」になったタイミングで部門マスタを取り直す。
+   */
+  active?: boolean;
 }
 
 /**
@@ -105,6 +142,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   onSubmit,
   onImport,
   onDelete,
+  active = true,
 }) => {
   /**
    * 部門マスタ（所属の選択肢）。
@@ -116,27 +154,57 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [departments, setDepartments] = useState<Department[]>([]);
   /** 部門マスタ取得中フラグ（所属が選べない理由を画面に出すため） */
   const [loadingDepartments, setLoadingDepartments] = useState(true);
-  /** 部門マスタの取得に失敗したか（空との区別。再取得ボタンの表示に使う） */
+  /**
+   * 部門マスタの取得に失敗したか（空との区別に使う）。
+   * NOTE: DB 接続不可（システムエラー）の場合は部門側の問題ではないため false のままにする。
+   *       → その場合のメッセージは各操作時のシステムエラーダイアログで通知する。
+   */
   const [departmentsError, setDepartmentsError] = useState(false);
-  /** 部門マスタの再取得トリガー（「再読み込み」ボタンで加算する） */
-  const [reloadKey, setReloadKey] = useState(0);
+  /**
+   * DB 接続不可により部門マスタが取れなかったか。
+   * true の間は「部門が登録されていません」「取得できませんでした」を表示しない
+   * （原因は DB 側で、部門データ自体の問題ではないため）。
+   */
+  const [dbUnavailable, setDbUnavailable] = useState(false);
+  /**
+   * 画面を開いた時点で DB 接続異常を検知したか。
+   * true になったら「システムエラー」ダイアログを 1 回だけ表示する。
+   * （部門マスタ取得は画面表示時に自動で走るため、その失敗を DB 異常の初回検知として使う）
+   */
+  const [dbErrorOnOpen, setDbErrorOnOpen] = useState(false);
 
-  // 年度が変わったら部門マスタを取り直す
+  // 年度が変わったとき・この画面が表示されたときに部門マスタを取り直す。
+  // ※全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
+  //   再取得が走らない。「表示中（active）」になったタイミングで取り直して
+  //   所属の選択肢に最新の部門を反映する。
   useEffect(() => {
+    if (!active) return;
     let alive = true;
     setLoadingDepartments(true);
     setDepartmentsError(false);
+    setDbUnavailable(false);
 
     (async () => {
       try {
         const list = await fetchDepartments(year);
         if (!alive) return;
         setDepartments(list);
-      } catch {
+      } catch (e) {
         // 取得できなかった場合は空にする（所属が必須のため登録はできない）
         if (!alive) return;
         setDepartments([]);
-        setDepartmentsError(true);
+
+        if (isSystemError(e)) {
+          // DB 接続不可など → 部門マスタ固有の失敗ではないので赤字は一切出さない。
+          // 代わりに画面を開いた時点でシステムエラーを 1 回だけダイアログ表示する。
+          setDepartmentsError(false);
+          setDbUnavailable(true);
+          setDbErrorOnOpen(true);
+        } else {
+          // DB は正常だが部門マスタの取得に失敗した場合のみ赤字で知らせる
+          setDbUnavailable(false);
+          setDepartmentsError(true);
+        }
       } finally {
         // NOTE: アンマウント済みでもフラグは必ず戻す。
         //       （alive 判定で return してしまうと loading のまま固まる）
@@ -147,7 +215,24 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     return () => {
       alive = false;
     };
-  }, [year, reloadKey]);
+  }, [year, active]);
+
+  /**
+   * 画面を開いた時点で DB 異常を検知していたら、システムエラーを 1 回だけ表示する。
+   *
+   * NOTE: 部門マスタの取得は画面表示時に自動実行されるため、その失敗で
+   *       「画面を開いた瞬間に DB が落ちている」ことを検知できる。
+   *       DB が復旧したあとに再度画面を開けば改めて判定される。
+   */
+  useEffect(() => {
+    if (!active || !dbErrorOnOpen) return;
+    setDbErrorOnOpen(false); // 同じ異常で何度もダイアログを出さない
+    Modal.error({
+      title: 'システムエラー',
+      content: SYSTEM_ERROR_MESSAGE,
+      okText: '閉じる',
+    });
+  }, [active, dbErrorOnOpen]);
 
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState('');
@@ -232,7 +317,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       const count = await fetchPersonnelCount(year);
       setPersonnelCount(count);
     } catch {
-      // 取得できなかった場合は 0 件ではなく「-」を表示する
+      // 取得できなかった場合は 0 件ではなく「-」を表示する（画面は操作可能なまま）
       setPersonnelCount(null);
     }
   }, [year]);
@@ -352,12 +437,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     return '';
   };
 
-  /** 役割：必須・6 桁の半角英数字のみ */
+  /** 役割：必須・6 桁以内の半角英数字のみ */
   const validateRole = (v: string): string => {
     const t = v.trim();
     if (t === '') return '役割を入力してください。';
-    if (!/^[a-zA-Z0-9]{6}$/.test(t)) {
-      return '役割は6桁の半角英数字で入力してください。';
+    if (!/^[a-zA-Z0-9]{1,6}$/.test(t)) {
+      return '役割は6桁以内の半角英数字で入力してください。';
     }
     return '';
   };
@@ -527,13 +612,33 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         deptId,
       });
       message.success(`社員番号「${no}」の要員情報を表示しました。`);
-    } catch {
-      // 該当なし（404 など）→ ダイアログは出さず、そのまま新規登録の入力状態にする
-      // NOTE: 入力中の 役割・名前・所属 と各入力欄下のエラー表示は消さない
-      setEmployeeNo(no);
-      setVerifiedNo(no);
+    } catch (e) {
+      if (e instanceof PersonnelNotFoundError) {
+        // 該当なし（404）→ ダイアログは出さず、そのまま新規登録の入力状態にする
+        // NOTE: 入力中の 役割・名前・所属 と各入力欄下のエラー表示は消さない
+        setEmployeeNo(no);
+        setVerifiedNo(no);
+        setVerifiedExists(false);
+        message.info(`社員番号「${no}」は未登録です。`);
+        return;
+      }
+      // DB 接続不可などのシステムエラー → 「未登録」と誤表示せず、エラーを明示する
+      setVerifiedNo('');
       setVerifiedExists(false);
-      message.info(`社員番号「${no}」は未登録です。`);
+      setOriginal(null);
+      if (isSystemError(e)) {
+        Modal.error({
+          title: 'システムエラー',
+          content: SYSTEM_ERROR_MESSAGE,
+          okText: '閉じる',
+        });
+      } else {
+        message.error(
+          e instanceof Error
+            ? `検索に失敗しました：${e.message}`
+            : '検索に失敗しました。',
+        );
+      }
     } finally {
       setSearching(false);
     }
@@ -637,8 +742,27 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     let existing: Awaited<ReturnType<typeof fetchPersonnelInfo>> | null = null;
     try {
       existing = await fetchPersonnelInfo(no, year);
-    } catch {
-      // 404（存在しない）や通信エラーは「存在しない」として扱う
+    } catch (e) {
+      // 404（存在しない）だけを「存在しない」として扱う。
+      // DB 接続不可などのシステムエラーを新規追加として扱うと、
+      // 誤った追加・上書きが発生するため、必ず中断する。
+      if (!(e instanceof PersonnelNotFoundError)) {
+        setSaving(false);
+        if (isSystemError(e)) {
+          Modal.error({
+            title: 'システムエラー',
+            content: SYSTEM_ERROR_MESSAGE,
+            okText: '閉じる',
+          });
+        } else {
+          message.error(
+            e instanceof Error
+              ? `DB の確認に失敗しました：${e.message}`
+              : 'DB の確認に失敗しました。',
+          );
+        }
+        return;
+      }
       existing = null;
     } finally {
       setSaving(false);
@@ -736,32 +860,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setImportRows(resolved);
       } catch (e) {
         if (e instanceof PersonnelImportAbortedError) {
-          // 409 = ファイル全体中止。既存データとの重複は「上書きして取り込む」で
-          // 続行できるため、その場合はプレビューを開いてボタンで選ばせる。
+          // 409 = ファイル全体中止。ここではダイアログを出さず、プレビューを開いて
+          // 「取り込む」押下時に不備をまとめて確認させる。
+          // バックエンドの不備メッセージは解析時の警告に合流させて一覧表示する。
+          const backendWarnings = e.result.warnings;
           setImportCheck(e.result);
-          if (e.result.duplicated > 0) {
-            setImportRows(resolved);
-            return;
-          }
-
-          // ファイル内重複など、上書きしても続行できない中止
-          setImportRows(null);
-          Modal.error({
-            title: '取り込みを中止しました',
-            width: 620,
-            content: (
-              <Space direction='vertical' style={{ width: '100%' }}>
-                <Text>{e.message}</Text>
-                {e.result.warnings.length > 0 && (
-                  <ul style={{ margin: 0, paddingLeft: 18, maxHeight: 220, overflow: 'auto' }}>
-                    {e.result.warnings.map((w) => (
-                      <li key={w}>{w}</li>
-                    ))}
-                  </ul>
-                )}
-              </Space>
-            ),
-          });
+          setImportWarnings((prev) => [
+            ...new Set([...prev, ...backendWarnings]),
+          ]);
+          setImportRows(resolved);
           return;
         }
         throw e;
@@ -792,21 +899,55 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
+    // 取り込み前チェックを一括で行い、不備は「1 回のダイアログ」にまとめて表示する
+    // （1 件ずつ順番に止めると、直しては再実行を繰り返すことになるため）。
+    //   1) ファイル解析時の警告（必須項目の空欄など）
+    //   2) 事前検証（dryRun）でバックエンドが返した不備（桁数オーバー・重複など）
+    //   3) 桁数・半角チェック（画面上の入力欄と同じ制限）
+    //   4) 所属が未確定の行（E 列×N 列が部門マスタに一致しない）
+    const problems: string[] = [
+      ...importWarnings,
+      ...validatePersonnelImportRows(importRows),
+    ];
+
     // 新規追加行は所属が必須。既存データの上書き行は所属を更新しないので不要
     const unresolved = importRows.filter(
       (r) => !r.departmentId && !importDuplicatedNos.has(r.employeeNo),
     );
-    if (unresolved.length > 0) {
-      message.error(
-        `E 列（所属部門）× N 列（労働関係所属地）で部門を特定できない行が ${unresolved.length} 件あります。プレビュー上で所属を選択してください。`,
+    unresolved.forEach((r) => {
+      problems.push(
+        `${r.line ? `${r.line}行目：` : ''}社員番号「${r.employeeNo}」の所属を特定できません（E 列×N 列が部門マスタと一致しません）`,
       );
-      return;
-    }
-    // 所属が必須のため、不備があるファイルは 1 件も反映しない
-    if (importBlocked) {
-      message.error(
-        '所属が空欄、または部門マスタに無い所属があるため取り込みできません。',
-      );
+    });
+
+    if (problems.length > 0) {
+      // 解析時の警告とバックエンドの不備が同じ内容のことがあるため重複を除く
+      const uniq = Array.from(new Set(problems));
+      Modal.warning({
+        title: `取り込めない内容があります（${uniq.length} 件）`,
+        width: 620,
+        okText: '閉じる',
+        content: (
+          <Space direction='vertical' style={{ width: '100%' }}>
+            <Text>
+              以下の内容を直してから、もう一度取り込んでください。
+              中止した場合は 1 件も反映されません。
+            </Text>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                maxHeight: 300,
+                overflow: 'auto',
+              }}
+            >
+              {uniq.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </Space>
+        ),
+      });
       return;
     }
     const hasDuplicates = (importCheck?.duplicated ?? 0) > 0;
@@ -883,14 +1024,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   );
 
   /**
-   * 一括読み込み：ファイル全体の取り込みを中止したか。
-   *
-   * 所属は必須なため、次のいずれかがあれば 1 件も反映しない。
-   *   - ファイル解析で警告が出た行がある
-   *   - 所属が未確定（E 列×N 列が部門マスタに一致しない）行がある
+   * NOTE: 「取り込む」ボタンは disabled にしない。押下時に解析警告・桁数・
+   *       所属未確定などの不備を 1 つのダイアログにまとめて表示するため
+   *       （disabled にするとユーザーが理由を確認できない）。
    */
-  const importBlocked =
-    importWarnings.length > 0 || unresolvedRows.length > 0;
 
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<PersonnelImportRow> = [
@@ -1112,23 +1249,19 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               status={!isExisting && deptError ? 'error' : undefined}
               style={{ width: '100%' }}
             />
-            {!isExisting && !loadingDepartments && departments.length === 0 && (
-              <Space direction='vertical' size={2} style={{ marginTop: 4 }}>
-                <Text type='danger' style={{ fontSize: 12 }}>
+            {!isExisting &&
+              !loadingDepartments &&
+              !dbUnavailable &&
+              departments.length === 0 && (
+                <Text
+                  type='danger'
+                  style={{ fontSize: 12, marginTop: 4, display: 'block' }}
+                >
                   {departmentsError
                     ? '部門マスタを取得できませんでした。'
                     : '部門マスタに部門が登録されていません。'}
                 </Text>
-                {departmentsError && (
-                  <Button
-                    size='small'
-                    onClick={() => setReloadKey((k) => k + 1)}
-                  >
-                    再読み込み
-                  </Button>
-                )}
-              </Space>
-            )}
+              )}
             {!isExisting && deptError && (
               <Text type='danger' style={{ fontSize: 12 }}>
                 所属を選択してください。
@@ -1173,7 +1306,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         }
         cancelText='中止'
         confirmLoading={submittingImport}
-        okButtonProps={{ disabled: importBlocked }}
+        okButtonProps={{ disabled: false }}
         onOk={() => void handleImportConfirm()}
         onCancel={handleImportCancel}
         width={760}
@@ -1230,23 +1363,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 description={`E 列（所属部門）× N 列（労働関係所属地）が部門マスタ（部門別名・拠点）に一致しませんでした。プレビュー表の「所属」で選択してください。未選択のままでは取り込めません。`}
               />
             )}
-            {importWarnings.length > 0 && (
-              <Alert
-                type='error'
-                showIcon
-                message={`取り込めない行があります：${importWarnings.length} 件（取り込みは中止されます）`}
-                description={
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {importWarnings.slice(0, 5).map((w) => (
-                      <li key={w}>{w}</li>
-                    ))}
-                    {importWarnings.length > 5 && (
-                      <li>ほか {importWarnings.length - 5} 件</li>
-                    )}
-                  </ul>
-                }
-              />
-            )}
+            {/* NOTE: 取り込めない行（解析時の必須不正・桁数超過など）は
+                プレビュー上には出さず、「取り込む」押下時のダイアログで
+                まとめて表示する（handleImportConfirm を参照）。 */}
             <Table<PersonnelImportRow>
               rowKey='employeeNo'
               size='small'

@@ -212,34 +212,90 @@ def _validate(row: PersonnelImportRow, require_department: bool = True) -> str |
         require_department: 所属の必須チェックを行うか。
             既存データの上書き行は所属を更新しないため、False で呼ぶ。
     """
+    problems = _validate_all(row, require_department)
+    return problems[0] if problems else None
+
+
+def _fill_duplicated_info(
+    db: Session,
+    year_id: str,
+    payload: PersonnelImportRequest,
+    result: PersonnelImportResult,
+) -> None:
+    """中止時でも「既存データと重複する行」の情報を結果へ詰める。
+
+    画面は中止でもプレビューを表示し、上書き行は所属を更新しないため
+    「DB 上の既存所属」をグレー表示する。その判定に必要な
+    duplicatedEmployeeNos / duplicatedDepartments / duplicated を返す。
+
+    NOTE: 部門の存在チェックやファイル内重複の判定は行わない（中止理由とは別）。
+    """
+    dup_nos: list[str] = []
+    for row in payload.rows:
+        normalized_no = (row.employeeNo or "").strip()
+        if not normalized_no or normalized_no in dup_nos:
+            continue
+        existing = (
+            db.execute(
+                text(load_sql("personnel/personnel_select.sql")),
+                {"year_id": year_id, "employee_no": normalized_no},
+            )
+            .mappings()
+            .first()
+        )
+        if existing is None:
+            continue
+        dup_nos.append(normalized_no)
+        if existing["department_name"]:
+            result.duplicatedDepartments[normalized_no] = existing[
+                "department_name"
+            ]
+
+    result.duplicated = len(dup_nos)
+    result.duplicatedEmployeeNos = dup_nos
+
+
+def _validate_all(
+    row: PersonnelImportRow, require_department: bool = True
+) -> list[str]:
+    """取り込み行の検証を行い、問題を「すべて」返す（1 行 0〜複数件）。
+
+    画面側で「取り込めない内容」をまとめて表示できるよう、
+    最初の 1 件で打ち切らずに全項目をチェックする。
+
+    Args:
+        require_department: 所属の必須チェックを行うか。
+            既存データの上書き行は所属を更新しないため、False で呼ぶ。
+    """
     label = _label(row)
+    problems: list[str] = []
     if not row.employeeNo:
-        return f"{label}社員番号が空欄"
-    if len(row.employeeNo) > _MAX_EMPLOYEE_NO:
-        return (
+        problems.append(f"{label}社員番号が空欄")
+    elif len(row.employeeNo) > _MAX_EMPLOYEE_NO:
+        problems.append(
             f"{label}社員番号「{row.employeeNo}」が "
             f"{_MAX_EMPLOYEE_NO} 文字を超えています"
         )
     if not row.name:
-        return f"{label}社員番号「{row.employeeNo}」の名前が空欄"
-    if len(row.name) > _MAX_PERSON_NAME:
-        return (
+        problems.append(f"{label}社員番号「{row.employeeNo}」の名前が空欄")
+    elif len(row.name) > _MAX_PERSON_NAME:
+        problems.append(
             f"{label}社員番号「{row.employeeNo}」の名前が "
             f"{_MAX_PERSON_NAME} 文字を超えています"
         )
     if require_department and not row.department:
-        return f"{label}社員番号「{row.employeeNo}」の所属が空欄"
+        problems.append(f"{label}社員番号「{row.employeeNo}」の所属が空欄")
     if len(row.role) > _MAX_ROLE:
-        return (
+        problems.append(
             f"{label}社員番号「{row.employeeNo}」の役割が "
             f"{_MAX_ROLE} 文字を超えています"
         )
     if len(row.department) > _MAX_DEPARTMENT_NAME:
-        return (
+        problems.append(
             f"{label}社員番号「{row.employeeNo}」の所属が "
             f"{_MAX_DEPARTMENT_NAME} 文字を超えています"
         )
-    return None
+    return problems
 
 
 def import_personnel(
@@ -273,9 +329,9 @@ def import_personnel(
         row = _normalize(raw)
         # 所属が空欄の行は、既存データと重複していれば「上書き（所属は変更しない）」
         # として扱えるため、所属必須チェックを保留して先に登録有無を調べる。
-        warning = _validate(row, require_department=bool(row.department))
-        if warning is not None:
-            invalid_messages.append(warning)
+        problems = _validate_all(row, require_department=bool(row.department))
+        if problems:
+            invalid_messages.extend(problems)
             continue
         if not row.department:
             pending_department_rows.append(row)
@@ -286,10 +342,14 @@ def import_personnel(
         result.aborted = True
         result.abortReason = (
             f"入力内容に不備が {len(invalid_messages)} 件あります。"
-            "所属（部門）は必須です。ファイル全体の取り込みを中止しました。"
+            "ファイル全体の取り込みを中止しました。"
         )
         result.warnings.extend(invalid_messages)
         result.skipped = len(payload.rows)
+        # NOTE: 画面は中止でもプレビューを表示し、「上書き（＝所属は変更しない）」
+        #       行をグレー表示する。その判定に必要な情報をここでも返しておく。
+        #       （ここが空だと上書き行が「追加」扱いになり所属列が壊れる）
+        _fill_duplicated_info(db, year_id, payload, result)
         return result
 
     # --- 2) ファイル内の重複を検出（重複があればファイル全体を中止） ---

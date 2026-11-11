@@ -568,6 +568,7 @@ function App() {
         onImport={handleImportPersonnel}
         onDelete={handleDeletePersonnel}
         hasWorkData={hasWorkDataForPersonnel}
+        active={activeView === 'personnel-info'}
       />
     ),
     'department-manage': (
@@ -586,6 +587,7 @@ function App() {
         setProjects={setYearProjects}
         departments={store.departments}
         operatorId={currentUserId}
+        active={activeView === 'project-manage'}
       />
     ),
     'jinan-work-rate': (

@@ -6,6 +6,8 @@ interface DeptRequest {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   opUser?: string | null;
   body?: unknown;
+  /** GET の自動再試行を有効にするか（既定 false） */
+  retry?: boolean;
 }
 
 async function request<T>(url: string, opts: DeptRequest = {}): Promise<T> {
