@@ -569,7 +569,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：桜井商事'
                   value={form.customer}
-                  maxLength={30}
+                  maxLength={100}
                   onChange={(e) => setField('customer', e.target.value)}
                 />
               </div>
@@ -578,7 +578,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：基幹刷新'
                   value={form.caseName}
-                  maxLength={30}
+                  maxLength={100}
                   onChange={(e) => setField('caseName', e.target.value)}
                 />
               </div>
@@ -589,7 +589,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   <Input
                     placeholder='例：第一'
                     value={form.team}
-                    maxLength={20}
+                    maxLength={30}
                     onChange={(e) => setField('team', e.target.value)}
                   />
                 </div>
@@ -598,7 +598,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   <Input
                     placeholder='例：A'
                     value={form.subTeam}
-                    maxLength={20}
+                    maxLength={30}
                     onChange={(e) => setField('subTeam', e.target.value)}
                   />
                 </div>
@@ -608,7 +608,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：次期基幹システム'
                   value={form.name}
-                  maxLength={40}
+                  maxLength={30}
                   onChange={(e) => setField('name', e.target.value)}
                 />
               </div>
