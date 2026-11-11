@@ -1,7 +1,6 @@
 import type { AuthUser } from '../types/user';
 import { YAKUSHOKU_ROLE_MAP, DEFAULT_ROLE } from '../constants/options';
-import { t } from '../constants/messages';
-import { httpRequest } from './http';
+import { httpRequest } from '../utils/http';
 
 /** バックエンドのログインAPIレスポンス */
 export interface LoginResponse {
@@ -37,10 +36,4 @@ export async function loginApi(
     roleLabel,
     departmentId: data.department ?? undefined,
   };
-}
-
-/** ログイン失敗時のメッセージを返す（バックエンドの message を優先。未取得時は定数 E_KADOU_001 へ） */
-export function loginErrorMessage(e: unknown): string {
-  if (e instanceof Error && e.message) return e.message;
-  return t('E_KADOU_001');
 }

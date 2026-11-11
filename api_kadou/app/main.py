@@ -93,13 +93,16 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         request.method, request.url.path, exc.status_code, exc.detail,
     )
     message = str(exc.detail)
-    if message.startswith("{") and isinstance(exc.detail, dict):
-        message = str(exc.detail.get("message") or exc.detail)
+    # detail が dict の場合は「業務 code と message」を展開する（例: {code: E_KADOU_001, message: ...}）
+    detail_code = None
+    if isinstance(exc.detail, dict):
+        detail_code = exc.detail.get("code") or None
+        message = str(exc.detail.get("message") or "")
     return JSONResponse(
         status_code=exc.status_code,
         content=_error_body(
             request,
-            code=code_from_status(exc.status_code),
+            code=detail_code or code_from_status(exc.status_code),
             message=message,
             detail=exc.detail,
         ),

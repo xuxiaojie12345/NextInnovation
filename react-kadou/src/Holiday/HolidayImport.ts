@@ -1,60 +1,14 @@
-/**
- * 休日情報の一括読み込み（フロント モック実装）
- *
- * ■ 対応ファイル
- *   - Excel (.xlsx / .xlsm) … 要員情報の一括読み込みと同じ読み取り処理を利用
- *   - CSV / タブ区切りテキスト
- *   - Excel (.xls 旧形式) … 非対応（.xlsx か CSV で保存し直してもらう）
- *
- * ■ 想定する列（1行目は見出し行。列順は自由、見出し名で判定する）
- *   日付 / 名称 / 区分
- *   ※日付は YYYY-MM-DD / YYYY/MM/DD / Excel の日付セル（シリアル値）に対応
- *   ※見出し行が見つからない場合は上記の並びとみなす
- *
- * ■ 取込ルール
- *   - 同一日付の既存休日は上書き（名称・区分を更新）
- *   - ファイル内で同一日付が複数ある場合は後ろの行を優先
- *   - 選択中年度以外の日付は取り込まない（警告）
- *   - 区分が空・未知の場合は「会社休日」として取り込む（警告）
- */
-import dayjs from 'dayjs';
-import { HolidayKind } from '../data/yearStore';
+import dayjs from "dayjs";
 import {
   normalizeKey,
   readSpreadsheetFile,
-} from '../Personnel/personnelImport';
-
-/** 一括読み込みで受け取る1件分の休日情報 */
-export interface HolidayImportRow {
-  /** 日付（'YYYY-MM-DD'） */
-  date: string;
-}
-
-/** 一括読み込みの結果 */
-export interface HolidayImportResult {
-  /** 取り込み対象になった休日情報（日付は一意） */
-  rows: HolidayImportRow[];
-  /** 取り込めなかった行の警告（「n行目：〜」形式） */
-  warnings: string[];
-  error: string[];
-  /** 読み取り元の説明（結果メッセージ用。例：'Excel(.xlsx) / シート:Sheet1'） */
-  source: string;
-}
-
-/** ファイル選択ダイアログで許可する拡張子 */
-export const HOLIDAY_IMPORT_ACCEPT =
-  '.xlsx,.xlsm,.xls,.csv,text/csv,' +
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,' +
-  'application/vnd.ms-excel';
-
-/** 画面に表示する形式の説明 */
-export const HOLIDAY_IMPORT_FORMAT_HINT =
-  '形式：日付／名称／区分（1行目は見出し行）。日付は YYYY-MM-DD / YYYY/MM/DD、Excel の日付セルに対応。同じ日付は上書きします。';
-
-/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
-const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
-  date: ['日付', '休日', '休日付', 'date'],
-};
+} from "../Personnel/personnelImport";
+import {
+  HolidayImportResult,
+  HolidayImportRow,
+  HolidayKind,
+} from "./HolidaySettingMode";
+import { HEADER_ALIASES } from "../constants/options";
 
 /** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
 const HEADER_MATCH_MIN = 2;
@@ -63,31 +17,31 @@ const HEADER_MATCH_MIN = 2;
 const HEADER_SEARCH_ROWS = 5;
 
 /** 項目の並び（見出し行が無い場合のフォールバック） */
-const FIELD_ORDER: Array<keyof HolidayImportRow> = ['date'];
+const FIELD_ORDER: Array<keyof HolidayImportRow> = ["date"];
 
 /** 区分の表記ゆれを吸収する */
 const KIND_ALIASES: Record<string, HolidayKind> = {
-  祝日: '祝日',
-  しゅくじつ: '祝日',
-  会社休日: '会社休日',
-  companyholiday: '会社休日',
-  振替休日: '振替休日',
-  代休: '振替休日',
+  祝日: "祝日",
+  しゅくじつ: "祝日",
+  会社休日: "会社休日",
+  companyholiday: "会社休日",
+  振替休日: "振替休日",
+  代休: "振替休日",
 };
 
 /** 文字列の区分を HolidayKind へ変換する（未知は null） */
 const parseKind = (raw: string): HolidayKind | null => {
   const key = normalizeKey(raw);
-  return key ? KIND_ALIASES[key] ?? null : null;
+  return key ? (KIND_ALIASES[key] ?? null) : null;
 };
 
 /** Excel の日付シリアル値を 'YYYY-MM-DD' へ変換する */
 const parseExcelSerial = (serial: number): string | null => {
   // Excel のシリアル値は 1900-01-01 = 1（1900 年の閏日バグを考慮して基準日を 1899-12-30 にする）
   if (!Number.isFinite(serial) || serial <= 0 || serial > 2958465) return null;
-  return dayjs('1899-12-30')
-    .add(Math.floor(serial), 'day')
-    .format('YYYY-MM-DD');
+  return dayjs("1899-12-30")
+    .add(Math.floor(serial), "day")
+    .format("YYYY-MM-DD");
 };
 
 /** 日付セルの値を 'YYYY-MM-DD' へ変換する（解釈できない場合は null） */
@@ -103,11 +57,11 @@ const parseDateValue = (raw: string): string | null => {
   // 時刻や曜日が付いている場合は日付部分だけを使う
   const datePart = value
     .split(/[ T]/)[0]
-    .replace(/[（(].*?[)）]/g, '')
-    .replace(/年/g, '/')
-    .replace(/月/g, '/')
-    .replace(/日/g, '')
-    .replace(/[.-]/g, '/');
+    .replace(/[（(].*?[)）]/g, "")
+    .replace(/年/g, "/")
+    .replace(/月/g, "/")
+    .replace(/日/g, "")
+    .replace(/[.-]/g, "/");
 
   const matched = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(datePart);
   if (!matched) return null;
@@ -116,7 +70,7 @@ const parseDateValue = (raw: string): string | null => {
   const month = Number(matched[2]);
   const day = Number(matched[3]);
   const parsed = dayjs(
-    `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+    `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
   );
 
   // 存在しない日付（2026/2/30 など）を弾く
@@ -128,7 +82,7 @@ const parseDateValue = (raw: string): string | null => {
   ) {
     return null;
   }
-  return parsed.format('YYYY-MM-DD');
+  return parsed.format("YYYY-MM-DD");
 };
 
 /** 見出し行から列の対応を判定する（見出し行でなければ null） */
@@ -144,7 +98,9 @@ const detectColumns = (
     (Object.keys(HEADER_ALIASES) as Array<keyof HolidayImportRow>).forEach(
       (field) => {
         if (found[field] !== undefined) return;
-        if (HEADER_ALIASES[field].some((alias) => normalizeKey(alias) === key)) {
+        if (
+          HEADER_ALIASES[field].some((alias) => normalizeKey(alias) === key)
+        ) {
           found[field] = index;
         }
       },
@@ -191,7 +147,7 @@ const buildRows = (
     if (index <= headerIndex) return;
     const lineNo = index + 1;
 
-    const rawDate = (row[columns.date] ?? '').trim();
+    const rawDate = (row[columns.date] ?? "").trim();
 
     // 完全な空行はスキップする
     if (!rawDate) return;
@@ -203,26 +159,14 @@ const buildRows = (
 
     const date = parseDateValue(rawDate);
     if (!date) {
-      warnings.push(
-        `${lineNo}行目：日付「${rawDate}」を解釈できませんでした`,
-      );
+      warnings.push(`${lineNo}行目：日付「${rawDate}」を解釈できませんでした`);
       return;
     }
-
-    // // 選択中年度以外は取り込まない（年度ごとのデータのため）
-    // if (dayjs(date).year() !== year) {
-    //   warnings.push(
-    //     `${lineNo}行目：${date} は ${year}年度外のため取り込みませんでした`,
-    //   );
-    //   return;
-    // }
 
     // ファイル内で同じ日付が複数ある場合は後ろの行を優先する
     const duplicate = indexByDate.get(date);
     if (duplicate !== undefined) {
-      error.push(
-        `${lineNo}行目：日付 ${date} が重複しています。`,
-      );
+      error.push(`${lineNo}行目：日付 ${date} が重複しています。`);
       rows[duplicate] = { date };
       return;
     }

@@ -41,7 +41,7 @@ def add_department(
             **create_department(db, year, payload.model_dump(), op_user)
         )
     except IntegrityError:
-        raise HTTPException(status_code=409, detail="部門の登録に失敗しました。")
+        raise HTTPException(status_code=409, detail={"code": "E_KADOU_022"})
 
 
 @router.put("/departments/{year}/{id}", response_model=Department)
@@ -56,7 +56,7 @@ def edit_department(
     op_user = (x_user_id or "").strip() or None
     updated = update_department(db, year, id, payload.model_dump(), op_user)
     if updated is None:
-        raise HTTPException(status_code=404, detail="部門が見つかりません。")
+        raise HTTPException(status_code=404, detail={"code": "E_KADOU_024"})
     return Department(**updated)
 
 
@@ -66,5 +66,5 @@ def remove_department(
 ):
     """部門管理画面：部門を削除する。"""
     if not delete_department(db, year, id):
-        raise HTTPException(status_code=404, detail="部門が見つかりません。")
+        raise HTTPException(status_code=404, detail={"code": "E_KADOU_024"})
     return DepartmentDeleteResult(code=0)

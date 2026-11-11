@@ -5,9 +5,11 @@
  * 「値」はデータ、それ以外の選択肢情報はここで一元管理する。
  * ※派生値（YEAR_OPTIONS 等）や列名別名マップ（HEADER_ALIASES 等）は対象外。
  */
+import { HolidayImportRow, HolidayKind } from '../Holiday/HolidaySettingMode';
 import type { DepartmentKind, DepartmentLocation } from '../WorkStatus/types';
 import type { UserRole } from '../types/user';
-import type { HolidayKind } from '../data/yearStore';
+import dayjs from 'dayjs';
+
 
 // ---------------------------------------------------------------------------
 // 部門種別（部門 / 協力会社）
@@ -65,14 +67,41 @@ export const YAKUSHOKU_ROLE_MAP: Record<
 /** 役職区分が未知の場合の回退ロール */
 export const DEFAULT_ROLE = { role: 'bucho', roleLabel: '部長' };
 
-// ---------------------------------------------------------------------------
-// 休日区分
-// ---------------------------------------------------------------------------
-/** 休日の区分一覧 */
-export const HOLIDAY_KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
+/**
+ * 画面＿休日設置
+ */
 
+// 休日の区分一覧
+export const HOLIDAY_KINDS: HolidayKind[] = ['祝日', '会社休日', '振替休日'];
+// 休日の区分一覧Count利用
 export const HOLIDAY_KINDS_COUNT: HolidayKind[] = ['祝日', '会社休日', '振替休日','未指定'];
 
-/** 休日設定の「区分」選択肢 */
+// 休日設定の「区分」選択肢
 export const HOLIDAY_KIND_OPTIONS: { value: HolidayKind; label: string }[] =
   HOLIDAY_KINDS.map((k) => ({ value: k, label: k }));
+
+// 休日区分ごとの表示色
+export const KIND_COLOR: Record<HolidayKind, string> = {
+  祝日: 'red',
+  会社休日: 'blue',
+  振替休日: 'orange',
+  未指定: 'default',
+};
+
+// 日付の表示形式
+export const formatDate = (date: string) => dayjs(date).format('YYYY/MM/DD (ddd)');
+
+// CSV 出力用に値をエスケープする
+export const csvEscape = (v: string): string =>/[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+
+/** ファイル選択ダイアログで許可する拡張子 */
+export const HOLIDAY_IMPORT_ACCEPT =
+  '.xlsx,.xlsm,.xls,.csv,text/csv,' +
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,' +
+  'application/vnd.ms-excel';
+
+/** 見出し（列名）の候補。表記ゆれを吸収して判定する */
+export const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
+  date: ['日付', '休日', '休日付', 'date'],
+};
+

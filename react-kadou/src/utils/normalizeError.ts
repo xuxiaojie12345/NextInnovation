@@ -52,8 +52,12 @@ export async function normalizeHttpError(res: Response): Promise<ApiError> {
       kind,
       status,
       code: data.code,
+      // BusinessException は業務コード（message id）を message に載せる。
+      // code（システム分類）と分離して messageId として保持し、t() 翻訳に使う。
+      messageId: typeof data.message === 'string' ? data.message : undefined,
       message:
         typeof data.message === 'string' ? data.message : 'エラーが発生しました。',
+      params: extractParams(body),
       fieldErrors: toFieldErrors(data.fieldErrors),
       requestId,
     });
@@ -164,4 +168,27 @@ function toFieldErrors(value: unknown): Record<string, string> | undefined {
     }
   }
   return has ? out : undefined;
+}
+
+/** バックエンドが返すメッセージ位置引数（params）を正規化する。
+ * トップレベルまたは detail 内から探す（main.py の _error_body は params を detail に格納する）。 */
+function extractParams(
+  body: unknown,
+): Array<string | number> | undefined {
+  if (typeof body !== 'object' || body === null) return undefined;
+  const data = body as Record<string, unknown>;
+  let params: unknown = data.params;
+  if (
+    params === undefined &&
+    typeof data.detail === 'object' &&
+    data.detail !== null
+  ) {
+    params = (data.detail as Record<string, unknown>).params;
+  }
+  if (!Array.isArray(params)) return undefined;
+  const out: Array<string | number> = [];
+  for (const p of params) {
+    if (typeof p === 'string' || typeof p === 'number') out.push(p);
+  }
+  return out.length ? out : undefined;
 }

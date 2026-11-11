@@ -22,7 +22,6 @@ import {
 } from './data/departmentUtils';
 import {
   AVAILABLE_YEARS,
-  Holiday,
   YearStore,
   currentYear,
 } from './data/yearStore';
@@ -33,6 +32,7 @@ import {
   saveSession,
 } from './data/sessionStore';
 import './App.css';
+import { Holiday } from './Holiday/HolidaySettingMode';
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
 const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())

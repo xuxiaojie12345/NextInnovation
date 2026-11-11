@@ -22,21 +22,7 @@ import {
   getJinanWeeklyStats,
 } from './mockJinanStats';
 import { buildYearWeeks } from './yearWeeks';
-
-/** 休日の区分 */
-export type HolidayKind = '祝日' | '会社休日' | '振替休日' | '未指定';
-
-export type HolidayKindSelect = '祝日' | '会社休日' | '振替休日';
-
-
-/** 休日設定の1件 */
-export interface Holiday {
-  id: string | null;
-  /** 'YYYY-MM-DD' */
-  date: string;
-  name: string;
-  kind: HolidayKind | null;
-}
+import { Holiday } from '../Holiday/HolidaySettingMode';
 
 /** 無償支援（BUFFER）: 要員ID -> (週キー -> true) */
 export type UnpaidMap = Record<string, Record<string, boolean>>;

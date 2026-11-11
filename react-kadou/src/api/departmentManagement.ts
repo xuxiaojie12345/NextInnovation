@@ -1,5 +1,5 @@
 import type { Department } from '../WorkStatus/types';
-import { httpRequest, SAVE_TIMEOUT_MS } from './http';
+import { httpRequest, SAVE_TIMEOUT_MS } from '../utils/http';
 
 /** 部門 API の共通リクエスト（設計案 4.4 のタイムアウト / エラー正規化を適用） */
 interface DeptRequest {

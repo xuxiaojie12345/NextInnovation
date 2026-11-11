@@ -122,7 +122,7 @@ def delete_department(db: Session, year_id: str, department_id: str) -> bool:
     if reasons:
         raise HTTPException(
             status_code=403,
-            detail=f"この部門は{ '・'.join(reasons) }で参照されているため削除できません。",
+            detail={"code": "E_KADOU_002", "message": None, "params": ["・".join(reasons)]},
         )
 
     res = db.execute(

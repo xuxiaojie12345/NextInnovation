@@ -1,4 +1,4 @@
-import { httpRequest } from './http';
+import { httpRequest } from '../utils/http';
 
 /** バックエンドの年度概要APIレスポンス（1年度分）（年度選択画面用） */
 export interface YearSelectItem {

@@ -63,6 +63,7 @@ export const MESSAGES: Record<string, string> = {
   'E_KADOU_021': 'ログインに失敗しました。',
   'E_KADOU_022': '部門を保存できませんでした。',
   'E_KADOU_023': '年度データを更新できませんでした。',
+  'E_KADOU_024': '部門が見つかりません。',
 };
 
 /**

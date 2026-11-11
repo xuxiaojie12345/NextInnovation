@@ -3,7 +3,7 @@ import { Alert, Button, Card, Empty, Spin, Tag, Typography } from 'antd';
 import { CalendarOutlined, CheckCircleFilled } from '@ant-design/icons';
 import { AVAILABLE_YEARS } from '../data/yearStore';
 import { fetchYearSelect } from '../api/yearSelect';
-import { displayMessage } from '../api/normalizeError';
+import { displayMessage } from '../utils/normalizeError';
 import { t } from '../constants/messages';
 import type { YearSelectItem } from '../api/yearSelect';
 import './YearSelectScreen.css';
