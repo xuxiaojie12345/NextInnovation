@@ -1,5 +1,5 @@
 /** 休日の区分 */
-export type HolidayKind = '祝日' | '会社休日' | '振替休日' | '未指定';
+export type HolidayKind = "祝日" | "会社休日" | "振替休日" | "未指定";
 
 /** 休日設定の1件 */
 export interface Holiday {
@@ -34,4 +34,22 @@ export interface HolidayImportResult {
   error: string[];
   /** 読み取り元の説明（結果メッセージ用。例：'Excel(.xlsx) / シート:Sheet1'） */
   source: string;
+}
+
+export interface HolidayResponse {
+  id: number;
+  year: string;
+  kind: string;
+  data: string;
+  name: string;
+}
+
+export interface HolidayRequest {
+  kind: string;
+  data: string;
+  name: string;
+}
+
+export interface HolidayImportRequest {
+  data: string[];
 }

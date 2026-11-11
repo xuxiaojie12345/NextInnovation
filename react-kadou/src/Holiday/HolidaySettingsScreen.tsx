@@ -50,6 +50,8 @@ import {
   HolidaySettingsScreenProps,
 } from "./HolidaySettingMode";
 import { parseHolidayFile } from "./HolidayImport";
+import { apiErrorMessage } from "../utils/errorMessage";
+import { isApiError } from "../utils/ApiError";
 
 const { Title, Text } = Typography;
 
@@ -66,11 +68,15 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
 }) => {
   useEffect(() => {
     // 初始化：请求后台接口、加载数据
-    HolidayInitApi(year).then((data) => {
-      if (data) {
-        setHolidays(data);
-      }
-    });
+    HolidayInitApi(year)
+      .then((data) => {
+        if (data) {
+          setHolidays(data);
+        }
+      })
+      .catch((err) => {
+        message.error(apiErrorMessage(err));
+      });
   }, [year]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -142,11 +148,12 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         .then((data) => {
           setHolidays(data);
           handleResetForm();
+          message.success(`休日情報${formatDate(date)}を更新しました。`);
         })
         .catch((error) => {
-          message.error(`休日情報の更新に失敗しました：${error.message}`);
+          isApiError(error);
+          message.error(apiErrorMessage(error));
         });
-      message.success(`休日情報${formatDate(date)}を更新しました。`);
     } else {
       HolidayAddApi(year, currentUserId, {
         date: date,
@@ -157,11 +164,11 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         .then((data) => {
           setHolidays(data);
           handleResetForm();
+          message.success(`休日情報${formatDate(date)}を追加しました。`);
         })
         .catch((error) => {
-          message.error(`休日情報の追加に失敗しました：${error.message}`);
+          message.error(apiErrorMessage(error));
         });
-      message.success(`休日情報${formatDate(date)}を追加しました。`);
     }
     handleResetForm();
   };
@@ -181,11 +188,12 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       HolidayDeleteApi(year, row.id)
         .then((data) => {
           setHolidays(data);
+          message.success(`休日情報${formatDate(row.date)}を削除しました。`);
         })
         .catch((error) => {
-          message.error(`休日情報の削除に失敗しました：${error.message}`);
+          isApiError(error);
+          message.error(apiErrorMessage(error));
         });
-      message.success(`休日情報${formatDate(row.date)}を削除しました。`);
     },
     [setHolidays],
   );
@@ -245,9 +253,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           message.success(`休日を一括読み込みしました。`);
         })
         .catch((error) => {
-          message.error(
-            `休日情報の一括読み込みに失敗しました：${error.message}`,
-          );
+          message.error(apiErrorMessage(error));
         });
 
       if (result.warnings.length > 0) {
