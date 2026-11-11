@@ -1,8 +1,8 @@
 """部門サービス（部門管理画面用）"""
-from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.errors import BusinessException
 from app.sql import load_sql
 
 # 操作者が指定されない場合のフォールバック（認証情報が取れないとき用）
@@ -120,9 +120,10 @@ def delete_department(db: Session, year_id: str, department_id: str) -> bool:
         if counts[name]
     ]
     if reasons:
-        raise HTTPException(
+        raise BusinessException(
             status_code=403,
-            detail={"code": "E_KADOU_002", "message": None, "params": ["・".join(reasons)]},
+            message_id="E_KADOU_002",
+            params=["・".join(reasons)],
         )
 
     res = db.execute(

@@ -65,7 +65,7 @@ def update_holiday(
         },
     )
     if result.rowcount <= 0:
-        raise BusinessException(status_code=401, message_id="E_KADOU_024")
+        raise BusinessException(status_code=401, message_id="E_KADOU_016")
     db.commit()
     return findby_holidays(db, year)
 
@@ -75,7 +75,7 @@ def delete_holiday(db: Session, id: int, year: str) -> list[HolidaysResponse]:
     sql = load_sql("holidays.sql", "delete_holiday")
     result = db.execute(text(sql), {"holiday_id": id, "year_id": year})
     if result.rowcount <= 0:
-        raise BusinessException(status_code=401, message_id="E_KADOU_016")
+        raise BusinessException(status_code=401, message_id="E_KADOU_025")
     db.commit()
     return findby_holidays(db, year)
 
@@ -98,6 +98,6 @@ def import_holiday(
             {"year_id": addData[:4], "holiday_date": addData, "user_id": x_user_id},
         )
         if import_result.rowcount <= 0:
-            raise BusinessException(status_code=401, message_id="E_KADOU_029")
+            raise BusinessException(status_code=401, message_id="E_KADOU_026")
     db.commit()
     return findby_holidays(db, year)
