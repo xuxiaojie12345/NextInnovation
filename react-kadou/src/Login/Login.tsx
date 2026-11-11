@@ -36,7 +36,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/login/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/kadou/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

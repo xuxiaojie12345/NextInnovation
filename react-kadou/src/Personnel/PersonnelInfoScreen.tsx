@@ -86,6 +86,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 }) => {
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState("");
+  // 検索で既存要員の取得を確認した社員番号
+  const [lookedUpExistingNo, setLookedUpExistingNo] = useState("");
   // 役割（編集可）
   const [role, setRole] = useState("");
   // 名前（編集可）
@@ -146,12 +148,16 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     [personnel],
   );
 
-  /** 入力中の社員番号が既存の要員か（登録ボタンの表示切り替えに使用） */
-  const isExisting = masterByNo.has(employeeNo.trim());
+  /** 入力中の社員番号が検索済みの既存要員か */
+  const isExisting =
+    !!employeeNo.trim() && lookedUpExistingNo === employeeNo.trim();
+  /** 検索せずに入力された、一覧上の既存社員番号 */
+  const isUnsearchedExisting = masterByNo.has(employeeNo.trim()) && !isExisting;
 
   /** 入力値を初期化 */
   const handleReset = () => {
     setEmployeeNo("");
+    setLookedUpExistingNo("");
     setRole("");
     setName("");
     setDeptId(undefined);
@@ -164,7 +170,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleDelete = async () => {
     const no = employeeNo.trim();
-    if (!no || !masterByNo.has(no)) return;
+    if (!isExisting || !no || !masterByNo.has(no)) return;
     const doDelete = async () => {
       try {
         await onDelete(no);
@@ -204,6 +210,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       return;
     }
 
+    setLookedUpExistingNo("");
     try {
       // 后台 API から社員情報を取得
       const data = await getPersonnelInfo(year, no, currentUserId);
@@ -215,6 +222,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setRole(person.role || "");
         setName(person.name || "");
         setDeptId(person.departmentId || undefined);
+        setLookedUpExistingNo(person.employeeNo.trim());
         setConfirmedNo("");
         message.success(`社員番号「${no}」の要員情報を表示しました。`);
         return;
@@ -272,11 +280,16 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 要員一覧へ反映する（追加／更新。画面遷移はしない） */
   const save = async (no: string, isNew: boolean) => {
+    if (!deptId) {
+      message.warning("所属を選択してください。");
+      return;
+    }
+
     try {
       await onSubmit({
         employeeNo: no,
         name: name.trim(),
-        departmentId: deptId ?? departmentOptions[0]?.departmentId ?? "",
+        departmentId: deptId,
         role: role.trim(),
       });
       message.success(
@@ -301,6 +314,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.warning("社員番号を入力してください。");
       return;
     }
+    if (isUnsearchedExisting) {
+      message.warning("既存の社員番号です。検索してから更新してください。");
+      return;
+    }
     // 役割は必須入力（未入力では登録できない）
     if (!role.trim()) {
       message.warning("役割を入力してください。");
@@ -310,9 +327,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.warning("名前を入力してください。");
       return;
     }
+    if (!deptId) {
+      message.warning("所属を選択してください。");
+      return;
+    }
 
     // 既存の要員 → そのまま更新する
-    if (masterByNo.has(no)) {
+    if (isExisting) {
       await save(no, false);
       return;
     }
@@ -531,6 +552,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 maxLength={10}
                 onChange={(e) => {
                   setEmployeeNo(e.target.value);
+                  setLookedUpExistingNo("");
                   // 表示中の社員番号が変わったら「追加確認済み」を解除する
                   setConfirmedNo("");
                 }}
@@ -564,7 +586,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             />
           </div>
           <div>
-            <div className='form-label'>所属</div>
+            <div className='form-label'>所属（必須）</div>
             <Select
               placeholder='所属を選択'
               value={deptId}
@@ -584,6 +606,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               type='primary'
               icon={<CheckOutlined />}
               onClick={handleSubmit}
+              disabled={isUnsearchedExisting}
             >
               {isExisting ? "更新する" : "保存する"}
             </Button>

@@ -44,12 +44,16 @@ class PersonnelInput(BaseModel):
 
 
 def _record(
-    year: int, person: PersonnelInput, now: datetime, user_id: str
+    year: int,
+    person: PersonnelInput,
+    now: datetime,
+    user_id: str,
+    department_id: int,
 ) -> dict:
     return {
         "year": year,
         "employeeNo": person.employeeNo,
-        "departmentId": to_database_department_id(person.departmentId),
+        "departmentId": department_id,
         "idouFlag": "0",
         "idoubi": "",
         "personName": person.name,
@@ -60,6 +64,19 @@ def _record(
         "updateDatetime": now,
         "updateUser": user_id,
     }
+
+
+def _require_department_id(db: Session, year: int, value: Optional[str]) -> int:
+    """登録・更新時は選択済みの当年度部門IDを必須にする"""
+    department_id = to_database_department_id(value)
+    if department_id <= 0:
+        raise HTTPException(status_code=422, detail="所属を選択してください。")
+    if not get_dept_name(db, year, str(department_id)):
+        raise HTTPException(
+            status_code=422,
+            detail="選択された所属は当年度の部門マスタに存在しません。",
+        )
+    return department_id
 
 
 @router.get("/list")
@@ -101,10 +118,11 @@ def add_person(
     db: Session = Depends(get_db),
 ):
     now = datetime.now()
+    valid_department_id = _require_department_id(db, year, departmentId)
     record = {
         "year": year,
         "employeeNo": employeeNo,
-        "departmentId": to_database_department_id(departmentId),
+        "departmentId": valid_department_id,
         "idouFlag": idouFlag,
         "idoubi": idoubi,
         "personName": personName,
@@ -130,6 +148,7 @@ def save_person(
     db: Session = Depends(get_db),
 ):
     # 检查记录是否已存在
+    valid_department_id = _require_department_id(db, year, person.departmentId)
     existing = get_personnel_by_emp_no(db, year, person.employeeNo)
     now = datetime.now()
 
@@ -138,7 +157,7 @@ def save_person(
         update_data = {
             "year": year,
             "employeeNo": person.employeeNo,
-            "departmentId": person.departmentId,
+            "departmentId": valid_department_id,
             "personName": person.name,
             "role": person.role,
             "leavePlan": person.leavePlan,
@@ -149,7 +168,7 @@ def save_person(
         return {"code": 200, "msg": "更新完了"}
     else:
         # 记录不存在，执行插入
-        record = _record(year, person, now, user_id)
+        record = _record(year, person, now, user_id, valid_department_id)
         save_personnel_records(db, [record])
         return {"code": 200, "msg": "登録完了"}
 

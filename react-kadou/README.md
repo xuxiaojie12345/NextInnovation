@@ -72,6 +72,7 @@ npx eslint "src/**/*.{ts,tsx}"
 ### 要員情報 `src/Personnel/PersonnelInfoScreen.tsx`
 
 - 社員番号を入力すると 役割・名前・所属 を表示し、全項目を編集できます。未登録の社員番号は確認のうえで新規追加。
+- 手動で新規登録・更新する際は所属の選択が必須です。未選択または当年度の部門マスタにない所属では保存できません。
 - 「一括読み込む」で **Excel(.xlsx/.xlsm) / CSV / TSV** を取り込みます（`src/Personnel/personnelImport.ts`・外部ライブラリなし）。社員番号で突合し、既存は上書き・新規は追加。
 - 検証用フィクスチャは `node scripts/gen-test-fixtures.cjs` で生成できます（OS の一時フォルダに出力）。
 

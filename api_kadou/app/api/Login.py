@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.Login_service import login_service
 
-router = APIRouter(prefix="/login", tags=["用户认证"])
+router = APIRouter(prefix="/api/kadou", tags=["用户认证"])
 
 
 class LoginBody(BaseModel):
@@ -13,7 +13,7 @@ class LoginBody(BaseModel):
     password: str
 
 
-@router.post("", response_model=dict)
+@router.post("/login", response_model=dict)
 def login(login_data: LoginBody, db: Session = Depends(get_db)):
     return login_service(
         db=db,

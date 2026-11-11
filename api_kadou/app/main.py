@@ -22,7 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user_router, prefix="/api/login")
+# Login.py の router は prefix="/api/kadou" を持つため、include 時に追加 prefix は付けない
+# （付けると /api/login/api/kadou/login になり、フロントの /api/kadou/login と一致しない）
+app.include_router(user_router)
 app.include_router(personnel_router)
 app.include_router(department_router)
 app.include_router(holiday_router)
