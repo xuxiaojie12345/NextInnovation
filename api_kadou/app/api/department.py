@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.errors import BusinessException
 from app.db.session import get_db
 from app.schemas.department import (
     Department,
@@ -41,7 +42,7 @@ def add_department(
             **create_department(db, year, payload.model_dump(), op_user)
         )
     except IntegrityError:
-        raise HTTPException(status_code=409, detail={"code": "E_KADOU_022"})
+        raise BusinessException(status_code=409, message_id="E_KADOU_022")
 
 
 @router.put("/departments/{year}/{id}", response_model=Department)
@@ -56,7 +57,7 @@ def edit_department(
     op_user = (x_user_id or "").strip() or None
     updated = update_department(db, year, id, payload.model_dump(), op_user)
     if updated is None:
-        raise HTTPException(status_code=404, detail={"code": "E_KADOU_024"})
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
     return Department(**updated)
 
 
@@ -66,5 +67,5 @@ def remove_department(
 ):
     """部門管理画面：部門を削除する。"""
     if not delete_department(db, year, id):
-        raise HTTPException(status_code=404, detail={"code": "E_KADOU_024"})
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
     return DepartmentDeleteResult(code=0)
