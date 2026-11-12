@@ -575,6 +575,7 @@ function App() {
       <PersonnelInfoScreen
         year={selectedYear}
         personnel={store.personnel}
+        departments={store.departments}
         loading={personnelLoadedYear !== selectedYear}
         onSubmit={handleSavePersonnel}
         onImport={handleImportPersonnel}

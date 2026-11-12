@@ -31,7 +31,6 @@ import {
   parsePersonnelFile,
 } from "./personnelImport";
 import { getPersonnelInfo } from "./personnelApi";
-import { fetchDepartments } from "../Department/departmentApi";
 
 const { Title, Text } = Typography;
 
@@ -42,6 +41,11 @@ interface PersonnelInfoScreenProps {
   loading: boolean;
   /** 要員一覧（社員番号で 役割・名前・所属 を引く。マスタを兼ねる） */
   personnel: Personnel[];
+  /**
+   * 当年度の部門マスタ（App 側で 年次切替・部門管理 新增/修正/删除 のたびに更新される）
+   * ※所属の選択肢はこれをそのまま使う
+   */
+  departments: Department[];
   /**
    * 登録実行（App 側で要員一覧へ追加／更新する）
    * ※追加しても画面遷移はしない
@@ -78,6 +82,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   year,
   loading,
   personnel,
+  departments,
   onSubmit,
   onImport,
   onDelete,
@@ -106,41 +111,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [importFileName, setImportFileName] = useState("");
   const [importSource, setImportSource] = useState("");
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
-  // 所属の選択肢（JN_DEPARTMENT_MASTER を年度IDで検索した結果。null = 未取得）
-  const [dbDepartments, setDbDepartments] = useState<Department[] | null>(null);
-  // 所属の選択肢の取得中フラグ
-  const [departmentLoading, setDepartmentLoading] = useState(false);
 
-  /**
-   * 初期表示（および年度切替）時に、所属の選択肢を
-   * JN_DEPARTMENT_MASTER から年度ID（year_id）で検索して取得する。
-   */
-  useEffect(() => {
-    let cancelled = false;
-    setDepartmentLoading(true);
-    setDbDepartments(null);
-    fetchDepartments(year)
-      .then((list) => {
-        if (!cancelled) setDbDepartments(list);
-      })
-      .catch((error: unknown) => {
-        if (cancelled) return;
-        message.error(
-          error instanceof Error
-            ? `所属の一覧を取得できませんでした：${error.message}`
-            : "所属の一覧を取得できませんでした。",
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setDepartmentLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [year]);
-
-  /** 所属の選択肢（JN_DEPARTMENT_MASTER の検索結果のみ。未取得時は空） */
-  const departmentOptions = dbDepartments ?? [];
+  /** 所属の選択肢（App から渡された当年度部門マスタ。空配列 = 未取得/0件） */
+  const departmentOptions = departments;
 
   /** 社員番号 → 要員（社員マスタ） */
   const masterByNo = useMemo(
@@ -591,7 +564,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               placeholder='所属を選択'
               value={deptId}
               onChange={(v?: string) => setDeptId(v)}
-              loading={departmentLoading}
               options={departmentOptions.map((d) => ({
                 value: d.departmentId,
                 label: departmentLabelOf(departmentOptions, d.departmentId),

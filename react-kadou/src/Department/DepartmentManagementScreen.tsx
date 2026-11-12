@@ -74,7 +74,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
-  // 略称（新規登録 / 修正で共用。任意）
+  // 部門別名（新規登録 / 修正で共用。任意）
   const [alias, setAlias] = useState('');
   // 種別（新規登録 / 修正で共用）
   const [kind, setKind] = useState<DepartmentKind>('dept');
@@ -246,8 +246,8 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           departmentLabelOf(departments, row.departmentId),
       },
       {
-        // 部門名略称（任意）
-        title: '略称',
+        // 部門別名（DB の department_alisa。任意）
+        title: '部門別名',
         dataIndex: 'alias',
         key: 'alias',
         width: 140,
@@ -354,9 +354,9 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
               />
             </div>
             <div>
-              <div className='form-label'>略称（任意）</div>
+              <div className='form-label'>部門別名（任意）</div>
               <Input
-                placeholder='例：人事'
+                placeholder='例：SDS_1'
                 value={alias}
                 maxLength={20}
                 onChange={(e) => setAlias(e.target.value)}
