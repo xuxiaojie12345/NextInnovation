@@ -37,7 +37,8 @@ export const MESSAGES: Record<string, string> = {
   I_KADOU_036: "警告が {0} 件あります（{1}{2}）。",
   I_KADOU_037: "取り込まなかった行が {0} 件あります。",
   I_KADOU_038: " / スキップ {0} 件。",
-  I_KADOU_039: "社員番号「{0}」の情報は変更されていません。更新する項目を変更してください。",
+  I_KADOU_039:
+    "社員番号「{0}」の情報は変更されていません。更新する項目を変更してください。",
 
   // ---- 注意・確認 ----
   W_KADOU_001: "{0}を入力してください。",
@@ -93,13 +94,17 @@ export const MESSAGES: Record<string, string> = {
   E_KADOU_051: "サーバーに接続できませんでした。通信環境を確認してください。",
   E_KADOU_052:
     "サーバーエラーが発生しました。しばらく経ってから再度お試しください。",
+  E_KADOU_053: "{0}は既に登録されています。",
 };
 
 /**
  * code に対応するメッセージを取得して、位置引数 {0} {1} … を置換した文字列を返す。
  * 未知の code は汎用メッセージでフォールバックする。
  */
-export function messageInfo(code: string, params: Array<string | number> = []): string {
+export function messageInfo(
+  code: string,
+  params: Array<string | number> = [],
+): string {
   const template = MESSAGES[code] ?? MESSAGES["E_KADOU_020"];
   return template.replace(/\{(\d+)\}/g, (_, idx: string) => {
     const i = Number(idx);

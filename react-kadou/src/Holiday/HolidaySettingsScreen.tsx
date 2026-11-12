@@ -131,16 +131,8 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       message.warning("日付を選択してください。");
       return;
     }
+
     const date = newDate.format("YYYY-MM-DD");
-    const duplicate = holidays.find(
-      (h) => h.date === date && h.id !== editingId,
-    );
-
-    if (duplicate) {
-      message.warning(`${formatDate(date)} は既に登録されています。`);
-      return;
-    }
-
     if (editingId) {
       HolidayUpdateApi(year, currentUserId, {
         date: date,

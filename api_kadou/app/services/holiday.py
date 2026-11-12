@@ -27,20 +27,30 @@ def findby_holidays(db: Session, year_id: str) -> list[HolidaysResponse]:
 def add_holiday(
     db: Session, addHolidayRequest: HolidayRequest, x_user_id: str | None, year: str
 ) -> list[HolidaysResponse]:
-    sql = load_sql("holidays.sql", "add_holiday")
-    result = db.execute(
-        text(sql),
-        {
-            "year_id": year,
-            "holiday_date": addHolidayRequest.data,
-            "holiday_name": addHolidayRequest.name,
-            "holiday_kind": addHolidayRequest.kind,
-            "user_id": x_user_id,
-        },
-    )
-    if result.rowcount <= 0:
-        raise BusinessException(status_code=401, message_id="E_KADOU_015")
-    db.commit()
+    findby_sql = load_sql("holidays.sql", "findby_holiday_date_all")
+    findby_result = db.execute(text(findby_sql)).fetchall()
+    holidayDate: set[str] = [row.holiday_date for row in findby_result]
+    if addHolidayRequest.data not in holidayDate:
+        sql = load_sql("holidays.sql", "add_holiday")
+        result = db.execute(
+            text(sql),
+            {
+                "year_id": addHolidayRequest.data[:4],
+                "holiday_date": addHolidayRequest.data,
+                "holiday_name": addHolidayRequest.name,
+                "holiday_kind": addHolidayRequest.kind,
+                "user_id": x_user_id,
+            },
+        )
+        if result.rowcount <= 0:
+            raise BusinessException(status_code=401, message_id="E_KADOU_015")
+        db.commit()
+    else:
+        raise BusinessException(
+            status_code=401,
+            message_id="E_KADOU_053",
+            params=[f"{addHolidayRequest.data[0:4]}-{addHolidayRequest.data[4:6]}-{addHolidayRequest.data[6:8]}"],
+        )
     return findby_holidays(db, year)
 
 
