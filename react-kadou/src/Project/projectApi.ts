@@ -12,6 +12,8 @@
  * NOTE: 開発時は src/setupProxy.js により /api が http://127.0.0.1:8000 へ転送される。
  */
 
+import { normalizeHttpError, normalizeTransportError } from '../utils/normalizeError';
+
 /** プロジェクト（1件） */
 export interface ProjectApiInfo {
   /** システム項目ID（主キーの一部） */
@@ -90,21 +92,19 @@ function operatorHeaders(opUser?: string | null): Record<string, string> {
   return opUser ? { 'X-User-Id': opUser } : {};
 }
 
-/** 共通リクエストヘルパー（エラー時は detail を Error にして投げる） */
+/** 共通リクエストヘルパー（エラー時は ApiError に正規化して投げる） */
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    });
+  } catch (e) {
+    throw normalizeTransportError(e);
+  }
   if (!res.ok) {
-    let detail = 'サーバーエラーが発生しました。';
-    try {
-      const data = await res.json();
-      if (data && typeof data.detail === 'string') detail = data.detail;
-    } catch {
-      // JSON でないレスポンスは既定メッセージを使う
-    }
-    throw new Error(detail);
+    throw await normalizeHttpError(res);
   }
   return (await res.json()) as T;
 }

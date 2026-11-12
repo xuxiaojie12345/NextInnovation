@@ -30,7 +30,7 @@ import {
   kindLabelOf,
 } from '../constants/options';
 import { departmentLabelOf } from '../data/departmentUtils';
-import { t } from '../constants/messages';
+import { messageInfo } from '../constants/messages';
 import { apiErrorMessage } from '../utils/errorMessage';
 import {
   addDepartment,
@@ -38,6 +38,7 @@ import {
   fetchDepartments,
   updateDepartment,
 } from '../api/departmentManagement';
+import { notifySystemError } from '../utils/systemError';
 
 const { Title, Text } = Typography;
 
@@ -109,7 +110,9 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         const list = await fetchDepartments(year);
         if (alive) setDepartmentsRef.current(list);
       } catch (err) {
-        if (alive) message.error(apiErrorMessage(err, t('E_KADOU_020')));
+        if (!notifySystemError(err)) {
+          if (alive) message.error(apiErrorMessage(err, messageInfo('E_KADOU_020')));
+        }
       } finally {
         if (alive) setLoading(false);
       }
@@ -153,12 +156,14 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         );
         setEditingId((prev) => (prev === row.departmentId ? null : prev));
         message.success(
-          t('I_KADOU_003', [row.location, kindLabelOf(row.kind), row.name]),
+          messageInfo('I_KADOU_003', [row.location, kindLabelOf(row.kind), row.name]),
         );
       } catch (err) {
-        message.error(
-          apiErrorMessage(err, t('E_KADOU_022'))
-        );
+        if (!notifySystemError(err)) {
+          message.error(
+            apiErrorMessage(err, messageInfo('E_KADOU_022'))
+          );
+        }
       } finally {
         setSaving(false);
       }
@@ -170,11 +175,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      message.warning(t('W_KADOU_001', ['名称']));
+      message.warning(messageInfo('W_KADOU_001', ['名称']));
       return;
     }
     if (!location) {
-      message.warning(t('W_KADOU_002', ['拠点']));
+      message.warning(messageInfo('W_KADOU_002', ['拠点']));
       return;
     }
     if (saving) return;
@@ -198,18 +203,20 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           prev.map((d) => (d.departmentId === editingId ? updated : d)),
         );
         message.success(
-          t('I_KADOU_002', [location, kindLabelOf(kind), trimmed]),
+          messageInfo('I_KADOU_002', [location, kindLabelOf(kind), trimmed]),
         );
       } else {
         const created = await addDepartment(year, payload, operatorId);
         setDepartments((prev) => [...prev, created]);
         message.success(
-          t('I_KADOU_001', [location, kindLabelOf(kind), trimmed]),
+          messageInfo('I_KADOU_001', [location, kindLabelOf(kind), trimmed]),
         );
       }
       handleResetForm();
     } catch (err) {
-      message.error(apiErrorMessage(err, t('E_KADOU_022')));
+      if (!notifySystemError(err)) {
+        message.error(apiErrorMessage(err, messageInfo('E_KADOU_022')));
+      }
     } finally {
       setSaving(false);
     }
@@ -272,7 +279,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
             </Button>
             <Popconfirm
               title='削除の確認'
-              description={t('I_KADOU_004', [
+              description={messageInfo('I_KADOU_004', [
                 kindLabelOf(row.kind),
                 row.name,
               ])}

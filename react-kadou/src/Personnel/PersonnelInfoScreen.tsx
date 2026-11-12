@@ -36,7 +36,6 @@ import {
   PersonnelImportAbortedError,
   PersonnelImportApiResult,
   PersonnelNotFoundError,
-  PersonnelSystemError,
   deletePersonnel,
   fetchPersonnelCount,
   fetchPersonnelInfo,
@@ -44,36 +43,9 @@ import {
   importPersonnelRows,
   savePersonnel,
 } from './personnelApi';
-import { ApiError, isApiError } from '../utils/ApiError';
+import { notifySystemError } from '../utils/systemError';
 
 const { Title, Text } = Typography;
-
-/** バックエンドのシステムエラー（DB 接続不可など）を画面に出す共通メッセージ */
-const SYSTEM_ERROR_MESSAGE =
-  'DB に接続できない可能性があります。しばらく経ってから再度お試しください。';
-
-/**
- * DB 接続不可などのシステムエラーかどうかを判定する。
- *
- * NOTE: この画面は API 経路が 2 種類あるため、両方を判定する必要がある。
- *   ① personnelApi.ts（fetch 直接）→ PersonnelSystemError
- *   ② departmentManagement.ts など（httpRequest 経由）→ ApiError(kind='server')
- *   PersonnelSystemError と ApiError に継承関係は無いので、
- *   instanceof PersonnelSystemError だけでは ② を取りこぼす。
- */
-const isSystemError = (e: unknown): boolean => {
-  if (e instanceof PersonnelSystemError) return true;
-  if (isApiError(e)) {
-    return (
-      e.kind === 'server' ||
-      e.kind === 'maintenance' ||
-      e.kind === 'timeout' ||
-      e.kind === 'offline' ||
-      e.kind === 'network'
-    );
-  }
-  return false;
-};
 
 /** 解析結果の行をバックエンドへ送る形式へ変換する */
 const toApiRows = (rows: PersonnelImportRow[]) =>
@@ -156,22 +128,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   /**
    * 部門マスタの取得に失敗したか（空との区別に使う）。
-   * NOTE: DB 接続不可（システムエラー）の場合は部門側の問題ではないため false のままにする。
-   *       → その場合のメッセージは各操作時のシステムエラーダイアログで通知する。
+   * システムエラー時も取得に失敗するため true にする（グローバルの
+   * システムエラー画面への遷移も notifySystemError で行われる）。
    */
   const [departmentsError, setDepartmentsError] = useState(false);
-  /**
-   * DB 接続不可により部門マスタが取れなかったか。
-   * true の間は「部門が登録されていません」「取得できませんでした」を表示しない
-   * （原因は DB 側で、部門データ自体の問題ではないため）。
-   */
-  const [dbUnavailable, setDbUnavailable] = useState(false);
-  /**
-   * 画面を開いた時点で DB 接続異常を検知したか。
-   * true になったら「システムエラー」ダイアログを 1 回だけ表示する。
-   * （部門マスタ取得は画面表示時に自動で走るため、その失敗を DB 異常の初回検知として使う）
-   */
-  const [dbErrorOnOpen, setDbErrorOnOpen] = useState(false);
 
   // 年度が変わったとき・この画面が表示されたときに部門マスタを取り直す。
   // ※全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
@@ -182,7 +142,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     let alive = true;
     setLoadingDepartments(true);
     setDepartmentsError(false);
-    setDbUnavailable(false);
 
     (async () => {
       try {
@@ -191,20 +150,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setDepartments(list);
       } catch (e) {
         // 取得できなかった場合は空にする（所属が必須のため登録はできない）
+        notifySystemError(e);
         if (!alive) return;
         setDepartments([]);
-
-        if (isSystemError(e)) {
-          // DB 接続不可など → 部門マスタ固有の失敗ではないので赤字は一切出さない。
-          // 代わりに画面を開いた時点でシステムエラーを 1 回だけダイアログ表示する。
-          setDepartmentsError(false);
-          setDbUnavailable(true);
-          setDbErrorOnOpen(true);
-        } else {
-          // DB は正常だが部門マスタの取得に失敗した場合のみ赤字で知らせる
-          setDbUnavailable(false);
-          setDepartmentsError(true);
-        }
+        setDepartmentsError(true);
       } finally {
         // NOTE: アンマウント済みでもフラグは必ず戻す。
         //       （alive 判定で return してしまうと loading のまま固まる）
@@ -216,23 +165,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       alive = false;
     };
   }, [year, active]);
-
-  /**
-   * 画面を開いた時点で DB 異常を検知していたら、システムエラーを 1 回だけ表示する。
-   *
-   * NOTE: 部門マスタの取得は画面表示時に自動実行されるため、その失敗で
-   *       「画面を開いた瞬間に DB が落ちている」ことを検知できる。
-   *       DB が復旧したあとに再度画面を開けば改めて判定される。
-   */
-  useEffect(() => {
-    if (!active || !dbErrorOnOpen) return;
-    setDbErrorOnOpen(false); // 同じ異常で何度もダイアログを出さない
-    Modal.error({
-      title: 'システムエラー',
-      content: SYSTEM_ERROR_MESSAGE,
-      okText: '閉じる',
-    });
-  }, [active, dbErrorOnOpen]);
 
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState('');
@@ -316,8 +248,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     try {
       const count = await fetchPersonnelCount(year);
       setPersonnelCount(count);
-    } catch {
+    } catch (e) {
       // 取得できなかった場合は 0 件ではなく「-」を表示する（画面は操作可能なまま）
+      notifySystemError(e);
       setPersonnelCount(null);
     }
   }, [year]);
@@ -531,8 +464,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     let weeklyCount = 0;
     try {
       weeklyCount = await fetchWeeklyCount(no, year);
-    } catch {
+    } catch (e) {
       // 件数が取れない場合も削除操作自体は続行できるようにする（0 件扱い）
+      notifySystemError(e);
       weeklyCount = 0;
     } finally {
       setDeleting(false);
@@ -561,11 +495,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       );
       await reloadPersonnelCount();
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `削除に失敗しました：${e.message}`
-          : '削除に失敗しました。',
-      );
+      if (!notifySystemError(e)) {
+        message.error(
+          e instanceof Error
+            ? `削除に失敗しました：${e.message}`
+            : '削除に失敗しました。',
+        );
+      }
     } finally {
       setDeleting(false);
     }
@@ -623,22 +559,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         return;
       }
       // DB 接続不可などのシステムエラー → 「未登録」と誤表示せず、エラーを明示する
+      notifySystemError(e);
       setVerifiedNo('');
       setVerifiedExists(false);
       setOriginal(null);
-      if (isSystemError(e)) {
-        Modal.error({
-          title: 'システムエラー',
-          content: SYSTEM_ERROR_MESSAGE,
-          okText: '閉じる',
-        });
-      } else {
-        message.error(
-          e instanceof Error
-            ? `検索に失敗しました：${e.message}`
-            : '検索に失敗しました。',
-        );
-      }
+      message.error(
+        e instanceof Error
+          ? `検索に失敗しました：${e.message}`
+          : '検索に失敗しました。',
+      );
     } finally {
       setSearching(false);
     }
@@ -703,11 +632,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       );
       await reloadPersonnelCount();
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `保存に失敗しました：${e.message}`
-          : '保存に失敗しました。',
-      );
+      if (!notifySystemError(e)) {
+        message.error(
+          e instanceof Error
+            ? `保存に失敗しました：${e.message}`
+            : '保存に失敗しました。',
+        );
+      }
     } finally {
       setSaving(false);
     }
@@ -748,13 +679,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       // 誤った追加・上書きが発生するため、必ず中断する。
       if (!(e instanceof PersonnelNotFoundError)) {
         setSaving(false);
-        if (isSystemError(e)) {
-          Modal.error({
-            title: 'システムエラー',
-            content: SYSTEM_ERROR_MESSAGE,
-            okText: '閉じる',
-          });
-        } else {
+        if (!notifySystemError(e)) {
           message.error(
             e instanceof Error
               ? `DB の確認に失敗しました：${e.message}`
@@ -874,11 +799,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         throw e;
       }
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `一括読み込みに失敗しました：${e.message}`
-          : '一括読み込みに失敗しました。',
-      );
+      if (!notifySystemError(e)) {
+        message.error(
+          e instanceof Error
+            ? `一括読み込みに失敗しました：${e.message}`
+            : '一括読み込みに失敗しました。',
+        );
+      }
     } finally {
       setImporting(false);
     }
@@ -988,11 +915,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         message.error(e.message);
         return;
       }
-      message.error(
-        e instanceof Error
-          ? `一括読み込みに失敗しました：${e.message}`
-          : '一括読み込みに失敗しました。',
-      );
+      if (!notifySystemError(e)) {
+        message.error(
+          e instanceof Error
+            ? `一括読み込みに失敗しました：${e.message}`
+            : '一括読み込みに失敗しました。',
+        );
+      }
     } finally {
       setSubmittingImport(false);
     }
@@ -1251,7 +1180,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             />
             {!isExisting &&
               !loadingDepartments &&
-              !dbUnavailable &&
               departments.length === 0 && (
                 <Text
                   type='danger'

@@ -4,7 +4,8 @@ import { CalendarOutlined, CheckCircleFilled } from '@ant-design/icons';
 import { AVAILABLE_YEARS } from '../data/yearStore';
 import { fetchYearSelect } from '../api/yearSelect';
 import { displayMessage } from '../utils/normalizeError';
-import { t } from '../constants/messages';
+import { notifySystemError } from '../utils/systemError';
+import { messageInfo } from '../constants/messages';
 import type { YearSelectItem } from '../api/yearSelect';
 import './YearSelectScreen.css';
 
@@ -60,9 +61,11 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
         })),
       );
     } catch (err) {
-      setError(
-        displayMessage(err, t('E_KADOU_011')),
-      );
+      if (!notifySystemError(err)) {
+        setError(
+          displayMessage(err, messageInfo('E_KADOU_011')),
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -124,7 +127,7 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
             <Alert
               type='error'
               showIcon
-              message={t('E_KADOU_011')}
+              message={messageInfo('E_KADOU_011')}
               description={error}
               action={
                 <Button size='small' onClick={load}>
@@ -140,7 +143,7 @@ const YearSelectScreen: React.FC<YearSelectScreenProps> = ({
               <Alert
                 type='error'
                 showIcon
-                message={t('E_KADOU_023')}
+                message={messageInfo('E_KADOU_023')}
                 description={error}
                 action={
                   <Button size='small' onClick={load}>

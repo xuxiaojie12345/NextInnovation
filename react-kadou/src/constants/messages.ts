@@ -73,7 +73,7 @@ export const MESSAGES: Record<string, string> = {
  * code に対応するメッセージを取得して、位置引数 {0} {1} … を置換した文字列を返す。
  * 未知の code は汎用メッセージでフォールバックする。
  */
-export function t(code: string, params: Array<string | number> = []): string {
+export function messageInfo(code: string, params: Array<string | number> = []): string {
   const template = MESSAGES[code] ?? MESSAGES["E_KADOU_020"];
   return template.replace(/\{(\d+)\}/g, (_, idx: string) => {
     const i = Number(idx);

@@ -12,6 +12,8 @@ import WorkStatus from './WorkStatus/WorkStatus';
 import YearSelectScreen from './YearSelect/YearSelectScreen';
 import UserManagementScreen from './User/UserManagementScreen';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
+import SystemErrorScreen from './SystemErrorScreen';
+import { SYSTEM_ERROR_EVENT, SystemErrorDetail } from './utils/systemError';
 import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
 import type { AuthUser } from './types/user';
@@ -47,48 +49,6 @@ type PendingAction =
 
 /** ログインセッションを保持する localStorage キー（ブラウザ更新後もログイン状態を維持する） */
 const AUTH_STORAGE_KEY = 'kadou.auth.user';
-
-/** localStorage からログインユーザーを復元する（不正値・未ログインは null） */
-const loadStoredUser = (): AuthUser | null => {
-  try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as AuthUser) : null;
-  } catch {
-    return null;
-  }
-};
-
-/** 表示中画面・選択年度を保持する localStorage キー（リフレッシュ後も同じ画面に留まるようにする） */
-const ACTIVE_VIEW_STORAGE_KEY = 'kadou.activeView';
-const SELECTED_YEAR_STORAGE_KEY = 'kadou.selectedYear';
-
-/** 有効な画面キーの一覧（localStorage 復元時の検証用） */
-const MENU_KEYS: MenuKey[] = [
-  'year-select',
-  'work-status',
-  'personnel-info',
-  'department-manage',
-  'project-manage',
-  'jinan-work-rate',
-  'holiday-settings',
-  'user-manage',
-];
-
-/** localStorage から表示中画面を復元する（不正値は work-status を返す） */
-const loadStoredActiveView = (): MenuKey => {
-  const v = localStorage.getItem(ACTIVE_VIEW_STORAGE_KEY) as MenuKey | null;
-  return v && MENU_KEYS.includes(v) ? v : 'work-status';
-};
-
-/** localStorage から選択年度を復元する（不正値・未保存なら当年） */
-const loadStoredSelectedYear = (): number => {
-  const raw = localStorage.getItem(SELECTED_YEAR_STORAGE_KEY);
-  if (raw) {
-    const n = Number(raw);
-    if (Number.isInteger(n)) return n;
-  }
-  return currentYear();
-};
 
 function App() {
   // ブラウザのリロードでログイン画面に戻らないよう、sessionStorage から復元する
@@ -128,6 +88,12 @@ function App() {
   const [dirty, setDirty] = useState(false);
   // 未保存確認ダイアログで保留中の操作
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  // システムエラー発生中か（true の間は異常画面を表示する）
+  const [systemError, setSystemError] = useState(false);
+  // 異常画面に表示するエラー詳細（code + メッセージ）
+  const [systemErrorDetail, setSystemErrorDetail] = useState<
+    SystemErrorDetail | undefined
+  >(undefined);
   // 要員稼動管理の「保存」処理（WorkStatus から登録される）
   const saveHandlerRef = useRef<(() => void) | null>(null);
   // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
@@ -155,6 +121,17 @@ function App() {
       stores,
     });
   }, [currentUser, selectedYear, activeView, stores]);
+
+  // グローバルなシステムエラー信号を受信したら異常画面へ切り替える
+  useEffect(() => {
+    const onSystemError = (ev: Event) => {
+      const detail = (ev as CustomEvent<SystemErrorDetail>).detail;
+      setSystemErrorDetail(detail);
+      setSystemError(true);
+    };
+    window.addEventListener(SYSTEM_ERROR_EVENT, onSystemError);
+    return () => window.removeEventListener(SYSTEM_ERROR_EVENT, onSystemError);
+  }, []);
 
   // ---- ログイン / ログアウト ----------------------------------------
 
@@ -616,6 +593,11 @@ function App() {
       />
     ),
   };
+
+  // システムエラー発生中は異常画面を表示する
+  if (systemError) {
+    return <SystemErrorScreen detail={systemErrorDetail} />;
+  }
 
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {

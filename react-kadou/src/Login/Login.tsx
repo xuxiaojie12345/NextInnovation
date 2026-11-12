@@ -5,7 +5,8 @@ import type { AuthUser } from '../types/user';
 import { loginApi } from '../api/login';
 import { isApiError } from '../utils/ApiError';
 import { apiErrorMessage } from '../utils/errorMessage';
-import { t } from '../constants/messages';
+import { notifySystemError } from '../utils/systemError';
+import { messageInfo } from '../constants/messages';
 import { validatePassword, PASSWORD_MAX_LENGTH } from './passwordRules';
 import './Login.css';
 
@@ -61,8 +62,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   /** ユーザーID：必須・半角英数のみ（入力中に即時検証） */
   const userIdValidator = (_: unknown, value: string | undefined) => {
     const input = (value ?? '').trim();
-    if (input === '') return Promise.reject(new Error(t('W_KADOU_005')));
-    if (!HALF_WIDTH_ONLY.test(input)) return Promise.reject(new Error(t('W_KADOU_004')));
+    if (input === '') return Promise.reject(new Error(messageInfo('W_KADOU_005')));
+    if (!HALF_WIDTH_ONLY.test(input)) return Promise.reject(new Error(messageInfo('W_KADOU_004')));
     return Promise.resolve();
   };
 
@@ -80,11 +81,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     } catch (err) {
       // 認証失敗（401・AUTH_REQUIRED）と通信異常（タイムアウト/ネットワーク断/サーバー障害）を
       // 区別して表示する。メッセージ本文はバックエンドが返すものをそのまま使う（単一性源）。
-      const kind = isApiError(err) && (NETWORK_KINDS as readonly string[]).includes(err.kind)
-        ? 'network'
-        : 'auth';
-      setErrorKind(kind);
-      setError(apiErrorMessage(err));
+      if (!notifySystemError(err)) {
+        const kind = isApiError(err) && (NETWORK_KINDS as readonly string[]).includes(err.kind)
+          ? 'network'
+          : 'auth';
+        setErrorKind(kind);
+        setError(apiErrorMessage(err));
+      }
     } finally {
       setLoading(false);
     }

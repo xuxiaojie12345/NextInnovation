@@ -12,6 +12,8 @@
  * NOTE: 開発時は src/setupProxy.js により /api が http://127.0.0.1:8000 へ転送される。
  */
 
+import { ApiError } from '../utils/ApiError';
+
 /** 要員情報（1件） */
 export interface PersonnelInfoResponse {
   id: string | null;
@@ -90,15 +92,10 @@ export class PersonnelNotFoundError extends Error {
 }
 
 /** システムエラー（500 系・DB 接続不可など）を表す Error */
-export class PersonnelSystemError extends Error {
-  readonly code?: string;
-  readonly requestId?: string;
-
+export class PersonnelSystemError extends ApiError {
   constructor(message: string, code?: string, requestId?: string) {
-    super(message);
+    super({ kind: 'server', message, code, requestId });
     this.name = 'PersonnelSystemError';
-    this.code = code;
-    this.requestId = requestId;
   }
 }
 

@@ -52,6 +52,7 @@ import {
 import { parseHolidayFile } from "./HolidayImport";
 import { apiErrorMessage } from "../utils/errorMessage";
 import { isApiError } from "../utils/ApiError";
+import { notifySystemError } from "../utils/systemError";
 
 const { Title, Text } = Typography;
 
@@ -75,7 +76,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         }
       })
       .catch((err) => {
-        message.error(apiErrorMessage(err));
+        if (!notifySystemError(err)) {
+          message.error(apiErrorMessage(err));
+        }
       });
   }, [year]);
 
@@ -152,7 +155,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         })
         .catch((error) => {
           isApiError(error);
-          message.error(apiErrorMessage(error));
+          if (!notifySystemError(error)) {
+            message.error(apiErrorMessage(error));
+          }
         });
     } else {
       HolidayAddApi(year, currentUserId, {
@@ -167,7 +172,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           message.success(`休日情報${formatDate(date)}を追加しました。`);
         })
         .catch((error) => {
-          message.error(apiErrorMessage(error));
+          if (!notifySystemError(error)) {
+            message.error(apiErrorMessage(error));
+          }
         });
     }
     handleResetForm();
@@ -192,7 +199,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         })
         .catch((error) => {
           isApiError(error);
-          message.error(apiErrorMessage(error));
+          if (!notifySystemError(error)) {
+            message.error(apiErrorMessage(error));
+          }
         });
     },
     [setHolidays],
@@ -253,7 +262,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           message.success(`休日を一括読み込みしました。`);
         })
         .catch((error) => {
-          message.error(apiErrorMessage(error));
+          if (!notifySystemError(error)) {
+            message.error(apiErrorMessage(error));
+          }
         });
 
       if (result.warnings.length > 0) {
@@ -264,11 +275,13 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         );
       }
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `一括読み込みに失敗しました：${e.message}`
-          : "一括読み込みに失敗しました。",
-      );
+      if (!notifySystemError(e)) {
+        message.error(
+          e instanceof Error
+            ? `一括読み込みに失敗しました：${e.message}`
+            : "一括読み込みに失敗しました。",
+        );
+      }
     } finally {
       setImporting(false);
     }
