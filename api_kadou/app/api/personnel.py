@@ -3,13 +3,14 @@
 API_ID  : PersonnelInfoScreen
 API_PATH: /api/kadou/personnel/{employeeNo}/{year}  (GET)
 
-NOTE: 既存の部門管理（app/api/department.py）と同じ router に相乗りせず、
+NOTE: 本モジュールは「Web 側データの受け取り／返却」のみを担当する。
+      入力チェック・存在確認・業務エラーの生成は services/personnel.py に集約する。
+      既存の部門管理（app/api/department.py）と同じ router に相乗りせず、
       独立した router として登録する（既存コードへ影響を与えないため）。
 """
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.core.audit import normalize_op_user
 from app.db.session import get_db
 from app.schemas.personnel import (
     PersonnelCount,
@@ -22,11 +23,11 @@ from app.schemas.personnel import (
 )
 from app.services.personnel import (
     count_personnel,
-    count_weekly_assignments,
-    delete_personnel,
-    get_personnel,
-    import_personnel,
-    save_personnel,
+    fetch_personnel_info,
+    fetch_weekly_count,
+    import_personnel_or_raise,
+    register_personnel,
+    remove_personnel,
 )
 
 router = APIRouter(prefix="/api/kadou/personnel", tags=["personnel"])
@@ -57,10 +58,10 @@ def post_personnel_import(
     更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
     更新時は更新日時／更新者のみ書き換える。
     """
-    op_user = normalize_op_user(x_user_id)
-    result = import_personnel(db, year, payload, op_user)
+    result = import_personnel_or_raise(db, year, payload, x_user_id)
 
-    # ファイル全体を中止した場合は 409 で返す（1件も反映していない）
+    # ファイル全体を中止した場合は 409 で返す（1件も反映していない）。
+    # NOTE: 画面がプレビューを復元できるよう result 全体を detail に含める。
     if result.aborted:
         raise HTTPException(
             status_code=409,
@@ -77,17 +78,7 @@ def get_personnel_info(
     employeeNo: str, year: str, db: Session = Depends(get_db)
 ):
     """要員情報画面：社員番号で要員情報を1件取得する。"""
-    employee_no = employeeNo.strip()
-    if not employee_no:
-        raise HTTPException(status_code=400, detail="社員番号を指定してください。")
-
-    personnel = get_personnel(db, year, employee_no)
-    if personnel is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"社員番号「{employee_no}」の要員情報が見つかりません。",
-        )
-    return PersonnelInfo(**personnel)
+    return PersonnelInfo(**fetch_personnel_info(db, year, employeeNo))
 
 
 @router.put("/{employeeNo}/{year}", response_model=PersonnelInfo)
@@ -104,18 +95,7 @@ def put_personnel(
     更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
     更新時は更新日時／更新者のみ書き換える。
     """
-    employee_no = employeeNo.strip()
-    if not employee_no:
-        raise HTTPException(status_code=400, detail="社員番号を指定してください。")
-    if not payload.name.strip():
-        raise HTTPException(status_code=400, detail="名前を入力してください。")
-
-    op_user = normalize_op_user(x_user_id)
-    try:
-        saved, _created = save_personnel(db, year, employee_no, payload, op_user)
-    except ValueError as e:
-        # 部門マスタ未登録など、入力内容ではなくマスタ不足による保存不可
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    saved = register_personnel(db, year, employeeNo, payload, x_user_id)
     return PersonnelInfo(**saved)
 
 
@@ -127,18 +107,15 @@ def get_weekly_count(
 
     jn_weekly_assignment_table を year_id と employee_no で絞り込んで数える。
     """
-    employee_no = employeeNo.strip()
-    if not employee_no:
-        raise HTTPException(status_code=400, detail="社員番号を指定してください。")
     return PersonnelWeeklyCount(
         year=year,
-        employeeNo=employee_no,
-        count=count_weekly_assignments(db, year, employee_no),
+        employeeNo=employeeNo.strip(),
+        count=fetch_weekly_count(db, year, employeeNo),
     )
 
 
 @router.delete("/{employeeNo}/{year}", response_model=PersonnelDeleteResult)
-def remove_personnel(
+def remove_personnel_endpoint(
     employeeNo: str,
     year: str,
     deleteWeekly: bool = Query(
@@ -152,19 +129,10 @@ def remove_personnel(
     deleteWeekly=true の場合、年度 + 社員番号を検索条件として
     jn_weekly_assignment_table（要員稼動管理の週割当）も同時に削除する。
     """
-    employee_no = employeeNo.strip()
-    if not employee_no:
-        raise HTTPException(status_code=400, detail="社員番号を指定してください。")
-
-    # 削除前に件数を控える（実際に消えた件数を返すため）
-    weekly_count = count_weekly_assignments(db, year, employee_no)
-
-    if not delete_personnel(db, year, employee_no, delete_weekly=deleteWeekly):
-        raise HTTPException(
-            status_code=404,
-            detail=f"社員番号「{employee_no}」の要員情報が見つかりません。",
-        )
+    _, deleted_weekly_count = remove_personnel(
+        db, year, employeeNo, delete_weekly=deleteWeekly
+    )
     return PersonnelDeleteResult(
         code=0,
-        deletedWeeklyCount=weekly_count if deleteWeekly else 0,
+        deletedWeeklyCount=deleted_weekly_count,
     )

@@ -44,6 +44,8 @@ import {
   savePersonnel,
 } from './personnelApi';
 import { notifySystemError } from '../utils/systemError';
+import { apiErrorMessage } from '../utils/errorMessage';
+import { messageInfo as t } from '../constants/messages';
 
 const { Title, Text } = Typography;
 
@@ -150,10 +152,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setDepartments(list);
       } catch (e) {
         // 取得できなかった場合は空にする（所属が必須のため登録はできない）
-        notifySystemError(e);
+        // システムエラーはグローバル画面へ、業務エラーは画面内で通知する
+        if (!notifySystemError(e)) {
+          setDepartmentsError(true);
+        }
         if (!alive) return;
         setDepartments([]);
-        setDepartmentsError(true);
       } finally {
         // NOTE: アンマウント済みでもフラグは必ず戻す。
         //       （alive 判定で return してしまうと loading のまま固まる）
@@ -250,7 +254,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setPersonnelCount(count);
     } catch (e) {
       // 取得できなかった場合は 0 件ではなく「-」を表示する（画面は操作可能なまま）
-      notifySystemError(e);
+      // システムエラーはグローバル画面へ、業務エラーは画面内で通知する
+      if (!notifySystemError(e)) {
+        message.error(apiErrorMessage(e, t('E_KADOU_036')));
+      }
       setPersonnelCount(null);
     }
   }, [year]);
@@ -362,20 +369,20 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   // --- 入力チェック -----------------------------------------------
   /** 社員番号：5 桁以内の半角数字のみ */
   const validateEmployeeNo = (v: string): string => {
-    const t = v.trim();
-    if (t === '') return '社員番号を入力してください。';
-    if (!/^[0-9]{1,5}$/.test(t)) {
-      return '社員番号は5桁以内の半角数字で入力してください。';
+    const value = v.trim();
+    if (value === '') return t('E_KADOU_030');
+    if (!/^[0-9]{1,5}$/.test(value)) {
+      return t('E_KADOU_031');
     }
     return '';
   };
 
   /** 役割：必須・6 桁以内の半角英数字のみ */
   const validateRole = (v: string): string => {
-    const t = v.trim();
-    if (t === '') return '役割を入力してください。';
-    if (!/^[a-zA-Z0-9]{1,6}$/.test(t)) {
-      return '役割は6桁以内の半角英数字で入力してください。';
+    const value = v.trim();
+    if (value === '') return t('E_KADOU_032');
+    if (!/^[a-zA-Z0-9]{1,6}$/.test(value)) {
+      return t('E_KADOU_033');
     }
     return '';
   };
@@ -383,7 +390,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 名前：20 文字以内 */
   const validateName = (v: string): string => {
     if (v.trim().length > 20) {
-      return '名前は20文字以内で入力してください。';
+      return t('E_KADOU_035');
     }
     return '';
   };
@@ -466,7 +473,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       weeklyCount = await fetchWeeklyCount(no, year);
     } catch (e) {
       // 件数が取れない場合も削除操作自体は続行できるようにする（0 件扱い）
-      notifySystemError(e);
+      // システムエラーはグローバル画面へ、業務エラーは画面内で通知する
+      if (!notifySystemError(e)) {
+        message.error(apiErrorMessage(e, t('E_KADOU_020')));
+      }
       weeklyCount = 0;
     } finally {
       setDeleting(false);
@@ -490,17 +500,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       setDeleteWeekly(false);
       message.success(
         alsoWeekly && result.deletedWeeklyCount > 0
-          ? `社員番号「${no}」を削除しました（週割当 ${result.deletedWeeklyCount} 件も削除）。`
-          : `社員番号「${no}」を削除しました。`,
+          ? t('I_KADOU_035', [no, result.deletedWeeklyCount])
+          : t('I_KADOU_010', [no]),
       );
       await reloadPersonnelCount();
     } catch (e) {
       if (!notifySystemError(e)) {
-        message.error(
-          e instanceof Error
-            ? `削除に失敗しました：${e.message}`
-            : '削除に失敗しました。',
-        );
+        message.error(apiErrorMessage(e, t('E_KADOU_040')));
       }
     } finally {
       setDeleting(false);
@@ -515,7 +521,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const handleLookup = async (rawNo: string) => {
     const no = rawNo.trim();
     if (!no) {
-      setEmployeeNoError('社員番号を入力してください。');
+      setEmployeeNoError(t('E_KADOU_030'));
       return;
     }
     // 形式チェック（5 桁の半角数字）。NG の場合は検索しない
@@ -547,7 +553,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         role: (info.role ?? '').trim() || '要員',
         deptId,
       });
-      message.success(`社員番号「${no}」の要員情報を表示しました。`);
+      message.success(t('I_KADOU_005', [no]));
     } catch (e) {
       if (e instanceof PersonnelNotFoundError) {
         // 該当なし（404）→ ダイアログは出さず、そのまま新規登録の入力状態にする
@@ -555,19 +561,16 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setEmployeeNo(no);
         setVerifiedNo(no);
         setVerifiedExists(false);
-        message.info(`社員番号「${no}」は未登録です。`);
+        message.info(t('I_KADOU_031', [no]));
         return;
       }
       // DB 接続不可などのシステムエラー → 「未登録」と誤表示せず、エラーを明示する
-      notifySystemError(e);
       setVerifiedNo('');
       setVerifiedExists(false);
       setOriginal(null);
-      message.error(
-        e instanceof Error
-          ? `検索に失敗しました：${e.message}`
-          : '検索に失敗しました。',
-      );
+      if (!notifySystemError(e)) {
+        message.error(apiErrorMessage(e, t('E_KADOU_041')));
+      }
     } finally {
       setSearching(false);
     }
@@ -578,7 +581,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     // 入力チェック（不正な値は送信しない）
     const noError = validateEmployeeNo(no);
     const rError = validateRole(role);
-    const nError = name.trim() === '' ? '名前を入力してください。' : validateName(name);
+    const nError =
+      name.trim() === '' ? t('E_KADOU_034') : validateName(name);
     setEmployeeNoError(noError);
     setRoleError(rError);
     setNameError(nError);
@@ -626,18 +630,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       });
 
       message.success(
-        isNew
-          ? `社員番号「${no}」の要員情報を追加しました。`
-          : `社員番号「${no}」の要員情報を更新しました。`,
+        isNew ? t('I_KADOU_011', [no]) : t('I_KADOU_012', [no]),
       );
       await reloadPersonnelCount();
     } catch (e) {
       if (!notifySystemError(e)) {
-        message.error(
-          e instanceof Error
-            ? `保存に失敗しました：${e.message}`
-            : '保存に失敗しました。',
-        );
+        message.error(apiErrorMessage(e, t('E_KADOU_042')));
       }
     } finally {
       setSaving(false);
@@ -656,10 +654,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     const noError = validateEmployeeNo(no);
     const rError = validateRole(role);
     const nError = name.trim() === ''
-      ? '名前を入力してください。'
+      ? t('E_KADOU_034')
       : validateName(name);
     // 所属は必須（登録済みの要員は所属変更不可のため対象外）
-    const dError = !isExisting && !deptId ? '所属を選択してください。' : '';
+    const dError = !isExisting && !deptId ? t('W_KADOU_002', ['所属']) : '';
     setEmployeeNoError(noError);
     setRoleError(rError);
     setNameError(nError);
@@ -680,11 +678,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       if (!(e instanceof PersonnelNotFoundError)) {
         setSaving(false);
         if (!notifySystemError(e)) {
-          message.error(
-            e instanceof Error
-              ? `DB の確認に失敗しました：${e.message}`
-              : 'DB の確認に失敗しました。',
-          );
+          message.error(apiErrorMessage(e, t('E_KADOU_043')));
         }
         return;
       }
@@ -715,7 +709,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         });
         Modal.info({
           title: '変更内容がありません',
-          content: `社員番号「${no}」の情報は変更されていません。更新する項目を変更してください。`,
+          content: t('I_KADOU_039', [no]),
           okText: '閉じる',
         });
         return;
@@ -731,7 +725,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       // DB に既に存在する → 更新してよいか確認する
       Modal.confirm({
         title: '社員番号は既に登録されています',
-        content: `社員番号「${no}」は既に登録されています（${existing.name}）。このデータを更新しますか？`,
+        content: t('W_KADOU_034', [no, existing.name ?? '']),
         okText: '更新する',
         cancelText: 'キャンセル',
         onOk: () => {
@@ -760,9 +754,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     try {
       const parsed = await parsePersonnelFile(file);
       if (parsed.rows.length === 0) {
-        message.error(
-          `一括読み込み：取り込める社員情報がありませんでした（${file.name}）。`,
-        );
+        message.error(t('E_KADOU_048', [file.name]));
         return;
       }
 
@@ -800,11 +792,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       }
     } catch (e) {
       if (!notifySystemError(e)) {
-        message.error(
-          e instanceof Error
-            ? `一括読み込みに失敗しました：${e.message}`
-            : '一括読み込みに失敗しました。',
-        );
+        message.error(apiErrorMessage(e, t('E_KADOU_044')));
       }
     } finally {
       setImporting(false);
@@ -890,20 +878,23 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       onImport(importRows);
 
       message.success(
-        `社員情報を一括読み込みしました：追加 ${result.added} 件 / 上書き ${result.updated} 件` +
-          (result.skipped > 0 ? ` / スキップ ${result.skipped} 件` : '') +
-          '。',
+        t('I_KADOU_013', [result.added, result.updated]) +
+          (result.skipped > 0
+            ? t('I_KADOU_038', [result.skipped])
+            : ''),
       );
 
       const warnings = [...importWarnings, ...result.warnings];
       if (result.skipped > 0 && warnings.length === 0) {
-        warnings.push(`取り込まなかった行が ${result.skipped} 件あります。`);
+        warnings.push(t('I_KADOU_037', [result.skipped]));
       }
       if (warnings.length > 0) {
         message.warning(
-          `警告が ${warnings.length} 件あります（${warnings[0]}${
-            warnings.length > 1 ? ' ほか' : ''
-          }）。`,
+          t('I_KADOU_036', [
+            warnings.length,
+            warnings[0],
+            warnings.length > 1 ? ' ほか' : '',
+          ]),
         );
       }
 
@@ -916,11 +907,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         return;
       }
       if (!notifySystemError(e)) {
-        message.error(
-          e instanceof Error
-            ? `一括読み込みに失敗しました：${e.message}`
-            : '一括読み込みに失敗しました。',
-        );
+        message.error(apiErrorMessage(e, t('E_KADOU_044')));
       }
     } finally {
       setSubmittingImport(false);
@@ -1186,8 +1173,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                   style={{ fontSize: 12, marginTop: 4, display: 'block' }}
                 >
                   {departmentsError
-                    ? '部門マスタを取得できませんでした。'
-                    : '部門マスタに部門が登録されていません。'}
+                    ? t('E_KADOU_036')
+                    : t('E_KADOU_037')}
                 </Text>
               )}
             {!isExisting && deptError && (

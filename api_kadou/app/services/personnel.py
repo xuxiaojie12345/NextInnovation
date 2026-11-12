@@ -3,6 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.audit import normalize_op_user, system_now
+from app.core.errors import BusinessException
 from app.schemas.personnel import (
     PersonnelImportRequest,
     PersonnelImportResult,
@@ -55,6 +56,105 @@ def count_personnel(db: Session, year_id: str) -> int:
             text(load_sql("personnel/personnel_count.sql")), {"year_id": year_id}
         ).scalar_one()
     )
+
+
+# ---------------------------------------------------------------------------
+# API 入口（業務ルール・エラー送出はここで完結させる）
+#
+# NOTE: api 層は「Web 側データの受け取り／返却」だけを担当する。
+#       入力チェック・存在確認・業務エラーの生成は本モジュールに集約する。
+# ---------------------------------------------------------------------------
+
+def fetch_personnel_info(
+    db: Session, year_id: str, employee_no: str
+) -> dict:
+    """要員情報を1件取得する（存在しなければ業務エラー）。
+
+    Raises:
+        BusinessException: 社員番号が空（E_KADOU_030）／該当なし（I_KADOU_006）。
+    """
+    no = (employee_no or "").strip()
+    if not no:
+        raise BusinessException(status_code=400, message_id="E_KADOU_030")
+
+    personnel = get_personnel(db, year_id, no)
+    if personnel is None:
+        raise BusinessException(
+            status_code=404, message_id="I_KADOU_006", params=[no]
+        )
+    return personnel
+
+
+def register_personnel(
+    db: Session,
+    year_id: str,
+    employee_no: str,
+    data: PersonnelSaveRequest,
+    x_user_id: str | None = None,
+) -> dict:
+    """要員を保存する（存在すれば更新・なければ追加）。
+
+    Raises:
+        BusinessException: 社員番号が空（E_KADOU_030）／名前が空（E_KADOU_034）。
+    """
+    no = (employee_no or "").strip()
+    if not no:
+        raise BusinessException(status_code=400, message_id="E_KADOU_030")
+    if not (data.name or "").strip():
+        raise BusinessException(status_code=400, message_id="E_KADOU_034")
+
+    op_user = normalize_op_user(x_user_id)
+    try:
+        saved, _created = save_personnel(db, year_id, no, data, op_user)
+    except ValueError as e:
+        # 部門マスタ未登録など、入力内容ではなくマスタ不足による保存不可。
+        # NOTE: BusinessException の第 2 引数は「message」フィールドに入るため、
+        #       メッセージ ID でない原文を渡してもフロントはそのまま表示する。
+        raise BusinessException(
+            status_code=400, message_id=str(e)
+        ) from e
+    return saved
+
+
+def fetch_weekly_count(db: Session, year_id: str, employee_no: str) -> int:
+    """週割当件数を返す（削除確認ダイアログ用）。
+
+    Raises:
+        BusinessException: 社員番号が空（E_KADOU_030）。
+    """
+    no = (employee_no or "").strip()
+    if not no:
+        raise BusinessException(status_code=400, message_id="E_KADOU_030")
+    return count_weekly_assignments(db, year_id, no)
+
+
+def remove_personnel(
+    db: Session,
+    year_id: str,
+    employee_no: str,
+    delete_weekly: bool = False,
+) -> tuple[bool, int]:
+    """要員を削除する（残った週割当件数を返す）。
+
+    Returns:
+        (削除できたか, 削除した週割当件数)
+
+    Raises:
+        BusinessException: 社員番号が空（E_KADOU_030）／該当なし（I_KADOU_006）。
+    """
+    no = (employee_no or "").strip()
+    if not no:
+        raise BusinessException(status_code=400, message_id="E_KADOU_030")
+
+    # 削除前に件数を控える（実際に消えた件数を返すため）
+    weekly_count = count_weekly_assignments(db, year_id, no)
+
+    if not delete_personnel(db, year_id, no, delete_weekly=delete_weekly):
+        raise BusinessException(
+            status_code=404, message_id="I_KADOU_006", params=[no]
+        )
+
+    return True, weekly_count if delete_weekly else 0
 
 
 def save_personnel(
@@ -309,7 +409,6 @@ def import_personnel(
     年度 + 社員番号で既存データを判定し、
     存在すれば更新、存在しなければ追加する。
 
-    仕様（docs/react-kadou-data-design.html 8.1 / 8.4）:
       - ファイル内で社員番号が重複している場合はファイル全体を中止する
       - 所属が空欄、または部門マスタに存在しない場合はファイル全体を中止する
       - 既存データと重複している場合、overwrite=False ならファイル全体を中止する
@@ -550,3 +649,20 @@ def import_personnel(
 
     db.commit()
     return result
+
+
+def import_personnel_or_raise(
+    db: Session,
+    year_id: str,
+    payload: PersonnelImportRequest,
+    x_user_id: str | None = None,
+) -> PersonnelImportResult:
+    """社員情報を一括取り込みする（業務判断を含む入口）。
+
+    NOTE: 中止判定（result.aborted）はサービス層の業務判断だが、
+          中止時はプレビュー復元用の result 全体をフロントへ返す必要があるため、
+          HTTP への変換（409 応答）は api 層で行う。
+          本関数は「取込の実行と利用者 ID の正規化」までを担う。
+    """
+    op_user = normalize_op_user(x_user_id)
+    return import_personnel(db, year_id, payload, op_user)
