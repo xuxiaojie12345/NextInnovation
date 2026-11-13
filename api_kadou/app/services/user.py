@@ -74,8 +74,8 @@ def create_user(
 
 def update_user(
     db: Session, user_id: str, data: dict, op_user: str = _DEFAULT_OP_USER
-) -> dict | None:
-    """ユーザーを更新する。存在しない場合は None を返す。"""
+) -> dict:
+    """ユーザーを更新して更新後のユーザーを返す。存在しない場合は 404 エラーにする。"""
     res = db.execute(
         text(load_sql("user.sql", "update")),
         {
@@ -89,17 +89,18 @@ def update_user(
     )
     db.commit()
     if res.rowcount == 0:
-        return None
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
     return _get_user(db, user_id)
 
 
-def delete_user(db: Session, user_id: str) -> bool:
-    """ユーザーを削除する。削除できた場合は True を返す。"""
+def delete_user(db: Session, user_id: str) -> None:
+    """ユーザーを削除する。存在しない場合は 404 エラーにする。"""
     res = db.execute(
         text(load_sql("user.sql", "delete")), {"user_id": user_id}
     )
     db.commit()
-    return res.rowcount > 0
+    if res.rowcount == 0:
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
 
 
 def _get_user(db: Session, user_id: str) -> dict | None:
