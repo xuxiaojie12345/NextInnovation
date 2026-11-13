@@ -8,7 +8,7 @@ NOTE: 本モジュールは「Web 側データの受け取り／返却」のみ�
       既存の部門管理（app/api/department.py）と同じ router に相乗りせず、
       独立した router として登録する（既存コードへ影響を与えないため）。
 """
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -58,19 +58,8 @@ def post_personnel_import(
     更新日時／更新者も同じ値、異動フラグ = '0' をセットする。
     更新時は更新日時／更新者のみ書き換える。
     """
-    result = import_personnel_or_raise(db, year, payload, x_user_id)
-
-    # ファイル全体を中止した場合は 409 で返す（1件も反映していない）。
-    # NOTE: 画面がプレビューを復元できるよう result 全体を detail に含める。
-    if result.aborted:
-        raise HTTPException(
-            status_code=409,
-            detail={
-                "message": result.abortReason or "取り込みを中止しました。",
-                "result": result.model_dump(),
-            },
-        )
-    return result
+    # 中止（409）の判定と発生は services/personnel.py に集約している。
+    return import_personnel_or_raise(db, year, payload, x_user_id)
 
 
 @router.get("/{employeeNo}/{year}", response_model=PersonnelInfo)

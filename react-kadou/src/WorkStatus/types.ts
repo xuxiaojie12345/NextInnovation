@@ -95,6 +95,16 @@ export interface Project {
   departmentId: string;
   /** Project名称（任意） */
   name: string;
+  /**
+   * 有効稼働（true = 有効）
+   * DB: jn_project_master.valid_flg（'1' = 有効 / '0' = 無効）
+   */
+  validFlg: boolean;
+  /**
+   * 教育かどうか（true = 教育）
+   * DB: jn_project_master.education_flg（'1' = 教育 / '0' = 非教育）
+   */
+  educationFlg: boolean;
 }
 
 /**

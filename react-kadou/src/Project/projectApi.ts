@@ -10,9 +10,16 @@
  *   POST   /api/kadou/projects/import/{year}     … 一括取り込み
  *
  * NOTE: 開発時は src/setupProxy.js により /api が http://127.0.0.1:8000 へ転送される。
+ *
+ * 通信はログイン画面と同じく共通 HTTP クライアント（utils/http の httpRequest）を使う。
+ * ・タイムアウト / エラー正規化（ApiError）は httpRequest 側で一括して行う
+ * ・操作者 ID は httpRequest の operatorId（X-User-Id ヘッダー）で渡す
+ * ・GET は 5xx / タイムアウト時に 1 回自動再試行する
  */
 
-import { normalizeHttpError, normalizeTransportError } from '../utils/normalizeError';
+import { httpRequest, SAVE_TIMEOUT_MS } from '../utils/http';
+import { isApiError } from '../utils/ApiError';
+import { apiErrorMessage } from '../utils/errorMessage';
 
 /** プロジェクト（1件） */
 export interface ProjectApiInfo {
@@ -30,6 +37,10 @@ export interface ProjectApiInfo {
   departmentId: string | null;
   /** Project名称 */
   project_name: string | null;
+  /** 有効稼働（true = 有効） */
+  validFlg?: boolean | null;
+  /** 教育かどうか（true = 教育） */
+  educationFlg?: boolean | null;
 }
 
 /** プロジェクトの登録・更新ペイロード（所属は部門ID） */
@@ -43,6 +54,10 @@ export interface ProjectSavePayload {
   projectCode?: string;
   /** Project名称 */
   project_name?: string;
+  /** 有効稼働（true = 有効） */
+  validFlg?: boolean;
+  /** 教育かどうか（true = 教育） */
+  educationFlg?: boolean;
 }
 
 /** 一括取り込みの1件分 */
@@ -87,26 +102,43 @@ export interface ProjectImportApiResult {
   warnings: string[];
 }
 
-/** 操作者（登録・更新者）の ID を付与したリクエストヘッダーを作る */
-function operatorHeaders(opUser?: string | null): Record<string, string> {
-  return opUser ? { 'X-User-Id': opUser } : {};
+/**
+ * 一括取り込みが中止された場合に投げるエラー（409）。
+ * 画面はプレビューを復元して中止理由を表示するため、result 全体を保持する。
+ */
+export class ProjectImportAbortedError extends Error {
+  readonly result: ProjectImportApiResult;
+
+  constructor(message: string, result: ProjectImportApiResult) {
+    super(message);
+    this.name = 'ProjectImportAbortedError';
+    this.result = result;
+  }
 }
 
-/** 共通リクエストヘルパー（エラー時は ApiError に正規化して投げる） */
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      ...init,
-      headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
-    });
-  } catch (e) {
-    throw normalizeTransportError(e);
-  }
-  if (!res.ok) {
-    throw await normalizeHttpError(res);
-  }
-  return (await res.json()) as T;
+/**
+ * プロジェクト API の共通リクエスト（タイムアウト / エラー正規化は httpRequest が行う）
+ */
+interface ProjectRequest {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /** 操作者 ID（更新者記録用の X-User-Id ヘッダー） */
+  opUser?: string | null;
+  body?: unknown;
+}
+
+async function request<T>(
+  url: string,
+  opts: ProjectRequest = {},
+): Promise<T> {
+  const method = opts.method ?? 'GET';
+  return httpRequest<T>(url, {
+    method,
+    body: opts.body,
+    operatorId: opts.opUser,
+    timeoutMs: SAVE_TIMEOUT_MS,
+    // GET のみ 5xx / タイムアウト時に 1 回再試行する（ログイン画面の方針に合わせる）
+    retry: method === 'GET',
+  });
 }
 
 /** 指定年度のプロジェクト一覧を取得する（GET /api/kadou/projects/{year}） */
@@ -124,8 +156,8 @@ export async function createProject(
 ): Promise<ProjectApiInfo> {
   return request<ProjectApiInfo>(`/api/kadou/projects/${year}`, {
     method: 'POST',
-    headers: operatorHeaders(opUser),
-    body: JSON.stringify(data),
+    opUser,
+    body: data,
   });
 }
 
@@ -143,8 +175,8 @@ export async function updateProject(
     `/api/kadou/projects/${year}/${encodeURIComponent(key)}`,
     {
       method: 'PUT',
-      headers: operatorHeaders(opUser),
-      body: JSON.stringify(data),
+      opUser,
+      body: data,
     },
   );
 }
@@ -167,6 +199,9 @@ export async function deleteProject(
  * プロジェクト情報を一括取り込みする（POST /api/kadou/projects/import/{year}）。
  *
  * @param dryRun true = 検証のみ（DB へ書き込まない）
+ *
+ * ファイル全体が中止された場合（409）は ProjectImportAbortedError を投げる
+ * （画面はプレビューを復元して中止理由を表示する）。
  */
 export async function importProjectRows(
   year: number,
@@ -178,16 +213,41 @@ export async function importProjectRows(
     skipLines?: number[];
   } = {},
 ): Promise<ProjectImportApiResult> {
-  return request<ProjectImportApiResult>(
-    `/api/kadou/projects/import/${year}`,
-    {
-      method: 'POST',
-      headers: operatorHeaders(options.opUser),
-      body: JSON.stringify({
-        rows,
-        dryRun: options.dryRun ?? false,
-        skipLines: options.skipLines ?? [],
-      }),
-    },
-  );
+  try {
+    return await request<ProjectImportApiResult>(
+      `/api/kadou/projects/import/${year}`,
+      {
+        method: 'POST',
+        opUser: options.opUser,
+        body: {
+          rows,
+          dryRun: options.dryRun ?? false,
+          skipLines: options.skipLines ?? [],
+        },
+      },
+    );
+  } catch (e) {
+    // 409：ファイル全体を中止（1件も反映していない）
+    if (isApiError(e) && e.status === 409) {
+      const result = extractAbortResult(e.detail);
+      if (result) {
+        throw new ProjectImportAbortedError(apiErrorMessage(e), result);
+      }
+    }
+    throw e;
+  }
+}
+
+/**
+ * 中止レスポンス（409）の detail から取り込み結果を取り出す。
+ * バックエンドは { code, message, params, detail, result } の形で返すため、
+ * detail.result を探す（params に中止理由が入る）。
+ */
+function extractAbortResult(
+  detail: unknown,
+): ProjectImportApiResult | null {
+  if (typeof detail !== 'object' || detail === null) return null;
+  const result = (detail as Record<string, unknown>).result;
+  if (typeof result !== 'object' || result === null) return null;
+  return result as ProjectImportApiResult;
 }

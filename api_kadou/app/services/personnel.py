@@ -1,4 +1,5 @@
 """要員情報サービス（要員情報画面用）"""
+from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -659,10 +660,25 @@ def import_personnel_or_raise(
 ) -> PersonnelImportResult:
     """社員情報を一括取り込みする（業務判断を含む入口）。
 
-    NOTE: 中止判定（result.aborted）はサービス層の業務判断だが、
-          中止時はプレビュー復元用の result 全体をフロントへ返す必要があるため、
-          HTTP への変換（409 応答）は api 層で行う。
-          本関数は「取込の実行と利用者 ID の正規化」までを担う。
+    ファイル全体を中止した場合（result.aborted）は 409 を送出する。
+    画面がプレビューを復元できるよう、取り込み結果全体を detail.result に含める。
+
+    Raises:
+        HTTPException: 409（取り込み中止）
     """
     op_user = normalize_op_user(x_user_id)
-    return import_personnel(db, year_id, payload, op_user)
+    result = import_personnel(db, year_id, payload, op_user)
+
+    # ファイル全体を中止した場合は 409 で返す（1件も反映していない）。
+    # NOTE: 画面がプレビューを復元できるよう result 全体を detail に含める。
+    if result.aborted:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "KADOU_CONFLICT",
+                "message": result.abortReason or "取り込みを中止しました。",
+                "detail": "business",
+                "result": result.model_dump(),
+            },
+        )
+    return result

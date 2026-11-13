@@ -1,5 +1,5 @@
 import { Department, Personnel, Project } from '../WorkStatus/types';
-import { buildProjectAbbr } from '../Project/projectAbbr';
+import { buildProjectAbbr } from '../Project/ProjectManagementScreen';
 
 /**
  * 部門マスタのモックデータ（部門管理画面で管理する。部門ID は画面には表示しない）
@@ -70,6 +70,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('桜井商事', '基幹刷新', '第一', 'A'),
     departmentId: 'dept-0001',
     name: '基幹刷新',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0002',
@@ -81,6 +83,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('桜井商事', 'EC刷新', '第二', 'B'),
     departmentId: 'dept-0002',
     name: 'EC刷新',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0003',
@@ -92,6 +96,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('北斗物流', '業務効率化', '基盤', 'A'),
     departmentId: 'dept-0003',
     name: '業務効率化',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0004',
@@ -103,6 +109,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('北斗物流', '保守運用', '運用', 'C'),
     departmentId: 'dept-0003',
     name: '保守・運用',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     projectId: 'pj-0005',
@@ -114,6 +122,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('みなと銀行', '教育研修', '企画', 'A'),
     departmentId: 'dept-0002',
     name: '教育・研修',
+    validFlg: true,
+    educationFlg: true,
   },
   {
     // 協力会社の案件（所属部門 = 部門マスタの協力会社）
@@ -126,6 +136,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('桜井商事', '基幹刷新支援', '協力', 'A'),
     departmentId: 'dept-0004',
     name: '基幹刷新支援',
+    validFlg: true,
+    educationFlg: false,
   },
   {
     // 内・退職（この項目の要員はグレー表示にする）
@@ -138,6 +150,8 @@ export const MOCK_PROJECTS: Project[] = [
     abbr: buildProjectAbbr('内', '退職', '', ''),
     departmentId: 'dept-0003',
     name: '内・退職',
+    validFlg: false,
+    educationFlg: false,
   },
 ];
 

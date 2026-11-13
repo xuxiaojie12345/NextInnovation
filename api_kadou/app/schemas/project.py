@@ -21,6 +21,10 @@ class ProjectInfo(BaseModel):
     departmentId: Optional[Union[str, int]] = None
     # Project名称
     project_name: Optional[str] = None
+    # 有効稼働（DB: valid_flg '1'=有効 / '0'=無効。既定 = 有効）
+    validFlg: Optional[bool] = None
+    # 教育かどうか（DB: education_flg '1'=教育 / '0'=非教育。既定 = 非教育）
+    educationFlg: Optional[bool] = None
 
 
 class ProjectSaveRequest(BaseModel):
@@ -42,6 +46,10 @@ class ProjectSaveRequest(BaseModel):
     projectCode: Optional[str] = None
     # Project名称
     project_name: Optional[str] = None
+    # 有効稼働（未指定 = 有効）
+    validFlg: Optional[bool] = None
+    # 教育かどうか（未指定 = 非教育）
+    educationFlg: Optional[bool] = None
 
 
 class ProjectImportRow(BaseModel):

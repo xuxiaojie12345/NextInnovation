@@ -1,12 +1,27 @@
-"""プロジェクト管理サービス（プロジェクト管理画面用）"""
+"""プロジェクト管理サービス（プロジェクト管理画面用）
+
+NOTE: api 層（app/api/project.py）は「Web 側データの受け取り／返却」だけを担当し、
+      入力チェック・存在確認・業務エラーの生成は本モジュールに集約する
+      （要員情報 app/services/personnel.py と同じ方針）。
+"""
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.project import ProjectImportRequest, ProjectImportResult
+from app.core.audit import system_now
+from app.core.errors import BusinessException
+from app.schemas.project import (
+    ProjectDeleteResult,
+    ProjectImportRequest,
+    ProjectImportResult,
+    ProjectSaveRequest,
+)
 from app.sql import load_sql
 
 # 操作者が指定されない場合のフォールバック（認証情報が取れないとき用）
 _DEFAULT_OP_USER = "ADMIN"
+
 # 文字列長の上限（DB 定義に合わせる）
 _MAX_SYS_PROJECT_ID = 10
 _MAX_PROJECT_ID = 20
@@ -41,7 +56,26 @@ def _row_to_project(r) -> dict:
             None if r["department_id"] is None else str(r["department_id"])
         ),
         "project_name": r["project_name"] or "",
+        # DB は varchar(1) のため '1' / '0'（NULL は既定値に倒す）
+        "validFlg": _to_flag(r.get("valid_flg"), True),
+        "educationFlg": _to_flag(r.get("education_flg"), False),
     }
+
+
+def _to_flag(value, default: bool) -> bool:
+    """DB の有効/教育フラグ（'1'/1/True など）を真偽値へ変換する。"""
+    if value is None or value == "":
+        return default
+    if isinstance(value, str):
+        return value.strip() not in ("0", "", "false", "False")
+    return bool(value)
+
+
+def _flag_value(value, default: bool) -> str:
+    """登録・更新用に '1' / '0' へ変換する（列は varchar(1)）。"""
+    if value is None:
+        value = default
+    return "1" if bool(value) else "0"
 
 
 def _norm(value) -> str:
@@ -152,6 +186,9 @@ def create_project(
             "department_id": _norm(data.get("departmentId")),
             "project_id": _norm(data.get("projectCode")) or None,
             "project_name": _norm(data.get("project_name")) or None,
+            "valid_flg": _flag_value(data.get("validFlg"), True),
+            "education_flg": _flag_value(data.get("educationFlg"), False),
+            "now_dt": system_now(db),
             "op_user": op_user,
         },
     )
@@ -172,6 +209,8 @@ def create_project(
         ),
         "departmentId": data.get("departmentId") or "",
         "project_name": data.get("project_name") or "",
+        "validFlg": bool(data.get("validFlg", True)),
+        "educationFlg": bool(data.get("educationFlg", False)),
     }
 
 
@@ -198,6 +237,9 @@ def update_project(
             "department_id": _norm(data.get("departmentId")),
             "project_id": _norm(data.get("projectCode")) or None,
             "project_name": _norm(data.get("project_name")) or None,
+            "valid_flg": _flag_value(data.get("validFlg"), True),
+            "education_flg": _flag_value(data.get("educationFlg"), False),
+            "now_dt": system_now(db),
             "op_user": op_user,
         },
     )
@@ -480,8 +522,149 @@ def import_projects(
                 "departmentId": _norm(row.department),
                 "projectCode": _norm(row.projectCode),
                 "project_name": _norm(row.project_name),
+                # 取込ファイルにフラグ列は無いため既定値（有効 / 非教育）
+                "validFlg": True,
+                "educationFlg": False,
             },
             op_user,
         )
 
+    return result
+
+
+# ---------------------------------------------------------------------------
+# API 入口（Web 側からのリクエスト受付に対する業務処理・エラー送出はここで完結）
+#
+# NOTE: api 層（app/api/project.py）は「Web 側データの受け取り／返却」だけを担当し、
+#       入力チェック・存在確認・業務エラー（HTTPException）の生成は本モジュールに集約する。
+# ---------------------------------------------------------------------------
+
+def _require_text(value: str | None, message_id: str) -> str:
+    """必須文字列を検証して返す（空なら業務エラー）。
+
+    message_id は messages.ts のメッセージコード。
+    ログイン画面と同じく「API は業務 code のみを返し、文言はフロントで
+    code → 文言に変換する」方針のため、code だけを渡す（文面は埋め込まない）。
+    """
+    text_value = _norm(value)
+    if not text_value:
+        raise BusinessException(status_code=400, message_id=message_id)
+    return text_value
+
+
+def _length_error(message: str):
+    """文字数超過などの入力不備を業務エラーにする（詳細文は params で渡す）。"""
+    return BusinessException(
+        status_code=400, message_id="E_KADOU_057", params=[message]
+    )
+
+
+def fetch_project_list(db: Session, year_id: str) -> list[dict]:
+    """プロジェクト一覧を取得する（API 入口）。"""
+    return list_projects(db, year_id)
+
+
+def register_project(
+    db: Session,
+    year_id: str,
+    payload: ProjectSaveRequest,
+    op_user: str | None = None,
+) -> dict:
+    """プロジェクトを新規登録し、登録した内容を返す（API 入口）。
+
+    Raises:
+        BusinessException: 顧客が未入力（E_KADOU_053）／案件が未入力（E_KADOU_054）／
+                           文字数超過（E_KADOU_057）／登録失敗（E_KADOU_058）。
+    """
+    data = payload.model_dump()
+    _require_text(data.get("customer"), "E_KADOU_053")
+    _require_text(data.get("caseName"), "E_KADOU_054")
+
+    try:
+        return create_project(db, year_id, data, op_user or _DEFAULT_OP_USER)
+    except ValueError as e:
+        # 文字数超過などの入力不備
+        raise _length_error(str(e))
+    except IntegrityError:
+        db.rollback()
+        raise BusinessException(status_code=409, message_id="E_KADOU_058")
+
+
+def modify_project(
+    db: Session,
+    year_id: str,
+    key: str,
+    payload: ProjectSaveRequest,
+    op_user: str | None = None,
+) -> dict:
+    """プロジェクトを更新し、更新後の内容を返す（API 入口）。
+
+    Raises:
+        BusinessException: システム項目IDが空（E_KADOU_055）／顧客が未入力（E_KADOU_053）／
+                           案件が未入力（E_KADOU_054）／文字数超過（E_KADOU_057）／
+                           該当なし（E_KADOU_056）／更新失敗（E_KADOU_059）。
+    """
+    sys_project_id = _require_text(key, "E_KADOU_055")
+    data = payload.model_dump()
+    _require_text(data.get("customer"), "E_KADOU_053")
+    _require_text(data.get("caseName"), "E_KADOU_054")
+
+    try:
+        updated = update_project(
+            db, year_id, sys_project_id, data, op_user or _DEFAULT_OP_USER
+        )
+    except ValueError as e:
+        raise _length_error(str(e))
+    except IntegrityError:
+        db.rollback()
+        raise BusinessException(status_code=409, message_id="E_KADOU_059")
+
+    if updated is None:
+        raise BusinessException(status_code=404, message_id="E_KADOU_056")
+    return updated
+
+
+def remove_project(
+    db: Session, year_id: str, key: str
+) -> ProjectDeleteResult:
+    """プロジェクトを削除する（API 入口）。
+
+    Raises:
+        BusinessException: システム項目IDが空（E_KADOU_055）／該当なし（E_KADOU_056）。
+    """
+    sys_project_id = _require_text(key, "E_KADOU_055")
+    if not delete_project(db, year_id, sys_project_id):
+        raise BusinessException(status_code=404, message_id="E_KADOU_056")
+    return ProjectDeleteResult(code=0)
+
+
+def import_project_rows(
+    db: Session,
+    year_id: str,
+    payload: ProjectImportRequest,
+    op_user: str | None = None,
+) -> ProjectImportResult:
+    """プロジェクト情報を一括取り込みする（API 入口）。
+
+    ファイル全体を中止した場合は 409 を送出する（1 件も反映していない）。
+    画面がプレビューを復元できるよう result 全体を detail に含める。
+
+    Raises:
+        HTTPException: 409（取り込み中止）
+    """
+    result = import_projects(db, year_id, payload, op_user or _DEFAULT_OP_USER)
+    if result.aborted:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "KADOU_CONFLICT",
+                # 業務コード：フロントは messageId として t() で翻訳する
+                "message": "E_KADOU_060",
+                # 中止理由は {0} で埋め込めるよう位置引数で返す
+                "params": [result.abortReason] if result.abortReason else [],
+                "detail": "business",
+                # 画面がプレビューを復元できるように取り込み結果全体を返す
+                "result": result.model_dump(),
+            },
+        )
     return result

@@ -547,6 +547,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       // 検索で DB に存在したことを記録する（ボタンが「更新する」＋削除表示になる）
       setVerifiedNo(no);
       setVerifiedExists(true);
+      // 検索成功時は、入力欄の値が DB の値に置き換わっているため、
+      // 直前の入力内容に対する赤字の警告をすべて解除する。
+      setEmployeeNoError('');
+      setRoleError('');
+      setNameError('');
+      setDeptError(false);
       // 変更あり判定用に、検索時点の値をスナップショットしておく
       setOriginal({
         name: (info.name ?? '').trim(),
@@ -556,12 +562,30 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.success(t('I_KADOU_005', [no]));
     } catch (e) {
       if (e instanceof PersonnelNotFoundError) {
-        // 該当なし（404）→ ダイアログは出さず、そのまま新規登録の入力状態にする
-        // NOTE: 入力中の 役割・名前・所属 と各入力欄下のエラー表示は消さない
-        setEmployeeNo(no);
-        setVerifiedNo(no);
-        setVerifiedExists(false);
-        message.info(t('I_KADOU_031', [no]));
+        // 該当なし（404）→ 新規追加するかを確認する。
+        //   追加   : 社員番号だけを残し、それ以外の入力欄をクリアする
+        //   キャンセル : すべての入力内容をそのまま維持する
+        Modal.confirm({
+          title: '未登録の社員番号です',
+          content: t('W_KADOU_036', [no]),
+          okText: '追加',
+          cancelText: 'キャンセル',
+          onOk: () => {
+            // 社員番号以外をクリアして新規登録の入力状態にする
+            setEmployeeNo(no);
+            setRole('');
+            setName('');
+            setDeptId(undefined);
+            setDeptError(false);
+            setEmployeeNoError('');
+            setRoleError('');
+            setNameError('');
+            // 新規追加の対象として記録する（ボタンは「保存する」のまま）
+            setVerifiedNo(no);
+            setVerifiedExists(false);
+            setOriginal(null);
+          },
+        });
         return;
       }
       // DB 接続不可などのシステムエラー → 「未登録」と誤表示せず、エラーを明示する

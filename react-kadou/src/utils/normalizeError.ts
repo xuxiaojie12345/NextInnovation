@@ -60,6 +60,7 @@ export async function normalizeHttpError(res: Response): Promise<ApiError> {
       params: extractParams(body),
       fieldErrors: toFieldErrors(data.fieldErrors),
       requestId,
+      detail: data.detail,
     });
   }
 

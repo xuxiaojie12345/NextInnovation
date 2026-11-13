@@ -50,6 +50,11 @@ export class ApiError extends Error {
   readonly fieldErrors?: Record<string, string>;
   /** X-Request-Id（バックエンドが返す場合） */
   readonly requestId?: string;
+  /**
+   * バックエンドが返した detail（エラー契約の生データ）。
+   * 一括取り込み中止（409）のように、画面が復元用データを必要とする場合に使う。
+   */
+  readonly detail?: unknown;
 
   constructor(opts: {
     kind: ApiErrorKind;
@@ -60,6 +65,7 @@ export class ApiError extends Error {
     params?: Array<string | number>;
     fieldErrors?: Record<string, string>;
     requestId?: string;
+    detail?: unknown;
   }) {
     super(opts.message);
     this.name = 'ApiError';
@@ -70,6 +76,7 @@ export class ApiError extends Error {
     this.params = opts.params;
     this.fieldErrors = opts.fieldErrors;
     this.requestId = opts.requestId;
+    this.detail = opts.detail;
   }
 }
 

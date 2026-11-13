@@ -68,6 +68,37 @@
   flex: 1.3 1 200px !important;
 }
 
+/*
+ * 2 行目（項目ID / 有効稼働 / 教育かどうか）。
+ * flex-basis: 100% で必ず改行させ、顧客～所属部門の下に表示する。
+ * 幅は固定して左詰めにし、1 行目と同じ 12px の間隔で並べる。
+ */
+.project-form-grid > div.project-field-row2 {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.project-field-row2 > div {
+  min-width: 0;
+}
+
+/* 2 行目の項目ID（短いコードなので狭めにする） */
+.project-field-row2 > div.project-field-code {
+  flex: 0 0 120px;
+}
+
+/* 2 行目の 有効稼働 / 教育かどうか（隣接してコンパクトに並べる） */
+.project-field-row2 > div.project-field-pair {
+  flex: 0 0 240px;
+  /* 配下の .project-field-pair は 1.3 1 200px !important のため上書きする */
+  grid-template-columns: auto auto;
+  justify-content: start;
+  column-gap: 16px !important;
+}
+
 /* 画面右上の「当週の週数」 */
 .project-week {
   text-align: center;

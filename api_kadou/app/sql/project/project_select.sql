@@ -8,7 +8,9 @@ SELECT
     p.sub_team,
     p.department_id,
     d.department_name,
-    p.project_name
+    p.project_name,
+    p.valid_flg,
+    p.education_flg
 FROM jn_project_master p
 LEFT JOIN jn_department_master d
     ON d.year_id = p.year_id

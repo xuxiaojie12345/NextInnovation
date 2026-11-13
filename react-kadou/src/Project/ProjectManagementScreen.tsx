@@ -3,6 +3,7 @@ import {
   Alert,
   Button,
   Card,
+  Checkbox,
   Input,
   message,
   Modal,
@@ -26,7 +27,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Department, Project } from '../WorkStatus/types';
 import { findDepartment } from '../data/departmentUtils';
 import { fetchDepartments } from '../api/departmentManagement';
-import { buildProjectAbbr } from './projectAbbr';
 import {
   PROJECT_IMPORT_ACCEPT,
   PROJECT_IMPORT_FORMAT_HINT,
@@ -36,6 +36,7 @@ import {
 } from './projectImport';
 import {
   ProjectApiInfo,
+  ProjectImportAbortedError,
   ProjectImportApiResult,
   createProject,
   deleteProject,
@@ -43,9 +44,60 @@ import {
   importProjectRows,
   updateProject,
 } from './projectApi';
+import { notifySystemError } from '../utils/systemError';
+import { apiErrorMessage } from '../utils/errorMessage';
+import { messageInfo as t } from '../constants/messages';
 import './ProjectManagementScreen.css';
 
 const { Title, Text } = Typography;
+
+/** 画面で使う固定文言（定数化して散在を防ぐ） */
+const LABELS = {
+  /** 一括読み込みの桁数エラー確認ダイアログ */
+  importFormatErrorTitle: '取り込めない行があります',
+  importFormatErrorLead:
+    '以下の行は入力欄と同じ桁数の制限を満たしていません。ファイルを修正してから取り込んでください。',
+  /** 一括読み込み：ファイル内に完全一致行が複数あり中止したときの表示 */
+  importAbortedMessage:
+    'このファイルは取り込めません（ファイル内に完全に同じ行が複数あります）',
+  /** 一括読み込み：桁数エラーが複数あった場合の「ほか」 */
+  more: ' ほか',
+} as const;
+
+/**
+ * API エラーを画面に表示する（ログイン画面と同じ方針）。
+ *   1) システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面に遷移させ、
+ *      個別の message は出さない（notifySystemError が true を返す）。
+ *   2) それ以外（業務エラー・通信エラー）はバックエンドのメッセージを優先し、
+ *      未取得なら fallbackCode の文言を表示する。
+ *
+ * @param fallbackCode messages.ts のメッセージ ID（既定：E_KADOU_020 汎用エラー）
+ * @param params      fallbackCode の位置引数
+ */
+const showApiError = (
+  e: unknown,
+  fallbackCode: string = 'E_KADOU_020',
+  params: Array<string | number> = [],
+): void => {
+  if (notifySystemError(e)) return;
+  message.error(apiErrorMessage(e, t(fallbackCode, params)));
+};
+
+/**
+ * プロジェクトの「略称」を組み立てる。
+ * 顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
+ * ※自動生成のみ（画面からは編集不可）
+ * ※チーム / Subチーム は任意入力のため、未入力の項目は連結しない
+ */
+export const buildProjectAbbr = (
+  customer: string,
+  caseName: string,
+  team: string,
+  subTeam: string,
+): string =>
+  [customer.trim().charAt(0), caseName.trim(), team.trim(), subTeam.trim()]
+    .filter((part) => part !== '')
+    .join('・');
 
 /** 1ページの表示件数 */
 const PAGE_SIZE = 15;
@@ -66,6 +118,10 @@ interface ProjectFormValues {
   projectCode: string;
   /** Project名称 */
   name: string;
+  /** 有効稼働（true = 有効） */
+  validFlg: boolean;
+  /** 教育かどうか（true = 教育） */
+  educationFlg: boolean;
 }
 
 /** フォームの初期値（新規登録モード） */
@@ -77,6 +133,9 @@ const EMPTY_FORM: ProjectFormValues = {
   departmentId: '',
   projectCode: '',
   name: '',
+  // 既定値：有効 / 非教育
+  validFlg: true,
+  educationFlg: false,
 };
 
 /**
@@ -100,6 +159,8 @@ const toProjectFromApi = (p: ProjectApiInfo): Project => ({
     ),
   departmentId: p.departmentId ?? '',
   name: p.project_name ?? '',
+  validFlg: p.validFlg ?? true,
+  educationFlg: p.educationFlg ?? false,
 });
 
 /** 必須項目（入力順）。この3項目以外は任意入力 */
@@ -135,12 +196,12 @@ type FormErrors = Partial<Record<keyof ProjectFormValues, string>>;
  */
 const validateField = (
   key: keyof ProjectFormValues,
-  value: string,
+  value: string | boolean,
   options: { required: boolean },
 ): string | undefined => {
-  // 1) 最大長チェック
+  // 1) 最大長チェック（文字列項目のみ。チェックボックスは対象外）
   const limit = FIELD_LIMITS[key];
-  if (limit) {
+  if (limit && typeof value === 'string') {
     const [max, label] = limit;
     if (value.trim().length > max) {
       return `${label}は${max}文字以内で入力してください。`;
@@ -389,6 +450,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const [saving, setSaving] = useState(false);
   // 削除中フラグ
   const [deleting, setDeleting] = useState(false);
+  // 一覧の列ヘッダーフィルタ（有効稼働 / 教育かどうか）
+  const [validFilter, setValidFilter] = useState<string[]>([]);
+  const [educationFilter, setEducationFilter] = useState<string[]>([]);
   // 一括読み込み：プレビュー（null = ダイアログ非表示）
   const [importRows, setImportRows] = useState<ProjectImportRow[] | null>(null);
   // 一括読み込み：ファイル名 / 読み取り元 / 取り込まなかった行の警告
@@ -551,7 +615,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       .then((list) => {
         if (alive) setDeptMaster(list);
       })
-      .catch(() => {
+      .catch((e) => {
+        // システムエラー（DB 接続不可など）はログイン画面と同じく全画面エラーへ遷移させる
+        if (notifySystemError(e)) return;
         if (alive) setDeptMaster([]);
       })
       .finally(() => {
@@ -609,11 +675,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       const list = await fetchProjects(year);
       setProjectsRef.current(list.map(toProjectFromApi));
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `プロジェクト一覧の取得に失敗しました：${e.message}`
-          : 'プロジェクト一覧の取得に失敗しました。',
-      );
+      showApiError(e, 'E_KADOU_045');
     } finally {
       setLoading(false);
     }
@@ -716,6 +778,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       departmentId: row.departmentId,
       projectCode: row.projectCode,
       name: row.name,
+      validFlg: row.validFlg,
+      educationFlg: row.educationFlg,
     });
     setFormErrors({});
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -731,13 +795,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
           prev.filter((p) => p.projectId !== row.projectId),
         );
         setEditingKey((prev) => (prev === row.projectId ? null : prev));
-        message.success(`プロジェクト「${projectLabel(row)}」を削除しました。`);
+        message.success(t('I_KADOU_040', [projectLabel(row)]));
       } catch (e) {
-        message.error(
-          e instanceof Error
-            ? `削除に失敗しました：${e.message}`
-            : '削除に失敗しました。',
-        );
+        showApiError(e, 'E_KADOU_046');
       } finally {
         setDeleting(false);
       }
@@ -761,6 +821,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       // 項目ID は任意入力（空欄可・重複可。主キーではない）
       projectCode: form.projectCode.trim(),
       project_name: form.name.trim(),
+      validFlg: form.validFlg,
+      educationFlg: form.educationFlg,
     };
 
     setSaving(true);
@@ -777,25 +839,17 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         setProjects((prev) =>
           prev.map((p) => (p.projectId === editingKey ? values : p)),
         );
-        message.success(
-          `プロジェクト「${projectLabel(values)}」を修正しました。`,
-        );
+        message.success(t('I_KADOU_041', [projectLabel(values)]));
       } else {
         // 新規登録（システム項目ID はサーバー側で採番）
         const created = await createProject(year, payload, operatorId);
         const values = toProjectFromApi(created);
         setProjects((prev) => [...prev, values]);
-        message.success(
-          `プロジェクト「${projectLabel(values)}」を登録しました。`,
-        );
+        message.success(t('I_KADOU_042', [projectLabel(values)]));
       }
       handleResetForm();
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `保存に失敗しました：${e.message}`
-          : '保存に失敗しました。',
-      );
+      showApiError(e, 'E_KADOU_047');
     } finally {
       setSaving(false);
     }
@@ -807,16 +861,19 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    */
   const handleImportFile = async (file: File) => {
     setImporting(true);
+    // catch 節（409 中止）でプレビューを復元するために、
+    // 解析結果を try の外へ保持しておく。
+    let parsed: Awaited<ReturnType<typeof parseProjectFile>> | null = null;
     try {
-      const parsed = await parseProjectFile(file);
+      parsed = await parseProjectFile(file);
       if (parsed.rows.length === 0) {
         const detail =
           parsed.warnings.length > 0
-            ? `（${parsed.warnings[0]}${parsed.warnings.length > 1 ? ' ほか' : ''}）`
+            ? `（${parsed.warnings[0]}${
+                parsed.warnings.length > 1 ? LABELS.more : ''
+              }）`
             : '';
-        message.error(
-          `一括読み込み：取り込めるプロジェクトがありませんでした（${file.name}）${detail}`,
-        );
+        message.error(t('E_KADOU_048', [file.name]) + detail);
         return;
       }
 
@@ -833,11 +890,16 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       setImportCheck(check);
       setImportRows(parsed.rows);
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `一括読み込みに失敗しました：${e.message}`
-          : '一括読み込みに失敗しました。',
-      );
+      // 409（ファイル全体中止）はプレビューを開いて理由を表示する
+      if (e instanceof ProjectImportAbortedError) {
+        setImportFileName(file.name);
+        // 中止時は取り込み対象が無いため、プレビューは空のまま理由だけ表示する
+        // （解析に成功していれば、その行を復元して画面に表示する）
+        setImportRows(parsed ? parsed.rows : []);
+        setImportCheck(e.result);
+        return;
+      }
+      showApiError(e, 'E_KADOU_044');
     } finally {
       setImporting(false);
     }
@@ -881,15 +943,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     const formatProblems = validateProjectImportRows(importRows);
     if (formatProblems.length > 0) {
       Modal.warning({
-        title: '取り込めない行があります',
+        title: LABELS.importFormatErrorTitle,
         width: 620,
         okText: '閉じる',
         content: (
           <Space direction='vertical' style={{ width: '100%' }}>
-            <Text>
-              以下の行は入力欄と同じ桁数の制限を満たしていません。
-              ファイルを修正してから取り込んでください。
-            </Text>
+            <Text>{LABELS.importFormatErrorLead}</Text>
             <ul
               style={{
                 margin: 0,
@@ -908,15 +967,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       return;
     }
     if (importAborted) {
-      message.error(
-        '取り込みファイル内に完全に同じ行が複数あるため、このファイルは取り込めません。',
-      );
+      message.error(t('W_KADOU_010'));
       return;
     }
     if (importCounts.willAdd === 0) {
-      message.info(
-        '取り込む行が選択されていません。取り込みは行いませんでした。',
-      );
+      message.info(t('W_KADOU_011'));
       return;
     }
     // ユーザーがチェックを外した部分重複行だけを skipLines として送る
@@ -934,34 +989,29 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       await reloadProjects();
 
       message.success(
-        `プロジェクトを一括読み込みしました：追加 ${result.added} 件` +
-          (result.fullDuplicateLines && result.fullDuplicateLines.length > 0
-            ? ` / 完全重複により除外 ${
-                result.fullDuplicateLines.length
-              } 件`
-            : '') +
-          (skipLines.length > 0
-            ? ` / 選択により除外 ${skipLines.length} 件`
-            : '') +
-          (result.skipped > 0 ? ` / スキップ ${result.skipped} 件` : '') +
-          '。',
+        t('I_KADOU_043', [
+          result.added,
+          result.fullDuplicateLines && result.fullDuplicateLines.length > 0
+            ? t('I_KADOU_044', [result.fullDuplicateLines.length])
+            : '',
+          skipLines.length > 0 ? t('I_KADOU_045', [skipLines.length]) : '',
+          result.skipped > 0 ? t('I_KADOU_046', [result.skipped]) : '',
+        ]),
       );
 
       const warnings = [...importWarnings, ...result.warnings];
       if (warnings.length > 0) {
         message.warning(
-          `警告が ${warnings.length} 件あります（${warnings[0]}${
-            warnings.length > 1 ? ' ほか' : ''
-          }）。`,
+          t('I_KADOU_047', [
+            warnings.length,
+            warnings[0],
+            warnings.length > 1 ? LABELS.more : '',
+          ]),
         );
       }
       handleImportCancel();
     } catch (e) {
-      message.error(
-        e instanceof Error
-          ? `一括読み込みに失敗しました：${e.message}`
-          : '一括読み込みに失敗しました。',
-      );
+      showApiError(e, 'E_KADOU_044');
     } finally {
       setSubmittingImport(false);
     }
@@ -1016,6 +1066,37 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
           // 部門名称が未設定の場合は空欄に見えるため「－」を表示する
           return found.name ? found.name : <Text type='secondary'>－</Text>;
         },
+      },
+      {
+        // 有効稼働（DB: valid_flg / '1' = 有効, '0' = 無効）
+        title: '有効稼働',
+        dataIndex: 'validFlg',
+        key: 'validFlg',
+        width: 110,
+        filters: [
+          { text: '有効', value: 'valid' },
+          { text: '無効', value: 'invalid' },
+        ],
+        filterMultiple: false,
+        filteredValue: validFilter.length > 0 ? validFilter : null,
+        onFilter: (value, row) => (value === 'valid') === row.validFlg,
+        // 一覧は文字のみ（チェックボックスはフォームで入力する）
+        render: (v: boolean) => (v ? '有効' : '無効'),
+      },
+      {
+        // 教育かどうか（DB: education_flg / '1' = 教育, '0' = 非教育）
+        title: '教育かどうか',
+        dataIndex: 'educationFlg',
+        key: 'educationFlg',
+        width: 150,
+        filters: [
+          { text: '教育', value: 'edu' },
+          { text: '非教育', value: 'non-edu' },
+        ],
+        filterMultiple: false,
+        filteredValue: educationFilter.length > 0 ? educationFilter : null,
+        onFilter: (value, row) => (value === 'edu') === row.educationFlg,
+        render: (v: boolean) => (v ? '教育' : '非教育'),
       },
       {
         title: '項目ID',
@@ -1074,7 +1155,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         ),
       },
     ],
-    [handleEdit, handleDelete],
+    [handleEdit, handleDelete, deptMaster, validFilter, educationFilter],
   );
 
   /** 一括読み込み：プレビュー表の列 */
@@ -1182,7 +1263,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
-            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。右上の「一括読み込む」から Excel / CSV を取り込めます（所属部門は入力どおり登録します）。
+            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは統計の集計にだけ影響します（既定：有効 / 非教育）。右上の「一括読み込む」から Excel / CSV を取り込めます（所属部門は入力どおり登録します）。
           </Text>
         </div>
 
@@ -1366,21 +1447,50 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   </Text>
                 )}
               </div>
-              <div className='project-field-code'>
-                <div className='form-label'>項目ID（任意）</div>
-                <Input
-                  placeholder='例：PRJ-0006'
-                  value={form.projectCode}
-                  maxLength={40}
-                  status={formErrors.projectCode ? 'error' : undefined}
-                  onChange={(e) => setField('projectCode', e.target.value)}
-                  onBlur={() => handleBlur('projectCode')}
-                />
-                {formErrors.projectCode && (
-                  <Text type='danger' style={{ fontSize: 12 }}>
-                    {formErrors.projectCode}
-                  </Text>
-                )}
+              {/*
+                項目ID / 有効稼働 / 教育かどうか は 2 行目にまとめて表示する。
+                （1 行目の 顧客・案件・チーム・Subチーム・Project名称・略称・所属部門 の下）
+              */}
+              <div className='project-field-row2'>
+                <div className='project-field-code'>
+                  <div className='form-label'>項目ID（任意）</div>
+                  <Input
+                    placeholder='例：PRJ-0006'
+                    value={form.projectCode}
+                    maxLength={40}
+                    status={formErrors.projectCode ? 'error' : undefined}
+                    onChange={(e) => setField('projectCode', e.target.value)}
+                    onBlur={() => handleBlur('projectCode')}
+                  />
+                  {formErrors.projectCode && (
+                    <Text type='danger' style={{ fontSize: 12 }}>
+                      {formErrors.projectCode}
+                    </Text>
+                  )}
+                </div>
+                {/* 有効稼働 / 教育かどうか は隣接して各半分の幅で表示する */}
+                <div className='project-field-pair'>
+                  <div>
+                    <div className='form-label'>有効稼働</div>
+                    <Checkbox
+                      checked={form.validFlg}
+                      onChange={(e) => setField('validFlg', e.target.checked)}
+                    >
+                      {form.validFlg ? '有効' : '無効'}
+                    </Checkbox>
+                  </div>
+                  <div>
+                    <div className='form-label'>教育かどうか</div>
+                    <Checkbox
+                      checked={form.educationFlg}
+                      onChange={(e) =>
+                        setField('educationFlg', e.target.checked)
+                      }
+                    >
+                      {form.educationFlg ? '教育' : '非教育'}
+                    </Checkbox>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1435,7 +1545,20 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
           rowClassName={(row) =>
             row.projectId === editingKey ? 'project-row-editing' : ''
           }
-          scroll={{ x: 1440 }}
+          // 列ヘッダーフィルタ（有効稼働 / 教育かどうか）→ 絞り込み条件へ反映する
+          onChange={(_pagination, filters) => {
+            const rawValid = filters.validFlg;
+            setValidFilter(
+              Array.isArray(rawValid) ? rawValid.map((v) => String(v)) : [],
+            );
+            const rawEducation = filters.educationFlg;
+            setEducationFilter(
+              Array.isArray(rawEducation)
+                ? rawEducation.map((v) => String(v))
+                : [],
+            );
+          }}
+          scroll={{ x: 1720 }}
           pagination={{
             pageSize: PAGE_SIZE,
             showSizeChanger: false,
@@ -1477,7 +1600,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               showIcon
               message={
                 importAborted
-                  ? 'このファイルは取り込めません（ファイル内に完全に同じ行が複数あります）'
+                  ? LABELS.importAbortedMessage
                   : [
                       `対象 ${importCounts.total} 件`,
                       `新規追加 ${importCounts.added} 件`,
@@ -1492,7 +1615,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               }
               description={
                 importAborted
-                  ? `${importFileName}（${importSource}）内に、全項目（顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称）が完全に一致する行が複数あります。すべての行を取り込むことはできません。ファイルを修正してから、もう一度取り込んでください。`
+                  ? importCheck?.abortReason
+                    ? `${importFileName}（${importSource}）：${importCheck.abortReason}`
+                    : `${importFileName}（${importSource}）：一括取り込みを中止しました。ファイルを修正してから、もう一度取り込んでください。`
                   : importCounts.full > 0
                     ? `${importFileName}（${importSource}）のうち、全項目が既存データと完全一致する行（${importCounts.full} 件）は取り込みません（選択できません）。それ以外の行は「取込」列のチェックが ON の行だけ登録します。`
                     : `${importFileName}（${importSource}）を読み込みました。「取込」列のチェックが ON の行（${importCounts.willAdd} 件）を登録します。チェックを外した行は登録しません。`
@@ -1545,14 +1670,14 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               <Alert
                 type='warning'
                 showIcon
-                message={`ファイル側で取り込まなかった行：${importWarnings.length} 件`}
+                message={t('W_KADOU_013', [importWarnings.length])}
                 description={
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {importWarnings.slice(0, 5).map((w) => (
                       <li key={w}>{w}</li>
                     ))}
                     {importWarnings.length > 5 && (
-                      <li>ほか {importWarnings.length - 5} 件</li>
+                      <li>{t('I_KADOU_049', [importWarnings.length - 5])}</li>
                     )}
                   </ul>
                 }
@@ -1562,14 +1687,18 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               <Alert
                 type='error'
                 showIcon
-                message={`サーバー側で取り込まない行：${importCheck?.skipped} 件`}
+                message={t('W_KADOU_012', [importCheck?.skipped ?? 0])}
                 description={
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {(importCheck?.warnings ?? []).slice(0, 5).map((w) => (
                       <li key={w}>{w}</li>
                     ))}
                     {(importCheck?.warnings.length ?? 0) > 5 && (
-                      <li>ほか {(importCheck?.warnings.length ?? 0) - 5} 件</li>
+                      <li>
+                        {t('I_KADOU_049', [
+                          (importCheck?.warnings.length ?? 0) - 5,
+                        ])}
+                      </li>
                     )}
                   </ul>
                 }
