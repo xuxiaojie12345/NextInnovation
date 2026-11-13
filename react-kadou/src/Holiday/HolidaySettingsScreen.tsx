@@ -53,6 +53,7 @@ import { parseHolidayFile } from "./HolidayImport";
 import { apiErrorMessage } from "../utils/errorMessage";
 import { isApiError } from "../utils/ApiError";
 import { notifySystemError } from "../utils/systemError";
+import { messageInfo } from "../constants/messages";
 
 const { Title, Text } = Typography;
 
@@ -128,7 +129,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   /** 追加 or 更新（日付・名称は必須 / 同一日付は登録不可） */
   const handleSubmit = () => {
     if (!newDate) {
-      message.warning("日付を選択してください。");
+      message.warning(messageInfo("W_KADOU_007"));
       return;
     }
 
@@ -143,7 +144,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         .then((data) => {
           setHolidays(data);
           handleResetForm();
-          message.success(`休日情報${formatDate(date)}を更新しました。`);
+          message.success(messageInfo("I_KADOU_016", [formatDate(date)]));
         })
         .catch((error) => {
           isApiError(error);
@@ -161,7 +162,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         .then((data) => {
           setHolidays(data);
           handleResetForm();
-          message.success(`休日情報${formatDate(date)}を追加しました。`);
+          message.success(messageInfo("I_KADOU_017", [formatDate(date)]));
         })
         .catch((error) => {
           if (!notifySystemError(error)) {
@@ -187,7 +188,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       HolidayDeleteApi(year, row.id)
         .then((data) => {
           setHolidays(data);
-          message.success(`休日情報${formatDate(row.date)}を削除しました。`);
+          message.success(messageInfo("I_KADOU_018", [formatDate(row.date)]));
         })
         .catch((error) => {
           isApiError(error);
@@ -212,7 +213,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    message.success(`${sortedHolidays.length} 件を CSV 出力しました。`);
+    message.success(messageInfo("I_KADOU_009", [sortedHolidays.length]));
   };
 
   /**
@@ -226,7 +227,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
 
       if (result.error.length > 0) {
         message.error(
-          `一括読み込み：解析に失敗しました（${file.name}）\n${result.error.join("\n")}`,
+          messageInfo("E_KADOU_054", [file.name, result.error.join("\n")]),
         );
         return;
       }
@@ -238,9 +239,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
                 result.warnings.length > 1 ? " ほか" : ""
               }）`
             : "";
-        message.error(
-          `一括読み込み：取り込める休日がありませんでした（${file.name}）${detail}`,
-        );
+        message.error(messageInfo("E_KADOU_056", [file.name, detail]));
         return;
       }
 
@@ -251,7 +250,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       HolidayImportApi(year, currentUserId, requestDatas)
         .then((data) => {
           setHolidays(data);
-          message.success(`休日を一括読み込みしました。`);
+          message.success(messageInfo("E_KADOU_057"));
         })
         .catch((error) => {
           if (!notifySystemError(error)) {
@@ -260,18 +259,21 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         });
 
       if (result.warnings.length > 0) {
+        const detail = result.warnings.length > 1 ? " ほか" : "";
         message.warning(
-          `取り込まなかった行などが ${result.warnings.length} 件あります（${result.warnings[0]}${
-            result.warnings.length > 1 ? " ほか" : ""
-          }）。`,
+          messageInfo("E_KADOU_058", [
+            result.warnings.length,
+            result.warnings[0],
+            detail,
+          ]),
         );
       }
     } catch (e) {
       if (!notifySystemError(e)) {
         message.error(
           e instanceof Error
-            ? `一括読み込みに失敗しました：${e.message}`
-            : "一括読み込みに失敗しました。",
+            ? messageInfo("E_KADOU_044") + e.message
+            : messageInfo("E_KADOU_044"),
         );
       }
     } finally {

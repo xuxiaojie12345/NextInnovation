@@ -9,6 +9,7 @@ import {
   HolidayKind,
 } from "./HolidaySettingMode";
 import { HEADER_ALIASES } from "../constants/options";
+import { messageInfo } from "../constants/messages";
 
 /** 見出し行が見出しと判定されるのに必要な一致数（誤検出を避ける） */
 const HEADER_MATCH_MIN = 2;
@@ -153,20 +154,20 @@ const buildRows = (
     if (!rawDate) return;
 
     if (!rawDate) {
-      warnings.push(`${lineNo}行目：日付が空のため取り込みませんでした`);
+      warnings.push(messageInfo("I_KADOU_019", [lineNo]));
       return;
     }
 
     const date = parseDateValue(rawDate);
     if (!date) {
-      warnings.push(`${lineNo}行目：日付「${rawDate}」を解釈できませんでした`);
+      warnings.push(messageInfo("I_KADOU_020", [lineNo, rawDate]));
       return;
     }
 
     // ファイル内で同じ日付が複数ある場合は後ろの行を優先する
     const duplicate = indexByDate.get(date);
     if (duplicate !== undefined) {
-      error.push(`${lineNo}行目：日付 ${date} が重複しています。`);
+      error.push(messageInfo("E_KADOU_055", [lineNo, date]));
       rows[duplicate] = { date };
       return;
     }
