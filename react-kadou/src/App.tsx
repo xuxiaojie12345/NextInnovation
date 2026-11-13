@@ -17,7 +17,6 @@ import { SYSTEM_ERROR_EVENT, SystemErrorDetail } from './utils/systemError';
 import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
 import type { AuthUser } from './types/user';
-import { MOCK_USERS, defaultDepartmentsOf } from './data/mockUsers';
 import {
   departmentNameOf,
   resolveDepartmentIdByName,
@@ -41,6 +40,19 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
   ? AVAILABLE_YEARS
   : [...AVAILABLE_YEARS, currentYear()];
 
+/**
+ * ログイン直後に絞り込んでおく部門（初期表示の既定値）を返す。
+ *
+ *  - 部長          → 自部門のみ（＝自部門のデータを初期表示）
+ *  - 事業部長/管理者 → []（＝絞り込みなし＝全部門）
+ *
+ * ※権限ではない。部署の選択肢は常に全部門を表示し、他部門を選んで
+ *   閲覧できる（データ集約）。あくまで画面を開いたときの既定値。
+ */
+function defaultDepartmentsOf(user: AuthUser): string[] {
+  return user.role === 'bucho' && user.departmentId ? [user.departmentId] : [];
+}
+
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
 type PendingAction =
   | { type: 'year'; year: number }
@@ -55,9 +67,10 @@ function App() {
   const restored = loadSession();
 
   // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
-  const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
+  // 初期値は空とし、ユーザー管理画面表示時にバックエンドから取得する（mock は使わない）
+  const [users, setUsers] = useState<AuthUser[]>([]);
   // ログイン中のユーザー（null = 未ログイン）
-  // ※ログインAPIが返したユーザーをそのまま保持する。MOCK_USERS に無い
+  // ※ログインAPIが返したユーザーをそのまま保持する。一覧（users）に無い
   //   userId でも正しくログイン状態にするため lookup は行わない。
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(
     () => restored?.user ?? null,
