@@ -27,12 +27,14 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [error, setError] = useState("");
+  const [serverError, setServerError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleFinish = async (values: { userId: string; password: string }) => {
     const userId = values.userId.trim();
     const password = values.password;
     setError("");
+    setServerError(false);
     setLoading(true);
 
     try {
@@ -45,6 +47,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       });
 
       if (!res.ok) {
+        if (res.status >= 500) {
+          setServerError(true);
+          return;
+        }
         const errJson = await res.json().catch(() => null);
         const msg = errJson?.detail ?? "ログイン処理に失敗しました";
         setError(msg);
@@ -56,13 +62,27 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       onLogin(data.user);
     } catch (err) {
       console.error(err);
-      setError(
-        "サーバーに接続できません。ネットワークまたはサーバー起動状況を確認してください。",
-      );
+      setServerError(true);
     } finally {
       setLoading(false);
     }
   };
+
+  if (serverError) {
+    return (
+      <div className='login-page'>
+        <Card className='login-card login-server-error' role='alert'>
+          <Title level={4}>エラー</Title>
+          <Text>
+            サーバーエラーが発生しました。しばらく経ってから再度お試しください。
+          </Text>
+          <Button type='primary' block onClick={() => setServerError(false)}>
+            ログイン画面へ戻る
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className='login-page'>
@@ -85,6 +105,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             name='userId'
             rules={[
               { required: true, message: "ユーザーIDを入力してください。" },
+              {
+                pattern: /^[0-9A-Za-z]+$/,
+                message: "半角英数字のみ入力できます。",
+              },
             ]}
           >
             <Input
@@ -92,7 +116,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               prefix={<UserOutlined />}
               placeholder='ユーザーID'
               autoComplete='username'
-              maxLength={20}
+              maxLength={5}
               onChange={() => {
                 if (error) setError("");
               }}
