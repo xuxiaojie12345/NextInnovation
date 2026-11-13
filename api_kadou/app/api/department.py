@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Header
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.errors import BusinessException
 from app.db.session import get_db
 from app.schemas.department import (
     Department,
@@ -18,7 +16,6 @@ from app.services.department import (
 )
 
 router = APIRouter(prefix="/api/kadou", tags=["kadou"])
-
 
 @router.get("/departments/{year}", response_model=list[Department])
 def get_departments(year: str, db: Session = Depends(get_db)):
@@ -36,13 +33,14 @@ def add_department(
     x_user_id: str | None = Header(default=None, alias="X-User-Id"),
 ):
     """部門管理画面：部門を追加して作成した部門を返す。"""
-    op_user = (x_user_id or "").strip() or None
-    try:
-        return Department(
-            **create_department(db, year, payload.model_dump(), op_user)
+    return Department(
+        **create_department(
+            db,
+            year,
+            payload.model_dump(),
+            (x_user_id or "").strip() or None,
         )
-    except IntegrityError:
-        raise BusinessException(status_code=409, message_id="E_KADOU_022")
+    )
 
 
 @router.put("/departments/{year}/{id}", response_model=Department)
@@ -54,11 +52,15 @@ def edit_department(
     x_user_id: str | None = Header(default=None, alias="X-User-Id"),
 ):
     """部門管理画面：部門を更新して更新後の部門を返す。"""
-    op_user = (x_user_id or "").strip() or None
-    updated = update_department(db, year, id, payload.model_dump(), op_user)
-    if updated is None:
-        raise BusinessException(status_code=404, message_id="E_KADOU_024")
-    return Department(**updated)
+    return Department(
+        **update_department(
+            db,
+            year,
+            id,
+            payload.model_dump(),
+            (x_user_id or "").strip() or None,
+        )
+    )
 
 
 @router.delete("/departments/{year}/{id}", response_model=DepartmentDeleteResult)
@@ -66,6 +68,5 @@ def remove_department(
     year: str, id: str, db: Session = Depends(get_db)
 ):
     """部門管理画面：部門を削除する。"""
-    if not delete_department(db, year, id):
-        raise BusinessException(status_code=404, message_id="E_KADOU_024")
+    delete_department(db, year, id)
     return DepartmentDeleteResult(code=0)

@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.errors import BusinessException
 from app.schemas.login import LoginResponse
 from app.sql import load_sql
 
@@ -35,3 +36,15 @@ def authenticate(db: Session, user_id: str, password: str) -> LoginResponse | No
         yakushokukubun=row["yakushoku_kubun"],
         department=row["department_name"],
     )
+
+
+def login(db: Session, user_id: str, password: str) -> LoginResponse:
+    """ログイン認証業務。ユーザー不存在 / パスワード不一致は 401 エラーにする。
+
+    API 層にはロジックを置かず、認証成功時のユーザー情報のみを返す。
+    """
+    user = authenticate(db, user_id, password)
+    if user is None:
+        # ユーザー不存在 / パスワード不一致：后端只返回业务 code，文案由前端按 code 映射
+        raise BusinessException(status_code=401, message_id="E_KADOU_001")
+    return user

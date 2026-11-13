@@ -1,5 +1,6 @@
 """部門サービス（部門管理画面用）"""
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessException
@@ -40,19 +41,22 @@ def create_department(
     """部門を追加し、作成した部門を返す。
 
     department_id は DB の AUTO_INCREMENT で採番し、挿入後に発番された ID を
-    文字列に整形して返す（例："1"）。
+    文字列に整形して返す（例："1"）。重複など整合性違反は 409 エラーにする。
     """
-    res = db.execute(
-        text(load_sql("department.sql", "insert")),
-        {
-            "year_id": year_id,
-            "department_name": data["name"],
-            "department_alisa": data.get("alisa") or "",
-            "location": data["location"],
-            "kind": data["kind"] or "dept",
-            "op_user": op_user,
-        },
-    )
+    try:
+        res = db.execute(
+            text(load_sql("department.sql", "insert")),
+            {
+                "year_id": year_id,
+                "department_name": data["name"],
+                "department_alisa": data.get("alisa") or "",
+                "location": data["location"],
+                "kind": data["kind"] or "dept",
+                "op_user": op_user,
+            },
+        )
+    except IntegrityError:
+        raise BusinessException(status_code=409, message_id="E_KADOU_022")
     db.commit()
     department_id = str(res.lastrowid)
     return {
@@ -70,8 +74,8 @@ def update_department(
     department_id: str,
     data: dict,
     op_user: str = _DEFAULT_OP_USER,
-) -> dict | None:
-    """部門を更新する。存在しない場合は None を返す。"""
+) -> dict:
+    """部門を更新して更新後の部門を返す。存在しない場合は 404 エラーにする。"""
     res = db.execute(
         text(load_sql("department.sql", "update")),
         {
@@ -86,7 +90,7 @@ def update_department(
     )
     db.commit()
     if res.rowcount == 0:
-        return None
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
     return {
         "departmentId": department_id,
         "name": data["name"],
@@ -96,12 +100,12 @@ def update_department(
     }
 
 
-def delete_department(db: Session, year_id: str, department_id: str) -> bool:
+def delete_department(db: Session, year_id: str, department_id: str) -> None:
     """部門を削除する。
 
     同一年度の 要員 / プロジェクト / 稼働表行（異動の旧行を含む）のいずれかから
     参照されている場合は削除せず例外を投げる。ユーザー年度別所属はチェックしない。
-    削除できた場合は True を返す。
+    削除対象が存在しない場合は 404 エラーにする。
     """
     counts = {
         name: db.execute(
@@ -131,4 +135,5 @@ def delete_department(db: Session, year_id: str, department_id: str) -> bool:
         {"year_id": year_id, "department_id": department_id},
     )
     db.commit()
-    return res.rowcount > 0
+    if res.rowcount == 0:
+        raise BusinessException(status_code=404, message_id="E_KADOU_024")
