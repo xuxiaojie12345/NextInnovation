@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -7,6 +7,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Spin,
   Table,
   Tag,
   Typography,
@@ -22,6 +23,17 @@ import type { AuthUser, UserRole } from '../types/user';
 import type { Department } from '../WorkStatus/types';
 import { ROLE_OPTIONS, roleLabelOf } from '../constants/options';
 import { departmentLabelOf, findDepartment } from '../data/departmentUtils';
+import { fetchDepartments } from '../api/departmentManagement';
+import { messageInfo } from '../constants/messages';
+import { apiErrorMessage } from '../utils/errorMessage';
+import { notifySystemError } from '../utils/systemError';
+import { validatePassword, PASSWORD_MAX_LENGTH } from '../Login/passwordRules';
+import {
+  addUser,
+  deleteUser,
+  fetchUsers,
+  updateUser,
+} from '../api/userManagement';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
@@ -39,10 +51,14 @@ interface UserManagementScreenProps {
   setUsers: React.Dispatch<React.SetStateAction<AuthUser[]>>;
   /** ログイン中のユーザーID（自分自身の削除・降格を禁止するため） */
   currentUserId: string | null;
-  /** 所属部門の選択肢（現在選択中の年度の部門マスタ） */
-  departments: Department[];
+  /** 表示する年度（所属部門マスタをDBから取得するために使う） */
+  year: number;
   /** 管理権限（管理者のみ true） */
   allowManage: boolean;
+  /** 操作者（登録・更新者）のユーザーID */
+  operatorId?: string | null;
+  /** この画面が表示中かどうか（表示中になったときに一覧をDBから再取得する） */
+  active: boolean;
 }
 
 /**
@@ -50,13 +66,16 @@ interface UserManagementScreenProps {
  *
  * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者）の設定を行う。
  * ※ユーザー自体は全年度共通。所属部門は選択中年度の部門マスタを参照する。
+ * データはバックエンド（jn_user_table）から取得・保存する。
  */
 const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   users,
   setUsers,
   currentUserId,
-  departments,
+  year,
   allowManage,
+  operatorId,
+  active,
 }) => {
   // 編集中のユーザーID（null = 新規追加モード / '' = 未選択）
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -68,189 +87,310 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     undefined,
   );
   const [password, setPassword] = useState('pass1234');
+  // 初期データのロード中フラグ
+  const [loading, setLoading] = useState(false);
+  // 登録 / 修正 / 削除の実行中フラグ（二重送信防止）
+  const [saving, setSaving] = useState(false);
+  // 所属部門マスタ（DBから取得。App のモックには dept-0001 形式で id が一致しないため、
+  // 他の画面と同じく DB から取り直す）。
+  const [deptMaster, setDeptMaster] = useState<Department[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  // 最新の setUsers を保持する ref（setUsers はストア更新のたびに再生成されるため）
+  const setUsersRef = useRef(setUsers);
+  setUsersRef.current = setUsers;
 
   const isEditing = editingId !== null;
 
-  /** 管理者の人数（最後の管理者を守るため） */
+  // この画面が表示されたときにバックエンドからユーザー一覧を取得する
+  useEffect(() => {
+    if (!active) return;
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const list = await fetchUsers();
+        if (alive) setUsersRef.current(list);
+      } catch (err) {
+        if (!notifySystemError(err)) {
+          if (alive) message.error(apiErrorMessage(err, messageInfo('E_KADOU_020')));
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+    // 依存は active。setUsers は ref 経由で常に最新を参照する
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  // 年度が変わったとき・この画面が表示中になったときに所属部門マスタをDBから取り直す。
+  // ※App の departments はモック（dept-0001 形式）で DB の department_id と一致しない
+  //   ため、プロジェクト管理画面と同じく DB から取得したものを利用する。
+  useEffect(() => {
+    if (!active) return;
+    let alive = true;
+    setLoadingDepartments(true);
+    fetchDepartments(year)
+      .then((list) => {
+        if (alive) setDeptMaster(list);
+      })
+      .catch(() => {
+        if (alive) setDeptMaster([]);
+      })
+      .finally(() => {
+        if (alive) setLoadingDepartments(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [year, active]);
+
+  // 管理者の人数（最後の管理者を守るため）
   const adminCount = useMemo(
     () => users.filter((u) => u.role === 'admin').length,
     [users],
   );
 
-  const deptOptions = departments.map((d) => ({
-    value: d.departmentId,
-    label: departmentLabelOf(departments, d.departmentId),
-  }));
-
-  /**
-   * 保存する所属部門を解決する。
-   * 対象の部門が（部門マスタに存在しない＝削除された場合）は undefined（全部門）にクリアする。
-   */
-  const resolveDept = (id?: string): string | undefined =>
-    id && findDepartment(departments, id) ? id : undefined;
+  // 所属部門の選択肢。
+  // DB から取得した部門マスタ（deptMaster）をそのまま利用する。
+  // 部門名に一意制約はないため、同名部門がある場合は部門管理画面と同じく
+  // departmentLabelOf で「部門名（部門ID）」を付けて区別する。
+  const deptOptions = useMemo(
+    () =>
+      deptMaster.map((d) => ({
+        value: d.departmentId,
+        label: departmentLabelOf(deptMaster, d.departmentId),
+      })),
+    [deptMaster],
+  );
 
   /** フォームの初期化 */
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setUserId('');
     setName('');
     setRole('bucho');
     setDepartmentId(undefined);
     setPassword('pass1234');
-  };
+  }, []);
 
   /** 行の編集開始 */
-  const handleEdit = (user: AuthUser) => {
+  const handleEdit = useCallback((user: AuthUser) => {
     setEditingId(user.userId);
     setUserId(user.userId);
     setName(user.name);
     setRole(user.role);
     setDepartmentId(user.departmentId);
     setPassword(user.password);
-  };
+  }, []);
 
   /** 登録（新規追加 / 更新） */
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(async () => {
     const id = userId.trim();
     const nm = name.trim();
     if (!id) {
-      message.error('ユーザーIDを入力してください。');
+      message.warning(messageInfo('W_KADOU_005'));
+      return;
+    }
+    // ユーザーIDは半角英数字のみ許可（最大5文字。maxLengthで入力は制限済み）
+    if (!/^[A-Za-z0-9]+$/.test(id)) {
+      message.warning(messageInfo('W_KADOU_004'));
       return;
     }
     if (!nm) {
-      message.error('氏名を入力してください。');
+      message.warning(messageInfo('W_KADOU_001', ['氏名']));
       return;
     }
-    // ユーザーID の重複チェック（編集中の自分自身は除く）
-    if (users.some((u) => u.userId === id && u.userId !== editingId)) {
-      message.error(`ユーザーID「${id}」は既に登録されています。`);
+    // パスワード：ログイン画面と同じ検証ルール（必須・最大50文字・半角英数+記号のみ）
+    const pwdMsg = validatePassword(password);
+    if (pwdMsg) {
+      message.warning(pwdMsg);
       return;
     }
+    if (saving) return;
 
-    if (isEditing && editingId) {
-      const target = users.find((u) => u.userId === editingId);
-      // 最後の管理者を降格させない
-      if (
-        target?.role === 'admin' &&
-        role !== 'admin' &&
-        adminCount <= 1
-      ) {
-        message.error('管理者が 1 名だけのため、降格できません。');
-        return;
+    setSaving(true);
+    try {
+      if (isEditing && editingId) {
+        const target = users.find((u) => u.userId === editingId);
+        // 最後の管理者を降格させない
+        if (
+          target?.role === 'admin' &&
+          role !== 'admin' &&
+          adminCount <= 1
+        ) {
+          message.error(messageInfo('E_KADOU_005'));
+          return;
+        }
+        const updated = await updateUser(
+          editingId,
+          {
+            name: nm,
+            role,
+            departmentId,
+            password: password || 'pass1234',
+          },
+          operatorId,
+        );
+        setUsers((prev) =>
+          prev.map((u) => (u.userId === editingId ? updated : u)),
+        );
+        message.success(messageInfo('E_KADOU_008', [nm]));
+      } else {
+        const created = await addUser(
+          {
+            userId: id,
+            name: nm,
+            role,
+            departmentId,
+            password: password || 'pass1234',
+          },
+          operatorId,
+        );
+        setUsers((prev) => [...prev, created]);
+        message.success(messageInfo('E_KADOU_009', [nm]));
       }
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.userId === editingId
-            ? {
-                ...u,
-                userId: id,
-                name: nm,
-                role,
-                roleLabel: roleLabelOf(role),
-                departmentId: departmentId || undefined,
-                password,
-              }
-            : u,
-        ),
-      );
-      message.success(`ユーザー「${nm}」を更新しました。`);
       resetForm();
-      return;
+    } catch (err) {
+      if (!notifySystemError(err)) {
+        message.error(apiErrorMessage(err, messageInfo('E_KADOU_020')));
+      }
+    } finally {
+      setSaving(false);
     }
-
-    setUsers((prev) => [
-      ...prev,
-      {
-        userId: id,
-        name: nm,
-        role,
-        roleLabel: roleLabelOf(role),
-        departmentId: departmentId || undefined,
-        password: password || 'pass1234',
-      },
-    ]);
-    message.success(`ユーザー「${nm}」を追加しました。`);
-    resetForm();
-  };
+  }, [
+    userId,
+    name,
+    role,
+    password,
+    departmentId,
+    saving,
+    isEditing,
+    editingId,
+    users,
+    adminCount,
+    setUsers,
+    operatorId,
+    resetForm,
+  ]);
 
   /** 削除 */
-  const handleDelete = (user: AuthUser) => {
-    if (user.userId === currentUserId) {
-      message.error('ログイン中の自分自身は削除できません。');
-      return;
-    }
-    if (user.role === 'admin' && adminCount <= 1) {
-      message.error('管理者が 1 名だけのため、削除できません。');
-      return;
-    }
-    setUsers((prev) => prev.filter((u) => u.userId !== user.userId));
-    message.success(`ユーザー「${user.name}」を削除しました。`);
-    if (editingId === user.userId) resetForm();
-  };
+  const handleDelete = useCallback(
+    async (user: AuthUser) => {
+      if (user.userId === currentUserId) {
+        message.error(messageInfo('E_KADOU_007'));
+        return;
+      }
+      if (user.role === 'admin' && adminCount <= 1) {
+        message.error(messageInfo('E_KADOU_006'));
+        return;
+      }
+      if (saving) return;
+      setSaving(true);
+      try {
+        await deleteUser(user.userId);
+        setUsers((prev) =>
+          prev.filter((u) => u.userId !== user.userId),
+        );
+        if (editingId === user.userId) resetForm();
+        message.success(messageInfo('E_KADOU_010', [user.name]));
+      } catch (err) {
+        if (!notifySystemError(err)) {
+          message.error(apiErrorMessage(err, messageInfo('E_KADOU_020')));
+        }
+      } finally {
+        setSaving(false);
+      }
+    },
+    [currentUserId, adminCount, saving, setUsers, editingId, resetForm],
+  );
 
-  const columns: TableColumnsType<AuthUser> = [
-    {
-      title: 'ユーザーID',
-      dataIndex: 'userId',
-      key: 'userId',
-      width: 140,
-      render: (v: string, row) => (
-        <Space size={4}>
-          <UserOutlined />
-          <span>{v}</span>
-          {row.userId === currentUserId && <Tag color='green'>ログイン中</Tag>}
-        </Space>
-      ),
-    },
-    { title: '氏名', dataIndex: 'name', key: 'name', width: 160 },
-    {
-      title: '職級',
-      dataIndex: 'role',
-      key: 'role',
-      width: 120,
-      render: (_: unknown, row) => (
-        <Tag color={ROLE_COLOR[row.role]}>{roleLabelOf(row.role)}</Tag>
-      ),
-    },
-    {
-      title: '所属部門',
-      dataIndex: 'departmentId',
-      key: 'departmentId',
-      width: 140,
-      render: (v?: string) =>
-        v ? departmentLabelOf(departments, v) : '（全部門）',
-    },
-    { title: 'パスワード（モック）', dataIndex: 'password', key: 'password', width: 160 },
-    {
-      title: '操作',
-      key: 'action',
-      width: 160,
-      render: (_: unknown, row) => (
-        <Space>
-          <Button
-            type='text'
-            size='small'
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(row)}
-          >
-            編集
-          </Button>
-          <Popconfirm
-            title='ユーザー削除の確認'
-            description={`「${row.name}」を削除しますか？`}
-            okText='削除'
-            cancelText='キャンセル'
-            okButtonProps={{ danger: true }}
-            onConfirm={() => handleDelete(row)}
-          >
-            <Button type='text' danger size='small' icon={<DeleteOutlined />}>
-              削除
+  const columns: TableColumnsType<AuthUser> = useMemo(
+    () => [
+      {
+        title: 'ユーザーID',
+        dataIndex: 'userId',
+        key: 'userId',
+        width: 150,
+        render: (v: string, row) => (
+          <Space size={4}>
+            <UserOutlined />
+            <span>{v}</span>
+            {row.userId === currentUserId && <Tag color='green'>ログイン中</Tag>}
+          </Space>
+        ),
+      },
+      { title: '氏名', dataIndex: 'name', key: 'name', width: 160 },
+      {
+        title: '職級',
+        dataIndex: 'role',
+        key: 'role',
+        width: 100,
+        render: (_: unknown, row) => (
+          <Tag color={ROLE_COLOR[row.role]}>{roleLabelOf(row.role)}</Tag>
+        ),
+      },
+      {
+        title: '所属部門',
+        dataIndex: 'departmentId',
+        key: 'departmentId',
+        width: 170,
+        render: (v?: string) => {
+          if (!v) return '（全部門）';
+          if (findDepartment(deptMaster, v)) {
+            return departmentLabelOf(deptMaster, v);
+          }
+          return `（削除済み）${v}`;
+        },
+      },
+      {
+        title: 'パスワード',
+        dataIndex: 'password',
+        key: 'password',
+        width: 160,
+        ellipsis: { showTitle: true },
+      },
+      {
+        title: '操作',
+        key: 'action',
+        width: 160,
+        render: (_: unknown, row) => (
+          <Space>
+            <Button
+              type='text'
+              size='small'
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(row)}
+              disabled={saving}
+            >
+              編集
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title='ユーザー削除の確認'
+              description={`「${row.name}」を削除しますか？`}
+              okText='削除'
+              cancelText='キャンセル'
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDelete(row)}
+            >
+              <Button
+                type='text'
+                danger
+                size='small'
+                icon={<DeleteOutlined />}
+                disabled={saving}
+              >
+                削除
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    [currentUserId, handleEdit, handleDelete, saving, deptMaster],
+  );
 
   if (!allowManage) {
     return (
@@ -300,18 +440,20 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <span className='form-label'>ユーザーID</span>
             <Input
               value={userId}
-              placeholder='例：bucho4'
-              maxLength={20}
+              placeholder='例：adm01'
+              maxLength={5}
               onChange={(e) => setUserId(e.target.value)}
+              disabled={saving || isEditing}
             />
           </div>
           <div className='form-field'>
             <span className='form-label'>氏名</span>
             <Input
               value={name}
-              placeholder='例：山田 一郎'
-              maxLength={30}
+              placeholder='例：山田　一郎'
+              maxLength={10}
               onChange={(e) => setName(e.target.value)}
+              disabled={saving}
             />
           </div>
           <div className='form-field'>
@@ -319,8 +461,9 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <Select
               value={role}
               options={ROLE_OPTIONS}
-              onChange={(v) => setRole(v)}
+              onChange={(v: UserRole) => setRole(v)}
               style={{ width: '100%' }}
+              disabled={saving}
             />
           </div>
           <div className='form-field'>
@@ -329,29 +472,45 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               value={departmentId}
               options={deptOptions}
               allowClear
+              showSearch
+              optionFilterProp='label'
               placeholder='（未選択＝全部門）'
+              notFoundContent={
+                loadingDepartments
+                  ? '読み込み中...'
+                  : '部門が登録されていません'
+              }
               onChange={(v?: string) => setDepartmentId(v)}
               style={{ width: '100%' }}
+              disabled={saving || loadingDepartments}
             />
           </div>
           <div className='form-field'>
             <span className='form-label'>パスワード</span>
             <Input
               value={password}
-              maxLength={32}
+              maxLength={PASSWORD_MAX_LENGTH}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={saving}
             />
           </div>
           <Space className='user-form-actions'>
-            <Button type='primary' icon={<PlusOutlined />} onClick={handleSubmit}>
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              onClick={handleSubmit}
+              loading={saving}
+            >
               {isEditing ? '更新' : '追加'}
             </Button>
-            <Button onClick={resetForm}>クリア</Button>
+            <Button onClick={resetForm} disabled={saving}>
+              クリア
+            </Button>
           </Space>
         </div>
         <Text type='secondary' className='user-note'>
           ※ 部長は「所属部門」を設定すると、ログイン直後にその部門で絞り込まれます（未設定＝全部門）。
-          パスワードはモック表示です（実運用ではバックエンドで管理）。
+          パスワードは保存対象です（バックエンドで管理）。
         </Text>
       </Card>
 
@@ -361,13 +520,16 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         title={`ユーザー一覧（${users.length} 名）`}
         style={{ marginTop: 12 }}
       >
-        <Table<AuthUser>
-          rowKey='userId'
-          size='small'
-          columns={columns}
-          dataSource={users}
-          pagination={false}
-        />
+        <Spin spinning={loading}>
+          <Table<AuthUser>
+            rowKey='userId'
+            size='small'
+            tableLayout='fixed'
+            columns={columns}
+            dataSource={users}
+            pagination={false}
+          />
+        </Spin>
       </Card>
     </div>
   );

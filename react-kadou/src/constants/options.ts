@@ -68,6 +68,16 @@ export const YAKUSHOKU_ROLE_MAP: Record<
 export const DEFAULT_ROLE = { role: 'bucho', roleLabel: '部長' };
 
 /**
+ * ロール（UserRole）→ 役職区分コード（jn_user_table.yakushoku_kubun）の変換。
+ * YAKUSHOKU_ROLE_MAP の逆変換で、ユーザー管理画面のリクエスト送信時に使う。
+ */
+export const ROLE_TO_KUBUN: Record<UserRole, string> = {
+  bucho: '0',
+  admin: '1',
+  'jigyo-bucho': '2',
+};
+
+/**
  * 画面＿休日設置
  */
 
@@ -104,4 +114,3 @@ export const HOLIDAY_IMPORT_ACCEPT =
 export const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
   date: ['日付', '休日', '休日付', 'date'],
 };
-

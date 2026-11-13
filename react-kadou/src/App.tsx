@@ -588,8 +588,10 @@ function App() {
         users={users}
         setUsers={setUsers}
         currentUserId={currentUserId}
-        departments={store.departments}
+        year={selectedYear}
         allowManage={currentUser?.role === 'admin'}
+        operatorId={currentUserId}
+        active={activeView === 'user-manage'}
       />
     ),
   };
