@@ -35,6 +35,14 @@ import { fetchDepartments } from "../Department/departmentApi";
 
 const { Title, Text } = Typography;
 
+const EMPLOYEE_NO_PATTERN = /^[0-9]{1,5}$/;
+const ROLE_PATTERN = /^[A-Za-z0-9]{1,6}$/;
+const EMPLOYEE_NO_FORMAT_MESSAGE =
+  "社員番号は5桁以内の半角数字で入力してください。";
+const EMPLOYEE_NO_REQUIRED_MESSAGE = "社員番号を入力してください。";
+const ROLE_FORMAT_MESSAGE =
+  "役割は6桁以内の半角英数字で入力してください。";
+
 interface PersonnelInfoScreenProps {
   /** 表示する年度 */
   year: number;
@@ -86,10 +94,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 }) => {
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState("");
+  const [employeeNoError, setEmployeeNoError] = useState("");
   // 検索で既存要員の取得を確認した社員番号
   const [lookedUpExistingNo, setLookedUpExistingNo] = useState("");
   // 役割（編集可）
   const [role, setRole] = useState("");
+  const [roleError, setRoleError] = useState("");
   // 名前（編集可）
   const [name, setName] = useState("");
   // 所属（編集可。部門マスタの departmentId）
@@ -157,8 +167,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 入力値を初期化 */
   const handleReset = () => {
     setEmployeeNo("");
+    setEmployeeNoError("");
     setLookedUpExistingNo("");
     setRole("");
+    setRoleError("");
     setName("");
     setDeptId(undefined);
     setConfirmedNo("");
@@ -204,12 +216,17 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    * マスタに存在しない場合は、新規追加するか確認する。
    */
   const handleLookup = async (rawNo: string) => {
-    const no = rawNo.trim();
+    const no = rawNo;
     if (!no) {
-      message.warning("社員番号を入力してください。");
+      setEmployeeNoError(EMPLOYEE_NO_REQUIRED_MESSAGE);
+      return;
+    }
+    if (!EMPLOYEE_NO_PATTERN.test(no)) {
+      setEmployeeNoError(EMPLOYEE_NO_FORMAT_MESSAGE);
       return;
     }
 
+    setEmployeeNoError("");
     setLookedUpExistingNo("");
     try {
       // 后台 API から社員情報を取得
@@ -219,7 +236,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       if (person) {
         // 既存の要員 → 役割・名前・所属 を表示する
         setEmployeeNo(person.employeeNo);
+        setEmployeeNoError("");
         setRole(person.role || "");
+        setRoleError(
+          person.role && !ROLE_PATTERN.test(person.role)
+            ? ROLE_FORMAT_MESSAGE
+            : "",
+        );
         setName(person.name || "");
         setDeptId(person.departmentId || undefined);
         setLookedUpExistingNo(person.employeeNo.trim());
@@ -239,6 +262,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
           cancelText: "キャンセル",
           onOk: () => {
             setRole("");
+            setRoleError("");
             setName("");
             setDeptId(undefined);
             setConfirmedNo(no);
@@ -268,6 +292,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       cancelText: "キャンセル",
       onOk: () => {
         setRole("");
+        setRoleError("");
         setName("");
         setDeptId(undefined);
         setConfirmedNo(no);
@@ -309,20 +334,30 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 登録（追加／更新）。未確認の新規社員番号は追加確認を行う */
   const handleSubmit = async () => {
-    const no = employeeNo.trim();
+    const no = employeeNo;
     if (!no) {
-      message.warning("社員番号を入力してください。");
+      setEmployeeNoError(EMPLOYEE_NO_REQUIRED_MESSAGE);
       return;
     }
+    if (!EMPLOYEE_NO_PATTERN.test(no)) {
+      setEmployeeNoError(EMPLOYEE_NO_FORMAT_MESSAGE);
+      return;
+    }
+    setEmployeeNoError("");
     if (isUnsearchedExisting) {
       message.warning("既存の社員番号です。検索してから更新してください。");
       return;
     }
     // 役割は必須入力（未入力では登録できない）
-    if (!role.trim()) {
+    if (!role) {
       message.warning("役割を入力してください。");
       return;
     }
+    if (!ROLE_PATTERN.test(role)) {
+      setRoleError(ROLE_FORMAT_MESSAGE);
+      return;
+    }
+    setRoleError("");
     if (!name.trim()) {
       message.warning("名前を入力してください。");
       return;
@@ -549,10 +584,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               <Input
                 placeholder='例：10001'
                 value={employeeNo}
-                maxLength={10}
                 onChange={(e) => {
-                  setEmployeeNo(e.target.value);
+                  const value = e.target.value;
+                  setEmployeeNo(value);
                   setLookedUpExistingNo("");
+                  setEmployeeNoError(
+                    value && !EMPLOYEE_NO_PATTERN.test(value)
+                      ? EMPLOYEE_NO_FORMAT_MESSAGE
+                      : "",
+                  );
                   // 表示中の社員番号が変わったら「追加確認済み」を解除する
                   setConfirmedNo("");
                 }}
@@ -565,22 +605,31 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 検索
               </Button>
             </Space.Compact>
+            {employeeNoError && (
+              <Text type='danger'>{employeeNoError}</Text>
+            )}
           </div>
           <div>
             <div className='form-label'>役割（必須）</div>
             <Input
               placeholder='例：T11E03'
               value={role}
-              maxLength={30}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setRole(value);
+                setRoleError(
+                  value && !ROLE_PATTERN.test(value) ? ROLE_FORMAT_MESSAGE : "",
+                );
+              }}
             />
+            {roleError && <Text type='danger'>{roleError}</Text>}
           </div>
           <div>
             <div className='form-label'>名前（必須）</div>
             <Input
               placeholder='例：山田 花子'
               value={name}
-              maxLength={30}
+              maxLength={20}
               onChange={(e) => setName(e.target.value)}
               onPressEnter={handleSubmit}
             />
