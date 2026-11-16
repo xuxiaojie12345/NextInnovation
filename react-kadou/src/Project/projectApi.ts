@@ -80,18 +80,15 @@ export interface ProjectImportApiRow {
 export interface ProjectImportApiResult {
   added: number;
   skipped: number;
-  /** 既存データと重複した件数（略称 / 項目ID / Project名称 のいずれか一致） */
+  /** 既存データと重複した件数（顧客/案件/チーム/Subチーム が一致） */
   duplicated?: number;
   /** 既存データと重複した行のファイル上での行番号 */
   duplicatedLines?: number[];
-  /** 重複した行ごとの理由（行番号 → ['略称','項目ID','Project名称'] の部分集合） */
+  /** 重複した行ごとの理由（行番号 → ['既存データと重複']） */
   duplicatedReasons?: Record<number, string[]>;
-  /** 全項目（顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称）が完全一致した行番号（強制スキップ） */
+  /** 既存データと重複した行番号（取り込まない。画面ではグレー表示） */
   fullDuplicateLines?: number[];
-  /**
-   * 略称 / 項目ID / Project名称 のいずれかだけが一致した行番号（部分重複）。
-   * 既定は取り込み対象で、ユーザーが外した行だけ取り込まない。
-   */
+  /** 旧仕様（部分重複）との互換用。現在は常に空 */
   partialDuplicateLines?: number[];
   /** 重複せず、そのまま追加できる行番号 */
   addableLines?: number[];
@@ -99,6 +96,10 @@ export interface ProjectImportApiResult {
   aborted: boolean;
   /** ファイル全体を中止した理由 */
   abortReason: string | null;
+  /** ファイル内で重複した行番号（同じ一意キーが 2 行以上ある行。1 行目も含む） */
+  fileDuplicateLines?: number[];
+  /** ファイル内重複のグループ（行番号のまとまり。例: [[3, 7], [12, 15, 20]]） */
+  fileDuplicateGroups?: number[][];
   warnings: string[];
 }
 

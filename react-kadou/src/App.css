@@ -75,3 +75,8 @@
   color: #888;
   max-width: 460px;
 }
+
+/* 一括読み込みプレビュー：ファイル内重複の行（取り込まない行）を薄くハイライト */
+.personnel-import-row-dup > td {
+  background: #fff1f0 !important;
+}

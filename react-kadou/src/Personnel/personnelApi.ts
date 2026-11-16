@@ -53,6 +53,12 @@ export interface PersonnelImportApiResult {
    * 上書き時は所属を更新しないため、プレビューはこの値をグレー表示する。
    */
   duplicatedDepartments?: Record<string, string>;
+  /** 所属が未確定の社員番号（画面で所属を選択させる） */
+  pendingDepartmentNos?: string[];
+  /** ファイル内で重複した行番号（同じ社員番号が 2 行以上ある行。1 行目も含む） */
+  fileDuplicateLines?: number[];
+  /** ファイル内重複のグループ（行番号のまとまり） */
+  fileDuplicateGroups?: number[][];
   /** ファイル全体を中止したか */
   aborted: boolean;
   /** ファイル全体を中止した理由 */

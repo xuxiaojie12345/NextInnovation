@@ -57,6 +57,10 @@ class PersonnelImportResult(BaseModel):
     duplicatedDepartments: dict[str, str] = {}
     # 所属が未確定の社員番号（dryRun 時のみ。画面で所属を選択させる）
     pendingDepartmentNos: list[str] = []
+    # ファイル内で重複した行番号（同じ社員番号が 2 行以上ある行。1 行目も含む）
+    fileDuplicateLines: list[int] = []
+    # ファイル内重複のグループ（行番号のまとまり。例: [[3, 7], [12, 15]]）
+    fileDuplicateGroups: list[list[int]] = []
     # ファイル全体を中止したか（重複エラーなどの致命的な問題）
     aborted: bool = False
     # ファイル全体を中止した理由（aborted=true のときのみ）

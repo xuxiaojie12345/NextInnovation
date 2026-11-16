@@ -31,8 +31,22 @@ export interface ProjectImportRow {
   team: string;
   /** Subチーム（任意） */
   subTeam: string;
-  /** 所属部門（必須。ファイルの値をそのまま登録する） */
+  /**
+   * 所属部門（表示用の部門名称）。
+   * ファイルの値を部門マスタ（部門名称 / 部門別名）と照合して確定する。
+   * 一致しない場合は空にして、プレビュー上で選択させる。
+   */
   department: string;
+  /**
+   * 所属部門ID（部門マスタの departmentId）。
+   * 照合で 1 件に絞れた場合、または画面で選択した場合だけ設定される。
+   */
+  departmentId?: string;
+  /**
+   * 所属部門が「ファイルの値から自動で確定した」か。
+   * false かつ departmentId 未設定 → プレビューでプルダウン選択させる。
+   */
+  departmentAutoMatched?: boolean;
   /** 項目ID（任意） */
   projectCode: string;
   /** Project名称（任意） */
@@ -59,12 +73,17 @@ export const PROJECT_IMPORT_ACCEPT =
 
 /** 画面に表示する形式の説明 */
 export const PROJECT_IMPORT_FORMAT_HINT =
-  '形式：顧客／案件／チーム／Subチーム／Subチーム／略称／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。E 列の Subチームは取込対象外です。「所属部門」は入力どおり登録します。取り込むと新しいプロジェクトとして追加されます。';
+  '形式：顧客／案件／チーム／Subチーム／Subチーム／略称／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。E 列の Subチームは取込対象外です。「所属部門」は部門マスタ（部門名称・部門別名）と照合し、一致しない場合はプレビューで選択します。取り込むと新しいプロジェクトとして追加されます。';
 
 /**
  * 取込む項目（列）のキー。行番号 line はファイル上のメタ情報なので列に含めない。
+ * departmentId / departmentAutoMatched は照合結果として画面側で設定する値で、
+ * ファイルの列ではないため対象外とする。
  */
-type ProjectImportField = Exclude<keyof ProjectImportRow, 'line'>;
+type ProjectImportField = Exclude<
+  keyof ProjectImportRow,
+  'line' | 'departmentId' | 'departmentAutoMatched'
+>;
 
 type ProjectImportColumns = Record<ProjectImportField, number>;
 

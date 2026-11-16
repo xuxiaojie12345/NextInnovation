@@ -455,7 +455,11 @@ def import_personnel(
     # --- 2) ファイル内の重複を検出（重複があればファイル全体を中止） ---
     seen: dict[str, PersonnelImportRow] = {}
     duplicates: list[str] = []
+    # 社員番号 → その社員番号の行（行番号）。画面で重複行を特定するために返す
+    grouped: dict[str, list[int]] = {}
     for row in valid_rows + pending_department_rows:
+        if row.line is not None:
+            grouped.setdefault(row.employeeNo, []).append(row.line)
         first = seen.get(row.employeeNo)
         if first is not None:
             origin = f"{first.line}行目の" if first.line else "同一ファイル内の"
@@ -467,6 +471,15 @@ def import_personnel(
         seen[row.employeeNo] = row
 
     if duplicates:
+        # 重複している行番号のまとまり（2 行以上のもの）を返す
+        # NOTE: 画面はこの行だけを「ファイル内重複」として表示し、
+        #       「取り込む」操作自体を無効化する（项目管理画面と同じ挙動）。
+        dup_groups = [
+            sorted(lines) for lines in grouped.values() if len(lines) > 1
+        ]
+        dup_groups.sort(key=lambda g: g[0])
+        result.fileDuplicateGroups = dup_groups
+        result.fileDuplicateLines = sorted({n for g in dup_groups for n in g})
         result.aborted = True
         result.abortReason = (
             f"ファイル内に社員番号の重複が {len(duplicates)} 件あります。"

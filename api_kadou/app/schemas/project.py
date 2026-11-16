@@ -90,19 +90,16 @@ class ProjectImportResult(BaseModel):
 
     added: int = 0
     skipped: int = 0
-    # 既存データと重複した件数（略称 / 項目ID / Project名称 のいずれか一致）
+    # 既存データと重複した件数（顧客/案件/チーム/Subチーム が一致）
     duplicated: int = 0
     # 既存データと重複した行のファイル上での行番号（画面で「重複」を判定する用）
-    # ※ 完全重複・部分重複の両方を含む
     duplicatedLines: list[int] = []
-    # 重複した行ごとの理由（行番号 → ['略称', '項目ID', 'Project名称'] の部分集合）
+    # 重複した行ごとの理由（行番号 → ['既存データと重複']）
     duplicatedReasons: dict[int, list[str]] = {}
-    # 全項目（顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称）が
-    # 既存データと完全一致した行のファイル上行番号。
-    # この行は強制的に取り込まない（ユーザー選択の対象外）
+    # 既存データと重複した行のファイル上行番号。
+    # この行は取り込まない（画面ではグレー表示・チェック不可）
     fullDuplicateLines: list[int] = []
-    # 略称 / 項目ID / Project名称 のいずれかだけが一致した行（部分重複）の行番号。
-    # 画面では既定で取り込み対象（チェックON）とし、ユーザーが外した行だけ取り込まない
+    # 旧仕様（部分重複）との互換用。現在は常に空。
     partialDuplicateLines: list[int] = []
     # 既存データ・直前の行と重複せず、そのまま追加できる行の行番号
     addableLines: list[int] = []
@@ -110,6 +107,10 @@ class ProjectImportResult(BaseModel):
     aborted: bool = False
     # ファイル全体を中止した理由（aborted=true のときのみ）
     abortReason: Optional[str] = None
+    # ファイル内で重複した行番号（同じ一意キーが 2 行以上ある行。1 行目も含む）
+    fileDuplicateLines: list[int] = []
+    # ファイル内重複のグループ（行番号のまとまり。例: [[3, 7], [12, 15, 20]]）
+    fileDuplicateGroups: list[list[int]] = []
     warnings: list[str] = []
 
 

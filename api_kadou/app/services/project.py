@@ -22,6 +22,10 @@ from app.sql import load_sql
 # 操作者が指定されない場合のフォールバック（認証情報が取れないとき用）
 _DEFAULT_OP_USER = "ADMIN"
 
+# チーム / Subチーム は任意入力のため、未入力時は DB へ "-" を登録する
+# （空欄同士を同一とみなすため、NULL ではなく固定値にする）
+_EMPTY_TEAM = "-"
+
 # 文字列長の上限（DB 定義に合わせる）
 _MAX_SYS_PROJECT_ID = 10
 _MAX_PROJECT_ID = 20
@@ -79,8 +83,25 @@ def _flag_value(value, default: bool) -> str:
 
 
 def _norm(value) -> str:
-    """入力を前後空白除去 + 全角スペース除去した文字列にする。"""
+    """入力を前後空白除去 + 全角スペース除去した文字列にする。
+
+    NOTE: 全角/半角・大文字/小文字は区別する（小文字化は行わない）。
+    """
     return "" if value is None else str(value).replace("\u3000", " ").strip()
+
+
+def _team_norm(value) -> str:
+    """チーム / Subチーム 用の正規化（未入力は "-" にする）。"""
+    return _norm(value) or _EMPTY_TEAM
+
+
+def _key_norm(value) -> str:
+    """重複判定（一意制約）用の正規化。
+
+    比較時は前後空白のみ除去する（全角/半角・大文字/小文字は区別する）。
+    チーム / Subチーム は未入力を "-" として扱うため、空欄同士は同一とみなす。
+    """
+    return _norm(value)
 
 
 def _check_length(data: dict) -> None:
@@ -104,13 +125,18 @@ def build_project_abbr(
     """プロジェクトの「略称」を組み立てる（フロントエンドと同一規則）。
 
     顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
-    ※未入力の項目は連結しない
+    ※未入力の項目は連結しない（"-" は未入力として扱う）
     """
+
+    def part(value) -> str:
+        text_value = _norm(value)
+        return "" if text_value == _EMPTY_TEAM else text_value
+
     parts = [
-        _norm(customer)[:1],
-        _norm(case_name),
-        _norm(team),
-        _norm(sub_team),
+        part(customer)[:1],
+        part(case_name),
+        part(team),
+        part(sub_team),
     ]
     return "・".join(p for p in parts if p != "")
 
@@ -181,8 +207,8 @@ def create_project(
             "sys_project_id": sys_project_id,
             "customer": _norm(data.get("customer")),
             "case_name": _norm(data.get("caseName")),
-            "team": _norm(data.get("team")) or None,
-            "sub_team": _norm(data.get("subTeam")) or None,
+            "team": _team_norm(data.get("team")),
+            "sub_team": _team_norm(data.get("subTeam")),
             "department_id": _norm(data.get("departmentId")),
             "project_id": _norm(data.get("projectCode")) or None,
             "project_name": _norm(data.get("project_name")) or None,
@@ -199,8 +225,8 @@ def create_project(
         "projectCode": data.get("projectCode") or "",
         "customer": data["customer"],
         "caseName": data["caseName"],
-        "team": data.get("team") or "",
-        "subTeam": data.get("subTeam") or "",
+        "team": _team_norm(data.get("team")),
+        "subTeam": _team_norm(data.get("subTeam")),
         "abbr": build_project_abbr(
             data["customer"],
             data["caseName"],
@@ -232,8 +258,8 @@ def update_project(
             "sys_project_id": sys_project_id,
             "customer": _norm(data.get("customer")),
             "case_name": _norm(data.get("caseName")),
-            "team": _norm(data.get("team")) or None,
-            "sub_team": _norm(data.get("subTeam")) or None,
+            "team": _team_norm(data.get("team")),
+            "sub_team": _team_norm(data.get("subTeam")),
             "department_id": _norm(data.get("departmentId")),
             "project_id": _norm(data.get("projectCode")) or None,
             "project_name": _norm(data.get("project_name")) or None,
@@ -286,31 +312,97 @@ def _validate(row) -> str | None:
     return None
 
 
-def _abbr_key(customer, case_name, team, sub_team) -> str:
-    """重複判定用の「略称」キー（全角スペース除去・トリム・小文字化）。"""
-    return _norm(
-        build_project_abbr(
-            _norm(customer), _norm(case_name), _norm(team), _norm(sub_team)
+def _unique_key(customer, case_name, team, sub_team) -> str:
+    """一意制約の判定用キー。
+
+    対象: 顧客 / 案件 / チーム / Subチーム
+    比較時は前後空白のみ除去する（全角/半角・大文字/小文字は区別する）。
+    チーム / Subチーム は未入力を "-" として扱う（空欄同士は同一とみなす）。
+    """
+    return "\x1f".join(
+        [
+            _key_norm(customer),
+            _key_norm(case_name),
+            _key_norm(team) or _EMPTY_TEAM,
+            _key_norm(sub_team) or _EMPTY_TEAM,
+        ]
+    )
+
+
+def _row_unique_key(row) -> str:
+    """取込行の一意キー（チーム/Subチーム の空欄は "-" 扱い）。"""
+    return _unique_key(row.customer, row.caseName, row.team, row.subTeam)
+
+
+def _dept_match_key(value) -> str:
+    """部門名称 / 部門別名の照合キー。
+
+    部門マスタには「前後に空白が入った別名」（例: ' 開発1課'、'基 盤課123'）が
+    登録されていることがあるため、照合時は空白（半角・全角）をすべて除去する。
+    全角/半角の文字種、大文字/小文字は区別する。
+    """
+    if value is None:
+        return ""
+    return "".join(str(value).split())
+
+
+def _department_index(db: Session, year_id: str) -> dict[str, list[str]]:
+    """部門名称 / 部門別名 → 部門ID の索引を作る（年度単位）。
+
+    NOTE: jn_project_master.department_id は部門マスタの ID を保持する。
+          取込ファイルの「所属部門」列は名称（または別名）で書かれるため、
+          登録前に本索引で ID へ変換する必要がある。
+          （名称を直接登録すると画面側で「部門マスタに無い」と赤字表示になる）
+    """
+    rows = (
+        db.execute(
+            text(load_sql("project/department_resolve.sql")),
+            {"year_id": year_id},
         )
-    ).lower()
+        .mappings()
+        .all()
+    )
+    index: dict[str, list[str]] = {}
+    for r in rows:
+        dept_id = str(r["department_id"])
+        for key in (r["department_name"], r["department_alisa"]):
+            text_key = _dept_match_key(key)
+            if not text_key:
+                continue
+            ids = index.setdefault(text_key, [])
+            if dept_id not in ids:
+                ids.append(dept_id)
+    return index
 
 
-def _text_key(value) -> str:
-    """重複判定用の文字列キー（全角スペース除去・トリム・小文字化）。"""
-    return _norm(value).lower()
+def _resolve_department_id(
+    index: dict[str, list[str]], department: str, year_id: str = ""
+) -> tuple[str | None, bool]:
+    """所属部門（名称 / 別名 / ID）から部門IDを解決する。
+
+    Returns:
+        (部門ID, 解決できたか)
+        候補が 1 件に絞れた場合だけ ID を返す（同名が複数ある場合は曖昧なため None）
+    """
+    # 既に部門ID（数字）が書かれている場合は、そのまま部門IDとして扱う
+    text_value = _norm(department)
+    if not text_value:
+        return None, False
+    if text_value.isdigit():
+        return text_value, True
+
+    ids = index.get(_dept_match_key(department))
+    if ids and len(ids) == 1:
+        return ids[0], True
+    return None, False
 
 
-def _existing_keys(db: Session, year_id: str) -> tuple[set, set, set, set]:
-    """指定年度の既存プロジェクトから重複判定用のキー集合を作る。
 
-    判定条件（いずれか一致で重複）：
-      1) 略称（顧客の1文字目・案件・チーム・Subチーム）
-      2) 項目ID（project_id）
-      3) Project名称（project_name）
-    空文字のキーは集合に含めない（未入力同士を重複扱いしないため）。
+def _existing_keys(db: Session, year_id: str) -> set[str]:
+    """指定年度の既存プロジェクトから一意キーの集合を作る。
 
-    4つ目は「全項目完全一致」判定用のキー集合
-    （顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称 を連結したもの）。
+    判定条件: (year, 顧客, 案件, チーム, Subチーム) が一致すること。
+    所属部門 / 項目ID / Project名称 / フラグ類は判定に含めない。
     """
     rows = (
         db.execute(
@@ -320,53 +412,43 @@ def _existing_keys(db: Session, year_id: str) -> tuple[set, set, set, set]:
         .mappings()
         .all()
     )
-    abbrs: set[str] = set()
-    codes: set[str] = set()
-    names: set[str] = set()
-    fulls: set[str] = set()
-    for r in rows:
-        abbr = _text_key(r["abbr"])
-        if abbr:
-            abbrs.add(abbr)
-        code = _text_key(r["project_id"])
-        if code:
-            codes.add(code)
-        name = _text_key(r["project_name"])
-        if name:
-            names.add(name)
-        fulls.add(
-            _full_key(
-                r["customer"],
-                r["case_name"],
-                r["team"],
-                r["sub_team"],
-                r["department_id"],
-                r["project_id"],
-                r["project_name"],
-            )
-        )
-    return abbrs, codes, names, fulls
+    return {
+        _unique_key(r["customer"], r["case_name"], r["team"], r["sub_team"])
+        for r in rows
+    }
 
 
-def _full_key(
-    customer, case_name, team, sub_team, department, project_code, project_name
-) -> str:
-    """全項目完全一致の判定用キー（1行分の全フィールドを連結）。
+def project_key_exists(
+    db: Session,
+    year_id: str,
+    customer,
+    case_name,
+    team,
+    sub_team,
+    exclude_sys_id: str | None = None,
+) -> bool:
+    """同じ一意キーのプロジェクトが既に存在するか。
 
-    対象: 顧客 / 案件 / チーム / Subチーム / 所属部門 / 項目ID / Project名称
-    正規化（全角スペース→半角、前後トリム、小文字化）したうえで連結する。
+    exclude_sys_id を指定すると、そのシステム項目IDの行は判定から除く
+    （更新時に「自分自身」を重複と判定しないため）。
     """
-    return "\x1f".join(
-        [
-            _text_key(customer),
-            _text_key(case_name),
-            _text_key(team),
-            _text_key(sub_team),
-            _text_key(department),
-            _text_key(project_code),
-            _text_key(project_name),
-        ]
-    )
+    target = _unique_key(customer, case_name, team, sub_team)
+    for r in (
+        db.execute(
+            text(load_sql("project/project_duplicate_select.sql")),
+            {"year_id": year_id},
+        )
+        .mappings()
+        .all()
+    ):
+        if (
+            exclude_sys_id is not None
+            and str(r["sys_project_id"]) == str(exclude_sys_id)
+        ):
+            continue
+        if _unique_key(r["customer"], r["case_name"], r["team"], r["sub_team"]) == target:
+            return True
+    return False
 
 
 def import_projects(
@@ -377,53 +459,46 @@ def import_projects(
 ) -> ProjectImportResult:
     """プロジェクト情報を一括取り込みする。
 
-    取り込みルール（画面の仕様と 1 対 1 で対応）:
-      1) 既存データと重複しない行 ……… そのまま追加する
-      2) 既存データと「全項目完全一致」の行 … 追加しない（強制。ユーザー選択不可）
-      3) ファイル内に「全項目完全一致」の行が 2 行以上ある … ファイル全体を中止する
+    取り込みルール:
+      1) 一意キー (顧客/案件/チーム/Subチーム) が既存データと一致する行
+         … 追加しない（重複として画面に表示する）
+      2) ファイル内に同じ一意キーの行が 2 行以上ある … ファイル全体を中止する
          （1 件も登録しない / aborted=True）
-      4) 略称・項目ID・Project名称 のいずれかだけが一致する行（部分重複）
-         … 既定では追加する。画面でユーザーが「取り込まない」を選んだ行
-         （payload.skipLines）だけ追加しない
-      5) 上記が混在する場合 … 行ごとに上記を判定し、1)〜4) を同時に適用する
+      3) 上記以外の行 … そのまま追加する
 
     dryRun=True のときは検証のみ行い、DB へは書き込まない。
     「所属部門」列の値は部門マスタと照合せず、書かれている内容を
     そのまま jn_project_master.department_id へ登録する。
+    チーム / Subチーム が空欄の場合は "-" を登録する。
     """
     result = ProjectImportResult()
 
-    # --- 0) ファイル内の「全項目完全一致」行を検出（行番号ベース）---
-    # 上記(3): ファイル内に同じ内容の行が 2 行以上あれば、行の追加可否に
-    #          関係なくファイル全体を中止する（1 件も登録しない）
-    file_dup_lines: list[int] = []
+    # --- 0) ファイル内の重複（同じ一意キー）を検出（行番号ベース）---
+    # 既存データとの重複は「その行だけ取り込まない」だが、
+    # ファイル内の重複は「どちらを正とするか決められない」ため全体を中止する。
+    # NOTE: 中止の場合は「ファイル内で重複している行」だけを返す。
+    #       既存データとの重複（fullDuplicateLines 等）は空のままにして、
+    #       どれがファイル内の重複なのかを画面で判別できるようにする。
     if payload.abortOnFileDuplicate:
-        seen_full: dict[str, int] = {}
+        grouped: dict[str, list[int]] = {}
         for row in payload.rows:
-            full = _full_key(
-                row.customer,
-                row.caseName,
-                row.team,
-                row.subTeam,
-                row.department,
-                row.projectCode,
-                row.project_name,
-            )
-            first_line = seen_full.get(full)
-            if first_line is None:
-                seen_full[full] = row.line if row.line is not None else 0
+            if row.line is None:
                 continue
-            # 2 行目以降（1 行目も含めて中止対象として報告する）
-            if first_line not in file_dup_lines:
-                file_dup_lines.append(first_line)
-            if row.line is not None and row.line not in file_dup_lines:
-                file_dup_lines.append(row.line)
-        if file_dup_lines:
+            grouped.setdefault(_row_unique_key(row), []).append(row.line)
+
+        dup_groups = [
+            sorted(lines) for lines in grouped.values() if len(lines) > 1
+        ]
+        if dup_groups:
+            dup_groups.sort(key=lambda g: g[0])
+            file_dup_lines = sorted({n for g in dup_groups for n in g})
             result.aborted = True
+            result.fileDuplicateLines = file_dup_lines
+            result.fileDuplicateGroups = dup_groups
             result.abortReason = (
-                "取り込みファイル内に、全項目（顧客/案件/チーム/Subチーム/"
-                "所属部門/項目ID/Project名称）が完全に一致する行が複数あります"
-                f"（{', '.join(str(n) for n in sorted(file_dup_lines))} 行目）。"
+                "取り込みファイル内に、顧客・案件・チーム・Subチームが"
+                "同じ行が複数あります"
+                f"（{', '.join(str(n) for n in file_dup_lines)} 行目）。"
                 "重複行を削除してから、もう一度取り込んでください。"
                 "このファイルの内容は 1 件も登録していません。"
             )
@@ -440,67 +515,38 @@ def import_projects(
             continue
         valid_rows.append(row)
 
-    # --- 2) 既存データとの重複判定（DB を参照）---
-    # 完全重複（全項目一致）は強制的に取り込まない。
-    # 部分重複（略称/項目ID/Project名称のいずれか）は既定で取り込むが、
-    # 画面でユーザーが外した行（skipLines）は取り込まない。
-    skip_lines = set(payload.skipLines or [])
-    abbrs, codes, names, fulls = _existing_keys(db, year_id)
-    to_add = []
-    for row in valid_rows:
-        abbr = _abbr_key(row.customer, row.caseName, row.team, row.subTeam)
-        code = _text_key(row.projectCode)
-        name = _text_key(row.project_name)
-        full = _full_key(
-            row.customer,
-            row.caseName,
-            row.team,
-            row.subTeam,
-            row.department,
-            row.projectCode,
-            row.project_name,
-        )
-        # 該当した条件をすべて集める（画面で「どれが重複したか」を出すため）
-        reasons: list[str] = []
-        if abbr and abbr in abbrs:
-            reasons.append("略称")
-        if code and code in codes:
-            reasons.append("項目ID")
-        if name and name in names:
-            reasons.append("Project名称")
+    # 所属部門（名称 / 別名）→ 部門ID の索引（年度単位で 1 回だけ作る）
+    dept_index = _department_index(db, year_id)
 
-        # (2) 既存データと全項目完全一致 → 強制的に取り込まない
-        if full in fulls:
+    # --- 2) 既存データとの重複判定（DB を参照）---
+    existing_keys = _existing_keys(db, year_id)
+    to_add: list[tuple[object, str]] = []
+    for row in valid_rows:
+        # 所属部門は必須（部門マスタに無い／曖昧な場合は取り込まない）
+        # NOTE: 画面側（プレビュー）で所属部門を確定させてから送信するため、
+        #       ここで解決できない行は警告を出さずにスキップする。
+        department_id, resolved = _resolve_department_id(
+            dept_index, row.department
+        )
+        if not resolved:
+            result.skipped += 1
+            continue
+
+        key = _row_unique_key(row)
+        # 既存データと同じ一意キー → 取り込まない（重複として画面に表示する）
+        if key in existing_keys:
             result.duplicated += 1
             if row.line is not None:
                 result.duplicatedLines.append(row.line)
-                result.duplicatedReasons[row.line] = ["全項目一致"]
+                result.duplicatedReasons[row.line] = ["既存データと重複"]
                 result.fullDuplicateLines.append(row.line)
             continue
 
-        # (4) 部分重複 → 既定は取り込む。ユーザーが外した行だけ取り込まない
-        if reasons:
-            result.duplicated += 1
-            if row.line is not None:
-                result.duplicatedLines.append(row.line)
-                result.duplicatedReasons[row.line] = reasons
-                result.partialDuplicateLines.append(row.line)
-                if row.line in skip_lines:
-                    # ユーザーが取り込まないことを選んだ行
-                    result.skipped += 1
-                    continue
-
-        # (1) 追加する行のキーを集合へ入れて、以降の行を重複として判定する
-        if abbr:
-            abbrs.add(abbr)
-        if code:
-            codes.add(code)
-        if name:
-            names.add(name)
-        fulls.add(full)
+        # 以降の行を重複として判定できるよう、キーを集合へ入れる
+        existing_keys.add(key)
         if row.line is not None:
             result.addableLines.append(row.line)
-        to_add.append(row)
+        to_add.append((row, department_id))
 
     result.added = len(to_add)
 
@@ -508,18 +554,18 @@ def import_projects(
     if payload.dryRun:
         return result
 
-    # --- 4) 新規追加（完全重複・ユーザーが除外した行は追加しない）---
-    for row in to_add:
+    # --- 4) 新規追加 ---
+    for row, department_id in to_add:
         create_project(
             db,
             year_id,
             {
                 "customer": _norm(row.customer),
                 "caseName": _norm(row.caseName),
-                "team": _norm(row.team),
-                "subTeam": _norm(row.subTeam),
-                # 部門マスタとの照合は行わない（ファイルの値をそのまま登録する）
-                "departmentId": _norm(row.department),
+                "team": _team_norm(row.team),
+                "subTeam": _team_norm(row.subTeam),
+                # 部門マスタの ID を登録する（名称をそのまま登録しない）
+                "departmentId": department_id,
                 "projectCode": _norm(row.projectCode),
                 "project_name": _norm(row.project_name),
                 # 取込ファイルにフラグ列は無いため既定値（有効 / 非教育）
@@ -580,6 +626,17 @@ def register_project(
     _require_text(data.get("customer"), "E_KADOU_053")
     _require_text(data.get("caseName"), "E_KADOU_054")
 
+    # 一意キー (顧客/案件/チーム/Subチーム) が既存データと一致する場合は登録しない
+    if project_key_exists(
+        db,
+        year_id,
+        data.get("customer"),
+        data.get("caseName"),
+        data.get("team"),
+        data.get("subTeam"),
+    ):
+        raise BusinessException(status_code=409, message_id="E_KADOU_066")
+
     try:
         return create_project(db, year_id, data, op_user or _DEFAULT_OP_USER)
     except ValueError as e:
@@ -587,7 +644,7 @@ def register_project(
         raise _length_error(str(e))
     except IntegrityError:
         db.rollback()
-        raise BusinessException(status_code=409, message_id="E_KADOU_058")
+        raise BusinessException(status_code=409, message_id="E_KADOU_066")
 
 
 def modify_project(
@@ -608,6 +665,18 @@ def modify_project(
     data = payload.model_dump()
     _require_text(data.get("customer"), "E_KADOU_053")
     _require_text(data.get("caseName"), "E_KADOU_054")
+
+    # 一意キーが「他の」既存データと一致する場合は更新しない
+    if project_key_exists(
+        db,
+        year_id,
+        data.get("customer"),
+        data.get("caseName"),
+        data.get("team"),
+        data.get("subTeam"),
+        exclude_sys_id=sys_project_id,
+    ):
+        raise BusinessException(status_code=409, message_id="E_KADOU_066")
 
     try:
         updated = update_project(

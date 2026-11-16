@@ -321,14 +321,20 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     [departments],
   );
 
-  /** 一括取り込み：プレビュー行の所属を手動で選び直す（一致しなかった行のみ） */
+  /**
+   * 一括取り込み：プレビュー行の所属を手動で選び直す。
+   *
+   * NOTE: 行を特定するときは社員番号ではなく「行番号（1 始まり）」を使う。
+   *       ファイル内に同じ社員番号の行が複数ある場合、社員番号で更新すると
+   *       意図しない別行まで書き換えてしまうため。
+   */
   const handleImportDepartmentChange = useCallback(
-    (employeeNo: string, departmentId: string) => {
+    (lineNo: number, departmentId: string) => {
       const dept = departments.find((d) => d.departmentId === departmentId);
       setImportRows((prev) =>
         prev
-          ? prev.map((r) =>
-              r.employeeNo === employeeNo
+          ? prev.map((r, i) =>
+              (r.line ?? i + 1) === lineNo
                 ? {
                     ...r,
                     departmentId,
@@ -838,6 +844,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
+    // ファイル内に社員番号の重複がある → どちらを正とするか決められないため
+    // ファイル全体を中止する（项目管理画面と同じ扱い）
+    if (importAborted) {
+      message.error(t('W_KADOU_010'));
+      return;
+    }
     // 取り込み前チェックを一括で行い、不備は「1 回のダイアログ」にまとめて表示する
     // （1 件ずつ順番に止めると、直しては再実行を繰り返すことになるため）。
     //   1) ファイル解析時の警告（必須項目の空欄など）
@@ -851,7 +863,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
     // 新規追加行は所属が必須。既存データの上書き行は所属を更新しないので不要
     const unresolved = importRows.filter(
-      (r) => !r.departmentId && !importDuplicatedNos.has(r.employeeNo),
+      (r, index) =>
+        !r.departmentId &&
+        !importDuplicatedNos.has(r.employeeNo) &&
+        !importFileDuplicates.lines.has(r.line ?? index + 1),
     );
     unresolved.forEach((r) => {
       problems.push(
@@ -938,6 +953,59 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     }
   };
 
+  /**
+   * 一括読み込み：ファイル内で重複している行（同じ社員番号が 2 行以上）。
+   *
+   * NOTE: バックエンドの結果（fileDuplicateLines / groups）を優先するが、
+   *       バックエンドが未対応・未反映（aborted でも行番号が空）の場合に
+   *       備えて、常に画面側でも検出しておく。行番号は「社員番号の重複」
+   *       という同一基準で判定するため、両者の結果は一致する。
+   */
+  const importFileDuplicates = useMemo(() => {
+    const empty = { lines: new Set<number>(), groups: [] as number[][] };
+    if (!importRows || importRows.length === 0) return empty;
+
+    // 画面側で検出（社員番号が同じ行を 2 行以上まとめる）
+    // NOTE: 行番号は Excel 上の行番号（row.line）を優先する。
+    //       空行などがスキップされて配列の index とずれる場合は、
+    //       バックエンドが返す fileDuplicateLines（Excel 行番号）と
+    //       比較できるよう row.line を使う必要がある。
+    const grouped = new Map<string, number[]>();
+    importRows.forEach((r, i) => {
+      const key = (r.employeeNo ?? '').trim();
+      if (!key) return;
+      const lineNo = r.line ?? i + 1;
+      const list = grouped.get(key) ?? [];
+      list.push(lineNo);
+      grouped.set(key, list);
+    });
+    const localGroups = Array.from(grouped.values())
+      .filter((list) => list.length > 1)
+      .sort((a, b) => a[0] - b[0]);
+    const local = {
+      lines: new Set(localGroups.flat()),
+      groups: localGroups,
+    };
+
+    // バックエンドが行番号を返していればそちらを優先（行番号は Excel 上の行）
+    const fromApi = importCheck?.fileDuplicateLines;
+    if (fromApi && fromApi.length > 0) {
+      return {
+        lines: new Set(fromApi),
+        groups: (importCheck?.fileDuplicateGroups ?? []).map((g) => [...g]),
+      };
+    }
+    return local;
+  }, [importRows, importCheck]);
+
+  /**
+   * 一括読み込み：ファイル内重複により全体中止か。
+   * バックエンドが中止を返した場合に加え、画面側でファイル内重複を
+   * 検出した場合も中止扱いにする（1 件も登録しない）。
+   */
+  const importAborted =
+    importCheck?.aborted === true || importFileDuplicates.lines.size > 0;
+
   /** 一括読み込み：プレビュー表に出す追加／上書き件数（事前検証の結果を使う） */
   const importCounts = useMemo(
     () => ({
@@ -958,9 +1026,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const unresolvedRows = useMemo(
     () =>
       (importRows ?? []).filter(
-        (r) => !r.departmentId && !importDuplicatedNos.has(r.employeeNo),
+        (r, index) =>
+          !r.departmentId &&
+          !importDuplicatedNos.has(r.employeeNo) &&
+          !importFileDuplicates.lines.has(r.line ?? index + 1),
       ),
-    [importRows, importDuplicatedNos],
+    [importRows, importDuplicatedNos, importFileDuplicates],
   );
 
   /**
@@ -975,12 +1046,26 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       title: '区分',
       key: 'kind',
       width: 72,
-      render: (_, row) =>
-        importDuplicatedNos.has(row.employeeNo) ? (
+      /**
+       * 区分の表示：
+       *   ファイル内重複 … 同じ社員番号がファイル内に複数ある（ファイル全体を中止）
+       *   上書き         … 既存データと重複（名前・役割を上書き）
+       *   追加           … 新規追加
+       */
+      render: (_, row, index) => {
+        // NOTE: 行番号は Excel 上の行番号（row.line）を使う。
+        //       indexOf(row) は参照変化に弱く、index+1 は空行で
+        //       バックエンドの row.line と食い違うため。
+        const lineNo = row.line ?? index + 1;
+        if (importFileDuplicates.lines.has(lineNo)) {
+          return <Tag color='magenta'>ファイル内重複</Tag>;
+        }
+        return importDuplicatedNos.has(row.employeeNo) ? (
           <Tag color='gold'>上書き</Tag>
         ) : (
           <Tag color='green'>追加</Tag>
-        ),
+        );
+      },
     },
     { title: '社員番号', dataIndex: 'employeeNo', key: 'employeeNo', width: 110 },
     { title: '名前', dataIndex: 'name', key: 'name', width: 140 },
@@ -998,7 +1083,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
        *   3) 上記以外（照合できなかった行）→ プルダウンで選択させる。
        *      手動で選んでもプルダウンのまま残す（誤選択を修正できるようにする）。
        */
-      render: (_: string, row) => {
+      render: (_: string, row, index) => {
+        // NOTE: 行番号は Excel 上の行番号（row.line）を使う
+        const lineNo = row.line ?? index + 1;
+        // ファイル内重複の行は取り込まないため選択させない
+        if (importFileDuplicates.lines.has(lineNo)) {
+          return <Text>{row.department || '－'}</Text>;
+        }
         const isUpdate = importDuplicatedNos.has(row.employeeNo);
         if (isUpdate) {
           const existing = importDuplicatedDepartments[row.employeeNo] ?? '';
@@ -1036,7 +1127,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               label: d.name,
             }))}
             onChange={(v: string) =>
-              handleImportDepartmentChange(row.employeeNo, v)
+              handleImportDepartmentChange(lineNo, v)
             }
           />
         );
@@ -1239,13 +1330,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         open={importRows !== null}
         title='社員情報の一括読み込み'
         okText={
-          importCounts.duplicated > 0
-            ? '重複を上書きして取り込む'
-            : '取り込む'
+          importAborted
+            ? '閉じる'
+            : importCounts.duplicated > 0
+              ? '重複を上書きして取り込む'
+              : '取り込む'
         }
         cancelText='中止'
         confirmLoading={submittingImport}
-        okButtonProps={{ disabled: false }}
+        okButtonProps={{ disabled: importAborted }}
         onOk={() => void handleImportConfirm()}
         onCancel={handleImportCancel}
         width={760}
@@ -1253,17 +1346,38 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         {importRows && (
           <Space direction='vertical' style={{ width: '100%' }} size='middle'>
             <Alert
-              type={importCounts.duplicated > 0 ? 'warning' : 'info'}
+              type={
+                importAborted
+                  ? 'error'
+                  : importCounts.duplicated > 0
+                    ? 'warning'
+                    : 'info'
+              }
               showIcon
               message={
-                importCounts.duplicated > 0
-                  ? `重複が ${importCounts.duplicated} 件あります`
-                  : '取り込み内容の確認'
+                importAborted
+                  ? 'このファイルは取り込めません（ファイル内に社員番号の重複があります）'
+                  : importCounts.duplicated > 0
+                    ? `重複が ${importCounts.duplicated} 件あります`
+                    : '取り込み内容の確認'
               }
               description={
-                importCounts.duplicated > 0
-                  ? `${importFileName}（${importSource}）を読み込みました。重複した社員番号は 名前・役割 を上書きし（所属は変更できません）、新規の社員番号は所属を含めて追加します。中止した場合は 1 件も反映されません。`
-                  : `${importFileName}（${importSource}）を読み込みました。新規 ${importCounts.added} 件を追加します。`
+                importAborted
+                  ? importFileDuplicates.groups.length > 0
+                    ? `${importFileName}（${importSource}）：同じ社員番号がファイル内に複数あります。${importFileDuplicates.groups
+                        .map(
+                          (g, i) =>
+                            `グループ${i + 1}：${g
+                              .map((n) => `${n}行目`)
+                              .join('・')}`,
+                        )
+                        .join(' / ')}。重複行を削除してから、もう一度取り込んでください（このファイルは 1 件も登録していません）。`
+                    : importCheck?.abortReason
+                      ? `${importFileName}（${importSource}）：${importCheck.abortReason}`
+                      : `${importFileName}（${importSource}）：一括取り込みを中止しました。ファイルを修正してから、もう一度取り込んでください。`
+                  : importCounts.duplicated > 0
+                    ? `${importFileName}（${importSource}）を読み込みました。重複した社員番号は 名前・役割 を上書きし（所属は変更できません）、新規の社員番号は所属を含めて追加します。中止した場合は 1 件も反映されません。`
+                    : `${importFileName}（${importSource}）を読み込みました。新規 ${importCounts.added} 件を追加します。`
               }
             />
             <Space size='large' wrap>
@@ -1306,10 +1420,19 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 プレビュー上には出さず、「取り込む」押下時のダイアログで
                 まとめて表示する（handleImportConfirm を参照）。 */}
             <Table<PersonnelImportRow>
-              rowKey='employeeNo'
+              // NOTE: ファイル内重複があると employeeNo が重複するため、
+              //       行番号を含めたキーにして React の key 重複を避ける
+              rowKey={(row, index) => `${row.employeeNo}-${index}`}
               size='small'
               columns={importColumns}
               dataSource={importRows}
+              rowClassName={(_, index) =>
+                importFileDuplicates.lines.has(
+                  importRows?.[index]?.line ?? index + 1,
+                )
+                  ? 'personnel-import-row-dup'
+                  : ''
+              }
               pagination={{ pageSize: 5, size: 'small', showSizeChanger: false }}
             />
             {importCounts.duplicated > 0 && (

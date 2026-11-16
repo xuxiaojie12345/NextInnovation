@@ -258,137 +258,82 @@ const toApiRow = (row: ProjectImportRow, index: number) => ({
 });
 
 /**
- * 重複判定用のキー（前後空白・全角スペース除去 + 小文字化）。
- * バックエンド（app/services/project.py の _norm）と同じ規則に揃える。
+ * 重複判定用のキー。
+ * 比較時は前後空白のみ除去する（全角/半角・大文字/小文字は区別する）。
+ * バックエンド（app/services/project.py の _unique_key）と同一規則に揃える。
  */
-const dupKey = (value: string): string =>
-  (value ?? '').replace(/\u3000/g, ' ').trim().toLowerCase();
+const dupKey = (value: string): string => (value ?? '').trim();
+
+/** チーム / Subチーム の未入力は DB 上 "-" として扱う */
+const TEAM_EMPTY = '-';
 
 /**
- * 一括読み込みの行が重複かどうかを判定する。
- * 次のいずれかが既存（画面の一覧・プレビュー内の先行行）と一致すれば重複。
- *   1) 略称（顧客の1文字目・案件・チーム・Subチーム）
- *   2) 項目ID
- *   3) Project名称
- * 空欄の項目は比較対象外（未入力同士を重複扱いしない）。
- * 戻り値は該当した条件の配列（空配列 = 重複ではない。複数該当時はすべて返す）。
+ * 一意キー (顧客 / 案件 / チーム / Subチーム) を組み立てる。
+ * チーム / Subチーム の空欄は "-" として扱う（空欄同士は同一）。
+ */
+const uniqueKey = (
+  customer: string,
+  caseName: string,
+  team: string,
+  subTeam: string,
+): string =>
+  [
+    dupKey(customer),
+    dupKey(caseName),
+    dupKey(team) || TEAM_EMPTY,
+    dupKey(subTeam) || TEAM_EMPTY,
+  ].join('\u001f');
+
+/**
+ * 一括読み込みの行が既存データと重複するか（行番号 → 理由）。
+ *
+ * 判定条件は一意キー (顧客/案件/チーム/Subチーム) の一致のみ。
+ * 所属部門 / 項目ID / Project名称 / フラグ類は判定に含めない。
+ * NOTE: ファイル内の重複はバックエンドが全体中止で返すため、ここでは扱わない。
  */
 const detectDuplicateReasons = (
   rows: ProjectImportRow[],
   existing: Project[],
 ): string[][] => {
-  const abbrs = new Set<string>();
-  const codes = new Set<string>();
-  const names = new Set<string>();
-  existing.forEach((p) => {
-    const abbr = dupKey(p.abbr);
-    if (abbr) abbrs.add(abbr);
-    const code = dupKey(p.projectCode);
-    if (code) codes.add(code);
-    const name = dupKey(p.name);
-    if (name) names.add(name);
-  });
+  const keys = new Set(
+    existing.map((p) =>
+      uniqueKey(p.customer, p.caseName, p.team, p.subTeam),
+    ),
+  );
 
   return rows.map((row) => {
-    const abbr = dupKey(rowAbbr(row));
-    const code = dupKey(row.projectCode);
-    const name = dupKey(row.name);
-    const reasons: string[] = [];
-    if (abbr !== '' && abbrs.has(abbr)) reasons.push('略称');
-    if (code !== '' && codes.has(code)) reasons.push('項目ID');
-    if (name !== '' && names.has(name)) reasons.push('Project名称');
-    // 先行行のキーを登録し、ファイル内の重複も検出する
-    if (reasons.length === 0) {
-      if (abbr) abbrs.add(abbr);
-      if (code) codes.add(code);
-      if (name) names.add(name);
-    }
-    return reasons;
+    const key = uniqueKey(row.customer, row.caseName, row.team, row.subTeam);
+    return keys.has(key) ? ['既存データと重複'] : [];
   });
 };
 
 /**
- * 全項目（顧客/案件/チーム/Subチーム/所属部門/項目ID/Project名称）が
- * 完全一致する行を抽出する（完全重複と部分重複を区別するため）。
- * 空欄同士も含めて全項目を比較する（行の内容がまるごと一致していることを表す）。
+ * ファイル内で重複している行（同じ一意キーが 2 行以上）を検出する。
+ *
+ * 戻り値:
+ *   lines  … 重複した行番号（1 行目も含む）
+ *   groups … 重複グループ（行番号のまとまり）
+ *
+ * NOTE: バックエンドが aborted で返す場合はそちらを優先し、
+ *       ここは後方互換（fileDuplicateLines 未返却）のためのフォールバック。
  */
-const detectFullDuplicatedRows = (
+const detectFileDuplicates = (
   rows: ProjectImportRow[],
-  existing: Project[],
-  departments: Department[],
-): Set<number> => {
-  const key = (v: {
-    customer: string;
-    caseName: string;
-    team: string;
-    subTeam: string;
-    departmentId: string;
-    projectCode: string;
-    name: string;
-  }) =>
-    [
-      dupKey(v.customer),
-      dupKey(v.caseName),
-      dupKey(v.team),
-      dupKey(v.subTeam),
-      dupKey(v.departmentId),
-      dupKey(v.projectCode),
-      dupKey(v.name),
-    ].join('\u001f');
-
-  const existingKeys = new Set(
-    existing.map((p) =>
-      key({
-        customer: p.customer,
-        caseName: p.caseName,
-        team: p.team,
-        subTeam: p.subTeam,
-        departmentId: p.departmentId,
-        projectCode: p.projectCode,
-        name: p.name,
-      }),
-    ),
-  );
-
-  // ファイル側の「所属部門」は部門名/別名で記述されるため、部門IDへ解決して比較する
-  const resolveDepartmentId = (value: string): string => {
-    const v = dupKey(value);
-    if (!v) return '';
-    const found = departments.find(
-      (d) => dupKey(d.departmentId) === v,
-    );
-    if (found) return dupKey(found.departmentId);
-    const byAlisa = departments.find(
-      (d) => dupKey(d.alisa ?? '') === v || dupKey(d.name) === v,
-    );
-    return byAlisa ? dupKey(byAlisa.departmentId) : v;
-  };
-
-  const result = new Set<number>();
+): { lines: Set<number>; groups: number[][] } => {
+  const grouped = new Map<string, number[]>();
   rows.forEach((row, i) => {
-    const k = key({
-      customer: row.customer,
-      caseName: row.caseName,
-      team: row.team,
-      subTeam: row.subTeam,
-      departmentId: resolveDepartmentId(row.department),
-      projectCode: row.projectCode,
-      name: row.name,
-    });
-    if (existingKeys.has(k)) {
-      result.add(i + 1);
-    } else {
-      // 同一ファイル内の先行行も「既存」として扱う
-      existingKeys.add(k);
-    }
+    const key = uniqueKey(row.customer, row.caseName, row.team, row.subTeam);
+    const list = grouped.get(key) ?? [];
+    list.push(i + 1);
+    grouped.set(key, list);
   });
-  return result;
+
+  const groups = Array.from(grouped.values())
+    .filter((list) => list.length > 1)
+    .sort((a, b) => a[0] - b[0]);
+  const lines = new Set<number>(groups.flat());
+  return { lines, groups };
 };
-
-/** 一括読み込みの1行から略称を組み立てる（バックエンドと同一規則） */
-const rowAbbr = (row: ProjectImportRow): string =>
-  buildProjectAbbr(row.customer, row.caseName, row.team, row.subTeam);
-
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
 const projectLabel = (p: Project): string =>
   p.name || p.abbr || '（名称未設定）';
@@ -464,51 +409,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     useState<ProjectImportApiResult | null>(null);
   // 一括取り込みをバックエンドへ送信中フラグ
   const [submittingImport, setSubmittingImport] = useState(false);
-  /**
-   * 一括読み込み：重複理由（行番号 → 該当条件の説明配列）。
-   *
-   * 優先順位:
-   *   1) API（dryRun）が返した duplicatedReasons（行番号 → 理由）
-   *   2) API が duplicatedLines だけ返す場合 → その行は「条件不明」として理由を付ける
-   *   3) どちらも無い場合 → 画面側で既存一覧と照合して判定する
-   */
-  const importDupReasons = useMemo<Map<number, string[]>>(() => {
-    if (!importRows) return new Map();
 
-    const fromApi = importCheck?.duplicatedReasons;
-    if (fromApi && Object.keys(fromApi).length > 0) {
-      const map = new Map<number, string[]>();
-      Object.entries(fromApi).forEach(([line, reasons]) => {
-        map.set(Number(line), reasons);
-      });
-      return map;
-    }
-
-    // API が行番号だけ返す場合（旧バージョン互換）
-    const lines = importCheck?.duplicatedLines;
-    if (lines && lines.length > 0) {
-      const map = new Map<number, string[]>();
-      lines.forEach((line) => map.set(line, ['既存と重複']));
-      return map;
-    }
-
-    // 画面側で判定（既存一覧・同一ファイル内の先行行と照合）
-    const detected = detectDuplicateReasons(importRows, projects);
-    const map = new Map<number, string[]>();
-    detected.forEach((reasons, i) => {
-      if (reasons.length > 0) map.set(i + 1, reasons);
-    });
-    return map;
-  }, [importRows, importCheck, projects]);
-
-  /**
-   * 一括読み込み：ユーザーが取り込み対象に残した行番号（チェック ON）。
-   * 初期値は次のとおり:
-   *   - 追加行                … ON（取り込む）
-   *   - 部分重複行            … ON（既定で取り込む。ユーザーが外せる）
-   *   - 完全重複行            … OFF（強制。チェック不可）
-   */
-  const [importChecked, setImportChecked] = useState<Set<number>>(new Set());
   // 修正開始時にフォームへスクロールするための参照
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -524,71 +425,72 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const [loadingDepartments, setLoadingDepartments] = useState(true);
 
   /**
-   * 一括読み込み：全項目完全一致（既存データと全フィールド一致）の行番号。
+   * 一括読み込み：重複行（一意キーが既存データと一致）の行番号。
    * API（dryRun）の結果を優先し、無ければ画面側で判定する。
-   * この行は強制的に取り込まない（ユーザーが選択できない）。
+   * この行は取り込まない（画面ではグレー表示）。
+   *
+   * NOTE: ファイル内重複で中止になった場合は、既存データとの重複を表示しない。
+   *        （ファイル自体の問題を先に直す必要があり、混ざると原因が分からないため）
    */
   const importFullDupLines = useMemo<Set<number>>(() => {
     if (!importRows) return new Set();
+    if (importCheck?.aborted) return new Set();
     const fromApi = importCheck?.fullDuplicateLines;
     if (fromApi && fromApi.length > 0) return new Set(fromApi);
-    return detectFullDuplicatedRows(importRows, projects, deptMaster);
-  }, [importRows, importCheck, projects, deptMaster]);
+    const detected = detectDuplicateReasons(importRows, projects);
+    const lines = new Set<number>();
+    detected.forEach((reasons, i) => {
+      if (reasons.length > 0) lines.add(i + 1);
+    });
+    return lines;
+  }, [importRows, importCheck, projects]);
 
   /**
-   * 一括読み込み：部分重複の行番号
-   * （略称 / 項目ID / Project名称 のいずれかだけが一致）。
-   * 既定では取り込み対象（チェック ON）で、ユーザーが外した行だけ取り込まない。
+   * 一括読み込み：ファイル内で重複している行（同じ一意キーが 2 行以上）。
+   * 中止の原因を「この行たち」と特定できるよう、グループ単位で保持する。
    */
-  const importPartialDupLines = useMemo<Set<number>>(() => {
-    if (!importRows) return new Set();
-    const fromApi = importCheck?.partialDuplicateLines;
-    const base =
-      fromApi && fromApi.length > 0
-        ? fromApi
-        : Array.from(importDupReasons.keys());
-    // 全項目一致の行は「完全重複」として扱うので部分重複から除く
-    return new Set(base.filter((line) => !importFullDupLines.has(line)));
-  }, [importRows, importCheck, importDupReasons, importFullDupLines]);
-
-  // プレビューを開いたとき（importRows / 判定結果が変わったとき）に選択状態を初期化する
-  useEffect(() => {
-    if (!importRows) {
-      setImportChecked(new Set());
-      return;
+  const importFileDuplicates = useMemo(() => {
+    const empty = { lines: new Set<number>(), groups: [] as number[][] };
+    if (!importRows) return empty;
+    const fromApi = importCheck?.fileDuplicateLines;
+    if (fromApi && fromApi.length > 0) {
+      return {
+        lines: new Set(fromApi),
+        groups: (importCheck?.fileDuplicateGroups ?? []).map((g) => [...g]),
+      };
     }
-    const next = new Set<number>();
-    importRows.forEach((_, i) => {
-      const line = i + 1;
-      if (!importFullDupLines.has(line)) next.add(line);
-    });
-    setImportChecked(next);
-    // importFullDupLines は importRows / importCheck から派生するため、
-    // これらが変わったときだけ初期化し直す
-  }, [importRows, importFullDupLines]);
+    if (!importCheck?.aborted) return empty;
+    return detectFileDuplicates(importRows);
+  }, [importRows, importCheck]);
 
-  /** 一括読み込み：実際に取り込む行数（チェック ON かつ完全重複ではない行） */
+  /** 一括読み込み：旧仕様（部分重複）は廃止したため、常に空 */
+  const importPartialDupLines = useMemo<Set<number>>(
+    () => new Set<number>(),
+    [],
+  );
+  // NOTE: 旧仕様の名残（将来削除予定）。未使用警告を避けるため参照だけ残す。
+  void importPartialDupLines;
+
+  /** 一括読み込み：実際に取り込む行数（重複ではない行） */
   const importCounts = useMemo(() => {
     const total = importRows?.length ?? 0;
     const full = importFullDupLines.size;
-    const partial = importPartialDupLines.size;
-    const skipByUser = Array.from(importPartialDupLines).filter(
-      (line) => !importChecked.has(line),
-    ).length;
+    const partial = 0;
+    const skipByUser = 0;
     return {
       total,
-      /** 完全重複（強制スキップ） */
+      /** 既存データと重複（スキップ） */
       full,
-      /** 部分重複（既定 ON / ユーザーが外せる） */
+      /** 部分重複（旧仕様。常に 0） */
       partial,
-      /** ユーザーが取り込まない選択をした件数（部分重複のうち） */
+      /** ユーザーが取り込まない選択をした件数（旧仕様。常に 0） */
       skipByUser,
       /** 実際に登録される件数 */
-      willAdd: Math.max(0, total - full - skipByUser),
+      willAdd: Math.max(0, total - full),
       /** 新規追加（重複なし）件数 */
-      added: Math.max(0, total - full - partial),
+      added: Math.max(0, total - full),
     };
-  }, [importRows, importFullDupLines, importPartialDupLines, importChecked]);
+  }, [importRows, importFullDupLines]);
 
   /**
    * 一括読み込み：ファイル全体を中止したか。
@@ -603,6 +505,24 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    * この場合「取り込む」を押しても何も登録されないため、画面で明示する。
    */
   const importNothingToAdd = !importAborted && importCounts.willAdd === 0;
+
+  /**
+   * 一括読み込み：所属部門が確定していない行
+   * （ファイルの値が部門マスタに一致せず、プレビューでも未選択）。
+   * NOTE: 重複行（取り込まない行）は対象外。
+   */
+  const unresolvedDeptRows = useMemo(
+    () =>
+      (importRows ?? []).filter((row, index) => {
+        const lineNo = index + 1;
+        return (
+          !row.departmentId &&
+          !importFullDupLines.has(lineNo) &&
+          !importFileDuplicates.lines.has(lineNo)
+        );
+      }),
+    [importRows, importFullDupLines, importFileDuplicates],
+  );
 
   // 年度が変わったとき・この画面が表示されたときに部門マスタを取り直す。
   // ※全画面は常時マウントされているため、部門管理で部門を追加して戻ってきても
@@ -649,6 +569,87 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     (departmentId: string): string | undefined => {
       const found = findDepartment(deptMaster, departmentId);
       return found ? found.name : undefined;
+    },
+    [deptMaster],
+  );
+
+  /**
+   * 一括読み込みの「所属部門」列を部門マスタと照合して部門IDを確定する。
+   * 部門名称（department_name）または部門別名（department_alisa）と一致した
+   * 1 件だけを確定し、一致しない場合は未確定（プルダウン選択）にする。
+   * 照合時は全角/半角スペースを除去し、大文字小文字を無視する。
+   * バックエンド（app/services/project.py の _dept_match_key）と同一規則。
+   */
+  const resolveImportDepartment = useCallback(
+    (row: ProjectImportRow): ProjectImportRow => {
+      const normalize = (v: string | undefined) =>
+        (v ?? '').replace(/[\s\u3000]/g, '').toLowerCase();
+      const key = normalize(row.department);
+
+      if (!key) {
+        return {
+          ...row,
+          department: '',
+          departmentId: undefined,
+          departmentAutoMatched: false,
+        };
+      }
+      // 社員番号と同じく、数字のみは部門IDとして扱う（バックエンドと同じ規則）
+      if (/^[0-9]+$/.test(key)) {
+        const byId = findDepartment(deptMaster, row.department.trim());
+        if (byId) {
+          return {
+            ...row,
+            department: byId.name,
+            departmentId: byId.departmentId,
+            departmentAutoMatched: true,
+          };
+        }
+      }
+
+      const hit = deptMaster.filter(
+        (d) =>
+          normalize(d.name) === key || normalize(d.alisa) === key,
+      );
+
+      // 一致が 1 件に絞れたときだけ確定する（同名が複数ある場合は選ばせる）
+      if (hit.length === 1) {
+        return {
+          ...row,
+          department: hit[0].name,
+          departmentId: hit[0].departmentId,
+          departmentAutoMatched: true,
+        };
+      }
+      return {
+        ...row,
+        department: '',
+        departmentId: undefined,
+        departmentAutoMatched: false,
+      };
+    },
+    [deptMaster],
+  );
+
+  /** 一括読み込み：プレビュー行の所属部門を手動で選び直す（一致しなかった行のみ） */
+  const handleImportDepartmentChange = useCallback(
+    (index: number, departmentId: string) => {
+      const dept = findDepartment(deptMaster, departmentId);
+      setImportRows((prev) =>
+        prev
+          ? prev.map((r, i) =>
+              i === index
+                ? {
+                    ...r,
+                    departmentId,
+                    department: dept?.name ?? '',
+                    // 手動選択はプルダウンのまま維持する（自動確定とは区別）
+                    departmentAutoMatched: false,
+                  }
+                : r,
+            )
+          : prev,
+      );
     },
     [deptMaster],
   );
@@ -815,8 +816,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     const payload = {
       customer: form.customer.trim(),
       caseName: form.caseName.trim(),
-      team: form.team.trim(),
-      subTeam: form.subTeam.trim(),
+      // チーム / Subチーム は任意。空欄は DB 上 "-" として登録する
+      team: form.team.trim() || TEAM_EMPTY,
+      subTeam: form.subTeam.trim() || TEAM_EMPTY,
       departmentId: form.departmentId,
       // 項目ID は任意入力（空欄可・重複可。主キーではない）
       projectCode: form.projectCode.trim(),
@@ -881,21 +883,25 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       setImportSource(parsed.source);
       setImportWarnings(parsed.warnings);
 
+      // 所属部門（部門名称 / 部門別名）を部門マスタと照合して部門IDを確定する
+      // 一致しない行はプレビュー上でプルダウン選択させる
+      const resolved = parsed.rows.map(resolveImportDepartment);
+
       // 事前検証（DB へは書き込まない）
       const check = await importProjectRows(
         year,
-        parsed.rows.map(toApiRow),
+        resolved.map(toApiRow),
         { dryRun: true, opUser: operatorId },
       );
       setImportCheck(check);
-      setImportRows(parsed.rows);
+      setImportRows(resolved);
     } catch (e) {
       // 409（ファイル全体中止）はプレビューを開いて理由を表示する
       if (e instanceof ProjectImportAbortedError) {
         setImportFileName(file.name);
         // 中止時は取り込み対象が無いため、プレビューは空のまま理由だけ表示する
         // （解析に成功していれば、その行を復元して画面に表示する）
-        setImportRows(parsed ? parsed.rows : []);
+        setImportRows(parsed ? parsed.rows.map(resolveImportDepartment) : []);
         setImportCheck(e.result);
         return;
       }
@@ -912,36 +918,32 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     setImportWarnings([]);
     setImportFileName('');
     setImportSource('');
-    setImportChecked(new Set());
   };
-
-  /** 一括読み込み：1 行分のチェック状態を切り替える（完全重複行は不可） */
-  const toggleImportRow = useCallback(
-    (line: number, checked: boolean) => {
-      if (importFullDupLines.has(line)) return;
-      setImportChecked((prev) => {
-        const next = new Set(prev);
-        if (checked) next.add(line);
-        else next.delete(line);
-        return next;
-      });
-    },
-    [importFullDupLines],
-  );
 
   /**
    * 一括読み込み：プレビュー内容をバックエンドへ送信して DB を更新する。
    *
-   *   - ファイル内に全項目完全一致の行がある場合は中止（1 件も登録しない）
-   *   - 完全重複行は常に取り込まない
-   *   - 部分重複行はユーザーがチェックした行だけ取り込む
+   *   - ファイル内に一意キーが同じ行がある場合は中止（1 件も登録しない）
+   *   - 既存データと重複する行（一意キー一致）は取り込まない
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
     // 桁数チェック（画面上の入力欄と同じ制限）。不備があれば何行目の何が
     // 問題かを確認ダイアログに一覧表示し、取り込みは行わない。
     const formatProblems = validateProjectImportRows(importRows);
-    if (formatProblems.length > 0) {
+
+    // 所属部門が確定していない行（部門マスタに一致せず、画面でも未選択）。
+    // 重複行は取り込まないため対象外。
+    const unresolvedDeptProblems = importRows
+      .map((row, index) =>
+        !row.departmentId && !importFullDupLines.has(index + 1)
+          ? `${row.line ? `${row.line}行目：` : ''}所属部門を特定できません（ファイルの値が部門マスタの部門名称・部門別名と一致しません。プレビューで選択してください）`
+          : '',
+      )
+      .filter(Boolean);
+
+    const problems = [...formatProblems, ...unresolvedDeptProblems];
+    if (problems.length > 0) {
       Modal.warning({
         title: LABELS.importFormatErrorTitle,
         width: 620,
@@ -957,7 +959,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 overflow: 'auto',
               }}
             >
-              {formatProblems.map((p) => (
+              {problems.map((p) => (
                 <li key={p}>{p}</li>
               ))}
             </ul>
@@ -974,10 +976,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       message.info(t('W_KADOU_011'));
       return;
     }
-    // ユーザーがチェックを外した部分重複行だけを skipLines として送る
-    const skipLines = Array.from(importPartialDupLines).filter(
-      (line) => !importChecked.has(line),
-    );
+    // 重複行（一意キーが既存データと一致）は一切取り込まない
+    const skipLines = Array.from(importFullDupLines);
     setSubmittingImport(true);
     try {
       const result = await importProjectRows(year, importRows.map(toApiRow), {
@@ -1161,95 +1161,79 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<ProjectImportRow> = [
     {
-      /**
-       * 取り込み対象の選択。
-       *   追加行      … 既定 ON（外すことも可能）
-       *   部分重複行  … 既定 ON（ユーザーが外すと取り込まない）
-       *   完全重複行  … OFF 固定（チェック不可。全項目が既存と同一のため）
-       *   ファイル中止時 … すべてチェック不可
-       */
-      title: '取込',
-      key: 'checked',
-      width: 60,
-      align: 'center',
-      render: (_, row) => {
-        const index = importRows ? importRows.indexOf(row) : -1;
-        const lineNo = index >= 0 ? index + 1 : -1;
-        if (lineNo <= 0) return null;
-        const forcedOff = importFullDupLines.has(lineNo) || importAborted;
-        return (
-          <input
-            type='checkbox'
-            aria-label={`${lineNo}行目を取り込む`}
-            checked={forcedOff ? false : importChecked.has(lineNo)}
-            disabled={forcedOff}
-            onChange={(e) => toggleImportRow(lineNo, e.target.checked)}
-          />
-        );
-      },
-    },
-    {
       title: '区分',
       key: 'kind',
-      width: 110,
+      width: 130,
       /**
        * 区分は行単位で判定する。
+       *   ファイル内重複 … 同じ一意キー（顧客/案件/チーム/Subチーム）の行がファイル内に複数ある
+       *                    → ファイル全体を中止（最優先。既存データとの重複は表示しない）
+       *   重複           … 一意キーが既存データと一致 → 取り込まない
        *   追加           … 重複なし（そのまま追加）
-       *   完全重複        … 全項目（顧客～Project名称）が既存と完全一致 → 取り込まない
-       *   部分重複（N項目）… 略称 / 項目ID / Project名称 のいずれかが一致 → 既定で取り込む
        */
       render: (_, row) => {
         const index = importRows ? importRows.indexOf(row) : -1;
         const lineNo = index >= 0 ? index + 1 : -1;
+        if (importFileDuplicates.lines.has(lineNo)) {
+          return <Tag color='magenta'>ファイル内重複</Tag>;
+        }
         if (importFullDupLines.has(lineNo)) {
-          return <Tag color='red'>完全重複</Tag>;
+          return <Tag color='red'>重複</Tag>;
         }
-        const reasons = lineNo > 0 ? importDupReasons.get(lineNo) : undefined;
-        if (!reasons || reasons.length === 0) {
-          return <Tag color='green'>追加</Tag>;
-        }
-        return (
-          <Tag color={reasons.length >= 3 ? 'volcano' : 'gold'}>
-            部分重複（{reasons.length}項目）
-          </Tag>
-        );
-      },
-    },
-    {
-      title: '重複理由',
-      key: 'dupReason',
-      width: 200,
-      render: (_, row) => {
-        // 重複理由は「重複」の行にだけ表示する（追加行には出さない）
-        const index = importRows ? importRows.indexOf(row) : -1;
-        const lineNo = index >= 0 ? index + 1 : -1;
-        if (importFullDupLines.has(lineNo)) {
-          return (
-            <Tag color='red' style={{ marginInlineEnd: 0 }}>
-              全項目一致
-            </Tag>
-          );
-        }
-        const reasons = lineNo > 0 ? importDupReasons.get(lineNo) : undefined;
-        if (!reasons || reasons.length === 0) {
-          return <Text type='secondary'>－</Text>;
-        }
-        return (
-          <Space size={4} wrap>
-            {reasons.map((r) => (
-              <Tag key={r} color='volcano' style={{ marginInlineEnd: 0 }}>
-                {r}
-              </Tag>
-            ))}
-          </Space>
-        );
+        return <Tag color='green'>追加</Tag>;
       },
     },
     { title: '顧客', dataIndex: 'customer', key: 'customer', width: 130 },
     { title: '案件', dataIndex: 'caseName', key: 'caseName', width: 130 },
     { title: 'チーム', dataIndex: 'team', key: 'team', width: 90 },
     { title: 'Subチーム', dataIndex: 'subTeam', key: 'subTeam', width: 100 },
-    { title: '所属部門', dataIndex: 'department', key: 'department', width: 120 },
+    {
+      title: '所属部門',
+      dataIndex: 'department',
+      key: 'department',
+      width: 170,
+      /**
+       * 所属部門の表示（要員情報の一括読み込みと同じ規則）：
+       *   1) ファイルの値が部門マスタに一致（自動確定）→ テキスト表示
+       *   2) 一致しない行 → プルダウンで選択させる（未選択は赤字）
+       *   3) 重複行（取り込まない）→ 参照のみ（プルダウンは出さない）
+       */
+      render: (_, row) => {
+        const index = importRows ? importRows.indexOf(row) : -1;
+        const lineNo = index >= 0 ? index + 1 : -1;
+        // ファイル内重複・既存データ重複の行は取り込まないので選択させない
+        const notImported =
+          importFileDuplicates.lines.has(lineNo) ||
+          importFullDupLines.has(lineNo);
+
+        if (notImported) {
+          return (
+            <Text>
+              {row.departmentId
+                ? departmentNameOfId(row.departmentId) ?? row.departmentId
+                : row.department || '－'}
+            </Text>
+          );
+        }
+        // 自動照合で確定した行だけテキスト表示
+        if (row.departmentAutoMatched && row.departmentId) {
+          return row.department || '－';
+        }
+        return (
+          <Select
+            size='small'
+            showSearch
+            optionFilterProp='label'
+            placeholder='所属部門を選択'
+            status={row.departmentId ? undefined : 'error'}
+            style={{ width: '100%' }}
+            value={row.departmentId || undefined}
+            options={departmentOptions}
+            onChange={(v: string) => handleImportDepartmentChange(index, v)}
+          />
+        );
+      },
+    },
     { title: '項目ID', dataIndex: 'projectCode', key: 'projectCode', width: 110 },
     { title: 'Project名称', dataIndex: 'name', key: 'name', width: 150 },
   ];
@@ -1263,7 +1247,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
-            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは統計の集計にだけ影響します（既定：有効 / 非教育）。右上の「一括読み込む」から Excel / CSV を取り込めます（所属部門は入力どおり登録します）。
+            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは統計の集計にだけ影響します（既定：有効 / 非教育）。右上の「一括読み込む」から Excel / CSV を取り込めます（所属部門は部門マスタと照合し、一致しない場合はプレビューで選択します）。
           </Text>
         </div>
 
@@ -1593,9 +1577,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   ? 'error'
                   : importCounts.full > 0
                     ? 'warning'
-                    : importCounts.partial > 0
-                      ? 'warning'
-                      : 'info'
+                    : 'info'
               }
               showIcon
               message={
@@ -1604,23 +1586,27 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   : [
                       `対象 ${importCounts.total} 件`,
                       `新規追加 ${importCounts.added} 件`,
-                      `部分重複 ${importCounts.partial} 件${
-                        importCounts.skipByUser > 0
-                          ? `（うち ${importCounts.skipByUser} 件は除外）`
-                          : ''
-                      }`,
-                      `完全重複 ${importCounts.full} 件`,
+                      `重複 ${importCounts.full} 件`,
                       `登録予定 ${importCounts.willAdd} 件`,
                     ].join(' / ')
               }
               description={
                 importAborted
-                  ? importCheck?.abortReason
-                    ? `${importFileName}（${importSource}）：${importCheck.abortReason}`
-                    : `${importFileName}（${importSource}）：一括取り込みを中止しました。ファイルを修正してから、もう一度取り込んでください。`
+                  ? importFileDuplicates.groups.length > 0
+                    ? `${importFileName}（${importSource}）：同じプロジェクト（顧客・案件・チーム・Subチーム）がファイル内に複数あります。${importFileDuplicates.groups
+                        .map(
+                          (g, i) =>
+                            `グループ${i + 1}：${g
+                              .map((n) => `${n}行目`)
+                              .join('・')}`,
+                        )
+                        .join(' / ')}。重複行を削除してから、もう一度取り込んでください（このファイルは 1 件も登録していません）。`
+                    : importCheck?.abortReason
+                      ? `${importFileName}（${importSource}）：${importCheck.abortReason}`
+                      : `${importFileName}（${importSource}）：一括取り込みを中止しました。ファイルを修正してから、もう一度取り込んでください。`
                   : importCounts.full > 0
-                    ? `${importFileName}（${importSource}）のうち、全項目が既存データと完全一致する行（${importCounts.full} 件）は取り込みません（選択できません）。それ以外の行は「取込」列のチェックが ON の行だけ登録します。`
-                    : `${importFileName}（${importSource}）を読み込みました。「取込」列のチェックが ON の行（${importCounts.willAdd} 件）を登録します。チェックを外した行は登録しません。`
+                    ? `${importFileName}（${importSource}）のうち、同じプロジェクト（顧客・案件・チーム・Subチーム）が既に登録されている行（${importCounts.full} 件）は取り込みません（グレー表示）。`
+                    : `${importFileName}（${importSource}）を読み込みました。重複を除く${importCounts.willAdd} 件を登録します。`
               }
             />
             <Space size='large' wrap>
@@ -1635,19 +1621,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 件
               </Text>
               <Text>
-                部分重複{' '}
-                <Text strong style={{ color: '#d48806' }}>
-                  {importCounts.partial}
-                </Text>{' '}
-                件
-                {importCounts.skipByUser > 0 && (
-                  <Text type='secondary'>
-                    （うち {importCounts.skipByUser} 件は除外）
-                  </Text>
-                )}
-              </Text>
-              <Text>
-                完全重複{' '}
+                重複{' '}
                 <Text strong style={{ color: '#cf1322' }}>
                   {importCounts.full}
                 </Text>{' '}
@@ -1662,10 +1636,19 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               </Text>
             </Space>
             <Text type='secondary' style={{ fontSize: 12 }}>
-              判定ルール：① 重複なし → 追加　② 全項目が既存と完全一致 → 追加しない（固定）　③
-              ファイル内に完全に同じ行が 2 行以上ある → ファイル全体を中止　④
-              略称 / 項目ID / Project名称 のいずれかだけが一致 → 既定で追加（チェックを外すと追加しない）
+              判定ルール：① ファイル内に同じ一意キー（顧客・案件・チーム・Subチーム）の行が 2
+              行以上ある → ファイル全体を中止（該当行だけ「ファイル内重複」と表示）　②
+              一意キーが既存データと一致 → 取り込まない（グレー表示）　③ それ以外 → 追加。
+              チーム・Subチームの空欄は「-」として比較します。
             </Text>
+            {unresolvedDeptRows.length > 0 && (
+              <Alert
+                type='error'
+                showIcon
+                message={`所属部門を特定できない行が ${unresolvedDeptRows.length} 件あります`}
+                description='ファイルの「所属部門」が部門マスタの部門名称・部門別名と一致しませんでした。プレビュー表の「所属部門」で選択してください。未選択のままでは取り込めません。'
+              />
+            )}
             {importWarnings.length > 0 && (
               <Alert
                 type='warning'
@@ -1683,27 +1666,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 }
               />
             )}
-            {(importCheck?.skipped ?? 0) > 0 && (
-              <Alert
-                type='error'
-                showIcon
-                message={t('W_KADOU_012', [importCheck?.skipped ?? 0])}
-                description={
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {(importCheck?.warnings ?? []).slice(0, 5).map((w) => (
-                      <li key={w}>{w}</li>
-                    ))}
-                    {(importCheck?.warnings.length ?? 0) > 5 && (
-                      <li>
-                        {t('I_KADOU_049', [
-                          (importCheck?.warnings.length ?? 0) - 5,
-                        ])}
-                      </li>
-                    )}
-                  </ul>
-                }
-              />
-            )}
             <Table<ProjectImportRow>
               rowKey={(row, index) => `${row.customer}-${row.caseName}-${index}`}
               size='small'
@@ -1711,10 +1673,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               dataSource={importRows}
               rowClassName={(_, index) => {
                 const line = index + 1;
-                if (importFullDupLines.has(line)) return 'project-import-row-dup';
-                if (importPartialDupLines.has(line) && !importChecked.has(line)) {
-                  return 'project-import-row-dup';
-                }
+                if (importFileDuplicates.lines.has(line)) return '';
+                if (importFullDupLines.has(line)) return '';
                 return '';
               }}
               pagination={{ pageSize: 5, size: 'small', showSizeChanger: false }}
