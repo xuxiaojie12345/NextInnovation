@@ -92,7 +92,7 @@ def list_personnel(year: int, db: Session = Depends(get_db)):
 def get_person_info(year: int, employeeNo: str, db: Session = Depends(get_db)):
     person_info = get_personnel_by_emp_no(db, year, employeeNo)
     if not person_info:
-        raise HTTPException(status_code=404, detail="対象の従業員データが存在しません")
+        raise HTTPException(status_code=404, detail="社員番号が存在しません")
 
     # SQL查询使用了别名，所以需要使用别名後の键名
     dept_info = get_dept_name(db, year, person_info["departmentId"])
@@ -222,5 +222,5 @@ def import_personnel(
 def remove_person(year: int, employeeNo: str, db: Session = Depends(get_db)):
     deleted = delete_personnel(db, year, employeeNo)
     if not deleted:
-        raise HTTPException(status_code=404, detail="対象の従業員データが存在しません")
+        raise HTTPException(status_code=404, detail="社員番号が存在しません")
     return {"code": 200, "msg": "删除完成"}

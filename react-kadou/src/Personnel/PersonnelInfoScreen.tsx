@@ -39,8 +39,10 @@ const ROLE_PATTERN = /^[A-Za-z0-9]{1,6}$/;
 const EMPLOYEE_NO_FORMAT_MESSAGE =
   "社員番号は5桁以内の半角数字で入力してください。";
 const EMPLOYEE_NO_REQUIRED_MESSAGE = "社員番号を入力してください。";
-const ROLE_FORMAT_MESSAGE =
-  "役割は6桁以内の半角英数字で入力してください。";
+const ROLE_FORMAT_MESSAGE = "役割は6桁以内の半角英数字で入力してください。";
+const ROLE_REQUIRED_MESSAGE = "役割を入力してください。";
+const NAME_REQUIRED_MESSAGE = "名前を入力してください。";
+const DEPT_REQUIRED_MESSAGE = "所属を選択してください。";
 
 interface PersonnelInfoScreenProps {
   /** 表示する年度 */
@@ -107,8 +109,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [roleError, setRoleError] = useState("");
   // 名前（編集可）
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState("");
   // 所属（編集可。部門マスタの departmentId）
   const [deptId, setDeptId] = useState<string | undefined>(undefined);
+  const [deptError, setDeptError] = useState("");
   // 「新規追加してよい」と確認済みの社員番号（同じ番号での二重確認を防ぐ）
   const [confirmedNo, setConfirmedNo] = useState("");
   // 一括読み込み：ファイル解析中フラグ
@@ -145,7 +149,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setRole("");
     setRoleError("");
     setName("");
+    setNameError("");
     setDeptId(undefined);
+    setDeptError("");
     setConfirmedNo("");
   };
 
@@ -217,7 +223,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             : "",
         );
         setName(person.name || "");
+        setNameError("");
         setDeptId(person.departmentId || undefined);
+        setDeptError("");
         setLookedUpExistingNo(person.employeeNo.trim());
         setConfirmedNo("");
         message.success(`社員番号「${no}」の要員情報を表示しました。`);
@@ -237,7 +245,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             setRole("");
             setRoleError("");
             setName("");
+            setNameError("");
             setDeptId(undefined);
+            setDeptError("");
             setConfirmedNo(no);
             message.info(
               `社員番号「${no}」を新規追加します。役割・名前・所属を入力してください。`,
@@ -267,7 +277,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         setRole("");
         setRoleError("");
         setName("");
+        setNameError("");
         setDeptId(undefined);
+        setDeptError("");
         setConfirmedNo(no);
         message.info(
           `社員番号「${no}」を新規追加します。役割・名前・所属を入力してください。`,
@@ -279,7 +291,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 要員一覧へ反映する（追加／更新。画面遷移はしない） */
   const save = async (no: string, isNew: boolean) => {
     if (!deptId) {
-      message.warning("所属を選択してください。");
+      setDeptError(DEPT_REQUIRED_MESSAGE);
       return;
     }
 
@@ -321,24 +333,30 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.warning("既存の社員番号です。検索してから更新してください。");
       return;
     }
-    // 役割は必須入力（未入力では登録できない）
+    // 役割・名前・所属は画面上に赤字でエラーを表示する（同時にまとめて表示する）
+    let hasInputError = false;
     if (!role) {
-      message.warning("役割を入力してください。");
-      return;
-    }
-    if (!ROLE_PATTERN.test(role)) {
+      setRoleError(ROLE_REQUIRED_MESSAGE);
+      hasInputError = true;
+    } else if (!ROLE_PATTERN.test(role)) {
       setRoleError(ROLE_FORMAT_MESSAGE);
-      return;
+      hasInputError = true;
+    } else {
+      setRoleError("");
     }
-    setRoleError("");
     if (!name.trim()) {
-      message.warning("名前を入力してください。");
-      return;
+      setNameError(NAME_REQUIRED_MESSAGE);
+      hasInputError = true;
+    } else {
+      setNameError("");
     }
     if (!deptId) {
-      message.warning("所属を選択してください。");
-      return;
+      setDeptError(DEPT_REQUIRED_MESSAGE);
+      hasInputError = true;
+    } else {
+      setDeptError("");
     }
+    if (hasInputError) return;
 
     // 既存の要員 → そのまま更新する
     if (isExisting) {
@@ -557,6 +575,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               <Input
                 placeholder='例：10001'
                 value={employeeNo}
+                maxLength={5}
                 onChange={(e) => {
                   const value = e.target.value;
                   setEmployeeNo(value);
@@ -578,15 +597,14 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 検索
               </Button>
             </Space.Compact>
-            {employeeNoError && (
-              <Text type='danger'>{employeeNoError}</Text>
-            )}
+            {employeeNoError && <Text type='danger'>{employeeNoError}</Text>}
           </div>
           <div>
             <div className='form-label'>役割（必須）</div>
             <Input
               placeholder='例：T11E03'
               value={role}
+              maxLength={6}
               onChange={(e) => {
                 const value = e.target.value;
                 setRole(value);
@@ -603,16 +621,24 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               placeholder='例：山田 花子'
               value={name}
               maxLength={20}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setName(value);
+                if (value.trim()) setNameError("");
+              }}
               onPressEnter={handleSubmit}
             />
+            {nameError && <Text type='danger'>{nameError}</Text>}
           </div>
           <div>
             <div className='form-label'>所属（必須）</div>
             <Select
               placeholder='所属を選択'
               value={deptId}
-              onChange={(v?: string) => setDeptId(v)}
+              onChange={(v?: string) => {
+                setDeptId(v);
+                if (v) setDeptError("");
+              }}
               options={departmentOptions.map((d) => ({
                 value: d.departmentId,
                 label: departmentLabelOf(departmentOptions, d.departmentId),
@@ -620,6 +646,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               style={{ width: "100%" }}
               disabled={isExisting}
             />
+            {deptError && <Text type='danger'>{deptError}</Text>}
           </div>
 
           <Space wrap>
