@@ -3,7 +3,6 @@ import {
   Alert,
   Button,
   Card,
-  Checkbox,
   Input,
   message,
   Modal,
@@ -39,7 +38,6 @@ import {
   deletePersonnel,
   fetchPersonnelCount,
   fetchPersonnelInfo,
-  fetchWeeklyCount,
   importPersonnelRows,
   savePersonnel,
 } from './personnelApi';
@@ -91,9 +89,9 @@ interface PersonnelInfoScreenProps {
   /**
    * 当年度に稼働データ（行・割当・BUFFER）があるか。
    *
-   * NOTE: 削除確認は jn_weekly_assignment_table の実件数を
-   *       fetchWeeklyCount() で取得して表示するように変更したため、
-   *       この画面では現在未使用（App 側のインターフェース維持のため残す）。
+   * NOTE: 削除確認ダイアログは「当年度の稼働表行・割当・BUFFER も削除される」
+   *       という文言のみの確認に変更したため、この画面では現在未使用
+   *       （App 側のインターフェース維持のため残す）。
    */
   hasWorkData?: (employeeNo: string) => boolean;
   /**
@@ -107,7 +105,7 @@ interface PersonnelInfoScreenProps {
 /**
  * 要員情報 画面（メニュー「要員情報」で切り替わる画面）
  * 社員番号を入力すると、該当する要員の 役割・名前・所属 を表示する。
- * すべての項目は編集でき、存在しない社員番号は確認のうえで新規追加できる。
+ * すべての項目は編集でき、存在しない社員番号を検索した場合は「未登録」のメッセージを表示する。
  */
 const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   year,
@@ -209,16 +207,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [saving, setSaving] = useState(false);
   /**
    * 削除確認ダイアログの対象（null = ダイアログ非表示）。
-   * weeklyCount は jn_weekly_assignment_table の当該年度・社員番号の件数。
    */
   const [deleteTarget, setDeleteTarget] = useState<{
     employeeNo: string;
     name: string;
-    weeklyCount: number;
   } | null>(null);
-  /** 削除確認ダイアログで「要員稼動管理の情報も削除する」が選ばれているか */
-  const [deleteWeekly, setDeleteWeekly] = useState(false);
-  /** 削除処理（件数取得・実行）中フラグ */
+  /** 削除処理（実行）中フラグ */
   const [deleting, setDeleting] = useState(false);
   /**
    * 入力チェック結果（入力欄の下に赤字で表示する）。
@@ -464,38 +458,26 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    * 表示中の要員を削除する（バックエンドの DB から削除）。
    *
    * NOTE: 誤操作防止のため、必ず確認ダイアログを表示してから削除する。
-   *       ダイアログでは「要員稼動管理（jn_weekly_assignment_table）の情報も
-   *       削除するか」をチェックボックスで選ばせる。
-   *       週割当の削除条件は「年度 + 社員番号」。
+   *       確認文言は「当年度の稼働表行・割当・BUFFERも削除されますが、
+   *       よろしいでしょうか。」のみとし、削除時は当年度の稼働データ
+   *       （行・割当・BUFFER）も同時に削除する（週割当の条件は「年度 + 社員番号」）。
    */
   const handleDelete = async () => {
     const no = employeeNo.trim();
     if (!no || !isExisting) return;
 
-    // 削除対象の週割当件数を事前に取得する（ダイアログに表示するため）
-    setDeleting(true);
-    let weeklyCount = 0;
-    try {
-      weeklyCount = await fetchWeeklyCount(no, year);
-    } catch (e) {
-      // 件数が取れない場合も削除操作自体は続行できるようにする（0 件扱い）
-      // システムエラーはグローバル画面へ、業務エラーは画面内で通知する
-      if (!notifySystemError(e)) {
-        message.error(apiErrorMessage(e, t('E_KADOU_020')));
-      }
-      weeklyCount = 0;
-    } finally {
-      setDeleting(false);
-    }
-
-    setDeleteTarget({ employeeNo: no, name: name.trim(), weeklyCount });
+    // NOTE: 削除確認ダイアログは文言のみのシンプルな形にしたため、
+    //       周割当件数の事前取得は行わない（ダイアログに件数を出さない）。
+    //       当年度の稼働表行・割当・BUFFER も削除する（deleteWeekly=true）。
+    setDeleteTarget({ employeeNo: no, name: name.trim() });
   };
 
   /** 削除確認ダイアログで「削除」を押したときの実処理 */
   const handleDeleteConfirmed = async () => {
     if (!deleteTarget) return;
     const { employeeNo: no } = deleteTarget;
-    const alsoWeekly = deleteWeekly;
+    // 仕様：当年度の稼働表行・割当・BUFFER も同時に削除する
+    const alsoWeekly = true;
     setDeleting(true);
     try {
       const result = await deletePersonnel(no, year, alsoWeekly);
@@ -503,7 +485,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       onDelete(no);
       handleReset();
       setDeleteTarget(null);
-      setDeleteWeekly(false);
       message.success(
         alsoWeekly && result.deletedWeeklyCount > 0
           ? t('I_KADOU_035', [no, result.deletedWeeklyCount])
@@ -522,7 +503,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /**
    * 社員番号で要員情報を表示する（バックエンド API 経由）。
    * GET /api/kadou/personnel/{employeeNo}/{year}
-   * マスタに存在しない場合（404）は、新規追加するか確認する。
+   * マスタに存在しない場合（404）は「未登録です」のメッセージを出すだけにする
+   * （確認ダイアログ・追加／キャンセルの操作は行わない）。
    */
   const handleLookup = async (rawNo: string) => {
     const no = rawNo.trim();
@@ -568,30 +550,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       message.success(t('I_KADOU_005', [no]));
     } catch (e) {
       if (e instanceof PersonnelNotFoundError) {
-        // 該当なし（404）→ 新規追加するかを確認する。
-        //   追加   : 社員番号だけを残し、それ以外の入力欄をクリアする
-        //   キャンセル : すべての入力内容をそのまま維持する
-        Modal.confirm({
-          title: '未登録の社員番号です',
-          content: t('W_KADOU_036', [no]),
-          okText: '追加',
-          cancelText: 'キャンセル',
-          onOk: () => {
-            // 社員番号以外をクリアして新規登録の入力状態にする
-            setEmployeeNo(no);
-            setRole('');
-            setName('');
-            setDeptId(undefined);
-            setDeptError(false);
-            setEmployeeNoError('');
-            setRoleError('');
-            setNameError('');
-            // 新規追加の対象として記録する（ボタンは「保存する」のまま）
-            setVerifiedNo(no);
-            setVerifiedExists(false);
-            setOriginal(null);
-          },
-        });
+        // 該当なし（404）→ 確認ダイアログは表示せず、メッセージだけを出す。
+        // 入力内容はそのまま維持する（検索済み状態にもしない）。
+        message.warning(t('I_KADOU_031', [no]));
         return;
       }
       // DB 接続不可などのシステムエラー → 「未登録」と誤表示せず、エラーを明示する
@@ -1444,7 +1405,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         )}
       </Modal>
 
-      {/* 削除確認：要員稼動管理（jn_weekly_assignment_table）も消すか選ばせる */}
+      {/* 削除確認：当年度の稼働データも削除される旨のメッセージのみ表示する */}
       <Modal
         open={deleteTarget !== null}
         title='要員の削除'
@@ -1455,56 +1416,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         onOk={() => void handleDeleteConfirmed()}
         onCancel={() => {
           setDeleteTarget(null);
-          setDeleteWeekly(false);
         }}
-        width={560}
+        width={420}
       >
-        {deleteTarget && (
-          <Space direction='vertical' style={{ width: '100%' }} size='middle'>
-            <div>
-              社員番号「{deleteTarget.employeeNo}」（
-              {deleteTarget.name || '－'}）を削除します。
-              この操作は取り消せません。
-            </div>
-
-            <div
-              style={{
-                background: '#fff7e6',
-                border: '1px solid #ffd591',
-                borderRadius: 4,
-                padding: '8px 12px',
-              }}
-            >
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                要員稼動管理の情報も削除しますか？
-              </div>
-              <div style={{ fontSize: 12, color: '#595959', marginBottom: 8 }}>
-                対象テーブル：jn_weekly_assignment_table
-                <br />
-                検索条件：年度＝{year}、社員番号＝{deleteTarget.employeeNo}
-              </div>
-              {deleteTarget.weeklyCount > 0 ? (
-                <Checkbox
-                  checked={deleteWeekly}
-                  onChange={(e) => setDeleteWeekly(e.target.checked)}
-                >
-                  要員稼動管理の情報（週割当 {deleteTarget.weeklyCount} 件）も
-                  削除する
-                </Checkbox>
-              ) : (
-                <Text type='secondary' style={{ fontSize: 12 }}>
-                  当年度の週割当データは登録されていません。
-                </Text>
-              )}
-            </div>
-
-            {deleteTarget.weeklyCount === 0 && (
-              <Text type='secondary' style={{ fontSize: 12 }}>
-                ※ 要員情報（jn_personnel_master）のみ削除されます。
-              </Text>
-            )}
-          </Space>
-        )}
+        <div>
+          {t('W_KADOU_036')}
+        </div>
       </Modal>
     </div>
   );
