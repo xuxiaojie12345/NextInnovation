@@ -15,6 +15,7 @@ from app.schemas.project import (
     ProjectDeleteResult,
     ProjectImportRequest,
     ProjectImportResult,
+    ProjectImportWarning,
     ProjectSaveRequest,
 )
 from app.sql import load_sql
@@ -283,32 +284,42 @@ def delete_project(db: Session, year_id: str, sys_project_id: str) -> bool:
     return res.rowcount > 0
 
 
-def _label(line: int | None) -> str:
-    """警告メッセージ用の行ラベル（「3行目：」形式）。"""
-    return f"{line}行目：" if line else ""
+def _validate(row) -> dict | None:
+    """取り込み行の検証。問題があれば警告（messageId + params + line）を返す。
 
+    NOTE: メッセージ本文はここで組み立てず、messages.ts のメッセージ ID と
+          位置引数だけを返す（フロント側で t(messageId, params) により翻訳する）。
+          これにより画面と API の文言定義を 1 か所（messages.ts）に統一する。
+    """
+    line = row.line
 
-def _validate(row) -> str | None:
-    """取り込み行の検証。問題があれば警告メッセージを返す。"""
-    label = _label(row.line)
+    def warn(message_id: str, params: list) -> dict:
+        return {"messageId": message_id, "params": params, "line": line}
+
+    # 顧客（必須・桁数）
     if not _norm(row.customer):
-        return f"{label}顧客が空欄"
+        return warn("W_KADOU_001", ["顧客"])
     if len(_norm(row.customer)) > _MAX_CUSTOMER:
-        return f"{label}顧客が {_MAX_CUSTOMER} 文字を超えています"
+        return warn("E_KADOU_067", ["顧客", _MAX_CUSTOMER])
+
+    # 案件（必須・桁数）
     if not _norm(row.caseName):
-        return f"{label}案件が空欄"
+        return warn("W_KADOU_001", ["案件"])
     if len(_norm(row.caseName)) > _MAX_CASE_NAME:
-        return f"{label}案件が {_MAX_CASE_NAME} 文字を超えています"
+        return warn("E_KADOU_067", ["案件", _MAX_CASE_NAME])
+
+    # 任意項目（桁数のみ）
     if len(_norm(row.team)) > _MAX_TEAM:
-        return f"{label}チームが {_MAX_TEAM} 文字を超えています"
+        return warn("E_KADOU_067", ["チーム", _MAX_TEAM])
     if len(_norm(row.subTeam)) > _MAX_SUB_TEAM:
-        return f"{label}Subチームが {_MAX_SUB_TEAM} 文字を超えています"
+        return warn("E_KADOU_067", ["Subチーム", _MAX_SUB_TEAM])
     if len(_norm(row.department)) > _MAX_DEPARTMENT_NAME:
-        return f"{label}所属部門が {_MAX_DEPARTMENT_NAME} 文字を超えています"
+        return warn("E_KADOU_067", ["所属部門", _MAX_DEPARTMENT_NAME])
     if len(_norm(row.projectCode)) > _MAX_PROJECT_ID:
-        return f"{label}項目IDが {_MAX_PROJECT_ID} 文字を超えています"
+        return warn("E_KADOU_067", ["項目ID", _MAX_PROJECT_ID])
     if len(_norm(row.project_name)) > _MAX_PROJECT_NAME:
-        return f"{label}Project名称が {_MAX_PROJECT_NAME} 文字を超えています"
+        return warn("E_KADOU_067", ["Project名称", _MAX_PROJECT_NAME])
+
     return None
 
 
@@ -510,7 +521,11 @@ def import_projects(
     for row in payload.rows:
         warning = _validate(row)
         if warning is not None:
-            result.warnings.append(warning)
+            # 構造化データ（messageId + params）を返し、文言はフロントで生成する
+            # （バックエンドは日本語の業務文言を持たない）
+            result.warningDetails.append(
+                ProjectImportWarning(**warning)
+            )
             result.skipped += 1
             continue
         valid_rows.append(row)

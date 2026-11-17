@@ -85,6 +85,21 @@ class ProjectImportRequest(BaseModel):
     abortOnFileDuplicate: bool = True
 
 
+class ProjectImportWarning(BaseModel):
+    """一括取り込みの行警告（文言はフロント側で messageId から生成する）
+
+    NOTE: 文言をバックエンドに持たせず messageId + params だけを返すことで、
+          画面（react-kadou/src/constants/messages.ts）と文言を一元管理する。
+    """
+
+    # messages.ts のメッセージ ID（例：E_KADOU_067 / W_KADOU_001）
+    messageId: str
+    # messageId の位置引数（例：["顧客", 100]）
+    params: list[Union[str, int]] = []
+    # ファイル上の行番号（未指定可）
+    line: Optional[int] = None
+
+
 class ProjectImportResult(BaseModel):
     """一括取り込みの結果"""
 
@@ -111,7 +126,8 @@ class ProjectImportResult(BaseModel):
     fileDuplicateLines: list[int] = []
     # ファイル内重複のグループ（行番号のまとまり。例: [[3, 7], [12, 15, 20]]）
     fileDuplicateGroups: list[list[int]] = []
-    warnings: list[str] = []
+    # 行警告の構造化データ（messageId + params。文言はフロントで生成する）
+    warningDetails: list[ProjectImportWarning] = []
 
 
 class ProjectDeleteResult(BaseModel):

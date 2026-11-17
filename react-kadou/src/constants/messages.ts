@@ -116,6 +116,7 @@ export const MESSAGES: Record<string, string> = {
   E_KADOU_064: "プロジェクトが見つかりません。",
   E_KADOU_065: "{0}",
   E_KADOU_066: "同じプロジェクトが既に登録されています。",
+  E_KADOU_067: "{0}は{1}文字以内で入力してください。",
   E_KADOU_059: "プロジェクトの更新に失敗しました。",
   E_KADOU_060: "一括取り込みを中止しました。{0}",
   E_KADOU_050:

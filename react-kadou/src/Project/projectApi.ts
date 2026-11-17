@@ -76,6 +76,20 @@ export interface ProjectImportApiRow {
   line?: number;
 }
 
+/**
+ * 行警告（構造化）。
+ * 文言はバックエンドに持たせず、messageId を messages.ts で翻訳する。
+ * これにより画面と API の文言定義を 1 か所に統一できる。
+ */
+export interface ProjectImportWarning {
+  /** messages.ts のメッセージ ID（例：E_KADOU_067 / W_KADOU_001） */
+  messageId: string;
+  /** messageId の位置引数（例：['顧客', 100]） */
+  params?: Array<string | number>;
+  /** ファイル上の行番号 */
+  line?: number;
+}
+
 /** 一括取り込みの結果 */
 export interface ProjectImportApiResult {
   added: number;
@@ -100,7 +114,8 @@ export interface ProjectImportApiResult {
   fileDuplicateLines?: number[];
   /** ファイル内重複のグループ（行番号のまとまり。例: [[3, 7], [12, 15, 20]]） */
   fileDuplicateGroups?: number[][];
-  warnings: string[];
+  /** 行警告の構造化データ（messageId + params。文言は画面側で翻訳する） */
+  warningDetails?: ProjectImportWarning[];
 }
 
 /**

@@ -32,12 +32,12 @@ import {
   PROJECT_IMPORT_FORMAT_HINT,
   ProjectImportRow,
   parseProjectFile,
-  validateProjectImportRows,
 } from './projectImport';
 import {
   ProjectApiInfo,
   ProjectImportAbortedError,
   ProjectImportApiResult,
+  ProjectImportWarning,
   createProject,
   deleteProject,
   fetchProjects,
@@ -53,35 +53,19 @@ const { Title, Text } = Typography;
 
 /** 画面で使う固定文言（定数化して散在を防ぐ） */
 const LABELS = {
-  /** 一括読み込みの桁数エラー確認ダイアログ */
+  /**
+   * 一括読み込みの不備確認ダイアログ。
+   * NOTE: 不備の内容はバックエンド（dryRun の warnings）が返すものをそのまま並べる。
+   */
   importFormatErrorTitle: '取り込めない行があります',
   importFormatErrorLead:
-    '以下の行は入力欄と同じ桁数の制限を満たしていません。ファイルを修正してから取り込んでください。',
+    '以下の内容を直してから取り込んでください。中止した場合は 1 件も反映されません。',
   /** 一括読み込み：ファイル内に完全一致行が複数あり中止したときの表示 */
   importAbortedMessage:
     'このファイルは取り込めません（ファイル内に完全に同じ行が複数あります）',
-  /** 一括読み込み：桁数エラーが複数あった場合の「ほか」 */
+  /** 一括読み込み：エラーが複数あった場合の「ほか」 */
   more: ' ほか',
 } as const;
-
-/**
- * API エラーを画面に表示する（ログイン画面と同じ方針）。
- *   1) システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面に遷移させ、
- *      個別の message は出さない（notifySystemError が true を返す）。
- *   2) それ以外（業務エラー・通信エラー）はバックエンドのメッセージを優先し、
- *      未取得なら fallbackCode の文言を表示する。
- *
- * @param fallbackCode messages.ts のメッセージ ID（既定：E_KADOU_020 汎用エラー）
- * @param params      fallbackCode の位置引数
- */
-const showApiError = (
-  e: unknown,
-  fallbackCode: string = 'E_KADOU_020',
-  params: Array<string | number> = [],
-): void => {
-  if (notifySystemError(e)) return;
-  message.error(apiErrorMessage(e, t(fallbackCode, params)));
-};
 
 /** チーム / Subチーム の未入力は DB 上 "-" として扱う */
 const TEAM_EMPTY = '-';
@@ -209,7 +193,8 @@ const validateField = (
   if (limit && typeof value === 'string') {
     const [max, label] = limit;
     if (value.trim().length > max) {
-      return `${label}は${max}文字以内で入力してください。`;
+      // 文言は messages.ts に集約する（画面で文字列を直書きしない）
+      return t('E_KADOU_067', [label, max]);
     }
   }
 
@@ -219,9 +204,10 @@ const validateField = (
     if (required) {
       const label = required[1];
       if (!String(value ?? '').trim()) {
+        // 文言は messages.ts に集約する（入力＝W_KADOU_001 / 選択＝W_KADOU_002）
         return key === 'departmentId'
-          ? `${label}を選択してください。`
-          : `${label}を入力してください。`;
+          ? t('W_KADOU_002', [label])
+          : t('W_KADOU_001', [label]);
       }
     }
   }
@@ -345,6 +331,21 @@ const detectFileDuplicates = (
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
 const projectLabel = (p: Project): string =>
   p.name || p.abbr || '（名称未設定）';
+
+/**
+ * バックエンドが返した行警告（messageId + params）を表示用の文言へ変換する。
+ *
+ * NOTE: 文言は messages.ts に一元管理している。バックエンドは messageId と
+ *       位置引数だけを返し、ここで t() により翻訳する（画面と API で文言を共有）。
+ *       行番号があれば「3行目：〜」の形式に整える。
+ */
+const formatWarningDetails = (
+  result: { warningDetails?: ProjectImportWarning[] } | null | undefined,
+): string[] =>
+  (result?.warningDetails ?? []).map((w) => {
+    const line = w.line ? `${w.line}行目：` : '';
+    return `${line}${t(w.messageId, w.params ?? [])}`;
+  });
 
 /** ISO 8601 の週番号（月曜始まり・第1週は1/4を含む週）を求める */
 const getIsoWeek = (date: Dayjs): number => {
@@ -684,7 +685,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       const list = await fetchProjects(year);
       setProjectsRef.current(list.map(toProjectFromApi));
     } catch (e) {
-      showApiError(e, 'E_KADOU_045');
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
+      message.error(apiErrorMessage(e, t('E_KADOU_045')));
     } finally {
       setLoading(false);
     }
@@ -820,7 +824,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         setEditingKey((prev) => (prev === row.projectId ? null : prev));
         message.success(t('I_KADOU_040', [projectLabel(row)]));
       } catch (e) {
-        showApiError(e, 'E_KADOU_046');
+        // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+        if (notifySystemError(e)) return;
+        // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
+        message.error(apiErrorMessage(e, t('E_KADOU_046')));
       } finally {
         setDeleting(false);
       }
@@ -873,7 +880,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       }
       handleResetForm();
     } catch (e) {
-      showApiError(e, 'E_KADOU_047');
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
+      message.error(apiErrorMessage(e, t('E_KADOU_047')));
     } finally {
       setSaving(false);
     }
@@ -916,18 +926,30 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         { dryRun: true, opUser: operatorId },
       );
       setImportCheck(check);
+      // NOTE: 行単位の不備はバックエンドが messageId + params で返す。
+      //       文言は messages.ts から引く（画面と API で文言定義を共有する）。
+      setImportWarnings((prev) => [
+        ...new Set([...prev, ...formatWarningDetails(check)]),
+      ]);
       setImportRows(resolved);
     } catch (e) {
       // 409（ファイル全体中止）はプレビューを開いて理由を表示する
       if (e instanceof ProjectImportAbortedError) {
+        const abortResult = e.result;
         setImportFileName(file.name);
         // 中止時は取り込み対象が無いため、プレビューは空のまま理由だけ表示する
         // （解析に成功していれば、その行を復元して画面に表示する）
         setImportRows(parsed ? parsed.rows.map(resolveImportDepartment) : []);
-        setImportCheck(e.result);
+        setImportCheck(abortResult);
+        setImportWarnings((prev) => [
+          ...new Set([...prev, ...formatWarningDetails(abortResult)]),
+        ]);
         return;
       }
-      showApiError(e, 'E_KADOU_044');
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
+      message.error(apiErrorMessage(e, t('E_KADOU_044')));
     } finally {
       setImporting(false);
     }
@@ -950,9 +972,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    */
   const handleImportConfirm = async () => {
     if (!importRows) return;
-    // 桁数チェック（画面上の入力欄と同じ制限）。不備があれば何行目の何が
-    // 問題かを確認ダイアログに一覧表示し、取り込みは行わない。
-    const formatProblems = validateProjectImportRows(importRows);
+    // NOTE: 桁数チェックはバックエンド（services/project.py の _validate / _check_length）に
+    //       一本化した。フロントでは同じ検証を二重に行わず、dryRun が返した
+    //       warnings（不備の内容）をそのまま表示する。
 
     // 所属部門が確定していない行（部門マスタに一致せず、画面でも未選択）。
     // 重複行は取り込まないため対象外。
@@ -964,7 +986,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       )
       .filter(Boolean);
 
-    const problems = [...formatProblems, ...unresolvedDeptProblems];
+    // 取り込めない内容はバックエンド（dryRun）の warnings を単一の判定源にする
+    const problems = [...importWarnings, ...unresolvedDeptProblems];
     if (problems.length > 0) {
       Modal.warning({
         title: LABELS.importFormatErrorTitle,
@@ -1021,7 +1044,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         ]),
       );
 
-      const warnings = [...importWarnings, ...result.warnings];
+      const warnings = [...importWarnings, ...formatWarningDetails(result)];
       if (warnings.length > 0) {
         message.warning(
           t('I_KADOU_047', [
@@ -1033,7 +1056,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       }
       handleImportCancel();
     } catch (e) {
-      showApiError(e, 'E_KADOU_044');
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
+      message.error(apiErrorMessage(e, t('E_KADOU_044')));
     } finally {
       setSubmittingImport(false);
     }
