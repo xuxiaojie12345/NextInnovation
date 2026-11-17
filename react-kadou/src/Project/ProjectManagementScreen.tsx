@@ -83,11 +83,16 @@ const showApiError = (
   message.error(apiErrorMessage(e, t(fallbackCode, params)));
 };
 
+/** チーム / Subチーム の未入力は DB 上 "-" として扱う */
+const TEAM_EMPTY = '-';
+
 /**
  * プロジェクトの「略称」を組み立てる。
  * 顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
  * ※自動生成のみ（画面からは編集不可）
  * ※チーム / Subチーム は任意入力のため、未入力の項目は連結しない
+ * ※DB では未入力を半角 '-' で保持しているため、それも「未入力」として扱う
+ *   （そうしないと「顧客・案件・-・-」のように余計な区切りが付く）
  */
 export const buildProjectAbbr = (
   customer: string,
@@ -96,7 +101,7 @@ export const buildProjectAbbr = (
   subTeam: string,
 ): string =>
   [customer.trim().charAt(0), caseName.trim(), team.trim(), subTeam.trim()]
-    .filter((part) => part !== '')
+    .filter((part) => part !== '' && part !== TEAM_EMPTY)
     .join('・');
 
 /** 1ページの表示件数 */
@@ -234,12 +239,18 @@ const validateForm = (
 ): FormErrors => {
   const errors: FormErrors = {};
 
-  (Object.keys(FIELD_LIMITS) as Array<keyof ProjectFormValues>).forEach(
-    (key) => {
-      const message = validateField(key, form[key], options);
-      if (message) errors[key] = message;
-    },
-  );
+  // NOTE: 必須項目（所属部門など）は FIELD_LIMITS に無い場合があるため、
+  //       FIELD_LIMITS のキーだけを走査すると必須チェックが漏れる。
+  //       両者のキーを合わせて 1 回ずつ検証する。
+  const keys = new Set<keyof ProjectFormValues>([
+    ...(Object.keys(FIELD_LIMITS) as Array<keyof ProjectFormValues>),
+    ...REQUIRED_FIELDS.map(([k]) => k),
+  ]);
+
+  keys.forEach((key) => {
+    const message = validateField(key, form[key], options);
+    if (message) errors[key] = message;
+  });
 
   return errors;
 };
@@ -263,9 +274,6 @@ const toApiRow = (row: ProjectImportRow, index: number) => ({
  * バックエンド（app/services/project.py の _unique_key）と同一規則に揃える。
  */
 const dupKey = (value: string): string => (value ?? '').trim();
-
-/** チーム / Subチーム の未入力は DB 上 "-" として扱う */
-const TEAM_EMPTY = '-';
 
 /**
  * 一意キー (顧客 / 案件 / チーム / Subチーム) を組み立てる。
@@ -771,11 +779,20 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   /** 修正（選択したプロジェクトをフォームへ読み込む） */
   const handleEdit = useCallback((row: Project) => {
     setEditingKey(row.projectId);
+    /**
+     * チーム / Subチーム は DB 上、未入力を半角 '-' で保持している。
+     * そのままフォームへ入れると入力欄に「-」が表示されてしまうため、
+     * 編集時は未入力（空文字）へ戻す。
+     */
+    const toFormTeam = (v: string | undefined | null) => {
+      const s = (v ?? '').trim();
+      return s === TEAM_EMPTY ? '' : s;
+    };
     setForm({
       customer: row.customer,
       caseName: row.caseName,
-      team: row.team,
-      subTeam: row.subTeam,
+      team: toFormTeam(row.team),
+      subTeam: toFormTeam(row.subTeam),
       departmentId: row.departmentId,
       projectCode: row.projectCode,
       name: row.name,
@@ -783,7 +800,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       educationFlg: row.educationFlg,
     });
     setFormErrors({});
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 修正ボタン押下時は画面を最上部（初期表示位置）へ戻す。
+    // NOTE: scrollIntoView だとフォーム位置までしか戻らないため使わない。
+    //       対象要素が画面内にあると何もしないなど挙動も環境依存になる。
+    //       ページ全体をスクロールする要素（window / documentElement）を直接 0 にする。
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
   }, []);
 
   /** 削除（DB の jn_project_master から削除する） */
@@ -1036,14 +1058,26 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         dataIndex: 'team',
         key: 'team',
         width: 100,
-        render: (v: string) => v || <Text type='secondary'>－</Text>,
+        // NOTE: DB では空欄を半角 '-' で保持しているため、
+        //       画面では他の未設定項目と同じ全角 '－' で表示する。
+        render: (v: string) =>
+          v && v.trim() !== TEAM_EMPTY ? (
+            v
+          ) : (
+            <Text type='secondary'>－</Text>
+          ),
       },
       {
         title: 'Subチーム',
         dataIndex: 'subTeam',
         key: 'subTeam',
         width: 110,
-        render: (v: string) => v || <Text type='secondary'>－</Text>,
+        render: (v: string) =>
+          v && v.trim() !== TEAM_EMPTY ? (
+            v
+          ) : (
+            <Text type='secondary'>－</Text>
+          ),
       },
       {
         title: '略称',
@@ -1119,9 +1153,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         key: 'projectId',
         width: 140,
         fixed: 'right',
-        // DB の sys_project_id（INT）を「PJ.0000」の形式で表示する（4桁ゼロ埋め）
+        // DB の sys_project_id（INT）を「pj-00000」の形式で表示する（5桁ゼロ埋め）
         render: (v: string) =>
-          v ? `PJ.${v.padStart(4, '0')}` : <Text type='secondary'>－</Text>,
+          v ? `pj-${v.padStart(5, '0')}` : <Text type='secondary'>－</Text>,
       },
       {
         title: '操作',
@@ -1400,6 +1434,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   }
                   onChange={(v: string) => setField('departmentId', v)}
                   options={departmentOptions}
+                  // ドロップダウンの表示件数を 5 件に固定（1 件 = 32px）
+                  listHeight={160}
                   status={formErrors.departmentId ? 'error' : undefined}
                   style={{ width: '100%' }}
                 />
