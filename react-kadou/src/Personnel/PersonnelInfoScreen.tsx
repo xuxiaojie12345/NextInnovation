@@ -707,19 +707,21 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       }
     }
 
-    // DB の状態を検証結果として確定させる
-    // （入力欄は user が変更できるので、ここで上書きしてよい）
-    setVerifiedNo(no);
-    setVerifiedExists(existing !== null);
-
     if (existing) {
       // DB に既に存在する → 更新してよいか確認する
+      //
+      // NOTE: 「検索済み（更新／削除ボタンが出る）」状態への切り替えは
+      //       OK（更新する）を押したときだけ行う。ここで先に確定させると、
+      //       キャンセルしても更新モードのまま残ってしまうため。
       Modal.confirm({
         title: '社員番号は既に登録されています',
         content: t('W_KADOU_034', [no, existing.name ?? '']),
         okText: '更新する',
         cancelText: 'キャンセル',
         onOk: () => {
+          // DB の状態を検証結果として確定させる
+          setVerifiedNo(no);
+          setVerifiedExists(true);
           // 入力中の所属が未選択なら、DB の所属を引き継ぐ
           if (!deptId && existing?.department) {
             const dept = deptIdByName.get(existing.department);
@@ -727,12 +729,22 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
           }
           void save(no, false);
         },
+        // キャンセル：初期の登録（新規追加）状態を維持する。
+        //         入力欄の内容と赤枠表示はそのまま残す。
+        onCancel: () => {
+          setVerifiedNo('');
+          setVerifiedExists(false);
+          setOriginal(null);
+          setSaving(false);
+        },
       });
       return;
     }
 
     // DB に存在しない → 確認ダイアログは出さず、そのまま新規追加する
     // （存在しない場合は「保存する」ボタンでの新規登録が既定の動作）
+    setVerifiedNo(no);
+    setVerifiedExists(false);
     void save(no, true);
   };
 
