@@ -85,7 +85,7 @@ class PersonnelDeleteResult(BaseModel):
     """要員削除レスポンス（DELETE）"""
 
     code: int = 0
-    # 実際に削除した週割当件数（deleteWeekly=false なら 0）
+    # 実際に削除した週割当件数（要員マスタ削除時のカスケード削除）
     deletedWeeklyCount: int = 0
 
 

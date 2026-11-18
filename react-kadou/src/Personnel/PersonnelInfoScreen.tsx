@@ -480,13 +480,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     const alsoWeekly = true;
     setDeleting(true);
     try {
-      const result = await deletePersonnel(no, year, alsoWeekly);
+      const result = await deletePersonnel(no, year);
       // 画面側（App の要員一覧）にも反映する
       onDelete(no);
       handleReset();
       setDeleteTarget(null);
       message.success(
-        alsoWeekly && result.deletedWeeklyCount > 0
+        result.deletedWeeklyCount > 0
           ? t('I_KADOU_035', [no, result.deletedWeeklyCount])
           : t('I_KADOU_010', [no]),
       );

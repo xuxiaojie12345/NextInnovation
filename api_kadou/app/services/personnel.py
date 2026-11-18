@@ -133,9 +133,8 @@ def remove_personnel(
     db: Session,
     year_id: str,
     employee_no: str,
-    delete_weekly: bool = False,
 ) -> tuple[bool, int]:
-    """要員を削除する（残った週割当件数を返す）。
+    """要員を削除する（当年度の稼働データもカスケード削除する）。
 
     Returns:
         (削除できたか, 削除した週割当件数)
@@ -150,12 +149,12 @@ def remove_personnel(
     # 削除前に件数を控える（実際に消えた件数を返すため）
     weekly_count = count_weekly_assignments(db, year_id, no)
 
-    if not delete_personnel(db, year_id, no, delete_weekly=delete_weekly):
+    if not delete_personnel(db, year_id, no):
         raise BusinessException(
             status_code=404, message_id="I_KADOU_006", params=[no]
         )
 
-    return True, weekly_count if delete_weekly else 0
+    return True, weekly_count
 
 
 def save_personnel(
@@ -249,17 +248,13 @@ def delete_personnel(
     db: Session,
     year_id: str,
     employee_no: str,
-    delete_weekly: bool = False,
 ) -> bool:
     """要員を削除する。削除できた場合は True を返す。
 
-    Args:
-        delete_weekly: True のとき、jn_weekly_assignment_table の当該年度・
-            当該社員番号の週割当も同時に削除する（年度 + 社員番号で特定）。
-
-    NOTE: 週割当の削除は「画面の要員情報を消すので、稼働管理の実データも
-          消すか」を利用者に選ばせる仕様のため、既定は False（消さない）。
-          どちらも同一トランザクションで実行する。
+    NOTE: 要員マスタを削除した場合は、当該年度の稼働データ
+          （稼働表行・割当・BUFFER = jn_weekly_assignment_table）も
+          同一トランザクションで必ず削除する（設計 7.9 のカスケード）。
+          過去実績も削除対象。他年度のデータは削除しない。
     """
     res = db.execute(
         text(load_sql("personnel/personnel_delete.sql")),
@@ -267,7 +262,7 @@ def delete_personnel(
     )
     deleted = res.rowcount > 0
 
-    if deleted and delete_weekly:
+    if deleted:
         # 年度 + 社員番号を検索条件として週割当を削除する
         db.execute(
             text(load_sql("personnel/weekly_assignment_delete.sql")),

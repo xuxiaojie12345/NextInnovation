@@ -286,24 +286,21 @@ export async function fetchWeeklyCount(
 /** 要員削除の結果 */
 export interface PersonnelDeleteResponse {
   code: number;
-  /** 実際に削除した週割当件数（deleteWeekly=false なら 0） */
+  /** 実際に削除した週割当件数 */
   deletedWeeklyCount: number;
 }
 
 /**
  * 要員を削除する（DELETE /api/kadou/personnel/{employeeNo}/{year}）。
- *
- * @param deleteWeekly true のとき、jn_weekly_assignment_table の
- *                     当該年度・当該社員番号の週割当も同時に削除する
+ * 当年度の稼働データ（稼働表行・割当・BUFFER）も同時に削除する（設計 7.9）。
  */
 export async function deletePersonnel(
   employeeNo: string,
   year: number,
-  deleteWeekly = false,
 ): Promise<PersonnelDeleteResponse> {
-  const query = deleteWeekly ? '?deleteWeekly=true' : '';
+  // 当年度の稼働データ（稼働表行・割当・BUFFER）も同時に削除される（設計 7.9）
   return request<PersonnelDeleteResponse>(
-    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}${query}`,
+    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}`,
     { method: 'DELETE' },
   );
 }
