@@ -49,7 +49,7 @@ import {
   buildYearWeeks,
   mondayOf,
 } from '../data/yearWeeks';
-import type { UnpaidMap, WorkStatusData } from '../data/yearStore';
+import type { UnpaidMap } from '../data/yearStore';
 import type { WorkStatusPayload } from '../data/kadouRepository';
 import {
   currentWeekKey,
@@ -59,6 +59,7 @@ import {
   isPastWeek,
 } from './pastActuals';
 import type { SavedBaseline } from './pastActuals';
+import { fetchWorkStatus, toWorkStatusData } from './workStatusApi';
 
 const { Title, Text } = Typography;
 
@@ -170,8 +171,6 @@ interface WorkStatusProps {
   defaultDepartments?: string[];
   /** 社員マスタ（社員番号 → 要員）。氏名・役割・所属の参照に使う（マスタ編集は要員情報画面のみ） */
   employeeMaster: Map<string, Personnel>;
-  /** 保存済みの稼働表（表示行 rows・割当・BUFFER） */
-  initialWorkStatus: WorkStatusData;
     /** 所属変更（異動）で要員マスタの現在所属を更新する */
   onUpdateDepartment: (employeeNo: string, departmentId: string) => void;
   /** 保存（下書きを確定して親へ渡す） */
@@ -294,7 +293,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   departments,
   defaultDepartments,
   employeeMaster,
-  initialWorkStatus,
   onSave,
   onUpdateLeavePlan,
   onUpdateDepartment,
@@ -308,23 +306,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   // ---- 表示行（要員マスタとは別。行追加・行削除はこの並びだけを変える）----
   // employeeNo が空の行は「社員番号未入力」の空行。
   // 行は所属と有効期間を持ち、年途中の部門異動は 2 行に分けて表現する。
-  const [draftRows, setDraftRows] = useState<WorkStatusRow[]>(() =>
-    (initialWorkStatus.rows ?? []).map((row, i) => ({
-      ...row,
-      key: row.key || `r-${i + 1}`,
-      departmentId:
-        row.departmentId ||
-        employeeMaster.get(row.employeeNo)?.departmentId ||
-        '',
-    })),
-  );
-  // 行キーの連番（既存キーの最大値から再開する）
-  const rowIdRef = useRef(
-    (initialWorkStatus.rows ?? []).reduce((max, row) => {
-      const n = Number((row.key ?? '').replace(/^r-/, ''));
-      return Number.isFinite(n) ? Math.max(max, n) : max;
-    }, 0),
-  );
+  // 初期表示は空。DB に保存された週次データを API から取得して反映する。
+  const [draftRows, setDraftRows] = useState<WorkStatusRow[]>([]);
+  // 行キーの連番
+  const rowIdRef = useRef(0);
 
   /** 下書きの行を要員マスタ（氏名・役割・退場予定）と結合した表示用の行 */
   const draftPersonnel: PersonRow[] = useMemo(
@@ -351,9 +336,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   );
 
   // 割当: 要員ID -> (週キー 'YYYY-MM-DD' -> プロジェクトID or null)
-  const [assignment, setAssignment] = useState<AssignmentMap>(() => ({
-    ...initialWorkStatus.assignment,
-  }));
+  const [assignment, setAssignment] = useState<AssignmentMap>(() => ({}));
 
   // ---- 検索条件（部署で表示要員を絞り込む） ----
   // 選択した部署（空 = 全部署）。初期値はログインユーザーの既定部門
@@ -384,9 +367,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const [pasteUnpaid, setPasteUnpaid] = useState(false);
 
   // ---- 無償支援（契約外・非計費）: 要員ID -> (週キー -> true) ----
-  const [unpaid, setUnpaid] = useState<UnpaidMap>(() => ({
-    ...initialWorkStatus.unpaid,
-  }));
+  const [unpaid, setUnpaid] = useState<UnpaidMap>(() => ({}));
 
   // 行削除で業務データ（割当・BUFFER）を削除した要員。
   // 保存時にバックエンドへ渡し、DB 側でも当該年度の業務データを削除する
@@ -395,14 +376,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   // 保存済みデータ（過去実績の判定基準）。保存時に更新する
   // ※判定は未保存の下書きではなく保存済みデータで行う（設計 7.4）
   const [savedBaseline, setSavedBaseline] = useState<SavedBaseline>(() => ({
-    assignment: initialWorkStatus.assignment,
-    unpaid: initialWorkStatus.unpaid,
+    assignment: {},
+    unpaid: {},
   }));
 
   // 保存済みの行（保存済みの異動かどうかの判定に使う）
-  const [savedRows, setSavedRows] = useState<WorkStatusRow[]>(
-    () => initialWorkStatus.rows ?? [],
-  );
+  const [savedRows, setSavedRows] = useState<WorkStatusRow[]>([]);
 
   // 今週の月曜（過去週の判定基準）。週が変わったら 1 分以内に再計算する
   const [currentMonday, setCurrentMonday] = useState<string>(() =>
@@ -466,6 +445,87 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   useEffect(() => {
     onDirtyChange(dirty);
   }, [dirty, onDirtyChange]);
+
+  // API 取得結果の反映時に最新の編集状態を参照するための保持
+  // （依存配列に入れると編集のたびに再取得してしまうため参照で持つ）
+  const dirtyRef = useRef(dirty);
+  useEffect(() => {
+    dirtyRef.current = dirty;
+  }, [dirty]);
+
+  /**
+   * 初期表示（および年度切替）時に、その年度の稼働状況を API から取得する。
+   *
+   * GET /api/kadou/workStatus/{year} は「1 社員 × 1 週 = 1 レコード」で返るため、
+   * 「1 社員 × 所属期間 = 1 行」＋ 週ごとの割当／BUFFER に変換する
+   * （変換は workStatusApi.toWorkStatusData）。
+   *
+   * 画面には以下の順で要員を表示する：
+   *   1. DB に週次データがある要員（toWorkStatusData が生成した行）
+   *   2. 要員マスタには登録されているが、この年度の週次データが無い要員（空行）
+   *      → 週列はすべて空白。行の所属は要員マスタの現在所属を採用する。
+   * ※未保存の変更がある場合は、編集内容を壊さないよう反映しない。
+   */
+  useEffect(() => {
+    let cancelled = false;
+    fetchWorkStatus(year)
+      .then((records) => {
+        if (cancelled || dirtyRef.current) return;
+        const data = toWorkStatusData(year, records);
+
+        // DB の週次データに既に含まれる社員番号（重複追加を防ぐ）
+        const dbEmployeeNos = new Set(data.rows.map((r) => r.employeeNo));
+
+        // 要員マスタから、週次データの無い要員を空行として追加する
+        const masterRows: WorkStatusRow[] = [];
+        employeeMaster.forEach((person) => {
+          if (dbEmployeeNos.has(person.employeeNo)) return;
+          // 要員マスタの departmentId が '0' や空文字の場合は所属を空とする
+          const deptId =
+            person.departmentId && person.departmentId !== '0'
+              ? person.departmentId
+              : '';
+          masterRows.push({
+            key: '', // 後で連番を振る
+            employeeNo: person.employeeNo,
+            departmentId: deptId,
+          });
+        });
+
+        // 行キーを連番で振り直す（DB 行 → 要員マスタ空行の順）
+        const allRows: WorkStatusRow[] = [];
+        const baseCount = data.rows.length;
+        data.rows.forEach((r, i) => {
+          allRows.push({ ...r, key: `r-${i + 1}` });
+        });
+        masterRows.forEach((r, i) => {
+          allRows.push({ ...r, key: `r-${baseCount + i + 1}` });
+        });
+
+        setDraftRows(allRows);
+        setAssignment({ ...data.assignment });
+        setUnpaid({ ...data.unpaid });
+        // savedRows は DB から取得した行のみ（要員マスタ空行は保存実績なし）
+        setSavedRows(data.rows);
+        setSavedBaseline({
+          assignment: data.assignment,
+          unpaid: data.unpaid,
+        });
+        rowIdRef.current = allRows.length;
+        setAddedRowKeys(new Set<string>());
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        message.error(
+          error instanceof Error
+            ? `稼働状況の取得に失敗しました：${error.message}`
+            : '稼働状況の取得に失敗しました。',
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [year, employeeMaster]);
 
   /**
    * 社員番号の確定（表示行の employeeNo を差し替える。要員マスタは変更しない）
@@ -557,7 +617,21 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       const targetRows = draftRows.filter(
         (r) => r.employeeNo === no && !myRows.some((my) => my.key === r.key),
       );
-      const conflict = targetRows.some((target) =>
+      // 要員マスタから自動生成された「割当・BUFFER も有効期間も無い行」は
+      // 実データを持たない空行なので、重複扱いにせず今回の行へ置き換える
+      const hasDataForEmployee = (employeeNo: string): boolean =>
+        hasWorkData(employeeNo, assignment, unpaid) ||
+        hasWorkData(
+          employeeNo,
+          savedBaseline.assignment,
+          savedBaseline.unpaid,
+        );
+      const isPlaceholderRow = (row: WorkStatusRow): boolean =>
+        !row.activeFrom && !row.activeTo && !hasDataForEmployee(row.employeeNo);
+      const placeholderRows = targetRows.filter(isPlaceholderRow);
+      const dataRows = targetRows.filter((row) => !isPlaceholderRow(row));
+
+      const conflict = dataRows.some((target) =>
         myRows.some((my) => periodsOverlap(my, target)),
       );
       if (conflict) {
@@ -567,7 +641,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         return false;
       }
       // 同一社員の行は 1 年度につき最大 2 行（異動 1 回）
-      if (targetRows.length + myRows.length > 2) {
+      if (dataRows.length + myRows.length > 2) {
         message.error(
           `社員番号「${no}」の行が 2 行を超えるため、処理を中止しました。`,
         );
@@ -598,17 +672,20 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         );
       }
       // 異動で分割されている場合は 2 行まとめて同じ社員番号に変更する
+      // 併せて、置き換え対象の空行（マスタ自動生成行）は取り除く
       setDraftRows((prev) =>
-        prev.map((r) =>
-          myRows.some((my) => my.key === r.key)
-            ? {
-                ...r,
-                employeeNo: no,
-                // 空行から社員番号を確定したときはマスタの現在所属を採用する
-                departmentId: r.departmentId || master?.departmentId || '',
-              }
-            : r,
-        ),
+        prev
+          .filter((r) => !placeholderRows.some((p) => p.key === r.key))
+          .map((r) =>
+            myRows.some((my) => my.key === r.key)
+              ? {
+                  ...r,
+                  employeeNo: no,
+                  // 空行から社員番号を確定したときはマスタの現在所属を採用する
+                  departmentId: r.departmentId || master?.departmentId || '',
+                }
+              : r,
+          ),
       );
       setDirty(true);
       return true;

@@ -40,6 +40,7 @@ import {
   getYearSummary,
 } from "./data/yearStore";
 import { WorkStatusPayload, kadouRepository } from "./data/kadouRepository";
+import { fetchDepartments } from "./Department/departmentApi";
 import "./App.css";
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
@@ -91,6 +92,33 @@ function App() {
     () => AVAILABLE_YEARS.map((y) => getYearSummary(y, stores[y])),
     [stores],
   );
+
+  /**
+   * 年度切替時に部門マスタをバックエンドから取得する。
+   * 要員・プロジェクトの所属部門IDを部門名へ解決するため、
+   * 画面間で同じ部門マスタ（DB の departmentId）を共有する。
+   */
+  useEffect(() => {
+    let active = true;
+    fetchDepartments(selectedYear)
+      .then((departments) => {
+        if (!active) return;
+        setStores((previous) => ({
+          ...previous,
+          [selectedYear]: {
+            ...previous[selectedYear],
+            departments,
+          },
+        }));
+      })
+      .catch(() => {
+        // 取得できない場合は初期データのまま表示を継続する
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedYear]);
 
   useEffect(() => {
     let active = true;
@@ -563,7 +591,6 @@ function App() {
         departments={store.departments}
         defaultDepartments={defaultDepartments}
         employeeMaster={employeeMaster}
-        initialWorkStatus={store.workStatus}
         onSave={handleSaveWorkStatus}
         onUpdateLeavePlan={handleUpdateLeavePlan}
         onUpdateDepartment={handleUpdateDepartment}

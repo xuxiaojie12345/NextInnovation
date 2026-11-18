@@ -462,19 +462,27 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         render: (v: string) => v || <Text type='secondary'>－</Text>,
       },
       {
-        title: 'Project名称',
+        title: 'Project名称', 
         dataIndex: 'name',
         key: 'name',
         width: 170,
         render: (v: string) => v || <Text type='secondary'>－</Text>,
       },
       {
-        // 主キー（システム採番）。一覧の最右に表示する
+        // 主キー（システム採番）。一覧の最右に表示する。
+        // 画面上は `pj-` プレフィックス + 5 桁ゼロ埋めで表示（例：pj-00005）
         title: 'システム項目ID',
         dataIndex: 'projectId',
         key: 'projectId',
         width: 140,
         fixed: 'right',
+        render: (v: string) => {
+          const numeric = Number(v);
+          const padded = Number.isFinite(numeric)
+            ? String(numeric).padStart(5, '0')
+            : v;
+          return `pj-${padded}`;
+        }, 
       },
       {
         title: '操作',
