@@ -8,6 +8,7 @@ from app.schemas.department import DepartmentCreate, DepartmentOut, DepartmentQu
 from app.sql.Department_sql import (
     DEPARTMENT_DELETE,
     DEPARTMENT_INSERT,
+    DEPARTMENT_REF_COUNT,
     DEPARTMENT_SELECT_BY_YEAR,
     DEPARTMENT_UPDATE,
 )
@@ -82,9 +83,27 @@ def update_department(
 
 
 def delete_department(db: Session, year: str, dept_id: int) -> None:
-    """删除部門"""
+    """删除部門
+
+    以下のテーブルで参照されている場合は削除できない：
+      - jn_personnel_master        （要員の所属部門）
+      - jn_project_master          （プロジェクトの所属部門）
+      - jn_weekly_assignment_table （稼働表の週次データ。異動の旧行も含む）
+    """
     # 先查记录是否存在
     _find_department(db, year, dept_id)
+
+    # 参照チェック
+    result = db.execute(
+        DEPARTMENT_REF_COUNT,
+        {"year_id": year, "department_id": dept_id},
+    )
+    ref_count = result.scalar() or 0
+    if ref_count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="この部門は要員・要員稼働データ（異動の旧行を含む）で参照されているため削除できません。",
+        )
 
     db.execute(
         DEPARTMENT_DELETE,

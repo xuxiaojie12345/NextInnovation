@@ -43,3 +43,21 @@ WHERE
     year_id = :year_id
     AND department_id = :department_id
 """)
+
+# 部門削除可否チェック：3 テーブルのいずれかで参照されているか
+# 参照があれば 1 件以上返る（なければ 0 件）
+#  - jn_personnel_master        : 要員の所属部門
+#  - jn_project_master          : プロジェクトの所属部門
+#  - jn_weekly_assignment_table : 稼働表の週次データ（異動の旧行を含む）
+DEPARTMENT_REF_COUNT = text("""
+SELECT COUNT(*) AS cnt FROM (
+    SELECT department_id FROM jn_personnel_master
+        WHERE year_id = :year_id AND department_id = :department_id
+    UNION ALL
+    SELECT department_id FROM jn_project_master
+        WHERE year_id = :year_id AND department_id = :department_id
+    UNION ALL
+    SELECT department_id FROM jn_weekly_assignment_table
+        WHERE year_id = :year_id AND department_id = :department_id
+) AS refs
+""")

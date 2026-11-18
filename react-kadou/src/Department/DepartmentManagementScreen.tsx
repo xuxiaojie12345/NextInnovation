@@ -406,7 +406,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           rowClassName={(row) =>
             row.departmentId === editingId ? 'project-row-editing' : ''
           }
-          pagination={{ pageSize: 15, size: 'small', showSizeChanger: false }}
+          pagination={{ pageSize: 8, size: 'small', showSizeChanger: false }}
         />
       </Card>
     </div>
