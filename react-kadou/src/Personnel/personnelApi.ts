@@ -267,22 +267,6 @@ export async function savePersonnel(
   );
 }
 
-/**
- * 指定年度 + 社員番号の週割当件数を取得する
- * （GET /api/kadou/personnel/{employeeNo}/{year}/weekly-count）
- *
- * 要員削除の確認ダイアログで「週割当も削除するか」を判断するために使う。
- */
-export async function fetchWeeklyCount(
-  employeeNo: string,
-  year: number,
-): Promise<number> {
-  const data = await request<{ year: string; employeeNo: string; count: number }>(
-    `/api/kadou/personnel/${encodeURIComponent(employeeNo)}/${year}/weekly-count`,
-  );
-  return data.count;
-}
-
 /** 要員削除の結果 */
 export interface PersonnelDeleteResponse {
   code: number;

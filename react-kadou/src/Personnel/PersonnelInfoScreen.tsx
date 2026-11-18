@@ -32,6 +32,7 @@ import {
   validatePersonnelImportRows,
 } from './personnelImport';
 import {
+  PersonnelDeleteResponse,
   PersonnelImportAbortedError,
   PersonnelImportApiResult,
   PersonnelNotFoundError,
@@ -458,17 +459,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    * 表示中の要員を削除する（バックエンドの DB から削除）。
    *
    * NOTE: 誤操作防止のため、必ず確認ダイアログを表示してから削除する。
-   *       確認文言は「当年度の稼働表行・割当・BUFFERも削除されますが、
-   *       よろしいでしょうか。」のみとし、削除時は当年度の稼働データ
-   *       （行・割当・BUFFER）も同時に削除する（週割当の条件は「年度 + 社員番号」）。
+   *       削除時は当年度の稼働データ（稼働表行・割当・BUFFER）も同時に
+   *       削除する（週割当の条件は「年度 + 社員番号」）。確認文言は
+   *       ダイアログ側で対象の社員番号・氏名と併せて表示する。
    */
-  const handleDelete = async () => {
+  const handleDelete = () => {
     const no = employeeNo.trim();
     if (!no || !isExisting) return;
 
-    // NOTE: 削除確認ダイアログは文言のみのシンプルな形にしたため、
-    //       周割当件数の事前取得は行わない（ダイアログに件数を出さない）。
-    //       当年度の稼働表行・割当・BUFFER も削除する（deleteWeekly=true）。
+    // 削除確認ダイアログを開くだけ（周割当件数の事前取得は行わない）
     setDeleteTarget({ employeeNo: no, name: name.trim() });
   };
 
@@ -476,28 +475,29 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const handleDeleteConfirmed = async () => {
     if (!deleteTarget) return;
     const { employeeNo: no } = deleteTarget;
-    // 仕様：当年度の稼働表行・割当・BUFFER も同時に削除する
-    const alsoWeekly = true;
     setDeleting(true);
+    let result: PersonnelDeleteResponse;
     try {
-      const result = await deletePersonnel(no, year);
-      // 画面側（App の要員一覧）にも反映する
-      onDelete(no);
-      handleReset();
-      setDeleteTarget(null);
-      message.success(
-        result.deletedWeeklyCount > 0
-          ? t('I_KADOU_035', [no, result.deletedWeeklyCount])
-          : t('I_KADOU_010', [no]),
-      );
-      await reloadPersonnelCount();
+      result = await deletePersonnel(no, year);
     } catch (e) {
       if (!notifySystemError(e)) {
         message.error(apiErrorMessage(e, t('E_KADOU_040')));
       }
+      return;
     } finally {
       setDeleting(false);
     }
+    // 画面側（App の要員一覧）にも反映する
+    onDelete(no);
+    handleReset();
+    setDeleteTarget(null);
+    message.success(
+      result.deletedWeeklyCount > 0
+        ? t('I_KADOU_035', [no, result.deletedWeeklyCount])
+        : t('I_KADOU_010', [no]),
+    );
+    // 人数の再取得は削除結果に影響しない（失敗しても削除成功の表示を維持する）
+    void reloadPersonnelCount().catch(() => undefined);
   };
 
   /**
@@ -1431,7 +1431,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         )}
       </Modal>
 
-      {/* 削除確認：当年度の稼働データも削除される旨のメッセージのみ表示する */}
+      {/* 削除確認：対象の社員と、当年度の稼働データも削除される旨を表示する */}
       <Modal
         open={deleteTarget !== null}
         title='要員の削除'
@@ -1446,6 +1446,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         width={420}
       >
         <div>
+          <div style={{ marginBottom: 8, fontWeight: 600 }}>
+            社員番号「{deleteTarget?.employeeNo}」
+            {deleteTarget?.name ? `（${deleteTarget.name}）` : ''} を削除します。
+          </div>
           {t('W_KADOU_036')}
         </div>
       </Modal>
