@@ -687,8 +687,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     } catch (e) {
       // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
       if (notifySystemError(e)) return;
-      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
-      message.error(apiErrorMessage(e, t('E_KADOU_045')));
+      // NOTE: 文言はバックエンドが返す messageId を t() で翻訳する。
+      //       フロント独自の既定文言（fallback）は持たない。
+      message.error(apiErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -826,8 +827,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       } catch (e) {
         // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
         if (notifySystemError(e)) return;
-        // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
-        message.error(apiErrorMessage(e, t('E_KADOU_046')));
+        // NOTE: 文言はバックエンドが返す messageId を t() で翻訳する。
+        //       フロント独自の既定文言（fallback）は持たない。
+        message.error(apiErrorMessage(e));
       } finally {
         setDeleting(false);
       }
@@ -882,8 +884,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     } catch (e) {
       // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
       if (notifySystemError(e)) return;
-      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
-      message.error(apiErrorMessage(e, t('E_KADOU_047')));
+      // NOTE: 文言はバックエンドが返す messageId を t() で翻訳する。
+      //       フロント独自の既定文言（fallback）は持たない。
+      message.error(apiErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -948,8 +951,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       }
       // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
       if (notifySystemError(e)) return;
-      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
-      message.error(apiErrorMessage(e, t('E_KADOU_044')));
+      // NOTE: 文言はバックエンドが返す messageId を t() で翻訳する。
+      //       フロント独自の既定文言（fallback）は持たない。
+      message.error(apiErrorMessage(e));
     } finally {
       setImporting(false);
     }
@@ -1058,8 +1062,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     } catch (e) {
       // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
       if (notifySystemError(e)) return;
-      // 業務エラー・通信エラーはバックエンドのメッセージを優先し、無ければ既定文言
-      message.error(apiErrorMessage(e, t('E_KADOU_044')));
+      // NOTE: 文言はバックエンドが返す messageId を t() で翻訳する。
+      //       フロント独自の既定文言（fallback）は持たない。
+      message.error(apiErrorMessage(e));
     } finally {
       setSubmittingImport(false);
     }
@@ -1518,22 +1523,26 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <div className='project-field-pair'>
                   <div>
                     <div className='form-label'>有効稼働</div>
+                    {/* NOTE: チェックボックスの文言は状態で変えず固定にする。
+                        選択状態はチェックの有無で表す（オン=有効 / オフ=無効）。 */}
                     <Checkbox
                       checked={form.validFlg}
                       onChange={(e) => setField('validFlg', e.target.checked)}
                     >
-                      {form.validFlg ? '有効' : '無効'}
+                      有効
                     </Checkbox>
                   </div>
                   <div>
                     <div className='form-label'>教育かどうか</div>
+                    {/* NOTE: チェックボックスの文言は状態で変えず固定にする。
+                        選択状態はチェックの有無で表す（オン=非教育 / オフ=教育）。 */}
                     <Checkbox
                       checked={form.educationFlg}
                       onChange={(e) =>
                         setField('educationFlg', e.target.checked)
                       }
                     >
-                      {form.educationFlg ? '教育' : '非教育'}
+                      非教育
                     </Checkbox>
                   </div>
                 </div>

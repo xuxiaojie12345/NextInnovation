@@ -537,16 +537,11 @@ def import_projects(
     existing_keys = _existing_keys(db, year_id)
     to_add: list[tuple[object, str]] = []
     for row in valid_rows:
-        # 所属部門は必須（部門マスタに無い／曖昧な場合は取り込まない）
-        # NOTE: 画面側（プレビュー）で所属部門を確定させてから送信するため、
-        #       ここで解決できない行は警告を出さずにスキップする。
-        department_id, resolved = _resolve_department_id(
-            dept_index, row.department
-        )
-        if not resolved:
-            result.skipped += 1
-            continue
-
+        # NOTE: 重複判定を「所属部門の解決」より先に行う。
+        #       所属部門が部門マスタに無い行でも、一意キーが既存データと一致すれば
+        #       「重複（取り込まない行）」であり、追加対象ではない。
+        #       逆順にすると、重複行が「所属未確定の追加対象」として画面に表示され、
+        #       プレビューでは追加予定なのに取込時に何も登録されない不整合になる。
         key = _row_unique_key(row)
         # 既存データと同じ一意キー → 取り込まない（重複として画面に表示する）
         if key in existing_keys:
@@ -555,6 +550,16 @@ def import_projects(
                 result.duplicatedLines.append(row.line)
                 result.duplicatedReasons[row.line] = ["既存データと重複"]
                 result.fullDuplicateLines.append(row.line)
+            continue
+
+        # 所属部門は必須（部門マスタに無い／曖昧な場合は取り込まない）
+        # NOTE: 画面側（プレビュー）で所属部門を確定させてから送信するため、
+        #       ここで解決できない行は警告を出さずにスキップする。
+        department_id, resolved = _resolve_department_id(
+            dept_index, row.department
+        )
+        if not resolved:
+            result.skipped += 1
             continue
 
         # 以降の行を重複として判定できるよう、キーを集合へ入れる
@@ -616,7 +621,7 @@ def _require_text(value: str | None, message_id: str) -> str:
 def _length_error(message: str):
     """文字数超過などの入力不備を業務エラーにする（詳細文は params で渡す）。"""
     return BusinessException(
-        status_code=400, message_id="E_KADOU_057", params=[message]
+        status_code=400, message_id="E_KADOU_065", params=[message]
     )
 
 
@@ -634,12 +639,12 @@ def register_project(
     """プロジェクトを新規登録し、登録した内容を返す（API 入口）。
 
     Raises:
-        BusinessException: 顧客が未入力（E_KADOU_053）／案件が未入力（E_KADOU_054）／
-                           文字数超過（E_KADOU_057）／登録失敗（E_KADOU_058）。
+        BusinessException: 顧客が未入力（E_KADOU_061）／案件が未入力（E_KADOU_062）／
+                           文字数超過（E_KADOU_065）／登録失敗（E_KADOU_066）。
     """
     data = payload.model_dump()
-    _require_text(data.get("customer"), "E_KADOU_053")
-    _require_text(data.get("caseName"), "E_KADOU_054")
+    _require_text(data.get("customer"), "E_KADOU_061")
+    _require_text(data.get("caseName"), "E_KADOU_062")
 
     # 一意キー (顧客/案件/チーム/Subチーム) が既存データと一致する場合は登録しない
     if project_key_exists(
@@ -672,14 +677,14 @@ def modify_project(
     """プロジェクトを更新し、更新後の内容を返す（API 入口）。
 
     Raises:
-        BusinessException: システム項目IDが空（E_KADOU_055）／顧客が未入力（E_KADOU_053）／
-                           案件が未入力（E_KADOU_054）／文字数超過（E_KADOU_057）／
-                           該当なし（E_KADOU_056）／更新失敗（E_KADOU_059）。
+        BusinessException: システム項目IDが空（E_KADOU_063）／顧客が未入力（E_KADOU_061）／
+                           案件が未入力（E_KADOU_062）／文字数超過（E_KADOU_065）／
+                           該当なし（E_KADOU_064）／更新失敗（E_KADOU_059）。
     """
-    sys_project_id = _require_text(key, "E_KADOU_055")
+    sys_project_id = _require_text(key, "E_KADOU_063")
     data = payload.model_dump()
-    _require_text(data.get("customer"), "E_KADOU_053")
-    _require_text(data.get("caseName"), "E_KADOU_054")
+    _require_text(data.get("customer"), "E_KADOU_061")
+    _require_text(data.get("caseName"), "E_KADOU_062")
 
     # 一意キーが「他の」既存データと一致する場合は更新しない
     if project_key_exists(
@@ -704,7 +709,7 @@ def modify_project(
         raise BusinessException(status_code=409, message_id="E_KADOU_059")
 
     if updated is None:
-        raise BusinessException(status_code=404, message_id="E_KADOU_056")
+        raise BusinessException(status_code=404, message_id="E_KADOU_064")
     return updated
 
 
@@ -714,11 +719,11 @@ def remove_project(
     """プロジェクトを削除する（API 入口）。
 
     Raises:
-        BusinessException: システム項目IDが空（E_KADOU_055）／該当なし（E_KADOU_056）。
+        BusinessException: システム項目IDが空（E_KADOU_063）／該当なし（E_KADOU_064）。
     """
-    sys_project_id = _require_text(key, "E_KADOU_055")
+    sys_project_id = _require_text(key, "E_KADOU_063")
     if not delete_project(db, year_id, sys_project_id):
-        raise BusinessException(status_code=404, message_id="E_KADOU_056")
+        raise BusinessException(status_code=404, message_id="E_KADOU_064")
     return ProjectDeleteResult(code=0)
 
 

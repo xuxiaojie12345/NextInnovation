@@ -741,7 +741,21 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       return;
     }
 
-    // DB に存在しない → 確認ダイアログは出さず、そのまま新規追加する
+    // DB に存在しない（existing === null）
+    //
+    // NOTE: 更新モード（「更新する」ボタンが表示されている状態）で DB から消えている
+    //       場合、他の利用者によって削除された可能性がある。このまま新規追加すると
+    //       意図せずレコードが復活してしまうため、削除ボタンと同じ「見つかりません」
+    //       エラーを表示して中止する（勝手に追加しない）。
+    if (isExisting) {
+      message.error(t('I_KADOU_006', [no]));
+      setVerifiedNo('');
+      setVerifiedExists(false);
+      setOriginal(null);
+      return;
+    }
+
+    // 新規登録モードで DB に存在しない → 確認ダイアログは出さず、そのまま新規追加する
     // （存在しない場合は「保存する」ボタンでの新規登録が既定の動作）
     setVerifiedNo(no);
     setVerifiedExists(false);
