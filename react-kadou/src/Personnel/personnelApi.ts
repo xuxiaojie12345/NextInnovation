@@ -212,7 +212,7 @@ export async function importPersonnelRows(
   }
 
   const d = detail as
-    | { detail?: { message?: string; result?: PersonnelImportApiResult } }
+    | { code?: string; detail?: { message?: string; result?: PersonnelImportApiResult } }
     | null;
   const abortResult = d?.detail?.result;
   if (res.status === 409 && abortResult) {
@@ -220,6 +220,16 @@ export async function importPersonnelRows(
       d?.detail?.message ?? '取り込みを中止しました。',
       abortResult,
     );
+  }
+
+  // NOTE: 500 系（DB 接続不可 = 503 など）は Error ではなく ApiError として投げる。
+  //       ここで素の Error を投げるとステータス／code が失われ、画面側の
+  //       notifySystemError() が「システムエラー」と判定できず、プレビューを
+  //       残したまま行内メッセージが出るだけになってしまう。
+  //       ApiError にして 503 → kind:'maintenance' と判定させ、
+  //       整屏切换到系统异常画面（SystemErrorScreen）させる。
+  if (res.status >= 500 || d?.code === 'SYSTEM_ERROR') {
+    throw await normalizeHttpError(res);
   }
 
   throw new Error(
