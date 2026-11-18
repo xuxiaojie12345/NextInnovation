@@ -43,14 +43,14 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
 /**
  * ログイン直後に絞り込んでおく部門（初期表示の既定値）を返す。
  *
- *  - 部長          → 自部門のみ（＝自部門のデータを初期表示）
- *  - 事業部長/管理者 → []（＝絞り込みなし＝全部門）
+ *  ログインユーザーの所属部門のみを初期表示する。
+ *  （部門が未設定のユーザーは絞り込みなし＝全部門）
  *
  * ※権限ではない。部署の選択肢は常に全部門を表示し、他部門を選んで
- *   閲覧できる（データ集約）。あくまで画面を開いたときの既定値。
+ *   閲覧できる（データ集約）。「全表示」を押すと全部門を表示する。
  */
 function defaultDepartmentsOf(user: AuthUser): string[] {
-  return user.role === 'bucho' && user.departmentId ? [user.departmentId] : [];
+  return user.departmentId ? [user.departmentId] : [];
 }
 
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
@@ -112,6 +112,9 @@ function App() {
   // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
   const warnedDeptRef = useRef('');
 
+  // 要員の追加・編集・削除後に年度データを再取得するためのトークン
+  const [reloadToken, setReloadToken] = useState(0);
+
   /** 選択中年度のデータ */
   const store = stores[selectedYear];
 
@@ -145,6 +148,37 @@ function App() {
     window.addEventListener(SYSTEM_ERROR_EVENT, onSystemError);
     return () => window.removeEventListener(SYSTEM_ERROR_EVENT, onSystemError);
   }, []);
+
+  // ログイン時・年度切替時にバックエンドから年度データを取得して画面へ反映する
+  useEffect(() => {
+    if (!currentUser) return;
+    let cancelled = false;
+    kadouRepository
+      .loadYear(selectedYear)
+      .then((loaded) => {
+        if (cancelled) return;
+        setStores((prev) => ({ ...prev, [selectedYear]: loaded }));
+      })
+      // 後端未起動・通信エラー時は既存（空）データのままで表示を継続する
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser, selectedYear, reloadToken]);
+
+  /** 要員稼動管理以外の画面（要員情報など）で年度データが変わったとき、
+      表示中のデータを最新化するための再取得トークン */
+  const reloadYear = useCallback(() => setReloadToken((t) => t + 1), []);
+
+  /** 画面遷移：要員稼動管理へ戻ったときは年度データを再取得する
+      （要員情報で追加した要員などを反映するため） */
+  const handleSelectView = useCallback(
+    (key: MenuKey) => {
+      if (key === 'work-status') reloadYear();
+      setActiveView(key);
+    },
+    [reloadYear],
+  );
 
   // ---- ログイン / ログアウト ----------------------------------------
 
@@ -402,21 +436,6 @@ function App() {
   );
 
   /**
-   * 要員マスタの「現在の所属」の更新。
-   * 稼働表の「異動」で新しい所属を登録したときに呼ばれる。
-   */
-  const handleUpdateDepartment = useCallback(
-    (employeeNo: string, departmentId: string) => {
-      setYearPersonnel((prev) =>
-        prev.map((p) =>
-          p.employeeNo === employeeNo ? { ...p, departmentId } : p,
-        ),
-      );
-    },
-    [setYearPersonnel],
-  );
-
-  /**
    * 社員情報（Excel / CSV）の一括読み込み（モック：画面上のみ保持）
    * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
    */
@@ -476,15 +495,29 @@ function App() {
             rows: payload.rows,
             assignment: payload.assignment,
             unpaid: payload.unpaid,
+            // 版は保存後にバックエンドから再取得する
+            versions: prev[selectedYear]?.workStatus?.versions,
           },
         },
       }));
-      void kadouRepository.saveWorkStatus(selectedYear, payload);
-      message.success(
-        `${selectedYear}年度の内容を保存しました（モック：サーバー未接続）。`,
-      );
+      void kadouRepository
+        .saveWorkStatus(selectedYear, payload)
+        .then(() => {
+          message.success(`${selectedYear}年度の内容を保存しました。`);
+          // 変更セルの version など最新状態を取得して画面へ反映する
+          reloadYear();
+        })
+        .catch((err: unknown) => {
+          message.error(
+            err instanceof Error && err.message
+              ? err.message
+              : '保存に失敗しました。',
+          );
+          // 他のユーザーの更新などで保存できなかった場合は最新データへ戻す
+          reloadYear();
+        });
     },
-    [selectedYear],
+    [selectedYear, reloadYear],
   );
 
   /** 要員稼動管理の「保存」処理を WorkStatus から受け取る（未保存確認から呼ぶ） */
@@ -507,7 +540,7 @@ function App() {
     return wanted.filter((id) => ids.has(id));
   }, [currentUser, store.departments]);
 
-  /** 部長の自部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
+  /** ログインユーザーの所属部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
   useEffect(() => {
     if (!currentUser) return;
     const wanted = defaultDepartmentsOf(currentUser);
@@ -544,7 +577,6 @@ function App() {
         initialWorkStatus={store.workStatus}
         onSave={handleSaveWorkStatus}
         onUpdateLeavePlan={handleUpdateLeavePlan}
-        onUpdateDepartment={handleUpdateDepartment}
         onDirtyChange={setDirty}
         registerSaveHandler={registerSaveHandler}
       />
@@ -626,7 +658,7 @@ function App() {
       {/* 共通メニュー（選択で画面を切り替える） */}
       <AppMenu
         activeKey={activeView}
-        onSelect={setActiveView}
+        onSelect={handleSelectView}
         user={currentUser}
         departmentName={
           currentUser.departmentId

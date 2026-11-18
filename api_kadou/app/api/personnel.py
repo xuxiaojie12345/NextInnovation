@@ -8,7 +8,7 @@ NOTE: 本モジュールは「Web 側データの受け取り／返却」のみ�
       既存の部門管理（app/api/department.py）と同じ router に相乗りせず、
       独立した router として登録する（既存コードへ影響を与えないため）。
 """
-from fastapi import APIRouter, Depends, Header, Query
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -21,6 +21,7 @@ from app.schemas.personnel import (
     PersonnelSaveRequest,
     PersonnelWeeklyCount,
 )
+from app.schemas.workStatus import PersonnelDto
 from app.services.personnel import (
     count_personnel,
     fetch_personnel_info,
@@ -29,8 +30,18 @@ from app.services.personnel import (
     register_personnel,
     remove_personnel,
 )
+from app.services.workStatus import list_personnel
 
 router = APIRouter(prefix="/api/kadou/personnel", tags=["personnel"])
+
+
+@router.get("/{year}", response_model=list[PersonnelDto])
+def get_personnel_list(year: str, db: Session = Depends(get_db)):
+    """指定年度の要員一覧（employeeNo / name / departmentId / role / leavePlan）。
+
+    要員稼働管理画面の左固定列（氏名・役割・退場予定）のマスタ解決に使う。
+    """
+    return list_personnel(db, int(year))
 
 
 @router.get("/count/{year}", response_model=PersonnelCount)
@@ -107,20 +118,15 @@ def get_weekly_count(
 def remove_personnel_endpoint(
     employeeNo: str,
     year: str,
-    deleteWeekly: bool = Query(
-        default=False,
-        description="true のとき、jn_weekly_assignment_table の当該年度・社員番号の週割当も削除する",
-    ),
     db: Session = Depends(get_db),
 ):
     """要員情報画面：要員を削除する。
 
-    deleteWeekly=true の場合、年度 + 社員番号を検索条件として
-    jn_weekly_assignment_table（要員稼動管理の週割当）も同時に削除する。
+    年度 + 社員番号を検索条件として jn_weekly_assignment_table
+    （要員稼動管理の週割当・稼働表行・BUFFER）も同時に削除する（設計 7.9）。
+    他年度のデータは削除しない。
     """
-    _, deleted_weekly_count = remove_personnel(
-        db, year, employeeNo, delete_weekly=deleteWeekly
-    )
+    _, deleted_weekly_count = remove_personnel(db, year, employeeNo)
     return PersonnelDeleteResult(
         code=0,
         deletedWeeklyCount=deleted_weekly_count,

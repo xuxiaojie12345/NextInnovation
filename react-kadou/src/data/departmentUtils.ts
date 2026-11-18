@@ -12,7 +12,7 @@ export const findDepartment = (
   departments: Department[],
   departmentId: string,
 ): Department | undefined =>
-  departments.find((d) => d.departmentId === departmentId);
+  departments.find((d) => String(d.departmentId) === String(departmentId));
 
 /** 部門IDから表示名を返す（見つからない場合はIDをそのまま返す） */
 export const departmentNameOf = (

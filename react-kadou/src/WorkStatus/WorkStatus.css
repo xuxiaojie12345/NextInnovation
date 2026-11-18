@@ -326,3 +326,9 @@
   padding-top: 4px !important;
   padding-bottom: 4px !important;
 }
+
+/* 固定列（番号〜所属）が週セル右上の BUFFER バッジ(z-index:2)を
+   水平スクロール時に覆えるよう、固定列の重なり順を上げる */
+.ws-page .ant-table-cell-fix-left {
+  z-index: 5;
+}

@@ -22,10 +22,10 @@ export interface RequestOptions {
   operatorId?: string | null;
 }
 
-const DEFAULT_TIMEOUT_MS = 10_000;
+const DEFAULT_TIMEOUT_MS = 30_000;
 
 /** 保存系などの長い処理に使うタイムアウト */
-export const SAVE_TIMEOUT_MS = 15_000;
+export const SAVE_TIMEOUT_MS = 60_000;
 
 export async function httpRequest<T>(
   url: string,

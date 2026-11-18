@@ -27,12 +27,17 @@ import { Holiday } from '../Holiday/HolidaySettingMode';
 /** 無償支援（BUFFER）: 要員ID -> (週キー -> true) */
 export type UnpaidMap = Record<string, Record<string, boolean>>;
 
+/** 楽観ロック用の版: 要員ID -> (週キー -> version) */
+export type VersionMap = Record<string, Record<string, number>>;
+
 /** 要員稼動管理グリッドの保存済みデータ */
 export interface WorkStatusData {
   /** 稼働表に表示する要員（社員番号の並び） */
   rows: WorkStatusRows;
   assignment: AssignmentMap;
   unpaid: UnpaidMap;
+  /** 週次割当の版（変更セルの楽観ロックに使う） */
+  versions?: VersionMap;
 }
 
 /** 1 年度分のデータセット（＝保存済みデータ。画面の編集はこれを書き換える） */
