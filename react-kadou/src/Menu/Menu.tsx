@@ -12,7 +12,7 @@ import {
   ProjectOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import type { AuthUser } from '../data/mockUsers';
+import type { AuthUser } from '../data/userTypes';
 import { AVAILABLE_YEARS } from '../data/yearStore';
 import './Menu.css';
 
@@ -102,7 +102,6 @@ const ROLE_COLOR: Record<AuthUser['role'], string> = {
   bucho: 'blue',
   'jigyo-bucho': 'geekblue',
   admin: 'red',
-  user: 'default',
 };
 
 /**

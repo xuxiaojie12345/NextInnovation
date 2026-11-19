@@ -27,7 +27,8 @@ import UserManagementScreen from "./User/UserManagementScreen";
 import UnsavedChangesModal from "./components/UnsavedChangesModal";
 import { Department, Personnel, Project } from "./WorkStatus/types";
 import type { PersonnelImportRow } from "./Personnel/personnelImport";
-import { AuthUser, MOCK_USERS, defaultDepartmentsOf } from "./data/mockUsers";
+import { AuthUser, defaultDepartmentsOf } from "./data/userTypes";
+import { DEFAULT_ROLE, YAKUSHOKU_ROLE_MAP } from "./constants/options";
 import {
   departmentNameOf,
   resolveDepartmentIdByName,
@@ -53,8 +54,6 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
 type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
 function App() {
-  // ログインユーザー一覧（ユーザー管理画面で編集する。年度に依存しない）
-  const [users, setUsers] = useState<AuthUser[]>(MOCK_USERS);
   // ログイン中のユーザーID（null = 未ログイン）
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   // バックエンド認証済みユーザー
@@ -161,12 +160,15 @@ function App() {
 
   /** ログイン（年度は当年に戻す） */
   const handleLogin = useCallback((user: LoginUser) => {
+    // 役職区分コード（0=部長 / 1=管理者 / 2=事業部長）→ 画面のロール
+    const { role, roleLabel } =
+      YAKUSHOKU_ROLE_MAP[user.yakushokuKubun] ?? DEFAULT_ROLE;
     setCurrentUser({
       userId: user.userId,
       password: "",
       name: user.shimei,
-      role: user.userId === "admin" ? "admin" : "user",
-      roleLabel: user.yakushokuKubun || "一般ユーザー",
+      role,
+      roleLabel,
       departmentId: user.departmentId || undefined,
     });
     setCurrentUserId(user.userId);
@@ -655,8 +657,6 @@ function App() {
     ),
     "user-manage": (
       <UserManagementScreen
-        users={users}
-        setUsers={setUsers}
         currentUserId={currentUserId}
         departments={store.departments}
         allowManage={currentUser?.role === "admin"}

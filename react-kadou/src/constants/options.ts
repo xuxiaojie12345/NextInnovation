@@ -8,7 +8,7 @@
 import { HolidayImportRow } from "../Holiday/holidayImport";
 import { HolidayKind } from "../data/yearStore";
 import type { DepartmentKind, DepartmentLocation } from "../WorkStatus/types";
-import type { UserRole } from "../data/mockUsers";
+import type { UserRole } from "../data/userTypes";
 import dayjs from "dayjs";
 
 // ---------------------------------------------------------------------------
@@ -65,17 +65,20 @@ export const YAKUSHOKU_ROLE_MAP: Record<
 };
 
 /** 役職区分が未知の場合の回退ロール */
-export const DEFAULT_ROLE = { role: "bucho", roleLabel: "部長" };
+export const DEFAULT_ROLE: { role: UserRole; roleLabel: string } = {
+  role: "bucho",
+  roleLabel: "部長",
+};
 
 /**
  * ロール（UserRole）→ 役職区分コード（jn_user_table.yakushoku_kubun）の変換。
  * YAKUSHOKU_ROLE_MAP の逆変換で、ユーザー管理画面のリクエスト送信時に使う。
  */
-// export const ROLE_TO_KUBUN: Record<UserRole, string> = {
-//   bucho: "0",
-//   admin: "1",
-//   "jigyo-bucho": "2",
-// };
+export const ROLE_TO_KUBUN: Record<UserRole, string> = {
+  bucho: "0",
+  admin: "1",
+  "jigyo-bucho": "2",
+};
 
 /**
  * 画面＿休日設置

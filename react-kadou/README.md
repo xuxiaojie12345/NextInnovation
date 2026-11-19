@@ -32,17 +32,12 @@ npx tsc --noEmit -p tsconfig.json
 npx eslint "src/**/*.{ts,tsx}"
 ```
 
-## ログイン（モック）
+## ログイン
 
-バックエンド未接続のため、フロント内の固定ユーザー（`src/data/mockUsers.ts`）で照合します。
-パスワードはすべて `pass1234`（テスト用アカウントはログイン画面にも表示されます）。
+バックエンド API（`POST /api/kadou/login`、テーブル `jn_user_table`）で認証します。
+テスト用アカウントは `jn_user_table` に登録されたものです（パスワードは DB 側で管理）。
 
-| ユーザーID | 氏名 | 職級 | 所属部門 |
-| --- | --- | --- | --- |
-| bucho1 / bucho2 / bucho3 | 山田 一郎 / 佐藤 二郎 / 鈴木 三郎 | 部長 | 第一開発部 / 第二開発部 / 第三開発部 |
-| jigyo | 高橋 事業 | 事業部長 | （＝全部門） |
-| admin | システム管理者 | 管理者 | （＝全部門） |
-
+- 役職区分（`yakushoku_kubun`）は **0=部長 / 1=管理者 / 2=事業部長**。画面のロールへの変換は `src/constants/options.ts` の `YAKUSHOKU_ROLE_MAP` で行います。
 - 職級は**権限ではなく初期表示の既定値**です。部長はログイン直後に自部門で絞り込まれますが、他部門を選んで閲覧することもできます。
 - 「ユーザー管理」メニューは管理者のみに表示されます。
 - セッションはメモリのみ（リロードで再ログイン）です。
@@ -111,8 +106,10 @@ npx eslint "src/**/*.{ts,tsx}"
 ### ユーザー管理 `src/User/UserManagementScreen.tsx`
 
 - 管理者のみ。ログインユーザーの 追加 / 変更 / 削除、職級（部長 / 事業部長 / 管理者）と所属部門の設定。
-- ログイン中の自分自身の削除、および管理者が 1 名だけの状態での降格・削除はできません。
-- この画面の内容は年度に依存しません。
+- 一覧・追加・変更・削除はバックエンド API（`/api/users/select`・`/insert`・`/update/{userId}`・`/delete/{userId}`、テーブル `jn_user_table`）と連携します。ユーザーIDの重複はエラーになります。
+- ログイン中の自分自身の削除、および管理者が 1 名だけの状態での降格・削除はできません（画面側でチェック）。
+- ユーザーID は変更できません（更新時は入力不可）。
+- この画面の内容は年度に依存しません。所属部門は選択中の年度の部門マスタを参照するため、年度に存在しない部門は保存時に「未設定（全部門）」になります。
 
 ## データの持ち方
 
@@ -147,7 +144,8 @@ react-kadou/
    ├─ data/                   # モックデータ・保存層
    │  ├─ yearStore.ts         # 年度ストア（部門/要員/項目/休日/済南統計/稼動）
    │  ├─ kadouRepository.ts   # 保存層 interface + メモリ実装
-   │  ├─ mockData.ts / mockJinanStats.ts / mockUsers.ts / yearWeeks.ts
+   │  ├─ mockData.ts / mockJinanStats.ts / yearWeeks.ts
+   │  ├─ userTypes.ts         # ログインユーザー / ロールの型
    ├─ Login/                  # ログイン画面
    ├─ Menu/                   # 共通メニュー（ヘッダー）
    ├─ YearSelect/             # 年度選択 画面
@@ -157,5 +155,5 @@ react-kadou/
    ├─ Project/                # プロジェクト管理 画面 + 略称生成
    ├─ Statistics/             # 済南稼働率統計 画面
    ├─ Holiday/                # 休日設置 画面
-   └─ User/                   # ユーザー管理 画面
+   └─ User/                   # ユーザー管理 画面 + API 呼び出し（userApi.ts）
 ```

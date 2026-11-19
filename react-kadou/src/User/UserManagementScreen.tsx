@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -18,41 +18,36 @@ import {
   PlusOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { AuthUser, UserRole } from '../data/mockUsers';
+import type { AuthUser, UserRole } from '../data/userTypes';
+import { ROLE_OPTIONS, roleLabelOf } from '../constants/options';
 import type { Department } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
 import {
   departmentExists,
   normalizeUserDepartmentId,
 } from '../data/departmentRules';
+import {
+  createUser,
+  deleteUser,
+  fetchUsers,
+  updateUser,
+} from './userApi';
 import './UserManagementScreen.css';
 
 const { Title, Text } = Typography;
-
-/** 職級（ロール）の選択肢 */
-const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
-  { value: 'bucho', label: '部長' },
-  { value: 'jigyo-bucho', label: '事業部長' },
-  { value: 'admin', label: '管理者' },
-  { value: 'user', label: '一般ユーザー' },
-];
-
-/** 職級（ロール）→ 表示名 */
-const roleLabelOf = (role: UserRole): string =>
-  ROLE_OPTIONS.find((r) => r.value === role)?.label ?? role;
 
 /** 職級（ロール）→ Tag 色 */
 const ROLE_COLOR: Record<UserRole, string> = {
   bucho: 'blue',
   'jigyo-bucho': 'geekblue',
   admin: 'red',
-  user: 'default',
 };
 
+/** エラーから表示用メッセージを取り出す */
+const errorMessageOf = (error: unknown, fallback: string): string =>
+  error instanceof Error && error.message ? error.message : fallback;
+
 interface UserManagementScreenProps {
-  /** ログインユーザー一覧（App 側で保持） */
-  users: AuthUser[];
-  setUsers: React.Dispatch<React.SetStateAction<AuthUser[]>>;
   /** ログイン中のユーザーID（自分自身の削除・降格を禁止するため） */
   currentUserId: string | null;
   /** 所属部門の選択肢（現在選択中の年度の部門マスタ） */
@@ -64,16 +59,19 @@ interface UserManagementScreenProps {
 /**
  * ユーザー管理 画面（管理者のみ）
  *
- * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者・一般ユーザー）の設定を行う。
+ * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者）の設定を行う。
+ * ユーザー情報はバックエンド（jn_user_table）が保持する。
  * ※ユーザー自体は全年度共通。所属部門は選択中年度の部門マスタを参照する。
  */
 const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
-  users,
-  setUsers,
   currentUserId,
   departments,
   allowManage,
 }) => {
+  // ユーザー一覧（バックエンドから取得する）
+  const [users, setUsers] = useState<AuthUser[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   // 編集中のユーザーID（null = 新規追加モード / '' = 未選択）
   const [editingId, setEditingId] = useState<string | null>(null);
   // フォーム
@@ -86,6 +84,26 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   const [password, setPassword] = useState('pass1234');
 
   const isEditing = editingId !== null;
+  const opUserId = currentUserId ?? '';
+
+  /** 一覧を取得する */
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      setUsers(await fetchUsers(opUserId));
+    } catch (error) {
+      message.error(
+        errorMessageOf(error, 'ユーザー一覧の取得に失敗しました。'),
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [opUserId]);
+
+  useEffect(() => {
+    if (!allowManage) return;
+    void reload();
+  }, [allowManage, reload]);
 
   /** 管理者の人数（最後の管理者を守るため） */
   const adminCount = useMemo(
@@ -114,12 +132,14 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     setUserId(user.userId);
     setName(user.name);
     setRole(user.role);
-    setDepartmentId(user.departmentId);
+    // 一覧で「（全部門）」と表示しているユーザーは、選択中の年度に無い部門IDを持つ。
+    // その場合はフォームでも未選択（＝全部門）として扱う。
+    setDepartmentId(normalizeUserDepartmentId(departments, user.departmentId));
     setPassword(user.password);
   };
 
   /** 登録（新規追加 / 更新） */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const id = userId.trim();
     const nm = name.trim();
     if (!id) {
@@ -128,6 +148,10 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     }
     if (!nm) {
       message.error('氏名を入力してください。');
+      return;
+    }
+    if (!password) {
+      message.error('パスワードを入力してください。');
       return;
     }
     // ユーザーID の重複チェック（編集中の自分自身は除く）
@@ -142,6 +166,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       departmentId,
     );
 
+    setSaving(true);
     if (isEditing && editingId) {
       const target = users.find((u) => u.userId === editingId);
       // 最後の管理者を降格させない
@@ -151,45 +176,56 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         adminCount <= 1
       ) {
         message.error('管理者が 1 名だけのため、降格できません。');
+        setSaving(false);
         return;
       }
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.userId === editingId
-            ? {
-                ...u,
-                userId: id,
-                name: nm,
-                role,
-                roleLabel: roleLabelOf(role),
-                departmentId: normalizedDepartmentId,
-                password,
-              }
-            : u,
-        ),
-      );
-      message.success(`ユーザー「${nm}」を更新しました。`);
-      resetForm();
+      try {
+        const updated = await updateUser(
+          editingId,
+          {
+            name: nm,
+            role,
+            departmentId: normalizedDepartmentId,
+            password,
+          },
+          opUserId,
+        );
+        setUsers((prev) =>
+          prev.map((u) => (u.userId === editingId ? updated : u)),
+        );
+        message.success(`ユーザー「${nm}」を更新しました。`);
+        resetForm();
+      } catch (error) {
+        message.error(errorMessageOf(error, 'ユーザーの更新に失敗しました。'));
+      } finally {
+        setSaving(false);
+      }
       return;
     }
 
-    setUsers((prev) => [
-      ...prev,
-      {
-        userId: id,
-        name: nm,
-        role,
-        roleLabel: roleLabelOf(role),
-        departmentId: normalizedDepartmentId,
-        password: password || 'pass1234',
-      },
-    ]);
-    message.success(`ユーザー「${nm}」を追加しました。`);
-    resetForm();
+    try {
+      const created = await createUser(
+        {
+          userId: id,
+          name: nm,
+          role,
+          departmentId: normalizedDepartmentId,
+          password,
+        },
+        opUserId,
+      );
+      setUsers((prev) => [...prev, created]);
+      message.success(`ユーザー「${nm}」を追加しました。`);
+      resetForm();
+    } catch (error) {
+      message.error(errorMessageOf(error, 'ユーザーの追加に失敗しました。'));
+    } finally {
+      setSaving(false);
+    }
   };
 
   /** 削除 */
-  const handleDelete = (user: AuthUser) => {
+  const handleDelete = async (user: AuthUser) => {
     if (user.userId === currentUserId) {
       message.error('ログイン中の自分自身は削除できません。');
       return;
@@ -198,9 +234,14 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       message.error('管理者が 1 名だけのため、削除できません。');
       return;
     }
-    setUsers((prev) => prev.filter((u) => u.userId !== user.userId));
-    message.success(`ユーザー「${user.name}」を削除しました。`);
-    if (editingId === user.userId) resetForm();
+    try {
+      await deleteUser(user.userId, opUserId);
+      setUsers((prev) => prev.filter((u) => u.userId !== user.userId));
+      message.success(`ユーザー「${user.name}」を削除しました。`);
+      if (editingId === user.userId) resetForm();
+    } catch (error) {
+      message.error(errorMessageOf(error, 'ユーザーの削除に失敗しました。'));
+    }
   };
 
   const columns: TableColumnsType<AuthUser> = [
@@ -208,7 +249,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       title: 'ユーザーID',
       dataIndex: 'userId',
       key: 'userId',
-      width: 140,
+      // 列幅はデザイン画像の比率に合わせる（合計 100%）
+      width: '16%',
       render: (v: string, row) => (
         <Space size={4}>
           <UserOutlined />
@@ -217,12 +259,18 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         </Space>
       ),
     },
-    { title: '氏名', dataIndex: 'name', key: 'name', width: 160 },
+    {
+      title: '氏名',
+      dataIndex: 'name',
+      key: 'name',
+      width: '17%',
+      ellipsis: true,
+    },
     {
       title: '職級',
       dataIndex: 'role',
       key: 'role',
-      width: 120,
+      width: '11%',
       render: (_: unknown, row) => (
         <Tag color={ROLE_COLOR[row.role]}>{roleLabelOf(row.role)}</Tag>
       ),
@@ -231,17 +279,24 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       title: '所属部門',
       dataIndex: 'departmentId',
       key: 'departmentId',
-      width: 140,
+      width: '19%',
+      ellipsis: true,
       render: (v?: string) =>
         v && departmentExists(departments, v)
           ? departmentLabelOf(departments, v)
           : '（全部門）',
     },
-    { title: 'パスワード（モック）', dataIndex: 'password', key: 'password', width: 160 },
+    {
+      title: 'パスワード',
+      dataIndex: 'password',
+      key: 'password',
+      width: '17%',
+      ellipsis: true,
+    },
     {
       title: '操作',
       key: 'action',
-      width: 160,
+      width: '20%',
       render: (_: unknown, row) => (
         <Space>
           <Button
@@ -317,8 +372,9 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <span className='form-label'>ユーザーID</span>
             <Input
               value={userId}
-              placeholder='例：bucho4'
-              maxLength={20}
+              placeholder='例：bucho'
+              maxLength={5}
+              disabled={isEditing}
               onChange={(e) => setUserId(e.target.value)}
             />
           </div>
@@ -326,8 +382,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <span className='form-label'>氏名</span>
             <Input
               value={name}
-              placeholder='例：山田 一郎'
-              maxLength={30}
+              placeholder='例：山田 太郎'
+              maxLength={10}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
@@ -361,21 +417,28 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <span className='form-label'>パスワード</span>
             <Input
               value={password}
-              maxLength={32}
+              maxLength={50}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <Space className='user-form-actions'>
-            <Button type='primary' icon={<PlusOutlined />} onClick={handleSubmit}>
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              loading={saving}
+              onClick={handleSubmit}
+            >
               {isEditing ? '更新' : '追加'}
             </Button>
-            <Button onClick={resetForm}>クリア</Button>
+            <Button onClick={resetForm} disabled={saving}>
+              クリア
+            </Button>
           </Space>
         </div>
         <Text type='secondary' className='user-note'>
           ※ 部長は「所属部門」を設定すると、ログイン直後にその部門で絞り込まれます（未設定＝全部門）。
           所属部門が削除された場合は、保存時に「未設定（全ての部門）」になります。
-          パスワードはモック表示です（実運用ではバックエンドで管理）。
+          ユーザーはバックエンド（jn_user_table）に保存されます。
         </Text>
       </Card>
 
@@ -388,6 +451,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         <Table<AuthUser>
           rowKey='userId'
           size='small'
+          loading={loading}
+          tableLayout='fixed'
           columns={columns}
           dataSource={users}
           pagination={false}
