@@ -42,6 +42,7 @@ import {
 import { WorkStatusPayload, kadouRepository } from "./data/kadouRepository";
 import { fetchDepartments } from "./Department/departmentApi";
 import "./App.css";
+import { PrinterOutlined } from "@ant-design/icons";
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
 const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
@@ -64,9 +65,9 @@ function App() {
   const [stores, setStores] = useState<Record<number, YearStore>>(() =>
     kadouRepository.snapshot(INITIAL_YEARS),
   );
-  const [personnelLoadedYear, setPersonnelLoadedYear] = useState<
-    number | null
-  >(null);
+  const [personnelLoadedYear, setPersonnelLoadedYear] = useState<number | null>(
+    null,
+  );
   // 表示中の画面
   const [activeView, setActiveView] = useState<MenuKey>("work-status");
   // 要員稼動管理に未保存の変更があるか
@@ -82,7 +83,7 @@ function App() {
   const store = stores[selectedYear];
 
   /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
-  const loginUserId = currentUser?.userId ?? '';
+  const loginUserId = currentUser?.userId ?? "";
 
   /**
    * 年度選択画面に表示する年度ごとの概要。
@@ -142,8 +143,7 @@ function App() {
             personnel: [],
           },
         }));
-        const detail =
-          error instanceof Error ? error.message : "不明なエラー";
+        const detail = error instanceof Error ? error.message : "不明なエラー";
         message.error(
           `${selectedYear}年度の要員情報を取得できませんでした：${detail}`,
         );
@@ -165,7 +165,7 @@ function App() {
       userId: user.userId,
       password: "",
       name: user.shimei,
-      role: "bucho",
+      role: user.userId === "admin" ? "admin" : "user",
       roleLabel: user.yakushokuKubun || "一般ユーザー",
       departmentId: user.departmentId || undefined,
     });
@@ -408,10 +408,13 @@ function App() {
       );
       if (!person) return;
       try {
-        await savePersonnelApi(selectedYear, { ...person, leavePlan }, loginUserId);
+        await savePersonnelApi(
+          selectedYear,
+          { ...person, leavePlan },
+          loginUserId,
+        );
       } catch (error) {
-        const detail =
-          error instanceof Error ? error.message : "不明なエラー";
+        const detail = error instanceof Error ? error.message : "不明なエラー";
         message.error(`退場予定を保存できませんでした：${detail}`);
         return;
       }
@@ -435,10 +438,13 @@ function App() {
       );
       if (!person) return;
       try {
-        await savePersonnelApi(selectedYear, { ...person, departmentId }, loginUserId);
+        await savePersonnelApi(
+          selectedYear,
+          { ...person, departmentId },
+          loginUserId,
+        );
       } catch (error) {
-        const detail =
-          error instanceof Error ? error.message : "不明なエラー";
+        const detail = error instanceof Error ? error.message : "不明なエラー";
         message.error(`所属を保存できませんでした：${detail}`);
         return;
       }
@@ -459,40 +465,42 @@ function App() {
     async (rows: PersonnelImportRow[]) => {
       const departments = stores[selectedYear]?.departments ?? [];
       const previous = stores[selectedYear]?.personnel ?? [];
-      const indexByNo = new Map(previous.map((person, i) => [person.employeeNo, i]));
+      const indexByNo = new Map(
+        previous.map((person, i) => [person.employeeNo, i]),
+      );
       const next = [...previous];
       const importedPeople = new Map<string, Personnel>();
 
       rows.forEach((row) => {
         // 部門マスタの別名（department_alias）+ 拠点（location）で department_id を解決する
-        const departmentAlias = row.department || '';
-        const location = row.location || '';
+        const departmentAlias = row.department || "";
+        const location = row.location || "";
 
         const matchedDept = departments.find(
           (d) =>
-            (d.alias ?? '').trim() === departmentAlias.trim() &&
+            (d.alias ?? "").trim() === departmentAlias.trim() &&
             d.location === location,
         );
-        const departmentId = matchedDept?.departmentId || '';
+        const departmentId = matchedDept?.departmentId || "";
 
         const index = indexByNo.get(row.employeeNo);
         const existing = index === undefined ? undefined : next[index];
         const person: Personnel = existing
           ? {
               ...existing,
-              name: row.name,  // 只读取Excel中的姓名，不添加额外内容
+              name: row.name, // 只读取Excel中的姓名，不添加额外内容
               role: row.role || existing.role,
               departmentId: departmentId || existing.departmentId,
-              department: departmentAlias,  // 保存部门别名
-              location: location,  // 保存工作地点
+              department: departmentAlias, // 保存部门别名
+              location: location, // 保存工作地点
             }
           : {
               employeeNo: row.employeeNo,
-              name: row.name,  // 只读取Excel中の姓名，不添加额外内容
+              name: row.name, // 只读取Excel中の姓名，不添加额外内容
               role: row.role || "要員",
-              departmentId: departmentId,  // 保存根据department_alias + location查询出的department_id
-              department: departmentAlias,  // 保存部门别名
-              location: location,  // 保存工作地点
+              departmentId: departmentId, // 保存根据department_alias + location查询出的department_id
+              department: departmentAlias, // 保存部门别名
+              location: location, // 保存工作地点
             };
         if (index !== undefined) {
           next[index] = person;
@@ -503,7 +511,11 @@ function App() {
         importedPeople.set(row.employeeNo, person);
       });
 
-      await importPersonnelApi(selectedYear, Array.from(importedPeople.values()), loginUserId);
+      await importPersonnelApi(
+        selectedYear,
+        Array.from(importedPeople.values()),
+        loginUserId,
+      );
       setYearPersonnel((prev) => {
         return next;
       });
@@ -654,9 +666,9 @@ function App() {
 
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {
-    return (
-      <Login onLogin={handleLogin} />
-    );
+    return <Login onLogin={handleLogin} />;
+  } else {
+    console.log(currentUser);
   }
 
   return (

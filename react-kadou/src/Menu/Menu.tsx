@@ -102,6 +102,7 @@ const ROLE_COLOR: Record<AuthUser['role'], string> = {
   bucho: 'blue',
   'jigyo-bucho': 'geekblue',
   admin: 'red',
+  user: 'default',
 };
 
 /**

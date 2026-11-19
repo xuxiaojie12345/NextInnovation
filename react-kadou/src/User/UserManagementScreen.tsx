@@ -34,6 +34,7 @@ const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
   { value: 'bucho', label: '部長' },
   { value: 'jigyo-bucho', label: '事業部長' },
   { value: 'admin', label: '管理者' },
+  { value: 'user', label: '一般ユーザー' },
 ];
 
 /** 職級（ロール）→ 表示名 */
@@ -45,6 +46,7 @@ const ROLE_COLOR: Record<UserRole, string> = {
   bucho: 'blue',
   'jigyo-bucho': 'geekblue',
   admin: 'red',
+  user: 'default',
 };
 
 interface UserManagementScreenProps {
@@ -62,7 +64,7 @@ interface UserManagementScreenProps {
 /**
  * ユーザー管理 画面（管理者のみ）
  *
- * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者）の設定を行う。
+ * ログインユーザーの 追加 / 変更 / 削除 と職級（部長・事業部長・管理者・一般ユーザー）の設定を行う。
  * ※ユーザー自体は全年度共通。所属部門は選択中年度の部門マスタを参照する。
  */
 const UserManagementScreen: React.FC<UserManagementScreenProps> = ({

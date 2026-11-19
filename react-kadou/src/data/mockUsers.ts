@@ -10,8 +10,8 @@
  * ※実運用では認証 API（api-ud）に置き換える。
  */
 
-/** ロール */
-export type UserRole = 'bucho' | 'jigyo-bucho' | 'admin';
+/** ロール（user は部長・事業部長・管理者以外の一般ユーザー） */
+export type UserRole = 'bucho' | 'jigyo-bucho' | 'admin' | 'user';
 
 /** ログインユーザー */
 export interface AuthUser {
