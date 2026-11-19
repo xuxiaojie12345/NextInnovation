@@ -122,9 +122,11 @@ const EMPTY_FORM: ProjectFormValues = {
   departmentId: '',
   projectCode: '',
   name: '',
-  // 既定値：有効 / 非教育
+  // 既定値：「有効」はチェック済み、「非教育」は未チェックで表示する。
+  // - validFlg=true   → 「有効」がチェック済みになる（= 有効）
+  // - educationFlg は「非教育」チェックの反転値なので true（=教育）にすると未チェック
   validFlg: true,
-  educationFlg: false,
+  educationFlg: true,
 };
 
 /**
@@ -331,6 +333,14 @@ const detectFileDuplicates = (
 /** 画面表示用のプロジェクト名（Project名称 → 略称 の順にフォールバック） */
 const projectLabel = (p: Project): string =>
   p.name || p.abbr || '（名称未設定）';
+
+/**
+ * 登録・修正・削除の完了メッセージ用ラベル。略称を優先する。
+ * NOTE: 処理結果の通知は「どのプロジェクトか」を略称で示す仕様のため、
+ *       projectLabel（Project名称優先）とは別に用意する。
+ */
+const projectAbbrLabel = (p: Project): string =>
+  p.abbr || p.name || '（名称未設定）';
 
 /**
  * バックエンドが返した行警告（messageId + params）を表示用の文言へ変換する。
@@ -823,7 +833,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
           prev.filter((p) => p.projectId !== row.projectId),
         );
         setEditingKey((prev) => (prev === row.projectId ? null : prev));
-        message.success(t('I_KADOU_040', [projectLabel(row)]));
+        message.success(t('I_KADOU_040', [projectAbbrLabel(row)]));
       } catch (e) {
         // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
         if (notifySystemError(e)) return;
@@ -872,13 +882,13 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         setProjects((prev) =>
           prev.map((p) => (p.projectId === editingKey ? values : p)),
         );
-        message.success(t('I_KADOU_041', [projectLabel(values)]));
+        message.success(t('I_KADOU_041', [projectAbbrLabel(values)]));
       } else {
         // 新規登録（システム項目ID はサーバー側で採番）
         const created = await createProject(year, payload, operatorId);
         const values = toProjectFromApi(created);
         setProjects((prev) => [...prev, values]);
-        message.success(t('I_KADOU_042', [projectLabel(values)]));
+        message.success(t('I_KADOU_042', [projectAbbrLabel(values)]));
       }
       handleResetForm();
     } catch (e) {
@@ -1534,12 +1544,13 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   </div>
                   <div>
                     <div className='form-label'>教育かどうか</div>
-                    {/* NOTE: チェックボックスの文言は状態で変えず固定にする。
-                        選択状態はチェックの有無で表す（オン=非教育 / オフ=教育）。 */}
+                    {/* NOTE: 文言は「非教育」で固定。チェック ON = 非教育、OFF = 教育。
+                        DB の education_flg は「教育かどうか」を持つ（'1'=教育）ため、
+                        チェック状態とは真偽が反転する。ここで反転して整合させる。 */}
                     <Checkbox
-                      checked={form.educationFlg}
+                      checked={!form.educationFlg}
                       onChange={(e) =>
-                        setField('educationFlg', e.target.checked)
+                        setField('educationFlg', !e.target.checked)
                       }
                     >
                       非教育
