@@ -392,7 +392,15 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     [currentUserId, handleEdit, handleDelete, saving, deptMaster],
   );
 
-  if (!allowManage) {
+  // ログインユーザーの職級は、この画面が保持する users（最新）を優先する。
+  // この画面で自分の職級を非管理者へ更新した場合も、即座に「権限なし」表示へ切り替える。
+  // （users に自分がまだ読み込まれていない場合は、ログイン時の allowManage を使う）
+  const loggedInUser = currentUserId
+    ? users.find((u) => u.userId === currentUserId)
+    : undefined;
+  const canManage = loggedInUser ? loggedInUser.role === 'admin' : allowManage;
+
+  if (!canManage) {
     return (
       <div className='screen-page'>
         <div className='screen-header'>
