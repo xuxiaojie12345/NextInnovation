@@ -16,8 +16,10 @@ from datetime import datetime, timedelta
 
 from fastapi import HTTPException
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.errors import BusinessException
 from app.schemas.workStatus import (
     DepartmentDto,
     PersonnelDto,
@@ -224,15 +226,18 @@ def transfer_personnel(
     op_user: str = _DEFAULT_OP_USER,
 ) -> PersonnelDto | None:
     """異動（所属変更）。該当要員が存在しなければ None を返す。"""
-    res = db.execute(
-        text(load_sql("work_status.sql", "transfer")),
-        {
-            "year_id": str(year_id),
-            "employee_no": employee_no,
-            "department_id": department_id,
-            "op_user": op_user,
-        },
-    )
+    try:
+        res = db.execute(
+            text(load_sql("work_status.sql", "transfer")),
+            {
+                "year_id": str(year_id),
+                "employee_no": employee_no,
+                "department_id": department_id,
+                "op_user": op_user,
+            },
+        )
+    except IntegrityError:
+        raise BusinessException(status_code=409, message_id="E_KADOU_087")
     db.commit()
     if res.rowcount == 0:
         return None
@@ -526,10 +531,13 @@ def _delete_weekly_of_deleted(
             # 社員番号変更の旧番号は削除しない（保存時に UNASSIGN へ戻す）
             continue
         deleted_nos.add(no)
-        db.execute(
-            text(_SQL_DELETE_WEEKLY),
-            {"year_id": year, "employee_no": no},
-        )
+        try:
+            db.execute(
+                text(_SQL_DELETE_WEEKLY),
+                {"year_id": year, "employee_no": no},
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_085")
     return deleted_nos
 
 
@@ -577,23 +585,28 @@ def _rebuild_missing_weeks(
         else:
             sys_project_id = _UNASSIGN
             is_unpaid = "0"
-        db.execute(
-            text(insert_sql),
-            {
-                "year_id": year,
-                "version": _VERSION,
-                "employee_no": emp,
-                "department_id": active_row.departmentId,
-                "week_start_date": week_start,
-                "week_end_date": _week_end_db(week),
-                "sys_project_id": sys_project_id,
-                "is_unpaid": is_unpaid,
-                "register_datetime": now,
-                "register_user": op_user,
-                "update_datetime": now,
-                "update_user": op_user,
-            },
-        )
+        try:
+            res = db.execute(
+                text(insert_sql),
+                {
+                    "year_id": year,
+                    "version": _VERSION,
+                    "employee_no": emp,
+                    "department_id": active_row.departmentId,
+                    "week_start_date": week_start,
+                    "week_end_date": _week_end_db(week),
+                    "sys_project_id": sys_project_id,
+                    "is_unpaid": is_unpaid,
+                    "register_datetime": now,
+                    "register_user": op_user,
+                    "update_datetime": now,
+                    "update_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_083")
+        if res.rowcount is None or res.rowcount <= 0:
+            raise BusinessException(status_code=409, message_id="E_KADOU_083")
         existing_weeks.add(week_start)
 
 
@@ -621,19 +634,22 @@ def _apply_changed_cells(
         )
         if active_row is None:
             continue
-        res = db.execute(
-            text(update_sql),
-            {
-                "year_id": year,
-                "employee_no": emp,
-                "week_start_date": _week_to_db(week),
-                "sys_project_id": cell.projectId if cell.projectId else _UNASSIGN,
-                "is_unpaid": "1" if cell.isUnpaid else "0",
-                "expected_version": cell.version,
-                "update_datetime": now,
-                "update_user": op_user,
-            },
-        )
+        try:
+            res = db.execute(
+                text(update_sql),
+                {
+                    "year_id": year,
+                    "employee_no": emp,
+                    "week_start_date": _week_to_db(week),
+                    "sys_project_id": cell.projectId if cell.projectId else _UNASSIGN,
+                    "is_unpaid": "1" if cell.isUnpaid else "0",
+                    "expected_version": cell.version,
+                    "update_datetime": now,
+                    "update_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_084")
         if res.rowcount > 0:
             continue
         if cell.version is not None:
@@ -642,23 +658,32 @@ def _apply_changed_cells(
             continue
         # レコードが無いセル（新規）は、値がある場合だけ追加する
         if cell.projectId or cell.isUnpaid:
-            db.execute(
-                text(insert_sql),
-                {
-                    "year_id": year,
-                    "version": _VERSION,
-                    "employee_no": emp,
-                    "department_id": active_row.departmentId,
-                    "week_start_date": _week_to_db(week),
-                    "week_end_date": _week_end_db(week),
-                    "sys_project_id": cell.projectId,
-                    "is_unpaid": "1" if cell.isUnpaid else "0",
-                    "register_datetime": now,
-                    "register_user": op_user,
-                    "update_datetime": now,
-                    "update_user": op_user,
-                },
-            )
+            try:
+                res = db.execute(
+                    text(insert_sql),
+                    {
+                        "year_id": year,
+                        "version": _VERSION,
+                        "employee_no": emp,
+                        "department_id": active_row.departmentId,
+                        "week_start_date": _week_to_db(week),
+                        "week_end_date": _week_end_db(week),
+                        "sys_project_id": cell.projectId,
+                        "is_unpaid": "1" if cell.isUnpaid else "0",
+                        "register_datetime": now,
+                        "register_user": op_user,
+                        "update_datetime": now,
+                        "update_user": op_user,
+                    },
+                )
+            except IntegrityError:
+                raise BusinessException(
+                    status_code=409, message_id="E_KADOU_083"
+                )
+            if res.rowcount is None or res.rowcount <= 0:
+                raise BusinessException(
+                    status_code=409, message_id="E_KADOU_083"
+                )
 
 
 def _sync_week_departments(
@@ -679,18 +704,21 @@ def _sync_week_departments(
     for r in emp_rows:
         from_week = _week_to_db(r.activeFrom) if r.activeFrom else first_week
         to_week = _week_to_db(r.activeTo) if r.activeTo else last_week
-        db.execute(
-            text(update_department_sql),
-            {
-                "year_id": year,
-                "employee_no": emp,
-                "department_id": r.departmentId,
-                "from_week": from_week,
-                "to_week": to_week,
-                "update_datetime": now,
-                "update_user": op_user,
-            },
-        )
+        try:
+            db.execute(
+                text(update_department_sql),
+                {
+                    "year_id": year,
+                    "employee_no": emp,
+                    "department_id": r.departmentId,
+                    "from_week": from_week,
+                    "to_week": to_week,
+                    "update_datetime": now,
+                    "update_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_084")
 
 
 def _clear_renamed_assignments(
@@ -705,15 +733,18 @@ def _clear_renamed_assignments(
         return
     clear_assignments_sql = load_sql("work_status.sql", "clear_assignments")
     for frm, _to in renumbers:
-        db.execute(
-            text(clear_assignments_sql),
-            {
-                "year_id": year,
-                "employee_no": frm,
-                "update_datetime": now,
-                "update_user": op_user,
-            },
-        )
+        try:
+            db.execute(
+                text(clear_assignments_sql),
+                {
+                    "year_id": year,
+                    "employee_no": frm,
+                    "update_datetime": now,
+                    "update_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_084")
 
 
 # ============================================================
@@ -846,28 +877,40 @@ def _sync_personnel_transfer(
         return
 
     base = current[0]
-    db.execute(
-        text(delete_sql),
-        {"year_id": year, "employee_no": employee_no},
-    )
-    for idx, (dept, idoubi, idou_flag) in enumerate(specs):
-        db.execute(
-            text(insert_sql),
-            {
-                "year_id": year,
-                "employee_no": employee_no,
-                "department_id": dept,
-                "idou_flag": idou_flag,
-                "idoubi": idoubi,
-                "person_name": base["person_name"],
-                "role": base["role"],
-                "leave_plan": base["leave_plan"],
-                "register_datetime": base["register_datetime"] if idx == 0 else now,
-                "register_user": base["register_user"] if idx == 0 else op_user,
-                "now_dt": now,
-                "op_user": op_user,
-            },
+    # 既存行を削除して作り直す。SELECT で取得済みの行が削除できなければ
+    # 他のユーザーによる変更なので、保存全体を取り消す
+    try:
+        res = db.execute(
+            text(delete_sql),
+            {"year_id": year, "employee_no": employee_no},
         )
+    except IntegrityError:
+        raise BusinessException(status_code=409, message_id="E_KADOU_088")
+    if res.rowcount is None or res.rowcount <= 0:
+        raise BusinessException(status_code=409, message_id="E_KADOU_088")
+    for idx, (dept, idoubi, idou_flag) in enumerate(specs):
+        try:
+            res = db.execute(
+                text(insert_sql),
+                {
+                    "year_id": year,
+                    "employee_no": employee_no,
+                    "department_id": dept,
+                    "idou_flag": idou_flag,
+                    "idoubi": idoubi,
+                    "person_name": base["person_name"],
+                    "role": base["role"],
+                    "leave_plan": base["leave_plan"],
+                    "register_datetime": base["register_datetime"] if idx == 0 else now,
+                    "register_user": base["register_user"] if idx == 0 else op_user,
+                    "now_dt": now,
+                    "op_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_086")
+        if res.rowcount is None or res.rowcount <= 0:
+            raise BusinessException(status_code=409, message_id="E_KADOU_086")
 
 
 # ============================================================

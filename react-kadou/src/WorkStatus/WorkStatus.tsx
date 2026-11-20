@@ -58,11 +58,15 @@ import {
   PersonnelNotFoundError,
   fetchPersonnelInfo,
 } from '../Personnel/personnelApi';
+import { notifySystemError } from '../utils/systemError';
 
 const { Title, Text } = Typography;
 
 /** 複数セル選択時に使うセルキーの区切り */
 const KEY_SEP = '|';
+
+/** 週セルのプロジェクト選択リストの最大幅（長い略称でも画面を覆わないようにする） */
+const WEEK_CELL_DROPDOWN_MAX_WIDTH = 280;
 
 /**
  * 「内・退職」を表すプロジェクト名
@@ -284,6 +288,8 @@ const WeekCell = React.memo(
         showSearch
         optionFilterProp='label'
         popupMatchSelectWidth={false}
+        // 長い略称でもリストが画面幅いっぱいに広がらないよう最大幅を制限する
+        styles={{ popup: { root: { maxWidth: WEEK_CELL_DROPDOWN_MAX_WIDTH } } }}
         // 無償支援のセルは矢印アイコンの位置に「BUFFER」バッジを表示する
         suffixIcon={isUnpaid ? <span className='ws-unpaid-badge'>BUFFER</span> : undefined}
       />
@@ -704,9 +710,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       try {
         master = await lookupPersonnel(no);
       } catch (e) {
-        if (e instanceof PersonnelNotFoundError) master = null;
-        else {
-          message.error(messageInfo('E_KADOU_072'));
+        if (e instanceof PersonnelNotFoundError) {
+          master = null;
+        } else {
+          // DB 異常などのシステムエラーは異常画面へ遷移させる
+          if (!notifySystemError(e)) {
+            message.error(messageInfo('E_KADOU_072'));
+          }
           return false;
         }
       }
@@ -1101,9 +1111,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   }, []);
 
   // プロジェクトの選択肢と参照マップ（メニューの「プロジェクト管理」で増える）
-  // ※セルには「略称」を表示する
+  // ※セルには「略称」を表示する（省略された場合はホバーで完全な略称を表示する）
   const projectOptions = useMemo(
-    () => projects.map((p) => ({ value: p.projectId, label: p.abbr || p.name })),
+    () =>
+      projects.map((p) => ({
+        value: p.projectId,
+        label: p.abbr || p.name,
+        title: p.abbr || p.name,
+      })),
     [projects],
   );
   const projectMap = useMemo(

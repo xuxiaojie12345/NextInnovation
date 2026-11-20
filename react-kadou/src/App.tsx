@@ -14,7 +14,8 @@ import YearSelectScreen from './YearSelect/YearSelectScreen';
 import UserManagementScreen from './User/UserManagementScreen';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
 import SystemErrorScreen from './SystemErrorScreen';
-import { SYSTEM_ERROR_EVENT, SystemErrorDetail } from './utils/systemError';
+import { SYSTEM_ERROR_EVENT, SystemErrorDetail, notifySystemError } from './utils/systemError';
+import { apiErrorMessage } from './utils/errorMessage';
 import { Department, Personnel, Project } from './WorkStatus/types';
 import type { PersonnelImportRow } from './Personnel/personnelImport';
 import type { AuthUser } from './types/user';
@@ -161,7 +162,13 @@ function App() {
         setStores((prev) => ({ ...prev, [selectedYear]: loaded }));
       })
       // 後端未起動・通信エラー時は既存（空）データのままで表示を継続する
-      .catch(() => undefined);
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        // DB 異常などのシステムエラーは異常画面へ遷移させる
+        if (!notifySystemError(err)) {
+          message.error(apiErrorMessage(err, messageInfo('E_KADOU_011')));
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -514,11 +521,11 @@ function App() {
           reloadYear();
         })
         .catch((err: unknown) => {
-          message.error(
-            err instanceof Error && err.message
-              ? err.message
-              : messageInfo('E_KADOU_042'),
-          );
+          // DB 異常などのシステムエラーは異常画面へ遷移させる
+          if (!notifySystemError(err)) {
+            // 業務エラー（保存失敗・競合など）はメッセージ ID を翻訳して表示する
+            message.error(apiErrorMessage(err, messageInfo('E_KADOU_042')));
+          }
           // 他のユーザーの更新などで保存できなかった場合は最新データへ戻す
           reloadYear();
         });

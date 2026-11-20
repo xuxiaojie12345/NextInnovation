@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logger import get_logger, setup_logging, trace_id_var
@@ -170,6 +170,28 @@ async def db_connection_exception_handler(request: Request, exc: OperationalErro
             request,
             code="SYSTEM_ERROR",
             message="システムエラーが発生しました。データベースに接続できませんでした。",
+        ),
+    )
+
+
+@app.exception_handler(ProgrammingError)
+async def db_schema_exception_handler(request: Request, exc: ProgrammingError):
+    """テーブル・カラムの不整合（テーブル名変更・未作成など）の専用ハンドラ。
+
+    NOTE: これが無いと Exception ハンドラに落ち、「サーバー内部エラー」という
+          原因不明の文言になり、フロントも異常画面へ遷移できない。
+          ここで 503 + SYSTEM_ERROR を返し、画面にシステムエラーを出させる。
+    """
+    logger.error(
+        "DBスキーマエラー: method=%s path=%s error=%s",
+        request.method, request.url.path, exc, exc_info=True,
+    )
+    return JSONResponse(
+        status_code=503,
+        content=_error_body(
+            request,
+            code="SYSTEM_ERROR",
+            message="システムエラーが発生しました。データベースの処理に失敗しました。",
         ),
     )
 
