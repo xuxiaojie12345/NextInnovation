@@ -354,26 +354,27 @@ def _split_rows(emp: str, runs: list[tuple[str, list[str]]]) -> list[WorkStatusR
 def _build_work_status_rows(
     master_rows_by_emp, weekly_depts, master_dept_by_emp
 ) -> list[WorkStatusRowDto]:
-    """要員マスタと週次割当から画面の表示行を組み立てる。
+    """要員マスタを起点に、週次割当を LEFT JOIN して画面の表示行を組み立てる。
 
     - 要員マスタが 2 行以上（異動あり）: 旧所属行・新所属行の 2 行
     - 週次割当の所属が変化している旧データ: 変化点で分割した行
     - それ以外: 1 行
+    - 週次データにしか存在しない社員（要員マスタ未登録）は表示しない
     """
     rows: list[WorkStatusRowDto] = []
-    for emp in sorted(set(master_rows_by_emp) | set(weekly_depts)):
-        master_rows = master_rows_by_emp.get(emp, [])
+    for emp in sorted(master_rows_by_emp):
+        master_rows = master_rows_by_emp[emp]
         # 異動あり（要員マスタに複数行）→ 旧所属行・新所属行を判定して期間を算出する
         if len(master_rows) >= 2:
             rows.extend(_transfer_rows(emp, master_rows))
             continue
 
-        # 異動なし（要員マスタ 1 行、または未登録）
+        # 異動なし（要員マスタ 1 行）
         runs = _weekly_runs(emp, weekly_depts, master_dept_by_emp)
         if len(runs) <= 1:
-            dept = (
-                _as_str(master_rows[0]["department_id"]) if master_rows else ""
-            ) or (runs[0][0] if runs else master_dept_by_emp.get(emp, ""))
+            dept = _as_str(master_rows[0]["department_id"]) or (
+                runs[0][0] if runs else master_dept_by_emp.get(emp, "")
+            )
             rows.append(WorkStatusRowDto(key=emp, employeeNo=emp, departmentId=dept))
             continue
         rows.extend(_split_rows(emp, runs))
@@ -394,6 +395,13 @@ def load_work_status(db: Session, year_id: int) -> WorkStatusLoadResponse:
     departments = _load_departments(db, year)
     projects = _load_projects(db, year)
     assignment, unpaid, versions, asgn_rows = _load_assignments(db, year)
+
+    # 要員マスタを起点にした LEFT JOIN に合わせ、週次の付随データも
+    # 要員マスタ未登録（週次データだけに存在する孤児）社員のキーを除外する
+    master_emps = set(master_rows_by_emp)
+    assignment = {k: v for k, v in assignment.items() if k in master_emps}
+    unpaid = {k: v for k, v in unpaid.items() if k in master_emps}
+    versions = {k: v for k, v in versions.items() if k in master_emps}
 
     # 週次割当の所属（行分割の判定に使う）
     weekly_depts: dict[str, list[tuple[str, str]]] = {}

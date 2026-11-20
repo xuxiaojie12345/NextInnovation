@@ -544,7 +544,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     setDirty((prev) => (prev === next ? prev : next));
   }, [draftRows, assignment, unpaid, isDraftEqualToSaved]);
 
-  // 今週の月曜（過去週の判定基準）。週が変わったら 1 分以内に再計算する
+  // 今週の月曜（過去週の判定基準）。
   const [currentMonday, setCurrentMonday] = useState<string>(() =>
     currentWeekKey(),
   );
@@ -601,27 +601,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     rowIdRef.current += 1;
     return `r-${rowIdRef.current}`;
   }, []);
-
-  /**...r,
-          departmentId: r.departmentId || master?.departmentId || '',
-          name: master?.name ?? '',
-          role: master?.roleo(
-    () =>
-      draftRows.map((r) => {
-        const master = r.employeeNo
-          ? employeeMaster.get(r.employeeNo)
-          : undefined;
-        return {
-          key: r.key,
-          employeeNo: r.employeeNo,
-          name: master?.name ?? '',
-          role: master?.role ?? '',
-          departmentId: master?.departmentId ?? '',
-          leavePlan: master?.leavePlan,
-        };
-      }),
-    [draftRows, employeeMaster],
-  );
 
   /** 未保存かどうかを親（年度切替・ログアウトの確認）へ通知する */
   useEffect(() => {
@@ -2859,7 +2838,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             });
           }}
           scroll={{
-            // 左固定（番号60+備考190+役割90+社員番号90+名前90+所属90）
+            // 左固定（番号60+備考190+役割70+社員番号90+名前90+所属160）
             // + 週列 + 右固定（操作 150）
             x: FIXED_LEFT_WIDTH + weeks.length * WEEK_COL_WIDTH + 150,
             y: tableScrollY,

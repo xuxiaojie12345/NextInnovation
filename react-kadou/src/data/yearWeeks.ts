@@ -9,8 +9,8 @@ import dayjs, { Dayjs } from 'dayjs';
 /** 週列の幅（px）。scroll.x と「初期表示の水平スクロール位置」の計算に使う */
 export const WEEK_COL_WIDTH = 96;
 
-/** 左固定列の合計幅（番号60+備考190+役割90+社員番号90+名前90+所属90） */
-export const FIXED_LEFT_WIDTH = 610;
+/** 左固定列の合計幅（番号60+備考190+役割70+社員番号90+名前90+所属160） */
+export const FIXED_LEFT_WIDTH = 660;
 
 /** 1週（月曜〜日曜）の情報 */
 export interface WeekCol {
