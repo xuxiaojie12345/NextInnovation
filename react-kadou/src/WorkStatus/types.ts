@@ -39,6 +39,11 @@ export interface WorkStatusRow {
   employeeNoLocked?: boolean;
   /** この行を分割して作られた元の行キー（異動取消時の復元用） */
   splitFromKey?: string;
+  /**
+   * 異動フラグ（'0' = 異動前 / '1' = 異動後の行）。
+   * 明細部の並び順（社員番号 → 異動フラグ）に使う。
+   */
+  transferFlag?: string;
 }
 
 /** 稼働表に表示する行（＝要員マスタの employeeNo の並び） */

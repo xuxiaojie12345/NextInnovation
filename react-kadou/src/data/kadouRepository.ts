@@ -58,6 +58,12 @@ export interface WorkStatusPayload {
    * （未保存の異動では現在所属を変更しない）
    */
   departmentUpdates?: WorkStatusDepartmentUpdate[];
+  /**
+   * 社員番号変更（旧番号 → 新番号）。
+   * 旧番号の週次データは削除せず UNASSIGN に戻す（要員マスタは変更しない）。
+   * 新番号の週次データは deletedEmployeeNos で全件削除 → payload で再登録する。
+   */
+  renumbers?: { from: string; to: string }[];
 }
 
 /** 年度のマスタ系データ（部門・要員・項目・休日）の保存パッチ */
@@ -71,7 +77,11 @@ export interface KadouRepository {
   /** 年度のマスタ系データの保存（将来: PUT） */
   saveMaster(year: number, patch: YearMasterPatch): Promise<void>;
   /** 要員稼動管理の保存（将来: POST） */
-  saveWorkStatus(year: number, payload: WorkStatusPayload): Promise<void>;
+  saveWorkStatus(
+    year: number,
+    payload: WorkStatusPayload,
+    operatorId?: string | null,
+  ): Promise<void>;
   /**
    * 要員マスタの削除（将来: DELETE）
    * 当年度の稼働データ（行・割当・BUFFER）も同時に削除する（他年度は変更しない）
@@ -195,6 +205,7 @@ class HttpKadouRepository implements KadouRepository {
   async saveWorkStatus(
     year: number,
     payload: WorkStatusPayload,
+    operatorId?: string | null,
   ): Promise<void> {
     // 画面の「未割当(null)」は後端の「UNASSIGN」へ畳む
     const assignment: Record<string, Record<string, string>> = {};
@@ -208,6 +219,8 @@ class HttpKadouRepository implements KadouRepository {
 
     await httpRequest(`/api/kadou/${year}/work-status`, {
       method: 'PUT',
+      // 登録・更新者（register_user / update_user）にログインユーザーを記録する
+      operatorId,
       body: {
         rows: payload.rows,
         assignment,
@@ -218,6 +231,10 @@ class HttpKadouRepository implements KadouRepository {
           projectId: cell.projectId ? cell.projectId : null,
         })),
         departmentUpdates: payload.departmentUpdates ?? [],
+        renumbers: (payload.renumbers ?? []).map((r) => ({
+          fromNo: r.from,
+          toNo: r.to,
+        })),
       },
     });
 

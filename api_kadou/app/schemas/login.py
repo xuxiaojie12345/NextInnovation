@@ -16,6 +16,8 @@ class LoginResponse(BaseModel):
     userId: str
     name: str
     yakushokukubun: str
+    # 担当部門ID（年度に依存しない）
+    departmentId: Optional[str] = None
     department: Optional[str] = None
     token: str = ""
 

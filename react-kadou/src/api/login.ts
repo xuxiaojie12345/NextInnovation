@@ -7,6 +7,8 @@ export interface LoginResponse {
   userId: string;
   name: string;
   yakushokukubun: string;
+  /** 担当部門ID（年度に依存しない） */
+  departmentId?: string | number | null;
   department: string | null;
   token: string;
 }
@@ -34,6 +36,9 @@ export async function loginApi(
     name: data.name,
     role,
     roleLabel,
-    departmentId: data.department ?? undefined,
+    departmentId:
+      data.departmentId === null || data.departmentId === undefined
+        ? undefined
+        : String(data.departmentId),
   };
 }

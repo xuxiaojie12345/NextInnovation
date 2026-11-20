@@ -55,6 +55,8 @@ class WorkStatusRowDto(BaseModel):
     activeTo: Optional[str] = None
     employeeNoLocked: Optional[bool] = None
     splitFromKey: Optional[str] = None
+    # 異動フラグ（'0' = 異動前 / '1' = 異動後の行）。明細部の並び順に使う
+    transferFlag: str = "0"
 
 
 class WorkStatusDataDto(BaseModel):
@@ -110,18 +112,27 @@ class WorkStatusSaveDepartment(BaseModel):
     departmentId: str
 
 
+class WorkStatusSaveRenumber(BaseModel):
+    """保存リクエストの社員番号変更 1件（旧番号 → 新番号）"""
+
+    fromNo: str
+    toNo: str
+
+
 class WorkStatusSaveRequest(BaseModel):
     """PUT /api/kadou/{year}/work-status（当年全量置換）"""
 
     rows: list[WorkStatusSaveRow] = []
     assignment: dict[str, dict[str, str]] = {}
     unpaid: dict[str, dict[str, bool]] = {}
-    # 行削除で消した社員番号（保存後、週割当を削除する。要員マスタは削除しない）
+    # 行削除・社員番号変更で消した社員番号（保存後、週割当を削除する。要員マスタは削除しない）
     deletedEmployeeNos: list[str] = []
     # 画面で変更したセル（このセルだけを version + 1 で更新する）
     changedCells: list[WorkStatusSaveCell] = []
     # 異動で変更した要員の現在所属（保存成功時に要員マスタへ反映する）
     departmentUpdates: list[WorkStatusSaveDepartment] = []
+    # 社員番号変更（旧番号の週割当は削除せず UNASSIGN に戻す）
+    renumbers: list[WorkStatusSaveRenumber] = []
 
 
 class WorkStatusSaveResult(BaseModel):

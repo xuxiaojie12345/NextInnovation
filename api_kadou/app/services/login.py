@@ -34,6 +34,11 @@ def authenticate(db: Session, user_id: str, password: str) -> LoginResponse | No
         userId=row["user_id"],
         name=row["shimei"],
         yakushokukubun=row["yakushoku_kubun"],
+        departmentId=(
+            None
+            if row["department_id"] is None
+            else str(row["department_id"])
+        ),
         department=row["department_name"],
     )
 

@@ -484,7 +484,7 @@ function App() {
 
   // ---- 要員稼動管理の保存 -------------------------------------------
 
-  /** 要員稼動管理の保存（表示行・割当・BUFFER のみ。要員マスタは変更しない） */
+  /** 要員稼動管理の保存（表示行・割当・BUFFER。異動時は要員マスタの所属も更新する） */
   const handleSaveWorkStatus = useCallback(
     (payload: WorkStatusPayload) => {
       setStores((prev) => ({
@@ -501,7 +501,12 @@ function App() {
         },
       }));
       void kadouRepository
-        .saveWorkStatus(selectedYear, payload)
+        .saveWorkStatus(
+          selectedYear,
+          payload,
+          // register_user / update_user はログインユーザーの ID を記録する
+          currentUserId,
+        )
         .then(() => {
           message.success(`${selectedYear}年度の内容を保存しました。`);
           // 変更セルの version など最新状態を取得して画面へ反映する
@@ -517,7 +522,7 @@ function App() {
           reloadYear();
         });
     },
-    [selectedYear, reloadYear],
+    [selectedYear, reloadYear, currentUserId],
   );
 
   /** 要員稼動管理の「保存」処理を WorkStatus から受け取る（未保存確認から呼ぶ） */
@@ -536,17 +541,19 @@ function App() {
     if (!currentUser) return [];
     const wanted = defaultDepartmentsOf(currentUser);
     if (wanted.length === 0) return [];
-    const ids = new Set(store.departments.map((d) => d.departmentId));
-    return wanted.filter((id) => ids.has(id));
+    const ids = new Set(store.departments.map((d) => String(d.departmentId)));
+    return wanted.filter((id) => ids.has(String(id)));
   }, [currentUser, store.departments]);
 
   /** ログインユーザーの所属部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
   useEffect(() => {
     if (!currentUser) return;
+    // 部門マスタの取得前（空）は判定できないため、取得後に判定する
+    if (store.departments.length === 0) return;
     const wanted = defaultDepartmentsOf(currentUser);
     if (wanted.length === 0) return;
-    const ids = new Set(store.departments.map((d) => d.departmentId));
-    const missing = wanted.filter((id) => !ids.has(id));
+    const ids = new Set(store.departments.map((d) => String(d.departmentId)));
+    const missing = wanted.filter((id) => !ids.has(String(id)));
     if (missing.length === 0) return;
     const key = `${selectedYear}:${currentUser.userId}`;
     if (warnedDeptRef.current === key) return;

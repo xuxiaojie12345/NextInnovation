@@ -6,7 +6,7 @@ API_PATH:
   PUT /api/kadou/{year}/work-status   稼働表の保存（当年全量置換）
 
 NOTE: 本モジュールは「Web 側データの受け取り／返却」のみを担当する。
-      週キー換算・周割当の持替・業務エラーは services/workStatus.py に集約する。
+      週キー換算・週割当の持ち替え・業務エラーは services/workStatus.py に集約する。
 """
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
@@ -37,8 +37,11 @@ def put_work_status(
 ):
     """要員稼働管理：稼働表を当年全量置換で保存する。
 
-    登録者/登録日時は既存行があれば引き継ぎ、週割当は入荷通りに置き換える。
-    deletedEmployeeNos の社員は週割当・要員マスタからも削除される。
+    - 週次割当は受信した payload（assignment / unpaid）の内容で更新する。
+    - deletedEmployeeNos の社員は週次割当を削除し、要員マスタは削除せず
+      現在の所属 1 行に戻す（異動フラグを解除する）。
+    - renumbers（社員番号変更）は、新番号に旧番号の内容を移植し、
+      旧番号は週次割当を UNASSIGN に戻す（要員マスタは変更しない）。
     """
     op_user = (x_user_id or "").strip() or "ADMIN"
     return save_work_status(db, int(year), payload, op_user)

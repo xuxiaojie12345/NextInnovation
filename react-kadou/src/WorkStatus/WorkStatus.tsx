@@ -414,6 +414,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   // 保存時にバックエンドへ渡し、DB 側でも当該年度の業務データを削除する
   const [deletedEmployeeNos, setDeletedEmployeeNos] = useState<string[]>([]);
 
+  // 社員番号変更（旧番号 → 新番号）。
+  // 保存時にバックエンドへ渡し、旧番号の週次データを UNASSIGN に戻す
+  const [renumberedEmployees, setRenumberedEmployees] = useState<
+    { from: string; to: string }[]
+  >([]);
+
   // この画面で変更したセル（社員番号|週キー）。
   // 保存時はこのセルのレコードだけを更新する（全年度の一括更新はしない）
   const [changedCells, setChangedCells] = useState<Set<string>>(new Set());
@@ -460,11 +466,83 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     setUnpaid({ ...initialWorkStatus.unpaid });
     versionsRef.current = initialWorkStatus.versions ?? {};
     setChangedCells((prev) => (prev.size === 0 ? prev : new Set()));
+    setRenumberedEmployees((prev) => (prev.length === 0 ? prev : []));
     setSavedBaseline({
       assignment: initialWorkStatus.assignment,
       unpaid: initialWorkStatus.unpaid,
     });
   }, [initialWorkStatus, dirty, employeeMaster]);
+
+  /**
+   * 下書きが保存済みデータ（initialWorkStatus）と同一か。
+   *
+   * 「保存」ボタンの活性（dirty）は編集操作のフラグではなく、この比較結果から決める。
+   *  - 行を追加してそのまま削除した → 元のデータに戻るので未保存なし
+   *  - 異動を保存した直後 → 保存内容と保存済みデータが一致するので未保存なし
+   * といったケースで、フラグが残って保存ボタンが活性のままになるのを防ぐ。
+   */
+  const isDraftEqualToSaved = useCallback(
+    (
+      rows: Pick<
+        WorkStatusRow,
+        'employeeNo' | 'departmentId' | 'activeFrom' | 'activeTo'
+      >[],
+      asg: AssignmentMap,
+      up: UnpaidMap,
+    ): boolean => {
+      const savedRows = initialWorkStatus.rows ?? [];
+      if (rows.length !== savedRows.length) return false;
+      for (let i = 0; i < rows.length; i += 1) {
+        const a = rows[i];
+        const b = savedRows[i];
+        if ((a.employeeNo || '') !== (b.employeeNo || '')) return false;
+        // 所属は行の値 → 要員マスタ → 空 の優先順で比較する（初期表示の補完と同じ）
+        const aDept =
+          a.departmentId ||
+          employeeMaster.get(a.employeeNo)?.departmentId ||
+          '';
+        const bDept =
+          b.departmentId ||
+          employeeMaster.get(b.employeeNo)?.departmentId ||
+          '';
+        if (aDept !== bDept) return false;
+        if ((a.activeFrom || '') !== (b.activeFrom || '')) return false;
+        if ((a.activeTo || '') !== (b.activeTo || '')) return false;
+      }
+      const normProject = (v?: string | null) =>
+        v && v !== 'UNASSIGN' ? v : '';
+      const savedAsg = initialWorkStatus.assignment ?? {};
+      for (const emp of new Set([...Object.keys(asg), ...Object.keys(savedAsg)])) {
+        const a = asg[emp] ?? {};
+        const b = savedAsg[emp] ?? {};
+        for (const weekKey of new Set([
+          ...Object.keys(a),
+          ...Object.keys(b),
+        ])) {
+          if (normProject(a[weekKey]) !== normProject(b[weekKey])) return false;
+        }
+      }
+      const savedUp = initialWorkStatus.unpaid ?? {};
+      for (const emp of new Set([...Object.keys(up), ...Object.keys(savedUp)])) {
+        const a = up[emp] ?? {};
+        const b = savedUp[emp] ?? {};
+        for (const weekKey of new Set([
+          ...Object.keys(a),
+          ...Object.keys(b),
+        ])) {
+          if (!!a[weekKey] !== !!b[weekKey]) return false;
+        }
+      }
+      return true;
+    },
+    [initialWorkStatus, employeeMaster],
+  );
+
+  // 下書きと保存済みデータの差分から未保存有無を更新する
+  useEffect(() => {
+    const next = !isDraftEqualToSaved(draftRows, assignment, unpaid);
+    setDirty((prev) => (prev === next ? prev : next));
+  }, [draftRows, assignment, unpaid, isDraftEqualToSaved]);
 
   // 今週の月曜（過去週の判定基準）。週が変わったら 1 分以内に再計算する
   const [currentMonday, setCurrentMonday] = useState<string>(() =>
@@ -594,19 +672,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       // 変更なし
       if (no === currentNo) return true;
 
-      // 過去実績がある社員は変更できない（入力欄も無効化されているが念のため）
-      if (
-        currentNo &&
-        hasPastActualsForEmployee(
-          draftRows,
-          currentNo,
-          savedBaseline,
-          currentMonday,
-        )
-      ) {
-        message.error('過去実績があるため社員番号を変更できません。');
-        return false;
-      }
+      // 過去実績・操作日（今週の月曜）より前の割当/BUFFER の有無は DB を参照する
+      // チェックのため、保存時にバックエンドで判定する（画面側では重複判定しない）。
+      // ※過去実績のある社員は社員番号欄を無効化している（UI 上のガードのみ）。
 
       // 同じ社員の行（異動の 2 行）はまとめて変更する
       const myRows = currentNo
@@ -697,37 +765,34 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         return false;
       }
 
-      // 引き継いだ割当・BUFFER のセルは、新しい社員番号の変更セルとして送る
-      if (currentNo) {
-        Object.keys(assignment[currentNo] ?? {}).forEach((weekKey) =>
-          markCellChanged(no, weekKey),
-        );
-        Object.keys(unpaid[currentNo] ?? {}).forEach((weekKey) =>
-          markCellChanged(no, weekKey),
-        );
-      }
       // 割当・BUFFER を新しい社員番号へ引き継ぐ
-      // （新しい社員番号に既存データがある場合は、引き継いだデータで上書きする）
+      // （新番号の週次データは保存時に全件削除して、旧番号の内容で作り直す）
       setAssignment((prev) => {
         if (!currentNo || !prev[currentNo]) return prev;
         const next = { ...prev };
-        next[no] = { ...(next[no] ?? {}), ...prev[currentNo] };
+        next[no] = { ...prev[currentNo] };
         delete next[currentNo];
         return next;
       });
       setUnpaid((prev) => {
         if (!currentNo || !prev[currentNo]) return prev;
         const next = { ...prev };
-        next[no] = { ...(next[no] ?? {}), ...prev[currentNo] };
+        next[no] = { ...prev[currentNo] };
         delete next[currentNo];
         return next;
       });
-      // 旧社員番号の当年度データは残さない（API は削除→payload 反映の順）
+      // 旧番号の当年度データは削除せず、保存時に UNASSIGN へ戻す
       if (currentNo) {
-        setDeletedEmployeeNos((prev) =>
-          prev.includes(currentNo) ? prev : [...prev, currentNo],
-        );
+        setRenumberedEmployees((prev) => [
+          ...prev.filter((r) => r.from !== currentNo && r.to !== no),
+          { from: currentNo, to: no },
+        ]);
       }
+      // 新番号の週次データは保存時に削除 → 旧番号の内容で再登録する
+      setDeletedEmployeeNos((prev) => {
+        const next = prev.filter((n) => n !== currentNo);
+        return next.includes(no) ? next : [...next, no];
+      });
       // 異動で分割されている場合は 2 行まとめて同じ社員番号に変更する
       setDraftRows((prev) =>
         prev.map((r) =>
@@ -750,9 +815,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       draftRows,
       lookupPersonnel,
       savedBaseline,
-      currentMonday,
       pastYear,
-      markCellChanged,
     ],
   );
 
@@ -804,11 +867,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       if (!target) return;
       // 過年度は参照のみ
       if (pastYear) return;
-      // 過去実績（保存済みデータ）がある行は削除できない
-      if (hasPastActualsForRow(target, savedBaseline, currentMonday)) {
-        message.error('過去実績がある行は削除できません。');
-        return;
-      }
+      // 過去実績（保存済みデータ）がある行は削除できない（削除ボタンを無効化済み）。
+      // DB を参照する判定のため、画面側では重複してエラーを出さない。
       const employeeNo = target.employeeNo;
       // その社員の最後の行を削除するか（＝再追加時に全週「未割当」で表示する）
       const isLastRowOfEmployee =
@@ -935,8 +995,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       draftRows,
       assignment,
       unpaid,
-      savedBaseline,
-      currentMonday,
       pastYear,
       markCellChanged,
     ],
@@ -1015,6 +1073,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       changedCells: changed,
       // 異動で変更した要員の現在所属（保存成功時に要員マスタへ反映する）
       departmentUpdates,
+      // 社員番号変更（旧番号の週次データを UNASSIGN に戻す）
+      renumbers: renumberedEmployees,
     });
     // 保存したセルの版を +1 しておく（再取得が完了するまでの楽観ロック用）
     if (changed.length > 0) {
@@ -1035,6 +1095,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     // 判定基準を更新する（保存失敗時は旧データのまま戻る）。
     // 保存済みの削除情報・変更セルはクリアする（次回の保存で再送しない）
     setDeletedEmployeeNos((prev) => (prev.length === 0 ? prev : []));
+    setRenumberedEmployees((prev) => (prev.length === 0 ? prev : []));
     setChangedCells((prev) => (prev.size === 0 ? prev : new Set()));
     // ※保存では追加行の表示を解除しない（次にフィルタを適用したときに解除する）
     setDirty(false);
@@ -1043,6 +1104,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     assignment,
     unpaid,
     deletedEmployeeNos,
+    renumberedEmployees,
     changedCells,
     onSave,
     employeeMaster,
@@ -1154,7 +1216,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [draftRows, allWeeks, currentMonday, pastYear],
   );
 
-  /** 所属変更（異動）を確定する */
+  /** 所属変更（異動）を確定する（画面だけ反映し、保存時に要員マスタへ反映する） */
   const handleTransfer = useCallback(() => {
     if (!transferRowKey) return;
     const row = draftRows.find((r) => r.key === transferRowKey);
@@ -1191,54 +1253,38 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       .format('YYYY-MM-DD');
     const newKey = nextRowKey();
     const deptName = departmentLabelOf(departments, transferDeptId);
-    // 異動は保存後に取り消せないため、確定前に確認ダイアログで明示する（設計 7.6）
-    Modal.confirm({
-      title: '所属変更（異動）の確認',
-      content: (
-        <div>
-          {row.employeeNo} の所属を「{deptName}」に変更します（
-          {dayjs(transferWeekKey).format('YYYY/M/D')} の週から）。
-          <br />
-          異動は保存後に取り消せません。よろしいですか？
-          <br />
-          ※保存するまで現在の所属（要員マスタ）は変わりません。
-        </div>
-      ),
-      okText: '変更する',
-      cancelText: 'キャンセル',
-      onOk: () => {
-        setDraftRows((prev) => {
-          const index = prev.findIndex((r) => r.key === transferRowKey);
-          if (index < 0) return prev;
-          const oldRow = prev[index];
-          const next = [...prev];
-          // 旧所属の行は開始週の前週まで
-          next[index] = {
-            ...oldRow,
-            activeTo: prevWeekKey,
-            employeeNoLocked: true,
-          };
-          // 新所属の行を旧行の直後に追加（開始週から）
-          next.splice(index + 1, 0, {
-            key: newKey,
-            employeeNo: oldRow.employeeNo,
-            departmentId: transferDeptId,
-            activeFrom: transferWeekKey,
-            activeTo: oldRow.activeTo,
-            employeeNoLocked: true,
-            splitFromKey: oldRow.key,
-          });
-          return next;
-        });
-        setTransferRowKey(null);
-        setDirty(true);
-        message.success(
-          `${row.employeeNo} の所属を ${deptName} に変更しました（${dayjs(
-            transferWeekKey,
-          ).format('YYYY/M/D')} の週から・未保存）。`,
-        );
-      },
+    setDraftRows((prev) => {
+      const index = prev.findIndex((r) => r.key === transferRowKey);
+      if (index < 0) return prev;
+      const oldRow = prev[index];
+      const next = [...prev];
+      // 旧所属の行は開始週の前週まで（異動フラグ 0 = 異動前）
+      next[index] = {
+        ...oldRow,
+        activeTo: prevWeekKey,
+        employeeNoLocked: true,
+        transferFlag: '0',
+      };
+      // 新所属の行を旧行の直後に追加（開始週から。異動フラグ 1 = 異動後）
+      next.splice(index + 1, 0, {
+        key: newKey,
+        employeeNo: oldRow.employeeNo,
+        departmentId: transferDeptId,
+        activeFrom: transferWeekKey,
+        activeTo: oldRow.activeTo,
+        employeeNoLocked: true,
+        splitFromKey: oldRow.key,
+        transferFlag: '1',
+      });
+      return next;
     });
+    setTransferRowKey(null);
+    setDirty(true);
+    message.success(
+      `${row.employeeNo} の所属を ${deptName} に変更しました（${dayjs(
+        transferWeekKey,
+      ).format('YYYY/M/D')} の週から・未保存）。保存すると確定し、取り消せません。`,
+    );
   }, [
     transferRowKey,
     transferDeptId,
@@ -1417,8 +1463,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       p.employeeNo === '' || addedRowKeys.has(p.key);
 
     /**
-     * 明細部の並び順: 社員番号 → 所属。
-     * 異動で 2 行ある社員は社員番号でまとまり、その中で所属順に並ぶ。
+     * 明細部の並び順: 社員番号 → 異動フラグ（0 = 異動前 → 1 = 異動後）。
+     * 異動で 2 行ある社員は社員番号でまとまり、その中で異動前の行が先に並ぶ。
      * 社員番号が未入力の行（空行）は末尾に置く。
      */
     const sortRows = (list: PersonRow[]) =>
@@ -1430,6 +1476,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             numeric: true,
           });
         }
+        const aFlag = a.transferFlag ?? '0';
+        const bFlag = b.transferFlag ?? '0';
+        if (aFlag !== bFlag) return aFlag.localeCompare(bFlag);
+        // 同じ異動フラグ内は有効開始週（未指定 = 年度初め）→ 所属の順
+        const aFrom = a.activeFrom ?? '';
+        const bFrom = b.activeFrom ?? '';
+        if (aFrom !== bFrom) return aFrom.localeCompare(bFrom);
         return a.departmentId.localeCompare(b.departmentId, 'ja', {
           numeric: true,
         });
@@ -2137,7 +2190,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         dataIndex: 'role',
         key: 'role',
         fixed: 'left',
-        width: 90,
+        width: 70,
       },
       {
         title: '社員番号',
@@ -2188,7 +2241,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         dataIndex: 'departmentId',
         key: 'departmentId',
         fixed: 'left',
-        width: 90,
+        width: 160,
         filters: filterOptions.dept,
         filterMultiple: true,
         filteredValue: deptFilter.length > 0 ? deptFilter : null,
@@ -2486,11 +2539,33 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   );
 
   // 固定列（fixed left/right）利用時は scroll.y を指定する必要がある。
-  // 行数が少ないとヘッダー/本体の幅計測が振動して「チラつき」を起こすため、
-  // 本体の縦スクロール高さを行数に応じた固定値にする（少ない行は余白を最小化）。
+  // 行数を「1 行 40px」の固定値で見積もると、所属が複数行に折り返した行で
+  // 実際の行高が 40px を超え、行数が少なくても不要な縦スクロールバーが出る。
+  // そのため本体（tbody）の実高さを測り、その高さに合わせる。
+  const [tableBodyHeight, setTableBodyHeight] = useState(0);
+  useEffect(() => {
+    const body = tableWrapRef.current?.querySelector('.ant-table-body');
+    const tbody = body?.querySelector('tbody');
+    if (!(tbody instanceof HTMLElement)) return;
+    const measure = () => {
+      // tbody はスクロール領域内でも自然な高さを持つ（表示上だけクリップされる）
+      const h = tbody.getBoundingClientRect().height;
+      if (h <= 0) return;
+      setTableBodyHeight((prev) => (Math.abs(prev - h) < 1 ? prev : h));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(tbody);
+    return () => observer.disconnect();
+  }, [tableRows]);
+
+  // 実高さ＋横スクロールバー分（約 20px）で縦スクロールが出ないようにする
   const tableScrollY = Math.min(
     425,
-    Math.max(120, (tableRows.length + 1) * 40),
+    Math.max(
+      120,
+      tableBodyHeight ? tableBodyHeight + 20 : (tableRows.length + 1) * 40,
+    ),
   );
 
   /**
@@ -2858,6 +2933,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               ※適用開始週の前週までを旧所属、開始週からを新所属の行に分けます。
               期間外の週は空欄（編集不可）になります。
               異動週以降の既存の割当は、そのまま新所属の行に引き継がれます。
+              <br/>
+              <strong>保存すると異動が確定し、取り消すことはできません。</strong>
             </div>
           </div>
         )}

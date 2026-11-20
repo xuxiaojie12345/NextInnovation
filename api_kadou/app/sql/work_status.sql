@@ -7,6 +7,7 @@
 -- :name: personnel
 -- 指定年度の要員マスタ全行（異動の分割行を含む。表示行・現在所属の算出に使う）
 -- 異動がない要員は 1 行、異動がある要員は 旧所属行＋新所属行 の複数行。
+-- 旧所属行（idoubi なし）を先、異動で追加した新所属行（idoubi あり）を後に並べる。
 SELECT
     employee_no,
     person_name,
@@ -19,10 +20,11 @@ SELECT
     register_user
 FROM jn_personnel_master
 WHERE year_id = :year_id
-ORDER BY employee_no, (idoubi IS NULL) DESC, idoubi
+ORDER BY employee_no, (idoubi IS NOT NULL), idoubi
 
 -- :name: search
--- 社員番号による要員1件取得（異動後再取得用）
+-- 社員番号による要員1件取得（異動後の「現在の所属」を返す）
+-- 異動時は異動後の所属の行を追加し、その行だけが idoubi（異動日）を持つ。
 SELECT
     employee_no,
     person_name,
@@ -32,7 +34,7 @@ SELECT
 FROM jn_personnel_master
 WHERE year_id = :year_id
   AND employee_no = :employee_no
-ORDER BY department_id
+ORDER BY (idoubi IS NULL), idoubi DESC
 LIMIT 1
 
 -- :name: transfer
@@ -79,11 +81,6 @@ FROM jn_weekly_assignment_table
 WHERE year_id = :year_id
 ORDER BY employee_no, week_start_date
 
--- :name: delete
--- 保存時：行削除となった社員分の週次割当を削除する（1セル＝1レコード方針）
-DELETE FROM jn_weekly_assignment_table
-WHERE year_id = :year_id AND employee_no = :employee_no
-
 -- :name: insert
 -- 保存時：週次割当の1件挿入（グリッドの欠落週・新規セルの投入）
 INSERT INTO jn_weekly_assignment_table
@@ -124,9 +121,29 @@ WHERE year_id = :year_id
   AND week_start_date <= :to_week
   AND department_id <> :department_id
 
+-- :name: count_work_before
+-- 社員番号変更の可否：指定日（今週の月曜）より前の週に割当・BUFFER があるかを数える
+SELECT COUNT(*) AS cnt
+FROM jn_weekly_assignment_table
+WHERE year_id = :year_id
+  AND employee_no = :employee_no
+  AND week_start_date < :before_week
+  AND (COALESCE(sys_project_id, 'UNASSIGN') <> 'UNASSIGN' OR is_unpaid = '1')
+
+-- :name: clear_assignments
+-- 社員番号変更時：旧社員番号の週次割当を UNASSIGN に戻す（行は削除しない）
+UPDATE jn_weekly_assignment_table
+SET sys_project_id = 'UNASSIGN',
+    is_unpaid = '0',
+    version = version + 1,
+    update_user = :update_user,
+    update_datetime = :update_datetime
+WHERE year_id = :year_id
+  AND employee_no = :employee_no
+
 -- :name: personnel_of_employee
--- 異動保存時：要員マスタの現在の行（旧所属行・新所属行）を取得する
--- 先頭が旧所属行（idoubi が NULL の行 → 最も古い異動日の行）
+-- 異動保存時：要員マスタの現在の行を取得する
+-- 先頭が旧所属行（idoubi なし）、後ろが異動で追加した新所属行（idoubi あり）
 SELECT
     employee_no,
     department_id,
@@ -140,7 +157,7 @@ SELECT
 FROM jn_personnel_master
 WHERE year_id = :year_id
   AND employee_no = :employee_no
-ORDER BY (idoubi IS NULL) DESC, idoubi
+ORDER BY (idoubi IS NOT NULL), idoubi
 
 -- :name: delete_personnel_rows
 -- 異動保存時：要員マスタの行をいったん全件削除し、現在の異動状態で作り直す

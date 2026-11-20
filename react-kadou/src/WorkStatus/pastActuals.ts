@@ -117,3 +117,27 @@ export const hasWorkData = (
   const buffer = unpaid[employeeNo] ?? {};
   return Object.keys(buffer).some((weekKey) => buffer[weekKey] === true);
 };
+
+/**
+ * 操作日（今週の月曜）より前の週に割当・BUFFER があるか
+ * （社員番号変更の可否判定に使う。未割当 'UNASSIGN' は実績なしとして扱う）
+ */
+export const hasWorkBeforeWeek = (
+  employeeNo: string,
+  assignment: AssignmentMap,
+  unpaid: UnpaidMap,
+  currentMonday: string,
+): boolean => {
+  if (!employeeNo) return false;
+  const weeks = new Set([
+    ...Object.keys(assignment[employeeNo] ?? {}),
+    ...Object.keys(unpaid[employeeNo] ?? {}),
+  ]);
+  for (const weekKey of weeks) {
+    if (!isPastWeek(weekKey, currentMonday)) continue;
+    const projectId = assignment[employeeNo]?.[weekKey];
+    if (projectId != null && projectId !== 'UNASSIGN') return true;
+    if (unpaid[employeeNo]?.[weekKey] === true) return true;
+  }
+  return false;
+};
