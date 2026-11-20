@@ -39,7 +39,10 @@ const request = async <T>(
       typeof body?.detail === 'string'
         ? body.detail
         : `HTTP ${response.status}`;
-    throw new Error(detail);
+    // 画面側で「サーバーエラー（5xx）」を判別できるようステータスを付与する
+    const error = new Error(detail) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
   }
 
   return response.json() as Promise<T>;

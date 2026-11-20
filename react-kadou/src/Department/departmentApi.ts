@@ -147,6 +147,22 @@ const extractErrorMessage = (
 };
 
 /**
+ * HTTP ステータス付きのエラー。
+ * 画面側で「サーバーエラー（5xx / 通信失敗）」と「業務エラー（4xx）」を
+ * 区別するために使う（Login 画面と同じ扱い）。
+ */
+export interface ApiError extends Error {
+  /** HTTP ステータス（通信自体が失敗した場合は undefined） */
+  status?: number;
+}
+
+/** 例外をステータス付きエラーに変換する */
+const toApiError = (error: unknown, fallbackMessage: string): ApiError =>
+  Object.assign(new Error(extractErrorMessage(error, fallbackMessage)), {
+    status: axios.isAxiosError(error) ? error.response?.status : undefined,
+  });
+
+/**
  * 年度に紐づく部門一覧を取得する（画面の初期表示時に使用）。
  * @param year 画面上で選択されている年度
  * @returns 該当年度の部門一覧（協力会社を含む）
@@ -161,9 +177,7 @@ export const fetchDepartments = async (
     );
     return data.map(toDepartment);
   } catch (error) {
-    throw new Error(
-      extractErrorMessage(error, '部門一覧の取得に失敗しました。'),
-    );
+    throw toApiError(error, '部門一覧の取得に失敗しました。');
   }
 };
 
@@ -184,7 +198,7 @@ export const registerDepartment = async (
     );
     return toDepartment(data);
   } catch (error) {
-    throw new Error(extractErrorMessage(error, '登録に失敗しました。'));
+    throw toApiError(error, '登録に失敗しました。');
   }
 };
 
@@ -213,7 +227,7 @@ export const updateDepartment = async (
     );
     return toDepartment(data);
   } catch (error) {
-    throw new Error(extractErrorMessage(error, '更新に失敗しました。'));
+    throw toApiError(error, '更新に失敗しました。');
   }
 };
 
@@ -234,6 +248,6 @@ export const deleteDepartment = async (
       )}/${encodeURIComponent(departmentId)}`,
     );
   } catch (error) {
-    throw new Error(extractErrorMessage(error, '削除に失敗しました。'));
+    throw toApiError(error, '削除に失敗しました。');
   }
 };

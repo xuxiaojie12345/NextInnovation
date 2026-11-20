@@ -47,6 +47,15 @@ const ROLE_COLOR: Record<UserRole, string> = {
 const errorMessageOf = (error: unknown, fallback: string): string =>
   error instanceof Error && error.message ? error.message : fallback;
 
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ */
+const isServerError = (error: unknown): boolean => {
+  const status = (error as { status?: number } | null)?.status;
+  return status === undefined || status >= 500;
+};
+
 interface UserManagementScreenProps {
   /** ログイン中のユーザーID（自分自身の削除・降格を禁止するため） */
   currentUserId: string | null;
@@ -54,6 +63,8 @@ interface UserManagementScreenProps {
   departments: Department[];
   /** 管理権限（管理者のみ true） */
   allowManage: boolean;
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面のエラー画面へ切り替える */
+  onServerError: () => void;
 }
 
 /**
@@ -67,6 +78,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   currentUserId,
   departments,
   allowManage,
+  onServerError,
 }) => {
   // ユーザー一覧（バックエンドから取得する）
   const [users, setUsers] = useState<AuthUser[]>([]);
@@ -92,13 +104,18 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     try {
       setUsers(await fetchUsers(opUserId));
     } catch (error) {
+      // 5xx / 通信失敗はログイン画面のエラー画面へ切り替える
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(
         errorMessageOf(error, 'ユーザー一覧の取得に失敗しました。'),
       );
     } finally {
       setLoading(false);
     }
-  }, [opUserId]);
+  }, [opUserId, onServerError]);
 
   useEffect(() => {
     if (!allowManage) return;
@@ -196,6 +213,10 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         message.success(`ユーザー「${nm}」を更新しました。`);
         resetForm();
       } catch (error) {
+        if (isServerError(error)) {
+          onServerError();
+          return;
+        }
         message.error(errorMessageOf(error, 'ユーザーの更新に失敗しました。'));
       } finally {
         setSaving(false);
@@ -218,6 +239,10 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       message.success(`ユーザー「${nm}」を追加しました。`);
       resetForm();
     } catch (error) {
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(errorMessageOf(error, 'ユーザーの追加に失敗しました。'));
     } finally {
       setSaving(false);
@@ -240,6 +265,10 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       message.success(`ユーザー「${user.name}」を削除しました。`);
       if (editingId === user.userId) resetForm();
     } catch (error) {
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(errorMessageOf(error, 'ユーザーの削除に失敗しました。'));
     }
   };

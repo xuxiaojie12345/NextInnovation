@@ -82,7 +82,12 @@ const request = async <T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    throw new Error(errorMessageOf(body, response.status));
+    // 画面側で「サーバーエラー（5xx）」を判別できるようステータスを付与する
+    const error = new Error(errorMessageOf(body, response.status)) as Error & {
+      status?: number;
+    };
+    error.status = response.status;
+    throw error;
   }
 
   return response.json() as Promise<T>;

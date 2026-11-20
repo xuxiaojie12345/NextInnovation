@@ -80,7 +80,18 @@ interface PersonnelInfoScreenProps {
   hasWorkData: (employeeNo: string) => boolean;
   /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
   currentUserId: string;
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面のエラー画面へ切り替える */
+  onServerError: () => void;
 }
+
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ */
+const isServerError = (error: unknown): boolean => {
+  const status = (error as { status?: number } | null)?.status;
+  return status === undefined || status >= 500;
+};
 
 /**
  * 要員情報 画面（メニュー「要員情報」で切り替わる画面）
@@ -98,6 +109,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   onDelete,
   hasWorkData,
   currentUserId,
+  onServerError,
 }) => {
   // 入力中の社員番号
   const [employeeNo, setEmployeeNo] = useState("");
@@ -168,6 +180,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         handleReset();
         message.success(`社員番号「${no}」を削除しました。`);
       } catch (error) {
+        if (isServerError(error)) {
+          onServerError();
+          return;
+        }
         message.error(
           `削除できませんでした：${
             error instanceof Error ? error.message : "不明なエラー"
@@ -258,6 +274,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       }
 
       // その他のエラー
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(
         error instanceof Error
           ? `検索に失敗しました：${error.message}`
@@ -309,6 +329,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       );
       handleReset();
     } catch (error) {
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(
         `保存できませんでした：${
           error instanceof Error ? error.message : "不明なエラー"
@@ -436,6 +460,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       }
       handleImportCancel();
     } catch (error) {
+      if (isServerError(error)) {
+        onServerError();
+        return;
+      }
       message.error(
         `一括読み込みに失敗しました：${
           error instanceof Error ? error.message : "不明なエラー"

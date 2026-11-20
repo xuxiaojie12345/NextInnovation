@@ -49,12 +49,23 @@ const LOCATION_OPTIONS: { value: DepartmentLocation; label: string }[] = [
 const kindLabelOf = (kind?: DepartmentKind): string =>
   kind === 'partner' ? '協力会社' : '部門';
 
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ */
+const isServerError = (error: unknown): boolean => {
+  const status = (error as { status?: number } | null)?.status;
+  return status === undefined || status >= 500;
+};
+
 interface DepartmentManagementScreenProps {
   /** 表示する年度 */
   year: number;
   /** 部門マスタ（App 側で年度ごとに保持。協力会社も含む） */
   departments: Department[];
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面のエラー画面へ切り替える */
+  onServerError: () => void;
 }
 
 /**
@@ -71,6 +82,7 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   year,
   departments,
   setDepartments,
+  onServerError,
 }) => {
   // 名称（新規登録 / 修正で共用）
   const [name, setName] = useState('');
@@ -93,14 +105,20 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
   // setDepartments は App 側で年度や保存内容が変わるたびに作り直されるため、
   // 取得処理の依存配列から外すために最新の関数を参照で保持する
   const setDepartmentsRef = useRef(setDepartments);
+  // onServerError も同様に参照で保持する（依存配列による再取得を防ぐ）
+  const onServerErrorRef = useRef(onServerError);
 
   useEffect(() => {
     setDepartmentsRef.current = setDepartments;
+    onServerErrorRef.current = onServerError;
   });
 
   const isEditing = editingId !== null;
 
-  /** 初期表示（および年度切替）時に、その年度の部門一覧を API から取得して一覧に表示する */
+  /**
+   * 初期表示（および年度切替）時に、その年度の部門一覧を API から取得する。
+   * 5xx / 通信失敗はログイン画面のエラー画面へ切り替える。
+   */
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -111,20 +129,22 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         }
       })
       .catch((error: unknown) => {
-        if (!cancelled) {
-          message.error(
-            error instanceof Error
-              ? error.message
-              : '部門一覧の取得に失敗しました。',
-          );
+        if (cancelled) return;
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
         }
+        message.error(
+          error instanceof Error
+            ? error.message
+            : '部門一覧の取得に失敗しました。',
+        );
       })
       .finally(() => {
         if (!cancelled) {
           setLoading(false);
         }
       });
-    // 画面を離れた / 年度が変わった後に古い結果を反映しないよう中断する
     return () => {
       cancelled = true;
     };
@@ -162,6 +182,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
           `${kindLabelOf(row.kind)}「${row.name}」を削除しました。`,
         );
       } catch (error) {
+        // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         message.error(
           error instanceof Error ? error.message : '削除に失敗しました。',
         );
@@ -203,6 +228,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
         );
         handleResetForm();
       } catch (error) {
+        // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         message.error(
           error instanceof Error ? error.message : '修正に失敗しました。',
         );
@@ -228,6 +258,11 @@ const DepartmentManagementScreen: React.FC<DepartmentManagementScreenProps> = ({
       );
       handleResetForm();
     } catch (error) {
+      // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+      if (isServerError(error)) {
+        onServerErrorRef.current();
+        return;
+      }
       message.error(
         error instanceof Error ? error.message : '登録に失敗しました。',
       );

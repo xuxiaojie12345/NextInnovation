@@ -88,7 +88,7 @@ const isWeekActive = (
   weekKey: string,
 ): boolean =>
   (!row.activeFrom || weekKey >= row.activeFrom) &&
-  (!row.activeTo || weekKey <= row.activeTo);
+  (!row.activeTo || weekKey <= row.activeTo); 
 
 /** 2つの行の有効期間が重なるか（未指定 = 年度全体） */
 const periodsOverlap = (

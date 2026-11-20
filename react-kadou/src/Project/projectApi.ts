@@ -92,6 +92,22 @@ const extractErrorMessage = (error: unknown): string => {
 };
 
 /**
+ * HTTP ステータス付きのエラー。
+ * 画面側で「サーバーエラー（5xx / 通信失敗）」と「業務エラー（4xx）」を
+ * 区別するために使う（Login 画面と同じ扱い）。
+ */
+export interface ApiError extends Error {
+  /** HTTP ステータス（通信自体が失敗した場合は undefined） */
+  status?: number;
+}
+
+/** 例外をステータス付きエラーに変換する */
+const toApiError = (error: unknown): ApiError =>
+  Object.assign(new Error(extractErrorMessage(error)), {
+    status: axios.isAxiosError(error) ? error.response?.status : undefined,
+  });
+
+/**
  * 年度に紐づくプロジェクト一覧を取得する（画面の初期表示時に使用）。
  * @param year 画面上で選択されている年度
  * @returns 該当年度のプロジェクト一覧
@@ -104,7 +120,7 @@ export const fetchProjects = async (year: number): Promise<Project[]> => {
     );
     return data.map(toProject);
   } catch (error) {
-    throw new Error(extractErrorMessage(error));
+    throw toApiError(error);
   }
 };
 
@@ -168,7 +184,7 @@ export const createProject = async (
     );
     return data;
   } catch (error) {
-    throw new Error(extractErrorMessage(error));
+    throw toApiError(error);
   }
 };
 
@@ -194,7 +210,7 @@ export const updateProject = async (
     );
     return data;
   } catch (error) {
-    throw new Error(extractErrorMessage(error));
+    throw toApiError(error);
   }
 };
 
@@ -240,7 +256,7 @@ export const importProjects = async (
     );
     return data;
   } catch (error) {
-    throw new Error(extractErrorMessage(error));
+    throw toApiError(error);
   }
 };
 
@@ -261,6 +277,6 @@ export const deleteProject = async (
       )}`,
     );
   } catch (error) {
-    throw new Error(extractErrorMessage(error));
+    throw toApiError(error);
   }
 };

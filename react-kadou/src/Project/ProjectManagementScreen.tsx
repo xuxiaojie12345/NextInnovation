@@ -91,6 +91,15 @@ const REQUIRED_FIELDS: [keyof ProjectFormValues, string][] = [
 const projectLabel = (p: Project): string =>
   p.name || p.abbr || '（名称未設定）';
 
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ */
+const isServerError = (error: unknown): boolean => {
+  const status = (error as { status?: number } | null)?.status;
+  return status === undefined || status >= 500;
+};
+
 /** ISO 8601 の週番号（月曜始まり・第1週は1/4を含む週）を求める */
 const getIsoWeek = (date: Dayjs): number => {
   const d = date.startOf('day');
@@ -108,6 +117,8 @@ interface ProjectManagementScreenProps {
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   /** 部門マスタ（「所属部門」「部門」の選択肢） */
   departments: Department[];
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面のエラー画面へ切り替える */
+  onServerError: () => void;
 }
 
 /**
@@ -122,6 +133,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   projects,
   setProjects,
   departments,
+  onServerError,
 }) => {
   // 登録 / 修正フォームの入力値
   const [form, setForm] = useState<ProjectFormValues>(EMPTY_FORM);
@@ -143,9 +155,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   // setProjects は App 側で年度や保存内容が変わるたびに作り直されるため、
   // 取得処理の依存配列から外すために最新の関数を参照で保持する
   const setProjectsRef = useRef(setProjects);
+  // onServerError も同様に参照で保持する（依存配列による再取得を防ぐ）
+  const onServerErrorRef = useRef(onServerError);
 
   useEffect(() => {
     setProjectsRef.current = setProjects;
+    onServerErrorRef.current = onServerError;
   });
 
   const isEditing = editingKey !== null;
@@ -155,6 +170,42 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   useEffect(() => {
     setValidFilter([]);
     setEducationFilter([]);
+  }, [year]);
+
+  /**
+   * 初期表示（および年度切替）時にプロジェクト一覧を API から取得する。
+   * 5xx / 通信失敗はログイン画面のエラー画面へ切り替える。
+   */
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const requestId = ++requestIdRef.current;
+    fetchProjects(year)
+      .then((list) => {
+        if (!cancelled && requestId === requestIdRef.current) {
+          setProjectsRef.current(list);
+        }
+      })
+      .catch((error) => {
+        if (cancelled || requestId !== requestIdRef.current) return;
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
+        message.error(
+          error instanceof Error
+            ? error.message
+            : 'プロジェクト一覧の取得に失敗しました。',
+        );
+      })
+      .finally(() => {
+        if (!cancelled && requestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [year]);
 
   /**
@@ -173,6 +224,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       }
     } catch (error) {
       if (requestId === requestIdRef.current) {
+        // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         message.error(
           error instanceof Error
             ? error.message
@@ -185,11 +241,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       }
     }
   }, [year]);
-
-  /** 初期表示（および年度切替）時に一覧を取得する */
-  useEffect(() => {
-    void reloadProjects();
-  }, [reloadProjects]);
 
   /** 当週の週数（画面右上に表示） */
   const week = useMemo(() => {
@@ -249,6 +300,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         message.success(`プロジェクト「${projectLabel(row)}」を削除しました。`);
         await reloadProjects();
       } catch (error) {
+        // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         message.error(
           error instanceof Error ? error.message : '削除に失敗しました。',
         );
@@ -282,6 +338,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         handleResetForm();
         await reloadProjects();
       } catch (error) {
+        // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         message.error(
           error instanceof Error ? error.message : '更新に失敗しました。',
         );
@@ -307,6 +368,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       handleResetForm();
       await reloadProjects();
     } catch (error) {
+      // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+      if (isServerError(error)) {
+        onServerErrorRef.current();
+        return;
+      }
       message.error(
         error instanceof Error ? error.message : '登録に失敗しました。',
       );
@@ -370,6 +436,11 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
 
       await reloadProjects();
     } catch (e) {
+      // 5xx / 通信失敗はログイン画面のエラー画面へ、4xx（業務エラー）はメッセージ表示
+      if (isServerError(e)) {
+        onServerErrorRef.current();
+        return;
+      }
       message.error(
         e instanceof Error
           ? `一括読み込みに失敗しました：${e.message}`

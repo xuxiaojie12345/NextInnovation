@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { message } from "antd";
+import { Button, Card, Typography, message } from "antd";
 import AppMenu from "./Menu/Menu";
 import type { MenuKey } from "./Menu/Menu";
 import Login from "./Login/Login";
@@ -53,6 +53,8 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
 type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
+const { Title, Text } = Typography;
+
 function App() {
   // ログイン中のユーザーID（null = 未ログイン）
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -69,6 +71,8 @@ function App() {
   );
   // 表示中の画面
   const [activeView, setActiveView] = useState<MenuKey>("work-status");
+  // サーバーエラー（5xx / 通信失敗）。true の間はログイン画面と同じエラー画面を全画面表示する
+  const [serverError, setServerError] = useState(false);
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
   // 未保存確認ダイアログで保留中の操作
@@ -83,6 +87,18 @@ function App() {
 
   /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
   const loginUserId = currentUser?.userId ?? "";
+
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面と同じエラー画面へ切り替える */
+  const handleServerError = useCallback(() => {
+    setServerError(true);
+  }, []);
+
+  /** エラー画面の「ログイン画面へ戻る」（ログアウトしてログイン画面を表示する） */
+  const handleServerErrorBack = useCallback(() => {
+    setServerError(false);
+    setCurrentUser(null);
+    setCurrentUserId(null);
+  }, []);
 
   /**
    * 年度選択画面に表示する年度ごとの概要。
@@ -142,6 +158,12 @@ function App() {
             personnel: [],
           },
         }));
+        // 5xx / 通信失敗はログイン画面と同じエラー画面へ切り替える
+        const status = (error as { status?: number } | null)?.status;
+        if (status === undefined || status >= 500) {
+          setServerError(true);
+          return;
+        }
         const detail = error instanceof Error ? error.message : "不明なエラー";
         message.error(
           `${selectedYear}年度の要員情報を取得できませんでした：${detail}`,
@@ -623,6 +645,7 @@ function App() {
         onDelete={handleDeletePersonnel}
         hasWorkData={hasWorkDataForPersonnel}
         currentUserId={loginUserId}
+        onServerError={handleServerError}
       />
     ),
     "department-manage": (
@@ -630,6 +653,7 @@ function App() {
         year={selectedYear}
         departments={store.departments}
         setDepartments={setYearDepartments}
+        onServerError={handleServerError}
       />
     ),
     "project-manage": (
@@ -638,6 +662,7 @@ function App() {
         projects={store.projects}
         setProjects={setYearProjects}
         departments={store.departments}
+        onServerError={handleServerError}
       />
     ),
     "jinan-work-rate": (
@@ -653,6 +678,7 @@ function App() {
         year={selectedYear}
         holidays={store.holidays}
         setHolidays={setYearHolidays}
+        onServerError={handleServerError}
       />
     ),
     "user-manage": (
@@ -660,9 +686,27 @@ function App() {
         currentUserId={currentUserId}
         departments={store.departments}
         allowManage={currentUser?.role === "admin"}
+        onServerError={handleServerError}
       />
     ),
   };
+
+  // サーバーエラー発生時は、メニューを出さずログイン画面と同じエラー画面を表示する
+  if (serverError) {
+    return (
+      <div className='login-page'>
+        <Card className='login-card login-server-error' role='alert'>
+          <Title level={4}>エラー</Title>
+          <Text>
+            サーバーエラーが発生しました。しばらく経ってから再度お試しください。
+          </Text>
+          <Button type='primary' block onClick={handleServerErrorBack}>
+            ログイン画面へ戻る
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {

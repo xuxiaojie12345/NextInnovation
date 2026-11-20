@@ -75,7 +75,18 @@ interface HolidaySettingsScreenProps {
   /** その年度の休日（App 側で年度ごとに保持） */
   holidays: Holiday[];
   setHolidays: React.Dispatch<React.SetStateAction<Holiday[]>>;
+  /** サーバーエラー（5xx / 通信失敗）時にログイン画面のエラー画面へ切り替える */
+  onServerError: () => void;
 }
+
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ * ※休日 API は通信自体の失敗を status=0 で返す。
+ */
+const isServerError = (error: unknown): boolean =>
+  error instanceof HolidayApiError &&
+  (error.status === 0 || error.status >= 500);
 
 /**
  * 休日設置 画面（メニュー「休日設置」で切り替わる画面）
@@ -86,6 +97,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   year,
   holidays,
   setHolidays,
+  onServerError,
 }) => {
   // 編集中の休日ID（null = 新規追加モード）
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -108,9 +120,12 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   // setHolidays は App 側で年度や保存内容が変わるたびに作り直されるため、
   // 取得処理の依存配列から外すために最新の関数を参照で保持する
   const setHolidaysRef = useRef(setHolidays);
+  // onServerError も同様に参照で保持する（依存配列による再取得を防ぐ）
+  const onServerErrorRef = useRef(onServerError);
 
   useEffect(() => {
     setHolidaysRef.current = setHolidays;
+    onServerErrorRef.current = onServerError;
   });
 
   /** 初期表示（および年度切替）時に、その年度の休日一覧を API から取得する */
@@ -123,6 +138,11 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       })
       .catch((error: unknown) => {
         if (cancelled) return;
+        // 5xx / 通信失敗はログイン画面のエラー画面へ切り替える
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         const detail =
           error instanceof Error ? error.message : '不明なエラー';
         message.error(
@@ -214,6 +234,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
       } catch (error) {
         if (error instanceof HolidayApiError && error.status === 409) {
           message.warning(error.message);
+        } else if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
         } else {
           const detail =
             error instanceof Error ? error.message : '不明なエラー';
@@ -239,6 +262,9 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     } catch (error) {
       if (error instanceof HolidayApiError && error.status === 409) {
         message.warning(error.message);
+      } else if (isServerError(error)) {
+        onServerErrorRef.current();
+        return;
       } else {
         const detail =
           error instanceof Error ? error.message : '不明なエラー';
@@ -281,6 +307,10 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           `${formatDate(row.date)}「${holidayNameLabel(row.name)}」を削除しました。`,
         );
       } catch (error) {
+        if (isServerError(error)) {
+          onServerErrorRef.current();
+          return;
+        }
         const detail =
           error instanceof Error ? error.message : '不明なエラー';
         message.error(`休日の削除に失敗しました：${detail}`);
@@ -365,6 +395,11 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
         );
       }
     } catch (e) {
+      // 5xx / 通信失敗はログイン画面のエラー画面へ切り替える
+      if (isServerError(e)) {
+        onServerErrorRef.current();
+        return;
+      }
       message.error(
         e instanceof Error
           ? `一括読み込みに失敗しました：${e.message}`
