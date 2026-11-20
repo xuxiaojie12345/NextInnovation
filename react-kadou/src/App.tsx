@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { message } from 'antd';
+import { messageInfo } from './constants/messages';
 import AppMenu from './Menu/Menu';
 import type { MenuKey } from './Menu/Menu';
 import Login from './Login/Login';
@@ -508,7 +509,7 @@ function App() {
           currentUserId,
         )
         .then(() => {
-          message.success(`${selectedYear}年度の内容を保存しました。`);
+          message.success(messageInfo('I_KADOU_061', [selectedYear]));
           // 変更セルの version など最新状態を取得して画面へ反映する
           reloadYear();
         })
@@ -516,7 +517,7 @@ function App() {
           message.error(
             err instanceof Error && err.message
               ? err.message
-              : '保存に失敗しました。',
+              : messageInfo('E_KADOU_042'),
           );
           // 他のユーザーの更新などで保存できなかった場合は最新データへ戻す
           reloadYear();
@@ -559,9 +560,12 @@ function App() {
     if (warnedDeptRef.current === key) return;
     warnedDeptRef.current = key;
     message.warning(
-      `${missing
-        .map((id) => departmentNameOf(store.departments, id))
-        .join('・')} は ${selectedYear}年度の部門マスタに存在しないため、全部門を表示します。`,
+      messageInfo('W_KADOU_047', [
+        missing
+          .map((id) => departmentNameOf(store.departments, id))
+          .join('・'),
+        selectedYear,
+      ]),
     );
   }, [currentUser, selectedYear, store.departments]);
 

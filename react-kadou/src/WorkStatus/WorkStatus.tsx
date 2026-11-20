@@ -28,6 +28,7 @@ import {
   SwapOutlined,
 } from '@ant-design/icons';
 import './WorkStatus.css';
+import { messageInfo } from '../constants/messages';
 import {
   AssignmentMap,
   Department,
@@ -664,9 +665,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       if (no === '') {
         // 異動中の 2 行は空にできない（行削除で対応）
         if (myRows.length > 1) {
-          message.error(
-            '異動中の行は社員番号を空にできません。行削除で対応してください。',
-          );
+          message.error(messageInfo('E_KADOU_070'));
           return false;
         }
         // 業務データ（割当・BUFFER）がある場合は空にできない
@@ -679,9 +678,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             savedBaseline.unpaid,
           )
         ) {
-          message.error(
-            '割当・BUFFERが登録されているため、社員番号を空にできません。行を削除してください。',
-          );
+          message.error(messageInfo('E_KADOU_071'));
           return false;
         }
         setDraftRows((prev) =>
@@ -709,16 +706,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       } catch (e) {
         if (e instanceof PersonnelNotFoundError) master = null;
         else {
-          message.error(
-            '要員マスタの検索に失敗しました。しばらくしてから再度お試しください。',
-          );
+          message.error(messageInfo('E_KADOU_072'));
           return false;
         }
       }
       if (!master) {
-        message.warning(
-          `社員番号「${no}」は要員マスタに存在しません。要員情報画面で登録してください。`,
-        );
+        message.warning(messageInfo('W_KADOU_040', [no]));
         return false;
       }
 
@@ -731,16 +724,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         myRows.some((my) => periodsOverlap(my, target)),
       );
       if (conflict) {
-        message.error(
-          `社員番号「${no}」は同じ期間に既に表示されているため、処理を中止しました。`,
-        );
+        message.error(messageInfo('E_KADOU_073', [no]));
         return false;
       }
       // 同一社員の行は 1 年度につき最大 2 行（異動 1 回）
       if (targetRows.length + myRows.length > 2) {
-        message.error(
-          `社員番号「${no}」の行が 2 行を超えるため、処理を中止しました。`,
-        );
+        message.error(messageInfo('E_KADOU_074', [no]));
         return false;
       }
 
@@ -828,9 +817,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     // 追加した行（表の最下部）が見えるようスクロールする
     scrollToBottomRef.current = true;
     setDirty(true);
-    message.success(
-      '空の行を追加しました（フィルタ適用中でも表示されます。未保存・社員番号を入力してください）。',
-    );
+    message.success(messageInfo('I_KADOU_050'));
   }, [nextRowKey, pastYear]);
 
   /**
@@ -965,9 +952,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       });
       setDirty(true);
       message.success(
-        isLastRowOfEmployee
-          ? '行と当年度の業務データ（割当・BUFFER）を削除しました（未保存）。要員マスタは変更していません。'
-          : '行とこの期間の業務データ（割当・BUFFER）を削除しました（未保存）。要員マスタは変更していません。',
+        messageInfo(isLastRowOfEmployee ? 'I_KADOU_051' : 'I_KADOU_052'),
       );
     },
     [
@@ -983,14 +968,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const handleSave = useCallback(() => {
     // 過年度は参照のみ
     if (pastYear) {
-      message.error('過年度は参照のみです。');
+      message.error(messageInfo('E_KADOU_075'));
       return;
     }
     // 社員番号が空の行があると保存できない（マスタ未登録の行は表示できない）
     if (draftRows.some((r) => r.employeeNo === '')) {
-      message.error(
-        '社員番号が未入力の行があります。社員番号を入力するか、行を削除してください。',
-      );
+      message.error(messageInfo('E_KADOU_076'));
       return;
     }
 
@@ -1163,12 +1146,12 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       if (pastYear) return;
       const row = draftRows.find((r) => r.key === rowKey);
       if (!row?.employeeNo) {
-        message.warning('社員番号を入力してから所属変更してください。');
+        message.warning(messageInfo('W_KADOU_041'));
         return;
       }
       // 同一社員は 1 年度につき 1 回まで（すでに 2 行なら異動できない）
       if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
-        message.error('1年度につき異動は1回までです。');
+        message.error(messageInfo('E_KADOU_077'));
         return;
       }
       const firstWeek = row.activeFrom ?? allWeeks[0]?.key ?? '';
@@ -1180,9 +1163,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           w.key >= currentMonday,
       );
       if (candidates.length === 0) {
-        message.warning(
-          'この行には所属変更できる週がありません（適用開始週は今週以降のみです）。',
-        );
+        message.warning(messageInfo('W_KADOU_042'));
         return;
       }
       const initial =
@@ -1202,29 +1183,29 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     if (!row) return;
     // 同一社員は 1 年度につき 1 回まで
     if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
-      message.error('1年度につき異動は1回までです。');
+      message.error(messageInfo('E_KADOU_077'));
       return;
     }
     if (!transferDeptId) {
-      message.error('新しい所属を選択してください。');
+      message.error(messageInfo('E_KADOU_078'));
       return;
     }
     if (!transferWeekKey) {
-      message.error('適用開始週を選択してください。');
+      message.error(messageInfo('E_KADOU_079'));
       return;
     }
     const firstWeek = row.activeFrom ?? allWeeks[0]?.key ?? '';
     if (transferWeekKey <= firstWeek) {
-      message.error('適用開始週は、この行の初週より後にしてください。');
+      message.error(messageInfo('E_KADOU_080'));
       return;
     }
     if (row.activeTo && transferWeekKey > row.activeTo) {
-      message.error('適用開始週が、この行の有効期間外です。');
+      message.error(messageInfo('E_KADOU_081'));
       return;
     }
     // 適用開始週は今週の月曜以降のみ（過去週には異動できない）
     if (transferWeekKey < currentMonday) {
-      message.error('適用開始週は今週の月曜以降にしてください。');
+      message.error(messageInfo('E_KADOU_082'));
       return;
     }
     const prevWeekKey = dayjs(transferWeekKey)
@@ -1260,9 +1241,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     setTransferRowKey(null);
     setDirty(true);
     message.success(
-      `${row.employeeNo} の所属を ${deptName} に変更しました（${dayjs(
-        transferWeekKey,
-      ).format('YYYY/M/D')} の週から・未保存）。保存すると確定し、取り消せません。`,
+      messageInfo('I_KADOU_053', [
+        row.employeeNo,
+        deptName,
+        dayjs(transferWeekKey).format('YYYY/M/D'),
+      ]),
     );
   }, [
     transferRowKey,
@@ -1603,7 +1586,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       if (!personId) return;
       // 過去週は変更できない（念のためのガード）
       if (isPastWeek(weekKey, currentMonday)) {
-        message.warning('過去の週は変更できません。');
+        message.warning(messageInfo('W_KADOU_043'));
         return;
       }
       const from = weeks.findIndex((w) => w.key === weekKey);
@@ -1906,7 +1889,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   /** 選択セルからコピー（先頭セルの値。未割当なら「未割当」扱い。無償支援も引き継ぐ） */
   const handleCopyFromSelected = useCallback(() => {
     if (selectedCells.size === 0) {
-      message.warning('コピー元のセルを選択してください。');
+      message.warning(messageInfo('W_KADOU_044'));
       return;
     }
     let value: string | null = null;
@@ -1926,8 +1909,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     setPasteUnpaid(unpaidFlag);
     const label = value
       ? projectMap.get(value)?.abbr ?? value
-      : '未割当（クリア）';
-    message.info(`コピーしました: ${label}${unpaidFlag ? '（BUFFER）' : ''}`);
+      : messageInfo('I_KADOU_062');
+    message.info(
+      messageInfo(unpaidFlag ? 'I_KADOU_055' : 'I_KADOU_054', [label]),
+    );
   }, [
     selectedCells,
     assignment,
@@ -1939,11 +1924,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   /** コピーしたプロジェクト（と無償支援）を選択セルすべてへ貼り付け */
   const handlePasteToSelected = useCallback(() => {
     if (selectedCells.size === 0) {
-      message.warning('貼り付け先のセルを選択してください。');
+      message.warning(messageInfo('W_KADOU_045'));
       return;
     }
     if (clipboard === undefined) {
-      message.warning('先にコピー元（貼り付けるプロジェクト）を選択してください。');
+      message.warning(messageInfo('W_KADOU_046'));
       return;
     }
     applyProjectToSelected(clipboard);
@@ -1951,12 +1936,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     if (withUnpaid) applyUnpaidToSelected(true);
     const label =
       clipboard === null
-        ? '未割当（クリア）'
+        ? messageInfo('I_KADOU_062')
         : (projectMap.get(clipboard)?.abbr ?? clipboard);
     message.success(
-      `選択中の ${selectedCells.size} セルに「${label}」${
-        withUnpaid ? 'をBUFFERとして' : 'を'
-      }貼り付けました。`,
+      messageInfo(withUnpaid ? 'I_KADOU_057' : 'I_KADOU_056', [
+        selectedCells.size,
+        label,
+      ]),
     );
   }, [
     clipboard,
@@ -2072,8 +2058,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         const flag = isUnpaidAt(personId, weekKey);
         setClipboard(v);
         setPasteUnpaid(flag);
-        const label = v ? projectMap.get(v)?.abbr ?? v : '未割当（クリア）';
-        message.info(`コピーしました: ${label}${flag ? '（BUFFER）' : ''}`);
+        const label = v
+          ? projectMap.get(v)?.abbr ?? v
+          : messageInfo('I_KADOU_062');
+        message.info(messageInfo(flag ? 'I_KADOU_055' : 'I_KADOU_054', [label]));
       } else if (key === 'clear') {
         setAssignmentAt(personId, weekKey, null);
       }
@@ -2186,8 +2174,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               <Tooltip
                 title={
                   pastYear
-                    ? '過年度は参照のみです'
-                    : '過去実績があるため社員番号を変更できません'
+                    ? messageInfo('W_KADOU_053')
+                    : messageInfo('W_KADOU_048')
                 }
               >
                 <span className='ws-employee-no-locked'>{row.employeeNo}</span>
@@ -2265,7 +2253,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             // 社員番号が未入力の行には割当できない
             if (!row.employeeNo) {
               return (
-                <span className='ws-week-cell' title='社員番号を入力してください'>
+                <span className='ws-week-cell' title={messageInfo('W_KADOU_049')}>
                   －
                 </span>
               );
@@ -2275,7 +2263,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               return (
                 <span
                   className='ws-week-cell ws-week-cell-inactive'
-                  title='所属変更（異動）の前後の期間のため入力できません'
+                  title={messageInfo('W_KADOU_050')}
                 />
               );
             }
@@ -2289,7 +2277,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               return (
                 <div
                   className='ws-week-cell ws-week-cell-past'
-                  title={`${label}（過去の週は変更できません）`}
+                  title={messageInfo('W_KADOU_051', [label])}
                   onContextMenu={(e) => openCellMenu(row.employeeNo, w.key, e)}
                 >
                   <span className='cell-chip-text'>{label}</span>
@@ -2388,18 +2376,18 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           !!row.employeeNo &&
           (rowCountByEmployee.get(row.employeeNo) ?? 0) > 1;
         const description = !row.employeeNo
-          ? 'この行を削除します。'
+          ? messageInfo('W_KADOU_055')
           : hasRemainingRows
-          ? 'この行と、この行の期間の業務データ（割当・BUFFER）を削除します。要員マスタは削除されません。残りの行は期間が自動で延長されます。'
-          : 'この行と、当年度の業務データ（割当・BUFFER）をすべて削除します。要員マスタは削除されません。';
+          ? messageInfo('W_KADOU_056')
+          : messageInfo('W_KADOU_057');
         return (
           <Space size={0}>
             {deleteBlocked ? (
               <Tooltip
                 title={
                   pastYear
-                    ? '過年度は参照のみです'
-                    : '過去実績があるため削除できません'
+                    ? messageInfo('W_KADOU_053')
+                    : messageInfo('W_KADOU_052')
                 }
               >
                 <span className='ws-disabled-action'>
@@ -2437,8 +2425,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               <Tooltip
                 title={
                   pastYear
-                    ? '過年度は参照のみです'
-                    : '1年度につき異動は1回までです'
+                    ? messageInfo('W_KADOU_053')
+                    : messageInfo('W_KADOU_054')
                 }
               >
                 <span className='ws-disabled-action'>
@@ -2726,7 +2714,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               onClick={() => {
                 applyProjectToSelected(null);
                 message.success(
-                  `選択中の ${selectedCells.size} セルを未割当にしました。`,
+                  messageInfo('I_KADOU_058', [selectedCells.size]),
                 );
               }}
             >
@@ -2737,7 +2725,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               onClick={() => {
                 applyUnpaidToSelected(true);
                 message.success(
-                  `選択中の割当済み ${assignedSelectedCount} セルを BUFFER にしました。`,
+                  messageInfo('I_KADOU_059', [assignedSelectedCount]),
                 );
               }}
             >
@@ -2748,7 +2736,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               onClick={() => {
                 applyUnpaidToSelected(false);
                 message.success(
-                  `選択中の割当済み ${assignedSelectedCount} セルの BUFFER を解除しました。`,
+                  messageInfo('I_KADOU_060', [assignedSelectedCount]),
                 );
               }}
             >
