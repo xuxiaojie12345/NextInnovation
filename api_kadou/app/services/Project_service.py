@@ -161,6 +161,21 @@ def import_projects(
     warnings: List[ProjectImportWarning] = []
     imported = 0
 
+    # 重複チェック用のキー（顧客・案件・チーム・Subチームの組合せ）
+    # 該当年度の既存プロジェクトを先に読み込み、取込中に登録した行も随時追加する
+    existing_keys = set()
+    for existing in db.execute(
+        PROJECT_SELECT_BY_YEAR, {"year_id": year}
+    ).fetchall():
+        existing_keys.add(
+            (
+                (existing.customer or "").strip(),
+                (existing.case_name or "").strip(),
+                (existing.team or "").strip(),
+                (existing.sub_team or "").strip(),
+            )
+        )
+
     for index, row in enumerate(rows, start=1):
         dept_name = (row.department or "").strip()
         candidate_ids = dept_ids_by_name.get(dept_name, [])
@@ -184,14 +199,31 @@ def import_projects(
             )
             continue
 
+        customer = row.customer.strip()
+        case_name = row.case_name.strip()
+        team = (row.team or "").strip()
+        sub_team = (row.sub_team or "").strip()
+
+        # 顧客・案件・チーム・Subチームの組合せが同じ場合は登録しない
+        # （既存データ・同じ取込ファイル内の重複のどちらも対象）
+        key = (customer, case_name, team, sub_team)
+        if key in existing_keys:
+            warnings.append(
+                ProjectImportWarning(
+                    row=index,
+                    message="同じ顧客・案件・チーム・Subチームのプロジェクトが既に登録されているため登録しません。",
+                )
+            )
+            continue
+
         db.execute(
             PROJECT_INSERT,
             {
                 "year_id": year,
-                "customer": row.customer.strip(),
-                "case_name": row.case_name.strip(),
-                "team": (row.team or "").strip() or None,
-                "sub_team": (row.sub_team or "").strip() or None,
+                "customer": customer,
+                "case_name": case_name,
+                "team": team or None,
+                "sub_team": sub_team or None,
                 "department_id": str(candidate_ids[0]),
                 "project_id": (row.project_code or "").strip(),
                 "project_name": (row.name or "").strip(),
@@ -199,6 +231,7 @@ def import_projects(
                 "update_user": "SYS",
             },
         )
+        existing_keys.add(key)
         imported += 1
 
     db.commit()
