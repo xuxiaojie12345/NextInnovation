@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Button,
   Card,
@@ -10,37 +10,32 @@ import {
   Table,
   Tag,
   Typography,
-} from 'antd';
-import type { TableColumnsType } from 'antd';
+} from "antd";
+import type { TableColumnsType } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   UserOutlined,
-} from '@ant-design/icons';
-import type { AuthUser, UserRole } from '../data/userTypes';
-import { ROLE_OPTIONS, roleLabelOf } from '../constants/options';
-import type { Department } from '../WorkStatus/types';
-import { departmentLabelOf } from '../data/departmentUtils';
+} from "@ant-design/icons";
+import type { AuthUser, UserRole } from "../data/userTypes";
+import { ROLE_OPTIONS, roleLabelOf } from "../constants/options";
+import type { Department } from "../WorkStatus/types";
+import { departmentLabelOf } from "../data/departmentUtils";
 import {
   departmentExists,
   normalizeUserDepartmentId,
-} from '../data/departmentRules';
-import {
-  createUser,
-  deleteUser,
-  fetchUsers,
-  updateUser,
-} from './userApi';
-import './UserManagementScreen.css';
+} from "../data/departmentRules";
+import { createUser, deleteUser, fetchUsers, updateUser } from "./userApi";
+import "./UserManagementScreen.css";
 
 const { Title, Text } = Typography;
 
 /** 職級（ロール）→ Tag 色 */
 const ROLE_COLOR: Record<UserRole, string> = {
-  bucho: 'blue',
-  'jigyo-bucho': 'geekblue',
-  admin: 'red',
+  bucho: "blue",
+  "jigyo-bucho": "geekblue",
+  admin: "red",
 };
 
 /** エラーから表示用メッセージを取り出す */
@@ -87,16 +82,16 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   // 編集中のユーザーID（null = 新規追加モード / '' = 未選択）
   const [editingId, setEditingId] = useState<string | null>(null);
   // フォーム
-  const [userId, setUserId] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState<UserRole>('bucho');
+  const [userId, setUserId] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState<UserRole>("bucho");
   const [departmentId, setDepartmentId] = useState<string | undefined>(
     undefined,
   );
-  const [password, setPassword] = useState('pass1234');
+  const [password, setPassword] = useState("pass1234");
 
   const isEditing = editingId !== null;
-  const opUserId = currentUserId ?? '';
+  const opUserId = currentUserId ?? "";
 
   /** 一覧を取得する */
   const reload = useCallback(async () => {
@@ -110,7 +105,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         return;
       }
       message.error(
-        errorMessageOf(error, 'ユーザー一覧の取得に失敗しました。'),
+        errorMessageOf(error, "ユーザー一覧の取得に失敗しました。"),
       );
     } finally {
       setLoading(false);
@@ -124,7 +119,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
 
   /** 管理者の人数（最後の管理者を守るため） */
   const adminCount = useMemo(
-    () => users.filter((u) => u.role === 'admin').length,
+    () => users.filter((u) => u.role === "admin").length,
     [users],
   );
 
@@ -136,11 +131,11 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   /** フォームの初期化 */
   const resetForm = () => {
     setEditingId(null);
-    setUserId('');
-    setName('');
-    setRole('bucho');
+    setUserId("");
+    setName("");
+    setRole("bucho");
     setDepartmentId(undefined);
-    setPassword('pass1234');
+    setPassword("pass1234");
   };
 
   /** 行の編集開始 */
@@ -160,15 +155,15 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     const id = userId.trim();
     const nm = name.trim();
     if (!id) {
-      message.error('ユーザーIDを入力してください。');
+      message.error("ユーザーIDを入力してください。");
       return;
     }
     if (!nm) {
-      message.error('氏名を入力してください。');
+      message.error("氏名を入力してください。");
       return;
     }
     if (!password) {
-      message.error('パスワードを入力してください。');
+      message.error("パスワードを入力してください。");
       return;
     }
     // ユーザーID の重複チェック（編集中の自分自身は除く）
@@ -187,12 +182,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     if (isEditing && editingId) {
       const target = users.find((u) => u.userId === editingId);
       // 最後の管理者を降格させない
-      if (
-        target?.role === 'admin' &&
-        role !== 'admin' &&
-        adminCount <= 1
-      ) {
-        message.error('管理者が 1 名だけのため、降格できません。');
+      if (target?.role === "admin" && role !== "admin" && adminCount <= 1) {
+        message.error("管理者が 1 名だけのため、降格できません。");
         setSaving(false);
         return;
       }
@@ -217,7 +208,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           onServerError();
           return;
         }
-        message.error(errorMessageOf(error, 'ユーザーの更新に失敗しました。'));
+        message.error(errorMessageOf(error, "ユーザーの更新に失敗しました。"));
       } finally {
         setSaving(false);
       }
@@ -243,7 +234,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         onServerError();
         return;
       }
-      message.error(errorMessageOf(error, 'ユーザーの追加に失敗しました。'));
+      message.error(errorMessageOf(error, "ユーザーの追加に失敗しました。"));
     } finally {
       setSaving(false);
     }
@@ -252,11 +243,11 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   /** 削除 */
   const handleDelete = async (user: AuthUser) => {
     if (user.userId === currentUserId) {
-      message.error('ログイン中の自分自身は削除できません。');
+      message.error("ログイン中の自分自身は削除できません。");
       return;
     }
-    if (user.role === 'admin' && adminCount <= 1) {
-      message.error('管理者が 1 名だけのため、削除できません。');
+    if (user.role === "admin" && adminCount <= 1) {
+      message.error("管理者が 1 名だけのため、削除できません。");
       return;
     }
     try {
@@ -269,17 +260,17 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         onServerError();
         return;
       }
-      message.error(errorMessageOf(error, 'ユーザーの削除に失敗しました。'));
+      message.error(errorMessageOf(error, "ユーザーの削除に失敗しました。"));
     }
   };
 
   const columns: TableColumnsType<AuthUser> = [
     {
-      title: 'ユーザーID',
-      dataIndex: 'userId',
-      key: 'userId',
+      title: "ユーザーID",
+      dataIndex: "userId",
+      key: "userId",
       // 列幅はデザイン画像の比率に合わせる（合計 100%）
-      width: '16%',
+      width: "16%",
       render: (v: string, row) => (
         <Space size={4}>
           <UserOutlined />
@@ -289,43 +280,43 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       ),
     },
     {
-      title: '氏名',
-      dataIndex: 'name',
-      key: 'name',
-      width: '17%',
+      title: "氏名",
+      dataIndex: "name",
+      key: "name",
+      width: "17%",
       ellipsis: true,
     },
     {
-      title: '職級',
-      dataIndex: 'role',
-      key: 'role',
-      width: '11%',
+      title: "職級",
+      dataIndex: "role",
+      key: "role",
+      width: "11%",
       render: (_: unknown, row) => (
         <Tag color={ROLE_COLOR[row.role]}>{roleLabelOf(row.role)}</Tag>
       ),
     },
     {
-      title: '所属部門',
-      dataIndex: 'departmentId',
-      key: 'departmentId',
-      width: '19%',
+      title: "所属部門",
+      dataIndex: "departmentId",
+      key: "departmentId",
+      width: "19%",
       ellipsis: true,
       render: (v?: string) =>
         v && departmentExists(departments, v)
           ? departmentLabelOf(departments, v)
-          : '（全部門）',
+          : "（全部門）",
     },
     {
-      title: 'パスワード',
-      dataIndex: 'password',
-      key: 'password',
-      width: '17%',
+      title: "パスワード",
+      dataIndex: "password",
+      key: "password",
+      width: "17%",
       ellipsis: true,
     },
     {
-      title: '操作',
-      key: 'action',
-      width: '20%',
+      title: "操作",
+      key: "action",
+      width: "20%",
       render: (_: unknown, row) => (
         <Space>
           <Button
@@ -361,9 +352,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <Title level={4} style={{ margin: 0 }}>
               ユーザー管理
             </Title>
-            <Text type='secondary'>
-              この画面は管理者のみ利用できます。
-            </Text>
+            <Text type='secondary'>この画面は管理者のみ利用できます。</Text>
           </div>
         </div>
         <Card className='screen-card' style={{ marginTop: 12 }}>
@@ -393,7 +382,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       {/* 登録フォーム */}
       <Card
         className='screen-card'
-        title={isEditing ? 'ユーザーの変更' : 'ユーザーの追加'}
+        title={isEditing ? "ユーザーの変更" : "ユーザーの追加"}
         style={{ marginTop: 12 }}
       >
         <div className='user-form'>
@@ -422,7 +411,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               value={role}
               options={ROLE_OPTIONS}
               onChange={(v) => setRole(v)}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </div>
           <div className='form-field'>
@@ -433,14 +422,14 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               allowClear
               placeholder='（未選択＝全部門）'
               onChange={(v?: string) => setDepartmentId(v)}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
+              popupMatchSelectWidth={false}
             />
-            {departmentId &&
-              !departmentExists(departments, departmentId) && (
-                <Text type='warning'>
-                  選択中の所属部門は選択中の年度に存在しません。保存すると「全部門」になります。
-                </Text>
-              )}
+            {departmentId && !departmentExists(departments, departmentId) && (
+              <Text type='warning'>
+                選択中の所属部門は選択中の年度に存在しません。保存すると「全部門」になります。
+              </Text>
+            )}
           </div>
           <div className='form-field'>
             <span className='form-label'>パスワード</span>
@@ -457,7 +446,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               loading={saving}
               onClick={handleSubmit}
             >
-              {isEditing ? '更新' : '追加'}
+              {isEditing ? "更新" : "追加"}
             </Button>
             <Button onClick={resetForm} disabled={saving}>
               クリア
@@ -465,7 +454,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           </Space>
         </div>
         <Text type='secondary' className='user-note'>
-          ※ 部長は「所属部門」を設定すると、ログイン直後にその部門で絞り込まれます（未設定＝全部門）。
+          ※
+          部長は「所属部門」を設定すると、ログイン直後にその部門で絞り込まれます（未設定＝全部門）。
           所属部門が削除された場合は、保存時に「未設定（全ての部門）」になります。
           ユーザーはバックエンド（jn_user_table）に保存されます。
         </Text>
