@@ -23,6 +23,7 @@ from app.core.errors import BusinessException
 from app.schemas.workStatus import (
     DepartmentDto,
     PersonnelDto,
+    PersonnelMasterRowDto,
     ProjectDto,
     WorkStatusDataDto,
     WorkStatusLoadResponse,
@@ -386,6 +387,31 @@ def _build_work_status_rows(
     return rows
 
 
+def list_personnel_master_rows(
+    db: Session, year_id: int, employee_no: str
+) -> list[PersonnelMasterRowDto]:
+    """指定社員の要員マスタ行（行削除の存在チェック用キー）を返す。
+
+    行の識別キー: year_id + employee_no + department_id + idou_flag + idoubi
+    """
+    rows = (
+        db.execute(
+            text(load_sql("work_status.sql", "personnel_of_employee")),
+            {"year_id": str(year_id), "employee_no": employee_no},
+        )
+        .mappings()
+        .all()
+    )
+    return [
+        PersonnelMasterRowDto(
+            departmentId=_as_str(r["department_id"]),
+            idouFlag=r["idou_flag"] or "0",
+            idoubi=r["idoubi"] or "",
+        )
+        for r in rows
+    ]
+
+
 def load_work_status(db: Session, year_id: int) -> WorkStatusLoadResponse:
     """要員稼働管理の表示データ（要員・部門・プロジェクト・週次割当）を取得する。"""
     year = str(year_id)
@@ -526,12 +552,16 @@ def _delete_weekly_of_deleted(
             # 社員番号変更の旧番号は削除しない（保存時に UNASSIGN へ戻す）
             continue
         deleted_nos.add(no)
+        # 削除前の件数を控え、実際に削除できた件数と一致するか確認する
+        expected = len(_existing_weeks(db, year, no))
         try:
-            db.execute(
+            res = db.execute(
                 text(_SQL_DELETE_WEEKLY),
                 {"year_id": year, "employee_no": no},
             )
         except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_085")
+        if (res.rowcount or 0) != expected:
             raise BusinessException(status_code=409, message_id="E_KADOU_085")
     return deleted_nos
 
@@ -645,7 +675,7 @@ def _apply_changed_cells(
             )
         except IntegrityError:
             raise BusinessException(status_code=409, message_id="E_KADOU_084")
-        if res.rowcount > 0:
+        if (res.rowcount or 0) > 0:
             continue
         if cell.version is not None:
             # 他のユーザーが先に更新した（版が一致しない）
@@ -806,9 +836,14 @@ def _personnel_transfer_specs(ordered, current, new_department, is_renumber_targ
     if not dept:
         return None
     if len(current) < 2:
+        kept = current[0]
+        if (kept["idou_flag"] or "0") == "1":
+            # 異動の 2 行のうち旧所属の行だけが削除されている（手動・他画面による変更）。
+            # 何もしないと異動フラグが 1 のまま残るため、画面の 1 行に合わせて
+            # 異動フラグ・異動日を解除する
+            return [(dept, None, "0")]
         # 異動の記録がない → 所属が変わった場合だけ所属を更新する
         # （社員番号変更で旧番号の所属を引き継ぐケース。異動フラグ・異動日は変えない）
-        kept = current[0]
         if _as_str(kept["department_id"]) == dept:
             return None
         return [(dept, kept["idoubi"] or None, kept["idou_flag"] or "0")]
@@ -858,8 +893,14 @@ def _sync_personnel_transfer(
         {"year_id": year, "employee_no": employee_no},
     ).mappings().all()
     if not current:
-        # 要員マスタに存在しない（週割当だけ残っている旧データ等）→ 何もしない
-        return
+        # 要員マスタに存在しない（要員情報画面や手動で削除済みなど）。
+        # 画面の下書きに社員が残っている場合は週次データだけが作られて
+        # しまうため、エラーにして再読み込みを促す。
+        if emp_rows:
+            raise BusinessException(status_code=409, message_id="E_KADOU_089")
+        # 全行削除の保存：削除対象の要員マスタが DB に無い＝削除件数が
+        # 一致しないため、黙って成功にせず削除失敗として扱う
+        raise BusinessException(status_code=409, message_id="E_KADOU_088")
 
     ordered = sorted(emp_rows, key=lambda r: r.activeFrom or "")
     specs = _personnel_transfer_specs(
@@ -881,7 +922,8 @@ def _sync_personnel_transfer(
         )
     except IntegrityError:
         raise BusinessException(status_code=409, message_id="E_KADOU_088")
-    if res.rowcount is None or res.rowcount <= 0:
+    if (res.rowcount or 0) != len(current):
+        # 削除件数が SELECT した件数と一致しない（他のユーザーによる変更など）
         raise BusinessException(status_code=409, message_id="E_KADOU_088")
     for idx, (dept, idoubi, idou_flag) in enumerate(specs):
         try:

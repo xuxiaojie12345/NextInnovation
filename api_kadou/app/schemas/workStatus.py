@@ -139,3 +139,20 @@ class WorkStatusSaveResult(BaseModel):
     """PUT /api/kadou/{year}/work-status のレスポンス"""
 
     code: int = 0
+
+
+class PersonnelMasterRowDto(BaseModel):
+    """要員マスタの 1 行（行削除の存在チェック用キー）"""
+
+    # 行の識別キー: year_id + employeeNo + departmentId + idouFlag + idoubi
+    departmentId: str
+    # 異動フラグ（'0' = 異動前 / '1' = 異動後）
+    idouFlag: str = "0"
+    # 異動日（'YYYYMMDD'。未指定 = 空文字）
+    idoubi: str = ""
+
+
+class PersonnelMasterRowsResponse(BaseModel):
+    """GET /api/kadou/{year}/work-status/personnel/{employeeNo}/rows のレスポンス"""
+
+    rows: list[PersonnelMasterRowDto] = []
