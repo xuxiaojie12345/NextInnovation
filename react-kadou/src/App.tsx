@@ -41,6 +41,10 @@ import {
   getYearSummary,
 } from "./data/yearStore";
 import { WorkStatusPayload, kadouRepository } from "./data/kadouRepository";
+import {
+  saveWorkStatus as saveWorkStatusApi,
+  transferEmployee as transferEmployeeApi,
+} from "./WorkStatus/workStatusApi";
 import { fetchDepartments } from "./Department/departmentApi";
 import "./App.css";
 import { PrinterOutlined } from "@ant-design/icons";
@@ -54,6 +58,19 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
 type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
 const { Title, Text } = Typography;
+
+/**
+ * サーバーエラー（5xx / 通信失敗）かどうか。
+ * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
+ */
+const isServerError = (error: unknown): boolean => {
+  const apiError = error as {
+    status?: number;
+    response?: { status?: number };
+  } | null;
+  const status = apiError?.status ?? apiError?.response?.status;
+  return status === undefined || status >= 500;
+};
 
 function App() {
   // ログイン中のユーザーID（null = 未ログイン）
@@ -451,34 +468,36 @@ function App() {
     [selectedYear, setYearPersonnel, stores, loginUserId],
   );
 
-  /**
-   * 要員マスタの「現在の所属」の更新。
-   * 稼働表の「異動」で新しい所属を登録したときに呼ばれる。
-   */
-  const handleUpdateDepartment = useCallback(
-    async (employeeNo: string, departmentId: string) => {
-      const person = stores[selectedYear]?.personnel.find(
-        (item) => item.employeeNo === employeeNo,
-      );
-      if (!person) return;
+  /** 要員稼働管理の「異動」を API で確定し、要員マスタの表示へ反映する */
+  const handleTransfer = useCallback(
+    async (
+      employeeNo: string,
+      newDepartmentId: string,
+      transferWeekKey: string,
+    ) => {
       try {
-        await savePersonnelApi(
+        await transferEmployeeApi(
           selectedYear,
-          { ...person, departmentId },
+          { employeeNo, newDepartmentId, transferWeekKey },
           loginUserId,
         );
       } catch (error) {
+        if (isServerError(error)) {
+          setServerError(true);
+        }
         const detail = error instanceof Error ? error.message : "不明なエラー";
-        message.error(`所属を保存できませんでした：${detail}`);
-        return;
+        message.error(`異動を確定できませんでした：${detail}`);
+        throw error;
       }
       setYearPersonnel((prev) =>
-        prev.map((p) =>
-          p.employeeNo === employeeNo ? { ...p, departmentId } : p,
+        prev.map((person) =>
+          person.employeeNo === employeeNo
+            ? { ...person, departmentId: newDepartmentId, idouFlag: "1" }
+            : person,
         ),
       );
     },
-    [selectedYear, setYearPersonnel, stores, loginUserId],
+    [selectedYear, setYearPersonnel, loginUserId],
   );
 
   /**
@@ -549,24 +568,29 @@ function App() {
 
   // ---- 要員稼動管理の保存 -------------------------------------------
 
-  /** 要員稼動管理の保存（表示行・割当・BUFFER のみ。要員マスタは変更しない） */
+  /**
+   * 要員稼動管理の保存（表示行・割当・BUFFER のみ。要員マスタは変更しない）。
+   * 画面側で「変更された社員」だけに絞った payload が渡されるため、
+   * DB もその社員のデータだけが更新される。
+   */
   const handleSaveWorkStatus = useCallback(
-    (payload: WorkStatusPayload) => {
-      setStores((prev) => ({
-        ...prev,
-        [selectedYear]: {
-          ...prev[selectedYear],
-          workStatus: {
-            rows: payload.rows,
-            assignment: payload.assignment,
-            unpaid: payload.unpaid,
-          },
-        },
-      }));
-      void kadouRepository.saveWorkStatus(selectedYear, payload);
-      message.success(
-        `${selectedYear}年度の内容を保存しました（モック：サーバー未接続）。`,
-      );
+    async (payload: WorkStatusPayload) => {
+      try {
+        await saveWorkStatusApi(selectedYear, payload);
+      } catch (error) {
+        // 5xx / 通信失敗はログイン画面と同じエラー画面へ切り替える
+        if (isServerError(error)) {
+          setServerError(true);
+          throw error;
+        }
+        message.error(
+          `保存に失敗しました：${
+            error instanceof Error ? error.message : "不明なエラー"
+          }`,
+        );
+        throw error;
+      }
+      message.success(`${selectedYear}年度の内容を保存しました。`);
     },
     [selectedYear],
   );
@@ -629,7 +653,7 @@ function App() {
         employeeMaster={employeeMaster}
         onSave={handleSaveWorkStatus}
         onUpdateLeavePlan={handleUpdateLeavePlan}
-        onUpdateDepartment={handleUpdateDepartment}
+        onTransfer={handleTransfer}
         onDirtyChange={setDirty}
         registerSaveHandler={registerSaveHandler}
       />

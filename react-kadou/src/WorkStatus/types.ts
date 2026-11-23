@@ -21,6 +21,11 @@ export interface Personnel {
    * ※社員所属≠案件所属の場合に入力が必要
    */
   leavePlan?: string;
+  /**
+   * 異動フラグ（'1' = この年度で既に異動済み）
+   * 異動済みの要員は「異動」ボタンを非活性にする（1年度につき異動は1回まで）
+   */
+  idouFlag?: string;
 }
 
 /**

@@ -4,16 +4,31 @@ from typing import Dict, List, Optional, Tuple
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.user import normalize_user_id
 from app.schemas.work_status import (
+    TransferRequest,
+    TransferResponse,
     WorkStatusOut,
     WorkStatusRowIn,
     WorkStatusSaveRequest,
     WorkStatusSaveResponse,
 )
+from app.services.Personnel_service import (
+    get_dept_name,
+    get_personnel_by_emp_no,
+    to_database_department_id,
+)
+from app.sql.Personnel_sql import (
+    SQL_COUNT_PERSONNEL_IDOU,
+    SQL_INSERT_JN_PERSONNEL_MASTER,
+    SQL_UPDATE_PERSONNEL_IDOU,
+)
 from app.sql.WorkStatus_sql import (
-    WORK_STATUS_DELETE_BY_YEAR,
+    WORK_STATUS_DELETE_BY_EMPLOYEES,
     WORK_STATUS_INSERT,
     WORK_STATUS_SELECT_BY_YEAR,
+    WORK_STATUS_UPDATE_BY_WEEK,
+    WORK_STATUS_UPDATE_DEPARTMENT_FROM_WEEK,
 )
 
 # 未配分（未アサイン）の週に設定する予約プロジェクトコード
@@ -203,8 +218,11 @@ def save_work_status(
 ) -> WorkStatusSaveResponse:
     """稼働状況（週次アサイン）を保存する。
 
-    当該年度のデータを全量置換する（削除 → 登録）。
-    1 社員 × 1 週 = 1 行として、当年度の全週分を登録する。
+    画面で変更された「週のセル」だけを登録・更新する（部分更新）。
+    - 通常の変更: 指定された週の行だけを更新する（行が無ければ登録する）
+      同じ社員の他の週のデータには触れない
+    - 行削除・社員番号変更（deletedEmployeeNos）: 当該社員の当年度データを
+      削除してから、指定された週の行を登録し直す
     """
     if not year.isdigit() or len(year) != 4:
         raise HTTPException(status_code=400, detail=f"年度の指定が不正です：{year}")
@@ -212,19 +230,14 @@ def save_work_status(
     year_number = int(year)
     mondays = _year_mondays(year_number)
     week_keys = [monday.strftime(WEEK_KEY_FORMAT) for monday in mondays]
+    monday_by_week = dict(zip(week_keys, mondays))
 
     # 社員番号ごとに所属行をまとめる
     rows_by_employee: Dict[str, List[WorkStatusRowIn]] = {}
     for row in payload.rows:
         rows_by_employee.setdefault(row.employee_no, []).append(row)
 
-    # rows と assignment の社員は一致している必要がある
-    missing_assignment = sorted(set(rows_by_employee) - set(payload.assignment))
-    if missing_assignment:
-        raise HTTPException(
-            status_code=400,
-            detail=f"割当（assignment）が無い社員がいます：{', '.join(missing_assignment)}",
-        )
+    # 割当（assignment）を送る社員には所属行が必要
     missing_rows = sorted(set(payload.assignment) - set(rows_by_employee))
     if missing_rows:
         raise HTTPException(
@@ -234,43 +247,48 @@ def save_work_status(
 
     # 週キー → 所属部門ID（異動を考慮）
     department_by_employee = {
-        employee_no: _department_periods(
-            employee_no, rows, week_keys
-        )
-        for employee_no, rows in rows_by_employee.items()
+        employee_no: _department_periods(employee_no, employee_rows, week_keys)
+        for employee_no, employee_rows in rows_by_employee.items()
+        if employee_no in payload.assignment
     }
 
-    # 全週が揃っているか検証し、DB 登録用レコードを組み立てる
-    records: List[dict] = []
-    required_week_keys = set(week_keys)
+    deleted_employees = set(payload.deleted_employee_nos)
+
+    # 部分更新用（通常の変更）と再登録用（行削除・社員番号変更）を分ける
+    update_records: List[dict] = []
+    rebuild_records: List[dict] = []
 
     for employee_no in sorted(payload.assignment):
         weeks = payload.assignment[employee_no]
-        actual_week_keys = set(weeks)
-        if actual_week_keys != required_week_keys:
-            missing = sorted(required_week_keys - actual_week_keys)
-            extra = sorted(actual_week_keys - required_week_keys)
-            detail = (
-                f"{employee_no} の割当（assignment）は当年度の全週を指定してください。"
+        if not weeks:
+            continue
+        # 指定された週キーが当年度の週（月曜）であることを検証する
+        invalid_week_keys = sorted(set(weeks) - set(week_keys))
+        if invalid_week_keys:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"{employee_no} の週キーが当年度の範囲外です："
+                    f"{', '.join(invalid_week_keys)}"
+                ),
             )
-            if missing:
-                detail += f" 不足：{', '.join(missing)}"
-            if extra:
-                detail += f" 範囲外：{', '.join(extra)}"
-            raise HTTPException(status_code=400, detail=detail)
 
         unpaid_weeks = payload.unpaid.get(employee_no, {})
-        unknown_unpaid = sorted(set(unpaid_weeks) - actual_week_keys)
+        unknown_unpaid = sorted(set(unpaid_weeks) - set(weeks))
         if unknown_unpaid:
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f"{employee_no} の unpaid に割当の無い週が含まれています："
+                    f"{employee_no} の unpaid に更新対象外の週が含まれています："
                     f"{', '.join(unknown_unpaid)}"
                 ),
             )
 
-        for monday, week_key in zip(mondays, week_keys):
+        target_records = (
+            rebuild_records if employee_no in deleted_employees else update_records
+        )
+        for week_key in sorted(weeks):
+            monday = monday_by_week[week_key]
             project_id = _normalize_project_id(weeks[week_key])
             is_unpaid = unpaid_weeks.get(week_key) is True
             if is_unpaid and project_id == UNASSIGN:
@@ -281,7 +299,7 @@ def save_work_status(
                         "無償支援（unpaid）を設定できません。"
                     ),
                 )
-            records.append(
+            target_records.append(
                 {
                     "version": 1,
                     "year_id": year,
@@ -299,12 +317,137 @@ def save_work_status(
             )
 
     try:
-        db.execute(WORK_STATUS_DELETE_BY_YEAR, {"year_id": year})
-        if records:
-            db.execute(WORK_STATUS_INSERT, records)
+        # 行削除・社員番号変更の社員は当該年度データを削除して登録し直す
+        if deleted_employees:
+            db.execute(
+                WORK_STATUS_DELETE_BY_EMPLOYEES,
+                {"year_id": year, "employee_nos": sorted(deleted_employees)},
+            )
+        if rebuild_records:
+            db.execute(WORK_STATUS_INSERT, rebuild_records)
+        # 通常の変更は、指定された週の行だけを更新する（行が無ければ登録する）
+        for record in update_records:
+            result = db.execute(WORK_STATUS_UPDATE_BY_WEEK, record)
+            if result.rowcount == 0:
+                db.execute(WORK_STATUS_INSERT, [record])
         db.commit()
     except Exception:
         db.rollback()
         raise
 
     return WorkStatusSaveResponse(code=0)
+
+
+def transfer_employee(
+    db: Session, year: str, payload: TransferRequest, user_id: str
+) -> TransferResponse:
+    """所属変更（異動）を確定する。
+
+    1 トランザクションで以下を行う:
+      1. 要員マスタの元レコードに 異動フラグ(idou_flag='1')・異動開始日(idoubi) を設定
+      2. 要員マスタに新しい所属部門のレコードを追加（氏名・役割・退場予定は元を引き継ぐ）
+      3. 週次アサイン（jn_weekly_assignment_table）の「適用開始週」以降の
+         所属部門ID を新しい部門へ更新する（割当・BUFFER は変更しない）
+    """
+    if not year.isdigit() or len(year) != 4:
+        raise HTTPException(status_code=400, detail=f"年度の指定が不正です：{year}")
+    year_number = int(year)
+
+    # 適用開始週は当年度の週キー（月曜）であること
+    monday = _parse_week_key(payload.transfer_week_key, "適用開始週")
+    if monday not in _year_mondays(year_number):
+        raise HTTPException(
+            status_code=400,
+            detail=f"適用開始週が当年度の範囲外です：{payload.transfer_week_key}",
+        )
+
+    employee_no = payload.employee_no
+    new_dept_id_str = payload.new_department_id
+    new_dept_id = to_database_department_id(new_dept_id_str)
+    if new_dept_id <= 0:
+        raise HTTPException(status_code=400, detail="新しい所属部門を選択してください。")
+    if not get_dept_name(db, year_number, str(new_dept_id)):
+        raise HTTPException(
+            status_code=400,
+            detail="選択された所属は当年度の部門マスタに存在しません。",
+        )
+
+    # 元の要員レコード
+    person = get_personnel_by_emp_no(db, year_number, employee_no)
+    if not person:
+        raise HTTPException(
+            status_code=400,
+            detail=f"社員番号「{employee_no}」は要員マスタに存在しません。",
+        )
+
+    # 同一社員は 1 年度につき 1 回まで（既に異動済みなら拒否）
+    idou_count = db.execute(
+        SQL_COUNT_PERSONNEL_IDOU, {"year": year_number, "employeeNo": employee_no}
+    ).scalar()
+    if idou_count:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{employee_no} は既に異動済みです（1年度につき異動は1回までです）。",
+        )
+
+    old_dept_id = to_database_department_id(person["departmentId"])
+    if old_dept_id == new_dept_id:
+        raise HTTPException(
+            status_code=400, detail="新しい所属が現在の所属と同じです。"
+        )
+
+    now = datetime.datetime.now()
+    operator = normalize_user_id(user_id)
+    idoubi = payload.transfer_week_key  # 異動開始日（'YYYY-MM-DD'）
+    from_week = monday.strftime("%Y%m%d")  # weekly.week_start_date は 'YYYYMMDD'
+
+    try:
+        # 1. 元レコードに異動フラグ・異動開始日を設定
+        db.execute(
+            SQL_UPDATE_PERSONNEL_IDOU,
+            {
+                "year": year_number,
+                "employeeNo": employee_no,
+                "oldDepartmentId": old_dept_id,
+                "idoubi": idoubi,
+                "updateDatetime": now,
+                "updateUser": operator,
+            },
+        )
+        # 2. 新しい所属部門のレコードを追加
+        db.execute(
+            SQL_INSERT_JN_PERSONNEL_MASTER,
+            [
+                {
+                    "year": year_number,
+                    "employeeNo": employee_no,
+                    "departmentId": new_dept_id,
+                    "idouFlag": "1",
+                    "idoubi": idoubi,
+                    "personName": person["name"],
+                    "role": person["role"],
+                    "leavePlan": person.get("leavePlan") or "",
+                    "registerDatetime": now,
+                    "registerUser": operator,
+                    "updateDatetime": now,
+                    "updateUser": operator,
+                }
+            ],
+        )
+        # 3. 適用開始週以降の週次レコードの所属部門を更新
+        db.execute(
+            WORK_STATUS_UPDATE_DEPARTMENT_FROM_WEEK,
+            {
+                "year_id": year,
+                "employee_no": employee_no,
+                "new_department_id": new_dept_id_str,
+                "from_week": from_week,
+                "update_user": operator,
+            },
+        )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    return TransferResponse(code=0)

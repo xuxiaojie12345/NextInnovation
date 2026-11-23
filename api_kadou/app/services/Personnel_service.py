@@ -63,6 +63,7 @@ def get_personnel_list(db: Session, year: int):
                 "name": person["name"],
                 "role": person["role"],
                 "leavePlan": person["leavePlan"],
+                "idouFlag": person.get("idouFlag") or "0",
             },
         )
     return list(latest_by_employee.values())

@@ -171,10 +171,14 @@ interface WorkStatusProps {
   defaultDepartments?: string[];
   /** 社員マスタ（社員番号 → 要員）。氏名・役割・所属の参照に使う（マスタ編集は要員情報画面のみ） */
   employeeMaster: Map<string, Personnel>;
-    /** 所属変更（異動）で要員マスタの現在所属を更新する */
-  onUpdateDepartment: (employeeNo: string, departmentId: string) => void;
+  /** 所属変更（異動）を API で確定する */
+  onTransfer: (
+    employeeNo: string,
+    newDepartmentId: string,
+    transferWeekKey: string,
+  ) => Promise<void>;
   /** 保存（下書きを確定して親へ渡す） */
-  onSave: (payload: WorkStatusPayload) => void;
+  onSave: (payload: WorkStatusPayload) => Promise<void> | void;
   /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
   onUpdateLeavePlan: (employeeNo: string, leavePlan: string) => void;
   /** 未保存の変更があるかの通知 */
@@ -295,7 +299,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   employeeMaster,
   onSave,
   onUpdateLeavePlan,
-  onUpdateDepartment,
+  onTransfer,
   onDirtyChange,
   registerSaveHandler,
 }) => {
@@ -883,7 +887,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   );
 
   /** 保存（下書きを確定して親へ渡す。要員マスタは含めない） */
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     // 過年度は参照のみ
     if (pastYear) {
       message.error('過年度は参照のみです。');
@@ -924,16 +928,183 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       (employeeNo) => employeeMaster.get(employeeNo)?.departmentId,
     );
 
-    onSave({
-      rows,
-      assignment,
-      unpaid,
-      departmentUpdates,
-      // 行削除で業務データを消した要員（DB 側でも当該年度の分を削除する）
-      deletedEmployeeNos,
+    // 画面で変更された社員だけを保存対象にする
+    // （行・割当・BUFFER を保存済みデータと比較し、差分のある社員のみ送信する）
+    const mapSignature = (map?: Record<string, unknown>): string =>
+      map
+        ? Object.keys(map)
+            .sort()
+            .map((key) => `${key}=${map[key]}`)
+            .join('&')
+        : '';
+    const rowsSignature = (list: WorkStatusRow[], employeeNo: string): string =>
+      list
+        .filter((row) => row.employeeNo === employeeNo)
+        .map(
+          (row) =>
+            `${row.departmentId ?? ''}|${row.activeFrom ?? ''}|${
+              row.activeTo ?? ''
+            }`,
+        )
+        .sort()
+        .join(',');
+
+    const candidateEmployeeNos = new Set<string>(
+      [
+        ...rows.map((row) => row.employeeNo),
+        ...savedRows.map((row) => row.employeeNo),
+        ...Object.keys(assignment),
+        ...Object.keys(savedBaseline.assignment),
+        ...Object.keys(unpaid),
+        ...Object.keys(savedBaseline.unpaid),
+        ...deletedEmployeeNos,
+      ].filter((employeeNo) => Boolean(employeeNo)),
+    );
+    const changedEmployeeNos = new Set(
+      Array.from(candidateEmployeeNos).filter((employeeNo) => {
+        if (deletedEmployeeNos.includes(employeeNo)) return true;
+        return (
+          rowsSignature(rows, employeeNo) !==
+            rowsSignature(savedRows, employeeNo) ||
+          mapSignature(assignment[employeeNo]) !==
+            mapSignature(savedBaseline.assignment[employeeNo]) ||
+          mapSignature(unpaid[employeeNo]) !==
+            mapSignature(savedBaseline.unpaid[employeeNo])
+        );
+      }),
+    );
+
+    // 割当が 1 件も無い社員（行を追加しただけの状態）は週次データを作れないため対象外
+    const savableEmployeeNos = new Set(
+      Array.from(changedEmployeeNos).filter(
+        (employeeNo) =>
+          deletedEmployeeNos.includes(employeeNo) ||
+          assignment[employeeNo] !== undefined,
+      ),
+    );
+
+    // 変更が無い場合は保存しない
+    if (savableEmployeeNos.size === 0) {
+      message.info('変更された内容はありません。');
+      setDirty(false);
+      return;
+    }
+
+    // 週ごとの所属部門ID（異動で所属が変わる週を検出するために使う）
+    const departmentAt = (
+      list: WorkStatusRow[],
+      employeeNo: string,
+      weekKey: string,
+    ): string =>
+      list.find(
+        (row) => row.employeeNo === employeeNo && isWeekActive(row, weekKey),
+      )?.departmentId ?? '';
+
+    const deletedSet = new Set(deletedEmployeeNos);
+    // 当年度の全週キー（行削除・社員番号変更時の作り直し／所属変更週の検出に使う）
+    const yearWeekKeys = buildYearWeeks(year).map((week) => week.key);
+    const rowsByEmployee = new Map<string, WorkStatusRow[]>();
+    rows.forEach((row) => {
+      const list = rowsByEmployee.get(row.employeeNo);
+      if (list) {
+        list.push(row);
+      } else {
+        rowsByEmployee.set(row.employeeNo, [row]);
+      }
     });
+
+    // 画面で変更された「週のセル」だけを送信する。
+    // ・行削除・社員番号変更の社員は当年度データを作り直すため全週を送信する
+    // ・それ以外は変更された週だけを送信し、他の週のデータには触れない
+    const weekPayload: Record<string, Record<string, string | null>> = {};
+    const unpaidPayload: Record<string, Record<string, boolean>> = {};
+    const rowsPayload: WorkStatusRow[] = [];
+
+    savableEmployeeNos.forEach((employeeNo) => {
+      // 業務データを全削除する社員（再登録する割当が無い）
+      if (deletedSet.has(employeeNo) && assignment[employeeNo] === undefined) {
+        return;
+      }
+      const currentAssignment = assignment[employeeNo] ?? {};
+      const baselineAssignment = savedBaseline.assignment[employeeNo] ?? {};
+      const currentUnpaid = unpaid[employeeNo] ?? {};
+      const baselineUnpaid = savedBaseline.unpaid[employeeNo] ?? {};
+      const changedWeeks = new Set<string>();
+
+      if (deletedSet.has(employeeNo)) {
+        // 行削除・社員番号変更は作り直しのため全週を対象にする
+        yearWeekKeys.forEach((weekKey) => changedWeeks.add(weekKey));
+      } else {
+        Object.keys(currentAssignment).forEach((weekKey) => {
+          if (
+            (currentAssignment[weekKey] ?? null) !==
+            (baselineAssignment[weekKey] ?? null)
+          ) {
+            changedWeeks.add(weekKey);
+          }
+        });
+        Object.keys(baselineAssignment).forEach((weekKey) => {
+          if (!(weekKey in currentAssignment)) changedWeeks.add(weekKey);
+        });
+        Object.keys(currentUnpaid).forEach((weekKey) => {
+          if (currentUnpaid[weekKey] !== baselineUnpaid[weekKey]) {
+            changedWeeks.add(weekKey);
+          }
+        });
+        Object.keys(baselineUnpaid).forEach((weekKey) => {
+          if (!(weekKey in currentUnpaid)) changedWeeks.add(weekKey);
+        });
+        // 異動などで所属が変わった週も更新対象にする
+        if (
+          rowsSignature(rows, employeeNo) !==
+          rowsSignature(savedRows, employeeNo)
+        ) {
+          yearWeekKeys.forEach((weekKey) => {
+            if (
+              departmentAt(rows, employeeNo, weekKey) !==
+              departmentAt(savedRows, employeeNo, weekKey)
+            ) {
+              changedWeeks.add(weekKey);
+            }
+          });
+        }
+      }
+
+      if (changedWeeks.size === 0) return;
+
+      const weekEntries: Record<string, string | null> = {};
+      changedWeeks.forEach((weekKey) => {
+        weekEntries[weekKey] = currentAssignment[weekKey] ?? null;
+      });
+      weekPayload[employeeNo] = weekEntries;
+
+      const unpaidEntries: Record<string, boolean> = {};
+      changedWeeks.forEach((weekKey) => {
+        if (currentUnpaid[weekKey]) unpaidEntries[weekKey] = true;
+      });
+      if (Object.keys(unpaidEntries).length > 0) {
+        unpaidPayload[employeeNo] = unpaidEntries;
+      }
+
+      rowsPayload.push(...(rowsByEmployee.get(employeeNo) ?? []));
+    });
+
+    try {
+      await onSave({
+        rows: rowsPayload,
+        assignment: weekPayload,
+        unpaid: unpaidPayload,
+        departmentUpdates: departmentUpdates.filter((update) =>
+          savableEmployeeNos.has(update.employeeNo),
+        ),
+        // 行削除で業務データを消した要員（DB 側でも当該年度の分を削除する）
+        deletedEmployeeNos,
+      });
+    } catch {
+      // エラー表示は親（App）側で行う。保存状態は変更しない
+      return;
+    }
     // 保存した内容を過去実績判定の基準に反映する
-    // （メモリ実装のため即時。API 接続時は保存成功後に更新する）
     setSavedBaseline({ assignment, unpaid });
     setSavedRows(rows);
     // 保存済みの削除情報はクリアする（次回の保存で再送しない）
@@ -948,6 +1119,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     onSave,
     employeeMaster,
     savedRows,
+    year,
     pastYear,
   ]);
 
@@ -1056,8 +1228,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [draftRows, allWeeks, currentMonday, pastYear],
   );
 
-  /** 所属変更（異動）を確定する */
-  const handleTransfer = useCallback(() => {
+  /** 所属変更（異動）を API で確定し、旧所属・新所属の2行に分ける */
+  const handleTransfer = useCallback(async () => {
     if (!transferRowKey) return;
     const row = draftRows.find((r) => r.key === transferRowKey);
     if (!row) return;
@@ -1069,7 +1241,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       return;
     }
     // 同一社員は 1 年度につき 1 回まで
-    if (draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2) {
+    if (
+      employeeMaster.get(row.employeeNo)?.idouFlag === '1' ||
+      draftRows.filter((r) => r.employeeNo === row.employeeNo).length >= 2
+    ) {
       message.error('1年度につき異動は1回までです。');
       return;
     }
@@ -1095,16 +1270,24 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       message.error('適用開始週は今週の月曜以降にしてください。');
       return;
     }
+
+    try {
+      await onTransfer(row.employeeNo, transferDeptId, transferWeekKey);
+    } catch {
+      // エラー表示は親（App）側で行う。失敗時は行・保存済み基準を変更しない
+      return;
+    }
+
     const prevWeekKey = dayjs(transferWeekKey)
       .subtract(7, 'day')
       .format('YYYY-MM-DD');
     const newKey = nextRowKey();
     const deptName = departmentLabelOf(departments, transferDeptId);
-    setDraftRows((prev) => {
-      const index = prev.findIndex((r) => r.key === transferRowKey);
-      if (index < 0) return prev;
-      const oldRow = prev[index];
-      const next = [...prev];
+    const splitRows = (rows: WorkStatusRow[]): WorkStatusRow[] => {
+      const index = rows.findIndex((r) => r.key === transferRowKey);
+      if (index < 0) return rows;
+      const oldRow = rows[index];
+      const next = [...rows];
       // 旧所属の行は開始週の前週まで
       next[index] = {
         ...oldRow,
@@ -1122,16 +1305,16 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         splitFromKey: oldRow.key,
       });
       return next;
-    });
-        // 要員マスタの「現在の所属」を新しい所属に更新する
-    onUpdateDepartment(row.employeeNo, transferDeptId);
-    // 要員マスタの「現在の所属」は、稼働表の保存成功時に反映する
+    };
+    setDraftRows((prev) => splitRows(prev));
+    // 異動は既に DB へ確定済みのため、保存済み基準も同じ2行にする。
+    // これにより後の保存で異動済みの所属変更を再送しない。
+    setSavedRows((prev) => splitRows(prev));
     setTransferRowKey(null);
-    setDirty(true);
     message.success(
       `${row.employeeNo} の所属を ${deptName} に変更しました（${dayjs(
         transferWeekKey,
-      ).format('YYYY/M/D')} の週から・未保存）。保存すると確定し、取り消せません。`,
+      ).format('YYYY/M/D')} の週から）。`,
     );
   }, [
     transferRowKey,
@@ -1142,7 +1325,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     nextRowKey,
     departments,
     employeeMaster,
-    onUpdateDepartment,
+    onTransfer,
     currentMonday,
   ]);
 
@@ -2207,6 +2390,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         const transferBlockedByCount =
           !!row.employeeNo &&
           (rowCountByEmployee.get(row.employeeNo) ?? 0) >= 2;
+        const transferBlockedByIdou =
+          !!row.employeeNo &&
+          employeeMaster.get(row.employeeNo)?.idouFlag === '1';
         const transferBlockedByEmptyDepartment =
           !!row.employeeNo &&
           hasMissingDepartment(employeeMaster.get(row.employeeNo));
@@ -2263,6 +2449,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             )}
             {pastYear ||
             transferBlockedByCount ||
+            transferBlockedByIdou ||
             transferBlockedByEmptyDepartment ? (
               <Tooltip
                 title={

@@ -16,6 +16,7 @@ SQL_GET_JN_PERSONNEL_MASTER = text("""
 SQL_LIST_JN_PERSONNEL_MASTER = text("""
     SELECT employee_no AS employeeNo, department_id AS departmentId,
            person_name AS name, `role` AS role, leave_plan AS leavePlan,
+           idou_flag AS idouFlag,
            update_datetime, register_datetime
     FROM `JN_PERSONNEL_MASTER`
     WHERE year_id = :year
@@ -67,4 +68,26 @@ SET department_id = :departmentId,
     update_user = :updateUser
 WHERE year_id = :year
 AND employee_no = :employeeNo
+""")
+
+# 異動：元の所属レコードに異動フラグ・異動開始日を設定する
+# （year + employee_no + 元の department_id で1行に絞る）
+SQL_UPDATE_PERSONNEL_IDOU = text("""
+UPDATE `JN_PERSONNEL_MASTER`
+SET idou_flag = '1',
+    idoubi = :idoubi,
+    update_datetime = :updateDatetime,
+    update_user = :updateUser
+WHERE year_id = :year
+AND employee_no = :employeeNo
+AND department_id = :oldDepartmentId
+""")
+
+# 異動：指定社員に異動済みレコード（idou_flag = '1'）があるか確認する
+SQL_COUNT_PERSONNEL_IDOU = text("""
+SELECT COUNT(*) AS cnt
+FROM `JN_PERSONNEL_MASTER`
+WHERE year_id = :year
+AND employee_no = :employeeNo
+AND idou_flag = '1'
 """)

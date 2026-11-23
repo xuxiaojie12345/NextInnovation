@@ -16,6 +16,7 @@ interface PersonnelRecord {
   name: string | null;
   role: string | null;
   leavePlan: string | null;
+  idouFlag?: string | null;
 }
 
 /** ログインユーザーIDを X-User-Id ヘッダで送信する（register_user / update_user に保存される） */
@@ -54,6 +55,7 @@ const toPersonnel = (record: PersonnelRecord): Personnel => ({
   departmentId: record.departmentId ?? '',
   role: record.role ?? '',
   leavePlan: record.leavePlan ?? undefined,
+  idouFlag: record.idouFlag ?? '0',
 });
 
 /** 部門IDはDB側で int のため、数値以外（未登録・モックID）は送らない */

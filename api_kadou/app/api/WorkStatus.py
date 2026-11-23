@@ -3,8 +3,11 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.user import current_user_id
 from app.db.session import get_db
 from app.schemas.work_status import (
+    TransferRequest,
+    TransferResponse,
     WorkStatusOut,
     WorkStatusSaveRequest,
     WorkStatusSaveResponse,
@@ -13,6 +16,7 @@ from app.services.WorkStatus_service import (
     get_work_status_by_year as _get_work_status_by_year,
 )
 from app.services.WorkStatus_service import save_work_status as _save_work_status
+from app.services.WorkStatus_service import transfer_employee as _transfer_employee
 
 router = APIRouter(prefix="/api/kadou")
 
@@ -50,13 +54,38 @@ def save_work_status(
       - rows: 稼働表の行（社員番号 / 所属部門ID / 有効期間）
         氏名・役割は要員マスタ、部門名は部門マスタから解決するため受け取らない
       - assignment: 社員番号 → { 週キー(月曜 'YYYY-MM-DD') : システム項目ID }
-        当年度の全週（1/1 を含む週 〜 12/31 を含む週）を欠けなく指定する。
-        未配分の週は予約コード 'UNASSIGN' を指定する。
+        画面で変更された週だけを指定する（未配分は 'UNASSIGN'）。
+        行削除・社員番号変更の社員は当年度の全週を指定する（削除 → 登録し直す）。
       - unpaid: 社員番号 → { 週キー : true }（BUFFER＝無償支援）
         割当のある週（UNASSIGN 以外）のみ指定できる。
+      - deletedEmployeeNos: 行削除で業務データを削除した社員番号
     - 返回: {"code": 0}
-      ※保存は当該年度の全量置換（既存データを削除してから登録する）
+      ※指定された「社員 × 週」の行だけを更新する（他の週のデータは変更しない）
       ※年途中の異動は rows を複数行に分割して表現する
         （旧所属の activeTo = 異動前週、新所属の activeFrom = 異動当周）
     """
     return _save_work_status(db, year, payload)
+
+
+@router.post("/{year}/transfer", response_model=TransferResponse)
+def transfer(
+    year: str,
+    payload: TransferRequest,
+    user_id: str = Depends(current_user_id),
+    db: Session = Depends(get_db),
+):
+    """所属変更（異動）確定。
+
+    - 路径参数 year: 年度ID（4 桁）
+    - 请求体:
+      - employeeNo: 異動する社員番号
+      - newDepartmentId: 新しい所属部門ID
+      - transferWeekKey: 適用開始週（月曜 'YYYY-MM-DD'）
+    - 処理（1 トランザクション）:
+      1. 要員マスタの元レコードに 異動フラグ(idou_flag)・異動開始日(idoubi) を設定
+      2. 要員マスタに新しい所属部門のレコードを追加
+      3. jn_weekly_assignment_table の適用開始週以降の所属部門ID を新部門へ更新
+    - 返回: {"code": 0}
+      ※同一社員は 1 年度につき 1 回まで（既に異動済みなら 400）
+    """
+    return _transfer_employee(db, year, payload, user_id)

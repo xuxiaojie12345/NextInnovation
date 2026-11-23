@@ -60,6 +60,78 @@ export const fetchWorkStatus = async (
   return Array.isArray(data) ? (data as WorkStatusRecord[]) : [];
 };
 
+/** 稼働状況保存 API のペイロード（画面で変更された週のセルのみを含む） */
+export interface WorkStatusSavePayload {
+  /** 変更された社員の稼働表の行（社員番号 / 所属部門ID / 有効期間） */
+  rows: {
+    employeeNo: string;
+    departmentId: string;
+    activeFrom?: string;
+    activeTo?: string;
+  }[];
+  /** 社員番号 → { 週キー : システム項目ID | null }（変更された週のみ。null は未配分） */
+  assignment: Record<string, Record<string, string | null>>;
+  /** 社員番号 → { 週キー : true }（変更された週の BUFFER のみ） */
+  unpaid: Record<string, Record<string, boolean>>;
+  /** 行削除で業務データを削除した社員番号 */
+  deletedEmployeeNos?: string[];
+}
+
+/**
+ * 稼働状況（週次アサイン）を保存する。
+ *
+ * 画面で変更された「週のセル」だけを送信する（部分更新）。
+ * バックエンドは指定された週の行だけを更新するため、
+ * 同じ社員の他の週のデータは変更されない。
+ * 行削除・社員番号変更の社員は、画面側で当年度の全週が指定される。
+ * ※null（未割当）は予約コード 'UNASSIGN' として送信する。
+ */
+export const saveWorkStatus = async (
+  year: number,
+  payload: WorkStatusSavePayload,
+): Promise<void> => {
+  const assignment: Record<string, Record<string, string>> = {};
+  Object.entries(payload.assignment).forEach(([employeeNo, weeks]) => {
+    const weekEntries: Record<string, string> = {};
+    Object.entries(weeks).forEach(([weekKey, projectId]) => {
+      weekEntries[weekKey] = projectId ?? UNASSIGN_PROJECT_ID;
+    });
+    assignment[employeeNo] = weekEntries;
+  });
+
+  await api.post(
+    `/api/kadou/${encodeURIComponent(String(year))}/work-status`,
+    {
+      rows: payload.rows.map((row) => ({
+        employeeNo: row.employeeNo,
+        departmentId: row.departmentId,
+        activeFrom: row.activeFrom ?? null,
+        activeTo: row.activeTo ?? null,
+      })),
+      assignment,
+      unpaid: payload.unpaid,
+      deletedEmployeeNos: payload.deletedEmployeeNos ?? [],
+    },
+  );
+};
+
+/** 所属変更（異動）を確定する */
+export const transferEmployee = async (
+  year: number,
+  payload: {
+    employeeNo: string;
+    newDepartmentId: string;
+    transferWeekKey: string;
+  },
+  userId: string,
+): Promise<void> => {
+  await api.post(
+    `/api/kadou/${encodeURIComponent(String(year))}/transfer`,
+    payload,
+    { headers: { 'X-User-Id': userId } },
+  );
+};
+
 /** 'YYYYMMDD' → 画面の週キー 'YYYY-MM-DD'（月曜） */
 const toWeekKey = (yyyymmdd: string): string =>
   yyyymmdd.length === 8
