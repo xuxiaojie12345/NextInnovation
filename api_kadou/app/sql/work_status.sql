@@ -81,18 +81,19 @@ ORDER BY p.sys_project_id
 SELECT
     a.employee_no,
     a.week_start_date,
-    a.department_id,
+    m.department_id,
     a.sys_project_id,
     a.is_unpaid,
     a.version
 FROM (
-    SELECT DISTINCT employee_no
+    SELECT DISTINCT employee_no, department_id
     FROM jn_personnel_master
     WHERE year_id = :year_id
 ) m
 LEFT JOIN jn_weekly_assignment_table a
     ON a.year_id = :year_id
     AND a.employee_no = m.employee_no
+    AND a.department_id = m.department_id
 WHERE a.week_start_date IS NOT NULL
 ORDER BY a.employee_no, a.week_start_date
 
