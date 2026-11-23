@@ -398,8 +398,8 @@ def transfer_employee(
 
     now = datetime.datetime.now()
     operator = normalize_user_id(user_id)
-    idoubi = payload.transfer_week_key  # 異動開始日（'YYYY-MM-DD'）
-    from_week = monday.strftime("%Y%m%d")  # weekly.week_start_date は 'YYYYMMDD'
+    idoubi = monday.strftime("%Y%m%d")  # 異動開始日（idoubi は varchar(8)）
+    from_week = idoubi  # weekly.week_start_date は 'YYYYMMDD'
 
     try:
         # 1. 元レコードに異動フラグ・異動開始日を設定

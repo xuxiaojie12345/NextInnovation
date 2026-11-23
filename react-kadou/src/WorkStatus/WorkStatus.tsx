@@ -428,6 +428,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   const [transferRowKey, setTransferRowKey] = useState<string | null>(null);
   const [transferDeptId, setTransferDeptId] = useState<string | undefined>();
   const [transferWeekKey, setTransferWeekKey] = useState<string | undefined>();
+  // 異動 API の実行中（二重送信を防ぐ）
+  const [transferSaving, setTransferSaving] = useState(false);
 
   // ---- グリッドの初期表示位置（当月の列を左端に表示する） ----
   // テーブル全体のラッパー（.ant-table-body を探して水平スクロールする）
@@ -1272,10 +1274,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     }
 
     try {
+      setTransferSaving(true);
       await onTransfer(row.employeeNo, transferDeptId, transferWeekKey);
     } catch {
       // エラー表示は親（App）側で行う。失敗時は行・保存済み基準を変更しない
       return;
+    } finally {
+      setTransferSaving(false);
     }
 
     const prevWeekKey = dayjs(transferWeekKey)
@@ -2870,6 +2875,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         title='所属変更（異動）'
         okText='変更する'
         cancelText='キャンセル'
+        confirmLoading={transferSaving}
         onOk={handleTransfer}
         onCancel={() => setTransferRowKey(null)}
       >
