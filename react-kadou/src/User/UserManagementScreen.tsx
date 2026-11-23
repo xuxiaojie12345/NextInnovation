@@ -402,92 +402,96 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         style={{ marginTop: 12 }}
       >
         <div className='user-form'>
-          <div className='form-field'>
-            <span className='form-label'>ユーザーID</span>
-            <Input
-              value={userId}
-              placeholder='例：bucho'
-              maxLength={5}
-              disabled={isEditing}
-              onChange={(e) => {
-                const next = e.target.value;
-                if (!USER_ID_PATTERN.test(next)) {
-                  message.warning({
-                    content: USER_ID_FORMAT_MESSAGE,
-                    key: "userIdFormat",
-                  });
-                  return;
-                }
-                setUserId(next);
-              }}
-            />
+          <div className='user-form-row'>
+            <div className='form-field'>
+              <span className='form-label'>ユーザーID</span>
+              <Input
+                value={userId}
+                placeholder='例：bucho'
+                maxLength={5}
+                disabled={isEditing}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (!USER_ID_PATTERN.test(next)) {
+                    message.warning({
+                      content: USER_ID_FORMAT_MESSAGE,
+                      key: "userIdFormat",
+                    });
+                    return;
+                  }
+                  setUserId(next);
+                }}
+              />
+            </div>
+            <div className='form-field'>
+              <span className='form-label'>氏名</span>
+              <Input
+                value={name}
+                placeholder='例：山田 太郎'
+                maxLength={10}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className='form-field'>
+              <span className='form-label'>職級</span>
+              <Select
+                value={role}
+                options={ROLE_OPTIONS}
+                onChange={(v) => setRole(v)}
+                style={{ width: "100%" }}
+              />
+            </div>
+            <div className='form-field'>
+              <span className='form-label'>所属部門</span>
+              <Select
+                value={departmentId}
+                options={deptOptions}
+                allowClear
+                placeholder='（未選択＝全部門）'
+                onChange={(v?: string) => setDepartmentId(v)}
+                style={{ width: "100%" }}
+                popupMatchSelectWidth={false}
+              />
+              {departmentId && !departmentExists(departments, departmentId) && (
+                <Text type='warning'>
+                  選択中の所属部門は選択中の年度に存在しません。保存すると「全部門」になります。
+                </Text>
+              )}
+            </div>
           </div>
-          <div className='form-field'>
-            <span className='form-label'>氏名</span>
-            <Input
-              value={name}
-              placeholder='例：山田 太郎'
-              maxLength={10}
-              onChange={(e) => setName(e.target.value)}
-            />
+          <div className='user-form-row'>
+            <div className='form-field'>
+              <span className='form-label'>パスワード</span>
+              <Input
+                value={password}
+                maxLength={50}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (!PASSWORD_PATTERN.test(next)) {
+                    message.warning({
+                      content: PASSWORD_FORMAT_MESSAGE,
+                      key: "passwordFormat",
+                    });
+                    return;
+                  }
+                  setPassword(next);
+                }}
+              />
+            </div>
+            <Space className='user-form-actions'>
+              <Button
+                type='primary'
+                icon={<PlusOutlined />}
+                loading={saving}
+                onClick={handleSubmit}
+              >
+                {isEditing ? "更新" : "追加"}
+              </Button>
+              <Button onClick={resetForm} disabled={saving}>
+                クリア
+              </Button>
+            </Space>
           </div>
-          <div className='form-field'>
-            <span className='form-label'>職級</span>
-            <Select
-              value={role}
-              options={ROLE_OPTIONS}
-              onChange={(v) => setRole(v)}
-              style={{ width: "100%" }}
-            />
-          </div>
-          <div className='form-field'>
-            <span className='form-label'>所属部門</span>
-            <Select
-              value={departmentId}
-              options={deptOptions}
-              allowClear
-              placeholder='（未選択＝全部門）'
-              onChange={(v?: string) => setDepartmentId(v)}
-              style={{ width: "100%" }}
-              popupMatchSelectWidth={false}
-            />
-            {departmentId && !departmentExists(departments, departmentId) && (
-              <Text type='warning'>
-                選択中の所属部門は選択中の年度に存在しません。保存すると「全部門」になります。
-              </Text>
-            )}
-          </div>
-          <div className='form-field'>
-            <span className='form-label'>パスワード</span>
-            <Input
-              value={password}
-              maxLength={50}
-              onChange={(e) => {
-                const next = e.target.value;
-                if (!PASSWORD_PATTERN.test(next)) {
-                  message.warning({
-                    content: PASSWORD_FORMAT_MESSAGE,
-                    key: "passwordFormat",
-                  });
-                  return;
-                }
-                setPassword(next);
-              }}
-            />
-          </div>
-          <Space className='user-form-actions'>
-            <Button
-              type='primary'
-              icon={<PlusOutlined />}
-              loading={saving}
-              onClick={handleSubmit}
-            >
-              {isEditing ? "更新" : "追加"}
-            </Button>
-            <Button onClick={resetForm} disabled={saving}>
-              クリア
-            </Button>
-          </Space>
         </div>
         <Text type='secondary' className='user-note'>
           ※

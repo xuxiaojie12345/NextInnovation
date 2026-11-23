@@ -1,10 +1,3 @@
-/**
- * 休日設置 画面のバックエンド API 呼び出し
- *
- * 対象 API:
- * - GET  /api/holidays?year=YYYY  年度内の休日一覧
- * - POST /api/holidays?year=YYYY  休日登録（同一日付は 409）
- */
 import { Holiday, HolidayKind } from '../data/yearStore';
 
 const API_BASE_URL = (

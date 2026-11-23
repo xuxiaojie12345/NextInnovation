@@ -1,9 +1,3 @@
-/**
- * 年度選択 画面のバックエンド API 呼び出し
- *
- * 対象 API: GET /api/kadou/{year}（年度別サマリ）
- * パスパラメータは現行未使用のため、固定のセグメント（summary）を指定して呼び出す。
- */
 import axios, { AxiosError } from 'axios';
 import type { YearSummary } from '../data/yearStore';
 
