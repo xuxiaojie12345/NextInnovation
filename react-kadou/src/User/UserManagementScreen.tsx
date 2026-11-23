@@ -38,6 +38,14 @@ const ROLE_COLOR: Record<UserRole, string> = {
   admin: "red",
 };
 
+/** ユーザーID は半角英数字（0-9A-Za-z）のみ許可する */
+const USER_ID_PATTERN = /^[0-9A-Za-z]*$/;
+/** パスワードは半角英数字と ASC 記号（半角記号）のみ許可する（空白は不可） */
+const PASSWORD_PATTERN = /^[0-9A-Za-z\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]*$/;
+const USER_ID_FORMAT_MESSAGE = "半角英数字のみ入力できます。";
+const PASSWORD_FORMAT_MESSAGE =
+  "パスワードは半角英数字と記号で入力してください。";
+
 /** エラーから表示用メッセージを取り出す */
 const errorMessageOf = (error: unknown, fallback: string): string =>
   error instanceof Error && error.message ? error.message : fallback;
@@ -158,12 +166,20 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
       message.error("ユーザーIDを入力してください。");
       return;
     }
+    if (!USER_ID_PATTERN.test(id)) {
+      message.error(USER_ID_FORMAT_MESSAGE);
+      return;
+    }
     if (!nm) {
       message.error("氏名を入力してください。");
       return;
     }
     if (!password) {
       message.error("パスワードを入力してください。");
+      return;
+    }
+    if (!PASSWORD_PATTERN.test(password)) {
+      message.error(PASSWORD_FORMAT_MESSAGE);
       return;
     }
     // ユーザーID の重複チェック（編集中の自分自身は除く）
@@ -393,7 +409,17 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
               placeholder='例：bucho'
               maxLength={5}
               disabled={isEditing}
-              onChange={(e) => setUserId(e.target.value)}
+              onChange={(e) => {
+                const next = e.target.value;
+                if (!USER_ID_PATTERN.test(next)) {
+                  message.warning({
+                    content: USER_ID_FORMAT_MESSAGE,
+                    key: "userIdFormat",
+                  });
+                  return;
+                }
+                setUserId(next);
+              }}
             />
           </div>
           <div className='form-field'>
@@ -436,7 +462,17 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
             <Input
               value={password}
               maxLength={50}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                const next = e.target.value;
+                if (!PASSWORD_PATTERN.test(next)) {
+                  message.warning({
+                    content: PASSWORD_FORMAT_MESSAGE,
+                    key: "passwordFormat",
+                  });
+                  return;
+                }
+                setPassword(next);
+              }}
             />
           </div>
           <Space className='user-form-actions'>
