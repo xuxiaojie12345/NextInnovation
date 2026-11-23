@@ -231,9 +231,11 @@ const EmployeeNoInput: React.FC<{
     <Input
       size='small'
       value={text}
-      maxLength={10}
+      // 社員番号は 5 桁の半角数字のみ（全角数字・記号は入力させない）
+      maxLength={5}
       placeholder='例：10001'
-      onChange={(e) => setText(e.target.value)}
+      inputMode='numeric'
+      onChange={(e) => setText(e.target.value.replace(/[^0-9]/g, ''))}
       onBlur={() => void commit()}
       onPressEnter={() => void commit()}
     />

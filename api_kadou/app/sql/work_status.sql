@@ -75,11 +75,26 @@ ORDER BY p.sys_project_id
 
 -- :name: assignments
 -- 週次割当（割当・BUFFER・UNASSIGN・楽観ロック用の版）
--- department_id は異動前後の期間判定（表示行の分割）に使用する
-SELECT employee_no, week_start_date, department_id, sys_project_id, is_unpaid, version
-FROM jn_weekly_assignment_table
-WHERE year_id = :year_id
-ORDER BY employee_no, week_start_date
+-- 要員マスタを起点に LEFT JOIN する（要員マスタ未登録の孤児データは返さない）。
+-- department_id は異動前後の期間判定（表示行の分割）に使用する。
+-- ※要員マスタは異動で複数行になるため、社員番号を DISTINCT してから結合する。
+SELECT
+    a.employee_no,
+    a.week_start_date,
+    a.department_id,
+    a.sys_project_id,
+    a.is_unpaid,
+    a.version
+FROM (
+    SELECT DISTINCT employee_no
+    FROM jn_personnel_master
+    WHERE year_id = :year_id
+) m
+LEFT JOIN jn_weekly_assignment_table a
+    ON a.year_id = :year_id
+    AND a.employee_no = m.employee_no
+WHERE a.week_start_date IS NOT NULL
+ORDER BY a.employee_no, a.week_start_date
 
 -- :name: insert
 -- 保存時：週次割当の1件挿入（グリッドの欠落週・新規セルの投入）

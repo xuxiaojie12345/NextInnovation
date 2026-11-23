@@ -399,14 +399,9 @@ def load_work_status(db: Session, year_id: int) -> WorkStatusLoadResponse:
 
     departments = _load_departments(db, year)
     projects = _load_projects(db, year)
+    # 週次割当は SQL 側で要員マスタを起点に LEFT JOIN 済み
+    # （要員マスタ未登録の孤児データは SQL で除外される）
     assignment, unpaid, versions, asgn_rows = _load_assignments(db, year)
-
-    # 要員マスタを起点にした LEFT JOIN に合わせ、週次の付随データも
-    # 要員マスタ未登録（週次データだけに存在する孤児）社員のキーを除外する
-    master_emps = set(master_rows_by_emp)
-    assignment = {k: v for k, v in assignment.items() if k in master_emps}
-    unpaid = {k: v for k, v in unpaid.items() if k in master_emps}
-    versions = {k: v for k, v in versions.items() if k in master_emps}
 
     # 週次割当の所属（行分割の判定に使う）
     weekly_depts: dict[str, list[tuple[str, str]]] = {}
