@@ -5,16 +5,19 @@
  * ・年途中の部門異動は 2 行に分かれるため、その週に有効な行だけを数える
  * ・割当（assignment）と BUFFER（unpaid）は社員番号キー（有効期間は重ならない）
  *
- * ※教育実施人数だけは判定材料が無いため、現行モック値を流用する（保留中の指標）
+ * プロジェクトのフラグによる集計ルール：
+ * ・総稼動人数 = 「割当あり かつ プロジェクトの有効flg = true」だけを数える
+ *   （無効プロジェクトの割当は稼動系指標に計上しない。BUFFER も同じ扱い）
+ * ・教育実施人数 = 「割当あり かつ 教育flg = true」を数える
+ *   （有効flg・BUFFER とは無関係。有効 + 教育は稼動と教育の両方に計上する）
+ * ・「内・退職」は名前で判定し、フラグより先に除外する
+ *   離職人数 = その週に「内・退職」が設定されている人数（退職後は毎週計上）
+ *   総人数 = その週の部門行数 − 離職人数
  */
-import dayjs from 'dayjs';
 import type { Project, WorkStatusRow } from '../WorkStatus/types';
 import type { WorkStatusData } from './yearStore';
-import {
-  JINAN_ALL_LABEL,
-  JinanWeeklyStat,
-  getJinanWeeklyStats,
-} from './mockJinanStats';
+import { JINAN_ALL_LABEL } from './jinanStats';
+import type { JinanWeeklyStat } from './jinanStats';
 import { buildYearWeeks } from './yearWeeks';
 import type { WeekCol } from './yearWeeks';
 
@@ -45,12 +48,8 @@ export const getWorkStatusJinanWeeklyStats = (
     (p) => p.name === LEAVE_PROJECT_NAME || p.abbr === LEAVE_PROJECT_NAME,
   )?.projectId;
 
-  // 教育実施人数だけは保留中のため、現行モック値を流用する
-  const mock = getJinanWeeklyStats(department, year, targetDepartments);
-  const trainingByWeek = new Map<string, number>();
-  for (let i = 0; i < mock.length; i += 1) {
-    trainingByWeek.set(mock[i].weekKey, mock[i].training);
-  }
+  // projectId → Project（有効flg・教育flg の判定に使う）
+  const projectById = new Map(projects.map((p) => [p.projectId, p]));
 
   /** 1 部門 × 1 週分の統計 */
   const buildOne = (
@@ -62,9 +61,7 @@ export const getWorkStatusJinanWeeklyStats = (
     let leavers = 0;
     let activeTotal = 0;
     let nonContractActive = 0;
-    const prevWeekKey = dayjs(weekKey)
-      .subtract(7, 'day')
-      .format('YYYY-MM-DD');
+    let training = 0;
     for (let i = 0; i < rows.length; i += 1) {
       const row = rows[i];
       if (row.departmentId !== departmentId) continue;
@@ -72,19 +69,22 @@ export const getWorkStatusJinanWeeklyStats = (
       const cell = assignment[row.employeeNo] ?? {};
       const isLeave =
         !!leaveProjectId && cell[weekKey] === leaveProjectId;
-      const wasLeave =
-        !!leaveProjectId && cell[prevWeekKey] === leaveProjectId;
       if (isLeave) {
-        // 退職週のみ「離職人数」に数え、退職週以降は総人数から外す
-        if (!wasLeave) leavers += 1;
+        // 当週「内・退職」の人数（退職後は毎週計上。総人数からは外す）
+        leavers += 1;
         continue;
       }
       headcount += 1;
       const pid = cell[weekKey];
-      if (pid) {
-        // 総稼動人数は BUFFER を含む
+      const project = pid ? projectById.get(pid) : undefined;
+      if (project?.validFlg) {
+        // 総稼動人数は BUFFER を含む（無効プロジェクトの割当は計上しない）
         activeTotal += 1;
         if (unpaid[row.employeeNo]?.[weekKey]) nonContractActive += 1;
+      }
+      if (project?.educationFlg) {
+        // 教育実施人数は有効flg・BUFFER と無関係に計上する
+        training += 1;
       }
     }
     return {
@@ -96,7 +96,7 @@ export const getWorkStatusJinanWeeklyStats = (
       leavers,
       activeTotal,
       nonContractActive,
-      training: trainingByWeek.get(weekKey) ?? 0,
+      training,
       localActive: activeTotal,
     };
   };
@@ -114,12 +114,14 @@ export const getWorkStatusJinanWeeklyStats = (
     let leavers = 0;
     let activeTotal = 0;
     let nonContractActive = 0;
+    let training = 0;
     for (let d = 0; d < targetDepartments.length; d += 1) {
       const s = buildOne(targetDepartments[d], week.key, week);
       headcount += s.headcount;
       leavers += s.leavers;
       activeTotal += s.activeTotal;
       nonContractActive += s.nonContractActive;
+      training += s.training;
     }
     out.push({
       weekKey: week.key,
@@ -130,7 +132,7 @@ export const getWorkStatusJinanWeeklyStats = (
       leavers,
       activeTotal,
       nonContractActive,
-      training: trainingByWeek.get(week.key) ?? 0,
+      training,
       localActive: activeTotal,
     });
   }
