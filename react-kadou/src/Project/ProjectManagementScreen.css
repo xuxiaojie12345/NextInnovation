@@ -15,10 +15,11 @@
   max-width: 460px;
 }
 
-/* 登録・修正フォーム（自動折り返しのグリッド） */
+/* 登録・修正フォーム（自動折り返しのグリッド）
+   最小列幅は縦スクロールバー出現時の幅減でも折り返さないよう少し小さめにする */
 .project-form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
 }
 
