@@ -1,15 +1,14 @@
 /* ===== プロジェクト管理 画面 ===== */
 
-/* 画面右上の「プロジェクト情報 / 一括読み込む」 */
+/* 画面：タイトルの下に置く「プロジェクト情報 / 一括読み込む」 */
 .project-header-side {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 4px;
-  text-align: right;
-  /* 要員情報画面と同じく、ヘッダー右端に固定する */
-  margin-left: auto;
-  flex: 0 0 auto;
+  text-align: left;
+  /* タイトル（header）の下に独立した 1 行として並べる */
+  margin-bottom: 12px;
 }
 
 .project-import-hint {

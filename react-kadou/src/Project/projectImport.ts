@@ -51,8 +51,16 @@ export interface ProjectImportRow {
   projectCode: string;
   /** Project名称（任意） */
   name: string;
-  /** ファイル上の行番号（警告メッセージの表示用） */
+  /**
+   * プレビュー表（取り込み対象の行だけを並べた表）での行番号（1 始まり）。
+   *
+   * NOTE: エラーメッセージの「n行目」は必ずこの値を使う（空行などで
+   *       Excel の行番号とずれるため、ユーザーが見ている表の行に合わせる）。
+   *       sourceLine（Excel 行番号）はエラー表示には使わない。
+   */
   line?: number;
+  /** Excel（元ファイル）上の行番号（参照用。エラー表示には使わない） */
+  sourceLine?: number;
 }
 
 /** 一括読み込みの結果 */
@@ -76,13 +84,13 @@ export const PROJECT_IMPORT_FORMAT_HINT =
   '形式：顧客／案件／チーム／Subチーム／Subチーム／略称／所属部門／項目ID／Project名称（1行目は見出し行）。Excel(.xlsx)・CSV に対応。E 列の Subチームは取込対象外です。「所属部門」は部門マスタ（部門名称・部門別名）と照合し、一致しない場合はプレビューで選択します。取り込むと新しいプロジェクトとして追加されます。';
 
 /**
- * 取込む項目（列）のキー。行番号 line はファイル上のメタ情報なので列に含めない。
- * departmentId / departmentAutoMatched は照合結果として画面側で設定する値で、
- * ファイルの列ではないため対象外とする。
+ * 取込む項目（列）のキー。行番号 line / sourceLine はファイル上のメタ情報なので
+ * 列に含めない。departmentId / departmentAutoMatched は照合結果として画面側で
+ * 設定する値で、ファイルの列ではないため対象外とする。
  */
 type ProjectImportField = Exclude<
   keyof ProjectImportRow,
-  'line' | 'departmentId' | 'departmentAutoMatched'
+  'line' | 'sourceLine' | 'departmentId' | 'departmentAutoMatched'
 >;
 
 type ProjectImportColumns = Record<ProjectImportField, number>;
@@ -194,7 +202,8 @@ const buildRows = (
 
   matrix.forEach((row, index) => {
     if (index <= headerIndex) return;
-    const lineNo = index + 1;
+    // Excel（元ファイル）上の行番号。プレビュー表の行番号（rows.length + 1）とは別物
+    const sourceLine = index + 1;
 
     const customer = (row[columns.customer] ?? '').trim();
     const caseName = (row[columns.caseName] ?? '').trim();
@@ -217,19 +226,26 @@ const buildRows = (
       return;
     }
 
+    // NOTE: 行番号は「プレビュー表での行番号」で示す（Excel の行番号ではない）。
+    //       取り込まない行はプレビューに現れないため、その行が入る予定だった
+    //       位置＝次に取り込む行の番号（＝現在の取込対象件数 + 1）を使う。
+    const previewLine = rows.length + 1;
     if (!customer) {
-      warnings.push(`${lineNo}行目：顧客が空のため取り込みませんでした`);
+      warnings.push(`${previewLine}行目：顧客が空のため取り込みませんでした`);
       return;
     }
     if (!caseName) {
-      warnings.push(`${lineNo}行目：案件が空のため取り込みませんでした`);
+      warnings.push(`${previewLine}行目：案件が空のため取り込みませんでした`);
       return;
     }
     if (!department) {
-      warnings.push(`${lineNo}行目：所属部門が空のため取り込みませんでした`);
+      warnings.push(`${previewLine}行目：所属部門が空のため取り込みませんでした`);
       return;
     }
 
+    // NOTE: line はプレビュー表での行番号。空行などをスキップするため
+    //       Excel の行番号とは一致しない。警告・重複行の表示はプレビュー
+    //       で見えている行番号で行う必要があるためこちらを使う。
     rows.push({
       customer,
       caseName,
@@ -238,7 +254,8 @@ const buildRows = (
       department,
       projectCode,
       name,
-      line: lineNo,
+      line: rows.length + 1,
+      sourceLine,
     });
   });
 

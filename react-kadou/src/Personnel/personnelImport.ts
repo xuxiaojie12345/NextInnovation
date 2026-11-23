@@ -54,8 +54,17 @@ export interface PersonnelImportRow {
   departmentAutoMatched?: boolean;
   /** 役割コード（空欄も許容 → 取込時に既存値を保持／新規は「要員」） */
   role: string;
-  /** ファイル上の行番号（警告メッセージの表示用） */
+  /**
+   * プレビュー表（取り込み対象の行だけを並べた表）での行番号（1 始まり）。
+   *
+   * NOTE: エラーメッセージの「n行目」は必ずこの値を使う（空行などで
+   *       Excel の行番号とずれるため、ユーザーが見ている表の行に合わせる）。
+   *       sourceLine（Excel 行番号）はエラー表示には使わない。
+   *       この値は重複判定などのキーにも使うため、必ず一意になる。
+   */
   line?: number;
+  /** Excel（元ファイル）上の行番号（「元ファイル n 行目」の補足表示用） */
+  sourceLine?: number;
 }
 
 /** 一括読み込みの結果 */
@@ -624,7 +633,8 @@ const buildRows = (
   // 3 行目（index 2）以降を読み取る
   for (let index = startRow - 1; index < matrix.length; index += 1) {
     const row = matrix[index];
-    const lineNo = index + 1;
+    // Excel（元ファイル）上の行番号。プレビュー表の行番号とは別物なので分けて保持する
+    const sourceLine = index + 1;
 
     const employeeNo = cellAt(row, columns.employeeNo);
     const name = cellAt(row, columns.name);
@@ -667,8 +677,12 @@ const buildRows = (
     }
 
     if (missing.length > 0) {
+      // NOTE: 行番号は「プレビュー表での行番号」で示す（Excel の行番号ではない）。
+      //       取り込まない行はプレビューに現れないため、その行が入る予定だった
+      //       位置＝次に取り込む行の番号（＝現在の取込対象件数 + 1）を使う。
+      //       Excel の行番号は空行などでずれ、ユーザーが見ている表と一致しない。
       warnings.push(
-        `${lineNo}行目：${missing.join('・')}が空のため取り込みませんでした${
+        `${rows.length + 1}行目：${missing.join('・')}が空のため取り込みませんでした${
           employeeNo ? `（社員番号 ${employeeNo}）` : ''
         }`,
       );
@@ -678,6 +692,10 @@ const buildRows = (
     // 所属（department）は E 列×N 列で部門マスタを照合してから確定する。
     // ファイル内の重複はそのまま保持し、行番号を付けてバックエンドで判定させる
     // （docs 8.1：ファイル内重複があればファイル全体を中止する）
+    //
+    // NOTE: line はプレビュー表での行番号（＝取り込み対象の並び順 + 1）。
+    //       空行などをスキップするため Excel の行番号とは一致しない。
+    //       警告は「プレビューで見えている行」で示す必要があるためこちらを使う。
     rows.push({
       employeeNo,
       name,
@@ -685,7 +703,8 @@ const buildRows = (
       departmentAlias,
       workLocation,
       role,
-      line: lineNo,
+      line: rows.length + 1,
+      sourceLine,
     });
   }
 

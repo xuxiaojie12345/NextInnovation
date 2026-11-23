@@ -33,16 +33,10 @@
   margin-bottom: 12px;
 }
 
-/* ヘッダーの左（タイトル・説明）は残り幅いっぱい、右（一括読み込み）は右端に寄せる */
+/* ヘッダーの左（タイトル・説明）は残り幅いっぱい */
 .screen-header > div:first-child {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-/* 右上の「一括読み込む」ブロックは常に右端に固定する */
-.screen-header > div[class$='header-side'] {
-  margin-left: auto;
-  flex: 0 0 auto;
 }
 
 .screen-card {
@@ -61,13 +55,15 @@
   color: #666;
 }
 
-/* 要員情報画面：右上の「社員情報 / 一括読み込む」 */
+/* 要員情報画面：タイトルの下に置く「社員情報 / 一括読み込む」 */
 .personnel-header-side {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 4px;
-  text-align: right;
+  text-align: left;
+  /* タイトル（header）の下に独立した 1 行として並べる */
+  margin-bottom: 12px;
 }
 
 .personnel-import-hint {
