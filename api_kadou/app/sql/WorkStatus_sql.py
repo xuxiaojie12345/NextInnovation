@@ -111,3 +111,12 @@ WHERE year_id = :year_id
   AND employee_no = :employee_no
   AND week_start_date >= :from_week
 """)
+
+# 異動：指定社員の当年度データが 1 件も無いか確認する
+# （0 件なら適用開始週で分割した週次レコードを新規登録する）
+WORK_STATUS_COUNT_BY_EMPLOYEE = text("""
+SELECT COUNT(*) AS cnt
+FROM jn_weekly_assignment_table
+WHERE year_id = :year_id
+  AND employee_no = :employee_no
+""")

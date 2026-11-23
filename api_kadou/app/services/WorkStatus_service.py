@@ -24,6 +24,7 @@ from app.sql.Personnel_sql import (
     SQL_UPDATE_PERSONNEL_IDOU,
 )
 from app.sql.WorkStatus_sql import (
+    WORK_STATUS_COUNT_BY_EMPLOYEE,
     WORK_STATUS_DELETE_BY_EMPLOYEES,
     WORK_STATUS_INSERT,
     WORK_STATUS_SELECT_BY_YEAR,
@@ -348,6 +349,8 @@ def transfer_employee(
       2. 要員マスタに新しい所属部門のレコードを追加（氏名・役割・退場予定は元を引き継ぐ）
       3. 週次アサイン（jn_weekly_assignment_table）の「適用開始週」以降の
          所属部門ID を新しい部門へ更新する（割当・BUFFER は変更しない）
+      4. 週次アサインが 1 件も無い要員は、適用開始週で所属を分割した
+         週次レコード（未配分）を新規登録する
     """
     if not year.isdigit() or len(year) != 4:
         raise HTTPException(status_code=400, detail=f"年度の指定が不正です：{year}")
@@ -445,6 +448,37 @@ def transfer_employee(
                 "update_user": operator,
             },
         )
+        # 4. 週次データが 1 件も無い要員は、適用開始週で所属を分割した
+        #    週次レコードを新規登録する（開始週の前週までは元所属、開始週から新所属）
+        weekly_count = db.execute(
+            WORK_STATUS_COUNT_BY_EMPLOYEE,
+            {"year_id": year, "employee_no": employee_no},
+        ).scalar()
+        if not weekly_count:
+            old_dept_id_str = str(old_dept_id)
+            records = []
+            for week_monday in _year_mondays(year_number):
+                records.append(
+                    {
+                        "version": 1,
+                        "year_id": year,
+                        "employee_no": employee_no,
+                        "department_id": (
+                            new_dept_id_str
+                            if week_monday >= monday
+                            else old_dept_id_str
+                        ),
+                        "week_start_date": week_monday.strftime("%Y%m%d"),
+                        "week_end_date": (week_monday + ONE_WEEK - datetime.timedelta(days=1)).strftime(
+                            "%Y%m%d"
+                        ),
+                        "sys_project_id": UNASSIGN,
+                        "is_unpaid": "0",
+                        "register_user": operator,
+                        "update_user": operator,
+                    }
+                )
+            db.execute(WORK_STATUS_INSERT, records)
         db.commit()
     except Exception:
         db.rollback()
