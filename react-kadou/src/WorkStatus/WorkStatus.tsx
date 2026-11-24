@@ -347,6 +347,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     Map<string, Personnel>
   >(() => new Map());
 
+  // 未保存の備考（退場予定）。社員番号 → 入力値（保存時にまとめて要員マスタへ送る）
+  const [leavePlanEdits, setLeavePlanEdits] = useState<Record<string, string>>(
+    {},
+  );
+
   /** 下書きの行を要員マスタ（氏名・役割・退場予定）と結合した表示用の行 */
   const draftPersonnel: PersonRow[] = useMemo(
     () =>
@@ -359,10 +364,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           ...row,
           name: master?.name ?? '',
           role: master?.role ?? '',
-          leavePlan: master?.leavePlan,
+          leavePlan: leavePlanEdits[row.employeeNo] ?? master?.leavePlan,
         };
       }),
-    [draftRows, employeeMaster, fetchedPersonnel],
+    [draftRows, employeeMaster, fetchedPersonnel, leavePlanEdits],
   );
 
   // この画面で「行追加」した行のキー。
@@ -550,10 +555,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   );
 
   // 下書きと保存済みデータの差分から未保存有無を更新する
+  // （備考は行・割当とは別に保持しているため、変更があれば未保存とする）
   useEffect(() => {
-    const next = !isDraftEqualToSaved(draftRows, assignment, unpaid);
+    const next =
+      !isDraftEqualToSaved(draftRows, assignment, unpaid) ||
+      Object.keys(leavePlanEdits).length > 0;
     setDirty((prev) => (prev === next ? prev : next));
-  }, [draftRows, assignment, unpaid, isDraftEqualToSaved]);
+  }, [draftRows, assignment, unpaid, isDraftEqualToSaved, leavePlanEdits]);
 
   // 今週の月曜（過去週の判定基準）。
   const [currentMonday, setCurrentMonday] = useState<string>(() =>
@@ -801,16 +809,23 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     ],
   );
 
-  /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
+  /** 退場予定（備考）の変更。保存ボタンで要員マスタへ確定する */
   const commitLeavePlan = useCallback(
     (rowKey: string, leavePlan: string) => {
       // 過年度は参照のみ
       if (pastYear) return;
       const row = draftRows.find((r) => r.key === rowKey);
       if (!row?.employeeNo) return;
+      const master =
+        fetchedPersonnel.get(row.employeeNo) ??
+        employeeMaster.get(row.employeeNo);
+      // 変更が無ければ未保存状態にしない
+      if ((master?.leavePlan ?? '') === leavePlan) return;
+      // 表示用に親の要員マスタも更新しつつ、保存対象として保持する
       onUpdateLeavePlan(row.employeeNo, leavePlan);
+      setLeavePlanEdits((prev) => ({ ...prev, [row.employeeNo]: leavePlan }));
     },
-    [draftRows, onUpdateLeavePlan, pastYear],
+    [draftRows, employeeMaster, fetchedPersonnel, onUpdateLeavePlan, pastYear],
   );
 
   /** 行追加（社員番号未入力の行を表示行に追加する。要員マスタは変更しない） */
@@ -1087,6 +1102,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       departmentUpdates,
       // 社員番号変更（旧番号の週次データを UNASSIGN に戻す）
       renumbers: renumberedEmployees,
+      // 備考（退場予定）の変更（要員マスタへ反映する）
+      leavePlans: Object.entries(leavePlanEdits).map(
+        ([employeeNo, leavePlan]) => ({ employeeNo, leavePlan }),
+      ),
     });
     // 保存したセルの版を +1 しておく（再取得が完了するまでの楽観ロック用）
     if (changed.length > 0) {
@@ -1109,6 +1128,10 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     setDeletedEmployeeNos((prev) => (prev.length === 0 ? prev : []));
     setRenumberedEmployees((prev) => (prev.length === 0 ? prev : []));
     setChangedCells((prev) => (prev.size === 0 ? prev : new Set()));
+    // 保存済みの備考はクリアする（次回の保存で再送しない）
+    setLeavePlanEdits((prev) =>
+      Object.keys(prev).length === 0 ? prev : {},
+    );
     // ※保存では追加行の表示を解除しない（次にフィルタを適用したときに解除する）
     setDirty(false);
   }, [
@@ -1118,6 +1141,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     deletedEmployeeNos,
     renumberedEmployees,
     changedCells,
+    leavePlanEdits,
     onSave,
     employeeMaster,
     pastYear,

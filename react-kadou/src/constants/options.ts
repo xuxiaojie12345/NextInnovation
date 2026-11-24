@@ -86,9 +86,9 @@ export const HOLIDAY_KINDS: HolidayKind[] = ['祝日', '会社休日', '振替�
 // 休日の区分一覧Count利用
 export const HOLIDAY_KINDS_COUNT: HolidayKind[] = ['祝日', '会社休日', '振替休日','未指定'];
 
-// 休日設定の「区分」選択肢
+// 休日設定の「区分」選択肢（空は選べないため、未分類は「未指定」を選ぶ）
 export const HOLIDAY_KIND_OPTIONS: { value: HolidayKind; label: string }[] =
-  HOLIDAY_KINDS.map((k) => ({ value: k, label: k }));
+  HOLIDAY_KINDS_COUNT.map((k) => ({ value: k, label: k }));
 
 // 休日区分ごとの表示色
 export const KIND_COLOR: Record<HolidayKind, string> = {

@@ -474,6 +474,9 @@ def _load_save_sql() -> dict[str, str]:
         "insert_personnel_row": load_sql(
             "work_status.sql", "insert_personnel_row"
         ),
+        "update_leave_plan": load_sql(
+            "work_status.sql", "update_leave_plan"
+        ),
     }
 
 
@@ -953,6 +956,35 @@ def _sync_personnel_transfer(
 # ============================================================
 # 8. 保存（PUT /api/kadou/{year}/work-status）
 # ============================================================
+def _apply_leave_plans(
+    db: Session, year: str, leave_plans, sql_update: str, now, op_user: str
+) -> None:
+    """備考（退場予定）を要員マスタへ反映する。
+
+    要員マスタの全行（異動後は 2 行）に同じ備考を設定する。
+    対象社員の行が 1 件も無い場合は保存失敗にする。
+    """
+    for lp in leave_plans or []:
+        no = (lp.employeeNo or "").strip()
+        if not no:
+            continue
+        try:
+            res = db.execute(
+                text(sql_update),
+                {
+                    "year_id": year,
+                    "employee_no": no,
+                    "leave_plan": lp.leavePlan or "",
+                    "now": now,
+                    "op_user": op_user,
+                },
+            )
+        except IntegrityError:
+            raise BusinessException(status_code=409, message_id="E_KADOU_091")
+        if (res.rowcount or 0) <= 0:
+            raise BusinessException(status_code=409, message_id="E_KADOU_091")
+
+
 def save_work_status(
     db: Session,
     year_id: int,
@@ -966,7 +998,8 @@ def save_work_status(
       2. 社員番号変更・行削除の判定
       3. 社員ごとに週割当を再構築（欠落週の保証・変更セルの更新・所属同期）
       4. 要員マスタの同期（異動・社員番号変更・行削除）
-      5. 競合が無ければ確定（commit）
+      5. 備考（退場予定）の反映
+      6. 競合が無ければ確定（commit）
     """
     year = str(year_id)
     now = datetime.now()
@@ -1097,7 +1130,13 @@ def save_work_status(
             sql["insert_personnel_row"],
         )
 
-    # ---- 5. 確定（楽観ロックの不一致があれば全て取り消す）------------
+    # ---- 5. 備考（退場予定）の反映 --------------------------------
+    # 要員マスタの同期後に反映する（同期で行を作り直すため）
+    _apply_leave_plans(
+        db, year, req.leavePlans, sql["update_leave_plan"], now, op_user
+    )
+
+    # ---- 6. 確定（楽観ロックの不一致があれば全て取り消す）------------
     if conflicts:
         db.rollback()
         raise HTTPException(

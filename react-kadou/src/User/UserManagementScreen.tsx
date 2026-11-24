@@ -489,7 +489,8 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
                   : '部門が登録されていません'
               }
               onChange={(v?: string) => setDepartmentId(v)}
-              style={{ width: '100%' }}
+              // 選択した部門名が長くても幅が広がらないよう固定幅にする
+              style={{ width: 260 }}
               disabled={saving || loadingDepartments}
             />
           </div>

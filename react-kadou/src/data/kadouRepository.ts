@@ -64,6 +64,11 @@ export interface WorkStatusPayload {
    * 新番号の週次データは deletedEmployeeNos で全件削除 → payload で再登録する。
    */
   renumbers?: { from: string; to: string }[];
+  /**
+   * 備考（退場予定）の変更。
+   * 稼働表の保存と同一トランザクションで要員マスタへ反映する
+   */
+  leavePlans?: { employeeNo: string; leavePlan: string }[];
 }
 
 /** 年度のマスタ系データ（部門・要員・項目・休日）の保存パッチ */
@@ -235,6 +240,7 @@ class HttpKadouRepository implements KadouRepository {
           fromNo: r.from,
           toNo: r.to,
         })),
+        leavePlans: payload.leavePlans ?? [],
       },
     });
 

@@ -178,7 +178,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
     setEditingId(row.id);
     setNewDate(dayjs(row.date));
     setNewName(row.name);
-    setNewKind(row.kind == "未指定" ? null : row.kind);
+    setNewKind(row.kind);
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 

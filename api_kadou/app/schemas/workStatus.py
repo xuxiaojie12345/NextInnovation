@@ -119,6 +119,14 @@ class WorkStatusSaveRenumber(BaseModel):
     toNo: str
 
 
+class WorkStatusSaveLeavePlan(BaseModel):
+    """保存リクエストの備考（退場予定）更新 1件"""
+
+    employeeNo: str
+    # 備考（退場予定）。空文字 = クリア
+    leavePlan: str = ""
+
+
 class WorkStatusSaveRequest(BaseModel):
     """PUT /api/kadou/{year}/work-status（当年全量置換）"""
 
@@ -133,6 +141,8 @@ class WorkStatusSaveRequest(BaseModel):
     departmentUpdates: list[WorkStatusSaveDepartment] = []
     # 社員番号変更（旧番号の週割当は削除せず UNASSIGN に戻す）
     renumbers: list[WorkStatusSaveRenumber] = []
+    # 備考（退場予定）の変更（要員マスタへ反映する）
+    leavePlans: list[WorkStatusSaveLeavePlan] = []
 
 
 class WorkStatusSaveResult(BaseModel):

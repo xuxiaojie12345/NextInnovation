@@ -111,8 +111,9 @@ function App() {
   >(undefined);
   // 要員稼動管理の「保存」処理（WorkStatus から登録される）
   const saveHandlerRef = useRef<(() => void) | null>(null);
-  // 「部門マスタに無い」注意を年度ごとに 1 回だけ出すためのキー
-  const warnedDeptRef = useRef('');
+  // 「部門マスタに無い」注意を出す契機（ログイン成功時・年度切替時に true、
+  // 判定後は false に戻す。画面遷移や部門追加では出さない）
+  const warnDeptPendingRef = useRef(currentUser !== null);
 
   // 要員の追加・編集・削除後に年度データを再取得するためのトークン
   const [reloadToken, setReloadToken] = useState(0);
@@ -198,6 +199,8 @@ function App() {
       // ストレージ不可（プライベートモード等）でもログイン自体は続行する
     }
     setCurrentUser(user);
+    // ログイン成功時は所属部門の注意を判定する
+    warnDeptPendingRef.current = true;
     setSelectedYear(currentYear());
     setActiveView('work-status');
     setDirty(false);
@@ -235,6 +238,8 @@ function App() {
     setActiveView('work-status');
     setDirty(false);
     setPendingAction(null);
+    // 年度切替で要員稼働管理画面へ来た時は所属部門の注意を判定する
+    warnDeptPendingRef.current = true;
   }, []);
 
   /** 年度切替（未保存があれば確認ダイアログを出す） */
@@ -553,19 +558,26 @@ function App() {
     return wanted.filter((id) => ids.has(String(id)));
   }, [currentUser, store.departments]);
 
-  /** ログインユーザーの所属部門がその年度の部門マスタに無い場合は 1 回だけ注意する */
+  /** ログインユーザーの所属部門がその年度の部門マスタに無い場合は 1 回だけ注意する
+      （ログイン成功時・年度切替で要員稼働管理画面へ来た時だけ表示する） */
   useEffect(() => {
     if (!currentUser) return;
+    // 要員稼働管理画面以外へ移動したら、この契機の判定は取り消す
+    // （部門管理で部門を追加した後などに、あとから警告が出ないようにする）
+    if (activeView !== 'work-status') {
+      warnDeptPendingRef.current = false;
+      return;
+    }
+    if (!warnDeptPendingRef.current) return;
     // 部門マスタの取得前（空）は判定できないため、取得後に判定する
     if (store.departments.length === 0) return;
     const wanted = defaultDepartmentsOf(currentUser);
+    // 判定は 1 契機につき 1 回だけ行う
+    warnDeptPendingRef.current = false;
     if (wanted.length === 0) return;
     const ids = new Set(store.departments.map((d) => String(d.departmentId)));
     const missing = wanted.filter((id) => !ids.has(String(id)));
     if (missing.length === 0) return;
-    const key = `${selectedYear}:${currentUser.userId}`;
-    if (warnedDeptRef.current === key) return;
-    warnedDeptRef.current = key;
     message.warning(
       messageInfo('W_KADOU_047', [
         missing
@@ -574,7 +586,7 @@ function App() {
         selectedYear,
       ]),
     );
-  }, [currentUser, selectedYear, store.departments]);
+  }, [currentUser, selectedYear, store.departments, activeView]);
 
   /** メニューキー → 画面の対応（メニューの並び順とは独立） */
   const views: Record<MenuKey, React.ReactNode> = {

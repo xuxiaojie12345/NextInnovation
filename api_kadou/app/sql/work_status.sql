@@ -181,6 +181,15 @@ DELETE FROM jn_personnel_master
 WHERE year_id = :year_id
   AND employee_no = :employee_no
 
+-- :name: update_leave_plan
+-- 備考（退場予定）の更新：当該年度の社員の要員マスタ全行に反映する
+UPDATE jn_personnel_master
+SET leave_plan = :leave_plan,
+    update_datetime = :now,
+    update_user = :op_user
+WHERE year_id = :year_id
+  AND employee_no = :employee_no
+
 -- :name: insert_personnel_row
 -- 異動保存時：要員マスタの 1 行を追加する（異動時は新所属の行を追加）
 INSERT INTO jn_personnel_master
