@@ -96,7 +96,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   const [departmentId, setDepartmentId] = useState<string | undefined>(
     undefined,
   );
-  const [password, setPassword] = useState("pass1234");
+  const [password, setPassword] = useState("");
 
   const isEditing = editingId !== null;
   const opUserId = currentUserId ?? "";
@@ -143,7 +143,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
     setName("");
     setRole("bucho");
     setDepartmentId(undefined);
-    setPassword("pass1234");
+    setPassword("");
   };
 
   /** 行の編集開始 */
