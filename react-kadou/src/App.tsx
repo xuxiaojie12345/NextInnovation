@@ -578,14 +578,7 @@ function App() {
     const ids = new Set(store.departments.map((d) => String(d.departmentId)));
     const missing = wanted.filter((id) => !ids.has(String(id)));
     if (missing.length === 0) return;
-    message.warning(
-      messageInfo('W_KADOU_047', [
-        missing
-          .map((id) => departmentNameOf(store.departments, id))
-          .join('・'),
-        selectedYear,
-      ]),
-    );
+    message.warning(messageInfo('W_KADOU_047', [selectedYear]));
   }, [currentUser, selectedYear, store.departments, activeView]);
 
   /** メニューキー → 画面の対応（メニューの並び順とは独立） */
