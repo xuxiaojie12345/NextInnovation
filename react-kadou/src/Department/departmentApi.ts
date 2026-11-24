@@ -1,10 +1,3 @@
-/**
- * 部門管理 画面のバックエンド API 呼び出し
- *
- * 対象 API: POST /api/kadou/departments/{year}
- * 画面のフォーム値（種別・名称・拠点・年度）をバックエンドの契約に変換して送信し、
- * レスポンスを画面側の Department 型に変換して返す。
- */
 import axios, { AxiosError } from 'axios';
 import {
   Department,

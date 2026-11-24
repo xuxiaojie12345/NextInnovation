@@ -1,6 +1,12 @@
 /* ===== ユーザー管理画面 ===== */
 .user-form {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-form-row {
+  display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 12px;

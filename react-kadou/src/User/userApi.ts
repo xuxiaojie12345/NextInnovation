@@ -1,15 +1,3 @@
-/**
- * ユーザー管理 画面のバックエンド API 呼び出し
- *
- * 対象 API（api_kadou/app/api/user.py）:
- *  - GET    /api/users/select          : ユーザー一覧
- *  - POST   /api/users/insert          : ユーザー追加（重複は 409）
- *  - PUT    /api/users/update/{userId} : ユーザー更新（未登録は 404）
- *  - DELETE /api/users/delete/{userId} : ユーザー削除（未登録は 404）
- *
- * 役職区分（yakushoku_kubun）はコード（0=部長 / 1=管理者 / 2=事業部長）で
- * 送受信し、画面側の UserRole へ変換する。
- */
 import {
   DEFAULT_ROLE,
   ROLE_TO_KUBUN,
