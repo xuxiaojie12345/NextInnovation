@@ -120,26 +120,36 @@ def _check_length(data: dict) -> None:
             raise ValueError(f"{label}が {limit} 文字を超えています。")
 
 
+# 略称で「未入力」とみなす値（DB は半角 '-' だが、全角 '－' や空欄も来うる）
+_ABBR_EMPTY_VALUES = {"", "-", "ー", "‐", "‑", "–", "—", "―", "－", "−", "ｰ"}
+
+
+def _abbr_part(value) -> str:
+    """略称用の1項目を整形する（未入力なら空文字を返す）。
+
+    NOTE: チーム / Subチーム の未入力は DB 上 半角 "-" で保持しているが、
+          空欄・全角 "－"・全角スペースなども「未入力」として扱う。
+          （そうしないと「顧客・案件・－・－」のように区切りが残ってしまう）
+    """
+    text_value = _norm(value)
+    return "" if text_value in _ABBR_EMPTY_VALUES else text_value
+
+
 def build_project_abbr(
     customer: str, case_name: str, team: str, sub_team: str
 ) -> str:
     """プロジェクトの「略称」を組み立てる（フロントエンドと同一規則）。
 
     顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
-    ※未入力の項目は連結しない（"-" は未入力として扱う）
+    ※未入力の項目は連結しない（空欄・"-"・"－" などは未入力として扱う）
     """
-
-    def part(value) -> str:
-        text_value = _norm(value)
-        return "" if text_value == _EMPTY_TEAM else text_value
-
     parts = [
-        part(customer)[:1],
-        part(case_name),
-        part(team),
-        part(sub_team),
+        _abbr_part(customer)[:1],
+        _abbr_part(case_name),
+        _abbr_part(team),
+        _abbr_part(sub_team),
     ]
-    return "・".join(p for p in parts if p != "")
+    return "・".join(p for p in parts if p)
 
 
 def list_projects(db: Session, year_id: str) -> list[dict]:

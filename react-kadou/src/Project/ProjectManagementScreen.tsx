@@ -71,6 +71,31 @@ const LABELS = {
 const TEAM_EMPTY = '-';
 
 /**
+ * 略称で「未入力」とみなす値。
+ * DB は半角 '-' だが、空欄・全角 '－'・ハイフン類・全角スペースなども未入力として扱う
+ * （そうしないと「顧客・案件・－・－」のように余計な区切りが付く）。
+ */
+const ABBR_EMPTY_VALUES: ReadonlySet<string> = new Set([
+  '',
+  '-',
+  'ー',
+  '‐',
+  '‑',
+  '–',
+  '—',
+  '―',
+  '－',
+  '−',
+  'ｰ',
+]);
+
+/** 略称用の1項目を整形する（未入力なら空文字を返す） */
+const abbrPart = (value: string | null | undefined): string => {
+  const v = (value ?? '').replace(/\u3000/g, ' ').trim();
+  return ABBR_EMPTY_VALUES.has(v) ? '' : v;
+};
+
+/**
  * プロジェクトの「略称」を組み立てる。
  * 顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
  * ※自動生成のみ（画面からは編集不可）
@@ -84,8 +109,13 @@ export const buildProjectAbbr = (
   team: string,
   subTeam: string,
 ): string =>
-  [customer.trim().charAt(0), caseName.trim(), team.trim(), subTeam.trim()]
-    .filter((part) => part !== '' && part !== TEAM_EMPTY)
+  [
+    abbrPart(customer).charAt(0),
+    abbrPart(caseName),
+    abbrPart(team),
+    abbrPart(subTeam),
+  ]
+    .filter((part) => part !== '')
     .join('・');
 
 /** 1ページの表示件数 */
@@ -131,7 +161,7 @@ const EMPTY_FORM: ProjectFormValues = {
 
 /**
  * API のプロジェクト（ProjectApiInfo）を画面用の Project へ変換する。
- * 略称はサーバー側で生成されるが、未設定なら画面側で組み立てる。
+ * 略称は画面側で組み立てる（サーバーが古い値を返していても「-・-」を出さない）。
  */
 const toProjectFromApi = (p: ProjectApiInfo): Project => ({
   projectId: p.projectId ?? '',
@@ -140,14 +170,12 @@ const toProjectFromApi = (p: ProjectApiInfo): Project => ({
   caseName: p.caseName ?? '',
   team: p.team ?? '',
   subTeam: p.subTeam ?? '',
-  abbr:
-    p.abbr ??
-    buildProjectAbbr(
-      p.customer ?? '',
-      p.caseName ?? '',
-      p.team ?? '',
-      p.subTeam ?? '',
-    ),
+  abbr: buildProjectAbbr(
+    p.customer ?? '',
+    p.caseName ?? '',
+    p.team ?? '',
+    p.subTeam ?? '',
+  ),
   departmentId: p.departmentId ?? '',
   name: p.project_name ?? '',
   validFlg: p.validFlg ?? true,
@@ -333,7 +361,9 @@ const projectLabel = (p: Project): string =>
  *       projectLabel（Project名称優先）とは別に用意する。
  */
 const projectAbbrLabel = (p: Project): string =>
-  p.abbr || p.name || '（名称未設定）';
+  buildProjectAbbr(p.customer, p.caseName, p.team, p.subTeam) ||
+  p.name ||
+  '（名称未設定）';
 
 /**
  * バックエンドが返した行警告（messageId + params）を表示用の文言へ変換する。
@@ -1118,7 +1148,18 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         dataIndex: 'abbr',
         key: 'abbr',
         width: 240,
-        render: (v: string) => <span className='project-abbr'>{v}</span>,
+        // NOTE: サーバーが返す abbr に依存せず、画面の行データから毎回組み立てる。
+        //       （古い略称が DB/キャッシュに残っていても「顧客・案件・-・-」を出さない）
+        render: (_v: string, row: Project) => (
+          <span className='project-abbr'>
+            {buildProjectAbbr(
+              row.customer,
+              row.caseName,
+              row.team,
+              row.subTeam,
+            )}
+          </span>
+        ),
       },
       {
         title: '所属部門',
