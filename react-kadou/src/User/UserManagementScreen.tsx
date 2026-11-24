@@ -177,14 +177,23 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   }, []);
 
   /** 行の編集開始 */
-  const handleEdit = useCallback((user: AuthUser) => {
-    setEditingId(user.userId);
-    setUserId(user.userId);
-    setName(user.name);
-    setRole(user.role);
-    setDepartmentId(user.departmentId);
-    setPassword(user.password);
-  }, []);
+  const handleEdit = useCallback(
+    (user: AuthUser) => {
+      setEditingId(user.userId);
+      setUserId(user.userId);
+      setName(user.name);
+      setRole(user.role);
+      // 部門IDが空、または部門マスタに存在しない場合は未選択（全部門）として表示する
+      setDepartmentId(
+        user.departmentId &&
+          deptOptions.some((o) => o.value === user.departmentId)
+          ? user.departmentId
+          : undefined,
+      );
+      setPassword(user.password);
+    },
+    [deptOptions],
+  );
 
   /** 登録（新規追加 / 更新） */
   const handleSubmit = useCallback(async () => {
@@ -336,7 +345,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
         title: '所属部門',
         dataIndex: 'departmentId',
         key: 'departmentId',
-        width: 170,
+        width: 165,
         render: (v?: string) => {
           if (!v) return '（全部門）';
           if (findDepartment(deptMaster, v)) {
@@ -496,7 +505,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           </div>
           <div className='form-field'>
             <span className='form-label'>パスワード</span>
-            <Input
+            <Input.Password
               value={password}
               maxLength={PASSWORD_MAX_LENGTH}
               onChange={(e) => setPassword(e.target.value)}
