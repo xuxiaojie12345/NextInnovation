@@ -174,36 +174,33 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const handleDelete = async () => {
     const no = employeeNo.trim();
     if (!isExisting || !no || !masterByNo.has(no)) return;
-    const doDelete = async () => {
-      try {
-        await onDelete(no);
-        handleReset();
-        message.success(`社員番号「${no}」を削除しました。`);
-      } catch (error) {
-        if (isServerError(error)) {
-          onServerError();
-          return;
+    const hasData = hasWorkData(no);
+    Modal.confirm({
+      title: "要員の削除",
+      content: hasData
+        ? `社員番号「${no}」を削除します。当年度の稼働表行・割当・BUFFERも削除されますが、よろしいでしょうか。`
+        : `社員番号「${no}」を削除しますか？`,
+      okText: "削除",
+      cancelText: "キャンセル",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await onDelete(no);
+          handleReset();
+          message.success(`社員番号「${no}」を削除しました。`);
+        } catch (error) {
+          if (isServerError(error)) {
+            onServerError();
+            return;
+          }
+          message.error(
+            `削除できませんでした：${
+              error instanceof Error ? error.message : "不明なエラー"
+            }`,
+          );
         }
-        message.error(
-          `削除できませんでした：${
-            error instanceof Error ? error.message : "不明なエラー"
-          }`,
-        );
-      }
-    };
-    if (hasWorkData(no)) {
-      Modal.confirm({
-        title: "要員の削除",
-        content:
-          "当年度の稼働表行・割当・BUFFERも削除されますが、よろしいでしょうか。",
-        okText: "削除",
-        cancelText: "キャンセル",
-        okButtonProps: { danger: true },
-        onOk: doDelete,
-      });
-      return;
-    }
-    doDelete();
+      },
+    });
   };
 
   /**

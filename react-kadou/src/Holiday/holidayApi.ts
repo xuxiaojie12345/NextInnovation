@@ -6,6 +6,7 @@
  * - POST /api/holidays?year=YYYY  休日登録（同一日付は 409）
  */
 import { Holiday, HolidayKind } from '../data/yearStore';
+import { apiFetch } from '../api/apiConnection';
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000'
@@ -49,7 +50,7 @@ export class HolidayApiError extends Error {
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await apiFetch(`${API_BASE_URL}${path}`, {
       headers: {
         'Content-Type': 'application/json',
         ...init?.headers,

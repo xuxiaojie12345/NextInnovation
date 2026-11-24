@@ -6,12 +6,14 @@
  */
 import axios, { AxiosError } from 'axios';
 import type { YearSummary } from '../data/yearStore';
+import { attachApiConnectionMonitor } from '../api/apiConnection';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL ?? '',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
+attachApiConnectionMonitor(api);
 
 /** バックエンドの年度サマリ（バックエンドの YearSummary に対応） */
 export interface YearSummaryResponse {

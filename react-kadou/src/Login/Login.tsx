@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Card, Form, Input, Typography } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import "./Login.css";
+import { apiFetch } from "../api/apiConnection";
 
 const { Title, Text } = Typography;
 
@@ -38,7 +39,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/kadou/login`, {
+      const res = await apiFetch(`${API_BASE_URL}/api/kadou/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

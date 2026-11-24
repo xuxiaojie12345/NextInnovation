@@ -6,6 +6,7 @@
  */
 import axios, { AxiosError } from 'axios';
 import { Project } from '../WorkStatus/types';
+import { attachApiConnectionMonitor } from '../api/apiConnection';
 
 /**
  * API クライアント。
@@ -19,6 +20,7 @@ const api = axios.create({
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
+attachApiConnectionMonitor(api);
 
 /** プロジェクト一覧取得 API のレスポンス（バックエンドの ProjectQueryOut に対応） */
 export interface ProjectQueryResponse {

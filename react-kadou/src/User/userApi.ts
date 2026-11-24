@@ -16,6 +16,7 @@ import {
   YAKUSHOKU_ROLE_MAP,
 } from '../constants/options';
 import type { AuthUser, UserRole } from '../data/userTypes';
+import { apiFetch } from '../api/apiConnection';
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000'
@@ -68,7 +69,7 @@ const request = async <T>(
 ): Promise<T> => {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await apiFetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers: {
         'Content-Type': 'application/json',

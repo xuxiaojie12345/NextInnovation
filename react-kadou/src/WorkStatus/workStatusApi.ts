@@ -9,6 +9,7 @@ import axios from 'axios';
 import { AssignmentMap, WorkStatusRow } from './types';
 import type { UnpaidMap, WorkStatusData } from '../data/yearStore';
 import { buildYearWeeks } from '../data/yearWeeks';
+import { attachApiConnectionMonitor } from '../api/apiConnection';
 
 /**
  * API クライアント。
@@ -22,6 +23,7 @@ const api = axios.create({
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
+attachApiConnectionMonitor(api);
 
 /** 未配分（未アサイン）を表す予約プロジェクトコード（バックエンドと共通） */
 export const UNASSIGN_PROJECT_ID = 'UNASSIGN';

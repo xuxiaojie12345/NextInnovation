@@ -1,4 +1,5 @@
 import { Personnel } from '../WorkStatus/types';
+import { apiFetch } from '../api/apiConnection';
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000'
@@ -25,7 +26,7 @@ const request = async <T>(
   userId: string,
   init?: RequestInit,
 ): Promise<T> => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await apiFetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',

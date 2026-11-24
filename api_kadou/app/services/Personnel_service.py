@@ -12,6 +12,7 @@ from app.sql.Personnel_sql import (
     SQL_LIST_JN_PERSONNEL_MASTER,
     SQL_UPDATE_JN_PERSONNEL_MASTER,
 )
+from app.sql.WorkStatus_sql import WORK_STATUS_DELETE_BY_EMPLOYEES
 
 # 未登録の所属（部門マスタに無い）を表す department_id
 UNREGISTERED_DEPARTMENT_ID = 0
@@ -53,20 +54,26 @@ def get_personnel_by_emp_no(db: Session, year: int, employeeNo: str):
 def get_personnel_list(db: Session, year: int):
     rows = db.execute(SQL_LIST_JN_PERSONNEL_MASTER, {"year": year}).fetchall()
     latest_by_employee = {}
+    has_idou = {}
     for row in rows:
         person = row._asdict()
-        latest_by_employee.setdefault(
-            person["employeeNo"],
-            {
-                "employeeNo": person["employeeNo"],
-                "departmentId": _to_screen_department_id(person["departmentId"]),
-                "name": person["name"],
-                "role": person["role"],
-                "leavePlan": person["leavePlan"],
-                "idouFlag": person.get("idouFlag") or "0",
-            },
-        )
-    return list(latest_by_employee.values())
+        emp_no = person["employeeNo"]
+        if person.get("idouFlag") == "1":
+            has_idou[emp_no] = "1"
+        # setdefault で最初の1件を採用する（SQL は idou_flag='0' 優先でソート済み）
+        latest_by_employee.setdefault(emp_no, person)
+    return [
+        {
+            "employeeNo": person["employeeNo"],
+            "departmentId": _to_screen_department_id(person["departmentId"]),
+            "name": person["name"],
+            "role": person["role"],
+            "leavePlan": person["leavePlan"],
+            # idouFlag：有効レコードの値ではなく、本年度異動有無を返す
+            "idouFlag": has_idou.get(emp_no, person.get("idouFlag") or "0"),
+        }
+        for emp_no, person in latest_by_employee.items()
+    ]
 
 
 def get_dept_name(db: Session, year: int, departmentId: str):
@@ -108,13 +115,23 @@ def save_personnel_records(db: Session, records: list):
 
 
 def delete_personnel(db: Session, year: int, employeeNo: str):
+    """要員マスタと週次アサインを同一トランザクションで削除する
+
+    異動済みの要員マスタは (year_id, employee_no) で 2 件存在するため、
+    要員マスタはまとめて削除する。週次アサインも当年度の分を同時に削除する。
+    """
     try:
-        result = db.execute(
+        personnel_result = db.execute(
             SQL_DELETE_JN_PERSONNEL_MASTER,
             {"year": year, "employeeNo": employeeNo},
         )
+        # 週次アサイン（存在しなければ影響 0 なので常に実行してよい）
+        db.execute(
+            WORK_STATUS_DELETE_BY_EMPLOYEES,
+            {"year_id": str(year), "employee_nos": [employeeNo]},
+        )
         db.commit()
-        return result.rowcount > 0
+        return personnel_result.rowcount > 0
     except Exception:
         db.rollback()
         raise

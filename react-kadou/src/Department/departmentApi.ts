@@ -11,6 +11,7 @@ import {
   DepartmentKind,
   DepartmentLocation,
 } from '../WorkStatus/types';
+import { attachApiConnectionMonitor } from '../api/apiConnection';
 
 /**
  * API クライアント。
@@ -24,6 +25,7 @@ const api = axios.create({
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
+attachApiConnectionMonitor(api);
 
 /** 画面フォームから受け取る値 */
 export interface DepartmentFormValues {

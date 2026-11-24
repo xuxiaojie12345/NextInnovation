@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Button, Card, Typography, message } from "antd";
+import { message } from "antd";
 import AppMenu from "./Menu/Menu";
 import type { MenuKey } from "./Menu/Menu";
 import Login from "./Login/Login";
@@ -25,6 +25,11 @@ import WorkStatus from "./WorkStatus/WorkStatus";
 import YearSelectScreen from "./YearSelect/YearSelectScreen";
 import UserManagementScreen from "./User/UserManagementScreen";
 import UnsavedChangesModal from "./components/UnsavedChangesModal";
+import ServerErrorScreen from "./Error/ServerErrorScreen";
+import {
+  CONNECTION_ERROR_STATUS,
+  onApiConnectionError,
+} from "./api/apiConnection";
 import { Department, Personnel, Project } from "./WorkStatus/types";
 import type { PersonnelImportRow } from "./Personnel/personnelImport";
 import { AuthUser, defaultDepartmentsOf } from "./data/userTypes";
@@ -57,8 +62,6 @@ const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
 type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
-const { Title, Text } = Typography;
-
 /**
  * サーバーエラー（5xx / 通信失敗）かどうか。
  * Login 画面と同じ扱いで、5xx はエラー画面へ切り替え、4xx はメッセージ表示にする。
@@ -88,8 +91,12 @@ function App() {
   );
   // 表示中の画面
   const [activeView, setActiveView] = useState<MenuKey>("work-status");
-  // サーバーエラー（5xx / 通信失敗）。true の間はログイン画面と同じエラー画面を全画面表示する
+  // サーバーエラー（5xx / 通信失敗）。true の間は接続エラー画面を全画面表示する
   const [serverError, setServerError] = useState(false);
+  // エラー画面に表示する HTTP ステータス（通信不可は 503）
+  const [serverErrorStatus, setServerErrorStatus] = useState(
+    CONNECTION_ERROR_STATUS,
+  );
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
   // 未保存確認ダイアログで保留中の操作
@@ -105,17 +112,21 @@ function App() {
   /** ログイン中のユーザーID（登録・更新ユーザーとしてバックエンドへ送信する） */
   const loginUserId = currentUser?.userId ?? "";
 
-  /** サーバーエラー（5xx / 通信失敗）時にログイン画面と同じエラー画面へ切り替える */
+  /** サーバーエラー（5xx / 通信失敗）時に接続エラー画面へ切り替える */
   const handleServerError = useCallback(() => {
+    setServerErrorStatus(CONNECTION_ERROR_STATUS);
     setServerError(true);
   }, []);
 
-  /** エラー画面の「ログイン画面へ戻る」（ログアウトしてログイン画面を表示する） */
-  const handleServerErrorBack = useCallback(() => {
-    setServerError(false);
-    setCurrentUser(null);
-    setCurrentUserId(null);
-  }, []);
+  /** すべての API 呼び出しの接続失敗を監視し、エラー画面へ切り替える */
+  useEffect(
+    () =>
+      onApiConnectionError((status) => {
+        setServerErrorStatus(status);
+        setServerError(true);
+      }),
+    [],
+  );
 
   /**
    * 年度選択画面に表示する年度ごとの概要。
@@ -715,21 +726,9 @@ function App() {
     ),
   };
 
-  // サーバーエラー発生時は、メニューを出さずログイン画面と同じエラー画面を表示する
+  // サーバーエラー発生時は、メニューを出さず接続エラー画面を表示する
   if (serverError) {
-    return (
-      <div className='login-page'>
-        <Card className='login-card login-server-error' role='alert'>
-          <Title level={4}>エラー</Title>
-          <Text>
-            サーバーエラーが発生しました。しばらく経ってから再度お試しください。
-          </Text>
-          <Button type='primary' block onClick={handleServerErrorBack}>
-            ログイン画面へ戻る
-          </Button>
-        </Card>
-      </div>
-    );
+    return <ServerErrorScreen status={serverErrorStatus} />;
   }
 
   // 未ログイン時はログイン画面を表示する

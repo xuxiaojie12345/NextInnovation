@@ -425,7 +425,7 @@ def transfer_employee(
                     "year": year_number,
                     "employeeNo": employee_no,
                     "departmentId": new_dept_id,
-                    "idouFlag": "1",
+                    "idouFlag": "0",
                     "idoubi": idoubi,
                     "personName": person["name"],
                     "role": person["role"],

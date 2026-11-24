@@ -9,7 +9,8 @@ SQL_GET_JN_PERSONNEL_MASTER = text("""
     FROM `JN_PERSONNEL_MASTER`
     WHERE year_id = :year
     AND employee_no = :employeeNo
-    ORDER BY update_datetime DESC, register_datetime DESC
+    ORDER BY CASE WHEN idou_flag = '0' THEN 0 ELSE 1 END,
+             update_datetime DESC, register_datetime DESC
     LIMIT 1
 """)
 
@@ -20,7 +21,9 @@ SQL_LIST_JN_PERSONNEL_MASTER = text("""
            update_datetime, register_datetime
     FROM `JN_PERSONNEL_MASTER`
     WHERE year_id = :year
-    ORDER BY employee_no, update_datetime DESC, register_datetime DESC
+    ORDER BY employee_no,
+             CASE WHEN idou_flag = '0' THEN 0 ELSE 1 END,
+             update_datetime DESC, register_datetime DESC
 """)
 
 SQL_GET_JN_DEPARTMENT_MASTER = text("""
@@ -68,6 +71,7 @@ SET department_id = :departmentId,
     update_user = :updateUser
 WHERE year_id = :year
 AND employee_no = :employeeNo
+AND idou_flag = '0'
 """)
 
 # 異動：元の所属レコードに異動フラグ・異動開始日を設定する
