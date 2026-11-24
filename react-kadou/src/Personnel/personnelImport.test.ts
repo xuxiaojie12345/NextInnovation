@@ -279,7 +279,10 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/E3/N3/R3）', () =
       role: 'T01',
       departmentAlias: 'システム開発部',
       workLocation: '東京',
-      line: 3,
+      // line はプレビュー表（取込対象の先頭が 1 行目）での行番号
+      line: 1,
+      // Excel 上の行番号は sourceLine に保持する
+      sourceLine: 3,
     });
   });
 
@@ -305,7 +308,9 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/E3/N3/R3）', () =
 
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].employeeNo).toBe('10002');
-    expect(result.rows[0].line).toBe(3);
+    // プレビュー表では先頭行（= 1 行目）。Excel 上は 3 行目
+    expect(result.rows[0].line).toBe(1);
+    expect(result.rows[0].sourceLine).toBe(3);
   });
 
   it('Excel の振り仮名（<rPh>）を名前に混入させない', async () => {
@@ -407,6 +412,86 @@ describe('parsePersonnelFile（固定テンプレート B3/C3/E3/N3/R3）', () =
 
     expect(result.rows).toHaveLength(0);
     expect(result.warnings).toHaveLength(1); // E列が空のため1件警告
+  });
+
+  it('空行を挟むと line（プレビュー行）は詰まり、Excel 行番号は sourceLine に残る', async () => {
+    const strings = sharedStrings([
+      '<t>10001</t>',
+      '<t>山田 太郎</t>',
+      '<t>T01</t>',
+      '<t>開発部</t>',
+      '<t>東京</t>',
+      '<t>10002</t>',
+      '<t>佐藤 花子</t>',
+      '<t>T02</t>',
+      '<t>営業部</t>',
+      '<t>大阪</t>',
+    ]);
+    // 3行目＝1件目、4行目は完全な空行、5行目＝2件目
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+      E3: '3',
+      N3: '4',
+      B5: '5',
+      C5: '6',
+      R5: '7',
+      E5: '8',
+      N5: '9',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(2);
+    // プレビュー表では 1 行目・2 行目（空行は詰められる）
+    expect(result.rows[0].line).toBe(1);
+    expect(result.rows[1].line).toBe(2);
+    // Excel 上は 3 行目・5 行目
+    expect(result.rows[0].sourceLine).toBe(3);
+    expect(result.rows[1].sourceLine).toBe(5);
+  });
+
+  it('取り込まない行の警告もプレビュー行番号で示す（Excel 行番号ではない）', async () => {
+    const strings = sharedStrings([
+      // 3行目：正常（プレビュー1行目になる）
+      '<t>10001</t>',
+      '<t>山田 太郎</t>',
+      '<t>T01</t>',
+      '<t>開発部</t>',
+      '<t>東京</t>',
+      // 4行目：氏名なし → 取り込まない（警告はプレビュー2行目）
+      '<t>10002</t>',
+      // 5行目：正常（プレビュー2行目になる）
+      '<t>10003</t>',
+      '<t>佐藤 花子</t>',
+      '<t>T02</t>',
+      '<t>営業部</t>',
+      '<t>大阪</t>',
+    ]);
+    const sheet = sheetFromCells({
+      B3: '0',
+      C3: '1',
+      R3: '2',
+      E3: '3',
+      N3: '4',
+      B4: '5',
+      B5: '6',
+      C5: '7',
+      R5: '8',
+      E5: '9',
+      N5: '10',
+    });
+
+    const result = await parsePersonnelFile(makeXlsxFile(strings, sheet));
+
+    expect(result.rows).toHaveLength(2);
+    expect(result.rows[1].line).toBe(2);
+    expect(result.rows[1].sourceLine).toBe(5);
+    // 警告の行番号は「プレビュー表での位置（2 行目）」。Excel の 4 行目ではない
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toContain('2行目');
+    expect(result.warnings[0]).not.toContain('4行目');
   });
 });
 

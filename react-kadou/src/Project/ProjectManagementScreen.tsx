@@ -71,6 +71,31 @@ const LABELS = {
 const TEAM_EMPTY = '-';
 
 /**
+ * 略称で「未入力」とみなす値。
+ * DB は半角 '-' だが、空欄・全角 '－'・ハイフン類・全角スペースなども未入力として扱う
+ * （そうしないと「顧客・案件・－・－」のように余計な区切りが付く）。
+ */
+const ABBR_EMPTY_VALUES: ReadonlySet<string> = new Set([
+  '',
+  '-',
+  'ー',
+  '‐',
+  '‑',
+  '–',
+  '—',
+  '―',
+  '－',
+  '−',
+  'ｰ',
+]);
+
+/** 略称用の1項目を整形する（未入力なら空文字を返す） */
+const abbrPart = (value: string | null | undefined): string => {
+  const v = (value ?? '').replace(/\u3000/g, ' ').trim();
+  return ABBR_EMPTY_VALUES.has(v) ? '' : v;
+};
+
+/**
  * プロジェクトの「略称」を組み立てる。
  * 顧客の1番目の文字 ＋「・」＋ 案件 ＋「・」＋ チーム ＋「・」＋ Subチーム
  * ※自動生成のみ（画面からは編集不可）
@@ -84,8 +109,13 @@ export const buildProjectAbbr = (
   team: string,
   subTeam: string,
 ): string =>
-  [customer.trim().charAt(0), caseName.trim(), team.trim(), subTeam.trim()]
-    .filter((part) => part !== '' && part !== TEAM_EMPTY)
+  [
+    abbrPart(customer).charAt(0),
+    abbrPart(caseName),
+    abbrPart(team),
+    abbrPart(subTeam),
+  ]
+    .filter((part) => part !== '')
     .join('・');
 
 /** 1ページの表示件数 */
@@ -131,7 +161,7 @@ const EMPTY_FORM: ProjectFormValues = {
 
 /**
  * API のプロジェクト（ProjectApiInfo）を画面用の Project へ変換する。
- * 略称はサーバー側で生成されるが、未設定なら画面側で組み立てる。
+ * 略称は画面側で組み立てる（サーバーが古い値を返していても「-・-」を出さない）。
  */
 const toProjectFromApi = (p: ProjectApiInfo): Project => ({
   projectId: p.projectId ?? '',
@@ -140,14 +170,12 @@ const toProjectFromApi = (p: ProjectApiInfo): Project => ({
   caseName: p.caseName ?? '',
   team: p.team ?? '',
   subTeam: p.subTeam ?? '',
-  abbr:
-    p.abbr ??
-    buildProjectAbbr(
-      p.customer ?? '',
-      p.caseName ?? '',
-      p.team ?? '',
-      p.subTeam ?? '',
-    ),
+  abbr: buildProjectAbbr(
+    p.customer ?? '',
+    p.caseName ?? '',
+    p.team ?? '',
+    p.subTeam ?? '',
+  ),
   departmentId: p.departmentId ?? '',
   name: p.project_name ?? '',
   validFlg: p.validFlg ?? true,
@@ -171,14 +199,11 @@ const FIELD_LIMITS: Partial<Record<keyof ProjectFormValues, [number, string]>> =
   name: [30, 'Project名称'],
 };
 
-/** フォームの入力エラー（キーごとの赤字メッセージ。'' = エラーなし） */
-type FormErrors = Partial<Record<keyof ProjectFormValues, string>>;
-
 /**
- * 1項目分の入力チェック（最大長 + 必須）。
+ * 1項目分の入力チェック（必須のみ）。
  *
- * NOTE: フォーカスを失った時点（onBlur）でこの関数だけを呼び、
- *       その項目の赤字メッセージを即時に出せるようにしている。
+ * NOTE: 桁数チェックは行わない。入力欄は maxLength により上限に達したら
+ *       入力不可にしてあるため、桁数超過は発生しない。
  *
  * @param key     チェック対象の項目
  * @param value   入力値
@@ -190,27 +215,16 @@ const validateField = (
   value: string | boolean,
   options: { required: boolean },
 ): string | undefined => {
-  // 1) 最大長チェック（文字列項目のみ。チェックボックスは対象外）
-  const limit = FIELD_LIMITS[key];
-  if (limit && typeof value === 'string') {
-    const [max, label] = limit;
-    if (value.trim().length > max) {
-      // 文言は messages.ts に集約する（画面で文字列を直書きしない）
-      return t('E_KADOU_067', [label, max]);
-    }
-  }
-
-  // 2) 必須チェック（登録・修正時のみ）
+  if (typeof value !== 'string') return undefined;
+  // 必須チェック（登録・修正時のみ）
   if (options.required) {
     const required = REQUIRED_FIELDS.find(([k]) => k === key);
-    if (required) {
+    if (required && !value.trim()) {
       const label = required[1];
-      if (!String(value ?? '').trim()) {
-        // 文言は messages.ts に集約する（入力＝W_KADOU_001 / 選択＝W_KADOU_002）
-        return key === 'departmentId'
-          ? t('W_KADOU_002', [label])
-          : t('W_KADOU_001', [label]);
-      }
+      // 文言は messages.ts に集約する（入力＝W_KADOU_001 / 選択＝W_KADOU_002）
+      return key === 'departmentId'
+        ? t('W_KADOU_002', [label])
+        : t('W_KADOU_001', [label]);
     }
   }
 
@@ -218,33 +232,37 @@ const validateField = (
 };
 
 /**
- * 入力値を検証する（必須チェック + 最大長チェック）。
- * 1項目ずつ validateField に委譲し、画面全体のエラー表を組み立てる。
+ * 入力値を検証し、最初の不備だけを返す。
+ *
+ * 判定順は画面の上から下・左から右：
+ *   顧客 → 案件 → チーム → Subチーム → Project名称 → 所属部門 → 項目ID
+ * ユーザーが上から順に直していけるよう、1 件見つかった時点で打ち切る。
+ *
+ * NOTE: 桁数チェックは行わない（入力欄の maxLength で入力自体を止めるため）。
  */
-const validateForm = (
+const findFirstFormProblem = (
   form: ProjectFormValues,
   options: { required: boolean },
-): FormErrors => {
-  const errors: FormErrors = {};
-
-  // NOTE: 必須項目（所属部門など）は FIELD_LIMITS に無い場合があるため、
-  //       FIELD_LIMITS のキーだけを走査すると必須チェックが漏れる。
-  //       両者のキーを合わせて 1 回ずつ検証する。
-  const keys = new Set<keyof ProjectFormValues>([
-    ...(Object.keys(FIELD_LIMITS) as Array<keyof ProjectFormValues>),
-    ...REQUIRED_FIELDS.map(([k]) => k),
-  ]);
-
-  keys.forEach((key) => {
+): string | null => {
+  /** 画面の表示順（上→下 / 左→右） */
+  const order: Array<keyof ProjectFormValues> = [
+    'customer',
+    'caseName',
+    'team',
+    'subTeam',
+    'name',
+    'departmentId',
+    'projectCode',
+  ];
+  for (const key of order) {
     const message = validateField(key, form[key], options);
-    if (message) errors[key] = message;
-  });
-
-  return errors;
+    if (message) return message;
+  }
+  return null;
 };
 
 /** 一括読み込みの1行を API 送信形式へ変換する */
-const toApiRow = (row: ProjectImportRow, index: number) => ({
+const toApiRow = (row: ProjectImportRow) => ({
   customer: row.customer,
   caseName: row.caseName,
   team: row.team,
@@ -252,8 +270,10 @@ const toApiRow = (row: ProjectImportRow, index: number) => ({
   department: row.department,
   projectCode: row.projectCode,
   project_name: row.name,
-  // 画面に出す行番号は見出し行を除いた 1 始まり
-  line: index + 1,
+  // NOTE: line は「プレビュー表での行番号」。バックエンドが返す警告の
+  //       「n行目」もこの値になるため、ユーザーが見ている表の行と一致する。
+  //       （空行などをスキップした Excel の行番号ではない）
+  line: row.line,
 });
 
 /**
@@ -320,7 +340,8 @@ const detectFileDuplicates = (
   rows.forEach((row, i) => {
     const key = uniqueKey(row.customer, row.caseName, row.team, row.subTeam);
     const list = grouped.get(key) ?? [];
-    list.push(i + 1);
+    // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う
+    list.push(row.line ?? i + 1);
     grouped.set(key, list);
   });
 
@@ -340,7 +361,9 @@ const projectLabel = (p: Project): string =>
  *       projectLabel（Project名称優先）とは別に用意する。
  */
 const projectAbbrLabel = (p: Project): string =>
-  p.abbr || p.name || '（名称未設定）';
+  buildProjectAbbr(p.customer, p.caseName, p.team, p.subTeam) ||
+  p.name ||
+  '（名称未設定）';
 
 /**
  * バックエンドが返した行警告（messageId + params）を表示用の文言へ変換する。
@@ -459,7 +482,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     const detected = detectDuplicateReasons(importRows, projects);
     const lines = new Set<number>();
     detected.forEach((reasons, i) => {
-      if (reasons.length > 0) lines.add(i + 1);
+      // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う
+      if (reasons.length > 0) lines.add(importRows[i].line ?? i + 1);
     });
     return lines;
   }, [importRows, importCheck, projects]);
@@ -533,7 +557,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const unresolvedDeptRows = useMemo(
     () =>
       (importRows ?? []).filter((row, index) => {
-        const lineNo = index + 1;
+        // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う
+        const lineNo = row.line ?? index + 1;
         return (
           !row.departmentId &&
           !importFullDupLines.has(lineNo) &&
@@ -652,12 +677,12 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
 
   /** 一括読み込み：プレビュー行の所属部門を手動で選び直す（一致しなかった行のみ） */
   const handleImportDepartmentChange = useCallback(
-    (index: number, departmentId: string) => {
+    (lineNo: number, departmentId: string) => {
       const dept = findDepartment(deptMaster, departmentId);
       setImportRows((prev) =>
         prev
           ? prev.map((r, i) =>
-              i === index
+              (r.line ?? i + 1) === lineNo
                 ? {
                     ...r,
                     departmentId,
@@ -731,36 +756,22 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     form.subTeam,
   );
 
-  /** フォームの入力エラー（入力欄の下に赤字で表示する） */
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
-
-  /** フォームの1項目を更新 */
+  /**
+   * フォームの1項目を更新する。
+   *
+   * NOTE: 文字列項目は最大長で切り捨てる（＝達したらそれ以上入力できない）。
+   *       上限を超える入力があっても弾窗は出さず、静かに切り捨てる。
+   */
   const setField = <K extends keyof ProjectFormValues>(
     key: K,
     value: ProjectFormValues[K],
   ) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    // 入力し直したらその項目のエラーを解除する
-    setFormErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
-  };
-
-  /**
-   * 入力欄からフォーカスが外れたときに、その項目の最大長だけをチェックして
-   * 問題があれば赤字メッセージを即時表示する。
-   *
-   * NOTE: 必須チェックはここでは行わない（入力途中に「入力してください」が
-   *       出ると煩わしいため）。必須チェックは「登録する」「修正する」押下時に
-   *       validateForm(required: true) でまとめて判定する。
-   *       部門（Select）は選択時に値が入るため対象外（onBlur を付けていない）。
-   */
-  const handleBlur = (key: keyof ProjectFormValues) => {
-    // 必須チェックは押下時のみ。ここでは最大長だけを見る
-    const message = validateField(key, form[key], { required: false });
-    setFormErrors((prev) => {
-      // 変化なしなら再レンダーを避ける
-      if (prev[key] === message) return prev;
-      return { ...prev, [key]: message };
-    });
+    let next = value;
+    const limit = FIELD_LIMITS[key];
+    if (limit && typeof value === 'string' && value.length > limit[0]) {
+      next = value.slice(0, limit[0]) as ProjectFormValues[K];
+    }
+    setForm((prev) => ({ ...prev, [key]: next }));
   };
 
   /**
@@ -769,7 +780,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
    */
   const clearForm = useCallback(() => {
     setForm(EMPTY_FORM);
-    setFormErrors({});
   }, []);
 
   /**
@@ -779,7 +789,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const cancelEdit = useCallback(() => {
     setEditingKey(null);
     setForm(EMPTY_FORM);
-    setFormErrors({});
   }, []);
 
   /**
@@ -788,7 +797,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   const handleResetForm = useCallback(() => {
     setEditingKey(null);
     setForm(EMPTY_FORM);
-    setFormErrors({});
   }, []);
 
   /** 修正（選択したプロジェクトをフォームへ読み込む） */
@@ -814,7 +822,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
       validFlg: row.validFlg,
       educationFlg: row.educationFlg,
     });
-    setFormErrors({});
     // 修正ボタン押下時は画面を最上部（初期表示位置）へ戻す。
     // NOTE: scrollIntoView だとフォーム位置までしか戻らないため使わない。
     //       対象要素が画面内にあると何もしないなど挙動も環境依存になる。
@@ -847,12 +854,27 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     [year, setProjects],
   );
 
+  /**
+   * 入力の不備を画面へ知らせる。
+   *
+   * NOTE: 部門管理画面と完全に同じ表示方法（antd の message.warning）にする。
+   *       すなわち画面上部にメッセージ 1 文を表示し、数秒で自動的に消える。
+   *       タイトル黒体字もボタン（弾窗）も付けない。
+   */
+  const showInputProblem = (messageText: string) => {
+    message.warning(messageText);
+  };
+
   /** 新規登録 / 修正の実行（DB の jn_project_master へ保存する） */
   const handleSubmit = async () => {
-    // 入力チェック（必須・最大長）。不正な場合は入力欄の下に赤字で表示する
-    const errors = validateForm(form, { required: true });
-    setFormErrors(errors);
-    if (Object.values(errors).some(Boolean)) return;
+    // 入力チェック（必須）。最初の不備 1 件だけを弾窗で知らせる
+    // NOTE: 桁数チェックは入力欄の maxLength で入力自体を止めているため行わない。
+    //       弾窗はタイトル・リスト・ボタンを付けず、メッセージ 1 文だけを表示する。
+    const problem = findFirstFormProblem(form, { required: true });
+    if (problem) {
+      showInputProblem(problem);
+      return;
+    }
 
     const payload = {
       customer: form.customer.trim(),
@@ -994,7 +1016,8 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     // 重複行は取り込まないため対象外。
     const unresolvedDeptProblems = importRows
       .map((row, index) =>
-        !row.departmentId && !importFullDupLines.has(index + 1)
+        !row.departmentId &&
+        !importFullDupLines.has(row.line ?? index + 1)
           ? `${row.line ? `${row.line}行目：` : ''}所属部門を特定できません（ファイルの値が部門マスタの部門名称・部門別名と一致しません。プレビューで選択してください）`
           : '',
       )
@@ -1125,7 +1148,18 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
         dataIndex: 'abbr',
         key: 'abbr',
         width: 240,
-        render: (v: string) => <span className='project-abbr'>{v}</span>,
+        // NOTE: サーバーが返す abbr に依存せず、画面の行データから毎回組み立てる。
+        //       （古い略称が DB/キャッシュに残っていても「顧客・案件・-・-」を出さない）
+        render: (_v: string, row: Project) => (
+          <span className='project-abbr'>
+            {buildProjectAbbr(
+              row.customer,
+              row.caseName,
+              row.team,
+              row.subTeam,
+            )}
+          </span>
+        ),
       },
       {
         title: '所属部門',
@@ -1236,6 +1270,14 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<ProjectImportRow> = [
     {
+      // 行番号（＝エラーメッセージの「n行目」と一致する）
+      title: '行',
+      key: 'line',
+      width: 56,
+      align: 'right',
+      render: (_, row, index) => row.line ?? index + 1,
+    },
+    {
       title: '区分',
       key: 'kind',
       width: 130,
@@ -1246,9 +1288,10 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
        *   重複           … 一意キーが既存データと一致 → 取り込まない
        *   追加           … 重複なし（そのまま追加）
        */
-      render: (_, row) => {
-        const index = importRows ? importRows.indexOf(row) : -1;
-        const lineNo = index >= 0 ? index + 1 : -1;
+      render: (_, row, index) => {
+        // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う。
+        //       indexOf(row) は参照変化に弱いため使わない。
+        const lineNo = row.line ?? index + 1;
         if (importFileDuplicates.lines.has(lineNo)) {
           return <Tag color='magenta'>ファイル内重複</Tag>;
         }
@@ -1273,9 +1316,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
        *   2) 一致しない行 → プルダウンで選択させる（未選択は赤字）
        *   3) 重複行（取り込まない）→ 参照のみ（プルダウンは出さない）
        */
-      render: (_, row) => {
-        const index = importRows ? importRows.indexOf(row) : -1;
-        const lineNo = index >= 0 ? index + 1 : -1;
+      render: (_, row, index) => {
+        // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う
+        const lineNo = row.line ?? index + 1;
         // ファイル内重複・既存データ重複の行は取り込まないので選択させない
         const notImported =
           importFileDuplicates.lines.has(lineNo) ||
@@ -1304,7 +1347,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             style={{ width: '100%' }}
             value={row.departmentId || undefined}
             options={departmentOptions}
-            onChange={(v: string) => handleImportDepartmentChange(index, v)}
+            onChange={(v: string) => handleImportDepartmentChange(lineNo, v)}
           />
         );
       },
@@ -1322,38 +1365,38 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
             {year}年度　プロジェクト管理
           </Title>
           <Text type='secondary'>
-            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは統計の集計にだけ影響します（既定：有効 / 非教育）。右上の「一括読み込む」から Excel / CSV を取り込めます（所属部門は部門マスタと照合し、一致しない場合はプレビューで選択します）。
+            プロジェクト（顧客・案件・チーム・Subチーム・所属部門・項目ID・Project名称）を管理します。必須は 顧客 / 案件 / 所属部門 の 3 項目で、略称 は「顧客の1文字目・案件・チーム・Subチーム」で自動生成されます。有効稼働・教育かどうかは統計の集計にだけ影響します（既定：有効 / 非教育）。下の「一括読み込む」から Excel / CSV を取り込めます（所属部門は部門マスタと照合し、一致しない場合はプレビューで選択します）。
           </Text>
         </div>
+      </div>
 
-        {/* 右上：プロジェクト情報（Excel / CSV）の一括読み込み */}
-        <div className='project-header-side'>
-          <Space size={8} wrap align='center'>
-            <Text strong>プロジェクト情報</Text>
-            <Upload
-              accept={PROJECT_IMPORT_ACCEPT}
-              showUploadList={false}
-              multiple={false}
-              disabled={importing}
-              beforeUpload={(file) => {
-                // サーバーへは送信せず、フロントで解析してから API へ送る
-                void handleImportFile(file);
-                return false;
-              }}
+      {/* プロジェクト情報（Excel / CSV）の一括読み込み（タイトルの下） */}
+      <div className='project-header-side'>
+        <Space size={8} wrap align='center'>
+          <Text strong>プロジェクト情報</Text>
+          <Upload
+            accept={PROJECT_IMPORT_ACCEPT}
+            showUploadList={false}
+            multiple={false}
+            disabled={importing}
+            beforeUpload={(file) => {
+              // サーバーへは送信せず、フロントで解析してから API へ送る
+              void handleImportFile(file);
+              return false;
+            }}
+          >
+            <Button
+              type='primary'
+              icon={<UploadOutlined />}
+              loading={importing}
             >
-              <Button
-                type='primary'
-                icon={<UploadOutlined />}
-                loading={importing}
-              >
-                一括読み込む
-              </Button>
-            </Upload>
-          </Space>
-          <Text type='secondary' className='project-import-hint'>
-            {PROJECT_IMPORT_FORMAT_HINT}
-          </Text>
-        </div>
+              一括読み込む
+            </Button>
+          </Upload>
+        </Space>
+        <Text type='secondary' className='project-import-hint'>
+          {PROJECT_IMPORT_FORMAT_HINT}
+        </Text>
       </div>
 
       <div ref={formRef}>
@@ -1370,32 +1413,18 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：桜井商事'
                   value={form.customer}
-                  maxLength={200}
-                  status={formErrors.customer ? 'error' : undefined}
+                  maxLength={FIELD_LIMITS.customer?.[0]}
                   onChange={(e) => setField('customer', e.target.value)}
-                  onBlur={() => handleBlur('customer')}
                 />
-                {formErrors.customer && (
-                  <Text type='danger' style={{ fontSize: 12 }}>
-                    {formErrors.customer}
-                  </Text>
-                )}
               </div>
               <div>
                 <div className='form-label'>案件（必須）</div>
                 <Input
                   placeholder='例：基幹刷新'
                   value={form.caseName}
-                  maxLength={200}
-                  status={formErrors.caseName ? 'error' : undefined}
+                  maxLength={FIELD_LIMITS.caseName?.[0]}
                   onChange={(e) => setField('caseName', e.target.value)}
-                  onBlur={() => handleBlur('caseName')}
                 />
-                {formErrors.caseName && (
-                  <Text type='danger' style={{ fontSize: 12 }}>
-                    {formErrors.caseName}
-                  </Text>
-                )}
               </div>
               {/* チーム / Subチーム は隣接して各半分の幅で表示する */}
               <div className='project-field-pair'>
@@ -1404,32 +1433,18 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   <Input
                     placeholder='例：第一'
                     value={form.team}
-                    maxLength={60}
-                    status={formErrors.team ? 'error' : undefined}
+                    maxLength={FIELD_LIMITS.team?.[0]}
                     onChange={(e) => setField('team', e.target.value)}
-                    onBlur={() => handleBlur('team')}
                   />
-                  {formErrors.team && (
-                    <Text type='danger' style={{ fontSize: 12 }}>
-                      {formErrors.team}
-                    </Text>
-                  )}
                 </div>
                 <div>
                   <div className='form-label'>Subチーム（任意）</div>
                   <Input
                     placeholder='例：A'
                     value={form.subTeam}
-                    maxLength={60}
-                    status={formErrors.subTeam ? 'error' : undefined}
+                    maxLength={FIELD_LIMITS.subTeam?.[0]}
                     onChange={(e) => setField('subTeam', e.target.value)}
-                    onBlur={() => handleBlur('subTeam')}
                   />
-                  {formErrors.subTeam && (
-                    <Text type='danger' style={{ fontSize: 12 }}>
-                      {formErrors.subTeam}
-                    </Text>
-                  )}
                 </div>
               </div>
               <div>
@@ -1437,16 +1452,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                 <Input
                   placeholder='例：次期基幹システム'
                   value={form.name}
-                  maxLength={60}
-                  status={formErrors.name ? 'error' : undefined}
+                  maxLength={FIELD_LIMITS.name?.[0]}
                   onChange={(e) => setField('name', e.target.value)}
-                  onBlur={() => handleBlur('name')}
                 />
-                {formErrors.name && (
-                  <Text type='danger' style={{ fontSize: 12 }}>
-                    {formErrors.name}
-                  </Text>
-                )}
               </div>
               <div className='project-field-abbr'>
                 <div className='form-label'>略称（自動生成・編集不可）</div>
@@ -1459,27 +1467,29 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
               </div>
               <div className='project-field-dept'>
                 <div className='form-label'>所属部門（必須）</div>
-                {/* 選択肢は部門名称を表示し、内部値は部門番号を保持する */}
-                <Select
-                  value={form.departmentId || undefined}
-                  placeholder={
-                    loadingDepartments ? '部門を読み込み中...' : '部門を選択'
-                  }
-                  loading={loadingDepartments}
-                  showSearch
-                  optionFilterProp='label'
-                  notFoundContent={
-                    loadingDepartments
-                      ? '読み込み中...'
-                      : '部門が登録されていません'
-                  }
-                  onChange={(v: string) => setField('departmentId', v)}
-                  options={departmentOptions}
-                  // ドロップダウンの表示件数を 5 件に固定（1 件 = 32px）
-                  listHeight={160}
-                  status={formErrors.departmentId ? 'error' : undefined}
-                  style={{ width: '100%' }}
-                />
+                  {/*
+                    選択肢は部門名称を表示し、内部値は部門番号を保持する。
+                    必須エラーは送信時に彈窗で出す（入力欄の下には出さない）。
+                  */}
+                  <Select
+                    value={form.departmentId || undefined}
+                    placeholder={
+                      loadingDepartments ? '部門を読み込み中...' : '部門を選択'
+                    }
+                    loading={loadingDepartments}
+                    showSearch
+                    optionFilterProp='label'
+                    notFoundContent={
+                      loadingDepartments
+                        ? '読み込み中...'
+                        : '部門が登録されていません'
+                    }
+                    onChange={(v: string) => setField('departmentId', v)}
+                    options={departmentOptions}
+                    // ドロップダウンの表示件数を 5 件に固定（1 件 = 32px）
+                    listHeight={160}
+                    style={{ width: '100%' }}
+                  />
                 {/*
                   既存データの部門番号が部門マスタに無い場合、
                   選択肢に無いため空表示になる。修正を促すメッセージを出す。
@@ -1498,15 +1508,6 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                       」が部門マスタにありません。選択し直してください。
                     </Text>
                   )}
-                {formErrors.departmentId && (
-                  <Text
-                    type='danger'
-                    className='project-field-dept-error'
-                    style={{ fontSize: 12 }}
-                  >
-                    {formErrors.departmentId}
-                  </Text>
-                )}
               </div>
               {/*
                 項目ID / 有効稼働 / 教育かどうか は 2 行目にまとめて表示する。
@@ -1518,16 +1519,9 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                   <Input
                     placeholder='例：PRJ-0006'
                     value={form.projectCode}
-                    maxLength={40}
-                    status={formErrors.projectCode ? 'error' : undefined}
+                    maxLength={FIELD_LIMITS.projectCode?.[0]}
                     onChange={(e) => setField('projectCode', e.target.value)}
-                    onBlur={() => handleBlur('projectCode')}
                   />
-                  {formErrors.projectCode && (
-                    <Text type='danger' style={{ fontSize: 12 }}>
-                      {formErrors.projectCode}
-                    </Text>
-                  )}
                 </div>
                 {/* 有効稼働 / 教育かどうか は隣接して各半分の幅で表示する */}
                 <div className='project-field-pair'>

@@ -57,6 +57,9 @@ const toApiRows = (rows: PersonnelImportRow[]) =>
     department: r.department,
     departmentAlias: r.departmentAlias,
     workLocation: r.workLocation,
+    // NOTE: line は「プレビュー表での行番号」。バックエンドが返す警告の
+    //       「n行目」もこの値になるため、ユーザーが見ている表の行と一致する。
+    //       （空行などをスキップした Excel の行番号ではない）
     line: r.line,
   }));
 
@@ -177,12 +180,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const [name, setName] = useState('');
   // 所属（編集可。部門マスタの departmentId）
   const [deptId, setDeptId] = useState<string | undefined>(undefined);
-  /**
-   * 所属の未選択エラーを表示するか。
-   * 登録（保存）を押したときに未選択だった場合だけ true にする。
-   * 所属を選択すると解除する。
-   */
-  const [deptError, setDeptError] = useState(false);
   // 一括読み込み：ファイル解析中フラグ
   const [importing, setImporting] = useState(false);
   // 一括読み込み：解析結果（プレビュー用。null = ダイアログ非表示）
@@ -216,12 +213,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 削除処理（実行）中フラグ */
   const [deleting, setDeleting] = useState(false);
   /**
-   * 入力チェック結果（入力欄の下に赤字で表示する）。
-   * '' = エラーなし。フォーカスが外れたタイミングで判定する。
+   * 入力チェック結果（入力欄の下の赤字表示）は廃止した。
+   * 不備は「達したら入力不可」＋「弹窗」で知らせる（部門管理と同じ方式）。
    */
-  const [employeeNoError, setEmployeeNoError] = useState('');
-  const [roleError, setRoleError] = useState('');
-  const [nameError, setNameError] = useState('');
 
   /**
    * 直近の検索（または保存）が成功した社員番号。
@@ -368,57 +362,99 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const isExisting = isVerified && verifiedExists;
 
   // --- 入力チェック -----------------------------------------------
-  /** 社員番号：5 桁以内の半角数字のみ */
-  const validateEmployeeNo = (v: string): string => {
-    const value = v.trim();
-    if (value === '') return t('E_KADOU_030');
-    if (!/^[0-9]{1,5}$/.test(value)) {
-      return t('E_KADOU_031');
-    }
-    return '';
+  /**
+   * 入力欄の最大文字数。
+   * 上限に達したらそれ以上は入力できない（＝桁数チェックは行わない）。
+   */
+  const INPUT_LIMITS = {
+    employeeNo: 5,
+    role: 6,
+    name: 20,
+  } as const;
+
+  /**
+   * 入力値を上限で切り捨てて state へ反映する。
+   *
+   * NOTE: 上限に達した後は入力自体を受け付けない（`maxLength` と併用）。
+   *       上限を超える入力があっても弾窗は出さず、静かに切り捨てる。
+   *       また型（半角数字・半角英数など）では入力を制限しない
+   *       （規定外の文字も入力でき、保存時に型チェックで知らせる）。
+   */
+  const applyLimitedValue = (raw: string, max: number, commit: (v: string) => void) => {
+    commit(raw.length > max ? raw.slice(0, max) : raw);
   };
 
-  /** 役割：必須・6 桁以内の半角英数字のみ */
-  const validateRole = (v: string): string => {
-    const value = v.trim();
-    if (value === '') return t('E_KADOU_032');
-    if (!/^[a-zA-Z0-9]{1,6}$/.test(value)) {
-      return t('E_KADOU_033');
-    }
-    return '';
+  /** 社員番号の入力（5 文字まで。文字種は制限しない） */
+  const handleEmployeeNoChange = (raw: string) => {
+    applyLimitedValue(raw, INPUT_LIMITS.employeeNo, (v) => {
+      setEmployeeNo(v);
+      // 検索済みの社員番号と変わったら「確認済み」状態を解除する
+      // （＝ボタンが「保存する」に戻り、削除ボタンも隠れる）
+      if (v.trim() !== verifiedNo) {
+        setVerifiedNo('');
+        setVerifiedExists(false);
+      }
+    });
   };
 
-  /** 名前：20 文字以内 */
-  const validateName = (v: string): string => {
-    if (v.trim().length > 20) {
-      return t('E_KADOU_035');
-    }
-    return '';
+  /** 役割の入力（6 文字まで。文字種は制限しない） */
+  const handleRoleChange = (raw: string) => {
+    applyLimitedValue(raw, INPUT_LIMITS.role, setRole);
   };
 
-  /** 社員番号の入力チェック（フォーカスアウト時に呼ぶ） */
-  const handleEmployeeNoBlur = () => {
-    // 空欄は blurred 時にエラーにしない（必須エラーは送信時に出す）
-    if (employeeNo.trim() === '') {
-      setEmployeeNoError('');
-      return;
-    }
-    setEmployeeNoError(validateEmployeeNo(employeeNo));
+  /** 名前の入力（20 文字まで） */
+  const handleNameChange = (raw: string) => {
+    applyLimitedValue(raw, INPUT_LIMITS.name, setName);
   };
 
-  /** 役割の入力チェック（フォーカスアウト時に呼ぶ） */
-  const handleRoleBlur = () => {
-    // 空欄はフォーカスアウト時にエラーにしない（必須エラーは送信時に出す）
-    if (role.trim() === '') {
-      setRoleError('');
-      return;
+  /**
+   * 入力内容の検証（画面の上から下の順）。
+   *
+   * 判定順：社員番号 → 役割 → 名前 → 所属
+   * 各項目は「未入力（必須）」→「形式（型）」の順で見る。
+   *
+   * NOTE: 不備は 1 件だけ返す（最初に見つかった項目で打ち切る）。
+   *       ユーザーが上から順に直していけるようにするため。
+   *
+   * @returns 最初の不備のメッセージ。問題なければ null
+   */
+  const findFirstInputProblem = (options: {
+    /** 所属の必須チェックを行うか（登録済みの要員は所属変更不可のため false） */
+    requireDepartment: boolean;
+  }): string | null => {
+    // 1) 社員番号：必須 → 5 桁以内の半角数字
+    const no = employeeNo.trim();
+    if (!no) return t('E_KADOU_030');
+    if (!/^[0-9]{1,5}$/.test(no)) return t('E_KADOU_031');
+
+    // 2) 役割：必須 → 6 桁以内の半角英数字
+    const roleValue = role.trim();
+    if (!roleValue) return t('E_KADOU_032');
+    if (!/^[a-zA-Z0-9]{1,6}$/.test(roleValue)) return t('E_KADOU_033');
+
+    // 3) 名前：必須 → 20 文字以内
+    const nameValue = name.trim();
+    if (!nameValue) return t('E_KADOU_034');
+    if (nameValue.length > INPUT_LIMITS.name) return t('E_KADOU_035');
+
+    // 4) 所属：必須
+    if (options.requireDepartment && !deptId) {
+      return t('W_KADOU_002', ['所属']);
     }
-    setRoleError(validateRole(role));
+
+    return null;
   };
 
-  /** 名前の入力チェック（フォーカスアウト時に呼ぶ） */
-  const handleNameBlur = () => {
-    setNameError(validateName(name));
+  /**
+   * 最初の不備を画面へ知らせる。
+   *
+   * NOTE: 部門管理画面と完全に同じ表示方法（antd の message.warning）にする。
+   *       すなわち画面上部にメッセージ 1 文を表示し、数秒で自動的に消える。
+   *       タイトル黒体字もボタン（弾窗）も付けない。
+   */
+  const showInputProblem = (messageText: string | null) => {
+    if (!messageText) return;
+    message.warning(messageText);
   };
 
   /**
@@ -435,10 +471,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     original.role !== (role.trim() || '要員') ||
     (!isExisting && original.deptId !== deptId);
 
-  /** 所属を選択したら未選択エラーを解除する */
+  /** 所属を選択したとき（未選択の警告は送信時に弾窗で出す） */
   const handleDeptChange = (v?: string) => {
     setDeptId(v);
-    if (v) setDeptError(false);
   };
 
   /** 入力値を初期化 */
@@ -447,10 +482,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     setRole('');
     setName('');
     setDeptId(undefined);
-    setDeptError(false);
-    setEmployeeNoError('');
-    setRoleError('');
-    setNameError('');
     setVerifiedNo('');
     setVerifiedExists(false);
     setOriginal(null);
@@ -509,13 +540,12 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   const handleLookup = async (rawNo: string) => {
     const no = rawNo.trim();
     if (!no) {
-      setEmployeeNoError(t('E_KADOU_030'));
+      showInputProblem(t('E_KADOU_030'));
       return;
     }
     // 形式チェック（5 桁の半角数字）。NG の場合は検索しない
-    const noError = validateEmployeeNo(no);
-    if (noError) {
-      setEmployeeNoError(noError);
+    if (!/^[0-9]{1,5}$/.test(no)) {
+      showInputProblem(t('E_KADOU_031'));
       return;
     }
 
@@ -535,12 +565,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       // 検索で DB に存在したことを記録する（ボタンが「更新する」＋削除表示になる）
       setVerifiedNo(no);
       setVerifiedExists(true);
-      // 検索成功時は、入力欄の値が DB の値に置き換わっているため、
-      // 直前の入力内容に対する赤字の警告をすべて解除する。
-      setEmployeeNoError('');
-      setRoleError('');
-      setNameError('');
-      setDeptError(false);
+      // 検索成功時は、入力欄の値が DB の値に置き換わっている。
+      // 注意：検索は入力チェック（形式）だけを行い、必須チェックは保存時に弾窗で出す。
       // 変更あり判定用に、検索時点の値をスナップショットしておく
       setOriginal({
         name: (info.name ?? '').trim(),
@@ -569,23 +595,15 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
 
   /** 要員を DB へ保存する（新規追加／更新。画面遷移はしない） */
   const save = async (no: string, isNew: boolean) => {
-    // 入力チェック（不正な値は送信しない）
-    const noError = validateEmployeeNo(no);
-    const rError = validateRole(role);
-    const nError =
-      name.trim() === '' ? t('E_KADOU_034') : validateName(name);
-    setEmployeeNoError(noError);
-    setRoleError(rError);
-    setNameError(nError);
-    if (noError || rError || nError) {
+    // 入力チェック（最初の不備 1 件だけを弾窗で知らせる）
+    const problem = findFirstInputProblem({ requireDepartment: true });
+    if (problem) {
+      showInputProblem(problem);
       return;
     }
-
-    // 所属は必須（未選択のまま送信しない）
-    if (!deptId) {
-      setDeptError(true);
-      return;
-    }
+    // 所属は必須（上のチェックで保証済み。TS の型絞り込み用に再確認する）
+    if (!deptId) return;
+    const selectedDeptId = deptId;
 
     setSaving(true);
     try {
@@ -594,7 +612,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
         year,
         {
           name: name.trim(),
-          departmentId: deptId,
+          departmentId: selectedDeptId,
           role: role.trim() || '要員',
         },
         operatorId,
@@ -604,7 +622,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       onSubmit({
         employeeNo: no,
         name: name.trim(),
-        departmentId: deptId,
+        departmentId: selectedDeptId,
         role: role.trim() || '要員',
       });
 
@@ -641,19 +659,13 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    */
   const handleSubmit = async () => {
     const no = employeeNo.trim();
-    // 入力チェック（空欄・形式 NG はまとめて判定し、入力欄の下に赤字で表示する）
-    const noError = validateEmployeeNo(no);
-    const rError = validateRole(role);
-    const nError = name.trim() === ''
-      ? t('E_KADOU_034')
-      : validateName(name);
+    // 入力チェック（最初の不備 1 件だけを弾窗で知らせる）
     // 所属は必須（登録済みの要員は所属変更不可のため対象外）
-    const dError = !isExisting && !deptId ? t('W_KADOU_002', ['所属']) : '';
-    setEmployeeNoError(noError);
-    setRoleError(rError);
-    setNameError(nError);
-    setDeptError(dError !== '');
-    if (noError || rError || nError || dError) {
+    const problem = findFirstInputProblem({
+      requireDepartment: !isExisting,
+    });
+    if (problem) {
+      showInputProblem(problem);
       return;
     }
 
@@ -953,10 +965,9 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
     if (!importRows || importRows.length === 0) return empty;
 
     // 画面側で検出（社員番号が同じ行を 2 行以上まとめる）
-    // NOTE: 行番号は Excel 上の行番号（row.line）を優先する。
-    //       空行などがスキップされて配列の index とずれる場合は、
-    //       バックエンドが返す fileDuplicateLines（Excel 行番号）と
-    //       比較できるよう row.line を使う必要がある。
+    // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う。
+    //       バックエンドが返す fileDuplicateLines（こちらもプレビュー行番号）と
+    //       比較できるよう、必ず row.line を使う。
     const grouped = new Map<string, number[]>();
     importRows.forEach((r, i) => {
       const key = (r.employeeNo ?? '').trim();
@@ -974,7 +985,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       groups: localGroups,
     };
 
-    // バックエンドが行番号を返していればそちらを優先（行番号は Excel 上の行）
+    // バックエンドが行番号を返していればそちらを優先（行番号はプレビュー行番号）
     const fromApi = importCheck?.fileDuplicateLines;
     if (fromApi && fromApi.length > 0) {
       return {
@@ -1030,6 +1041,14 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
   /** 一括読み込み：プレビュー表の列 */
   const importColumns: TableColumnsType<PersonnelImportRow> = [
     {
+      // 行番号（＝エラーメッセージの「n行目」と一致する）
+      title: '行',
+      key: 'line',
+      width: 56,
+      align: 'right',
+      render: (_, row, index) => row.line ?? index + 1,
+    },
+    {
       title: '区分',
       key: 'kind',
       width: 72,
@@ -1040,9 +1059,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
        *   追加           … 新規追加
        */
       render: (_, row, index) => {
-        // NOTE: 行番号は Excel 上の行番号（row.line）を使う。
-        //       indexOf(row) は参照変化に弱く、index+1 は空行で
-        //       バックエンドの row.line と食い違うため。
+        // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う。
+        //       indexOf(row) は参照変化に弱いため使わない。
         const lineNo = row.line ?? index + 1;
         if (importFileDuplicates.lines.has(lineNo)) {
           return <Tag color='magenta'>ファイル内重複</Tag>;
@@ -1071,7 +1089,7 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
        *      手動で選んでもプルダウンのまま残す（誤選択を修正できるようにする）。
        */
       render: (_: string, row, index) => {
-        // NOTE: 行番号は Excel 上の行番号（row.line）を使う
+        // NOTE: 行番号は「プレビュー表での行番号」（row.line）を使う
         const lineNo = row.line ?? index + 1;
         // ファイル内重複の行は取り込まないため選択させない
         if (importFileDuplicates.lines.has(lineNo)) {
@@ -1135,31 +1153,31 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
             を表示します。すべての項目は編集でき、存在しない社員番号は確認のうえで新規追加できます。
           </Text>
         </div>
+      </div>
 
-        {/* 右上：社員情報（Excel / CSV）の一括読み込み */}
-        <div className='personnel-header-side'>
-          <Space size={8} wrap align='center'>
-            <Text strong>社員情報</Text>
-            <Upload
-              accept={PERSONNEL_IMPORT_ACCEPT}
-              showUploadList={false}
-              multiple={false}
-              disabled={importing}
-              beforeUpload={(file) => {
-                // サーバーへは送信せず、フロントのみで解析する（モック）
-                void handleImportFile(file);
-                return false;
-              }}
-            >
-              <Button type='primary' icon={<UploadOutlined />} loading={importing}>
-                一括読み込む
-              </Button>
-            </Upload>
-          </Space>
-          <Text type='secondary' className='personnel-import-hint'>
-            {PERSONNEL_IMPORT_FORMAT_HINT}
-          </Text>
-        </div>
+      {/* 社員情報（Excel / CSV）の一括読み込み（タイトルの下） */}
+      <div className='personnel-header-side'>
+        <Space size={8} wrap align='center'>
+          <Text strong>社員情報</Text>
+          <Upload
+            accept={PERSONNEL_IMPORT_ACCEPT}
+            showUploadList={false}
+            multiple={false}
+            disabled={importing}
+            beforeUpload={(file) => {
+              // サーバーへは送信せず、フロントのみで解析する（モック）
+              void handleImportFile(file);
+              return false;
+            }}
+          >
+            <Button type='primary' icon={<UploadOutlined />} loading={importing}>
+              一括読み込む
+            </Button>
+          </Upload>
+        </Space>
+        <Text type='secondary' className='personnel-import-hint'>
+          {PERSONNEL_IMPORT_FORMAT_HINT}
+        </Text>
       </div>
 
       {/* 入力フォーム */}
@@ -1183,19 +1201,8 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
               <Input
                 placeholder='例：10001'
                 value={employeeNo}
-                maxLength={20}
-                status={employeeNoError ? 'error' : undefined}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setEmployeeNo(next);
-                  // 検索済みの社員番号と変わったら「確認済み」状態を解除する
-                  // （＝ボタンが「保存する」に戻り、削除ボタンも隠れる）
-                  if (next.trim() !== verifiedNo) {
-                    setVerifiedNo('');
-                    setVerifiedExists(false);
-                  }
-                }}
-                onBlur={handleEmployeeNoBlur}
+                maxLength={INPUT_LIMITS.employeeNo}
+                onChange={(e) => handleEmployeeNoChange(e.target.value)}
                 onPressEnter={() => void handleLookup(employeeNo)}
               />
               <Button
@@ -1206,44 +1213,25 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 検索
               </Button>
             </Space.Compact>
-            {employeeNoError && (
-              <Text type='danger' style={{ fontSize: 12 }}>
-                {employeeNoError}
-              </Text>
-            )}
           </div>
           <div>
             <div className='form-label'>役割（必須）</div>
             <Input
               placeholder='例：T11E03'
               value={role}
-              maxLength={20}
-              status={roleError ? 'error' : undefined}
-              onChange={(e) => setRole(e.target.value)}
-              onBlur={handleRoleBlur}
+              maxLength={INPUT_LIMITS.role}
+              onChange={(e) => handleRoleChange(e.target.value)}
             />
-            {roleError && (
-              <Text type='danger' style={{ fontSize: 12 }}>
-                {roleError}
-              </Text>
-            )}
           </div>
           <div>
             <div className='form-label'>名前（必須）</div>
             <Input
               placeholder='例：山田 花子'
               value={name}
-              maxLength={50}
-              status={nameError ? 'error' : undefined}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={handleNameBlur}
+              maxLength={INPUT_LIMITS.name}
+              onChange={(e) => handleNameChange(e.target.value)}
               onPressEnter={handleSubmit}
             />
-            {nameError && (
-              <Text type='danger' style={{ fontSize: 12 }}>
-                {nameError}
-              </Text>
-            )}
           </div>
           <div>
             <div className='form-label'>所属（必須）</div>
@@ -1264,7 +1252,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                 label: departmentLabelOf(departments, d.departmentId),
               }))}
               disabled={isExisting}
-              status={!isExisting && deptError ? 'error' : undefined}
               style={{ width: '100%' }}
             />
             {!isExisting &&
@@ -1279,11 +1266,6 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
                     : t('E_KADOU_037')}
                 </Text>
               )}
-            {!isExisting && deptError && (
-              <Text type='danger' style={{ fontSize: 12 }}>
-                所属を選択してください。
-              </Text>
-            )}
             {isExisting && (
               <Text type='secondary' style={{ fontSize: 12 }}>
                 登録済みの要員は所属を変更できません。
