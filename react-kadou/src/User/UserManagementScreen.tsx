@@ -342,7 +342,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
           if (findDepartment(deptMaster, v)) {
             return departmentLabelOf(deptMaster, v);
           }
-          return `（削除済み）${v}`;
+          return '（全部門）';
         },
       },
       {

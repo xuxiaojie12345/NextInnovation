@@ -790,8 +790,9 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
             ? {
                 ...r,
                 employeeNo: no,
-                // 空行から社員番号を確定したときはマスタの現在所属を採用する
-                departmentId: r.departmentId || master?.departmentId || '',
+                // 社員番号の変更に合わせて所属も要員マスタの内容へ切り替える
+                // （氏名・役割・備考は draftPersonnel が新番号のマスタから表示する）
+                departmentId: master?.departmentId || r.departmentId || '',
               }
             : r,
         ),

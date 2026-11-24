@@ -155,7 +155,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
           <span className='app-menu-user-name'>{user.name}</span>
           <Tag color={ROLE_COLOR[user.role]}>
             {user.roleLabel}
-            {departmentName ? `／${departmentName}` : ''}
+            {departmentName ? `／${departmentName}` : '／全部門'}
           </Tag>
           <Button size='small' icon={<LogoutOutlined />} onClick={onLogout}>
             ログアウト

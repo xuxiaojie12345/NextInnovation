@@ -691,7 +691,11 @@ function App() {
         onSelect={handleSelectView}
         user={currentUser}
         departmentName={
-          currentUser.departmentId
+          // 部門IDが空、または選択年度の部門マスタに無い場合は「全部門」表示にする
+          currentUser.departmentId &&
+          store.departments.some(
+            (d) => String(d.departmentId) === String(currentUser.departmentId),
+          )
             ? departmentNameOf(store.departments, currentUser.departmentId)
             : undefined
         }
