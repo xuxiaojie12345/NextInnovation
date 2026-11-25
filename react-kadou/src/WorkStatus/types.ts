@@ -44,6 +44,11 @@ export interface WorkStatusRow {
    * 明細部の並び順（社員番号 → 異動フラグ）に使う。
    */
   transferFlag?: string;
+  /**
+   * この行（要員マスタの 1 行）の備考（退場予定）。
+   * 異動がある場合は 異動前・異動後 で別々の値になる。
+   */
+  leavePlan?: string;
 }
 
 /** 稼働表に表示する行（＝要員マスタの employeeNo の並び） */

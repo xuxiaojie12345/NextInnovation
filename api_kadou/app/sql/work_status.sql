@@ -183,12 +183,24 @@ WHERE year_id = :year_id
 
 -- :name: update_leave_plan
 -- 備考（退場予定）の更新：当該年度の社員の要員マスタ全行に反映する
+-- （行の所属部門が特定できない場合のフォールバック）
 UPDATE jn_personnel_master
 SET leave_plan = :leave_plan,
     update_datetime = :now,
     update_user = :op_user
 WHERE year_id = :year_id
   AND employee_no = :employee_no
+
+-- :name: update_leave_plan_row
+-- 備考（退場予定）の更新：要員マスタの 1 行（year_id + employee_no + department_id）だけに反映する
+-- （異動がある場合は 異動前・異動後 の行がそれぞれ別の備考を持つ）
+UPDATE jn_personnel_master
+SET leave_plan = :leave_plan,
+    update_datetime = :now,
+    update_user = :op_user
+WHERE year_id = :year_id
+  AND employee_no = :employee_no
+  AND department_id = :department_id
 
 -- :name: insert_personnel_row
 -- 異動保存時：要員マスタの 1 行を追加する（異動時は新所属の行を追加）

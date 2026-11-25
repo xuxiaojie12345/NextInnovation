@@ -182,8 +182,6 @@ interface WorkStatusProps {
   initialWorkStatus: WorkStatusData;
   /** 保存（下書きを確定して親へ渡す） */
   onSave: (payload: WorkStatusPayload) => void;
-  /** 退場予定（備考）の変更。要員マスタの項目なので即時保存する */
-  onUpdateLeavePlan: (employeeNo: string, leavePlan: string) => void;
   /** 未保存の変更があるかの通知 */
   onDirtyChange: (dirty: boolean) => void;
   /** 「保存」処理を親へ登録する（未保存確認ダイアログから呼ばれる） */
@@ -315,7 +313,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
   employeeMaster,
   initialWorkStatus,
   onSave,
-  onUpdateLeavePlan,
   onDirtyChange,
   registerSaveHandler,
 }) => {
@@ -350,7 +347,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     Map<string, Personnel>
   >(() => new Map());
 
-  // 未保存の備考（退場予定）。社員番号 → 入力値（保存時にまとめて要員マスタへ送る）
+  // 未保存の備考（退場予定）。行キー → 入力値（保存時にまとめて要員マスタへ送る）
+  // ※備考は要員マスタの行ごとの値のため、異動がある場合は「行」単位で保持する
   const [leavePlanEdits, setLeavePlanEdits] = useState<Record<string, string>>(
     {},
   );
@@ -367,7 +365,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           ...row,
           name: master?.name ?? '',
           role: master?.role ?? '',
-          leavePlan: leavePlanEdits[row.employeeNo] ?? master?.leavePlan,
+          leavePlan: leavePlanEdits[row.key] ?? row.leavePlan ?? master?.leavePlan,
         };
       }),
     [draftRows, employeeMaster, fetchedPersonnel, leavePlanEdits],
@@ -813,7 +811,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     ],
   );
 
-  /** 退場予定（備考）の変更。保存ボタンで要員マスタへ確定する */
+  /** 退場予定（備考）の変更。保存ボタンで要員マスタへ確定する（行ごとの値） */
   const commitLeavePlan = useCallback(
     (rowKey: string, leavePlan: string) => {
       // 過年度は参照のみ
@@ -824,12 +822,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         fetchedPersonnel.get(row.employeeNo) ??
         employeeMaster.get(row.employeeNo);
       // 変更が無ければ未保存状態にしない
-      if ((master?.leavePlan ?? '') === leavePlan) return;
-      // 表示用に親の要員マスタも更新しつつ、保存対象として保持する
-      onUpdateLeavePlan(row.employeeNo, leavePlan);
-      setLeavePlanEdits((prev) => ({ ...prev, [row.employeeNo]: leavePlan }));
+      if ((row.leavePlan ?? master?.leavePlan ?? '') === leavePlan) return;
+      // 表示用に行単位で保持する（異動前・異動後は別々の備考）
+      setLeavePlanEdits((prev) => ({ ...prev, [row.key]: leavePlan }));
     },
-    [draftRows, employeeMaster, fetchedPersonnel, onUpdateLeavePlan, pastYear],
+    [draftRows, employeeMaster, fetchedPersonnel, pastYear],
   );
 
   /** 行追加（社員番号未入力の行を表示行に追加する。要員マスタは変更しない） */
@@ -1089,6 +1086,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           r.departmentId ||
           employeeMaster.get(r.employeeNo)?.departmentId ||
           '',
+        // 未保存の備考があれば行の値として持たせる（保存後の再描画用）
+        leavePlan: leavePlanEdits[r.key] ?? r.leavePlan,
       })),
       assignment,
       unpaid,
@@ -1102,10 +1101,21 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       departmentUpdates,
       // 社員番号変更（旧番号の週次データを UNASSIGN に戻す）
       renumbers: renumberedEmployees,
-      // 備考（退場予定）の変更（要員マスタへ反映する）
-      leavePlans: Object.entries(leavePlanEdits).map(
-        ([employeeNo, leavePlan]) => ({ employeeNo, leavePlan }),
-      ),
+      // 備考（退場予定）の変更（要員マスタの行へ反映する）
+      leavePlans: Object.entries(leavePlanEdits)
+        .map(([rowKey, leavePlan]) => {
+          const row = draftRows.find((r) => r.key === rowKey);
+          if (!row?.employeeNo) return null;
+          return {
+            employeeNo: row.employeeNo,
+            departmentId:
+              row.departmentId ||
+              employeeMaster.get(row.employeeNo)?.departmentId ||
+              '',
+            leavePlan,
+          };
+        })
+        .filter((lp): lp is NonNullable<typeof lp> => lp !== null),
     });
     // 保存したセルの版を +1 しておく（再取得が完了するまでの楽観ロック用）
     if (changed.length > 0) {
@@ -2214,7 +2224,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         render: (_, row) => {
           // 入力中は再描画しないよう uncontrolled にし、フォーカスアウト / Enter で確定する
           // （グリッド全体の再描画でタイプが重くなるのを避けるため）
-          // 備考は要員マスタの項目のため、確定時に即時保存する
+          // 備考は要員マスタの「行」ごとの項目のため、確定時は未保存として保持し、
+          // 保存ボタンで行（所属部門）単位に要員マスタへ反映する
           // 社員番号が未入力の行は編集できない
           return (
             <Input
@@ -2222,7 +2233,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               // F5 直後はセッション復元で行だけが先に描画され、要員マスタの
               // 備考（API）は後から届くので、未編集の間は値が変わったら作り直す。
               key={`${row.key}:${row.employeeNo}${
-                leavePlanEdits[row.employeeNo] === undefined
+                leavePlanEdits[row.key] === undefined
                   ? `:${row.leavePlan ?? ''}`
                   : ''
               }`}

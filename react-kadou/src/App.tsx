@@ -453,21 +453,6 @@ function App() {
   );
 
   /**
-   * 要員マスタの項目（現在は退場予定）の更新。
-   * 稼働表の備考欄から呼ばれる。マスタは即時保存する。
-   */
-  const handleUpdateLeavePlan = useCallback(
-    (employeeNo: string, leavePlan: string) => {
-      setYearPersonnel((prev) =>
-        prev.map((p) =>
-          p.employeeNo === employeeNo ? { ...p, leavePlan } : p,
-        ),
-      );
-    },
-    [setYearPersonnel],
-  );
-
-  /**
    * 社員情報（Excel / CSV）の一括読み込み（モック：画面上のみ保持）
    * 社員番号で突合し、既存は 名前・役割・所属 を上書き、新規は追加する。
    */
@@ -618,7 +603,6 @@ function App() {
         employeeMaster={employeeMaster}
         initialWorkStatus={store.workStatus}
         onSave={handleSaveWorkStatus}
-        onUpdateLeavePlan={handleUpdateLeavePlan}
         onDirtyChange={setDirty}
         registerSaveHandler={registerSaveHandler}
       />

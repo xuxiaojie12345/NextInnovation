@@ -75,9 +75,14 @@ export interface WorkStatusPayload {
   renumbers?: { from: string; to: string }[];
   /**
    * 備考（退場予定）の変更。
-   * 稼働表の保存と同一トランザクションで要員マスタへ反映する
+   * 稼働表の保存と同一トランザクションで要員マスタへ反映する。
+   * 備考は要員マスタの行ごとの値のため、異動がある場合は行（所属部門）を指定する
    */
-  leavePlans?: { employeeNo: string; leavePlan: string }[];
+  leavePlans?: {
+    employeeNo: string;
+    departmentId: string;
+    leavePlan: string;
+  }[];
 }
 
 /** 年度のマスタ系データ（部門・要員・項目・休日）の保存パッチ */

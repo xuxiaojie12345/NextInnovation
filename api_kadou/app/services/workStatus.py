@@ -327,6 +327,8 @@ def _transfer_rows(emp: str, master_rows) -> list[WorkStatusRowDto]:
             activeFrom=None,
             activeTo=_prev_week(transfer_week) if transfer_week else None,
             transferFlag="0",
+            # 備考は行（要員マスタの 1 行）ごとの値
+            leavePlan=old_row["leave_plan"],
         ),
         WorkStatusRowDto(
             key=f"{emp}@{new_dept}",
@@ -335,12 +337,18 @@ def _transfer_rows(emp: str, master_rows) -> list[WorkStatusRowDto]:
             activeFrom=transfer_week or None,
             activeTo=None,
             transferFlag="1",
+            leavePlan=current_row["leave_plan"],
         ),
     ]
 
 
-def _split_rows(emp: str, runs: list[tuple[str, list[str]]]) -> list[WorkStatusRowDto]:
-    """週割当の所属変化で分割した表示行（旧データ用）。"""
+def _split_rows(
+    emp: str, runs: list[tuple[str, list[str]]], leave_plan
+) -> list[WorkStatusRowDto]:
+    """週割当の所属変化で分割した表示行（旧データ用）。
+
+    要員マスタは 1 行のままなので、分割した行は同じ備考を持つ。
+    """
     rows: list[WorkStatusRowDto] = []
     for i, (dept, run_weeks) in enumerate(runs):
         rows.append(
@@ -354,6 +362,7 @@ def _split_rows(emp: str, runs: list[tuple[str, list[str]]]) -> list[WorkStatusR
                     if i == len(runs) - 1
                     else _prev_week(runs[i + 1][1][0])
                 ),
+                leavePlan=leave_plan,
             )
         )
     return rows
@@ -389,10 +398,11 @@ def _build_work_status_rows(
                     employeeNo=emp,
                     departmentId=dept,
                     transferFlag="0",
+                    leavePlan=master_rows[0]["leave_plan"],
                 )
             )
             continue
-        rows.extend(_split_rows(emp, runs))
+        rows.extend(_split_rows(emp, runs, master_rows[0]["leave_plan"]))
     return rows
 
 
@@ -496,6 +506,9 @@ def _load_save_sql() -> dict[str, str]:
         ),
         "update_leave_plan": load_sql(
             "work_status.sql", "update_leave_plan"
+        ),
+        "update_leave_plan_row": load_sql(
+            "work_status.sql", "update_leave_plan_row"
         ),
     }
 
@@ -936,6 +949,10 @@ def _sync_personnel_transfer(
         return
 
     base = current[0]
+    # 備考は行（所属部門）ごとの値。作り直すときも同じ所属の行の値を引き継ぐ
+    leave_plan_by_dept = {
+        _as_str(r["department_id"]): r["leave_plan"] for r in current
+    }
     # 既存行を削除して作り直す。SELECT で取得済みの行が削除できなければ
     # 他のユーザーによる変更なので、保存全体を取り消す
     try:
@@ -960,7 +977,7 @@ def _sync_personnel_transfer(
                     "idoubi": idoubi,
                     "person_name": base["person_name"],
                     "role": base["role"],
-                    "leave_plan": base["leave_plan"],
+                    "leave_plan": leave_plan_by_dept.get(dept, base["leave_plan"]),
                     "register_datetime": base["register_datetime"] if idx == 0 else now,
                     "register_user": base["register_user"] if idx == 0 else op_user,
                     "now_dt": now,
@@ -977,28 +994,40 @@ def _sync_personnel_transfer(
 # 8. 保存（PUT /api/kadou/{year}/work-status）
 # ============================================================
 def _apply_leave_plans(
-    db: Session, year: str, leave_plans, sql_update: str, now, op_user: str
+    db: Session,
+    year: str,
+    leave_plans,
+    sql_update_row: str,
+    sql_update_all: str,
+    now,
+    op_user: str,
 ) -> None:
     """備考（退場予定）を要員マスタへ反映する。
 
-    要員マスタの全行（異動後は 2 行）に同じ備考を設定する。
+    備考は要員マスタの行ごとの値のため、異動がある場合は 異動前・異動後 の
+    行を別々に更新する（year_id + employee_no + department_id で特定）。
+    所属部門が特定できない場合だけ、当該社員の全行に反映する。
     対象社員の行が 1 件も無い場合は保存失敗にする。
     """
     for lp in leave_plans or []:
         no = (lp.employeeNo or "").strip()
         if not no:
             continue
+        dept = (lp.departmentId or "").strip()
+        params = {
+            "year_id": year,
+            "employee_no": no,
+            "leave_plan": lp.leavePlan or "",
+            "now": now,
+            "op_user": op_user,
+        }
+        if dept:
+            sql_update = sql_update_row
+            params["department_id"] = int(dept) if dept.isdigit() else dept
+        else:
+            sql_update = sql_update_all
         try:
-            res = db.execute(
-                text(sql_update),
-                {
-                    "year_id": year,
-                    "employee_no": no,
-                    "leave_plan": lp.leavePlan or "",
-                    "now": now,
-                    "op_user": op_user,
-                },
-            )
+            res = db.execute(text(sql_update), params)
         except IntegrityError:
             raise BusinessException(status_code=409, message_id="E_KADOU_091")
         if (res.rowcount or 0) <= 0:
@@ -1159,7 +1188,13 @@ def save_work_status(
     # ---- 5. 備考（退場予定）の反映 --------------------------------
     # 要員マスタの同期後に反映する（同期で行を作り直すため）
     _apply_leave_plans(
-        db, year, req.leavePlans, sql["update_leave_plan"], now, op_user
+        db,
+        year,
+        req.leavePlans,
+        sql["update_leave_plan_row"],
+        sql["update_leave_plan"],
+        now,
+        op_user,
     )
 
     # ---- 6. 確定（楽観ロックの不一致があれば全て取り消す）------------

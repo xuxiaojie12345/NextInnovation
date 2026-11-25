@@ -58,6 +58,9 @@ class WorkStatusRowDto(BaseModel):
     splitFromKey: Optional[str] = None
     # 異動フラグ（'0' = 異動前 / '1' = 異動後の行）。明細部の並び順に使う
     transferFlag: str = "0"
+    # この行（要員マスタの 1 行）の備考（退場予定）。
+    # 異動がある場合は 異動前・異動後 で別々の値になる
+    leavePlan: Optional[str] = None
 
 
 class WorkStatusDataDto(BaseModel):
@@ -121,9 +124,15 @@ class WorkStatusSaveRenumber(BaseModel):
 
 
 class WorkStatusSaveLeavePlan(BaseModel):
-    """保存リクエストの備考（退場予定）更新 1件"""
+    """保存リクエストの備考（退場予定）更新 1件
+
+    備考は要員マスタの行（year_id + employee_no + department_id）ごとの値。
+    異動がある場合は 異動前・異動後 の行を別々に更新する。
+    """
 
     employeeNo: str
+    # 行の所属部門ID（空 = 社員の全行を更新する）
+    departmentId: str = ""
     # 備考（退場予定）。空文字 = クリア
     leavePlan: str = ""
 
