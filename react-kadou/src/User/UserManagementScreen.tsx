@@ -86,7 +86,6 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
   // ユーザー一覧（バックエンドから取得する）
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   // 編集中のユーザーID（null = 新規追加モード / '' = 未選択）
   const [editingId, setEditingId] = useState<string | null>(null);
   // フォーム
@@ -100,6 +99,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
 
   const isEditing = editingId !== null;
   const opUserId = currentUserId ?? "";
+  const [saving, setSaving] = useState(false);
 
   /** 一覧を取得する */
   const reload = useCallback(async () => {
@@ -484,6 +484,7 @@ const UserManagementScreen: React.FC<UserManagementScreenProps> = ({
                 icon={<PlusOutlined />}
                 loading={saving}
                 onClick={handleSubmit}
+                disabled={saving}
               >
                 {isEditing ? "更新" : "追加"}
               </Button>

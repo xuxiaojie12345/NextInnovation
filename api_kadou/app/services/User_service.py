@@ -10,9 +10,6 @@ from app.sql.User_sql import (
     USER_UPDATE,
 )
 
-# 操作者が指定されない場合のフォールバック（認証情報が取れないとき用）
-_DEFAULT_OP_USER = "ADMIN"
-
 # 役職区分コード → 表示名（jn_user_table.yakushoku_kubun）
 _YAKUSHOKU_LABELS: dict[str, str] = {
     "0": "部長",
@@ -20,11 +17,9 @@ _YAKUSHOKU_LABELS: dict[str, str] = {
     "2": "事業部長",
 }
 
-
 def _role_label(kubun: str) -> str:
     """役職区分コード → 表示名（未定義の区分は部長扱い）"""
     return _YAKUSHOKU_LABELS.get(kubun, "部長")
-
 
 def _row_to_user(r) -> dict:
     return {
@@ -36,15 +31,13 @@ def _row_to_user(r) -> dict:
         "password": r["password"],
     }
 
-
 def list_users(db: Session) -> list[dict]:
     """ユーザー一覧を返す。"""
     rows = db.execute(USER_SELECT_ALL).mappings().all()
     return [_row_to_user(r) for r in rows]
 
-
 def create_user(
-    db: Session, data: dict, op_user: str = _DEFAULT_OP_USER
+    db: Session, data: dict, op_user: str
 ) -> dict:
     """ユーザーを追加し、作成したユーザーを返す。
 
@@ -75,7 +68,7 @@ def create_user(
 
 
 def update_user(
-    db: Session, user_id: str, data: dict, op_user: str = _DEFAULT_OP_USER
+    db: Session, user_id: str, data: dict, op_user: str
 ) -> dict:
     """ユーザーを更新して更新後のユーザーを返す。存在しない場合は 404 エラーにする。"""
     res = db.execute(
@@ -109,7 +102,6 @@ def delete_user(db: Session, user_id: str) -> None:
             detail=f"ユーザー「{user_id}」が見つかりません。",
         )
     db.commit()
-
 
 def _get_user(db: Session, user_id: str) -> dict | None:
     """ユーザー単件を取得する。存在しない場合は None を返す。"""
