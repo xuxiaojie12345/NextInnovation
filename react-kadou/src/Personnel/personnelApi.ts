@@ -161,33 +161,6 @@ export async function fetchPersonnelInfo(
   );
 }
 
-/** 要員マスタの 1 行（行削除の存在チェック用キー） */
-export interface PersonnelMasterRow {
-  /** 所属部門ID */
-  departmentId: string;
-  /** 異動フラグ（'0' = 異動前 / '1' = 異動後） */
-  idouFlag: string;
-  /** 異動日（'YYYYMMDD'。未指定 = 空文字） */
-  idoubi: string;
-}
-
-/**
- * 社員の要員マスタ行を取得する
- * （GET /api/kadou/{year}/work-status/personnel/{employeeNo}/rows）。
- *
- * 行削除時に「画面が保持している行（年度 + 社員番号 + 所属 + 異動フラグ + 異動日）が
- * DB に残っているか」を確認するために使う。
- */
-export async function fetchPersonnelMasterRows(
-  employeeNo: string,
-  year: number,
-): Promise<PersonnelMasterRow[]> {
-  const data = await request<{ rows: PersonnelMasterRow[] }>(
-    `/api/kadou/${year}/work-status/personnel/${encodeURIComponent(employeeNo)}/rows`,
-  );
-  return data.rows ?? [];
-}
-
 /** 現在の登録要員数を取得する（GET /api/kadou/personnel/count/{year}） */
 export async function fetchPersonnelCount(year: number): Promise<number> {
   const data = await request<{ year: string; count: number }>(

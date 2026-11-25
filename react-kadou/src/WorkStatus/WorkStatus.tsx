@@ -55,10 +55,8 @@ import {
 } from './pastActuals';
 import type { SavedBaseline } from './pastActuals';
 import {
-  PersonnelMasterRow,
   PersonnelNotFoundError,
   fetchPersonnelInfo,
-  fetchPersonnelMasterRows,
 } from '../Personnel/personnelApi';
 import { notifySystemError } from '../utils/systemError';
 
@@ -863,48 +861,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
    * ・最後の行を削除した場合は当年度の業務データを全件削除する
    */
   const handleDeleteRow = useCallback(
-    async (rowKey: string) => {
+    (rowKey: string) => {
       const target = draftRows.find((r) => r.key === rowKey);
       if (!target) return;
       // 過年度は参照のみ
       if (pastYear) return;
       // 過去実績（保存済みデータ）がある行は削除できない（削除ボタンを無効化済み）。
-      // DB を参照する判定のため、画面側では重複してエラーを出さない。
+      // 要員マスタの存在チェックは保存時にバックエンドで行う（異動と同じ）。
       const employeeNo = target.employeeNo;
-      // 画面を開いた時点の要員マスタ行（異動前後の 2 行を含む）。
-      // 行の識別キー（年度 + 社員番号 + 所属 + 異動フラグ + 異動日）で
-      // 1 行でも DB に存在しなければ削除失敗にする（異動前・異動後とも）
-      const baselineRows = employeeNo
-        ? (initialWorkStatus.rows ?? []).filter(
-            (r) => r.employeeNo === employeeNo,
-          )
-        : [];
-      if (baselineRows.length > 0) {
-        let masterRows: PersonnelMasterRow[];
-        try {
-          masterRows = await fetchPersonnelMasterRows(employeeNo, year);
-        } catch (e) {
-          // DB 異常などのシステムエラーは異常画面へ遷移させる
-          if (!notifySystemError(e)) {
-            message.error(messageInfo('E_KADOU_090'));
-          }
-          return;
-        }
-        const missing = baselineRows.some(
-          (r) =>
-            !masterRows.some(
-              (m) =>
-                m.departmentId === r.departmentId &&
-                m.idouFlag === (r.transferFlag ?? '0') &&
-                m.idoubi ===
-                  (r.activeFrom ? r.activeFrom.replace(/-/g, '') : ''),
-            ),
-        );
-        if (missing) {
-          message.error(messageInfo('E_KADOU_090'));
-          return;
-        }
-      }
       // その社員の最後の行を削除するか（＝再追加時に全週「未割当」で表示する）
       const isLastRowOfEmployee =
         employeeNo !== '' &&
@@ -1029,8 +993,6 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       assignment,
       unpaid,
       pastYear,
-      year,
-      initialWorkStatus,
       markCellChanged,
     ],
   );
@@ -1089,6 +1051,36 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       }
     });
 
+    // 行削除した社員について、画面を開いた時点の要員マスタ行
+    // （年度 + 社員番号 + 所属 + 異動フラグ + 異動日）を送る。
+    // 保存時に DB と突き合わせ、1 行でも欠けていれば削除失敗にする（異動と同じ扱い）
+    const deletedBaselines = deletedEmployeeNos
+      .map((employeeNo) => {
+        const seen = new Set<string>();
+        const rows = (initialWorkStatus.rows ?? [])
+          .filter(
+            (r) =>
+              r.employeeNo === employeeNo &&
+              (r.transferFlag === '0' || r.transferFlag === '1'),
+          )
+          .map((r) => ({
+            departmentId: r.departmentId ?? '',
+            idouFlag: r.transferFlag ?? '0',
+            idoubi:
+              r.transferFlag === '1' && r.activeFrom
+                ? r.activeFrom.replace(/-/g, '')
+                : '',
+          }))
+          .filter((b) => {
+            const k = `${b.departmentId}|${b.idouFlag}|${b.idoubi}`;
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+        return { employeeNo, rows };
+      })
+      .filter((b) => b.rows.length > 0);
+
     onSave({
       // 行は「社員番号・所属・有効期間」を持つ（年途中の部門異動は2行）
       rows: draftRows.map((r) => ({
@@ -1102,6 +1094,8 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
       unpaid,
       // 行削除で業務データを消した要員（DB 側でも当該年度の分を削除する）
       deletedEmployeeNos,
+      // 画面を開いた時点の要員マスタ行（保存時に DB と突き合わせる）
+      deletedBaselines,
       // 画面で変更したセルだけを version + 1 で更新する
       changedCells: changed,
       // 異動で変更した要員の現在所属（保存成功時に要員マスタへ反映する）
@@ -2227,7 +2221,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
               key={`${row.key}:${row.employeeNo}`}
               size='small'
               defaultValue={row.leavePlan ?? ''}
-              maxLength={30}
+              maxLength={100}
               disabled={pastYear || !row.employeeNo}
               placeholder={`例：${year}/10/31`}
               onBlur={(e) => commitLeavePlan(row.key, e.target.value)}

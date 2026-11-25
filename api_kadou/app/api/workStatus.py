@@ -13,34 +13,13 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.schemas.workStatus import (
-    PersonnelMasterRowsResponse,
     WorkStatusLoadResponse,
     WorkStatusSaveRequest,
     WorkStatusSaveResult,
 )
-from app.services.workStatus import (
-    list_personnel_master_rows,
-    load_work_status,
-    save_work_status,
-)
+from app.services.workStatus import load_work_status, save_work_status
 
 router = APIRouter(prefix="/api/kadou", tags=["workstatus"])
-
-
-@router.get(
-    "/{year}/work-status/personnel/{employee_no}/rows",
-    response_model=PersonnelMasterRowsResponse,
-)
-def get_personnel_master_rows(
-    year: str, employee_no: str, db: Session = Depends(get_db)
-):
-    """要員稼働管理：指定社員の要員マスタ行を返す（行削除の存在チェック用）。
-
-    行の識別キーは year_id + employee_no + department_id + idou_flag + idoubi。
-    """
-    return PersonnelMasterRowsResponse(
-        rows=list_personnel_master_rows(db, int(year), employee_no)
-    )
 
 
 @router.get("/{year}/work-status", response_model=WorkStatusLoadResponse)

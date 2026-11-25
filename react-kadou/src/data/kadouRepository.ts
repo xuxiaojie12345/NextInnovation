@@ -50,6 +50,15 @@ export interface WorkStatusPayload {
    * （要員マスタは削除しない）
    */
   deletedEmployeeNos?: string[];
+  /**
+   * 行削除した社員について、画面を開いた時点の要員マスタ行
+   * （年度 + 社員番号 + 所属 + 異動フラグ + 異動日）。
+   * 保存時に DB と突き合わせ、1 行でも欠けていれば削除失敗になる
+   */
+  deletedBaselines?: {
+    employeeNo: string;
+    rows: { departmentId: string; idouFlag: string; idoubi: string }[];
+  }[];
   /** 画面で変更したセル（このセルだけを version + 1 で更新する） */
   changedCells?: WorkStatusChangedCell[];
   /**
@@ -237,6 +246,7 @@ class HttpKadouRepository implements KadouRepository {
         assignment,
         unpaid: payload.unpaid ?? {},
         deletedEmployeeNos: payload.deletedEmployeeNos ?? [],
+        deletedBaselines: payload.deletedBaselines ?? [],
         changedCells: (payload.changedCells ?? []).map((cell) => ({
           ...cell,
           projectId: cell.projectId ? cell.projectId : null,

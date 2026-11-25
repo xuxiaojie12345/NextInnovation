@@ -137,7 +137,11 @@ const normalizeCellValue = (raw: string): string => {
 // ---------------------------------------------------------------------------
 
 /** 一括読み込みテンプレートの種別 */
-export type ImportTemplateKind = 'personnel' | 'project' | 'unknown';
+export type ImportTemplateKind =
+  | 'personnel'
+  | 'project'
+  | 'holiday'
+  | 'unknown';
 
 // NOTE: テンプレートの判定は「シート名」で行う（IMPORT_SHEET_RULES /
 //       detectTemplateBySheetName を参照）。以前は 1 ファイル＝1 テンプレート
@@ -446,6 +450,8 @@ export const IMPORT_SHEET_RULES = {
   personnel: '全員情報',
   /** プロジェクト管理画面：シート名がこの文字列と「一致すれば」プロジェクト管理 */
   project: 'マスタ',
+  /** 休日設置画面：シート名がこの文字列と「一致すれば」休日（大文字小文字は無視） */
+  holiday: 'holiday',
 } as const;
 
 /** シート名の正規化（前後空白除去・全角スペース除去） */
@@ -460,6 +466,10 @@ export const detectTemplateBySheetName = (
   if (!name) return 'unknown';
   if (name.includes(IMPORT_SHEET_RULES.personnel)) return 'personnel';
   if (name === IMPORT_SHEET_RULES.project) return 'project';
+  if (
+    normalizeKey(name) === normalizeKey(IMPORT_SHEET_RULES.holiday)
+  )
+    return 'holiday';
   return 'unknown';
 };
 
@@ -720,7 +730,8 @@ const buildRows = (
  * ※要員情報・プロジェクト情報の一括読み込みで共用する。
  *
  * expected を指定すると、Excel はシート名で対象シートを選ぶ
- * （要員情報＝シート名に「全員情報」を含む、プロジェクト管理＝「マスタ」）。
+ * （要員情報＝シート名に「全員情報」を含む、プロジェクト管理＝「マスタ」、
+ *   休日設置＝「holiday」）。
  */
 export const readSpreadsheetFile = async (
   file: File,

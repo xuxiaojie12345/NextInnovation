@@ -128,6 +128,24 @@ class WorkStatusSaveLeavePlan(BaseModel):
     leavePlan: str = ""
 
 
+class PersonnelMasterRowDto(BaseModel):
+    """要員マスタの 1 行（行削除の存在チェック用キー）"""
+
+    # 行の識別キー: year_id + employeeNo + departmentId + idouFlag + idoubi
+    departmentId: str
+    # 異動フラグ（'0' = 異動前 / '1' = 異動後）
+    idouFlag: str = "0"
+    # 異動日（'YYYYMMDD'。未指定 = 空文字）
+    idoubi: str = ""
+
+
+class WorkStatusSaveDeletedBaseline(BaseModel):
+    """保存リクエストの行削除時の要員マスタ基準（画面を開いた時点の行）"""
+
+    employeeNo: str
+    rows: list[PersonnelMasterRowDto] = []
+
+
 class WorkStatusSaveRequest(BaseModel):
     """PUT /api/kadou/{year}/work-status（当年全量置換）"""
 
@@ -136,6 +154,9 @@ class WorkStatusSaveRequest(BaseModel):
     unpaid: dict[str, dict[str, bool]] = {}
     # 行削除・社員番号変更で消した社員番号（保存後、週割当を削除する。要員マスタは削除しない）
     deletedEmployeeNos: list[str] = []
+    # 行削除した社員について、画面を開いた時点の要員マスタ行
+    # （1 行でも DB に無ければ削除失敗にする）
+    deletedBaselines: list[WorkStatusSaveDeletedBaseline] = []
     # 画面で変更したセル（このセルだけを version + 1 で更新する）
     changedCells: list[WorkStatusSaveCell] = []
     # 異動で変更した要員の現在所属（保存成功時に要員マスタへ反映する）
@@ -150,20 +171,3 @@ class WorkStatusSaveResult(BaseModel):
     """PUT /api/kadou/{year}/work-status のレスポンス"""
 
     code: int = 0
-
-
-class PersonnelMasterRowDto(BaseModel):
-    """要員マスタの 1 行（行削除の存在チェック用キー）"""
-
-    # 行の識別キー: year_id + employeeNo + departmentId + idouFlag + idoubi
-    departmentId: str
-    # 異動フラグ（'0' = 異動前 / '1' = 異動後）
-    idouFlag: str = "0"
-    # 異動日（'YYYYMMDD'。未指定 = 空文字）
-    idoubi: str = ""
-
-
-class PersonnelMasterRowsResponse(BaseModel):
-    """GET /api/kadou/{year}/work-status/personnel/{employeeNo}/rows のレスポンス"""
-
-    rows: list[PersonnelMasterRowDto] = []
