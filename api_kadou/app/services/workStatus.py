@@ -1090,6 +1090,12 @@ def save_work_status(
         db, year, req.deletedBaselines, sql["personnel_of_employee"]
     )
 
+    # 行削除した社員の要員マスタが、画面を開いた時点から変わっていないか確認する
+    # （1 行でも欠けていれば削除失敗。異動と同じく保存時に判定する）
+    _verify_deleted_baselines(
+        db, year, req.deletedBaselines, sql["personnel_of_employee"]
+    )
+
     # 行削除・社員番号変更で業務データを消した社員は、当該年度の週次データを
     # いったん全件削除し、残った行の payload（assignment / unpaid）を反映する。
     # 「削除 → payload 反映」の順にするため、行が残る社員も対象に含める（設計 7.5 / 7.8）。
