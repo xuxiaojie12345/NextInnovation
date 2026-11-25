@@ -57,17 +57,23 @@ FROM jn_holiday_master
 ORDER BY holiday_date
 
 -- :name: import_holiday
--- 休日追加
+-- 休日追加（一括読み込み）
+-- NOTE: 一括読み込みのファイルには日付しか無いため、区分は「未指定」を表す '' を入れる
+--       （holiday_kind は NOT NULL のため省略すると 1364 エラーになる）
 INSERT INTO jn_holiday_master (
     year_id,
+    holiday_kind,
     holiday_date,
+    holiday_name,
     register_datetime,
     register_user,
     update_datetime,
     update_user
 ) VALUES (
     :year_id,    
+    '',
     :holiday_date,
+    '',
     CURRENT_TIMESTAMP,
     :user_id,
     CURRENT_TIMESTAMP,

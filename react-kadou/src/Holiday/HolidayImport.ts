@@ -187,6 +187,7 @@ export const parseHolidayFile = async (
   file: File,
   year: number,
 ): Promise<HolidayImportResult> => {
-  const { matrix, source } = await readSpreadsheetFile(file);
+  // Excel は「holiday」シートだけを読む（CSV はシートの概念が無いためそのまま読む）
+  const { matrix, source } = await readSpreadsheetFile(file, 'holiday');
   return buildRows(matrix, year, source);
 };

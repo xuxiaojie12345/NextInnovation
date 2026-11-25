@@ -23,7 +23,6 @@ from app.core.errors import BusinessException
 from app.schemas.workStatus import (
     DepartmentDto,
     PersonnelDto,
-    PersonnelMasterRowDto,
     ProjectDto,
     WorkStatusDataDto,
     WorkStatusLoadResponse,
@@ -384,35 +383,53 @@ def _build_work_status_rows(
             dept = _as_str(master_rows[0]["department_id"]) or (
                 runs[0][0] if runs else master_dept_by_emp.get(emp, "")
             )
-            rows.append(WorkStatusRowDto(key=emp, employeeNo=emp, departmentId=dept))
+            rows.append(
+                WorkStatusRowDto(
+                    key=emp,
+                    employeeNo=emp,
+                    departmentId=dept,
+                    transferFlag="0",
+                )
+            )
             continue
         rows.extend(_split_rows(emp, runs))
     return rows
 
 
-def list_personnel_master_rows(
-    db: Session, year_id: int, employee_no: str
-) -> list[PersonnelMasterRowDto]:
-    """指定社員の要員マスタ行（行削除の存在チェック用キー）を返す。
+def _verify_deleted_baselines(
+    db: Session, year: str, baselines, sql_rows: str
+) -> None:
+    """行削除した社員の要員マスタが、画面を開いた時点から変わっていないか確認する。
 
-    行の識別キー: year_id + employee_no + department_id + idou_flag + idoubi
+    画面が保持していた行（year_id + employee_no + department_id + idou_flag +
+    idoubi）が 1 行でも DB に存在しなければ削除失敗にする
+    （他の画面・手作業で要員マスタが削除/変更された場合）。
     """
-    rows = (
-        db.execute(
-            text(load_sql("work_status.sql", "personnel_of_employee")),
-            {"year_id": str(year_id), "employee_no": employee_no},
+    for b in baselines or []:
+        no = (b.employeeNo or "").strip()
+        if not no or not b.rows:
+            continue
+        rows = (
+            db.execute(text(sql_rows), {"year_id": year, "employee_no": no})
+            .mappings()
+            .all()
         )
-        .mappings()
-        .all()
-    )
-    return [
-        PersonnelMasterRowDto(
-            departmentId=_as_str(r["department_id"]),
-            idouFlag=r["idou_flag"] or "0",
-            idoubi=r["idoubi"] or "",
-        )
-        for r in rows
-    ]
+        current = {
+            (
+                _as_str(r["department_id"]),
+                _as_str(r["idou_flag"]) or "0",
+                r["idoubi"] or "",
+            )
+            for r in rows
+        }
+        for want in b.rows:
+            key = (
+                want.departmentId or "",
+                want.idouFlag or "0",
+                want.idoubi or "",
+            )
+            if key not in current:
+                raise BusinessException(status_code=409, message_id="E_KADOU_090")
 
 
 def load_work_status(db: Session, year_id: int) -> WorkStatusLoadResponse:
@@ -1037,6 +1054,12 @@ def save_work_status(
     renamed_from = {frm for frm, _to in renumbers}
     renumber_targets = {to for _frm, to in renumbers}
     _validate_renumbers(db, year, renumbers, current_monday)
+
+    # 行削除した社員の要員マスタが、画面を開いた時点から変わっていないか確認する
+    # （1 行でも欠けていれば削除失敗。異動と同じく保存時に判定する）
+    _verify_deleted_baselines(
+        db, year, req.deletedBaselines, sql["personnel_of_employee"]
+    )
 
     # 行削除・社員番号変更で業務データを消した社員は、当該年度の週次データを
     # いったん全件削除し、残った行の payload（assignment / unpaid）を反映する。
