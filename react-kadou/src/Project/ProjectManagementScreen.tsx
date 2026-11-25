@@ -1508,8 +1508,7 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
                       className='project-field-dept-error'
                       style={{ fontSize: 12 }}
                     >
-                      登録済みの所属部門名「{form.departmentId}
-                      」が部門マスタにありません。選択し直してください。
+                      登録済みの所属部門ID「{form.departmentId}」が部門マスタにありません。選択し直してください。
                     </Text>
                   )}
               </div>
