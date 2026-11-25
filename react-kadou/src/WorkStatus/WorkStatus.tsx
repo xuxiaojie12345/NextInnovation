@@ -2218,7 +2218,14 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
           // 社員番号が未入力の行は編集できない
           return (
             <Input
-              key={`${row.key}:${row.employeeNo}`}
+              // uncontrolled のため defaultValue の後からの変更は反映されない。
+              // F5 直後はセッション復元で行だけが先に描画され、要員マスタの
+              // 備考（API）は後から届くので、未編集の間は値が変わったら作り直す。
+              key={`${row.key}:${row.employeeNo}${
+                leavePlanEdits[row.employeeNo] === undefined
+                  ? `:${row.leavePlan ?? ''}`
+                  : ''
+              }`}
               size='small'
               defaultValue={row.leavePlan ?? ''}
               maxLength={100}
@@ -2557,6 +2564,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     handleCellDragEnter,
     commitEmployeeNo,
     commitLeavePlan,
+    leavePlanEdits,
     handleDeleteRow,
     openTransfer,
     departments,
