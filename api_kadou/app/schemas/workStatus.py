@@ -9,6 +9,7 @@ class DepartmentDto(BaseModel):
 
     departmentId: str
     name: str = ""
+    alisa: Optional[str] = ""
     location: Optional[str] = None
     kind: str = "dept"
 

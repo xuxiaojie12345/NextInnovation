@@ -17,7 +17,16 @@ import type { YearStore } from './yearStore';
 
 const KEY_SESSION = 'kadou.session.v1';
 
-/** sessionStorage に保存する内容 */
+/**
+ * sessionStorage に保存する内容
+ *
+ * NOTE: 主データ（部門 / プロジェクト / 要員 / 休日）は保存しない。
+ *       これらは各画面が表示されたときに API から取得して最新化するため、
+ *       古いスナップショットを復元すると「保存したのにリロードで元に戻る」
+ *       不整合の原因になる（有効稼働 / 教育かどうか の不具合がこれに該当）。
+ *       ここでは「ログイン状態・年度・表示画面」と、
+ *       画面内で編集中の状態（要員稼動管理の稼働表）だけを保持する。
+ */
 interface PersistedSession {
   /** ログイン中のユーザー（null = 未ログイン） */
   user: AuthUser | null;
@@ -26,12 +35,20 @@ interface PersistedSession {
   /** 表示中の画面 */
   view: MenuKey;
   /**
-   * 年度ごとのストア。
-   * メモリ実装の kadouRepository はリロードで消えるため、
-   * 保存した内容を復元して画面上の編集結果を維持する。
+   * 年度ごとの「編集中の状態」（要員稼動管理の稼働表のみ）。
+   * 主データ（部門 / プロジェクト / 要員 / 休日）は含めない。
    */
-  stores: Record<number, YearStore>;
+  stores: Record<number, PersistedStore>;
 }
+
+/** 保存対象のストア部分（主データを含めない） */
+export type PersistedStore = Pick<YearStore, 'year' | 'workStatus'>;
+
+/** ストアから保存対象の項目だけを取り出す */
+export const toPersistedStore = (store: YearStore): PersistedStore => ({
+  year: store.year,
+  workStatus: store.workStatus,
+});
 
 /** 保存済みのセッションを読み込む（無い・壊れている場合は null） */
 export function loadSession(): PersistedSession | null {
@@ -47,7 +64,7 @@ export function loadSession(): PersistedSession | null {
       view: (parsed.view ?? 'work-status') as MenuKey,
       stores:
         parsed.stores && typeof parsed.stores === 'object'
-          ? (parsed.stores as Record<number, YearStore>)
+          ? (parsed.stores as Record<number, PersistedStore>)
           : {},
     };
   } catch {

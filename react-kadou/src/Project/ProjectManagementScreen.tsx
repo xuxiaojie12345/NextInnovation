@@ -730,11 +730,15 @@ const ProjectManagementScreen: React.FC<ProjectManagementScreenProps> = ({
     }
   }, [year]);
 
-  // 年度が変わったら一覧を取得し直す（画面初期データ取得 API）
-  // 依存は year のみ。setProjects は ref 経由で常に最新を参照する
+  // 年度が変わったら一覧を取得し直す（画面初期データ取得 API）。
+  // さらに表示中（active）になったタイミングでも再取得する。
+  // ※全画面は常時マウントされているため、これが無いと一度取得したきりになり、
+  //   他画面での変更や DB の直接更新が一覧に反映されない
+  //   （有効稼働 / 教育かどうか の更新がリロードで元に戻る不具合の原因）。
   useEffect(() => {
+    if (!active) return;
     void reloadProjects();
-  }, [reloadProjects]);
+  }, [active, reloadProjects]);
 
   /** 当週の週数（画面右上に表示） */
   const week = useMemo(() => {

@@ -33,7 +33,9 @@ import {
   clearSession,
   loadSession,
   saveSession,
+  toPersistedStore,
 } from './data/sessionStore';
+import type { PersistedStore } from './data/sessionStore';
 import './App.css';
 import { Holiday } from './Holiday/HolidaySettingMode';
 
@@ -83,15 +85,24 @@ function App() {
     () => restored?.year ?? currentYear(),
   );
   // 年度ごとのデータ（＝保存済みデータ）
-  // リロード時は sessionStorage に保存した内容を優先して復元する
+  // NOTE: sessionStorage から復元するのは「画面内で編集中の状態」（稼働表）だけ。
+  //       部門 / プロジェクト / 要員 / 休日 などの主データは復元せず、
+  //       各画面が表示されたタイミングで API から最新を取得する
+  //       （古いスナップショットで DB の最新値が上書きされる不整合を防ぐ）。
   const [stores, setStores] = useState<Record<number, YearStore>>(() => {
     const snapshot = kadouRepository.snapshot(INITIAL_YEARS);
     if (!restored) return snapshot;
-    // 保存済みの年度データで上書きする（画面での編集結果を維持する）
     const merged: Record<number, YearStore> = { ...snapshot };
-    Object.entries(restored.stores).forEach(([y, store]) => {
+    Object.entries(restored.stores).forEach(([y, saved]) => {
       const year = Number(y);
-      if (store) merged[year] = store;
+      if (!saved) return;
+      const base = merged[year] ?? kadouRepository.snapshot([year])[year];
+      if (!base) return;
+      // 稼働表（編集中の状態）だけを復元し、主データはスナップショット（API 取得前の空）のまま使う
+      merged[year] = {
+        ...base,
+        workStatus: saved.workStatus ?? base.workStatus,
+      };
     });
     return merged;
   });
@@ -133,11 +144,19 @@ function App() {
       clearSession();
       return;
     }
+    // NOTE: 主データ（部門 / プロジェクト / 要員 / 休日）は保存しない。
+    //       これらは各画面が表示時に API から取得するため、
+    //       古いスナップショットを復元すると DB の最新値と食い違う。
+    const persistedStores: Record<number, PersistedStore> = {};
+    Object.entries(stores).forEach(([y, s]) => {
+      const year = Number(y);
+      if (s) persistedStores[year] = toPersistedStore(s);
+    });
     saveSession({
       user: currentUser,
       year: selectedYear,
       view: activeView,
-      stores,
+      stores: persistedStores,
     });
   }, [currentUser, selectedYear, activeView, stores]);
 

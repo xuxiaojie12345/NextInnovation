@@ -20,6 +20,7 @@ from app.api.yearSelect import router as year_router
 from app.api.department import router as kadou_router
 from app.api.personnel import router as personnel_router
 from app.api.project import router as project_router
+from app.api.jinanWorkRate import router as stats_router
 from app.api.holiday import router as holiday_router
 from app.api.user import router as user_router
 from app.api.workStatus import router as work_status_router
@@ -260,6 +261,7 @@ app.include_router(year_router)
 app.include_router(kadou_router)
 app.include_router(personnel_router)
 app.include_router(project_router)
+app.include_router(stats_router)
 app.include_router(holiday_router)
 app.include_router(user_router)
 app.include_router(work_status_router)

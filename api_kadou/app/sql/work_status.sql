@@ -47,7 +47,7 @@ WHERE year_id = :year_id
 
 -- :name: departments
 -- 部門一覧（指定年度）
-SELECT department_id, department_name, location, kind
+SELECT department_id, department_name, department_alisa, location, kind
 FROM jn_department_master
 WHERE year_id = :year_id
 ORDER BY department_id

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Card, Empty, Space, Statistic, Table, Tag, Typography } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Card, Empty, Space, Statistic, Table, Tag, Typography, message } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import {
@@ -24,6 +24,11 @@ import { getWorkStatusJinanWeeklyStats } from '../data/jinanStatsFromWorkStatus'
 import { getJinanTargetDepartmentIds } from '../data/departmentRules';
 import { departmentLabelOf, departmentNameOf } from '../data/departmentUtils';
 import { weekKeyOf } from '../data/yearWeeks';
+import { fetchJinanWorkRate } from './jinanWorkRateApi';
+import type { JinanWorkRateTotal } from './jinanWorkRateApi';
+import { apiErrorMessage } from '../utils/errorMessage';
+import { notifySystemError } from '../utils/systemError';
+import { messageInfo } from '../constants/messages';
 import './JinanWorkRateScreen.css';
 
 const { Title, Text } = Typography;
@@ -203,6 +208,31 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   workStatus,
   projects,
 }) => {
+  /**
+   * 済南全社の集計（9 項目）はバックエンドの統計 API から取得する。
+   * 統計は保存せず、年度が変わったときだけ再取得（再計算）する。
+   */
+  const [total, setTotal] = useState<JinanWorkRateTotal | null>(null);
+  /** 離職と判定するシステム項目ID（API が返す暫定値。注記の表示に使う） */
+  const [leaveProjectId, setLeaveProjectId] = useState<string | null>(null);
+
+  const reloadTotal = useCallback(async () => {
+    try {
+      const data = await fetchJinanWorkRate(year);
+      setTotal(data.total);
+      setLeaveProjectId(data.leaveProjectId ?? null);
+    } catch (e) {
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      message.error(apiErrorMessage(e, messageInfo('E_KADOU_020')));
+      setTotal(null);
+    }
+  }, [year]);
+
+  useEffect(() => {
+    void reloadTotal();
+  }, [reloadTotal]);
+
   /**
    * 済南拠点の集計対象部門（部門マスタで 拠点＝済南 かつ 協力会社以外）
    * 拠点を天津に変更した部門・協力会社は集計対象から外れる。
@@ -431,32 +461,52 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     [chartSeries, departments, weeks, year, workStatus, projects],
   );
 
-  /** 今週のサマリ（9 項目） */
+  /**
+   * 済南全社の集計（9 項目）。
+   * 値はバックエンドの統計 API（GET /api/kadou/{year}/stats/jinan）の total を使う。
+   * ※連表（要員マスタ × 稼動表 × プロジェクトマスタ）で集計した値
+   */
   const cards: {
     label: string;
     value: number;
     suffix: string;
     isRate?: boolean;
-  }[] = [
-    { label: '総人数', value: week.headcount, suffix: '名' },
-    { label: '離職人数', value: week.leavers, suffix: '名' },
-    { label: '総稼動人数', value: week.activeTotal, suffix: '名' },
-    { label: '総稼動率', value: week.activeRate, suffix: '%', isRate: true },
-    { label: '非契約稼動人数', value: week.nonContractActive, suffix: '名' },
-    { label: '教育実施人数', value: week.training, suffix: '名' },
-    {
-      label: '現地稼動人数（日本出張含）',
-      value: week.localActive,
-      suffix: '名',
-    },
-    { label: '現地稼動率', value: week.localRate, suffix: '%', isRate: true },
-    {
-      label: '契約稼動率',
-      value: week.contractRate,
-      suffix: '%',
-      isRate: true,
-    },
-  ];
+  }[] = total
+    ? [
+        { label: '総人数', value: total.headcount, suffix: '名' },
+        { label: '離職人数', value: total.leavers, suffix: '名' },
+        { label: '総稼動人数', value: total.activeTotal, suffix: '名' },
+        {
+          label: '総稼動率',
+          value: total.activeRate,
+          suffix: '%',
+          isRate: true,
+        },
+        {
+          label: '非契約稼動人数',
+          value: total.nonContractActive,
+          suffix: '名',
+        },
+        { label: '教育実施人数', value: total.training, suffix: '名' },
+        {
+          label: '現地稼動人数（日本出張含）',
+          value: total.localActive,
+          suffix: '名',
+        },
+        {
+          label: '現地稼動率',
+          value: total.localRate,
+          suffix: '%',
+          isRate: true,
+        },
+        {
+          label: '契約稼動率',
+          value: total.contractRate,
+          suffix: '%',
+          isRate: true,
+        },
+      ]
+    : [];
 
   /** 週次統計テーブルの列（指標 × 週の横向き。要員稼動管理グリッドと同じ 2 段ヘッダー） */
   const columns: TableColumnsType<MetricRow> = useMemo(() => {
@@ -555,13 +605,12 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
         </div>
         <Space>
           <Tag color='blue'>拠点：済南</Tag>
-          <Tag color='orange'>フロント モック（バックエンド未接続）</Tag>
         </Space>
       </div>
 
-      {/* 今週の集計（9 項目） */}
+      {/* 済南全社の集計（9 項目） */}
       <Card
-        title={`${isCurrentYear ? '今週' : '年度末週'}の集計（${JINAN_ALL_LABEL}／${week.label}）`}
+        title={`${JINAN_ALL_LABEL}の集計`}
         className='screen-card jinan-card-full'
         extra={<Text type='secondary'>目標稼働率 {JINAN_TARGET_RATE}%</Text>}
       >
@@ -586,8 +635,11 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
           ))}
         </div>
         <Text type='secondary' className='jinan-note'>
-          ※ {isCurrentYear ? '当週' : '年度末週'}（{week.period}）の実績値です。人数は当該週の人数、稼動率は「各分子 ÷ 総人数」で算出しています。
-          {!week.hasData && ' ※対象週のデータが無いため 0 で表示しています。'}
+          ※ 年単位（{year}年度）の集計値です。総稼動率 = 総稼動人数 ÷ 総人数、契約稼動率 =（総稼動人数 − 非契約稼動人数）÷ 総人数、現地稼動人数・現地稼動率は総稼動人数・総稼動率と同じ値です。
+          {!total && ' ※統計の取得中または取得できませんでした。'}
+          {leaveProjectId && (
+            <> 離職は稼動表のシステム項目ID「{leaveProjectId}」で判定しています。</>
+          )}
           <br />
           ※ 天津出張人数の指標削除に伴い、現地稼動人数・現地稼動率は総稼動人数・総稼動率と同じ値です。
         </Text>

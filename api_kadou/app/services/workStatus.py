@@ -96,6 +96,8 @@ def _row_to_project(r) -> ProjectDto:
         abbr=_abbr(r["customer"], r["case_name"], r["team"], r["sub_team"]),
         departmentId=_as_str(r["department_id"]),
         name=r["project_name"] or "",
+        validFlg=_as_str(r["valid_flg"]),
+        educationFlg=_as_str(r["education_flg"]),
     )
 
 
@@ -258,6 +260,7 @@ def _load_departments(db: Session, year: str) -> list[DepartmentDto]:
         DepartmentDto(
             departmentId=_as_str(r["department_id"]),
             name=r["department_name"],
+            alisa=r["department_alisa"] or "",
             location=r["location"],
             kind=r["kind"] or "dept",
         )

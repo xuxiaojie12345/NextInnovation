@@ -110,6 +110,8 @@ interface WorkStatusLoadResponse {
   departments: Array<{
     departmentId: string;
     name: string;
+    /** 部門別名（画面の「部門別名」列で表示する） */
+    alisa?: string;
     location?: string;
     kind?: string;
   }>;
@@ -168,7 +170,11 @@ class HttpKadouRepository implements KadouRepository {
     // マスタ系は後端の値を採用する
     store.departments = res.departments as Department[];
     store.personnel = res.personnel as Personnel[];
-    // プロジェクト：後端の valid_flg / education_flg は '1'/'0' なので真偽値へ畳む
+    // プロジェクト：後端の valid_flg / education_flg は '1'/'0'（または真偽値）なので真偽値へ畳む
+    // NOTE: 比較は文字列 '1' 固定にせず、'1' / true / 1 のいずれでも true になるようにする
+    //       （後端が真偽値や null を返した場合にフラグが常に false になる事故を防ぐ）
+    const toFlag = (v: unknown): boolean =>
+      v === true || v === 1 || v === '1';
     store.projects = (res.projects ?? []).map((p) => ({
       projectId: p.projectId,
       projectCode: p.projectCode,
@@ -179,8 +185,8 @@ class HttpKadouRepository implements KadouRepository {
       abbr: p.abbr,
       departmentId: p.departmentId,
       name: p.name,
-      validFlg: p.validFlg === '1',
-      educationFlg: p.educationFlg === '1',
+      validFlg: toFlag(p.validFlg),
+      educationFlg: toFlag(p.educationFlg),
     }));
 
     // 週割当：後端の「UNASSIGN」は画面の「未割当(null)」へ畳む
