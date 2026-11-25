@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Department, Personnel } from '../WorkStatus/types';
 import { departmentLabelOf } from '../data/departmentUtils';
+import { normalizeLocation } from '../constants/options';
 import { fetchDepartments } from '../api/departmentManagement';
 import {
   PERSONNEL_IMPORT_ACCEPT,
@@ -276,6 +277,10 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
    *   N 列 → 部門マスタの「拠点（location）」
    *   両方が一致した部門だけを候補とする（完全一致・全半角/大文字小文字は正規化）。
    *
+   * NOTE: N 列は「済南」「天津」のような日本語表記、部門マスタの location は
+   *       「JN」「TJ」の英字コードで保持されているため、normalizeLocation() で
+   *       同じコードへ揃えてから比較する（済南 → JN / 天津 → TJ）。
+   *
    * 一致した場合は所属（部門名称）と部門ID を確定して「ロック」する。
    * 一致しない場合は department を空にして、プレビュー上で手動選択させる。
    */
@@ -284,12 +289,16 @@ const PersonnelInfoScreen: React.FC<PersonnelInfoScreenProps> = ({
       const normalize = (v: string | undefined) =>
         (v ?? '').replace(/\u3000/g, ' ').trim().toLowerCase();
       const alias = normalize(row.departmentAlias);
-      const loc = normalize(row.workLocation);
+      // 拠点は表記ゆれ（済南/JN・天津/TJ）を吸収してから比較する
+      const loc = normalizeLocation(row.workLocation);
 
-      const hit = departments.filter(
-        (d) =>
-          normalize(d.alisa) === alias && normalize(d.location) === loc,
-      );
+      const hit = loc
+        ? departments.filter(
+            (d) =>
+              normalize(d.alisa) === alias &&
+              normalizeLocation(d.location) === loc,
+          )
+        : [];
 
       // 一致が 1 件に絞れたときだけ確定する（同名・同拠点が複数ある場合は選ばせる）
       if (hit.length === 1) {

@@ -26,7 +26,8 @@ ORDER BY d.department_id
 --
 --   ・headcount     : 要員マスタで 対象拠点（:location）の部門に所属する要員数
 --                     （異動で複数行になるため社員番号で DISTINCT して数える）
---   ・leavers       : 稼動表の当週プロジェクトが「内・退職」（:leave_project_id）の要員数
+--   ・leavers       : 稼動表の当週プロジェクト（プロジェクトマスタ連表）の
+--                     顧客 = '内' かつ 案件名 = '退職' の要員数
 --   ・active_total  : 稼動表の当週プロジェクトの有効flg = '1' の要員数
 --   ・non_contract  : 稼動表の is_unpaid = '1'（無償支援）の要員数
 --   ・training      : 稼動表の当週プロジェクトの教育flg = '1' の要員数
@@ -35,7 +36,11 @@ ORDER BY d.department_id
 --       連表（JOIN）で取得する。稼動表の部門IDは文字列・数値が混在するため、
 --       両辺を数値化して比較する。
 --
--- NOTE: 同一週（同一 week_start_date）に「内・退職」（:leave_project_id）の割当がある要員は
+-- NOTE: 離職（内・退職）の判定はプロジェクトマスタの 顧客・案件名 で行う
+--       （システム項目ID は年ごとに変わり得るため）。
+--       「顧客 = :leave_customer かつ 案件名 = :leave_case_name」の項目を離職として扱う。
+--
+-- NOTE: 同一週（同一 week_start_date）に「顧客 = 内・案件名 = 退職」の割当がある要員は
 --       「離職人数」にだけ数え、総稼動人数・非契約稼動人数・教育実施人数には数えない
 --       （二重計上を防ぐ）。総人数（headcount）は従来どおり要員マスタで数える。
 SELECT
@@ -48,14 +53,19 @@ SELECT
           AND CAST(p.department_id AS UNSIGNED) = d.department_id
     ) AS headcount,
     (
-        SELECT COUNT(DISTINCT a.employee_no)
+        SELECT COUNT(DISTINCT p.employee_no)
         FROM jn_personnel_master p
         INNER JOIN jn_weekly_assignment_table a
             ON a.year_id = p.year_id
            AND a.employee_no = p.employee_no
+        INNER JOIN jn_project_master pr
+            ON pr.year_id = a.year_id
+           AND pr.sys_project_id = CAST(a.sys_project_id AS SIGNED)
         WHERE p.year_id = :year_id
           AND CAST(p.department_id AS UNSIGNED) = d.department_id
-          AND a.sys_project_id = :leave_project_id
+          -- 離職判定：顧客 = '内' かつ 案件名 = '退職'
+          AND TRIM(pr.customer) = :leave_customer
+          AND TRIM(pr.case_name) = :leave_case_name
     ) AS leavers,
     (
         SELECT COUNT(DISTINCT a.employee_no)
@@ -73,10 +83,14 @@ SELECT
           AND NOT EXISTS (
               SELECT 1
               FROM jn_weekly_assignment_table lv
+              INNER JOIN jn_project_master lpr
+                  ON lpr.year_id = lv.year_id
+                 AND lpr.sys_project_id = CAST(lv.sys_project_id AS SIGNED)
               WHERE lv.year_id = a.year_id
                 AND lv.employee_no = a.employee_no
                 AND lv.week_start_date = a.week_start_date
-                AND lv.sys_project_id = :leave_project_id
+                AND TRIM(lpr.customer) = :leave_customer
+                AND TRIM(lpr.case_name) = :leave_case_name
           )
     ) AS active_total,
     (
@@ -92,10 +106,14 @@ SELECT
           AND NOT EXISTS (
               SELECT 1
               FROM jn_weekly_assignment_table lv
+              INNER JOIN jn_project_master lpr
+                  ON lpr.year_id = lv.year_id
+                 AND lpr.sys_project_id = CAST(lv.sys_project_id AS SIGNED)
               WHERE lv.year_id = a.year_id
                 AND lv.employee_no = a.employee_no
                 AND lv.week_start_date = a.week_start_date
-                AND lv.sys_project_id = :leave_project_id
+                AND TRIM(lpr.customer) = :leave_customer
+                AND TRIM(lpr.case_name) = :leave_case_name
           )
     ) AS non_contract,
     (
@@ -114,10 +132,14 @@ SELECT
           AND NOT EXISTS (
               SELECT 1
               FROM jn_weekly_assignment_table lv
+              INNER JOIN jn_project_master lpr
+                  ON lpr.year_id = lv.year_id
+                 AND lpr.sys_project_id = CAST(lv.sys_project_id AS SIGNED)
               WHERE lv.year_id = a.year_id
                 AND lv.employee_no = a.employee_no
                 AND lv.week_start_date = a.week_start_date
-                AND lv.sys_project_id = :leave_project_id
+                AND TRIM(lpr.customer) = :leave_customer
+                AND TRIM(lpr.case_name) = :leave_case_name
           )
     ) AS training
 FROM jn_department_master d

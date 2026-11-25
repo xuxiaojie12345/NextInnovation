@@ -213,14 +213,11 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
    * 統計は保存せず、年度が変わったときだけ再取得（再計算）する。
    */
   const [total, setTotal] = useState<JinanWorkRateTotal | null>(null);
-  /** 離職と判定するシステム項目ID（API が返す暫定値。注記の表示に使う） */
-  const [leaveProjectId, setLeaveProjectId] = useState<string | null>(null);
 
   const reloadTotal = useCallback(async () => {
     try {
       const data = await fetchJinanWorkRate(year);
       setTotal(data.total);
-      setLeaveProjectId(data.leaveProjectId ?? null);
     } catch (e) {
       // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
       if (notifySystemError(e)) return;
@@ -635,11 +632,8 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
           ))}
         </div>
         <Text type='secondary' className='jinan-note'>
-          ※ 年単位（{year}年度）の集計値です。総稼動率 = 総稼動人数 ÷ 総人数、契約稼動率 =（総稼動人数 − 非契約稼動人数）÷ 総人数、現地稼動人数・現地稼動率は総稼動人数・総稼動率と同じ値です。
+          ※ 当週（{week.period}）の実績値です。人数は当該週の人数、稼動率は「各分子 ÷ 総人数」で算出しています。
           {!total && ' ※統計の取得中または取得できませんでした。'}
-          {leaveProjectId && (
-            <> 離職は稼動表のシステム項目ID「{leaveProjectId}」で判定しています。</>
-          )}
           <br />
           ※ 天津出張人数の指標削除に伴い、現地稼動人数・現地稼動率は総稼動人数・総稼動率と同じ値です。
         </Text>

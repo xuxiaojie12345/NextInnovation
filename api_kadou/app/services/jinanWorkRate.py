@@ -6,7 +6,7 @@ NOTE: api 層（app/api/jinanWorkRate.py）は「Web 側データの受け取り
 
 集計ルール（画面仕様）:
   1. 総人数              : 要員マスタで拠点 JN の部門に所属する要員数
-  2. 離職人数            : 稼動表の当週プロジェクトが「内・退職」（システム項目ID = 定数）の要員数
+  2. 離職人数            : 稼動表の当週プロジェクトが「顧客 = 内・案件名 = 退職」の要員数
   3. 総稼動人数          : 稼動表の当週プロジェクトの有効flg = '1' の要員数
   4. 総稼動率            : 総稼動人数 ÷ 総人数
   5. 非契約稼動人数      : 稼動表の is_unpaid = '1' の要員数
@@ -15,7 +15,7 @@ NOTE: api 層（app/api/jinanWorkRate.py）は「Web 側データの受け取り
   8. 現地稼動率          : 総稼動率と同じ
   9. 契約稼動率          : (総稼動人数 - 非契約稼動人数) ÷ 総人数
 
-  NOTE: 同一週（同一 week_start_date）に「内・退職」（:leave_project_id）の割当がある要員は
+  NOTE: 同一週（同一 week_start_date）に「顧客 = 内・案件名 = 退職」の割当がある要員は
         「離職人数」にだけ数え、総稼動人数・非契約稼動人数・教育実施人数には数えない
         （離職者の二重計上を防ぐ）。総人数（headcount）は要員マスタで数えるため影響しない。
 
@@ -32,9 +32,11 @@ from app.sql import load_sql
 # 集計対象拠点（部門マスタの location）
 _TARGET_LOCATION = "JN"
 
-# 離職（「内・退職」）を表す システム項目ID
-# NOTE: 暫定データのため定数化している（将来変更される可能性がある）。
-LEAVE_PROJECT_ID = "27"
+# 離職（内・退職）を表すプロジェクトの 顧客 / 案件名
+# NOTE: プロジェクトマスタの「顧客 = 内」「案件名 = 退職」の項目を離職として扱う
+#       （システム項目ID は年ごとに変わり得るため、名称で判定する）。
+LEAVE_CUSTOMER = "内"
+LEAVE_CASE_NAME = "退職"
 
 # 年度の書式（4桁の数字）
 _YEAR_LENGTH = 4
@@ -134,7 +136,8 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
                 {
                     "year_id": year_id,
                     "location": _TARGET_LOCATION,
-                    "leave_project_id": LEAVE_PROJECT_ID,
+                    "leave_customer": LEAVE_CUSTOMER,
+                    "leave_case_name": LEAVE_CASE_NAME,
                 },
             )
             .mappings()
@@ -153,5 +156,6 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
         "location": _TARGET_LOCATION,
         "departments": departments,
         "total": _total_of(departments),
-        "leaveProjectId": LEAVE_PROJECT_ID,
+        "leaveCustomer": LEAVE_CUSTOMER,
+        "leaveCaseName": LEAVE_CASE_NAME,
     }

@@ -10,8 +10,8 @@
  *   （無効プロジェクトの割当は稼動系指標に計上しない。BUFFER も同じ扱い）
  * ・教育実施人数 = 「割当あり かつ 教育flg = true」を数える
  *   （有効flg・BUFFER とは無関係。有効 + 教育は稼動と教育の両方に計上する）
- * ・「内・退職」は名前で判定し、フラグより先に除外する
- *   離職人数 = その週に「内・退職」が設定されている人数（退職後は毎週計上）
+ * ・離職は「顧客 = 内 かつ 案件名 = 退職」のプロジェクトで判定し、フラグより先に除外する
+ *   離職人数 = その週に該当プロジェクトが設定されている人数（退職後は毎週計上）
  *   総人数 = その週の部門行数 − 離職人数
  */
 import type { Project, WorkStatusRow } from '../WorkStatus/types';
@@ -21,8 +21,11 @@ import type { JinanWeeklyStat } from './jinanStats';
 import { buildYearWeeks } from './yearWeeks';
 import type { WeekCol } from './yearWeeks';
 
-/** 「内・退職」を表すプロジェクト名（WorkStatus と同一） */
-const LEAVE_PROJECT_NAME = '内・退職';
+/** 離職を表すプロジェクトの 顧客 */
+const LEAVE_CUSTOMER = '内';
+
+/** 離職を表すプロジェクトの 案件名 */
+const LEAVE_CASE_NAME = '退職';
 
 /** その週が行の有効期間内か */
 const isActive = (row: WorkStatusRow, weekKey: string): boolean =>
@@ -44,9 +47,19 @@ export const getWorkStatusJinanWeeklyStats = (
   const rows = workStatus.rows ?? [];
   const assignment = workStatus.assignment ?? {};
   const unpaid = workStatus.unpaid ?? {};
-  const leaveProjectId = projects.find(
-    (p) => p.name === LEAVE_PROJECT_NAME || p.abbr === LEAVE_PROJECT_NAME,
-  )?.projectId;
+  /** 離職ID 集合（顧客 = 内 かつ 案件名 = 退職 のプロジェクト） */
+  const leaveProjectIds = new Set(
+    projects
+      .filter(
+        (p) =>
+          (p.customer ?? '').trim() === LEAVE_CUSTOMER &&
+          (p.caseName ?? '').trim() === LEAVE_CASE_NAME,
+      )
+      .map((p) => p.projectId),
+  );
+  /** 離職判定（プロジェクトID の集合で判定する） */
+  const isLeaveProject = (projectId: string | null | undefined): boolean =>
+    !!projectId && leaveProjectIds.has(String(projectId));
 
   // projectId → Project（有効flg・教育flg の判定に使う）
   const projectById = new Map(projects.map((p) => [p.projectId, p]));
@@ -67,15 +80,13 @@ export const getWorkStatusJinanWeeklyStats = (
       if (row.departmentId !== departmentId) continue;
       if (!isActive(row, weekKey)) continue;
       const cell = assignment[row.employeeNo] ?? {};
-      const isLeave =
-        !!leaveProjectId && cell[weekKey] === leaveProjectId;
-      if (isLeave) {
-        // 当週「内・退職」の人数（退職後は毎週計上。総人数からは外す）
+      const pid = cell[weekKey];
+      if (isLeaveProject(pid)) {
+        // 当週「内・退職」の人数（退職後は毎週計上。他の指標には計上しない）
         leavers += 1;
         continue;
       }
       headcount += 1;
-      const pid = cell[weekKey];
       const project = pid ? projectById.get(pid) : undefined;
       if (project?.validFlg) {
         // 総稼動人数は BUFFER を含む（無効プロジェクトの割当は計上しない）

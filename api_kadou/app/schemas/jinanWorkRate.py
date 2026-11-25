@@ -63,5 +63,6 @@ class JinanWorkRateResponse(BaseModel):
     departments: list[JinanDepartmentStat] = []
     # 済南拠点全体（対象部門の合計から算出）
     total: JinanWorkRateStat = JinanWorkRateStat()
-    # 離職と判定する稼動表のシステム項目ID（暫定値。将来変更される可能性があるため定数で返す）
-    leaveProjectId: Optional[str] = None
+    # 離職と判定するプロジェクトの 顧客 / 案件名（画面の注記表示用）
+    leaveCustomer: Optional[str] = None
+    leaveCaseName: Optional[str] = None

@@ -65,8 +65,10 @@ export interface JinanWorkRateApiResult {
   departments: JinanWorkRateDepartmentStat[];
   /** 済南拠点全体（対象部門の合計から算出） */
   total: JinanWorkRateTotal;
-  /** 離職と判定するシステム項目ID（暫定値） */
-  leaveProjectId?: string | null;
+  /** 離職と判定するプロジェクトの 顧客 */
+  leaveCustomer?: string | null;
+  /** 離職と判定するプロジェクトの 案件名 */
+  leaveCaseName?: string | null;
 }
 
 /**

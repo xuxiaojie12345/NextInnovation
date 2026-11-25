@@ -71,10 +71,15 @@ const KEY_SEP = '|';
 const WEEK_CELL_DROPDOWN_MAX_WIDTH = 280;
 
 /**
- * 「内・退職」を表すプロジェクト名
+ * 「内・退職」を表すプロジェクトの 顧客 / 案件名
  * 週セルでこの項目を選ぶと、その週から最終週までを一括で「内・退職」にし、行をグレー表示する
+ * ※判定はプロジェクトマスタの 顧客・案件名 で行う（システム項目ID は年ごとに変わり得るため）
  */
-const LEAVE_PROJECT_NAME = '内・退職';
+const LEAVE_CUSTOMER = '内';
+const LEAVE_CASE_NAME = '退職';
+
+/** 画面に表示する「内・退職」の名称（判定には使わない） */
+const LEAVE_PROJECT_LABEL = '内・退職';
 
 /** セルキー（行キー|週キー）を組み立てる */
 const cellKey = (rowKey: string, weekKey: string) =>
@@ -1191,11 +1196,13 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [projects],
   );
 
-  /** 「内・退職」プロジェクトのID（見つからない場合は undefined） */
+  /** 「内・退職」プロジェクトのID（顧客 = 内 かつ 案件名 = 退職） */
   const leaveProjectKey = useMemo(
     () =>
       projects.find(
-        (p) => p.name === LEAVE_PROJECT_NAME || p.abbr === LEAVE_PROJECT_NAME,
+        (p) =>
+          (p.customer ?? '').trim() === LEAVE_CUSTOMER &&
+          (p.caseName ?? '').trim() === LEAVE_CASE_NAME,
       )?.projectId,
     [projects],
   );
@@ -2842,7 +2849,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
 
       {/* 凡例 */}
       <div className='ws-legend'>
-        <span className='legend-item'>{LEAVE_PROJECT_NAME}</span>
+        <span className='legend-item'>{LEAVE_PROJECT_LABEL}</span>
         <span className='legend-item'>未割当（－）</span>
         <span
           className='legend-item ws-legend-unpaid'
@@ -2920,7 +2927,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         </Text>
         <br />
         <Text type='secondary'>
-          {`※「${LEAVE_PROJECT_NAME}」を選ぶと、その週から12月31日を含む週までを一括で「${LEAVE_PROJECT_NAME}」に設定し、行をグレー表示します。`}
+          {`※「${LEAVE_PROJECT_LABEL}」を選ぶと、その週から12月31日を含む週までを一括で「${LEAVE_PROJECT_LABEL}」に設定し、行をグレー表示します。`}
         </Text>
         <br />
         <Text type='secondary'>

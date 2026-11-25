@@ -36,6 +36,44 @@ export const LOCATION_OPTIONS: {
   { value: 'JN', label: '済南' },
 ];
 
+/**
+ * 外部ファイル・画面入力の「拠点」表記を DepartmentLocation（'JN' / 'TJ'）へ正規化する。
+ *
+ * 取込ファイルの N 列【労働関係所属地】は「済南」「天津」のような日本語表記だが、
+ * 部門マスタの location は「JN」「TJ」の英字 2 文字で保持している。
+ * そのため両者を比較する前に、どちらの表記でも同じ値になるよう変換する。
+ *
+ * 対応表記（全角/半角・大文字/小文字・前後空白は吸収）：
+ *   済南 / 济南 / 濟南 / JN / Jinan          → 'JN'
+ *   天津 / TJ / Tianjin                     → 'TJ'
+ * 上記以外は undefined（照合しない）。
+ */
+export const normalizeLocation = (
+  value: string | undefined | null,
+): DepartmentLocation | undefined => {
+  // 前後空白（全角スペース含む）を除去し、大文字化して比較する
+  const key = (value ?? '').replace(/\u3000/g, ' ').trim().toUpperCase();
+  if (!key) return undefined;
+  switch (key) {
+    case 'JN':
+    case '済南':
+    case '济南': // 簡体字（中国語 Excel で入力される場合がある）
+    case '濟南': // 旧字体
+    case 'JINAN':
+      return 'JN';
+    case 'TJ':
+    case '天津':
+    case 'TIANJIN':
+      return 'TJ';
+    default:
+      return undefined;
+  }
+};
+
+/** 拠点コード（'JN' / 'TJ'）から画面表示用の日本語名を返す */
+export const locationLabelOf = (location: string | undefined): string =>
+  location === 'TJ' ? '天津' : location === 'JN' ? '済南' : (location ?? '');
+
 // ---------------------------------------------------------------------------
 // 職級（ロール）
 // ---------------------------------------------------------------------------
