@@ -14,7 +14,7 @@ class HolidaysResponse(BaseModel):
 class HolidayRequest(BaseModel):
     kind: str
     data: str
-    name: str
+    name: str | None
 
 
 class HolidayImportRequest(BaseModel):
