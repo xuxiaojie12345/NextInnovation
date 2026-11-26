@@ -61,6 +61,8 @@ export interface JinanWorkRateApiResult {
   year: string;
   /** 集計対象拠点（'JN'） */
   location: string;
+  /** 実際に集計した基準週（'YYYYMMDD'。月曜） */
+  weekStartDate?: string;
   /** 集計対象部門（部門マスタから動的生成） */
   departments: JinanWorkRateDepartmentStat[];
   /** 済南拠点全体（対象部門の合計から算出） */
@@ -74,12 +76,19 @@ export interface JinanWorkRateApiResult {
 /**
  * 済南稼働率統計を取得する（GET /api/kadou/{year}/stats/jinan）。
  * 統計は保存せず、呼び出しのたびにバックエンドで集計する。
+ *
+ * @param weekStartDate 集計基準週（'YYYY-MM-DD' の月曜）。
+ *   未指定は当年＝当週 / 過去年度＝年度末週 / 未来年度＝年度第 1 週。
  */
 export async function fetchJinanWorkRate(
   year: number,
+  weekStartDate?: string,
 ): Promise<JinanWorkRateApiResult> {
+  const query = weekStartDate
+    ? `?weekStartDate=${encodeURIComponent(weekStartDate)}`
+    : '';
   return httpRequest<JinanWorkRateApiResult>(
-    `/api/kadou/${year}/stats/jinan`,
+    `/api/kadou/${year}/stats/jinan${query}`,
     {
       method: 'GET',
       timeoutMs: SAVE_TIMEOUT_MS,

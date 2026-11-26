@@ -161,16 +161,42 @@ def _validate_year(year: str) -> str:
     return value
 
 
-def fetch_jinan_work_rate(db: Session, year: str) -> dict:
+def _validate_week(value: str) -> str:
+    """基準週（'YYYYMMDD'）を検証して返す（未指定は空文字）。
+
+    指定された週はそのまま集計基準週として使う（週ごとの検証用）。
+    書式不正は業務エラー 400（年度と同じ E_KADOU_026）。
+    """
+    week = (value or "").strip()
+    if not week:
+        return ""
+    if len(week) != 8 or not week.isdigit():
+        raise BusinessException(status_code=400, message_id="E_KADOU_026")
+    return week
+
+
+def fetch_jinan_work_rate(db: Session, year: str, week_start_date: str = "") -> dict:
     """済南稼働率統計を取得する（API 入口）。
+
+    Args:
+        year: 対象年度（4桁）
+        week_start_date: 集計基準週（'YYYYMMDD' または 'YYYY-MM-DD' も許容）。
+            未指定なら対象年度の代表週（当年 = 当週 / 過年度 = 年度末週 /
+            未来年度 = 年度第 1 週）を使う。
 
     Returns:
         dict: 年度 / 対象部門の統計値一覧 / 拠点全体の合計
 
     Raises:
-        BusinessException: 年度の書式が不正（E_KADOU_026）
+        BusinessException: 年度・基準週の書式が不正（E_KADOU_026）
     """
     year_id = _validate_year(year)
+    base_week = _validate_week(week_start_date)
+    if base_week:
+        # 'YYYY-MM-DD' で渡された場合も DB 格納形式に合わせる
+        base_week = base_week.replace("-", "")
+    else:
+        base_week = _current_monday(year_id)
     try:
         rows = (
             db.execute(
@@ -180,8 +206,8 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
                     "location": _TARGET_LOCATION,
                     "leave_customer": LEAVE_CUSTOMER,
                     "leave_case_name": LEAVE_CASE_NAME,
-                    # 集計基準週（対象年度の代表週の月曜）。離職判定を週単位で行うために使う
-                    "week_start_date": _current_monday(year_id),
+                    # 集計基準週（月曜）。当週の割当／離職判定はこの週だけで行う
+                    "week_start_date": base_week,
                 },
             )
             .mappings()
@@ -198,6 +224,8 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
     return {
         "year": year_id,
         "location": _TARGET_LOCATION,
+        # 実際に集計した基準週（呼び出し側で確認用）
+        "weekStartDate": base_week,
         "departments": departments,
         "total": _total_of(departments),
         "leaveCustomer": LEAVE_CUSTOMER,

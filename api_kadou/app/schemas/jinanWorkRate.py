@@ -59,6 +59,8 @@ class JinanWorkRateResponse(BaseModel):
     year: str
     # 集計対象拠点（'JN'）
     location: str = "JN"
+    # 実際に集計した基準週（'YYYYMMDD' の月曜）
+    weekStartDate: str = ""
     # 集計対象部門（部門マスタから動的生成。追加・削除で増減する）
     departments: list[JinanDepartmentStat] = []
     # 済南拠点全体（対象部門の合計から算出）
