@@ -17,6 +17,7 @@ export interface HolidaySettingsScreenProps {
   holidays: Holiday[];
   setHolidays: React.Dispatch<React.SetStateAction<Holiday[]>>;
   currentUserId: string | null;
+  active: boolean;
 }
 
 /** 一括読み込みで受け取る1件分の休日情報 */

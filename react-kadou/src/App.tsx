@@ -1,43 +1,49 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { message } from 'antd';
-import { messageInfo } from './constants/messages';
-import AppMenu from './Menu/Menu';
-import type { MenuKey } from './Menu/Menu';
-import Login from './Login/Login';
-import HolidaySettingsScreen from './Holiday/HolidaySettingsScreen';
-import DepartmentManagementScreen from './Department/DepartmentManagementScreen';
-import PersonnelInfoScreen from './Personnel/PersonnelInfoScreen';
-import ProjectManagementScreen from './Project/ProjectManagementScreen';
-import JinanWorkRateScreen from './Statistics/JinanWorkRateScreen';
-import WorkStatus from './WorkStatus/WorkStatus';
-import YearSelectScreen from './YearSelect/YearSelectScreen';
-import UserManagementScreen from './User/UserManagementScreen';
-import UnsavedChangesModal from './components/UnsavedChangesModal';
-import SystemErrorScreen from './SystemErrorScreen';
-import { SYSTEM_ERROR_EVENT, SystemErrorDetail, notifySystemError } from './utils/systemError';
-import { apiErrorMessage } from './utils/errorMessage';
-import { Department, Personnel, Project } from './WorkStatus/types';
-import type { PersonnelImportRow } from './Personnel/personnelImport';
-import type { AuthUser } from './types/user';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { message } from "antd";
+import { messageInfo } from "./constants/messages";
+import AppMenu from "./Menu/Menu";
+import type { MenuKey } from "./Menu/Menu";
+import Login from "./Login/Login";
+import HolidaySettingsScreen from "./Holiday/HolidaySettingsScreen";
+import DepartmentManagementScreen from "./Department/DepartmentManagementScreen";
+import PersonnelInfoScreen from "./Personnel/PersonnelInfoScreen";
+import ProjectManagementScreen from "./Project/ProjectManagementScreen";
+import JinanWorkRateScreen from "./Statistics/JinanWorkRateScreen";
+import WorkStatus from "./WorkStatus/WorkStatus";
+import YearSelectScreen from "./YearSelect/YearSelectScreen";
+import UserManagementScreen from "./User/UserManagementScreen";
+import UnsavedChangesModal from "./components/UnsavedChangesModal";
+import SystemErrorScreen from "./SystemErrorScreen";
+import {
+  SYSTEM_ERROR_EVENT,
+  SystemErrorDetail,
+  notifySystemError,
+} from "./utils/systemError";
+import { apiErrorMessage } from "./utils/errorMessage";
+import { Department, Personnel, Project } from "./WorkStatus/types";
+import type { PersonnelImportRow } from "./Personnel/personnelImport";
+import type { AuthUser } from "./types/user";
 import {
   departmentNameOf,
   resolveDepartmentIdByName,
-} from './data/departmentUtils';
-import {
-  AVAILABLE_YEARS,
-  YearStore,
-  currentYear,
-} from './data/yearStore';
-import { WorkStatusPayload, kadouRepository } from './data/kadouRepository';
+} from "./data/departmentUtils";
+import { AVAILABLE_YEARS, YearStore, currentYear } from "./data/yearStore";
+import { WorkStatusPayload, kadouRepository } from "./data/kadouRepository";
 import {
   clearSession,
   loadSession,
   saveSession,
   toPersistedStore,
-} from './data/sessionStore';
-import type { PersistedStore } from './data/sessionStore';
-import './App.css';
-import { Holiday } from './Holiday/HolidaySettingMode';
+} from "./data/sessionStore";
+import type { PersistedStore } from "./data/sessionStore";
+import "./App.css";
+import { Holiday } from "./Holiday/HolidaySettingMode";
 
 /** アプリが保持する年度（選択範囲 + 当年。当年が範囲外でも動くようにする） */
 const INITIAL_YEARS: number[] = AVAILABLE_YEARS.includes(currentYear())
@@ -58,13 +64,10 @@ function defaultDepartmentsOf(user: AuthUser): string[] {
 }
 
 /** 年度切替 / ログアウト の保留アクション（未保存確認ダイアログ用） */
-type PendingAction =
-  | { type: 'year'; year: number }
-  | { type: 'logout' }
-  | null;
+type PendingAction = { type: "year"; year: number } | { type: "logout" } | null;
 
 /** ログインセッションを保持する localStorage キー（ブラウザ更新後もログイン状態を維持する） */
-const AUTH_STORAGE_KEY = 'kadou.auth.user';
+const AUTH_STORAGE_KEY = "kadou.auth.user";
 
 function App() {
   // ブラウザのリロードでログイン画面に戻らないよう、sessionStorage から復元する
@@ -108,7 +111,7 @@ function App() {
   });
   // 表示中の画面（リロード時は前回の画面を復元）
   const [activeView, setActiveView] = useState<MenuKey>(
-    () => restored?.view ?? 'work-status',
+    () => restored?.view ?? "work-status",
   );
   // 要員稼動管理に未保存の変更があるか
   const [dirty, setDirty] = useState(false);
@@ -186,7 +189,7 @@ function App() {
         if (cancelled) return;
         // DB 異常などのシステムエラーは異常画面へ遷移させる
         if (!notifySystemError(err)) {
-          message.error(apiErrorMessage(err, messageInfo('E_KADOU_011')));
+          message.error(apiErrorMessage(err, messageInfo("E_KADOU_011")));
         }
       });
     return () => {
@@ -202,7 +205,7 @@ function App() {
       （要員情報で追加した要員などを反映するため） */
   const handleSelectView = useCallback(
     (key: MenuKey) => {
-      if (key === 'work-status') reloadYear();
+      if (key === "work-status") reloadYear();
       setActiveView(key);
     },
     [reloadYear],
@@ -221,7 +224,7 @@ function App() {
     // ログイン成功時は所属部門の注意を判定する
     warnDeptPendingRef.current = true;
     setSelectedYear(currentYear());
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
   }, []);
 
@@ -233,7 +236,7 @@ function App() {
       // ストレージ不可は無視する
     }
     setCurrentUser(null);
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
     setPendingAction(null);
     // 保存済みセッションも消す（リロードで勝手にログインされないように）
@@ -243,7 +246,7 @@ function App() {
   /** ログアウト（未保存があれば確認ダイアログを出す） */
   const requestLogout = useCallback(() => {
     if (dirty) {
-      setPendingAction({ type: 'logout' });
+      setPendingAction({ type: "logout" });
       return;
     }
     doLogout();
@@ -254,7 +257,7 @@ function App() {
   /** 実際の年度切替（切替後は要員稼動管理へ移動する） */
   const applyYearChange = useCallback((year: number) => {
     setSelectedYear(year);
-    setActiveView('work-status');
+    setActiveView("work-status");
     setDirty(false);
     setPendingAction(null);
     // 年度切替で要員稼働管理画面へ来た時は所属部門の注意を判定する
@@ -267,11 +270,11 @@ function App() {
       // 同じ年度の再選択：年度は変わらないが「この年度で開く」意図なので稼働管理画面へ移動する
       // （dirty も潰してはならないため、年度が変わる時だけ未保存確認を行う）
       if (year === selectedYear) {
-        setActiveView('work-status');
+        setActiveView("work-status");
         return;
       }
       if (dirty) {
-        setPendingAction({ type: 'year', year });
+        setPendingAction({ type: "year", year });
         return;
       }
       applyYearChange(year);
@@ -283,9 +286,9 @@ function App() {
   const handleSaveAndContinue = useCallback(() => {
     saveHandlerRef.current?.();
     const action = pendingAction;
-    if (action?.type === 'year') {
+    if (action?.type === "year") {
       applyYearChange(action.year);
-    } else if (action?.type === 'logout') {
+    } else if (action?.type === "logout") {
       doLogout();
     } else {
       setPendingAction(null);
@@ -296,12 +299,12 @@ function App() {
   const handleDiscardAndContinue = useCallback(() => {
     const action = pendingAction;
     setDirty(false);
-    if (action?.type === 'year') {
+    if (action?.type === "year") {
       // 年度が変わるので WorkStatus は作り直され、下書きは破棄される
       applyYearChange(action.year);
       return;
     }
-    if (action?.type === 'logout') {
+    if (action?.type === "logout") {
       doLogout();
       return;
     }
@@ -328,7 +331,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.departments ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ departments: next });
     },
     [stores, selectedYear, updateStore],
@@ -340,7 +343,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.projects ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ projects: next });
     },
     [stores, selectedYear, updateStore],
@@ -352,7 +355,7 @@ function App() {
   >(
     (action) => {
       const current = stores[selectedYear]?.holidays ?? [];
-      const next = typeof action === 'function' ? action(current) : action;
+      const next = typeof action === "function" ? action(current) : action;
       updateStore({ holidays: next });
     },
     [stores, selectedYear, updateStore],
@@ -380,9 +383,7 @@ function App() {
       role: string;
     }) => {
       setYearPersonnel((prev) => {
-        const index = prev.findIndex(
-          (p) => p.employeeNo === values.employeeNo,
-        );
+        const index = prev.findIndex((p) => p.employeeNo === values.employeeNo);
         // 既存の社員番号 → 役割・名前・所属 を更新する
         if (index >= 0) {
           const next = [...prev];
@@ -478,8 +479,7 @@ function App() {
               ...current,
               name: row.name,
               role: row.role || current.role,
-              departmentId:
-                resolvedDepartmentId ?? current.departmentId,
+              departmentId: resolvedDepartmentId ?? current.departmentId,
             };
             return;
           }
@@ -488,8 +488,8 @@ function App() {
           next.push({
             employeeNo: row.employeeNo,
             name: row.name,
-            role: row.role || '要員',
-            departmentId: resolvedDepartmentId ?? '',
+            role: row.role || "要員",
+            departmentId: resolvedDepartmentId ?? "",
           });
         });
 
@@ -525,7 +525,7 @@ function App() {
           currentUserId,
         )
         .then(() => {
-          message.success(messageInfo('I_KADOU_061', [selectedYear]));
+          message.success(messageInfo("I_KADOU_061", [selectedYear]));
           // 変更セルの version など最新状態を取得して画面へ反映する
           reloadYear();
         })
@@ -533,7 +533,7 @@ function App() {
           // DB 異常などのシステムエラーは異常画面へ遷移させる
           if (!notifySystemError(err)) {
             // 業務エラー（保存失敗・競合など）はメッセージ ID を翻訳して表示する
-            message.error(apiErrorMessage(err, messageInfo('E_KADOU_042')));
+            message.error(apiErrorMessage(err, messageInfo("E_KADOU_042")));
           }
           // 他のユーザーの更新などで保存できなかった場合は最新データへ戻す
           reloadYear();
@@ -568,7 +568,7 @@ function App() {
     if (!currentUser) return;
     // 要員稼働管理画面以外へ移動したら、この契機の判定は取り消す
     // （部門管理で部門を追加した後などに、あとから警告が出ないようにする）
-    if (activeView !== 'work-status') {
+    if (activeView !== "work-status") {
       warnDeptPendingRef.current = false;
       return;
     }
@@ -582,19 +582,19 @@ function App() {
     const ids = new Set(store.departments.map((d) => String(d.departmentId)));
     const missing = wanted.filter((id) => !ids.has(String(id)));
     if (missing.length === 0) return;
-    message.warning(messageInfo('W_KADOU_047', [selectedYear]));
+    message.warning(messageInfo("W_KADOU_047", [selectedYear]));
   }, [currentUser, selectedYear, store.departments, activeView]);
 
   /** メニューキー → 画面の対応（メニューの並び順とは独立） */
   const views: Record<MenuKey, React.ReactNode> = {
-    'year-select': (
+    "year-select": (
       <YearSelectScreen
         selectedYear={selectedYear}
         onSelect={requestYearChange}
-        active={activeView === 'year-select'}
+        active={activeView === "year-select"}
       />
     ),
-    'work-status': (
+    "work-status": (
       <WorkStatus
         year={selectedYear}
         projects={store.projects}
@@ -607,7 +607,7 @@ function App() {
         registerSaveHandler={registerSaveHandler}
       />
     ),
-    'personnel-info': (
+    "personnel-info": (
       <PersonnelInfoScreen
         year={selectedYear}
         personnel={store.personnel}
@@ -616,29 +616,29 @@ function App() {
         onImport={handleImportPersonnel}
         onDelete={handleDeletePersonnel}
         hasWorkData={hasWorkDataForPersonnel}
-        active={activeView === 'personnel-info'}
+        active={activeView === "personnel-info"}
       />
     ),
-    'department-manage': (
+    "department-manage": (
       <DepartmentManagementScreen
         year={selectedYear}
         departments={store.departments}
         setDepartments={setYearDepartments}
         operatorId={currentUserId}
-        active={activeView === 'department-manage'}
+        active={activeView === "department-manage"}
       />
     ),
-    'project-manage': (
+    "project-manage": (
       <ProjectManagementScreen
         year={selectedYear}
         projects={store.projects}
         setProjects={setYearProjects}
         departments={store.departments}
         operatorId={currentUserId}
-        active={activeView === 'project-manage'}
+        active={activeView === "project-manage"}
       />
     ),
-    'jinan-work-rate': (
+    "jinan-work-rate": (
       <JinanWorkRateScreen
         year={selectedYear}
         departments={store.departments}
@@ -646,23 +646,24 @@ function App() {
         projects={store.projects}
       />
     ),
-    'holiday-settings': (
+    "holiday-settings": (
       <HolidaySettingsScreen
         year={selectedYear}
         holidays={store.holidays}
         setHolidays={setYearHolidays}
         currentUserId={currentUserId}
+        active={activeView === "holiday-settings"}
       />
     ),
-    'user-manage': (
+    "user-manage": (
       <UserManagementScreen
         users={users}
         setUsers={setUsers}
         currentUserId={currentUserId}
         year={selectedYear}
-        allowManage={currentUser?.role === 'admin'}
+        allowManage={currentUser?.role === "admin"}
         operatorId={currentUserId}
-        active={activeView === 'user-manage'}
+        active={activeView === "user-manage"}
       />
     ),
   };
@@ -674,13 +675,11 @@ function App() {
 
   // 未ログイン時はログイン画面を表示する
   if (!currentUser) {
-    return (
-      <Login onLogin={handleLogin} />
-    );
+    return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <div className='app-shell'>
+    <div className="app-shell">
       {/* 共通メニュー（選択で画面を切り替える） */}
       <AppMenu
         activeKey={activeView}
@@ -701,14 +700,14 @@ function App() {
       />
 
       {/* 年度が変わったら全画面を作り直す（画面内の状態を確実に切り替えるため） */}
-      <div className='app-main' key={selectedYear}>
+      <div className="app-main" key={selectedYear}>
         {/* 全画面を常時マウントしておき、表示/非表示のみ切り替える
             （月移動・絞り込み・セル編集・入力中の値などの画面状態を保持するため） */}
         {(Object.keys(views) as MenuKey[]).map((key) => (
           <div
             key={key}
             className={
-              activeView === key ? 'app-view' : 'app-view app-view-hidden'
+              activeView === key ? "app-view" : "app-view app-view-hidden"
             }
           >
             {views[key]}

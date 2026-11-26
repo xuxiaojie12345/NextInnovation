@@ -67,8 +67,10 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
   holidays,
   setHolidays,
   currentUserId,
+  active,
 }) => {
   useEffect(() => {
+    if (!active) return;
     // 初始化：请求后台接口、加载数据
     HolidayInitApi(year)
       .then((data) => {
@@ -81,7 +83,7 @@ const HolidaySettingsScreen: React.FC<HolidaySettingsScreenProps> = ({
           message.error(apiErrorMessage(err));
         }
       });
-  }, [year]);
+  }, [year, active]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
