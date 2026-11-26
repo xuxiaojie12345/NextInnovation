@@ -49,6 +49,13 @@ ORDER BY d.department_id
 --       離職者は稼働する人員ではないため、総人数から除外する
 --       （以前は要員マスタ全員をそのまま総人数としていた）。
 --
+-- NOTE: 異動がある要員は要員マスタに 2 行（旧所属・新所属）存在する。
+--       単純に数えると同一人物が旧部門・新部門の両方で計上され、合計が +1 される。
+--       そのため総人数は「当週（:week_start_date）時点で有効な 1 行」だけを数える。
+--       当週時点の所属行 = 異動日(idoubi)が当週以前で最も新しい行
+--       （当週以前の異動が無ければ異動日が空の行）。
+--       これにより、異動週より前は旧部門、異動週以降は新部門で各 1 名として計上される。
+--
 -- NOTE: 離職の判定は「週単位」で行う（:week_start_date = 当週の月曜）。
 --       例えば下半期に退職する要員は、上半期の週では在籍者として総人数に計上し、
 --       退職した週以降だけ総人数から除外する。
@@ -66,10 +73,28 @@ SELECT
         GREATEST(
             0,
             (
+                -- 対象部門に「当週時点で所属している」要員数。
+                -- 異動があると要員マスタは 1 人 2 行（旧所属・新所属）になる。
+                -- そのまま数えると同じ人が旧部門と新部門の両方で計上されるため、
+                -- 当週（:week_start_date）時点で有効な「1 行だけ」を対象にする。
+                --
+                -- 当週時点の所属行の決め方（_pick_current_row と同じ考え方）:
+                --   ・当週以前の異動行のうち、最も新しい異動日を持つ行
+                --   ・当週以前の異動行が無ければ、異動日が空の行（異動していない）
+                --   ※ 当週より後の異動行は「まだ起きていない」ので対象外
                 SELECT COUNT(DISTINCT p.employee_no)
                 FROM jn_personnel_master p
                 WHERE p.year_id = :year_id
                   AND CAST(p.department_id AS UNSIGNED) = d.department_id
+                  -- この行が「当週時点の所属行」であること
+                  AND COALESCE(p.idoubi, '') = (
+                      -- 当週以前で最も新しい異動日（無ければ '' を返す）
+                      SELECT COALESCE(MAX(COALESCE(q.idoubi, '')), '')
+                      FROM jn_personnel_master q
+                      WHERE q.year_id = p.year_id
+                        AND q.employee_no = p.employee_no
+                        AND COALESCE(q.idoubi, '') <= :week_start_date
+                  )
             )
             - (
                 SELECT COUNT(DISTINCT p.employee_no)

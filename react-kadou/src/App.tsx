@@ -644,6 +644,8 @@ function App() {
         departments={store.departments}
         workStatus={store.workStatus}
         projects={store.projects}
+        // 他の画面での保存内容を反映するため、表示時に統計を取り直す
+        active={activeView === "jinan-work-rate"}
       />
     ),
     "holiday-settings": (

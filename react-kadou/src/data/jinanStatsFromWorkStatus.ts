@@ -77,10 +77,21 @@ export const getWorkStatusJinanWeeklyStats = (
     let activeTotal = 0;
     let nonContractActive = 0;
     let training = 0;
+    /**
+     * 同一週に処理済みの社員番号。
+     * 異動の 2 行は有効期間が重ならない想定だが、画面の下書き（保存前）や
+     * 異動日の設定漏れで同じ週に 2 行が有効になることがある。
+     * その場合に同じ人を 2 回数えないよう、社員番号で重複を弾く。
+     */
+    const countedEmployees = new Set<string>();
     for (let i = 0; i < rows.length; i += 1) {
       const row = rows[i];
       if (row.departmentId !== departmentId) continue;
       if (!isActive(row, weekKey)) continue;
+      // 同一週に同じ社員を二重計上しない（異動行の重なり対策）
+      const employeeKey = row.employeeNo || row.key;
+      if (countedEmployees.has(employeeKey)) continue;
+      countedEmployees.add(employeeKey);
       // 総人数の母数 = 有効な部門行数（離職者も含めて数える）
       allRows += 1;
       const cell = assignment[row.employeeNo] ?? {};

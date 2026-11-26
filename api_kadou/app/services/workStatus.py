@@ -178,6 +178,29 @@ def _pick_current_row(rows):
     return rows[-1]
 
 
+def _mask_old_rows_until_transfer(rows) -> list[dict]:
+    """異動前の所属行に「異動週の前週」を有効終了週として持たせる。
+
+    異動があると要員マスタは 1 人 2 行（旧所属・新所属）になるが、
+    旧所属の行には終了日が無いため、画面（WorkStatus の表示行）で
+    有効期間が重なってしまい、同じ人を二重計上する原因になる。
+    ここで旧所属行の activeTo を補完し、週次統計が必ず 1 週 1 人になるようにする。
+
+    戻り値は新規 dict のリスト（元の行は変更しない）。
+    """
+    current_row = _pick_current_row(rows)
+    transfer_week = _week_of_idoubi(current_row["idoubi"] or "")
+    out: list[dict] = []
+    for r in rows:
+        row = dict(r)
+        if transfer_week and r is not current_row:
+            # 旧所属行（異動日を持たない行）は異動週の前週まで
+            if not (row["idoubi"] or ""):
+                row["activeTo"] = _prev_week(transfer_week)
+        out.append(row)
+    return out
+
+
 def _current_personnel(rows) -> list[PersonnelDto]:
     """要員マスタの全行から「現在の所属」の行だけを返す。"""
     by_emp: dict[str, list] = {}
@@ -310,7 +333,12 @@ def _weekly_runs(emp, weekly_depts, master_dept_by_emp) -> list[tuple[str, list[
 
 
 def _transfer_rows(emp: str, master_rows) -> list[WorkStatusRowDto]:
-    """異動あり（要員マスタ 2 行以上）の表示行（旧所属行・新所属行）。"""
+    """異動あり（要員マスタ 2 行以上）の表示行（旧所属行・新所属行）。
+
+    ※ 旧所属行の activeTo は「異動週の前週」に固定する。
+       None のままだと新所属行と有効期間が重なり、週次統計で
+       同じ社員を 2 回数えてしまう（済南稼働率統計の人数 +1 の原因）。
+    """
     current_row = _pick_current_row(master_rows)
     others = [m for m in master_rows if m is not current_row]
     old_row = others[0] if others else current_row
