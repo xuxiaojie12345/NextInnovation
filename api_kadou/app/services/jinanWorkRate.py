@@ -52,14 +52,36 @@ LEAVE_CASE_NAME = "退職"
 _YEAR_LENGTH = 4
 
 
-def _current_monday() -> str:
-    """今日を含む週の月曜日（'YYYY-MM-DD'）を返す。
+def _current_monday(year_id: str) -> str:
+    """集計基準週の月曜日（DB 格納形式 'YYYYMMDD'）を返す。
 
     統計の集計基準週（当週）に使う。
     離職の判定を週単位で行うため、当週の week_start_date を SQL へ渡す。
+
+    ・対象年度が当年  → 今日を含む週の月曜
+    ・対象年度が過年度 → その年度の最終週の月曜（年度末週）
+    ・対象年度が未来年度 → その年度の第 1 週の月曜（1/1 を含む週）
+
+    NOTE: 稼動表 jn_weekly_assignment_table の week_start_date は
+          'YYYYMMDD'（ハイフン無し）で保存されているため、
+          バインド値も同じ形式に合わせる（'YYYY-MM-DD' で渡すと一致しない）。
+    NOTE: 当年度以外で「今日を含む週」をそのまま渡すと、対象年度に存在しない週に
+          なり 8 項目がすべて 0 になるため、年度内の代表週へ丸める。
     """
     today = date.today()
-    return (today - timedelta(days=today.weekday())).strftime("%Y-%m-%d")
+    this_monday = today - timedelta(days=today.weekday())
+    y = int(year_id)
+
+    if y != today.year:
+        if y < today.year:
+            # 過年度: その年度の 12/31 を含む週の月曜（年度末週）
+            anchor = date(y, 12, 31)
+        else:
+            # 未来年度: その年度の 1/1 を含む週の月曜（第 1 週）
+            anchor = date(y, 1, 1)
+        this_monday = anchor - timedelta(days=anchor.weekday())
+
+    return this_monday.strftime("%Y%m%d")
 
 
 # ============================================================
@@ -158,8 +180,8 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
                     "location": _TARGET_LOCATION,
                     "leave_customer": LEAVE_CUSTOMER,
                     "leave_case_name": LEAVE_CASE_NAME,
-                    # 集計基準週（当週の月曜）。離職判定を週単位で行うために使う
-                    "week_start_date": _current_monday(),
+                    # 集計基準週（対象年度の代表週の月曜）。離職判定を週単位で行うために使う
+                    "week_start_date": _current_monday(year_id),
                 },
             )
             .mappings()
