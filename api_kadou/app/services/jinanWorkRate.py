@@ -5,7 +5,9 @@ NOTE: api 層（app/api/jinanWorkRate.py）は「Web 側データの受け取り
       （要員情報 app/services/personnel.py / プロジェクト管理 app/services/project.py と同じ方針）。
 
 集計ルール（画面仕様）:
-  1. 総人数              : 要員マスタで拠点 JN の部門に所属する要員数
+  1. 総人数              : 対象部門の要員マスタ全員 − 当週の離職人数（内・退職）
+                           （離職者は稼働する人員ではないため総人数から除外する。
+                             判定は週単位：下半期に退職しても上半期の週では在籍として計上する）
   2. 離職人数            : 稼動表の当週プロジェクトが「顧客 = 内・案件名 = 退職」の要員数
   3. 総稼動人数          : 稼動表の当週プロジェクトの有効flg = '1' の要員数
   4. 総稼動率            : 総稼動人数 ÷ 総人数
@@ -17,11 +19,19 @@ NOTE: api 層（app/api/jinanWorkRate.py）は「Web 側データの受け取り
 
   NOTE: 同一週（同一 week_start_date）に「顧客 = 内・案件名 = 退職」の割当がある要員は
         「離職人数」にだけ数え、総稼動人数・非契約稼動人数・教育実施人数には数えない
-        （離職者の二重計上を防ぐ）。総人数（headcount）は要員マスタで数えるため影響しない。
+        （離職者の二重計上を防ぐ）。
+
+  NOTE: 総人数（headcount）は「対象部門の要員マスタ全員 − 当週の離職（内・退職）人数」で算出する。
+        離職判定は週単位（week_start_date = 当週の月曜）で行う。
+        例：下半期に退職する要員は、上半期の週では在籍者として総人数に計上し、
+            退職した週以降だけ総人数から除外する（0 未満にはしない）。
+        総稼動人数・非契約稼動人数・教育実施人数も、すべて当週の割当だけを数える。
 
   いずれも「要員マスタ（社員番号）→ 稼動表（週割当）→ プロジェクトマスタ」の
   連表（JOIN）で取得する。統計は保存しない（毎回集計する）。
 """
+from datetime import date, timedelta
+
 from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -40,6 +50,16 @@ LEAVE_CASE_NAME = "退職"
 
 # 年度の書式（4桁の数字）
 _YEAR_LENGTH = 4
+
+
+def _current_monday() -> str:
+    """今日を含む週の月曜日（'YYYY-MM-DD'）を返す。
+
+    統計の集計基準週（当週）に使う。
+    離職の判定を週単位で行うため、当週の week_start_date を SQL へ渡す。
+    """
+    today = date.today()
+    return (today - timedelta(days=today.weekday())).strftime("%Y-%m-%d")
 
 
 # ============================================================
@@ -138,6 +158,8 @@ def fetch_jinan_work_rate(db: Session, year: str) -> dict:
                     "location": _TARGET_LOCATION,
                     "leave_customer": LEAVE_CUSTOMER,
                     "leave_case_name": LEAVE_CASE_NAME,
+                    # 集計基準週（当週の月曜）。離職判定を週単位で行うために使う
+                    "week_start_date": _current_monday(),
                 },
             )
             .mappings()

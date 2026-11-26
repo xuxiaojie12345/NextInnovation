@@ -748,7 +748,7 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
         style={{ marginTop: 12 }}
       >
         <ul className='jinan-formula-list'>
-          <li>総人数 = その週の部門行数 − 離職人数</li>
+          <li>総人数 = その週の有効な部門行数 − 離職人数</li>
           <li>離職人数 = その週に「内・退職」の人数（退職後は毎週計上）</li>
           <li>総稼動人数 = 契約稼動人数 + 非契約稼動人数</li>
           <li>契約稼動人数 = 総稼動人数 − 非契約稼動人数</li>

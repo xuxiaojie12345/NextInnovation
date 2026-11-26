@@ -12,7 +12,8 @@
  *   （有効flg・BUFFER とは無関係。有効 + 教育は稼動と教育の両方に計上する）
  * ・離職は「顧客 = 内 かつ 案件名 = 退職」のプロジェクトで判定し、フラグより先に除外する
  *   離職人数 = その週に該当プロジェクトが設定されている人数（退職後は毎週計上）
- *   総人数 = その週の部門行数 − 離職人数
+ *   総人数 = その週の有効な部門行数 − 離職人数
+ *   （離職者は稼働する人員ではないため、総人数からも差し引く）
  */
 import type { Project, WorkStatusRow } from '../WorkStatus/types';
 import type { WorkStatusData } from './yearStore';
@@ -70,7 +71,8 @@ export const getWorkStatusJinanWeeklyStats = (
     weekKey: string,
     week: WeekCol,
   ): JinanWeeklyStat => {
-    let headcount = 0;
+    /** その週に有効な部門行数（この部門の全員） */
+    let allRows = 0;
     let leavers = 0;
     let activeTotal = 0;
     let nonContractActive = 0;
@@ -79,6 +81,8 @@ export const getWorkStatusJinanWeeklyStats = (
       const row = rows[i];
       if (row.departmentId !== departmentId) continue;
       if (!isActive(row, weekKey)) continue;
+      // 総人数の母数 = 有効な部門行数（離職者も含めて数える）
+      allRows += 1;
       const cell = assignment[row.employeeNo] ?? {};
       const pid = cell[weekKey];
       if (isLeaveProject(pid)) {
@@ -86,7 +90,6 @@ export const getWorkStatusJinanWeeklyStats = (
         leavers += 1;
         continue;
       }
-      headcount += 1;
       const project = pid ? projectById.get(pid) : undefined;
       if (project?.validFlg) {
         // 総稼動人数は BUFFER を含む（無効プロジェクトの割当は計上しない）
@@ -98,6 +101,8 @@ export const getWorkStatusJinanWeeklyStats = (
         training += 1;
       }
     }
+    // 総人数 = 有効な部門行数 − 離職人数（負にはしない）
+    const headcount = Math.max(0, allRows - leavers);
     return {
       weekKey,
       start: week.monday.format('YYYY/M/D'),
