@@ -221,12 +221,12 @@ def fetch_jinan_work_rate(db: Session, year: str, week_start_date: str = "") -> 
     except DBAPIError as e:
         # NOTE: DB レイヤの例外だけを業務エラーへ変換する。
         #       BusinessException(...) は HTTPException を返すため、
-        #       ここで Exception を広く捕まえると業務エラーまで 500（E_KADOU_045）に
+        #       ここで Exception を広く捕まえると業務エラーまで 500 に
         #       包み直してしまい、本来の status_code / message_id が失われる。
         #       接続断・スキーマ不整合は main.py の OperationalError / ProgrammingError
-        #       ハンドラで 503 に変換されるため、ここでは「統計の取得に失敗した」
-        #       業務エラー（500）として返す。
-        raise BusinessException(status_code=500, message_id="E_KADOU_045") from e
+        #       ハンドラで 503 に変換されるため、ここでは「稼働率統計の取得に失敗した」
+        #       業務エラー（500 / E_KADOU_092）として返す。
+        raise BusinessException(status_code=500, message_id="E_KADOU_092") from e
 
     departments = [_row_to_stat(r) for r in rows]
     return {

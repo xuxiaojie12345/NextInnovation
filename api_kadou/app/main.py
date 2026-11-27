@@ -76,6 +76,13 @@ async def trace_log_middleware(request: Request, call_next):
 
 # ---- 全局异常处理（记录日志并返回统一 JSON，携带 trace_id） ----
 
+# 5xx（システムエラー）で異常画面に出す表示用文言。
+# NOTE: 5xx はフロントが異常画面へ遷移し、その画面は翻訳せず message をそのまま出す。
+#       そのため message に業務コード（E_KADOU_xxx）ではなく表示用の文言を載せる。
+SYSTEM_ERROR_MESSAGES: dict[str, str] = {
+    "E_KADOU_092": "稼働率統計の取得に失敗しました。しばらく経ってから再度お試しください。",
+}
+
 def _error_body(request: Request, *, code: str, message: str, detail=None) -> dict:
     """错误响应的公共字段（设计案 2.1 の契約）"""
     body: dict = {
@@ -98,9 +105,23 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     message = str(exc.detail)
     # detail が dict の場合は「業務 code と message」を展開する（例: {code: E_KADOU_001, message: ...}）
     detail_code = None
+    message_id = None
     if isinstance(exc.detail, dict):
         detail_code = exc.detail.get("code") or None
         message = str(exc.detail.get("message") or "")
+        message_id = message or None
+
+    # NOTE: 5xx（システムエラー）はフロントが異常画面へ遷移し、
+    #       その画面は翻訳を行わずレスポンスの message をそのまま表示する。
+    #       そのため message に業務コード（E_KADOU_xxx）が載っていると
+    #       「E_KADOU_045」のような内部コードがそのまま画面に出てしまう。
+    #       ここで表示用の文言へ置き換え、業務コードは detail.messageId に残す
+    #       （4xx は従来どおり message に業務コードを載せ、フロントで翻訳する）。
+    if exc.status_code >= 500 and message_id:
+        message = SYSTEM_ERROR_MESSAGES.get(
+            message_id, "システムエラーが発生しました。しばらく経ってから再度お試しください。"
+        )
+
     return JSONResponse(
         status_code=exc.status_code,
         content=_error_body(
