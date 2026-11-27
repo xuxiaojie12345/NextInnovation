@@ -152,3 +152,27 @@ export const HOLIDAY_IMPORT_ACCEPT =
 export const HEADER_ALIASES: Record<keyof HolidayImportRow, string[]> = {
   date: ['日付', '休日', '休日付', 'date'],
 };
+
+/**
+ * 要員 週別 プロジェクト稼働管理（週セルの固定値）
+ */
+
+/** 未割当を表すプロジェクトID（バックエンドの UNASSIGN と同一値） */
+export const UNASSIGN = 'UNASSIGN';
+
+/** コピー/貼り付けで「未割当にクリア」を表す送信値 */
+export const CLEAR_VALUE = '__clear__';
+
+/** コピー/貼り付けの選択肢に表示する「未割当クリア」の名称 */
+export const CLEAR_OPTION_LABEL = '（未割当）クリア';
+
+/**
+ * 「内・退職」を表すプロジェクトの 顧客 / 案件名
+ * 週セルでこの項目を選ぶと、その週から最終週までを一括で「内・退職」にし、行をグレー表示する
+ * ※判定はプロジェクトマスタの 顧客・案件名 で行う（システム項目ID は年ごとに変わり得るため）
+ */
+export const LEAVE_CUSTOMER = '内';
+export const LEAVE_CASE_NAME = '退職';
+
+/** 画面に表示する「内・退職」の名称（判定には使わない） */
+export const LEAVE_PROJECT_LABEL = '内・退職';

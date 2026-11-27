@@ -1118,12 +1118,6 @@ def save_work_status(
         db, year, req.deletedBaselines, sql["personnel_of_employee"]
     )
 
-    # 行削除した社員の要員マスタが、画面を開いた時点から変わっていないか確認する
-    # （1 行でも欠けていれば削除失敗。異動と同じく保存時に判定する）
-    _verify_deleted_baselines(
-        db, year, req.deletedBaselines, sql["personnel_of_employee"]
-    )
-
     # 行削除・社員番号変更で業務データを消した社員は、当該年度の週次データを
     # いったん全件削除し、残った行の payload（assignment / unpaid）を反映する。
     # 「削除 → payload 反映」の順にするため、行が残る社員も対象に含める（設計 7.5 / 7.8）。
@@ -1201,7 +1195,8 @@ def save_work_status(
 
     # 行削除で画面から全ての行が無くなった社員は、異動フラグを解除して
     # 要員マスタを 1 行（現在の所属）へ戻す。要員マスタ自体は削除しない（設計 7.9）。
-    # （週次データは冒頭の「削除 → payload 反映」で削除済み）
+    # 週次データは冒頭で削除済みのため、当年度の全週を「未割当」で登録し直す
+    # （削除したままにせず、画面と同じ「未割当」状態を DB に残す）。
     for no in deleted_nos:
         if no in rows_by_emp:
             # 一部の行だけ削除された社員（異動取消）→ 上の処理で反映済み
@@ -1217,6 +1212,32 @@ def save_work_status(
             sql["personnel_of_employee"],
             sql["delete_personnel_rows"],
             sql["insert_personnel_row"],
+        )
+        # 要員マスタ同期後の現在所属を付けて、当年度の全週を未割当で登録する
+        master_rows = (
+            db.execute(
+                text(sql["personnel_of_employee"]),
+                {"year_id": year, "employee_no": no},
+            )
+            .mappings()
+            .all()
+        )
+        if not master_rows:
+            continue
+        dept = _as_str(_pick_current_row(master_rows)["department_id"])
+        _rebuild_missing_weeks(
+            db,
+            year,
+            no,
+            [WorkStatusRowDto(key=no, employeeNo=no, departmentId=dept)],
+            year_weeks,
+            set(),
+            False,
+            {},
+            {},
+            sql["insert"],
+            now,
+            op_user,
         )
 
     # ---- 5. 備考（退場予定）の反映 --------------------------------

@@ -30,6 +30,14 @@ import {
 import './WorkStatus.css';
 import { messageInfo } from '../constants/messages';
 import {
+  CLEAR_OPTION_LABEL,
+  CLEAR_VALUE,
+  LEAVE_CASE_NAME,
+  LEAVE_CUSTOMER,
+  LEAVE_PROJECT_LABEL,
+  UNASSIGN,
+} from '../constants/options';
+import {
   AssignmentMap,
   Department,
   Personnel,
@@ -67,17 +75,6 @@ const KEY_SEP = '|';
 
 /** 週セルのプロジェクト選択リストの最大幅（長い略称でも画面を覆わないようにする） */
 const WEEK_CELL_DROPDOWN_MAX_WIDTH = 280;
-
-/**
- * 「内・退職」を表すプロジェクトの 顧客 / 案件名
- * 週セルでこの項目を選ぶと、その週から最終週までを一括で「内・退職」にし、行をグレー表示する
- * ※判定はプロジェクトマスタの 顧客・案件名 で行う（システム項目ID は年ごとに変わり得るため）
- */
-const LEAVE_CUSTOMER = '内';
-const LEAVE_CASE_NAME = '退職';
-
-/** 画面に表示する「内・退職」の名称（判定には使わない） */
-const LEAVE_PROJECT_LABEL = '内・退職';
 
 /** セルキー（行キー|週キー）を組み立てる */
 const cellKey = (rowKey: string, weekKey: string) =>
@@ -527,7 +524,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
         if ((a.activeTo || '') !== (b.activeTo || '')) return false;
       }
       const normProject = (v?: string | null) =>
-        v && v !== 'UNASSIGN' ? v : '';
+        v && v !== UNASSIGN ? v : '';
       const savedAsg = initialWorkStatus.assignment ?? {};
       for (const emp of new Set([...Object.keys(asg), ...Object.keys(savedAsg)])) {
         const a = asg[emp] ?? {};
@@ -987,10 +984,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     },
     [
       draftRows,
-      assignment,
-      unpaid,
       pastYear,
-      markCellChanged,
     ],
   );
 
@@ -1155,6 +1149,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     onSave,
     employeeMaster,
     pastYear,
+    initialWorkStatus.rows,
   ]);
 
   /** 未保存確認ダイアログから呼べるように「保存」処理を登録する */
@@ -1746,14 +1741,11 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
     [weeklyAssignedCounts],
   );
 
-  /** 「未割当（クリア）」を表す送信値 */
-  const CLEAR_VALUE = '__clear__';
-
   /** コピー/貼り付け 用のプロジェクト選択肢（未割当クリア付き） */
   const clipboardOptions = useMemo(
     () => [
       ...projects.map((p) => ({ value: p.projectId, label: p.abbr || p.name })),
-      { value: CLEAR_VALUE, label: '（未割当）クリア' },
+      { value: CLEAR_VALUE, label: CLEAR_OPTION_LABEL },
     ],
     [projects],
   );
@@ -2628,7 +2620,7 @@ const WorkStatus: React.FC<WorkStatusProps> = ({
 
   // 実高さ＋横スクロールバー分（約 20px）で縦スクロールが出ないようにする
   const tableScrollY = Math.min(
-    425,
+    420,
     Math.max(
       120,
       tableBodyHeight ? tableBodyHeight + 20 : (tableRows.length + 1) * 40,
