@@ -196,7 +196,7 @@ const FIELD_LIMITS: Partial<Record<keyof ProjectFormValues, [number, string]>> =
   team: [30, 'チーム'],
   subTeam: [30, 'Subチーム'],
   projectCode: [20, '項目ID'],
-  name: [30, 'Project名称'],
+  name: [100, 'Project名称'],
 };
 
 /**
