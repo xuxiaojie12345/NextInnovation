@@ -221,41 +221,6 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
    */
   const [total, setTotal] = useState<JinanWorkRateTotal | null>(null);
 
-  const reloadTotal = useCallback(async () => {
-    try {
-      const data = await fetchJinanWorkRate(year);
-      setTotal(data.total);
-    } catch (e) {
-      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
-      if (notifySystemError(e)) return;
-      message.error(apiErrorMessage(e, messageInfo('E_KADOU_020')));
-      setTotal(null);
-    }
-  }, [year]);
-
-  useEffect(() => {
-    void reloadTotal();
-  }, [reloadTotal]);
-
-  /**
-   * 画面が表示されたとき・タブへ戻ってきたときに統計を再取得する。
-   * 他の画面（要員稼動管理など）で保存された内容や、
-   * 他ユーザーが更新した内容をカードへ即時反映するため。
-   */
-  useEffect(() => {
-    if (!active) return;
-    void reloadTotal();
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void reloadTotal();
-    };
-    window.addEventListener('focus', onVisible);
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      window.removeEventListener('focus', onVisible);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, [active, reloadTotal]);
-
   /**
    * 済南拠点の集計対象部門（部門マスタで 拠点＝済南 かつ 協力会社以外）
    * 拠点を天津に変更した部門・協力会社は集計対象から外れる。
@@ -303,6 +268,17 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
   /** 当年か（当年だけ「今週の集計」を出す） */
   const isCurrentYear = year === today.year();
 
+  /**
+   * 集計基準週（月曜 'YYYY-MM-DD'）。
+   * 当年は今日を含む週、それ以外の年度は年度末の週。
+   * NOTE: この基準週はバックエンド（/stats/jinan?weekStartDate=...）へ
+   *       明示的に渡すため、先に確定させる（weeks に依存しない）。
+   */
+  const currentWeekKey = useMemo(
+    () => (isCurrentYear ? weekKeyOf(today) : '') ,
+    [isCurrentYear, today],
+  );
+
   /** 済南全社（対象部門の合計）の週次統計（保存済みの稼働表から算出） */
   const allStats = useMemo(
     () =>
@@ -326,11 +302,56 @@ const JinanWorkRateScreen: React.FC<JinanWorkRateScreenProps> = ({
     [allStats],
   );
 
-  /** 当年は今日を含む週、それ以外の年度は年度末の週 */
-  const currentWeekKey = useMemo(() => {
-    if (isCurrentYear) return weekKeyOf(today);
-    return weeks.length > 0 ? weeks[weeks.length - 1].key : '';
-  }, [weeks, isCurrentYear, today]);
+  /**
+   * 基準週が未確定（当年以外で週データが無い等）の場合だけ、
+   * 年度末の週で補完する（既定値を空にしない）。
+   */
+  const baseWeekKey = useMemo(
+    () =>
+      currentWeekKey ||
+      (weeks.length > 0 ? weeks[weeks.length - 1].key : ''),
+    [currentWeekKey, weeks],
+  );
+
+  /**
+   * 済南全社の集計（9 項目）はバックエンドの統計 API から取得する。
+   * 統計は保存せず、年度・基準週が変わったときだけ再取得（再計算）する。
+   */
+  const reloadTotal = useCallback(async () => {
+    try {
+      // 基準週（月曜 'YYYY-MM-DD'）はバックエンドへ明示的に渡す
+      const data = await fetchJinanWorkRate(year, baseWeekKey || undefined);
+      setTotal(data.total);
+    } catch (e) {
+      // システムエラー（5xx / タイムアウト / ネットワーク断）は異常画面へ遷移させる
+      if (notifySystemError(e)) return;
+      message.error(apiErrorMessage(e, messageInfo('E_KADOU_020')));
+      setTotal(null);
+    }
+  }, [year, baseWeekKey]);
+
+  useEffect(() => {
+    void reloadTotal();
+  }, [reloadTotal]);
+
+  /**
+   * 画面が表示されたとき・タブへ戻ってきたときに統計を再取得する。
+   * 他の画面（要員稼動管理など）で保存された内容や、
+   * 他ユーザーが更新した内容をカードへ即時反映するため。
+   */
+  useEffect(() => {
+    if (!active) return;
+    void reloadTotal();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void reloadTotal();
+    };
+    window.addEventListener('focus', onVisible);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [active, reloadTotal]);
 
   /** 月ごとの週グループ（ヘッダー 2 段組み） */
   const monthGroups: MonthGroup[] = useMemo(() => {

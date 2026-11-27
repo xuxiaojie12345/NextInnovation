@@ -32,8 +32,8 @@ NOTE: api 層（app/api/jinanWorkRate.py）は「Web 側データの受け取り
 """
 from datetime import date, timedelta
 
-from fastapi import HTTPException
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessException
@@ -162,17 +162,26 @@ def _validate_year(year: str) -> str:
 
 
 def _validate_week(value: str) -> str:
-    """基準週（'YYYYMMDD'）を検証して返す（未指定は空文字）。
+    """基準週を検証し、DB 格納形式 'YYYYMMDD' に正規化して返す（未指定は空文字）。
 
-    指定された週はそのまま集計基準週として使う（週ごとの検証用）。
-    書式不正は業務エラー 400（年度と同じ E_KADOU_026）。
+    受け付ける書式は 'YYYYMMDD' と 'YYYY-MM-DD'（月曜日のみ）。
+    日付として実在し、かつ月曜日であること。違反は業務エラー 400（E_KADOU_026）。
     """
     week = (value or "").strip()
     if not week:
         return ""
-    if len(week) != 8 or not week.isdigit():
+    compact = week.replace("-", "")
+    if len(compact) != 8 or not compact.isdigit():
         raise BusinessException(status_code=400, message_id="E_KADOU_026")
-    return week
+    try:
+        d = date(int(compact[0:4]), int(compact[4:6]), int(compact[6:8]))
+    except ValueError:
+        # '20261399' のような実在しない日付
+        raise BusinessException(status_code=400, message_id="E_KADOU_026") from None
+    # 集計基準は週の月曜（week_start_date の意味と一致させる）
+    if d.weekday() != 0:
+        raise BusinessException(status_code=400, message_id="E_KADOU_026")
+    return d.strftime("%Y%m%d")
 
 
 def fetch_jinan_work_rate(db: Session, year: str, week_start_date: str = "") -> dict:
@@ -191,12 +200,8 @@ def fetch_jinan_work_rate(db: Session, year: str, week_start_date: str = "") -> 
         BusinessException: 年度・基準週の書式が不正（E_KADOU_026）
     """
     year_id = _validate_year(year)
-    base_week = _validate_week(week_start_date)
-    if base_week:
-        # 'YYYY-MM-DD' で渡された場合も DB 格納形式に合わせる
-        base_week = base_week.replace("-", "")
-    else:
-        base_week = _current_monday(year_id)
+    # 基準週はフロントから 'YYYY-MM-DD'（月曜）で渡される。検証しつつ 'YYYYMMDD' に正規化する
+    base_week = _validate_week(week_start_date) or _current_monday(year_id)
     try:
         rows = (
             db.execute(
@@ -213,11 +218,14 @@ def fetch_jinan_work_rate(db: Session, year: str, week_start_date: str = "") -> 
             .mappings()
             .all()
         )
-    except HTTPException:
-        raise
-    except Exception as e:  # noqa: BLE001 - DB 例外は業務エラーへ変換する
-        # NOTE: 接続断・スキーマ不整合は main.py の例外ハンドラで 503 に変換されるため、
-        #       ここでは「統計の取得に失敗した」業務エラー（500）として返す。
+    except DBAPIError as e:
+        # NOTE: DB レイヤの例外だけを業務エラーへ変換する。
+        #       BusinessException(...) は HTTPException を返すため、
+        #       ここで Exception を広く捕まえると業務エラーまで 500（E_KADOU_045）に
+        #       包み直してしまい、本来の status_code / message_id が失われる。
+        #       接続断・スキーマ不整合は main.py の OperationalError / ProgrammingError
+        #       ハンドラで 503 に変換されるため、ここでは「統計の取得に失敗した」
+        #       業務エラー（500）として返す。
         raise BusinessException(status_code=500, message_id="E_KADOU_045") from e
 
     departments = [_row_to_stat(r) for r in rows]
